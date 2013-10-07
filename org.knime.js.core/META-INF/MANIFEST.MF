@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KNIME Javascript Core API
+Bundle-SymbolicName: org.knime.js.core;singleton:=true
+Bundle-Version: 2.9.0.qualifier
+Require-Bundle: org.knime.base;bundle-version="[2.9.0,3.0.0)",
+ org.knime.workbench.repository,
+ com.fasterxml.jackson;bundle-version="[2.2.2,3.0.0)"
