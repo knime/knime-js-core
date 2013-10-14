@@ -3,21 +3,24 @@ package org.knime.js.base.node.quickform;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.dialog.DialogNodeRepresentation;
+import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.flowvariable.FlowVariablePortObject;
 import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
-import org.knime.core.node.quickform.QuickFormConfigurationContent;
+import org.knime.core.node.web.WebViewContent;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <CNF> The concrete implementation of an {@link QuickFormConfigurationContent}.
- * @param <V> The value type.
+ * @param <REP> The configuration content of the quickform node.
+ * @param <VAL> The node value implementation of the quickform node. 
+ * @param <VC> The view content implementation of the quickform node. 
  *
  */
-public abstract class QuickFormFlowVariableNodeModel<CNF extends DialogNodeRepresentation<V>, V> 
-		extends QuickFormNodeModel<CNF, V> {
+public abstract class QuickFormFlowVariableNodeModel<REP extends DialogNodeRepresentation<VAL>, 
+        VAL extends DialogNodeValue, VC extends WebViewContent> 
+		extends QuickFormNodeModel<REP, VAL, VC> {
 
 	/** Creates a new node model with no inports and one flow variable outport. */
 	protected QuickFormFlowVariableNodeModel() {

@@ -9,7 +9,7 @@ import org.knime.core.node.dialog.DialogNodeRepresentation;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormConfigurationContent extends DialogNodeRepresentation<String> {
+public class StringInputQuickFormRepresentation extends DialogNodeRepresentation<StringInputQuickFormValue> {
 
 	private String m_value;
 

@@ -15,7 +15,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		//TODO: match pattern
 	};
 	
-	stringInput.pullViewValue = function(containerID) {
+	stringInput.getComponentValue = function(containerID) {
 		var value = jQuery("#" + containerID + " input." + className).value();
 		return JSON.stringify(value);
 	};

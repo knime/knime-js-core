@@ -11,7 +11,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  */
 public class StringInputQuickFormNodeFactory extends
 		NodeFactory<StringInputQuickFormNodeModel> implements
-		WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormConfigurationContent> {
+		WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormViewContent> {
 
 	@Override
 	public StringInputQuickFormNodeModel createNodeModel() {
@@ -38,12 +38,4 @@ public class StringInputQuickFormNodeFactory extends
 	protected NodeDialogPane createNodeDialogPane() {
 		return new StringInputQuickFormNodeDialog();
 	}
-
-    /**
-     * {@inheritDoc}
-     */
-    public String getWizardViewName() {
-        return getInteractiveViewName();
-    }
-
 }

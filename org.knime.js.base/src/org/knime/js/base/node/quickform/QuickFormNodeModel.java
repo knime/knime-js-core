@@ -11,17 +11,21 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNode;
 import org.knime.core.node.dialog.DialogNodeRepresentation;
+import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <CNF> The concrete implementation of an {@link QuickFormConfigurationContent}.
- * @param <V> The value type.
+ * @param <REP> The configuration content of the quickform node.
+ * @param <VAL> The node value implementation of the quickform node. 
+ * @param <VC> The view content implementation of the quickform node. 
  *
  */
-public abstract class QuickFormNodeModel<CNF extends DialogNodeRepresentation, V> 
-        extends NodeModel implements DialogNode<CNF, V>, WizardNode<CNF> {
+public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VAL>, 
+        VAL extends DialogNodeValue, VC extends WebViewContent> 
+        extends NodeModel implements DialogNode<REP, VAL>, WizardNode<VC> {
 
 	/**
 	 * Creates a new quickform model with the given number (and types!) of input and output types.
