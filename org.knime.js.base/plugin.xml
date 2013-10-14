@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension point="org.knime.workbench.repository.nodes">
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory">
+      </node>
+   </extension>
+   <extension
+         point="org.knime.workbench.repository.categories">
+      <category
+            icon="icons/quickform_category.png"
+            level-id="quickform"
+            name="Quick Form"
+            path="/">
+      </category>
+      <category
+      		icon="icons/missing.gif"
+            level-id="input"
+            name="Input"
+            path="/quickform"/>
+      <category
+      		icon="icons/missing.gif"
+            level-id="output"
+            name="Output"
+            path="/quickform"/>
+      <category
+      		icon="icons/missing.gif"
+            level-id="selection"
+            name="Selection"
+            path="/quickform"/>
+      <category
+      		icon="icons/missing.gif"
+            level-id="filter"
+            name="Filter"
+            path="/quickform"/>
+   </extension>
+   <extension point="org.knime.js.core.webResources">
+      <webResourceBundle
+            webResourceBundleID="org_knime_js_base_node_quickform_input_string_bundle">
+         <webResource
+               relativePathSource="src-js/org/knime/js/base/node/quickform/input/string/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/string/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/string/web-template.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+   </extension>
+   <extension
+         point="org.knime.js.core.javascriptComponents">
+      <javascriptComponent
+            implementationBundleID="org_knime_js_base_node_quickform_input_string_bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_string"
+            pullViewValue-method-name="pullViewValue"
+            validate-method-name="validate">
+      </javascriptComponent>
+   </extension>
+
+</plugin>
