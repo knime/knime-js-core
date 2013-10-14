@@ -46,51 +46,38 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform.input.string;
+package org.knime.js.base.node.quickform;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
+import javax.swing.JComponent;
+
+import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends DialogNodeValue {
-
-    private String m_string;
+public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends DialogNodePanel<VAL> {
     
     /**
-     * {@inheritDoc}
+     * 
      */
-    @Override
-    public void saveToNodeSettings(NodeSettingsWO settings) {
-        settings.addString("value", getString());
+    public QuickFormDialogPanel() {
+        //TODO: implement basic quick form layout
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString("value"));
+    
+    public void setLabel(String label) {
+      //TODO: implement
     }
-
-    /**
-     * @return the string
-     */
-    public String getString() {
-        return m_string;
+    
+    public void setDescription(String description) {
+      //TODO: implement
     }
-
-    /**
-     * @param string the string to set
-     */
-    public void setString(String string) {
-        m_string = string;
+    
+    protected void addValueComponent(JComponent component) {
+        //TODO: implement
     }
-
+    
 }

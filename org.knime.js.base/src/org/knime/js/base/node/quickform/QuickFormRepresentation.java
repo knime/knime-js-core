@@ -46,51 +46,74 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform.input.string;
+package org.knime.js.base.node.quickform;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.DialogNodeRepresentation;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends DialogNodeValue {
+public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> extends DialogNodeRepresentation<VAL> {
+    
+    private String m_label;
+    private String m_description;
 
-    private String m_string;
+    /**
+     * @return the label
+     */
+    public String getLabel() {
+        return m_label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(final String label) {
+        m_label = label;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return m_description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(final String description) {
+        m_description = description;
+    }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(NodeSettingsWO settings) {
-        settings.addString("value", getString());
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString("label", m_label);
+        settings.addString("description", m_description);
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString("value"));
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_label = settings.getString("label");
+        m_description = settings.getString("description");
     }
 
-    /**
-     * @return the string
-     */
-    public String getString() {
-        return m_string;
+    
+    protected void fillDialogPanel(QuickFormDialogPanel<VAL> panel) {
+        panel.setLabel(m_label);
+        panel.setDescription(m_description);
     }
-
-    /**
-     * @param string the string to set
-     */
-    public void setString(String string) {
-        m_string = string;
-    }
-
 }

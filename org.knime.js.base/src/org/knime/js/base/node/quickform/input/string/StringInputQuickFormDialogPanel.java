@@ -46,51 +46,47 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.base.node.quickform.input.string;
 
+import javax.swing.JTextField;
+
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.js.base.node.quickform.QuickFormFlowVariableDialogPanel;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends DialogNodeValue {
+public class StringInputQuickFormDialogPanel extends QuickFormFlowVariableDialogPanel<StringInputQuickFormValue> {
 
-    private String m_string;
+    private JTextField m_component;
+    
+    /**
+     * 
+     */
+    public StringInputQuickFormDialogPanel() {
+        super();
+        m_component = new JTextField();
+        addValueComponent(m_component);
+    }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(NodeSettingsWO settings) {
-        settings.addString("value", getString());
+    public void saveNodeValue(final StringInputQuickFormValue value) throws InvalidSettingsException {
+        value.setString(m_component.getText());
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString("value"));
-    }
-
-    /**
-     * @return the string
-     */
-    public String getString() {
-        return m_string;
-    }
-
-    /**
-     * @param string the string to set
-     */
-    public void setString(String string) {
-        m_string = string;
+    public void loadNodeValue(final StringInputQuickFormValue value) {
+        m_component.setText(value.getString());        
     }
 
 }

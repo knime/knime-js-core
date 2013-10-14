@@ -46,51 +46,27 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform.input.string;
+package org.knime.js.base.node.quickform;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends DialogNodeValue {
+public abstract class QuickFormFlowVariableDialogPanel<VAL extends DialogNodeValue> extends QuickFormDialogPanel<VAL> {
 
-    private String m_string;
+    /**
+     * 
+     */
+    public QuickFormFlowVariableDialogPanel() {
+        // TODO add flow variable component
+    }
     
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveToNodeSettings(NodeSettingsWO settings) {
-        settings.addString("value", getString());
+    public void setFlowVariableName(String name) {
+        // TODO implement
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString("value"));
-    }
-
-    /**
-     * @return the string
-     */
-    public String getString() {
-        return m_string;
-    }
-
-    /**
-     * @param string the string to set
-     */
-    public void setString(String string) {
-        m_string = string;
-    }
-
+    
 }
