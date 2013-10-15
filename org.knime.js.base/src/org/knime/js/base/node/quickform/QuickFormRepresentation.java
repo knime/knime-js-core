@@ -59,10 +59,16 @@ import org.knime.core.node.dialog.DialogNodeValue;
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The value class handled by this representation
  */
 public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> extends DialogNodeRepresentation<VAL> {
     
+    private static final String CFG_LABEL = "label";
+    
+    private static final String CFG_DESCRIPTION = "description";
+
     private String m_label;
+
     private String m_description;
 
     /**
@@ -92,27 +98,38 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
     public void setDescription(final String description) {
         m_description = description;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString("label", m_label);
-        settings.addString("description", m_description);
+        settings.addString(CFG_LABEL, m_label);
+        settings.addString(CFG_DESCRIPTION, m_description);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_label = settings.getString(CFG_LABEL);
+        m_description = settings.getString(CFG_DESCRIPTION);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_label = settings.getString("label");
-        m_description = settings.getString("description");
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_label = settings.getString(CFG_LABEL, "Label");
+        m_description = settings.getString(CFG_DESCRIPTION, "Enter Description");
     }
 
-    
-    protected void fillDialogPanel(QuickFormDialogPanel<VAL> panel) {
+    /**
+     * @param panel The panel to fill
+     */
+    protected void fillDialogPanel(final QuickFormDialogPanel<VAL> panel) {
         panel.setLabel(m_label);
         panel.setDescription(m_description);
     }

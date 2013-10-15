@@ -7,3 +7,4 @@ Require-Bundle: org.knime.js.core;bundle-version="[2.9.0,3.0.0)",
  org.knime.base;bundle-version="[2.9.0,3.0.0)",
  com.fasterxml.jackson;bundle-version="[2.2.2,3.0.0)"
 Bundle-Vendor: KNIME.com AG, Zurich, Switzerland
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

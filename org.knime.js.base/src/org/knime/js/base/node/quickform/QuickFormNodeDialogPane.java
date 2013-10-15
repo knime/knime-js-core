@@ -73,8 +73,7 @@ import org.knime.core.node.port.PortObjectSpec;
 
 /**
  * Dialog to node.
- *
- * @param <CFG> The configuration type this config works with.
+ * 
  * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
  */
 public abstract class QuickFormNodeDialogPane extends NodeDialogPane {
@@ -83,13 +82,19 @@ public abstract class QuickFormNodeDialogPane extends NodeDialogPane {
     public static final int DEF_TEXTFIELD_WIDTH = 20;
 
     private final JTextField m_labelField;
+
     private final JTextArea m_descriptionArea;
+
     private final JTextField m_variableNameField;
+
     private final JSpinner m_weightSpinner;
+
     private final JCheckBox m_hideInWizard;
 
-    /** Inits fields, sub-classes should call the {@link #createAndAddTab()}
-     * method when they are done initializing their fields. */
+    /**
+     * Inits fields, sub-classes should call the {@link #createAndAddTab()}
+     * method when they are done initializing their fields.
+     */
     public QuickFormNodeDialogPane() {
         m_labelField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_descriptionArea = new JTextArea(1, DEF_TEXTFIELD_WIDTH);
@@ -98,14 +103,16 @@ public abstract class QuickFormNodeDialogPane extends NodeDialogPane {
         m_descriptionArea.setMinimumSize(new Dimension(100, 30));
         m_variableNameField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_weightSpinner = new JSpinner(new SpinnerNumberModel(1, -100, 100, 1));
-        m_hideInWizard = new JCheckBox((Icon) null, false);
+        m_hideInWizard = new JCheckBox((Icon)null, false);
         m_hideInWizard.setToolTipText("If selected, this QuickForm elements is not visible in the wizard.");
     }
 
-    /** To be called from subclasses as last line in their constructor. It
+    /**
+     * To be called from subclasses as last line in their constructor. It
      * initializes the panel, call the
-     * {@link #fillPanel(JPanel, GridBagConstraints)} method and adds the tab
-     * to the dialog. */
+     * {@link #fillPanel(JPanel, GridBagConstraints)} method and adds the tab to
+     * the dialog.
+     */
     protected final void createAndAddTab() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -138,22 +145,25 @@ public abstract class QuickFormNodeDialogPane extends NodeDialogPane {
         addTab("Control", panel);
     }
 
-    /** Called from {@link #createAndAddTab()}. Subclasses should add their
-     * own controls to the argument panel.
+    /**
+     * Called from {@link #createAndAddTab()}. Subclasses should add their own
+     * controls to the argument panel.
+     * 
      * @param panelWithGBLayout To add to.
      * @param gbc The current constraints.
      */
-    protected abstract void fillPanel(
-            final JPanel panelWithGBLayout, GridBagConstraints gbc);
+    protected abstract void fillPanel(final JPanel panelWithGBLayout, GridBagConstraints gbc);
 
-    /** Adds a panel sub-component to the dialog.
+    /**
+     * Adds a panel sub-component to the dialog.
+     * 
      * @param label The label (left hand column)
      * @param c The component (right hand column)
      * @param panelWithGBLayout Panel to add
      * @param gbc constraints.
      */
-    protected final void addPairToPanel(final String label, final JComponent c,
-            final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+    protected final void addPairToPanel(final String label, final JComponent c, final JPanel panelWithGBLayout,
+            final GridBagConstraints gbc) {
         int fill = gbc.fill;
 
         gbc.gridwidth = 1;
@@ -167,32 +177,56 @@ public abstract class QuickFormNodeDialogPane extends NodeDialogPane {
         panelWithGBLayout.add(c, gbc);
         gbc.weightx = 0;
     }
-
-    /** {@inheritDoc} */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings)
-            throws InvalidSettingsException {
-        /*CFG c = createConfiguration();
-        c.setLabel(m_labelField.getText());
-        c.setDescription(m_descriptionArea.getText());
-        c.setVariableName(m_variableNameField.getText());
-        c.setWeight((Integer)m_weightSpinner.getValue());
-        c.setHideInWizard(m_hideInWizard.isSelected());
-        saveAdditionalSettings(c);
-        c.saveSettingsTo(settings);*/
+    
+    /**
+     * @return The label
+     */
+    protected String getLabel() {
+        return m_labelField.getText();
+    }
+    
+    /**
+     * @param label The label
+     */
+    protected void setLabel(final String label) {
+        m_labelField.setText(label);
+    }
+    
+    /**
+     * @return The description
+     */
+    protected String getDescription() {
+        return m_descriptionArea.getText();
+    }
+    
+    /**
+     * @param description The description
+     */
+    protected void setDescription(final String description) {
+        m_descriptionArea.setText(description);
+    }
+    
+    /**
+     * @return The flow variable name
+     */
+    protected String getFlowVariableName() {
+        return m_variableNameField.getText();
+    }
+    
+    /**
+     * @param flowVariableName The flow variable name
+     */
+    protected void setFlowVariableName(final String flowVariableName) {
+        m_variableNameField.setText(flowVariableName);
     }
 
     /** {@inheritDoc} */
     @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings,
-            final PortObjectSpec[] specs) throws NotConfigurableException {
-        /*CFG c = createConfiguration();
-        c.loadSettingsInDialog(settings);
-        m_labelField.setText(c.getLabel());
-        m_descriptionArea.setText(c.getDescription());
-        m_variableNameField.setText(c.getVariableName());
-        m_weightSpinner.setValue(c.getWeight());
-        m_hideInWizard.setSelected(c.isHideInWizard());
-        loadAdditionalSettings(c);*/
-    }
+    protected abstract void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException;
+
+    /** {@inheritDoc} */
+    @Override
+    protected abstract void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+            throws NotConfigurableException;
+
 }

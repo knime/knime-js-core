@@ -50,23 +50,32 @@
  */
 package org.knime.js.base.node.quickform;
 
+import javax.swing.JLabel;
+
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The type of value that is handled by this dialog
  */
+@SuppressWarnings("serial")
 public abstract class QuickFormFlowVariableDialogPanel<VAL extends DialogNodeValue> extends QuickFormDialogPanel<VAL> {
+
+    private JLabel m_flowVariableName = new JLabel();
 
     /**
      * 
      */
     public QuickFormFlowVariableDialogPanel() {
-        // TODO add flow variable component
+        addComponent(m_flowVariableName);
     }
-    
-    public void setFlowVariableName(String name) {
-        // TODO implement
+
+    /**
+     * @param name The name of the generated flow variable
+     */
+    public void setFlowVariableName(final String name) {
+        m_flowVariableName.setText(name);
     }
-    
+
 }

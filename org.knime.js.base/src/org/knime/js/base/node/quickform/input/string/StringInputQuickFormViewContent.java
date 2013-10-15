@@ -56,24 +56,27 @@ import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
+ *         Konstanz
  */
-public class StringInputQuickFormViewContent extends JSONViewContent{
+public class StringInputQuickFormViewContent extends JSONViewContent {
 
     /**
      * {@inheritDoc}
      */
-    public void saveToNodeSettings(NodeSettingsWO settings) {
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
         // TODO Auto-generated method stub
-        
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public void loadFromNodeSettings(NodeSettingsRO settings) {
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

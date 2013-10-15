@@ -51,27 +51,75 @@
 package org.knime.js.base.node.quickform;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.workflow.FlowVariable;
 
 /**
  * 
- * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland, KNIME.com, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The value class handled by this representation
  */
-public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNodeValue> extends QuickFormRepresentation<VAL> {
+public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNodeValue> extends
+        QuickFormRepresentation<VAL> {
+    
+    private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
-     private String m_flowVariableName;
+    private String m_flowVariableName;
+    
+    /**
+     * @return the flowVariableName
+     */
+    public String getFlowVariableName() {
+        return m_flowVariableName;
+    }
+    
+    /**
+     * @param flowVariableName the flowVariableName to set
+     */
+    public void setFlowVariableName(final String flowVariableName) {
+        m_flowVariableName = flowVariableName;
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void fillDialogPanel(QuickFormDialogPanel<VAL> panel) {
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
+        verifyFlowVariableName(m_flowVariableName);
+        m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        super.loadFromNodeSettingsInDialog(settings);
+        m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME, "new variable");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
+        settings.addString(CFG_FLOW_VARIABLE_NAME, m_flowVariableName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void fillDialogPanel(final QuickFormDialogPanel<VAL> panel) {
         super.fillDialogPanel(panel);
         ((QuickFormFlowVariableDialogPanel<VAL>)panel).setFlowVariableName(m_flowVariableName);
     }
-    
-    protected static String verifyFlowVariableName(final String name) throws InvalidSettingsException {
+
+    private static String verifyFlowVariableName(final String name) throws InvalidSettingsException {
         try {
             FlowVariable.Scope.Flow.verifyName(name);
             return name;
@@ -79,5 +127,5 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
             throw new InvalidSettingsException("Invalid variable name \"" + name + "\": " + e.getMessage(), e);
         }
     }
-    
+
 }

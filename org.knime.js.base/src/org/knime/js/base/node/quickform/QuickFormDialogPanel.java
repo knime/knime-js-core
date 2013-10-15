@@ -50,7 +50,9 @@
  */
 package org.knime.js.base.node.quickform;
 
+import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
@@ -58,26 +60,43 @@ import org.knime.core.node.dialog.DialogNodeValue;
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The type of value that is handled by this dialog
  */
+@SuppressWarnings("serial")
 public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends DialogNodePanel<VAL> {
-    
+
+    private JLabel m_label = new JLabel();
+
+    private JLabel m_description = new JLabel();
+
     /**
      * 
      */
     public QuickFormDialogPanel() {
-        //TODO: implement basic quick form layout
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        add(m_label);
+        add(m_description);
     }
-    
-    public void setLabel(String label) {
-      //TODO: implement
+
+    /**
+     * @param label The label of this quick form
+     */
+    public void setLabel(final String label) {
+        m_label.setText(label);
     }
-    
-    public void setDescription(String description) {
-      //TODO: implement
+
+    /**
+     * @param description The description of this quick form
+     */
+    public void setDescription(final String description) {
+        m_description.setText(description);
     }
-    
-    protected void addValueComponent(JComponent component) {
-        //TODO: implement
+
+    /**
+     * @param component The component that will be added to this quick form
+     */
+    protected void addComponent(final JComponent component) {
+        add(component);
     }
-    
+
 }

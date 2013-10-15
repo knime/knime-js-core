@@ -59,26 +59,24 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableDialogPanel;
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
+@SuppressWarnings("serial")
 public class StringInputQuickFormDialogPanel extends QuickFormFlowVariableDialogPanel<StringInputQuickFormValue> {
 
-    private JTextField m_component;
-    
+    private JTextField m_component = new JTextField();
+
     /**
      * 
      */
     public StringInputQuickFormDialogPanel() {
-        super();
-        m_component = new JTextField();
-        addValueComponent(m_component);
+        addComponent(m_component);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveNodeValue(final StringInputQuickFormValue value) throws InvalidSettingsException {
         value.setString(m_component.getText());
-
     }
 
     /**
@@ -86,7 +84,7 @@ public class StringInputQuickFormDialogPanel extends QuickFormFlowVariableDialog
      */
     @Override
     public void loadNodeValue(final StringInputQuickFormValue value) {
-        m_component.setText(value.getString());        
+        m_component.setText(value.getString());
     }
 
 }
