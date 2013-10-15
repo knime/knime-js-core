@@ -61,6 +61,8 @@ import org.knime.core.node.dialog.DialogNodeValue;
  */
 public class StringInputQuickFormValue extends DialogNodeValue {
 
+    private static final String CFG_STRING = "string";
+
     private String m_string;
 
     /**
@@ -68,7 +70,7 @@ public class StringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString("value", getString());
+        settings.addString(CFG_STRING, getString());
     }
 
     /**
@@ -76,7 +78,15 @@ public class StringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString("value"));
+        setString(settings.getString(CFG_STRING));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        setString(settings.getString(CFG_STRING, ""));
     }
 
     /**
@@ -91,15 +101,6 @@ public class StringInputQuickFormValue extends DialogNodeValue {
      */
     public void setString(final String string) {
         m_string = string;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettingsInDialog(NodeSettingsRO settings) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

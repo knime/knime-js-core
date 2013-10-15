@@ -67,15 +67,12 @@ public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends 
 
     private JLabel m_label = new JLabel();
 
-    private JLabel m_description = new JLabel();
-
     /**
      * 
      */
     public QuickFormDialogPanel() {
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         add(m_label);
-        add(m_description);
     }
 
     /**
@@ -89,7 +86,7 @@ public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends 
      * @param description The description of this quick form
      */
     public void setDescription(final String description) {
-        m_description.setText(description);
+        m_label.setToolTipText(description);
     }
 
     /**

@@ -53,14 +53,14 @@ package org.knime.js.base.node.quickform.input.string;
 import javax.swing.JTextField;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableDialogPanel;
+import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
-public class StringInputQuickFormDialogPanel extends QuickFormFlowVariableDialogPanel<StringInputQuickFormValue> {
+public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<StringInputQuickFormValue> {
 
     private JTextField m_component = new JTextField();
 

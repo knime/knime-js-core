@@ -63,18 +63,18 @@ import org.knime.core.node.workflow.FlowVariable;
  */
 public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNodeValue> extends
         QuickFormRepresentation<VAL> {
-    
+
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
     private String m_flowVariableName;
-    
+
     /**
      * @return the flowVariableName
      */
     public String getFlowVariableName() {
         return m_flowVariableName;
     }
-    
+
     /**
      * @param flowVariableName the flowVariableName to set
      */
@@ -88,10 +88,10 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
-        verifyFlowVariableName(m_flowVariableName);
         m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME);
+        verifyFlowVariableName(m_flowVariableName);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -110,17 +110,11 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
         settings.addString(CFG_FLOW_VARIABLE_NAME, m_flowVariableName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void fillDialogPanel(final QuickFormDialogPanel<VAL> panel) {
-        super.fillDialogPanel(panel);
-        ((QuickFormFlowVariableDialogPanel<VAL>)panel).setFlowVariableName(m_flowVariableName);
-    }
-
     private static String verifyFlowVariableName(final String name) throws InvalidSettingsException {
         try {
+            if (name == null) {
+                throw new Exception();
+            }
             FlowVariable.Scope.Flow.verifyName(name);
             return name;
         } catch (Exception e) {

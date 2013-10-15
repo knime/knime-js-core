@@ -51,7 +51,9 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialogPane {
         setDescription(representation.getDescription());
         setFlowVariableName(representation.getFlowVariableName());
         m_regexField.setText(representation.getRegex());
-        // TODO add value
+        StringInputQuickFormValue value = new StringInputQuickFormValue();
+        value.loadFromNodeSettingsInDialog(settings);
+        m_valueField.setText(value.getString());
     }
 
     /**
@@ -60,12 +62,14 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialogPane {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
-        // TODO add value
         representation.setLabel(getLabel());
         representation.setDescription(getDescription());
         representation.setFlowVariableName(getFlowVariableName());
         representation.setRegex(m_regexField.getText());
         representation.saveToNodeSettings(settings);
+        StringInputQuickFormValue value = new StringInputQuickFormValue();
+        value.setString(m_valueField.getText());
+        value.saveToNodeSettings(settings);
     }
 
 }

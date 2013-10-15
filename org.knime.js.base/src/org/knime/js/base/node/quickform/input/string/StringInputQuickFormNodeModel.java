@@ -8,26 +8,23 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class StringInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, StringInputQuickFormValue, StringInputQuickFormViewContent> {
+public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, 
+        StringInputQuickFormValue, StringInputQuickFormViewContent> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormRepresentation createNodeRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+    protected StringInputQuickFormRepresentation createNodeRepresentation() {
+        return new StringInputQuickFormRepresentation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormValue createNodeValue() {
-        // TODO Auto-generated method stub
-        return null;
+    protected StringInputQuickFormValue createNodeValue() {
+        return new StringInputQuickFormValue();
     }
 
     /**
@@ -71,8 +68,7 @@ public class StringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getString());
     }
 
     /**

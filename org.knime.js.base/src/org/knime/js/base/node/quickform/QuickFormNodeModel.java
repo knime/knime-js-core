@@ -26,6 +26,10 @@ import org.knime.core.node.wizard.WizardNode;
 public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VAL>, VAL extends DialogNodeValue, VC extends WebViewContent>
         extends NodeModel implements DialogNode<REP, VAL>, WizardNode<VC> {
 
+    private REP m_representation;
+
+    private VAL m_value;
+
     /**
      * Creates a new quickform model with the given number (and types!) of input
      * and output types.
@@ -43,6 +47,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         createNodeRepresentation().saveToNodeSettings(settings);
+        createNodeValue().saveToNodeSettings(settings);
     }
 
     /**
@@ -50,7 +55,10 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createNodeRepresentation().loadFromNodeSettings(settings);
+        m_representation = createNodeRepresentation();
+        m_representation.loadFromNodeSettings(settings);
+        m_value = createNodeValue();
+        m_value.loadFromNodeSettings(settings);
     }
 
     /**
@@ -70,4 +78,24 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
             CanceledExecutionException {
         // do nothing
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public REP getNodeRepresentation() {
+        return m_representation;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VAL getNodeValue() {
+        return m_value;
+    }
+    
+    protected abstract REP createNodeRepresentation();
+    
+    protected abstract VAL createNodeValue();
 }
