@@ -54,6 +54,7 @@ import javax.swing.JTextField;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
  * 
@@ -62,7 +63,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 @SuppressWarnings("serial")
 public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<StringInputQuickFormValue> {
 
-    private JTextField m_component = new JTextField();
+    private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
     /**
      * 

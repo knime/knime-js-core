@@ -66,7 +66,9 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
 
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
-    private String m_flowVariableName;
+    private static final String DEFAULT_FLOW_VARIABLE_NAME = "new variable";
+
+    private String m_flowVariableName = DEFAULT_FLOW_VARIABLE_NAME;
 
     /**
      * @return the flowVariableName
@@ -98,7 +100,7 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
-        m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME, "new variable");
+        m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME, DEFAULT_FLOW_VARIABLE_NAME);
     }
 
     /**

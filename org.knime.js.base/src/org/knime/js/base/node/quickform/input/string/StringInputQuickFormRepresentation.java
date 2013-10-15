@@ -14,7 +14,9 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     
     private static final String CFG_REGEX = "regex";
     
-    private String m_regex;
+    private static final String DEFAULT_REGEX = "";
+    
+    private String m_regex = DEFAULT_REGEX;
     
     /**
      * @return the regex
@@ -34,7 +36,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException {
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
     }
@@ -43,16 +45,16 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettingsInDialog(NodeSettingsRO settings) {
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
-        m_regex = settings.getString(CFG_REGEX, ".*");
+        m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(NodeSettingsWO settings) {
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
     }

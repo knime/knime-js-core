@@ -46,55 +46,63 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform;
+package org.knime.js.base.node.quickform.input.bool;
 
-import java.awt.FlowLayout;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
-import org.knime.core.node.dialog.DialogNodePanel;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
- * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
- * @param <VAL> The type of value that is handled by this dialog
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends DialogNodePanel<VAL> {
+public class BooleanInputQuickFormValue extends DialogNodeValue {
 
-    private JLabel m_label = new JLabel();
+    private static final String CFG_BOOLEAN = "boolean";
+    
+    private static final boolean DEFAULT_BOOLEAN = false;
+
+    private boolean m_boolean = DEFAULT_BOOLEAN;
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    public QuickFormDialogPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        add(m_label);
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addBoolean(CFG_BOOLEAN, getBoolean());
     }
 
     /**
-     * @param label The label of this quick form
+     * {@inheritDoc}
      */
-    public void setLabel(final String label) {
-        m_label.setText(label);
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setBoolean(settings.getBoolean(CFG_BOOLEAN));
     }
 
     /**
-     * @param description The description of this quick form
+     * {@inheritDoc}
      */
-    public void setDescription(final String description) {
-        m_label.setToolTipText(description);
+    @Override
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        setBoolean(settings.getBoolean(CFG_BOOLEAN, DEFAULT_BOOLEAN));
     }
 
     /**
-     * @param component The component that will be added to this quick form
+     * @return the string
      */
-    protected void addComponent(final JComponent component) {
-        add(component);
+    public boolean getBoolean() {
+        return m_boolean;
+    }
+
+    /**
+     * @param bool the boolean to set
+     */
+    public void setBoolean(final boolean bool) {
+        m_boolean = bool;
     }
 
 }

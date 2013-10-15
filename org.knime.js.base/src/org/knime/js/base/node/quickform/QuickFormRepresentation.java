@@ -62,14 +62,18 @@ import org.knime.core.node.dialog.DialogNodeValue;
  * @param <VAL> The value class handled by this representation
  */
 public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> extends DialogNodeRepresentation<VAL> {
-    
+
     private static final String CFG_LABEL = "label";
-    
+
     private static final String CFG_DESCRIPTION = "description";
 
-    private String m_label;
+    private static final String DEFAULT_LABEL = "Label";
 
-    private String m_description;
+    private static final String DEFAULT_DESCRIPTION = "Enter Description";
+
+    private String m_label = DEFAULT_LABEL;
+
+    private String m_description = DEFAULT_DESCRIPTION;
 
     /**
      * @return the label
@@ -104,6 +108,7 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
         settings.addString(CFG_LABEL, m_label);
         settings.addString(CFG_DESCRIPTION, m_description);
     }
@@ -113,17 +118,19 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
         m_label = settings.getString(CFG_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        m_label = settings.getString(CFG_LABEL, "Label");
-        m_description = settings.getString(CFG_DESCRIPTION, "Enter Description");
+        super.loadFromNodeSettingsInDialog(settings);
+        m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
+        m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
     }
 
     /**

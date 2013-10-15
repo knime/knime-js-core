@@ -62,8 +62,10 @@ import org.knime.core.node.dialog.DialogNodeValue;
 public class StringInputQuickFormValue extends DialogNodeValue {
 
     private static final String CFG_STRING = "string";
+    
+    private static final String DEFAULT_STRING = "";
 
-    private String m_string;
+    private String m_string = DEFAULT_STRING;
 
     /**
      * {@inheritDoc}
@@ -86,7 +88,7 @@ public class StringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setString(settings.getString(CFG_STRING, ""));
+        setString(settings.getString(CFG_STRING, DEFAULT_STRING));
     }
 
     /**

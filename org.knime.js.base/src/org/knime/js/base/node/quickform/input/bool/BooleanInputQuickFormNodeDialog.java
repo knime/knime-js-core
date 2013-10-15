@@ -1,9 +1,9 @@
-package org.knime.js.base.node.quickform.input.string;
+package org.knime.js.base.node.quickform.input.bool;
 
 import java.awt.GridBagConstraints;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -17,16 +17,13 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
-public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
+public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
-    private final JTextField m_regexField;
-
-    private final JTextField m_valueField;
+    private final JCheckBox m_valueField;
 
     /** Constructors, inits fields calls layout routines. */
-    StringInputQuickFormNodeDialog() {
-        m_regexField = new JTextField(DEF_TEXTFIELD_WIDTH);
-        m_valueField = new JTextField(DEF_TEXTFIELD_WIDTH);
+    BooleanInputQuickFormNodeDialog() {
+        m_valueField = new JCheckBox();
         createAndAddTab();
     }
 
@@ -35,8 +32,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        addPairToPanel("Regular Expression: ", m_regexField, panelWithGBLayout, gbc);
-        addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
+        addPairToPanel("Boolean Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**
@@ -45,13 +41,12 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
+        BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_regexField.setText(representation.getRegex());
-        StringInputQuickFormValue value = new StringInputQuickFormValue();
+        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setText(value.getString());
+        m_valueField.setSelected(value.getBoolean());
     }
 
     /**
@@ -59,12 +54,11 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
+        BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setRegex(m_regexField.getText());
         representation.saveToNodeSettings(settings);
-        StringInputQuickFormValue value = new StringInputQuickFormValue();
-        value.setString(m_valueField.getText());
+        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
+        value.setBoolean(m_valueField.isSelected());
         value.saveToNodeSettings(settings);
     }
 

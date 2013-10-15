@@ -46,55 +46,37 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform;
+package org.knime.js.base.node.quickform.input.bool;
 
-import java.awt.FlowLayout;
-
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-
-import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
- * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
- * @param <VAL> The type of value that is handled by this dialog
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
+ *         Konstanz
  */
-@SuppressWarnings("serial")
-public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends DialogNodePanel<VAL> {
-
-    private JLabel m_label = new JLabel();
+public class BooleanInputQuickFormViewContent extends JSONViewContent {
 
     /**
-     * 
+     * {@inheritDoc}
      */
-    public QuickFormDialogPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        add(m_label);
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        // TODO Auto-generated method stub
+
     }
 
     /**
-     * @param label The label of this quick form
+     * {@inheritDoc}
      */
-    public void setLabel(final String label) {
-        m_label.setText(label);
-    }
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) {
+        // TODO Auto-generated method stub
 
-    /**
-     * @param description The description of this quick form
-     */
-    public void setDescription(final String description) {
-        m_label.setToolTipText(description);
-    }
-
-    /**
-     * @param component The component that will be added to this quick form
-     */
-    protected void addComponent(final JComponent component) {
-        add(component);
     }
 
 }

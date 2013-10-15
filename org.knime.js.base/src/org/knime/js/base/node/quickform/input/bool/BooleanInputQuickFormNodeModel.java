@@ -1,4 +1,4 @@
-package org.knime.js.base.node.quickform.input.string;
+package org.knime.js.base.node.quickform.input.bool;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -8,31 +8,31 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class StringInputQuickFormNodeModel
+public class BooleanInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, StringInputQuickFormValue, StringInputQuickFormViewContent> {
+        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormViewContent> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected StringInputQuickFormRepresentation createNodeRepresentation() {
-        return new StringInputQuickFormRepresentation();
+    protected BooleanInputQuickFormRepresentation createNodeRepresentation() {
+        return new BooleanInputQuickFormRepresentation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected StringInputQuickFormValue createNodeValue() {
-        return new StringInputQuickFormValue();
+    protected BooleanInputQuickFormValue createNodeValue() {
+        return new BooleanInputQuickFormValue();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormViewContent createViewContent() {
+    public BooleanInputQuickFormViewContent createViewContent() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -41,7 +41,7 @@ public class StringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormViewContent createEmptyInstance() {
+    public BooleanInputQuickFormViewContent createEmptyInstance() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -59,7 +59,7 @@ public class StringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final StringInputQuickFormViewContent viewContent) {
+    public void loadViewContent(final BooleanInputQuickFormViewContent viewContent) {
         // TODO Auto-generated method stub
 
     }
@@ -69,7 +69,7 @@ public class StringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getString());
+        pushFlowVariableInt(getNodeRepresentation().getFlowVariableName(), getNodeValue().getBoolean() ? 1 : 0);
     }
 
     /**

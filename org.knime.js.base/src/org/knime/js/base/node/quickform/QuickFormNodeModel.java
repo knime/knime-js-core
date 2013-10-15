@@ -39,6 +39,8 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      */
     protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
+        m_representation = createNodeRepresentation();
+        m_value = createNodeValue();
     }
 
     /**
@@ -55,10 +57,12 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_representation = createNodeRepresentation();
-        m_representation.loadFromNodeSettings(settings);
-        m_value = createNodeValue();
-        m_value.loadFromNodeSettings(settings);
+        REP representation = createNodeRepresentation();
+        VAL value = createNodeValue();
+        representation.loadFromNodeSettings(settings);
+        value.loadFromNodeSettings(settings);
+        m_representation = representation;
+        m_value = value;
     }
 
     /**
@@ -78,7 +82,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
             CanceledExecutionException {
         // do nothing
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -86,7 +90,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public REP getNodeRepresentation() {
         return m_representation;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,8 +98,14 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public VAL getNodeValue() {
         return m_value;
     }
-    
+
+    /**
+     * @return The node representation
+     */
     protected abstract REP createNodeRepresentation();
-    
+
+    /**
+     * @return The node value
+     */
     protected abstract VAL createNodeValue();
 }

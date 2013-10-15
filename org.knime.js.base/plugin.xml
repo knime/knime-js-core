@@ -7,6 +7,11 @@
             factory-class="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory">
       </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
