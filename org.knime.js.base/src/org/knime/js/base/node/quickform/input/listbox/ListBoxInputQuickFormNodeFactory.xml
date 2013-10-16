@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
+<knimeNode icon="quickform_listbox.png" type="QuickForm">
+	<name>List Box Input</name>
+	<shortDescription>Outputs a data table with one column holding a list of strings.</shortDescription>
+	<fullDescription>
+		<intro>
+			<p>Outputs a data table with one column holding a list of strings.
+				The value can also be controlled from a quick form (web port).</p>
+		</intro>
+		<option name="Label">A descriptive label that will be shown in, for instance the web port.</option>
+		<option name="Description">Some lines of description that will be shown in the remote control
+			form, for instance by means of a tooltip.</option>
+		<option name="Weight">A weight value that influences the position of the component in
+			the final layout. Lighter elements will be placed at the top, whereas
+			heavier items will be placed nearer the bottom. The value is relative
+			to the weights of the other components in the workflow (absolute
+			value is not relevant, only the relative comparison to other
+			elements).</option>
+		<option name="Variable/Column Name">Variable identifier and column name.</option>
+		<option name="String List">String values, separated.</option>
+		<option name="Separator">An undelimited list of char separators including \n and \t; back slashes and/or quotes are not supported.
+			All tokens are used as delimiters.</option>
+	</fullDescription>
+	<ports>
+		<outPort index="0" name="List Values">Variable output with the given variable defined and the selected
+			option as index.</outPort>
+	</ports>
+</knimeNode>

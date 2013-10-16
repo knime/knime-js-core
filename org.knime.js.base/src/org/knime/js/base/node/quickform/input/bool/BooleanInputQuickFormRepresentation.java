@@ -7,7 +7,8 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class BooleanInputQuickFormRepresentation extends QuickFormFlowVariableRepresentation<BooleanInputQuickFormValue> {
+public class BooleanInputQuickFormRepresentation extends
+        QuickFormFlowVariableRepresentation<BooleanInputQuickFormValue> {
 
     /**
      * {@inheritDoc}

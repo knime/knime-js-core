@@ -12,6 +12,31 @@
             factory-class="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory">
       </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.integer.IntInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.integer.IntInputQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.dbl.DoubleInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.dbl.DoubleInputQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.date.DateStringInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.date.DateStringInputQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.listbox.ListBoxInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.listbox.ListBoxInputQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.molecule.MoleculeStringInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.molecule.MoleculeStringInputQuickFormNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
