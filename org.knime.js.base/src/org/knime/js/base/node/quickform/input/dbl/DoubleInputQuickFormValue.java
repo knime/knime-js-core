@@ -105,4 +105,14 @@ public class DoubleInputQuickFormValue extends DialogNodeValue {
         m_double = dbl;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

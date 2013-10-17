@@ -117,4 +117,14 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
         m_date = date;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

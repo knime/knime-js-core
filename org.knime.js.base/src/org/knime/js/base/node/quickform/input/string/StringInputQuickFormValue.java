@@ -105,4 +105,14 @@ public class StringInputQuickFormValue extends DialogNodeValue {
         m_string = string;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final NodeSettingsRO settings) 
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

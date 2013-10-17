@@ -105,4 +105,14 @@ public class BooleanInputQuickFormValue extends DialogNodeValue {
         m_boolean = bool;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

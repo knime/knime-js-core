@@ -105,6 +105,16 @@ public class MoleculeStringInputQuickFormValue extends DialogNodeValue {
         m_moleculeString = moleculeString;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
     
     
 }
