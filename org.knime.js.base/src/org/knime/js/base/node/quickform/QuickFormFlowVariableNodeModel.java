@@ -2,8 +2,6 @@ package org.knime.js.base.node.quickform;
 
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.dialog.DialogNodeRepresentation;
-import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -18,7 +16,7 @@ import org.knime.core.node.web.WebViewContent;
  * @param <VC> The view content implementation of the quickform node.
  * 
  */
-public abstract class QuickFormFlowVariableNodeModel<REP extends DialogNodeRepresentation<VAL>, VAL extends DialogNodeValue, VC extends WebViewContent>
+public abstract class QuickFormFlowVariableNodeModel<REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends QuickFormFlowVariableValue, VC extends WebViewContent>
         extends QuickFormNodeModel<REP, VAL, VC> {
 
     /** Creates a new node model with no inports and one flow variable outport. */
@@ -38,6 +36,19 @@ public abstract class QuickFormFlowVariableNodeModel<REP extends DialogNodeRepre
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         createAndPushFlowVariable();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VAL getNodeValue() {
+        VAL nodeValue = super.getNodeValue();
+        REP representation = getNodeRepresentation();
+        if (representation != null && representation.getFlowVariableName() != null) {
+            nodeValue.setValueKey(getNodeRepresentation().getFlowVariableName());
+        }
+        return nodeValue;
     }
 
     /**

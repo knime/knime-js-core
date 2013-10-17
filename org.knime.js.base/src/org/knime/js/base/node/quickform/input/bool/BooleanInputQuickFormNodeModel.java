@@ -25,7 +25,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected BooleanInputQuickFormValue createNodeValue() {
-        return new BooleanInputQuickFormValue();
+        return new BooleanInputQuickFormValue(null);
     }
 
     /**

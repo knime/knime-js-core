@@ -25,7 +25,7 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected DoubleInputQuickFormValue createNodeValue() {
-        return new DoubleInputQuickFormValue();
+        return new DoubleInputQuickFormValue(null);
     }
 
     /**

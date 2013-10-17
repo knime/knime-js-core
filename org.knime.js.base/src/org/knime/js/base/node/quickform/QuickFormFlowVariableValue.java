@@ -46,80 +46,44 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   17.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.quickform.input.bool;
+package org.knime.js.base.node.quickform;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
-
-    private static final String CFG_BOOLEAN = "boolean";
+public abstract class QuickFormFlowVariableValue extends DialogNodeValue {
     
-    private static final boolean DEFAULT_BOOLEAN = false;
-
-    private boolean m_boolean = DEFAULT_BOOLEAN;
+    private String m_cfgString;
     
     /**
      * @param valueKey
      */
-    public BooleanInputQuickFormValue(String valueKey) {
-        super(valueKey);
+    public QuickFormFlowVariableValue(String valueKey) {
+        m_cfgString = valueKey;
     }
 
     /**
-     * {@inheritDoc}
+     * @param valueKey
      */
-    @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(getCfgString(CFG_BOOLEAN), getBoolean());
+    public void setValueKey(final String valueKey) {
+        m_cfgString = valueKey;
     }
-
+    
     /**
-     * {@inheritDoc}
+     * @param defaultCfg
+     * @return config string
      */
-    @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setBoolean(settings.getBoolean(getCfgString(CFG_BOOLEAN)));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setBoolean(settings.getBoolean(getCfgString(CFG_BOOLEAN), DEFAULT_BOOLEAN));
-    }
-
-    /**
-     * @return the string
-     */
-    public boolean getBoolean() {
-        return m_boolean;
-    }
-
-    /**
-     * @param bool the boolean to set
-     */
-    public void setBoolean(final boolean bool) {
-        m_boolean = bool;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
+    protected String getCfgString(final String defaultCfg) {
+        if (m_cfgString == null || "".equals(m_cfgString)) {
+            return defaultCfg;
+        } else {
+            return m_cfgString;
+        }
     }
 
 }

@@ -25,7 +25,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected IntInputQuickFormValue createNodeValue() {
-        return new IntInputQuickFormValue();
+        return new IntInputQuickFormValue(null);
     }
 
     /**

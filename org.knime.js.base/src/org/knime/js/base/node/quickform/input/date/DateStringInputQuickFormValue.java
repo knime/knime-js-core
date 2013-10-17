@@ -55,26 +55,33 @@ import java.util.Date;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class DateStringInputQuickFormValue extends DialogNodeValue {
+public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private static final String CFG_DATE = "date";
 
     private static final Date DEFAULT_DATE = new Date();
 
     private Date m_date = DEFAULT_DATE;
+    
+    /**
+     * @param valueKey
+     */
+    public DateStringInputQuickFormValue(String valueKey) {
+        super(valueKey);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
+        settings.addString(getCfgString(CFG_DATE), DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
     }
 
     /**
@@ -82,7 +89,7 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        String value = settings.getString(CFG_DATE);
+        String value = settings.getString(getCfgString(CFG_DATE));
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {
@@ -95,7 +102,7 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        String value = settings.getString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
+        String value = settings.getString(getCfgString(CFG_DATE), DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {

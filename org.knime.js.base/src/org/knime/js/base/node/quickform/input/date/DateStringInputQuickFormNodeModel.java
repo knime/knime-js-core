@@ -32,7 +32,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     protected DateStringInputQuickFormValue createNodeValue() {
-        return new DateStringInputQuickFormValue();
+        return new DateStringInputQuickFormValue(null);
     }
 
     /**

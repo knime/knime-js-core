@@ -24,7 +24,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected StringInputQuickFormValue createNodeValue() {
-        return new StringInputQuickFormValue();
+        return new StringInputQuickFormValue(null);
     }
 
     /**
@@ -62,7 +62,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         // TODO Auto-generated method stub
 
     }
-
+    
     /**
      * {@inheritDoc}
      */

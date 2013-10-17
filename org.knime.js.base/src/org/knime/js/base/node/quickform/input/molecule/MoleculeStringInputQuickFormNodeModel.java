@@ -25,7 +25,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected MoleculeStringInputQuickFormValue createNodeValue() {
-        return new MoleculeStringInputQuickFormValue();
+        return new MoleculeStringInputQuickFormValue(null);
     }
 
     /**

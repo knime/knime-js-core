@@ -53,26 +53,33 @@ package org.knime.js.base.node.quickform.input.dbl;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class DoubleInputQuickFormValue extends DialogNodeValue {
+public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private static final String CFG_DOUBLE = "double";
 
     private static final double DEFAULT_DOUBLE = 0;
 
     private double m_double = DEFAULT_DOUBLE;
+    
+    /**
+     * @param valueKey
+     */
+    public DoubleInputQuickFormValue(String valueKey) {
+        super(valueKey);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addDouble(CFG_DOUBLE, getDouble());
+        settings.addDouble(getCfgString(CFG_DOUBLE), getDouble());
     }
 
     /**
@@ -80,7 +87,7 @@ public class DoubleInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setDouble(settings.getDouble(CFG_DOUBLE));
+        setDouble(settings.getDouble(getCfgString(CFG_DOUBLE)));
     }
 
     /**
@@ -88,7 +95,7 @@ public class DoubleInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setDouble(settings.getDouble(CFG_DOUBLE, DEFAULT_DOUBLE));
+        setDouble(settings.getDouble(getCfgString(CFG_DOUBLE), DEFAULT_DOUBLE));
     }
 
     /**

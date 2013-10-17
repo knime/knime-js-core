@@ -48,8 +48,8 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        createNodeRepresentation().saveToNodeSettings(settings);
-        createNodeValue().saveToNodeSettings(settings);
+        getNodeRepresentation().saveToNodeSettings(settings);
+        getNodeValue().saveToNodeSettings(settings);
     }
 
     /**
@@ -57,14 +57,10 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        REP representation = createNodeRepresentation();
-        VAL value = createNodeValue();
-        VAL defaultValue = createNodeValue();
+        REP representation = getNodeRepresentation();
         representation.loadFromNodeSettings(settings);
+        VAL value = getNodeValue();
         value.loadFromNodeSettings(settings);
-        defaultValue.loadFromNodeSettings(settings);
-        m_representation = representation;
-        m_value = value;
     }
 
     /**
@@ -92,7 +88,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public REP getNodeRepresentation() {
         return m_representation;
     }
-
+    
     /**
      * {@inheritDoc}
      */

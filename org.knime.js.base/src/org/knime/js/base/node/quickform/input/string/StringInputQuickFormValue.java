@@ -53,34 +53,42 @@ package org.knime.js.base.node.quickform.input.string;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends DialogNodeValue {
+public class StringInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private static final String CFG_STRING = "string";
     
     private static final String DEFAULT_STRING = "";
 
     private String m_string = DEFAULT_STRING;
-
+    
     /**
-     * {@inheritDoc}
+     * @param valueKey
      */
-    @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_STRING, getString());
+    public StringInputQuickFormValue(String valueKey) {
+        super(valueKey);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString(CFG_STRING));
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(getCfgString(CFG_STRING), getString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) 
+            throws InvalidSettingsException {
+        setString(settings.getString(getCfgString(CFG_STRING)));
     }
 
     /**
@@ -88,7 +96,7 @@ public class StringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setString(settings.getString(CFG_STRING, DEFAULT_STRING));
+        setString(settings.getString(getCfgString(CFG_STRING), DEFAULT_STRING));
     }
 
     /**
@@ -114,5 +122,4 @@ public class StringInputQuickFormValue extends DialogNodeValue {
         // TODO Auto-generated method stub
         
     }
-
 }

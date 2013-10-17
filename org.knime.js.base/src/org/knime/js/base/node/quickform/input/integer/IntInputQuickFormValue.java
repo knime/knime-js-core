@@ -53,26 +53,33 @@ package org.knime.js.base.node.quickform.input.integer;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class IntInputQuickFormValue extends DialogNodeValue {
+public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private static final String CFG_INTEGER = "integer";
 
     private static final int DEFAULT_INTEGER = 0;
 
     private int m_integer = DEFAULT_INTEGER;
+    
+    /**
+     * @param valueKey
+     */
+    public IntInputQuickFormValue(String valueKey) {
+        super(valueKey);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addInt(CFG_INTEGER, getInteger());
+        settings.addInt(getCfgString(CFG_INTEGER), getInteger());
     }
 
     /**
@@ -80,7 +87,7 @@ public class IntInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setInteger(settings.getInt(CFG_INTEGER));
+        setInteger(settings.getInt(getCfgString(CFG_INTEGER)));
     }
 
     /**
@@ -88,7 +95,7 @@ public class IntInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setInteger(settings.getInt(CFG_INTEGER, DEFAULT_INTEGER));
+        setInteger(settings.getInt(getCfgString(CFG_INTEGER), DEFAULT_INTEGER));
     }
 
     /**

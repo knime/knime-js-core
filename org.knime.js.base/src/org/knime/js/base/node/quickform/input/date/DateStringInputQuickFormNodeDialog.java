@@ -54,7 +54,7 @@ public class DateStringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_defaultField.setValue(representation.getDefaultValue());
-        DateStringInputQuickFormValue value = new DateStringInputQuickFormValue();
+        DateStringInputQuickFormValue value = new DateStringInputQuickFormValue(getFlowVariableName());
         value.loadFromNodeSettingsInDialog(settings);
         m_valueField.setValue(value.getDate());
     }
@@ -68,7 +68,7 @@ public class DateStringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         saveSettingsTo(representation);
         representation.setDefaultValue((Date)m_defaultField.getValue());
         representation.saveToNodeSettings(settings);
-        DateStringInputQuickFormValue value = new DateStringInputQuickFormValue();
+        DateStringInputQuickFormValue value = new DateStringInputQuickFormValue(getFlowVariableName());
         value.setDate((Date)m_valueField.getValue());
         value.saveToNodeSettings(settings);
     }
