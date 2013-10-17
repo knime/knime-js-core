@@ -59,8 +59,10 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         REP representation = createNodeRepresentation();
         VAL value = createNodeValue();
+        VAL defaultValue = createNodeValue();
         representation.loadFromNodeSettings(settings);
         value.loadFromNodeSettings(settings);
+        defaultValue.loadFromNodeSettings(settings);
         m_representation = representation;
         m_value = value;
     }
@@ -98,7 +100,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public VAL getNodeValue() {
         return m_value;
     }
-
+    
     /**
      * @return The node representation
      */

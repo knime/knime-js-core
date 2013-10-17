@@ -21,14 +21,19 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
+    private static final int TEXT_AREA_HEIGHT = 5;
+
     private final JTextField m_separatorField;
 
+    private final JTextArea m_defaultArea;
+    
     private final JTextArea m_valueArea;
-
+    
     /** Constructors, inits fields calls layout routines. */
     ListBoxInputQuickFormNodeDialog() {
         m_separatorField = new JTextField(DEF_TEXTFIELD_WIDTH);
-        m_valueArea = new JTextArea(5, DEF_TEXTFIELD_WIDTH);
+        m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
+        m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -38,6 +43,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Separator: ", m_separatorField, panelWithGBLayout, gbc);
+        addPairToPanel("Default List: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
         addPairToPanel("String List: ", new JScrollPane(m_valueArea), panelWithGBLayout, gbc);
     }
 
@@ -51,6 +57,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_separatorField.setText(representation.getSeparator());
+        m_defaultArea.setText(representation.getDefaultValue());
         ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
         m_valueArea.setText(value.getString());
@@ -64,6 +71,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         ListBoxInputQuickFormRepresentation representation = new ListBoxInputQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setSeparator(m_separatorField.getText());
+        representation.setDefaultValue(m_defaultArea.getText());
         representation.saveToNodeSettings(settings);
         ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
         value.setString(m_valueArea.getText());

@@ -19,6 +19,10 @@ public class ListBoxInputQuickFormRepresentation extends
     
     private String m_separator = DEFAULT_SEPARATOR;
     
+    private static final String CFG_DEFAULT = "default";
+    
+    private String m_defaultValue;
+    
     /**
      * @return the separator
      */
@@ -40,6 +44,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_separator = settings.getString(CFG_SEPARATOR);
+        setDefaultValue(settings.getString(CFG_DEFAULT));
     }
     
     /**
@@ -49,6 +54,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_separator = settings.getString(CFG_SEPARATOR, DEFAULT_SEPARATOR);
+        setDefaultValue(settings.getString(CFG_DEFAULT, ""));
     }
     
     /**
@@ -58,6 +64,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_SEPARATOR, m_separator);
+        settings.addString(CFG_DEFAULT, getDefaultValue());
     }
 
     /**
@@ -68,6 +75,28 @@ public class ListBoxInputQuickFormRepresentation extends
         ListBoxInputQuickFormDialogPanel panel = new ListBoxInputQuickFormDialogPanel();
         fillDialogPanel(panel);
         return panel;
+    }
+
+    /**
+     * @return the defaultValue
+     */
+    public String getDefaultValue() {
+        return m_defaultValue;
+    }
+
+    /**
+     * @param defaultValue the defaultValue to set
+     */
+    public void setDefaultValue(final String defaultValue) {
+        m_defaultValue = defaultValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetNodeValueToDefault(final ListBoxInputQuickFormValue value) {
+        value.setString(getDefaultValue());        
     }
 
 }

@@ -77,7 +77,7 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      */
     @Override
     public void saveNodeValue(final MoleculeStringInputQuickFormValue value) throws InvalidSettingsException {
-        value.setString(m_component.getText());
+        value.setMoleculeString(m_component.getText());
     }
 
     /**
@@ -85,7 +85,7 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      */
     @Override
     public void loadNodeValue(final MoleculeStringInputQuickFormValue value) {
-        m_component.setText(value.getString());
+        m_component.setText(value.getMoleculeString());
     }
 
 }

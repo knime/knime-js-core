@@ -20,13 +20,19 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
+    private final JSpinner m_defaultSpinner;
+    
     private final JSpinner m_valueSpinner;
 
     /** Constructors, inits fields calls layout routines. */
     DoubleInputQuickFormNodeDialog() {
-        m_valueSpinner =
-                new JSpinner(new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.1));
+        m_defaultSpinner = new JSpinner(getSpinnerModel());
+        m_valueSpinner = new JSpinner(getSpinnerModel());
         createAndAddTab();
+    }
+
+    private SpinnerNumberModel getSpinnerModel() {
+        return new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.1);
     }
 
     /**
@@ -34,6 +40,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Default Value: ", m_defaultSpinner, panelWithGBLayout, gbc);
         addPairToPanel("Double Value: ", m_valueSpinner, panelWithGBLayout, gbc);
     }
 
@@ -46,6 +53,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         DoubleInputQuickFormRepresentation representation = new DoubleInputQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
+        m_defaultSpinner.setValue(representation.getDefaultValue());
         DoubleInputQuickFormValue value = new DoubleInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
         m_valueSpinner.setValue(value.getDouble());
@@ -58,6 +66,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         DoubleInputQuickFormRepresentation representation = new DoubleInputQuickFormRepresentation();
         saveSettingsTo(representation);
+        representation.setDefaultValue((Double)m_defaultSpinner.getValue());
         representation.saveToNodeSettings(settings);
         DoubleInputQuickFormValue value = new DoubleInputQuickFormValue();
         value.setDouble((Double)m_valueSpinner.getValue());

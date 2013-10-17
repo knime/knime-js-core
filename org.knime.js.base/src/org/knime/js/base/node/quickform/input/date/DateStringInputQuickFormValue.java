@@ -50,8 +50,6 @@
  */
 package org.knime.js.base.node.quickform.input.date;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.knime.core.node.InvalidSettingsException;
@@ -65,11 +63,6 @@ import org.knime.core.node.dialog.DialogNodeValue;
  */
 public class DateStringInputQuickFormValue extends DialogNodeValue {
 
-    /**
-     * Format for the date to string and string to date operations.
-     */
-    static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-
     private static final String CFG_DATE = "date";
 
     private static final Date DEFAULT_DATE = new Date();
@@ -81,7 +74,7 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_DATE, FORMAT.format(getDate()));
+        settings.addString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
     }
 
     /**
@@ -91,7 +84,7 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         String value = settings.getString(CFG_DATE);
         try {
-            setDate(FORMAT.parse(value));
+            setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {
             throw new InvalidSettingsException("Can't parse date: " + value, e);
         }
@@ -102,9 +95,9 @@ public class DateStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        String value = settings.getString(CFG_DATE, FORMAT.format(DEFAULT_DATE));
+        String value = settings.getString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
         try {
-            setDate(FORMAT.parse(value));
+            setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {
             m_date = DEFAULT_DATE;
         }

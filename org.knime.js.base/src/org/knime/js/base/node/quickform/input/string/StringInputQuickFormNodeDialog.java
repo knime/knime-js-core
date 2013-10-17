@@ -20,12 +20,15 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JTextField m_regexField;
+    
+    private final JTextField m_defaultField;
 
     private final JTextField m_valueField;
 
     /** Constructors, inits fields calls layout routines. */
     StringInputQuickFormNodeDialog() {
         m_regexField = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_defaultField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_valueField = new JTextField(DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
@@ -36,6 +39,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Regular Expression: ", m_regexField, panelWithGBLayout, gbc);
+        addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
@@ -49,6 +53,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_regexField.setText(representation.getRegex());
+        m_defaultField.setText(representation.getDefaultValue());
         StringInputQuickFormValue value = new StringInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
         m_valueField.setText(value.getString());
@@ -62,6 +67,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setRegex(m_regexField.getText());
+        representation.setDefaultValue(m_defaultField.getText());
         representation.saveToNodeSettings(settings);
         StringInputQuickFormValue value = new StringInputQuickFormValue();
         value.setString(m_valueField.getText());

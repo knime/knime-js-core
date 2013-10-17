@@ -21,15 +21,20 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
+    private static final int TEXT_AREA_HEIGHT = 3;
+    
     private final JComboBox<String> m_formatBox;
 
+    private final JTextArea m_defaultArea;
+    
     private final JTextArea m_valueArea;
 
     /** Constructors, inits fields calls layout routines. */
     MoleculeStringInputQuickFormNodeDialog() {
         m_formatBox = new JComboBox<String>(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
-        m_valueArea = new JTextArea(3, DEF_TEXTFIELD_WIDTH);
+        m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
+        m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -39,6 +44,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Format: ", m_formatBox, panelWithGBLayout, gbc);
+        addPairToPanel("Default Value: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
         addPairToPanel("Molecule String: ", new JScrollPane(m_valueArea), panelWithGBLayout, gbc);
     }
 
@@ -51,10 +57,11 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         MoleculeStringInputQuickFormRepresentation representation = new MoleculeStringInputQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
+        m_defaultArea.setText(representation.getDefaultValue());
         m_formatBox.setSelectedItem(representation.getFormat());
         MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        m_valueArea.setText(value.getString());
+        m_valueArea.setText(value.getMoleculeString());
     }
 
     /**
@@ -65,9 +72,10 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         MoleculeStringInputQuickFormRepresentation representation = new MoleculeStringInputQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setFormat(m_formatBox.getSelectedItem().toString());
+        representation.setDefaultValue(m_defaultArea.getText());
         representation.saveToNodeSettings(settings);
         MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue();
-        value.setString(m_valueArea.getText());
+        value.setMoleculeString(m_valueArea.getText());
         value.saveToNodeSettings(settings);
     }
 

@@ -19,10 +19,13 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
+    private final JCheckBox m_defaultField;
+    
     private final JCheckBox m_valueField;
 
     /** Constructors, inits fields calls layout routines. */
     BooleanInputQuickFormNodeDialog() {
+        m_defaultField = new JCheckBox();
         m_valueField = new JCheckBox();
         createAndAddTab();
     }
@@ -32,6 +35,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("Boolean Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
@@ -44,6 +48,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
         BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
+        m_defaultField.setSelected(representation.getDefaultValue());
         BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
         m_valueField.setSelected(value.getBoolean());
@@ -56,6 +61,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
         saveSettingsTo(representation);
+        representation.setDefaultValue(m_defaultField.isSelected());
         representation.saveToNodeSettings(settings);
         BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
         value.setBoolean(m_valueField.isSelected());

@@ -69,7 +69,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getString());
+        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getMoleculeString());
         pushFlowVariableString("molecule_format", getNodeRepresentation().getFormat());
     }
 

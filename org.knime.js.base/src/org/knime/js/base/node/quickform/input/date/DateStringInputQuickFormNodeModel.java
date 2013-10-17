@@ -1,5 +1,8 @@
 package org.knime.js.base.node.quickform.input.date;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
@@ -8,10 +11,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class DateStringInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue, DateStringInputQuickFormViewContent> {
+public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
+        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue, DateStringInputQuickFormViewContent> {
 
+    /**
+     * Format for the date to string and string to date operations.
+     */
+    static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    
     /**
      * {@inheritDoc}
      */
@@ -70,7 +77,7 @@ public class DateStringInputQuickFormNodeModel
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
         pushFlowVariableString(getNodeRepresentation().getFlowVariableName(),
-                DateStringInputQuickFormValue.FORMAT.format(getNodeValue().getDate()));
+                FORMAT.format(getNodeValue().getDate()));
     }
 
     /**

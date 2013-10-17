@@ -61,25 +61,18 @@ import org.knime.core.node.dialog.DialogNodeValue;
  */
 public class MoleculeStringInputQuickFormValue extends DialogNodeValue {
 
-    private static final String CFG_STRING = "string";
-    
-    private static final String CFG_INLINE = "inline";
+    private static final String CFG_STRING = "moleculeString";
     
     private static final String DEFAULT_STRING = "";
     
-    private static final boolean DEFAULT_INLINE = true;
-
-    private String m_string = DEFAULT_STRING;
+    private String m_moleculeString = DEFAULT_STRING;
     
-    private boolean m_inline = DEFAULT_INLINE;
-
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_STRING, getString());
-        settings.addBoolean(CFG_INLINE, getInline());
+        settings.addString(CFG_STRING, getMoleculeString());
     }
 
     /**
@@ -87,8 +80,7 @@ public class MoleculeStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setString(settings.getString(CFG_STRING));
-        setInline(settings.getBoolean(CFG_INLINE));
+        setMoleculeString(settings.getString(CFG_STRING));
     }
 
     /**
@@ -96,36 +88,23 @@ public class MoleculeStringInputQuickFormValue extends DialogNodeValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setString(settings.getString(CFG_STRING, DEFAULT_STRING));
-        setInline(settings.getBoolean(CFG_INLINE, DEFAULT_INLINE));
+        setMoleculeString(settings.getString(CFG_STRING, DEFAULT_STRING));
     }
 
     /**
-     * @return the string
+     * @return the moleculeString
      */
-    public String getString() {
-        return m_string;
+    public String getMoleculeString() {
+        return m_moleculeString;
     }
 
     /**
-     * @param string the string to set
+     * @param moleculeString the moleculeString to set
      */
-    public void setString(final String string) {
-        m_string = string;
+    public void setMoleculeString(final String moleculeString) {
+        m_moleculeString = moleculeString;
     }
+
     
-    /**
-     * @return the inline
-     */
-    public boolean getInline() {
-        return m_inline;
-    }
     
-    /**
-     * @param inline the inline to set
-     */
-    public void setInline(final boolean inline) {
-        m_inline = inline;
-    }
-
 }

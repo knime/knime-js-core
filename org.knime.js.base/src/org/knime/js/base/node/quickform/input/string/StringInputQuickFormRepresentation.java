@@ -18,6 +18,10 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     
     private String m_regex = DEFAULT_REGEX;
     
+    private static final String CFG_DEFAULT = "default";
+    
+    private String m_defaultValue;
+    
     /**
      * @return the regex
      */
@@ -39,6 +43,8 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
+        m_defaultValue = settings.getString(CFG_DEFAULT);
+        
     }
     
     /**
@@ -48,6 +54,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
+        m_defaultValue = settings.getString(CFG_DEFAULT, "");
     }
     
     /**
@@ -57,6 +64,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
+        settings.addString(CFG_DEFAULT, m_defaultValue);
     }
 
     /**
@@ -67,6 +75,28 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         StringInputQuickFormDialogPanel panel = new StringInputQuickFormDialogPanel();
         fillDialogPanel(panel);
         return panel;
+    }
+
+    /**
+     * @return the defaultValue
+     */
+    public String getDefaultValue() {
+        return m_defaultValue;
+    }
+
+    /**
+     * @param defaultValue the defaultValue to set
+     */
+    public void setDefaultValue(final String defaultValue) {
+        m_defaultValue = defaultValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetNodeValueToDefault(final StringInputQuickFormValue value) {
+        value.setString(m_defaultValue);        
     }
 
 }

@@ -23,6 +23,10 @@ public class MoleculeStringInputQuickFormRepresentation extends
     private static final String DEFAULT_FORMAT = DEFAULT_FORMATS[0];
 
     private String m_format = DEFAULT_FORMAT;
+    
+    private static final String CFG_DEFAULT = "default";
+    
+    private String m_defaultValue = "";
 
     /**
      * @return the format
@@ -45,6 +49,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_format = settings.getString(CFG_FORMAT);
+        m_defaultValue = settings.getString(CFG_DEFAULT);
     }
 
     /**
@@ -54,6 +59,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_format = settings.getString(CFG_FORMAT, DEFAULT_FORMAT);
+        m_defaultValue = settings.getString(CFG_DEFAULT, "");
     }
 
     /**
@@ -63,6 +69,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_FORMAT, m_format);
+        settings.addString(CFG_DEFAULT, getDefaultValue());
     }
 
     /**
@@ -73,6 +80,28 @@ public class MoleculeStringInputQuickFormRepresentation extends
         MoleculeStringInputQuickFormDialogPanel panel = new MoleculeStringInputQuickFormDialogPanel();
         fillDialogPanel(panel);
         return panel;
+    }
+
+    /**
+     * @return the defaultValue
+     */
+    public String getDefaultValue() {
+        return m_defaultValue;
+    }
+
+    /**
+     * @param defaultValue the defaultValue to set
+     */
+    public void setDefaultValue(String defaultValue) {
+        m_defaultValue = defaultValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetNodeValueToDefault(final MoleculeStringInputQuickFormValue value) {
+        value.setMoleculeString(getDefaultValue());
     }
 
 }

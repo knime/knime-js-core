@@ -81,7 +81,7 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      */
     @Override
     public void saveNodeValue(final DoubleInputQuickFormValue value) throws InvalidSettingsException {
-        value.setDouble((Integer)m_component.getValue());
+        value.setDouble((Double)m_component.getValue());
     }
 
     /**
