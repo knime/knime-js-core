@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -44,47 +44,42 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.knime.js.core.JSONWebResources.WebResourcesToJSONStringSerializer;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonSerialize(using = WebResourcesToJSONStringSerializer.class, as = String.class)
 public class JSONWebResources {
 
-    public static void main(String[] args) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        JSONWebResources resources = new JSONWebResources();
-        JSONWebResource resource1 = new JSONWebResource();
-        resource1.setAbsolutePathSource("a1");
-        resource1.setRelativePathTarget("r1");
-        JSONWebResource resource2 = new JSONWebResource();
-        resource2.setAbsolutePathSource("a2");
-        resource2.setRelativePathTarget("r2");
-        resources.setWebResources(Arrays.asList(resource1, resource2));
-        System.out.println(mapper.writeValueAsString(resources));
-    }
-
     private List<JSONWebResource> m_webResources;
+
+    /** Serialization constructor, don't use. */
+    public JSONWebResources() { }
+
+    /**
+     * Creates a new JSONWebResource container.
+     * @param webResources the list of JSONWebResource
+     */
+    public JSONWebResources(final List<JSONWebResource> webResources) {
+        m_webResources = webResources;
+    }
 
     /**
      * @return the webResources
@@ -113,8 +108,9 @@ public class JSONWebResources {
         public final void serialize(final JSONWebResources value, final JsonGenerator jgen,
                 final SerializerProvider provider) throws IOException {
             jgen.writeArrayFieldStart("webResources");
-            for (JSONWebResource resource : value.getWebResources()) {
-                jgen.writeObjectField("webResource", resource);
+            List<JSONWebResource> webResources = value.getWebResources();
+            for (int i = 0; i < webResources.size(); i++) {
+                jgen.writeObject(webResources.get(i));
             }
             jgen.writeEndArray();
         }

@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -44,13 +44,12 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
-
-import java.io.IOException;
+import java.io.IOException;
 
 import org.knime.js.core.JSONWebResource.JSONStringToWebResourceDeserializer;
 import org.knime.js.core.JSONWebResource.WebResourceToJSONStringSerializer;
@@ -64,6 +63,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+
 /**
  * Helper class to allow serialization and deserialization of KNIME web resources.
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
@@ -75,6 +75,19 @@ public class JSONWebResource {
 
     private String m_absolutePathSource;
     private String m_relativePathTarget;
+
+    /** Serialization constructor, don't use. */
+    public JSONWebResource() { }
+
+    /**
+     * Creates a new JSONWebResource.
+     * @param absolutePathSource the absolute path to the source file
+     * @param relativePathTarget the relative path of the target file
+     */
+    public JSONWebResource(final String absolutePathSource, final String relativePathTarget) {
+        m_absolutePathSource = absolutePathSource;
+        m_relativePathTarget = relativePathTarget;
+    }
 
     /**
      * @return the absolutePathSource
@@ -118,6 +131,7 @@ public class JSONWebResource {
                 final SerializerProvider provider) throws IOException {
             jgen.writeStringField("absolutePathSource", value.getAbsolutePathSource());
             jgen.writeStringField("relativePathTarget", value.getRelativePathTarget());
+            jgen.writeEndObject();
         }
     }
 
