@@ -15,23 +15,23 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private static final int TEXT_AREA_HEIGHT = 3;
-    
-    private final JComboBox<String> m_formatBox;
+
+    private final JComboBox m_formatBox;
 
     private final JTextArea m_defaultArea;
-    
+
     private final JTextArea m_valueArea;
 
     /** Constructors, inits fields calls layout routines. */
     MoleculeStringInputQuickFormNodeDialog() {
-        m_formatBox = new JComboBox<String>(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
+        m_formatBox = new JComboBox(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
