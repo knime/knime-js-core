@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by
+ *  Copyright by 
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,57 +40,39 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
- *
- * Created on 16.09.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * ------------------------------------------------------------------------
+ * 
+ * History
+ *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * 
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-@JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePageConfiguration {
-
-    private JSONPageLayout m_layout;
-    private JSONBlackBoard m_blackBoard;
-
-    /**
-     * @return the blackBoard
-     */
-    public JSONBlackBoard getBlackBoard() {
-        return m_blackBoard;
-    }
-
-    /**
-     * @param blackBoard the blackBoard to set
-     */
-    public void setBlackBoard(final JSONBlackBoard blackBoard) {
-        m_blackBoard = blackBoard;
-    }
+public class JSONPageLayout {
+    
+    private String m_layout;
 
     /**
      * @return the layout
      */
-    public JSONPageLayout getLayout() {
+    public String getLayout() {
         return m_layout;
     }
-
+    
     /**
      * @param layout the layout to set
      */
-    public void setLayout(final JSONPageLayout layout) {
+    public void setLayout(final String layout) {
         m_layout = layout;
     }
-
-    // TODO: insert positioning and other meta info about page
 
 }

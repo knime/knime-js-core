@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -65,7 +65,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class JSONWebNodePage {
 
         private JSONWebNodePageConfiguration m_configuration;
-        private Map<String, String> m_webNodes;
+        private Map<String, JSONWebNode> m_webNodes;
 
         /**
          * @param configuration
@@ -75,7 +75,7 @@ public class JSONWebNodePage {
         @JsonCreator
         public JSONWebNodePage(
             @JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-            @JsonProperty("webNodes") final Map<String, String> webNodes) {
+            @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes) {
             m_configuration = configuration;
             m_webNodes = webNodes;
         }
@@ -100,7 +100,7 @@ public class JSONWebNodePage {
          * @return the webNodes
          */
         @JsonProperty("webNodes")
-        public Map<String, String> getWebNodes() {
+        public Map<String, JSONWebNode> getWebNodes() {
             return m_webNodes;
         }
 
@@ -108,7 +108,7 @@ public class JSONWebNodePage {
          * @param webNodes the webNodes to set
          */
         @JsonProperty("webNodes")
-        public void setWebNodes(final Map<String, String> webNodes) {
+        public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
             m_webNodes = webNodes;
         }
 }
