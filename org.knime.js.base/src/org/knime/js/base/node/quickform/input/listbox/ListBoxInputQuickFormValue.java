@@ -54,12 +54,13 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class ListBoxInputQuickFormValue extends DialogNodeValue {
+public class ListBoxInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_STRING = "string";
     

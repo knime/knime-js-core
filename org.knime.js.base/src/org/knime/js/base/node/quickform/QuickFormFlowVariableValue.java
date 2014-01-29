@@ -56,7 +56,7 @@ import org.knime.core.node.dialog.DialogNodeValue;
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public abstract class QuickFormFlowVariableValue extends DialogNodeValue {
+public abstract class QuickFormFlowVariableValue implements DialogNodeValue {
     
     private String m_cfgString;
     

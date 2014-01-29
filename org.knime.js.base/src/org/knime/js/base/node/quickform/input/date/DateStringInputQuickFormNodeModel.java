@@ -12,7 +12,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * 
  */
 public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue, DateStringInputQuickFormViewContent> {
+        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue, DateStringInputQuickFormViewRepresentation, DateStringInputQuickFormValue> {
 
     /**
      * Format for the date to string and string to date operations.
@@ -23,7 +23,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      * {@inheritDoc}
      */
     @Override
-    protected DateStringInputQuickFormRepresentation createNodeRepresentation() {
+    protected DateStringInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new DateStringInputQuickFormRepresentation();
     }
 
@@ -31,7 +31,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      * {@inheritDoc}
      */
     @Override
-    protected DateStringInputQuickFormValue createNodeValue() {
+    protected DateStringInputQuickFormValue createEmptyDialogValue() {
         return new DateStringInputQuickFormValue(null);
     }
 
@@ -39,18 +39,16 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      * {@inheritDoc}
      */
     @Override
-    public DateStringInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public DateStringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new DateStringInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public DateStringInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public DateStringInputQuickFormValue createEmptyViewValue() {
+        return new DateStringInputQuickFormValue(null);
     }
 
     /**
@@ -66,18 +64,9 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final DateStringInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(),
-                FORMAT.format(getNodeValue().getDate()));
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
+                FORMAT.format(getDialogValue().getDate()));
     }
 
     /**
@@ -96,6 +85,14 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(DateStringInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

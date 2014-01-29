@@ -53,13 +53,14 @@ package org.knime.js.base.node.quickform.input.molecule;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class MoleculeStringInputQuickFormValue extends QuickFormFlowVariableValue {
+public class MoleculeStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_STRING = "moleculeString";
     
@@ -67,11 +68,17 @@ public class MoleculeStringInputQuickFormValue extends QuickFormFlowVariableValu
     
     private String m_moleculeString = DEFAULT_STRING;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public MoleculeStringInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if (valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_STRING;
+        }
     }
     
     /**
@@ -79,7 +86,7 @@ public class MoleculeStringInputQuickFormValue extends QuickFormFlowVariableValu
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(getCfgString(CFG_STRING), getMoleculeString());
+        settings.addString(m_valueKey, getMoleculeString());
     }
 
     /**
@@ -87,7 +94,7 @@ public class MoleculeStringInputQuickFormValue extends QuickFormFlowVariableValu
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setMoleculeString(settings.getString(getCfgString(CFG_STRING)));
+        setMoleculeString(settings.getString(m_valueKey));
     }
 
     /**
@@ -95,7 +102,7 @@ public class MoleculeStringInputQuickFormValue extends QuickFormFlowVariableValu
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setMoleculeString(settings.getString(getCfgString(CFG_STRING), DEFAULT_STRING));
+        setMoleculeString(settings.getString(m_valueKey, DEFAULT_STRING));
     }
 
     /**

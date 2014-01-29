@@ -10,7 +10,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<ListBoxInputQuickFormNodeModel, ListBoxInputQuickFormViewContent> {
+        WizardNodeFactoryExtension<ListBoxInputQuickFormNodeModel, ListBoxInputQuickFormViewRepresentation, ListBoxInputQuickFormValue> {
 
     /**
      * {@inheritDoc}

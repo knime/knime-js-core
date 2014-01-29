@@ -26,7 +26,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  */
 public class ListBoxInputQuickFormNodeModel
         extends
-        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue, ListBoxInputQuickFormViewContent> {
+        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue, ListBoxInputQuickFormViewRepresentation, ListBoxInputQuickFormValue> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ListBoxInputQuickFormNodeModel.class);
 
@@ -38,15 +38,15 @@ public class ListBoxInputQuickFormNodeModel
     }
 
     private void createAndPushFlowVariable() {
-        final String variableName = getNodeRepresentation().getFlowVariableName();
-        final String value = getNodeValue().getString();
+        final String variableName = getDialogRepresentation().getFlowVariableName();
+        final String value = getDialogValue().getString();
         pushFlowVariableString(variableName, value);
     }
 
     /** {@inheritDoc} */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) {
-        final String variableName = getNodeRepresentation().getFlowVariableName();
+        final String variableName = getDialogRepresentation().getFlowVariableName();
         createAndPushFlowVariable();
         return new PortObjectSpec[]{createSpec(variableName)};
     }
@@ -54,9 +54,9 @@ public class ListBoxInputQuickFormNodeModel
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        final String variableName = getNodeRepresentation().getFlowVariableName();
-        final String value = getNodeValue().getString();
-        String separator = getNodeRepresentation().getSeparator();
+        final String variableName = getDialogRepresentation().getFlowVariableName();
+        final String value = getDialogValue().getString();
+        String separator = getDialogRepresentation().getSeparator();
         final ArrayList<String> values = new ArrayList<String>();
         if (separator == null || separator.isEmpty()) {
             values.add(value);
@@ -112,7 +112,7 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected ListBoxInputQuickFormRepresentation createNodeRepresentation() {
+    protected ListBoxInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new ListBoxInputQuickFormRepresentation();
     }
 
@@ -120,7 +120,7 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected ListBoxInputQuickFormValue createNodeValue() {
+    protected ListBoxInputQuickFormValue createEmptyDialogValue() {
         return new ListBoxInputQuickFormValue();
     }
 
@@ -128,18 +128,16 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ListBoxInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public ListBoxInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new ListBoxInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public ListBoxInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public ListBoxInputQuickFormValue createEmptyViewValue() {
+        return new ListBoxInputQuickFormValue();
     }
 
     /**
@@ -149,15 +147,6 @@ public class ListBoxInputQuickFormNodeModel
     public String getJavascriptObjectID() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewContent(final ListBoxInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
     }
 
     /**
@@ -176,6 +165,22 @@ public class ListBoxInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewContent(ListBoxInputQuickFormRepresentation viewContent) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(ListBoxInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

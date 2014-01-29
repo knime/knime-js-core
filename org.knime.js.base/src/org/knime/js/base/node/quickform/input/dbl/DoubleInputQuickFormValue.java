@@ -53,13 +53,14 @@ package org.knime.js.base.node.quickform.input.dbl;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
+public class DoubleInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_DOUBLE = "double";
 
@@ -67,11 +68,17 @@ public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private double m_double = DEFAULT_DOUBLE;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public DoubleInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if (valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_DOUBLE;
+        }
     }
 
     /**
@@ -79,7 +86,7 @@ public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addDouble(getCfgString(CFG_DOUBLE), getDouble());
+        settings.addDouble(m_valueKey, getDouble());
     }
 
     /**
@@ -87,7 +94,7 @@ public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setDouble(settings.getDouble(getCfgString(CFG_DOUBLE)));
+        setDouble(settings.getDouble(m_valueKey));
     }
 
     /**
@@ -95,7 +102,7 @@ public class DoubleInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setDouble(settings.getDouble(getCfgString(CFG_DOUBLE), DEFAULT_DOUBLE));
+        setDouble(settings.getDouble(m_valueKey, DEFAULT_DOUBLE));
     }
 
     /**

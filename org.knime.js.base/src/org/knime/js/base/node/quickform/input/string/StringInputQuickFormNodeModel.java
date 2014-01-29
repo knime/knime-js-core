@@ -9,13 +9,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * 
  */
 public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, 
-        StringInputQuickFormValue, StringInputQuickFormViewContent> {
+        StringInputQuickFormValue, StringInputQuickFormViewRepresentation, StringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected StringInputQuickFormRepresentation createNodeRepresentation() {
+    protected StringInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new StringInputQuickFormRepresentation();
     }
 
@@ -23,7 +23,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      * {@inheritDoc}
      */
     @Override
-    protected StringInputQuickFormValue createNodeValue() {
+    protected StringInputQuickFormValue createEmptyDialogValue() {
         return new StringInputQuickFormValue(null);
     }
 
@@ -31,36 +31,8 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public StringInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewContent(final StringInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
+        return "org_knime_js_base_node_quickform_input_string";
     }
     
     /**
@@ -68,7 +40,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getString());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getString());
     }
 
     /**
@@ -76,8 +48,8 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
+        createEmptyDialogValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -85,8 +57,44 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void reset() {
-        // TODO Auto-generated method stub
+        // not used
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public StringInputQuickFormRepresentation createEmptyRepresentationInstance() {
+        return new StringInputQuickFormRepresentation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringInputQuickFormValue createEmptyValueInstance() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(StringInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new StringInputQuickFormViewRepresentation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public StringInputQuickFormValue createEmptyViewValue() {
+        return new StringInputQuickFormValue(null);
     }
 
 }

@@ -2,6 +2,8 @@ package org.knime.js.base.node.quickform;
 
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.dialog.DialogNodeRepresentation;
+import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -11,13 +13,16 @@ import org.knime.core.node.web.WebViewContent;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP> The configuration content of the quickform node.
- * @param <VAL> The node value implementation of the quickform node.
- * @param <VC> The view content implementation of the quickform node.
+ * @param <DREP> The configuration content of the quickform node.
+ * @param <DVAL> The node value implementation of the quickform node.
+ * @param <VREP> The configuration content of the quickform node.
+ * @param <VVAL> The node value implementation of the quickform node.
  * 
  */
-public abstract class QuickFormFlowVariableNodeModel<REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends QuickFormFlowVariableValue, VC extends WebViewContent>
-        extends QuickFormNodeModel<REP, VAL, VC> {
+public abstract class QuickFormFlowVariableNodeModel<
+        DREP extends DialogNodeRepresentation<DVAL>, DVAL extends DialogNodeValue, 
+        VREP extends WebViewContent, VVAL extends WebViewContent>
+        extends QuickFormNodeModel<DREP, DVAL, VREP, VVAL> {
 
     /** Creates a new node model with no inports and one flow variable outport. */
     protected QuickFormFlowVariableNodeModel() {
@@ -37,19 +42,6 @@ public abstract class QuickFormFlowVariableNodeModel<REP extends QuickFormFlowVa
         createAndPushFlowVariable();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public VAL getNodeValue() {
-        VAL nodeValue = super.getNodeValue();
-        REP representation = getNodeRepresentation();
-        if (representation != null && representation.getFlowVariableName() != null) {
-            nodeValue.setValueKey(getNodeRepresentation().getFlowVariableName());
-        }
-        return nodeValue;
-    }
 
     /**
      * Subclasses will publish their flow variables here. Called from configure
@@ -57,6 +49,7 @@ public abstract class QuickFormFlowVariableNodeModel<REP extends QuickFormFlowVa
      * 
      * @throws InvalidSettingsException If settings are invalid.
      */
-    protected abstract void createAndPushFlowVariable() throws InvalidSettingsException;
+    protected abstract void createAndPushFlowVariable()
+            throws InvalidSettingsException;
 
 }

@@ -51,13 +51,19 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.knime.js.core.JSONWebResources.JSONStringToWebResourcesDeserializer;
 import org.knime.js.core.JSONWebResources.WebResourcesToJSONStringSerializer;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -66,6 +72,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonSerialize(using = WebResourcesToJSONStringSerializer.class, as = String.class)
+@JsonDeserialize(using = JSONStringToWebResourcesDeserializer.class, as = String.class)
 public class JSONWebResources {
 
     private List<JSONWebResource> m_webResources;
@@ -113,6 +120,35 @@ public class JSONWebResources {
                 jgen.writeObject(webResources.get(i));
             }
             jgen.writeEndArray();
+        }
+    }
+
+    /** JSON deserializer for JSONWebResources. */
+    @SuppressWarnings("serial")
+    public static class JSONStringToWebResourcesDeserializer extends JSONTypedDeserializer<JSONWebResources> {
+
+        /** Create new deserializer. */
+        protected JSONStringToWebResourcesDeserializer() {
+            super(JSONWebResources.class);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final JSONWebResources deserialize(final JsonParser jp, final DeserializationContext ctxt,
+                final JSONWebResources intoValue) throws IOException {
+            List<JSONWebResource> webResources = new ArrayList<JSONWebResource>();
+            JsonToken token;
+            while ((token = jp.nextToken()) != null) {
+                if (JsonToken.START_OBJECT == token) {
+                    webResources.add(jp.readValueAs(JSONWebResource.class));
+                } else if (JsonToken.END_OBJECT == token) {
+                    break;
+                }
+            }
+            intoValue.setWebResources(webResources);
+            return intoValue;
         }
     }
 }

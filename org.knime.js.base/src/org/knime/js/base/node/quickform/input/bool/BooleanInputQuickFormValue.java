@@ -53,13 +53,14 @@ package org.knime.js.base.node.quickform.input.bool;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
+public class BooleanInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_BOOLEAN = "boolean";
     
@@ -67,11 +68,17 @@ public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private boolean m_boolean = DEFAULT_BOOLEAN;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public BooleanInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if(valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_BOOLEAN;
+        }
     }
 
     /**
@@ -79,7 +86,7 @@ public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(getCfgString(CFG_BOOLEAN), getBoolean());
+        settings.addBoolean(m_valueKey, getBoolean());
     }
 
     /**
@@ -87,7 +94,7 @@ public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setBoolean(settings.getBoolean(getCfgString(CFG_BOOLEAN)));
+        setBoolean(settings.getBoolean(m_valueKey));
     }
 
     /**
@@ -95,7 +102,7 @@ public class BooleanInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setBoolean(settings.getBoolean(getCfgString(CFG_BOOLEAN), DEFAULT_BOOLEAN));
+        setBoolean(settings.getBoolean(m_valueKey, DEFAULT_BOOLEAN));
     }
 
     /**

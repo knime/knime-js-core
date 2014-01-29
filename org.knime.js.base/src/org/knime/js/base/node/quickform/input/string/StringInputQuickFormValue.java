@@ -53,55 +53,73 @@ package org.knime.js.base.node.quickform.input.string;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormValue extends QuickFormFlowVariableValue {
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public class StringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
-    private static final String CFG_STRING = "string";
+    public static final String CFG_STRING = "string";
     
     private static final String DEFAULT_STRING = "";
 
     private String m_string = DEFAULT_STRING;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public StringInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if (valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_STRING;
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(getCfgString(CFG_STRING), getString());
+        settings.addString(m_valueKey, getString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) 
             throws InvalidSettingsException {
-        setString(settings.getString(getCfgString(CFG_STRING)));
+        setString(settings.getString(m_valueKey));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setString(settings.getString(getCfgString(CFG_STRING), DEFAULT_STRING));
+        setString(settings.getString(m_valueKey, DEFAULT_STRING));
     }
 
     /**
      * @return the string
      */
+    @JsonProperty("string")
     public String getString() {
         return m_string;
     }
@@ -109,6 +127,7 @@ public class StringInputQuickFormValue extends QuickFormFlowVariableValue {
     /**
      * @param string the string to set
      */
+    @JsonProperty("string")
     public void setString(final String string) {
         m_string = string;
     }
@@ -117,6 +136,7 @@ public class StringInputQuickFormValue extends QuickFormFlowVariableValue {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings) 
             throws InvalidSettingsException {
         // TODO Auto-generated method stub

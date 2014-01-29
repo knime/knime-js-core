@@ -53,13 +53,14 @@ package org.knime.js.base.node.quickform.input.integer;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
+public class IntInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_INTEGER = "integer";
 
@@ -67,11 +68,17 @@ public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private int m_integer = DEFAULT_INTEGER;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public IntInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if (valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_INTEGER;
+        }
     }
 
     /**
@@ -79,7 +86,7 @@ public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addInt(getCfgString(CFG_INTEGER), getInteger());
+        settings.addInt(m_valueKey, getInteger());
     }
 
     /**
@@ -87,7 +94,7 @@ public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setInteger(settings.getInt(getCfgString(CFG_INTEGER)));
+        setInteger(settings.getInt(m_valueKey));
     }
 
     /**
@@ -95,7 +102,7 @@ public class IntInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setInteger(settings.getInt(getCfgString(CFG_INTEGER), DEFAULT_INTEGER));
+        setInteger(settings.getInt(m_valueKey, DEFAULT_INTEGER));
     }
 
     /**

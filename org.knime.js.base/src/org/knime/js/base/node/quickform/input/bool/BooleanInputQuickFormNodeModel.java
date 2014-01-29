@@ -10,13 +10,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class BooleanInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormViewContent> {
+        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormViewRepresentation, BooleanInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BooleanInputQuickFormRepresentation createNodeRepresentation() {
+    protected BooleanInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new BooleanInputQuickFormRepresentation();
     }
 
@@ -24,7 +24,7 @@ public class BooleanInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected BooleanInputQuickFormValue createNodeValue() {
+    protected BooleanInputQuickFormValue createEmptyDialogValue() {
         return new BooleanInputQuickFormValue(null);
     }
 
@@ -32,18 +32,16 @@ public class BooleanInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public BooleanInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public BooleanInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new BooleanInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public BooleanInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public BooleanInputQuickFormValue createEmptyViewValue() {
+        return new BooleanInputQuickFormValue(null);
     }
 
     /**
@@ -59,17 +57,8 @@ public class BooleanInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final BooleanInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableInt(getNodeRepresentation().getFlowVariableName(), getNodeValue().getBoolean() ? 1 : 0);
+        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getDialogValue().getBoolean() ? 1 : 0);
     }
 
     /**
@@ -88,6 +77,14 @@ public class BooleanInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(BooleanInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

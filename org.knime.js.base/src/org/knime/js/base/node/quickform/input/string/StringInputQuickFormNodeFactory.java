@@ -10,7 +10,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class StringInputQuickFormNodeFactory extends NodeFactory<StringInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormViewContent> {
+        WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormViewRepresentation, StringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}

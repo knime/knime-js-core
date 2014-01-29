@@ -10,13 +10,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class DoubleInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue, DoubleInputQuickFormViewContent> {
+        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue, DoubleInputQuickFormViewRepresentation, DoubleInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DoubleInputQuickFormRepresentation createNodeRepresentation() {
+    protected DoubleInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new DoubleInputQuickFormRepresentation();
     }
 
@@ -24,7 +24,7 @@ public class DoubleInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected DoubleInputQuickFormValue createNodeValue() {
+    protected DoubleInputQuickFormValue createEmptyDialogValue() {
         return new DoubleInputQuickFormValue(null);
     }
 
@@ -32,18 +32,16 @@ public class DoubleInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public DoubleInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public DoubleInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new DoubleInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public DoubleInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public DoubleInputQuickFormValue createEmptyViewValue() {
+        return new DoubleInputQuickFormValue(null);
     }
 
     /**
@@ -59,17 +57,8 @@ public class DoubleInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final DoubleInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableDouble(getNodeRepresentation().getFlowVariableName(), getNodeValue().getDouble());
+        pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getDialogValue().getDouble());
     }
 
     /**
@@ -88,6 +77,14 @@ public class DoubleInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(DoubleInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

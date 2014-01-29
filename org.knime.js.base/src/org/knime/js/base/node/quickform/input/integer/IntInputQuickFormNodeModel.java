@@ -10,13 +10,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class IntInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue, IntInputQuickFormViewContent> {
+        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue, IntInputQuickFormViewRepresentation, IntInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected IntInputQuickFormRepresentation createNodeRepresentation() {
+    protected IntInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new IntInputQuickFormRepresentation();
     }
 
@@ -24,7 +24,7 @@ public class IntInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected IntInputQuickFormValue createNodeValue() {
+    protected IntInputQuickFormValue createEmptyDialogValue() {
         return new IntInputQuickFormValue(null);
     }
 
@@ -32,18 +32,16 @@ public class IntInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public IntInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public IntInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new IntInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public IntInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public IntInputQuickFormValue createEmptyViewValue() {
+        return new IntInputQuickFormValue(null);
     }
 
     /**
@@ -59,17 +57,8 @@ public class IntInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final IntInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableInt(getNodeRepresentation().getFlowVariableName(), getNodeValue().getInteger());
+        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getDialogValue().getInteger());
     }
 
     /**
@@ -88,6 +77,22 @@ public class IntInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewContent(IntInputQuickFormRepresentation viewContent) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(IntInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

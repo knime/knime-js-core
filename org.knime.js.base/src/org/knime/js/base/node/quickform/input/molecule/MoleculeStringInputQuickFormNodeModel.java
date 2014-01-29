@@ -10,13 +10,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class MoleculeStringInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<MoleculeStringInputQuickFormRepresentation, MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormViewContent> {
+        QuickFormFlowVariableNodeModel<MoleculeStringInputQuickFormRepresentation, MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormViewRepresentation, MoleculeStringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected MoleculeStringInputQuickFormRepresentation createNodeRepresentation() {
+    protected MoleculeStringInputQuickFormRepresentation createEmptyDialogRepresentation() {
         return new MoleculeStringInputQuickFormRepresentation();
     }
 
@@ -24,7 +24,7 @@ public class MoleculeStringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected MoleculeStringInputQuickFormValue createNodeValue() {
+    protected MoleculeStringInputQuickFormValue createEmptyDialogValue() {
         return new MoleculeStringInputQuickFormValue(null);
     }
 
@@ -32,18 +32,16 @@ public class MoleculeStringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public MoleculeStringInputQuickFormViewContent createViewContent() {
-        // TODO Auto-generated method stub
-        return null;
+    public MoleculeStringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
+        return new MoleculeStringInputQuickFormViewRepresentation();
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    public MoleculeStringInputQuickFormViewContent createEmptyInstance() {
-        // TODO Auto-generated method stub
-        return null;
+    public MoleculeStringInputQuickFormValue createEmptyViewValue() {
+        return new MoleculeStringInputQuickFormValue(null);
     }
 
     /**
@@ -59,18 +57,9 @@ public class MoleculeStringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewContent(final MoleculeStringInputQuickFormViewContent viewContent) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getNodeRepresentation().getFlowVariableName(), getNodeValue().getMoleculeString());
-        pushFlowVariableString("molecule_format", getNodeRepresentation().getFormat());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getMoleculeString());
+        pushFlowVariableString("molecule_format", getDialogRepresentation().getFormat());
     }
 
     /**
@@ -89,6 +78,23 @@ public class MoleculeStringInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewContent(
+            MoleculeStringInputQuickFormRepresentation viewContent) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void loadViewValue(MoleculeStringInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

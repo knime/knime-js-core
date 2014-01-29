@@ -159,6 +159,8 @@ public class JSONWebResource {
                     if (jp.getCurrentName().equals("relativePathTarget")) {
                         intoValue.setRelativePathTarget(jp.getValueAsString());
                     }
+                } else if (JsonToken.END_OBJECT == token) {
+                    break;
                 }
             }
             return intoValue;

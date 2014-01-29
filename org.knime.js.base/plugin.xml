@@ -67,15 +67,16 @@
             name="Filter"
             path="/quickform"/>
    </extension>
-   <extension point="org.knime.js.core.webResources">
+   <extension
+         point="org.knime.js.core.webResources">
       <webResourceBundle
             webResourceBundleID="org_knime_js_base_node_quickform_input_string_bundle">
          <webResource
-               relativePathSource="src-js/org/knime/js/base/node/quickform/input/string/"
+               relativePathSource="src/org/knime/js/base/node/quickform/input/string/js/"
                relativePathTarget="org/knime/js/base/node/quickform/input/string/">
          </webResource>
          <importResource
-               relativePath="org/knime/js/base/node/quickform/input/string/web-template.js"
+               relativePath="src/org/knime/js/base/node/quickform/input/string/js/WebView.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
@@ -83,11 +84,15 @@
    <extension
          point="org.knime.js.core.javascriptComponents">
       <javascriptComponent
+            getComponentValue-method-name="value"
             implementationBundleID="org_knime_js_base_node_quickform_input_string_bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_string"
             pullViewValue-method-name="pullViewValue"
             validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
       </javascriptComponent>
    </extension>
 

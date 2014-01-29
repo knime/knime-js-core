@@ -55,13 +55,14 @@ import java.util.Date;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableValue;
+import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
+public class DateStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_DATE = "date";
 
@@ -69,11 +70,17 @@ public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
 
     private Date m_date = DEFAULT_DATE;
     
+    private String m_valueKey;
+    
     /**
      * @param valueKey
      */
     public DateStringInputQuickFormValue(String valueKey) {
-        super(valueKey);
+        if(valueKey!=null && valueKey.length()>0) {
+            m_valueKey = valueKey;
+        } else {
+            m_valueKey = CFG_DATE;
+        }
     }
 
     /**
@@ -81,7 +88,7 @@ public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(getCfgString(CFG_DATE), DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
+        settings.addString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
     }
 
     /**
@@ -89,7 +96,7 @@ public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        String value = settings.getString(getCfgString(CFG_DATE));
+        String value = settings.getString(m_valueKey);
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {
@@ -102,7 +109,7 @@ public class DateStringInputQuickFormValue extends QuickFormFlowVariableValue {
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        String value = settings.getString(getCfgString(CFG_DATE), DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
+        String value = settings.getString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {

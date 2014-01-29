@@ -3,14 +3,20 @@ package org.knime.js.base.node.quickform.input.string;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
+import org.knime.core.node.web.JSONViewContent;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRepresentation<StringInputQuickFormValue> {
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public class StringInputQuickFormViewRepresentation extends JSONViewContent {
     
     private static final String CFG_REGEX = "regex";
     
@@ -27,6 +33,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the regex
      */
+    @JsonProperty("regex")
     public String getRegex() {
         return m_regex;
     }
@@ -34,6 +41,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param regex the regex to set
      */
+    @JsonProperty("regex")
     public void setRegex(final String regex) {
         m_regex = regex;
     }
@@ -42,8 +50,8 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
         m_defaultValue = settings.getString(CFG_DEFAULT);
         m_value = new StringInputQuickFormValue(null);
@@ -54,38 +62,17 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
-        m_defaultValue = settings.getString(CFG_DEFAULT, "");
-        m_value = new StringInputQuickFormValue(null);
-        m_value.loadFromNodeSettingsInDialog(settings);
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_DEFAULT, m_defaultValue);
         m_value.saveToNodeSettings(settings);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DialogNodePanel<StringInputQuickFormValue> createDialogPanel() {
-        StringInputQuickFormDialogPanel panel = new StringInputQuickFormDialogPanel();
-        fillDialogPanel(panel);
-        return panel;
-    }
-
-    /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -93,21 +80,15 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void resetNodeValueToDefault(final StringInputQuickFormValue value) {
-        value.setString(m_defaultValue);        
     }
     
     /**
      * @return the value
      */
+    @JsonProperty("value")
     public StringInputQuickFormValue getValue() {
         return m_value;
     }
@@ -115,6 +96,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param value the value to set
      */
+    @JsonProperty("value")
     public void setValue(final StringInputQuickFormValue value) {
         m_value = value;
     }

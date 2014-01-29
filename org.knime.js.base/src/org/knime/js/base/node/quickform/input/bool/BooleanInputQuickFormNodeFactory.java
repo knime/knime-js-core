@@ -10,7 +10,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class BooleanInputQuickFormNodeFactory extends NodeFactory<BooleanInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<BooleanInputQuickFormNodeModel, BooleanInputQuickFormViewContent> {
+        WizardNodeFactoryExtension<BooleanInputQuickFormNodeModel, BooleanInputQuickFormViewRepresentation, BooleanInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
