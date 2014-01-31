@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -90,9 +91,16 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
     /**
      * {@inheritDoc}
      */
+    @Override
     public void loadViewValue(DateStringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public ValidationError validateViewValue(DateStringInputQuickFormValue viewContent) {
+        return null;
     }
 
 }

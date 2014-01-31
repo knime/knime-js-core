@@ -18,6 +18,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
@@ -178,9 +179,16 @@ public class ListBoxInputQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void loadViewValue(ListBoxInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public ValidationError validateViewValue(ListBoxInputQuickFormValue viewContent) {
+        return null;
     }
 
 }

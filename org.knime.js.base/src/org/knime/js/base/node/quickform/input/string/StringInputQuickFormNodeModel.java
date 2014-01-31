@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.string;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -78,6 +79,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     /**
      * {@inheritDoc}
      */
+    @Override
     public void loadViewValue(StringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         
@@ -86,6 +88,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
         return new StringInputQuickFormViewRepresentation();
     }
@@ -93,8 +96,16 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     /**
      * {@inheritDoc}
      */
+    @Override
     public StringInputQuickFormValue createEmptyViewValue() {
         return new StringInputQuickFormValue(null);
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public ValidationError validateViewValue(StringInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

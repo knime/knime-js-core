@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.bool;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -82,9 +83,18 @@ public class BooleanInputQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void loadViewValue(BooleanInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         
     }
+    
+    /** {@inheritDoc} */
+    @Override
+    public ValidationError validateViewValue(BooleanInputQuickFormValue viewContent) {
+        return null;
+    }
+
+    
 
 }

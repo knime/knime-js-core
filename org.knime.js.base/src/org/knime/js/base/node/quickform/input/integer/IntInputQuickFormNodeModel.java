@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.integer;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -90,9 +91,17 @@ public class IntInputQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public void loadViewValue(IntInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public ValidationError validateViewValue(IntInputQuickFormValue viewContent) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
