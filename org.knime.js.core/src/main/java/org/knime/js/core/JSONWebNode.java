@@ -51,6 +51,8 @@ package org.knime.js.core;
 
 import java.util.List;
 
+import org.knime.core.node.web.JSONViewContent;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -70,8 +72,8 @@ public class JSONWebNode {
     private String m_validateMethodName;
     private String m_getViewValueMethodName;
 
-    private String m_viewRepresentation;
-    private String m_viewValue;
+    private JSONViewContent m_viewRepresentation;
+    private JSONViewContent m_viewValue;
 
     /**
      * @return the javascript libraries
@@ -173,7 +175,7 @@ public class JSONWebNode {
      * @return the view representation
      */
     @JsonProperty("viewRepresentation")
-    public String getViewRepresentation() {
+    public JSONViewContent getViewRepresentation() {
         return m_viewRepresentation;
     }
 
@@ -181,7 +183,7 @@ public class JSONWebNode {
      * @param viewRepresentation
      */
     @JsonProperty("viewRepresentation")
-    public void setViewRepresentation(final String viewRepresentation) {
+    public void setViewRepresentation(final JSONViewContent viewRepresentation) {
         m_viewRepresentation = viewRepresentation;
     }
 
@@ -189,7 +191,7 @@ public class JSONWebNode {
      * @return the view value
      */
     @JsonProperty("viewValue")
-    public String getViewValue() {
+    public JSONViewContent getViewValue() {
         return m_viewValue;
     }
 
@@ -197,7 +199,7 @@ public class JSONWebNode {
      * @param viewValue
      */
     @JsonProperty("viewValue")
-    public void setViewValue(final String viewValue) {
+    public void setViewValue(final JSONViewContent viewValue) {
         m_viewValue = viewValue;
     }
 

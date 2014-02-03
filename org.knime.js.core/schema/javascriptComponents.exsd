@@ -60,6 +60,13 @@ Good practice is to use the Java package name of the node using the resource, li
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="namespace" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="init-method-name" type="string" use="default" value="init">
             <annotation>
                <documentation>

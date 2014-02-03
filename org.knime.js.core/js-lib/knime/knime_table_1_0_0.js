@@ -3,7 +3,7 @@
 // Copyright by KNIME.com AG, Zurich Switzerland.
 // All rights reserved.
 
-kt_1_0_0 = function() {
+kt = function() {
 	var kt = { version: "1.0.0" };
 	
 	var dataTable = {};

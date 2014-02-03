@@ -92,6 +92,9 @@
                <documentation>
                   
                </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/webResource/@relativePathTarget"/>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="type" use="required">
