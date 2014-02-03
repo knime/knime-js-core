@@ -37,6 +37,11 @@
             factory-class="org.knime.js.base.node.quickform.input.molecule.MoleculeStringInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.molecule.MoleculeStringInputQuickFormNodeFactory">
       </node>
+      <node
+            after="org.knime.base.node.viz.plotter.line.LinePlotterNodeFactory"
+            category-path="/view"
+            factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -80,6 +85,21 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.line.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/viz/plotter/line/web/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/line/">
+         </webResource>
+         <importResource
+               relativePath="src/org/knime/js/base/node/viz/plotter/line/web/web-template.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/node/viz/plotter/line/web/styles.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -88,10 +108,24 @@
             implementationBundleID="org_knime_js_base_node_quickform_input_string_bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_string"
-            pullViewValue-method-name="pullViewValue"
+            namespace="org_knime_js_base_node_quickform_input_string"
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.line.bundle"
+            init-method-name="init"
+            jsObjectID="knime_line_plotter"
+            namespace="knime_line_plotter"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="D3_3.2.8_Debug">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
       </javascriptComponent>
    </extension>
