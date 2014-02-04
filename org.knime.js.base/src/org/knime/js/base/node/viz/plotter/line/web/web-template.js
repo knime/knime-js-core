@@ -24,12 +24,14 @@ knime_line_plotter = function() {
 	var svg;
 	var line;
 	var valueGroup;
+	
+	var viewValue;
 
-	lineChart.init = function(viewContent, containerID) {
+	lineChart.init = function(representation, value) {
+		viewValue = value;
 		var knimeTable = new kt;
-		var parsedContent = JSON.parse(viewContent);
-		knimeTable.setDataTable(parsedContent.table);
-		container = "#" + containerID;
+		knimeTable.setDataTable(representation.table);
+		container = "body";
 		
 		hiliteHandler = knimeTable.getExtension("hilite");
 		var colNames = knimeTable.getColumnNames();
@@ -125,15 +127,15 @@ knime_line_plotter = function() {
 		
 		svg.call(brush);
 		update();
-	}
+	};
 
 	lineChart.hiliteChangeListener = function(changedRowIDs) {
 		update(changedRowIDs);
-	}
+	};
 
 	lineChart.hiliteClearListener = function() {
 		update();
-	}
+	};
 
 	function brushstart() {
 		hiliteHandler.fireClearHilite();
@@ -171,9 +173,13 @@ knime_line_plotter = function() {
 		});
 	}
 
-	lineChart.pullViewContent = function(container) {
-		// do nothing
-	}
+	lineChart.validate = function() {
+		return true;
+	};
+
+	lineChart.getComponentValue = function() {
+		return viewValue;
+	};
 	
 	return lineChart;
 }();

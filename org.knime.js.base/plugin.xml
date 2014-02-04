@@ -42,6 +42,11 @@
             category-path="/view"
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/>
+      <node
+            after="org.knime.base.node.rowselector.RowSelectorNodeFactory"
+            category-path="/quickforms/input"
+            factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
+            id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -100,6 +105,21 @@
                type="CSS">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.rowselector.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/rowselector/web/"
+               relativePathTarget="org/knime/js/base/node/rowselector/">
+         </webResource>
+         <importResource
+               relativePath="src/org/knime/js/base/node/rowselector/web/web-template.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/node/rowselector/web/styles.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -126,6 +146,20 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.rowselector.bundle"
+            init-method-name="init"
+            jsObjectID="knime_row_selector"
+            namespace="knime_row_selector"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="KnimeTable_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
          </webDependency>
       </javascriptComponent>
    </extension>
