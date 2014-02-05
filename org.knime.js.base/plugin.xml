@@ -43,8 +43,8 @@
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/>
       <node
-            after="org.knime.base.node.rowselector.RowSelectorNodeFactory"
-            category-path="/quickforms/input"
+            after="org.knime.base.node.preproc.filter.row.RowFilterNodeFactory"
+            category-path="/manipulation/row/row-filter"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/>
    </extension>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<knimeNode icon="./rowselector.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
-	<name>Row Selector</name>
+<knimeNode icon="./rowselector.gif" type="Manipulator" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+	<name>Row Selector (web-enabled)</name>
 	
 	<shortDescription>
 	</shortDescription>
@@ -13,6 +13,7 @@
     </interactiveView>
 	<ports>
 		<inPort index="0" name="Table">Table from which to select.</inPort>
+		<outPort index="0" name="Filtered table">Table with only the selected rows.</outPort>
 	</ports>
 	
 </knimeNode>

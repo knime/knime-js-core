@@ -97,6 +97,7 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
         m_input = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
+        m_representation.setTable(m_input);
         // TODO filter input table;
         BufferedDataContainer container = exec.createDataContainer(inData[0].getDataTableSpec());
         Set<Long> selected = new HashSet<Long>(java.util.Arrays.asList(ArrayUtils.toObject(m_value.getSelections())));

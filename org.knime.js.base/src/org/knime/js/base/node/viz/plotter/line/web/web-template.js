@@ -28,105 +28,109 @@ knime_line_plotter = function() {
 	var viewValue;
 
 	lineChart.init = function(representation, value) {
-		viewValue = value;
-		var knimeTable = new kt;
-		knimeTable.setDataTable(representation.table);
-		container = "body";
-		
-		hiliteHandler = knimeTable.getExtension("hilite");
-		var colNames = knimeTable.getColumnNames();
-		var colTypes = knimeTable.getColumnTypes();
-		var numberColsIDs = [];
-		var numberColNames = [];
-		color = d3.scale.category10();
-		
-		for (var i = 0; i < colTypes.length; i++) {
-			if (colTypes[i] === "number") {
-				numberColsIDs.push(i);
-				numberColNames.push(colNames[i]);
+		if (representation.table == null) {
+			document.body.innerHTML = "Error: No data available";
+		} else {
+			viewValue = value;
+			var knimeTable = new kt;
+			knimeTable.setDataTable(representation.table);
+			container = "body";
+			
+			hiliteHandler = knimeTable.getExtension("hilite");
+			var colNames = knimeTable.getColumnNames();
+			var colTypes = knimeTable.getColumnTypes();
+			var numberColsIDs = [];
+			var numberColNames = [];
+			color = d3.scale.category10();
+			
+			for (var i = 0; i < colTypes.length; i++) {
+				if (colTypes[i] === "number") {
+					numberColsIDs.push(i);
+					numberColNames.push(colNames[i]);
+				}
 			}
+			color.domain(numberColNames);
+		
+			//generate d3 data
+			valueSet = color.domain().map(function(name, i) {
+				return {
+					name: name,
+					values: knimeTable.getColumn(numberColsIDs[i])
+				};
+			});
+			x = d3.scale.linear()
+				.domain([0, knimeTable.getNumRows()])
+				.nice()
+				.range([0, width]);
+			var yDomain = [d3.min(valueSet, function(s) { return d3.min(s.values); }), 
+			               d3.max(valueSet, function(s) { return d3.max(s.values); })];
+			y = d3.scale.linear()
+				.domain(yDomain)
+				.nice()
+			    .range([height, 0]);
+			
+			xAxis = d3.svg.axis()
+		    	.scale(x)
+		    	.tickSize(5, 3, 5)
+		    	.tickSubdivide(10)
+		    	.tickPadding(5)
+		    	.orient("bottom");
+			
+			yAxis = d3.svg.axis()
+		    	.scale(y)
+		    	.tickSize(5, 3, 0)
+		    	.tickPadding(5)
+		    	.orient("left");
+			
+			brush = d3.svg.brush()
+				.x(x).y(y)
+				.on("brushstart", brushstart)
+				.on("brush", brushing)
+				.on("brushend", brushend);
+			
+			svg = d3.select(container).append("svg")
+		    	.attr("width", width + margin.left + margin.right)
+		    	.attr("height", height + margin.top + margin.bottom)
+		    	.append("g")
+		    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+			svg.append("g")
+		    	.attr("class", "x axis")
+		    	.attr("transform", "translate(0," + height + ")")
+		    	.call(xAxis);
+		
+			svg.append("g")
+		    	.attr("class", "y axis")
+		    	.call(yAxis);
+		
+			line = d3.svg.line()
+		    	.x(function(d, i) { return x(i); })
+		    	.y(function(d) { return y(d); })
+		    	.interpolate("linear");
+		
+			valueGroup = svg.selectAll(".valueSet")
+				.data(valueSet)
+				.enter().append("g")
+					.attr("class", "valueSet");
+		
+			valueGroup.append("path")
+				.attr("class", "line")
+				.attr("d", function(d) { return line(d.values); })
+				.style("stroke", function(d) { return color(d.name); });
+		
+			valueGroup.selectAll(".dot")
+		    	.data(function(d) { return d.values; })
+		    	.enter().append("circle")
+		    		.attr("class", "dot")
+		    		.attr("r", 3)
+					.attr("stroke-width", 3)
+		    		.attr("cx", function(d, i) { return x(i); })
+		    		.attr("cy", function(d) { return y(d); })
+		    		.style("fill", function(d) { return color(this.parentNode.__data__.name); });
+			
+			svg.call(brush);
+			update();
 		}
-		color.domain(numberColNames);
-	
-		//generate d3 data
-		valueSet = color.domain().map(function(name, i) {
-			return {
-				name: name,
-				values: knimeTable.getColumn(numberColsIDs[i])
-			};
-		});
-		x = d3.scale.linear()
-			.domain([0, knimeTable.getNumRows()])
-			.nice()
-			.range([0, width]);
-		var yDomain = [d3.min(valueSet, function(s) { return d3.min(s.values); }), 
-		               d3.max(valueSet, function(s) { return d3.max(s.values); })];
-		y = d3.scale.linear()
-			.domain(yDomain)
-			.nice()
-		    .range([height, 0]);
-		
-		xAxis = d3.svg.axis()
-	    	.scale(x)
-	    	.tickSize(5, 3, 5)
-	    	.tickSubdivide(10)
-	    	.tickPadding(5)
-	    	.orient("bottom");
-		
-		yAxis = d3.svg.axis()
-	    	.scale(y)
-	    	.tickSize(5, 3, 0)
-	    	.tickPadding(5)
-	    	.orient("left");
-		
-		brush = d3.svg.brush()
-			.x(x).y(y)
-			.on("brushstart", brushstart)
-			.on("brush", brushing)
-			.on("brushend", brushend);
-		
-		svg = d3.select(container).append("svg")
-	    	.attr("width", width + margin.left + margin.right)
-	    	.attr("height", height + margin.top + margin.bottom)
-	    	.append("g")
-	    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-	
-		svg.append("g")
-	    	.attr("class", "x axis")
-	    	.attr("transform", "translate(0," + height + ")")
-	    	.call(xAxis);
-	
-		svg.append("g")
-	    	.attr("class", "y axis")
-	    	.call(yAxis);
-	
-		line = d3.svg.line()
-	    	.x(function(d, i) { return x(i); })
-	    	.y(function(d) { return y(d); })
-	    	.interpolate("linear");
-	
-		valueGroup = svg.selectAll(".valueSet")
-			.data(valueSet)
-			.enter().append("g")
-				.attr("class", "valueSet");
-	
-		valueGroup.append("path")
-			.attr("class", "line")
-			.attr("d", function(d) { return line(d.values); })
-			.style("stroke", function(d) { return color(d.name); });
-	
-		valueGroup.selectAll(".dot")
-	    	.data(function(d) { return d.values; })
-	    	.enter().append("circle")
-	    		.attr("class", "dot")
-	    		.attr("r", 3)
-				.attr("stroke-width", 3)
-	    		.attr("cx", function(d, i) { return x(i); })
-	    		.attr("cy", function(d) { return y(d); })
-	    		.style("fill", function(d) { return color(this.parentNode.__data__.name); });
-		
-		svg.call(brush);
-		update();
 	};
 
 	lineChart.hiliteChangeListener = function(changedRowIDs) {
