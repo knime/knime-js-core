@@ -86,7 +86,7 @@
                relativePathTarget="org/knime/js/base/node/quickform/input/string/">
          </webResource>
          <importResource
-               relativePath="src/org/knime/js/base/node/quickform/input/string/js/WebView.js"
+               relativePath="org/knime/js/base/node/quickform/input/string/js/WebView.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
@@ -97,11 +97,11 @@
                relativePathTarget="org/knime/js/base/node/viz/plotter/line/">
          </webResource>
          <importResource
-               relativePath="src/org/knime/js/base/node/viz/plotter/line/web/web-template.js"
+               relativePath="org/knime/js/base/node/viz/plotter/line/web-template.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/node/viz/plotter/line/web/styles.css"
+               relativePath="org/knime/js/base/node/viz/plotter/line/styles.css"
                type="CSS">
          </importResource>
       </webResourceBundle>
@@ -112,11 +112,11 @@
                relativePathTarget="org/knime/js/base/node/rowselector/">
          </webResource>
          <importResource
-               relativePath="src/org/knime/js/base/node/rowselector/web/web-template.js"
+               relativePath="org/knime/js/base/node/rowselector/web-template.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/node/rowselector/web/styles.css"
+               relativePath="org/knime/js/base/node/rowselector/styles.css"
                type="CSS">
          </importResource>
       </webResourceBundle>

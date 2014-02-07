@@ -55,12 +55,13 @@ import java.io.IOException;
 import org.knime.base.data.filter.column.FilterColumnTable;
 import org.knime.base.node.viz.plotter.node.DefaultVisualizationNodeModel;
 import org.knime.core.data.DataTable;
-import org.knime.core.data.container.ContainerTable;
-import org.knime.core.data.container.DataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONDataTable;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
@@ -91,6 +92,30 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         }
         return new BufferedDataTable[0];
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(NodeSettingsRO settings) throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(NodeSettingsWO settings) {
+        // TODO Auto-generated method stub
+    }
 
     /**
      * {@inheritDoc}
@@ -98,9 +123,18 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
-        File f = new File(nodeInternDir, FILE_NAME);
+        /*File f = new File(nodeInternDir, FILE_NAME);
         ContainerTable table = DataContainer.readFromZip(f);
-        m_input = new JSONDataTable(table, 1, getEndIndex(), exec);
+        m_input = new JSONDataTable(table, 1, getEndIndex(), exec);*/
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(File nodeInternDir, ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        // TODO Auto-generated method stub
     }
 
     /**
@@ -163,5 +197,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         // TODO Auto-generated method stub
         return null;
     }
+    
+    
 
 }

@@ -32,6 +32,7 @@ knime_row_selector = function() {
 				} else {
 					$('.row').css('color', 'grey');
 				}
+				parent.KnimePageLoader.getPageValues();
 			});
 			for ( var i = 0; i < knimeTable.getColumnNames().length; i++) {
 				var tableHeader = $('<th>');
@@ -59,6 +60,7 @@ knime_row_selector = function() {
 					} else {
 						$('#row' + val).css('color', 'grey');
 					}
+					parent.KnimePageLoader.getPageValues();
 				});
 				for ( var j = 0; j < knimeTable.getColumnNames().length; j++) {
 					var columnType = knimeTable.getColumnTypes()[j];
