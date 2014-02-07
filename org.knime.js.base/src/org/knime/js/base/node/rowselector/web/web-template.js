@@ -14,6 +14,7 @@ knime_row_selector = function() {
 			var knimeTable = new kt();
 			knimeTable.setDataTable(representation.table);
 			var table = $('<table>');
+			table.css('margin', '0 auto');
 			var headerRow = $('<tr>');
 			table.append(headerRow);
 			var selectAllData = $('<td>');
@@ -60,9 +61,16 @@ knime_row_selector = function() {
 					}
 				});
 				for ( var j = 0; j < knimeTable.getColumnNames().length; j++) {
+					var columnType = knimeTable.getColumnTypes()[j];
 					var tableData = $('<td>');
 					tableRow.append(tableData);
-					tableData.text(knimeTable.getColumn(j)[i]);
+					if (columnType=="boolean" || columnType=="number" || columnType=="string") {
+						tableData.text(knimeTable.getColumn(j)[i]);
+					} else if (columnType=="png") {
+						var image = $('<img>');
+						tableData.append(image);
+						image.attr('src', 'data:image/png;base64,' + knimeTable.getColumn(j)[i]);
+					}
 				}
 			}
 			body.append(table);
