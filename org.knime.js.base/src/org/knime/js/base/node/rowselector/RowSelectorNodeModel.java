@@ -98,7 +98,6 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
         throws Exception {
         m_input = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
         m_representation.setTable(m_input);
-        // TODO filter input table;
         BufferedDataContainer container = exec.createDataContainer(inData[0].getDataTableSpec());
         Set<Long> selected = new HashSet<Long>(java.util.Arrays.asList(ArrayUtils.toObject(m_value.getSelections())));
         long i = 0;
@@ -191,8 +190,8 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+        m_representation.saveToNodeSettings(settings);
+        m_value.saveToNodeSettings(settings);
     }
 
     /**
@@ -200,8 +199,8 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -209,8 +208,8 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        m_representation.loadFromNodeSettings(settings);
+        m_value.loadFromNodeSettings(settings);
     }
 
     /**
@@ -218,8 +217,7 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
      */
     @Override
     protected void reset() {
-        // TODO Auto-generated method stub
-
+        // not used
     }
 
     /**
