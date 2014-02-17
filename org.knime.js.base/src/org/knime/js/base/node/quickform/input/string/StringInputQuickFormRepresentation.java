@@ -22,7 +22,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     
     private String m_defaultValue;
     
-    private StringInputQuickFormValue m_value;
+    private StringInputQuickFormValue m_value = new StringInputQuickFormValue(null);
     
     /**
      * @return the regex
