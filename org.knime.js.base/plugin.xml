@@ -47,6 +47,16 @@
             category-path="/manipulation/row/row-filter"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/>
+      <node
+            category-path="/quickform/selection"
+            factory-class="org.knime.js.base.node.quickform.selection.single.SingleSelectionQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.selection.single.SingleSelectionQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/quickform/selection"
+            factory-class="org.knime.js.base.node.quickform.selection.multiple.MultipleSelectionQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.selection.multiple.MultipleSelectionQuickFormNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
