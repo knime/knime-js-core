@@ -50,8 +50,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_input_integer";
     }
 
     /**
@@ -59,7 +58,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getDialogValue().getInteger());
+        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getViewValue().getInteger());
     }
 
     /**
@@ -78,23 +77,6 @@ public class IntInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void loadViewContent(IntInputQuickFormRepresentation viewContent) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(IntInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
     
     /** {@inheritDoc} */

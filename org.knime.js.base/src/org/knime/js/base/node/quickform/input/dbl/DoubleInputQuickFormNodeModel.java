@@ -50,8 +50,7 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_input_dbl";
     }
 
     /**
@@ -59,7 +58,7 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getDialogValue().getDouble());
+        pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getViewValue().getDouble());
     }
 
     /**
@@ -78,15 +77,6 @@ public class DoubleInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(DoubleInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
     
     /** {@inheritDoc} */

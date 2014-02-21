@@ -130,6 +130,50 @@
                type="CSS">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.molecule.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/molecule/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/molecule/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/molecule/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.integer.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/integer/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/integer/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/integer/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.dbl.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/dbl/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/dbl/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/dbl/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.bool.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/bool/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/bool/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/bool/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -168,6 +212,50 @@
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.molecule.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_molecule"
+            namespace="org_knime_js_base_node_quickform_input_molecule"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.integer.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_integer"
+            namespace="org_knime_js_base_node_quickform_input_integer"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.dbl.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_dbl"
+            namespace="org_knime_js_base_node_quickform_input_dbl"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.10.2">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.bool.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_bool"
+            namespace="org_knime_js_base_node_quickform_input_bool"
+            validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.10.2">
          </webDependency>

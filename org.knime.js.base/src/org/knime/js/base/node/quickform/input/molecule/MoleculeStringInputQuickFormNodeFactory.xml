@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="smilesIn.png" type="QuickForm">
+<knimeNode icon="./smilesIn.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
 	<name>Molecule String Input</name>
 	<shortDescription>Outputs a molecule string in the specified format.</shortDescription>
 	<fullDescription>
@@ -23,6 +22,9 @@
 		<option name="Molecule String">The string representation of a molecule.</option>
 		<option name="Format">The format of the molecule string. Please note that not all molecule sketchers support all formats.</option>
 	</fullDescription>
+	<interactiveView name="Molecule input">
+    	Input a molecule.
+    </interactiveView>
 	<ports>
 		<outPort index="0" name="Flow Variable Output">Variable output with the given variable defined.</outPort>
 	</ports>

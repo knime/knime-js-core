@@ -41,7 +41,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getString());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getString());
     }
 
     /**
@@ -59,30 +59,6 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     @Override
     protected void reset() {
         // not used
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public StringInputQuickFormRepresentation createEmptyRepresentationInstance() {
-        return new StringInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public StringInputQuickFormValue createEmptyValueInstance() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(StringInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
 
     /**

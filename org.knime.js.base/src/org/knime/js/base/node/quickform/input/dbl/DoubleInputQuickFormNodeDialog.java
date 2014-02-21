@@ -54,7 +54,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_defaultSpinner.setValue(representation.getDefaultValue());
-        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue(getFlowVariableName());
+        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue(null);
         value.loadFromNodeSettingsInDialog(settings);
         m_valueSpinner.setValue(value.getDouble());
     }
@@ -68,7 +68,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         saveSettingsTo(representation);
         representation.setDefaultValue((Double)m_defaultSpinner.getValue());
         representation.saveToNodeSettings(settings);
-        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue(getFlowVariableName());
+        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue(null);
         value.setDouble((Double)m_valueSpinner.getValue());
         value.saveToNodeSettings(settings);
     }

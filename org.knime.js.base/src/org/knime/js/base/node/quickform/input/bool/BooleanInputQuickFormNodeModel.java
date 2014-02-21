@@ -50,8 +50,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_input_bool";
     }
 
     /**
@@ -59,7 +58,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getDialogValue().getBoolean() ? 1 : 0);
+        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getViewValue().getBoolean() ? 1 : 0);
     }
 
     /**
@@ -78,15 +77,6 @@ public class BooleanInputQuickFormNodeModel
     protected void reset() {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(BooleanInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
     
     /** {@inheritDoc} */

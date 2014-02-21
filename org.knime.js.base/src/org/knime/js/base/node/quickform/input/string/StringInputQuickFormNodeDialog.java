@@ -54,7 +54,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         loadSettingsFrom(representation);
         m_regexField.setText(representation.getRegex());
         m_defaultField.setText(representation.getDefaultValue());
-        StringInputQuickFormValue value = new StringInputQuickFormValue(getFlowVariableName());
+        StringInputQuickFormValue value = new StringInputQuickFormValue(null);
         value.loadFromNodeSettingsInDialog(settings);
         m_valueField.setText(value.getString());
     }
@@ -69,7 +69,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.setRegex(m_regexField.getText());
         representation.setDefaultValue(m_defaultField.getText());
         representation.saveToNodeSettings(settings);
-        StringInputQuickFormValue value = new StringInputQuickFormValue(getFlowVariableName());
+        StringInputQuickFormValue value = new StringInputQuickFormValue(null);
         value.setString(m_valueField.getText());
         value.saveToNodeSettings(settings);
     }

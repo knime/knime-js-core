@@ -50,8 +50,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_input_molecule";
     }
 
     /**
@@ -59,7 +58,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getMoleculeString());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getMoleculeString());
         pushFlowVariableString("molecule_format", getDialogRepresentation().getFormat());
     }
 
@@ -80,28 +79,10 @@ public class MoleculeStringInputQuickFormNodeModel
         // TODO Auto-generated method stub
 
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void loadViewContent(
-            MoleculeStringInputQuickFormRepresentation viewContent) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(MoleculeStringInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
-    }
     
     /** {@inheritDoc} */
     @Override
-    public ValidationError validateViewValue(MoleculeStringInputQuickFormValue viewContent) {
+    public ValidationError validateViewValue(final MoleculeStringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }

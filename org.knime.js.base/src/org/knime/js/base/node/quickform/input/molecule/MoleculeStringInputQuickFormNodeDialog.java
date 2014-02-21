@@ -59,7 +59,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         loadSettingsFrom(representation);
         m_defaultArea.setText(representation.getDefaultValue());
         m_formatBox.setSelectedItem(representation.getFormat());
-        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue(getFlowVariableName());
+        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue(null);
         value.loadFromNodeSettingsInDialog(settings);
         m_valueArea.setText(value.getMoleculeString());
     }
@@ -74,7 +74,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         representation.setFormat(m_formatBox.getSelectedItem().toString());
         representation.setDefaultValue(m_defaultArea.getText());
         representation.saveToNodeSettings(settings);
-        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue(getFlowVariableName());
+        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue(null);
         value.setMoleculeString(m_valueArea.getText());
         value.saveToNodeSettings(settings);
     }

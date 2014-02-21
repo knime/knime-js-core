@@ -56,10 +56,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class BooleanInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_BOOLEAN = "boolean";
@@ -85,6 +92,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addBoolean(m_valueKey, getBoolean());
     }
@@ -93,6 +101,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setBoolean(settings.getBoolean(m_valueKey));
     }
@@ -101,6 +110,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         setBoolean(settings.getBoolean(m_valueKey, DEFAULT_BOOLEAN));
     }
@@ -108,6 +118,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     /**
      * @return the string
      */
+    @JsonProperty("boolean")
     public boolean getBoolean() {
         return m_boolean;
     }
@@ -115,6 +126,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     /**
      * @param bool the boolean to set
      */
+    @JsonProperty("boolean")
     public void setBoolean(final boolean bool) {
         m_boolean = bool;
     }
@@ -123,6 +135,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub

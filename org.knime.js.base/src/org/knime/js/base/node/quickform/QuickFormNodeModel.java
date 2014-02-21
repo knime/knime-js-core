@@ -127,6 +127,14 @@ public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<D
     }
     
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadViewValue(final VVAL viewContent) {
+        m_viewValue = viewContent;
+    };
+    
+    /**
      * @return The node representation
      */
     protected abstract DREP createEmptyDialogRepresentation();

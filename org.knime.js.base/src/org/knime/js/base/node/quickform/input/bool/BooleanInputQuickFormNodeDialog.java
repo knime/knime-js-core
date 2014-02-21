@@ -49,7 +49,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_defaultField.setSelected(representation.getDefaultValue());
-        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue(getFlowVariableName());
+        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue(null);
         value.loadFromNodeSettingsInDialog(settings);
         m_valueField.setSelected(value.getBoolean());
     }
@@ -63,7 +63,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
         saveSettingsTo(representation);
         representation.setDefaultValue(m_defaultField.isSelected());
         representation.saveToNodeSettings(settings);
-        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue(getFlowVariableName());
+        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue(null);
         value.setBoolean(m_valueField.isSelected());
         value.saveToNodeSettings(settings);
     }
