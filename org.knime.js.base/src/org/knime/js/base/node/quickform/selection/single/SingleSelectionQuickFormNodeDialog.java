@@ -24,21 +24,21 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
-    private final JList<String> m_defaultField;
+    private final JList m_defaultField;
 
-    private final JList<String> m_valueField;
+    private final JList m_valueField;
 
     private final JTextArea m_possibleChoicesField;
 
-    private final JComboBox<String> m_type;
+    private final JComboBox m_type;
 
     /**
      * Constructors, inits fields calls layout routines.
      */
     SingleSelectionQuickFormNodeDialog() {
-        m_defaultField = new JList<String>();
+        m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        m_valueField = new JList<String>();
+        m_valueField = new JList();
         m_valueField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_possibleChoicesField = new JTextArea();
         m_possibleChoicesField.getDocument().addDocumentListener(new DocumentListener() {
@@ -55,7 +55,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
                 refreshChoices();
             }
         });
-        m_type = new JComboBox<String>(SingleSelectionType.getAllTypes());
+        m_type = new JComboBox(SingleSelectionType.getAllTypes());
         createAndAddTab();
     }
 
@@ -104,12 +104,12 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         SingleSelectionQuickFormRepresentation representation = new SingleSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setDefaultValue(m_defaultField.getSelectedValue());
+        representation.setDefaultValue((String)m_defaultField.getSelectedValue());
         representation.setPossibleChoices(m_possibleChoicesField.getText().replace("\n", ","));
-        representation.setType(m_type.getItemAt(m_type.getSelectedIndex()));
+        representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
         representation.saveToNodeSettings(settings);
         SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
-        value.setVariableValue(m_valueField.getSelectedValue());
+        value.setVariableValue((String)m_valueField.getSelectedValue());
         value.saveToNodeSettings(settings);
     }
 
@@ -129,8 +129,8 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      * 
      * @param list The list that will be refreshed
      */
-    private void refreshChoices(final JList<String> list) {
-        String selection = list.getSelectedValue();
+    private void refreshChoices(final JList list) {
+        String selection = (String)list.getSelectedValue();
         list.setListData(m_possibleChoicesField.getText().split("\n"));
         list.setSelectedValue(selection, false);
     }

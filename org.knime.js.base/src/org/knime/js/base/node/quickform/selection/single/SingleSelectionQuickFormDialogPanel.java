@@ -171,10 +171,10 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
         private static final int MIN_WIDTH = 200;
 
-        private JList<String> m_list;
+        private JList m_list;
 
         ListComponent(final String[] choices) {
-            m_list = new JList<String>(choices);
+            m_list = new JList(choices);
             m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             m_list.setBorder(new EtchedBorder());
             if (m_list.getPreferredSize().width < MIN_WIDTH) {
@@ -189,7 +189,12 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
         @Override
         public String getSelection() {
-            return m_list.getSelectedValuesList().get(0);
+            Object[] values = m_list.getSelectedValues();
+            if (values.length > 0) {
+                return (String)values[0];
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -201,10 +206,10 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
     private class DropdownComponent implements SingleSelectionComponent {
 
-        private JComboBox<String> m_comboBox;
+        private JComboBox m_comboBox;
 
         DropdownComponent(final String[] choices) {
-            m_comboBox = new JComboBox<String>(choices);
+            m_comboBox = new JComboBox(choices);
         }
 
         @Override
@@ -214,7 +219,7 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
         @Override
         public String getSelection() {
-            return m_comboBox.getItemAt(m_comboBox.getSelectedIndex());
+            return (String)m_comboBox.getItemAt(m_comboBox.getSelectedIndex());
         }
 
         @Override

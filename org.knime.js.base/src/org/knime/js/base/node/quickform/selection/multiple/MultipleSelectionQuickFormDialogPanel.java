@@ -178,10 +178,10 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
 
         private static final int MIN_WIDTH = 200;
 
-        private JList<String> m_list;
+        private JList m_list;
 
         ListComponent(final String[] choices) {
-            m_list = new JList<String>(choices);
+            m_list = new JList(choices);
             m_list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
             m_list.setBorder(new EtchedBorder());
             if (m_list.getPreferredSize().width < MIN_WIDTH) {
@@ -196,14 +196,14 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
 
         @Override
         public String[] getSelections() {
-            return m_list.getSelectedValuesList().toArray(new String[0]);
+            return (Arrays.asList(m_list.getSelectedValues())).toArray(new String[0]);
         }
 
         @Override
         public void setSelections(final String[] selections) {
             List<Integer> indices = new ArrayList<Integer>(selections.length);
             List<String> selectionsList = Arrays.asList(selections);
-            ListModel<String> model = m_list.getModel();
+            ListModel model = m_list.getModel();
             for (int i = 0; i < model.getSize(); i++) {
                 if (selectionsList.contains(model.getElementAt(i))) {
                     indices.add(i);
@@ -220,26 +220,26 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
 
         private String[] m_choices;
 
-        private JList<String> m_includeList;
+        private JList m_includeList;
 
-        private JList<String> m_excludeList;
+        private JList m_excludeList;
 
-        private DefaultListModel<String> m_includeModel;
+        private DefaultListModel m_includeModel;
 
-        private DefaultListModel<String> m_excludeModel;
+        private DefaultListModel m_excludeModel;
 
         TwinlistComponent(final String[] choices) {
-            m_includeModel = new DefaultListModel<String>();
-            m_excludeModel = new DefaultListModel<String>();
+            m_includeModel = new DefaultListModel();
+            m_excludeModel = new DefaultListModel();
             m_choices = choices;
             m_panel = new JPanel();
-            m_includeList = new JList<String>(m_includeModel);
-            m_excludeList = new JList<String>(m_excludeModel);
+            m_includeList = new JList(m_includeModel);
+            m_excludeList = new JList(m_excludeModel);
             m_includeList.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() == 2) {
-                        removeFromSelection(m_includeList.getSelectedValuesList());
+                        removeFromSelection((List)Arrays.asList(m_includeList.getSelectedValues()));
                     }
                     super.mouseClicked(e);
                 }
@@ -248,7 +248,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
                 @Override
                 public void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() == 2) {
-                        addToSelection(m_excludeList.getSelectedValuesList());
+                        addToSelection((List)Arrays.asList(m_excludeList.getSelectedValues()));
                     }
                     super.mouseClicked(e);
                 }
@@ -260,7 +260,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
             includeSelected.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent arg0) {
-                    addToSelection(m_excludeList.getSelectedValuesList());
+                    addToSelection((List)Arrays.asList(m_excludeList.getSelectedValues()));
                 }
             });
             includeAll.addActionListener(new ActionListener() {
@@ -272,7 +272,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
             excludeSelected.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(final ActionEvent arg0) {
-                    removeFromSelection(m_includeList.getSelectedValuesList());
+                    removeFromSelection((List)Arrays.asList(m_includeList.getSelectedValues()));
                 }
             });
             excludeAll.addActionListener(new ActionListener() {
@@ -326,7 +326,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
         public String[] getSelections() {
             String[] selections = new String[m_includeModel.getSize()];
             for (int i = 0; i < m_includeModel.getSize(); i++) {
-                selections[i] = m_includeModel.getElementAt(i);
+                selections[i] = (String)m_includeModel.getElementAt(i);
             }
             return selections;
         }

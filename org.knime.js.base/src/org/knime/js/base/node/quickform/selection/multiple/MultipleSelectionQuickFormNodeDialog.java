@@ -30,21 +30,21 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
-    private final JList<String> m_defaultField;
+    private final JList m_defaultField;
 
-    private final JList<String> m_valueField;
+    private final JList m_valueField;
 
     private final JTextArea m_possibleChoicesField;
 
-    private final JComboBox<String> m_type;
+    private final JComboBox m_type;
 
     /**
      * Constructors, inits fields calls layout routines.
      */
     MultipleSelectionQuickFormNodeDialog() {
-        m_defaultField = new JList<String>();
+        m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        m_valueField = new JList<String>();
+        m_valueField = new JList();
         m_valueField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         m_possibleChoicesField = new JTextArea();
         m_possibleChoicesField.getDocument().addDocumentListener(new DocumentListener() {
@@ -61,7 +61,7 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
                 refreshChoices();
             }
         });
-        m_type = new JComboBox<String>(MultipleSelectionType.getAllTypes());
+        m_type = new JComboBox(MultipleSelectionType.getAllTypes());
         createAndAddTab();
     }
 
@@ -110,12 +110,12 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         MultipleSelectionQuickFormRepresentation representation = new MultipleSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setDefaultValue(StringUtils.join(m_defaultField.getSelectedValuesList(), ","));
+        representation.setDefaultValue(StringUtils.join((List)Arrays.asList(m_defaultField.getSelectedValues()), ","));
         representation.setPossibleChoices(m_possibleChoicesField.getText().replace("\n", ","));
-        representation.setType(m_type.getItemAt(m_type.getSelectedIndex()));
+        representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
         representation.saveToNodeSettings(settings);
         MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
-        value.setVariableValue(StringUtils.join(m_valueField.getSelectedValuesList(), ","));
+        value.setVariableValue(StringUtils.join((List)Arrays.asList(m_valueField.getSelectedValues()), ","));
         value.saveToNodeSettings(settings);
     }
     
@@ -134,8 +134,8 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      * 
      * @param list The list that will be refreshed
      */
-    private void refreshChoices(final JList<String> list) {
-        List<String> selections = list.getSelectedValuesList();
+    private void refreshChoices(final JList list) {
+        List<String> selections = (List)Arrays.asList(list.getSelectedValues());
         list.setListData(m_possibleChoicesField.getText().split("\n"));
         setSelections(list, selections);
     }
@@ -146,9 +146,9 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      * @param list The list where the selections will be applied
      * @param selections The new selections
      */
-    private void setSelections(final JList<String> list, final List<String> selections) {
+    private void setSelections(final JList list, final List<String> selections) {
         List<Integer> indices = new ArrayList<Integer>(selections.size());
-        ListModel<String> model = list.getModel();
+        ListModel model = list.getModel();
         for (int i = 0; i < model.getSize(); i++) {
             if (selections.contains(model.getElementAt(i))) {
                 indices.add(i);
