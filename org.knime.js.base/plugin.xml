@@ -90,13 +90,13 @@
    <extension
          point="org.knime.js.core.webResources">
       <webResourceBundle
-            webResourceBundleID="org_knime_js_base_node_quickform_input_string_bundle">
+            webResourceBundleID="org.knime.js.base.node.quickform.input.string.bundle">
          <webResource
                relativePathSource="src/org/knime/js/base/node/quickform/input/string/js/"
                relativePathTarget="org/knime/js/base/node/quickform/input/string/">
          </webResource>
          <importResource
-               relativePath="org/knime/js/base/node/quickform/input/string/js/WebView.js"
+               relativePath="org/knime/js/base/node/quickform/input/string/WebView.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
@@ -135,7 +135,7 @@
          point="org.knime.js.core.javascriptComponents">
       <javascriptComponent
             getComponentValue-method-name="value"
-            implementationBundleID="org_knime_js_base_node_quickform_input_string_bundle"
+            implementationBundleID="org.knime.js.base.node.quickform.input.string.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_string"
             namespace="org_knime_js_base_node_quickform_input_string"
