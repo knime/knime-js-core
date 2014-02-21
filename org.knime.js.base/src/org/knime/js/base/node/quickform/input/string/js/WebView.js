@@ -1,28 +1,34 @@
-var input;
-var content;
+org_knime_js_base_node_quickform_input_string = function() {
+	var stringInput = {
+			version: "1.0.0"
+	};
+	stringInput.name = "String input";
+	var viewValue;
+	var input;
+	var viewValue;
 
-function matchExact(regex, string) {
-	var match = string.match(regex);
-	return match != null && string == match[0];
-}
+	stringInput.init = function(representation, value) {
+		viewValue = value;
+		input = $("body").append("<input></input>").find("input");
+		input.attr("type", "text");
+		input.attr("pattern", representation.regex);
+		input.val(viewValue.string);
+	};
 
-function init(viewContent, containerID) {
-	content = JSON.parse(viewContent);
-	input = $("#" + containerID).append("<input></input>").find("input");
-	input.attr("type", "text");
-	input.attr("pattern", content.regex);
-	input.val(content.value.string);
-}
+	stringInput.validate = function() {
+		alert("Validate");
+		var valid = matchExact(input.attr("pattern"), input.val());
+		if (!valid) {
+			// TODO show error message
+		}
+		return valid;
+	};
 
-function validate() {
-	var valid = matchExact(input.attr("pattern"), input.val());
-	if (!valid) {
-		// TODO show error message
-	}
-	return valid;
-}
-
-function value(containerID) {
-	content.value.string = input.val();
-	return JSON.stringify(content.value);
-}
+	stringInput.value = function() {
+		viewValue.string = input.val();
+		return viewValue;
+	};
+	
+	return stringInput;
+	
+}();
