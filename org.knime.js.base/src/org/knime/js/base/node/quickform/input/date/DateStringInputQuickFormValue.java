@@ -58,10 +58,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DateStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_DATE = "date";
@@ -87,6 +94,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
     }
@@ -95,6 +103,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         String value = settings.getString(m_valueKey);
         try {
@@ -108,6 +117,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         String value = settings.getString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
         try {
@@ -120,6 +130,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     /**
      * @return the string
      */
+    @JsonProperty("date")
     public Date getDate() {
         return m_date;
     }
@@ -127,6 +138,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     /**
      * @param date the date to set
      */
+    @JsonProperty("date")
     public void setDate(final Date date) {
         m_date = date;
     }
@@ -135,6 +147,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub

@@ -57,8 +57,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_input_date";
     }
 
     /**
@@ -67,7 +66,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                FORMAT.format(getDialogValue().getDate()));
+                FORMAT.format(getViewValue().getDate()));
     }
 
     /**
@@ -92,14 +91,9 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(DateStringInputQuickFormValue viewContent) {
+    public ValidationError validateViewValue(
+            DateStringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
-        
-    }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(DateStringInputQuickFormValue viewContent) {
         return null;
     }
 

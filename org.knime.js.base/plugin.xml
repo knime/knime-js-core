@@ -174,6 +174,17 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.date.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/date/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/date/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/date/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -185,7 +196,7 @@
             namespace="org_knime_js_base_node_quickform_input_string"
             validate-method-name="validate">
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -213,7 +224,7 @@
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -224,7 +235,7 @@
             namespace="org_knime_js_base_node_quickform_input_molecule"
             validate-method-name="validate">
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -235,7 +246,7 @@
             namespace="org_knime_js_base_node_quickform_input_integer"
             validate-method-name="validate">
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -246,7 +257,7 @@
             namespace="org_knime_js_base_node_quickform_input_dbl"
             validate-method-name="validate">
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -257,7 +268,18 @@
             namespace="org_knime_js_base_node_quickform_input_bool"
             validate-method-name="validate">
          <webDependency
-               webResourceBundleID="jQuery_1.10.2">
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.date.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_date"
+            namespace="org_knime_js_base_node_quickform_input_date"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
       </javascriptComponent>
    </extension>
