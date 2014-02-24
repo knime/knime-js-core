@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="quickform_listbox.png" type="QuickForm">
+<knimeNode icon="./quickform_listbox.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
 	<name>List Box Input</name>
 	<shortDescription>Outputs a data table with one column holding a list of strings.</shortDescription>
 	<fullDescription>
@@ -22,6 +21,9 @@
 		<option name="Separator">An undelimited list of char separators including \n and \t; back slashes and/or quotes are not supported.
 			All tokens are used as delimiters.</option>
 	</fullDescription>
+	<interactiveView name="Listbox input">
+    	Input a list of strings.
+    </interactiveView>
 	<ports>
 		<outPort index="0" name="List Values">Variable output with the given variable defined and the selected
 			option as index.</outPort>

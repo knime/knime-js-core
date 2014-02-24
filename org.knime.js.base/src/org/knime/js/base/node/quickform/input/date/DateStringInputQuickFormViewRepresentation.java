@@ -7,10 +7,17 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DateStringInputQuickFormViewRepresentation extends JSONViewContent {
 
     private static final String CFG_DEFAULT = "default";
@@ -21,6 +28,7 @@ public class DateStringInputQuickFormViewRepresentation extends JSONViewContent 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         String value = settings.getString(CFG_DEFAULT);
@@ -35,6 +43,7 @@ public class DateStringInputQuickFormViewRepresentation extends JSONViewContent 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_DEFAULT, DateStringInputQuickFormNodeModel.FORMAT.format(getDefaultValue()));
     }
@@ -42,6 +51,7 @@ public class DateStringInputQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @return the default
      */
+    @JsonProperty("default")
     public Date getDefaultValue() {
         return m_defaultValue;
     }
@@ -49,6 +59,7 @@ public class DateStringInputQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @param defaultValue the default to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final Date defaultValue) {
         m_defaultValue = defaultValue;
     }

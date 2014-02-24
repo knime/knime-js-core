@@ -92,7 +92,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    public void setDefaultValue(String defaultValue) {
+    public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }
 

@@ -75,26 +75,13 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
     
     private String m_moleculeString = DEFAULT_STRING;
     
-    private String m_valueKey;
-    
-    /**
-     * @param valueKey
-     */
-    public MoleculeStringInputQuickFormValue(String valueKey) {
-        if (valueKey!=null && valueKey.length()>0) {
-            m_valueKey = valueKey;
-        } else {
-            m_valueKey = CFG_STRING;
-        }
-    }
-    
     /**
      * {@inheritDoc}
      */
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(m_valueKey, getMoleculeString());
+        settings.addString(CFG_STRING, getMoleculeString());
     }
 
     /**
@@ -103,7 +90,7 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setMoleculeString(settings.getString(m_valueKey));
+        setMoleculeString(settings.getString(CFG_STRING));
     }
 
     /**
@@ -112,7 +99,7 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setMoleculeString(settings.getString(m_valueKey, DEFAULT_STRING));
+        setMoleculeString(settings.getString(CFG_STRING, DEFAULT_STRING));
     }
 
     /**

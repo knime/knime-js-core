@@ -99,13 +99,4 @@ public class ListBoxInputQuickFormRepresentation extends
         value.setString(getDefaultValue());        
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public void validateSettings(NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

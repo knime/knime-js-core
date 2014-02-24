@@ -97,7 +97,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -105,7 +105,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -113,7 +113,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(NodeSettingsWO settings) {
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
         // TODO Auto-generated method stub
     }
 
@@ -132,7 +132,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(File nodeInternDir, ExecutionMonitor exec) throws IOException,
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
         // TODO Auto-generated method stub
     }

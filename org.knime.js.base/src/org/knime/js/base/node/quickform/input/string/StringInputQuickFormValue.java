@@ -69,24 +69,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class StringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
-    public static final String CFG_STRING = "string";
+    private static final String CFG_STRING = "string";
     
     private static final String DEFAULT_STRING = "";
 
     private String m_string = DEFAULT_STRING;
-    
-    private String m_valueKey;
-    
-    /**
-     * @param valueKey
-     */
-    public StringInputQuickFormValue(String valueKey) {
-        if (valueKey!=null && valueKey.length()>0) {
-            m_valueKey = valueKey;
-        } else {
-            m_valueKey = CFG_STRING;
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -94,7 +81,7 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(m_valueKey, getString());
+        settings.addString(CFG_STRING, getString());
     }
 
     /**
@@ -104,7 +91,7 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) 
             throws InvalidSettingsException {
-        setString(settings.getString(m_valueKey));
+        setString(settings.getString(CFG_STRING));
     }
 
     /**
@@ -113,7 +100,7 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setString(settings.getString(m_valueKey, DEFAULT_STRING));
+        setString(settings.getString(CFG_STRING, DEFAULT_STRING));
     }
 
     /**

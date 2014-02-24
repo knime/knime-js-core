@@ -67,6 +67,7 @@ public class SingleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public SingleSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
         return new SingleSelectionQuickFormViewRepresentation();
     }
@@ -74,6 +75,7 @@ public class SingleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public SingleSelectionQuickFormValue createEmptyViewValue() {
         return new SingleSelectionQuickFormValue();
     }
@@ -81,18 +83,11 @@ public class SingleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public ValidationError validateViewValue(
-            SingleSelectionQuickFormValue viewContent) {
+            final SingleSelectionQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void loadViewValue(SingleSelectionQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

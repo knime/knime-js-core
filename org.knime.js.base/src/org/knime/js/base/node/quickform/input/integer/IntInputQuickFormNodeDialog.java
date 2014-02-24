@@ -53,7 +53,7 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_defaultSpinner.setValue(representation.getDefaultValue());
-        IntInputQuickFormValue value = new IntInputQuickFormValue(null);
+        IntInputQuickFormValue value = new IntInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
         m_valueSpinner.setValue(value.getInteger());
     }
@@ -67,7 +67,7 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
         saveSettingsTo(representation);
         representation.setDefaultValue((Integer)m_defaultSpinner.getValue());
         representation.saveToNodeSettings(settings);
-        IntInputQuickFormValue value = new IntInputQuickFormValue(null);
+        IntInputQuickFormValue value = new IntInputQuickFormValue();
         value.setInteger((Integer)m_valueSpinner.getValue());
         value.saveToNodeSettings(settings);
     }

@@ -70,7 +70,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "rawtypes", "unchecked", "deprecation" })
 public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<SingleSelectionQuickFormValue> {
 
     private SingleSelectionComponent m_selectionComponent;

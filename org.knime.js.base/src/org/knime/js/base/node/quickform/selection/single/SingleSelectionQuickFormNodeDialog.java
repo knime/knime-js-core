@@ -22,6 +22,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
+@SuppressWarnings({"rawtypes", "unchecked" })
 public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JList m_defaultField;

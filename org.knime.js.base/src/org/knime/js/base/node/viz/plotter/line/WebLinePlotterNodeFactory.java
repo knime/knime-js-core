@@ -69,7 +69,8 @@ public class WebLinePlotterNodeFactory extends NodeFactory<WebLinePlotterNodeMod
     public WebTemplate getWebTemplate() {
         String pkg = "org.knime.base";
         String jsLocation = "js-lib/node/web/viz/plotter/line/";
-        WebResourceLocator jsFile = new WebResourceLocator(pkg, jsLocation + "web-template.js", WebResourceType.JAVASCRIPT);
+        WebResourceLocator jsFile = new WebResourceLocator(pkg, jsLocation + "web-template.js",
+            WebResourceType.JAVASCRIPT);
         WebResourceLocator cssFile = new WebResourceLocator(pkg, jsLocation + "styles.css", WebResourceType.CSS);
         WebDependency[] dependencies = new WebDependency[] {WebDependency.D3_3_2_8, WebDependency.KNIME_JS_TABLE_1_0_0};
         return new DefaultWebTemplate(new WebResourceLocator[]{jsFile, cssFile}, dependencies, "knime_line_plotter");

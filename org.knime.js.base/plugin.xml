@@ -185,6 +185,17 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.input.listbox.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/input/listbox/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/listbox/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/listbox/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -280,6 +291,17 @@
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQueryUi_1.10.4">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.listbox.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_input_listbox"
+            namespace="org_knime_js_base_node_quickform_input_listbox"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </javascriptComponent>
    </extension>

@@ -28,8 +28,6 @@ public class StringInputQuickFormViewRepresentation extends JSONViewContent {
     
     private String m_defaultValue;
     
-    private StringInputQuickFormValue m_value;
-    
     /**
      * @return the regex
      */
@@ -54,8 +52,6 @@ public class StringInputQuickFormViewRepresentation extends JSONViewContent {
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_regex = settings.getString(CFG_REGEX);
         m_defaultValue = settings.getString(CFG_DEFAULT);
-        m_value = new StringInputQuickFormValue(null);
-        m_value.loadFromNodeSettings(settings);
     }
     
     /**
@@ -66,7 +62,6 @@ public class StringInputQuickFormViewRepresentation extends JSONViewContent {
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_DEFAULT, m_defaultValue);
-        m_value.saveToNodeSettings(settings);
     }
 
     /**
@@ -83,22 +78,6 @@ public class StringInputQuickFormViewRepresentation extends JSONViewContent {
     @JsonProperty("default")
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
-    }
-    
-    /**
-     * @return the value
-     */
-    @JsonProperty("value")
-    public StringInputQuickFormValue getValue() {
-        return m_value;
-    }
-    
-    /**
-     * @param value the value to set
-     */
-    @JsonProperty("value")
-    public void setValue(final StringInputQuickFormValue value) {
-        m_value = value;
     }
 
 }

@@ -76,19 +76,6 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     private static final Date DEFAULT_DATE = new Date();
 
     private Date m_date = DEFAULT_DATE;
-    
-    private String m_valueKey;
-    
-    /**
-     * @param valueKey
-     */
-    public DateStringInputQuickFormValue(String valueKey) {
-        if(valueKey!=null && valueKey.length()>0) {
-            m_valueKey = valueKey;
-        } else {
-            m_valueKey = CFG_DATE;
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -96,7 +83,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
+        settings.addString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
     }
 
     /**
@@ -105,7 +92,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        String value = settings.getString(m_valueKey);
+        String value = settings.getString(CFG_DATE);
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {
@@ -119,7 +106,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        String value = settings.getString(m_valueKey, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
+        String value = settings.getString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
         try {
             setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
         } catch (Exception e) {

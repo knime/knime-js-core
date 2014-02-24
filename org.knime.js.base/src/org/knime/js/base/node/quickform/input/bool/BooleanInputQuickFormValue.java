@@ -74,19 +74,6 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     private static final boolean DEFAULT_BOOLEAN = false;
 
     private boolean m_boolean = DEFAULT_BOOLEAN;
-    
-    private String m_valueKey;
-    
-    /**
-     * @param valueKey
-     */
-    public BooleanInputQuickFormValue(String valueKey) {
-        if(valueKey!=null && valueKey.length()>0) {
-            m_valueKey = valueKey;
-        } else {
-            m_valueKey = CFG_BOOLEAN;
-        }
-    }
 
     /**
      * {@inheritDoc}
@@ -94,7 +81,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(m_valueKey, getBoolean());
+        settings.addBoolean(CFG_BOOLEAN, getBoolean());
     }
 
     /**
@@ -103,7 +90,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setBoolean(settings.getBoolean(m_valueKey));
+        setBoolean(settings.getBoolean(CFG_BOOLEAN));
     }
 
     /**
@@ -112,7 +99,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setBoolean(settings.getBoolean(m_valueKey, DEFAULT_BOOLEAN));
+        setBoolean(settings.getBoolean(CFG_BOOLEAN, DEFAULT_BOOLEAN));
     }
 
     /**

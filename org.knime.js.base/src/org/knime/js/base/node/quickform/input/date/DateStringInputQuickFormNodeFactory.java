@@ -10,7 +10,8 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class DateStringInputQuickFormNodeFactory extends NodeFactory<DateStringInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<DateStringInputQuickFormNodeModel, DateStringInputQuickFormViewRepresentation, DateStringInputQuickFormValue> {
+        WizardNodeFactoryExtension<DateStringInputQuickFormNodeModel, DateStringInputQuickFormViewRepresentation,
+        DateStringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}

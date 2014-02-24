@@ -25,7 +25,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected StringInputQuickFormValue createEmptyDialogValue() {
-        return new StringInputQuickFormValue(null);
+        return new StringInputQuickFormValue();
     }
 
     /**
@@ -74,12 +74,12 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     public StringInputQuickFormValue createEmptyViewValue() {
-        return new StringInputQuickFormValue(null);
+        return new StringInputQuickFormValue();
     }
     
     /** {@inheritDoc} */
     @Override
-    public ValidationError validateViewValue(StringInputQuickFormValue viewContent) {
+    public ValidationError validateViewValue(final StringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }

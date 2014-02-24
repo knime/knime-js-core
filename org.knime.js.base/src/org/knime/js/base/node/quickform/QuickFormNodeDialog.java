@@ -240,7 +240,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
      * @param representation Representation holding the content for the
      *            components
      */
-    protected void loadSettingsFrom(final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
+    protected void loadSettingsFrom(
+            final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
         setLabel(representation.getLabel());
         setDescription(representation.getDescription());
         setWeight(representation.getWeight());

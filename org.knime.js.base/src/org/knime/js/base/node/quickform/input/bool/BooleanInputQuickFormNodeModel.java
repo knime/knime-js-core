@@ -11,7 +11,8 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class BooleanInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormViewRepresentation, BooleanInputQuickFormValue> {
+        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue,
+        BooleanInputQuickFormViewRepresentation, BooleanInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
@@ -26,7 +27,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected BooleanInputQuickFormValue createEmptyDialogValue() {
-        return new BooleanInputQuickFormValue(null);
+        return new BooleanInputQuickFormValue();
     }
 
     /**
@@ -42,7 +43,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     public BooleanInputQuickFormValue createEmptyViewValue() {
-        return new BooleanInputQuickFormValue(null);
+        return new BooleanInputQuickFormValue();
     }
 
     /**
@@ -81,7 +82,7 @@ public class BooleanInputQuickFormNodeModel
     
     /** {@inheritDoc} */
     @Override
-    public ValidationError validateViewValue(BooleanInputQuickFormValue viewContent) {
+    public ValidationError validateViewValue(final BooleanInputQuickFormValue viewContent) {
         return null;
     }
 

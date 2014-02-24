@@ -127,6 +127,7 @@ public class MultipleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public MultipleSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
         return new MultipleSelectionQuickFormViewRepresentation();
     }
@@ -134,6 +135,7 @@ public class MultipleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public MultipleSelectionQuickFormValue createEmptyViewValue() {
         return new MultipleSelectionQuickFormValue();
     }
@@ -141,18 +143,11 @@ public class MultipleSelectionQuickFormNodeModel
     /**
      * {@inheritDoc}
      */
+    @Override
     public ValidationError validateViewValue(
-            MultipleSelectionQuickFormValue viewContent) {
+            final MultipleSelectionQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void loadViewValue(MultipleSelectionQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        
     }
 
 }

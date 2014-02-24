@@ -11,7 +11,8 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class IntInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue, IntInputQuickFormViewRepresentation, IntInputQuickFormValue> {
+        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue,
+        IntInputQuickFormViewRepresentation, IntInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
@@ -26,7 +27,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected IntInputQuickFormValue createEmptyDialogValue() {
-        return new IntInputQuickFormValue(null);
+        return new IntInputQuickFormValue();
     }
 
     /**
@@ -42,7 +43,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     public IntInputQuickFormValue createEmptyViewValue() {
-        return new IntInputQuickFormValue(null);
+        return new IntInputQuickFormValue();
     }
 
     /**
@@ -81,7 +82,7 @@ public class IntInputQuickFormNodeModel
     
     /** {@inheritDoc} */
     @Override
-    public ValidationError validateViewValue(IntInputQuickFormValue viewContent) {
+    public ValidationError validateViewValue(final IntInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }

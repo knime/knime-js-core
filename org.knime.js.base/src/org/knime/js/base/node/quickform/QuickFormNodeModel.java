@@ -24,7 +24,8 @@ import org.knime.core.node.wizard.WizardNode;
  * @param <VVAL> The node value implementation of the quickform node.
  * 
  */
-public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<DVAL>, DVAL extends DialogNodeValue, VREP extends WebViewContent, VVAL extends WebViewContent>
+public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<DVAL>, DVAL extends DialogNodeValue,
+        VREP extends WebViewContent, VVAL extends WebViewContent>
         extends NodeModel implements DialogNode<DREP, DVAL>, WizardNode<VREP, VVAL> {
 
     private DREP m_dialogRepresentation;

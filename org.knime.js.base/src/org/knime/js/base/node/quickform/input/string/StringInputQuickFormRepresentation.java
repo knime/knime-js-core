@@ -22,8 +22,6 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     
     private String m_defaultValue;
     
-    private StringInputQuickFormValue m_value = new StringInputQuickFormValue(null);
-    
     /**
      * @return the regex
      */
@@ -46,8 +44,6 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         super.loadFromNodeSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
         m_defaultValue = settings.getString(CFG_DEFAULT);
-        m_value = new StringInputQuickFormValue(null);
-        m_value.loadFromNodeSettings(settings);
     }
     
     /**
@@ -58,8 +54,6 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         super.loadFromNodeSettingsInDialog(settings);
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
         m_defaultValue = settings.getString(CFG_DEFAULT, "");
-        m_value = new StringInputQuickFormValue(null);
-        m_value.loadFromNodeSettingsInDialog(settings);
     }
     
     /**
@@ -70,7 +64,6 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         super.saveToNodeSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_DEFAULT, m_defaultValue);
-        m_value.saveToNodeSettings(settings);
     }
 
     /**
@@ -103,20 +96,6 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     @Override
     public void resetNodeValueToDefault(final StringInputQuickFormValue value) {
         value.setString(m_defaultValue);        
-    }
-    
-    /**
-     * @return the value
-     */
-    public StringInputQuickFormValue getValue() {
-        return m_value;
-    }
-    
-    /**
-     * @param value the value to set
-     */
-    public void setValue(final StringInputQuickFormValue value) {
-        m_value = value;
     }
 
 }

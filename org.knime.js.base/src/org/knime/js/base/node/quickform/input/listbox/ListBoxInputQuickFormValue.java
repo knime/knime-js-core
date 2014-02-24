@@ -56,10 +56,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ListBoxInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_STRING = "string";
@@ -72,6 +79,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_STRING, getString());
     }
@@ -80,6 +88,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setString(settings.getString(CFG_STRING));
     }
@@ -88,6 +97,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         setString(settings.getString(CFG_STRING, DEFAULT_STRING));
     }
@@ -95,6 +105,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
     /**
      * @return the string
      */
+    @JsonProperty("string")
     public String getString() {
         return m_string;
     }
@@ -102,6 +113,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
     /**
      * @param string the string to set
      */
+    @JsonProperty("string")
     public void setString(final String string) {
         m_string = string;
     }
@@ -110,6 +122,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub

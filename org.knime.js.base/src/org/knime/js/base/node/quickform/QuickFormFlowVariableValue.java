@@ -61,21 +61,21 @@ public abstract class QuickFormFlowVariableValue implements DialogNodeValue {
     private String m_cfgString;
     
     /**
-     * @param valueKey
+     * @param valueKey The value key
      */
-    public QuickFormFlowVariableValue(String valueKey) {
+    public QuickFormFlowVariableValue(final String valueKey) {
         m_cfgString = valueKey;
     }
 
     /**
-     * @param valueKey
+     * @param valueKey The value key
      */
     public void setValueKey(final String valueKey) {
         m_cfgString = valueKey;
     }
     
     /**
-     * @param defaultCfg
+     * @param defaultCfg The default config string
      * @return config string
      */
     protected String getCfgString(final String defaultCfg) {

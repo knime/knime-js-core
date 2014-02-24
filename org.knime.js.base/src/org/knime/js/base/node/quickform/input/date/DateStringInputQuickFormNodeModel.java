@@ -13,7 +13,8 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * 
  */
 public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue, DateStringInputQuickFormViewRepresentation, DateStringInputQuickFormValue> {
+        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue,
+        DateStringInputQuickFormViewRepresentation, DateStringInputQuickFormValue> {
 
     /**
      * Format for the date to string and string to date operations.
@@ -33,7 +34,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     protected DateStringInputQuickFormValue createEmptyDialogValue() {
-        return new DateStringInputQuickFormValue(null);
+        return new DateStringInputQuickFormValue();
     }
 
     /**
@@ -49,7 +50,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     public DateStringInputQuickFormValue createEmptyViewValue() {
-        return new DateStringInputQuickFormValue(null);
+        return new DateStringInputQuickFormValue();
     }
 
     /**
@@ -92,7 +93,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     public ValidationError validateViewValue(
-            DateStringInputQuickFormValue viewContent) {
+            final DateStringInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }
