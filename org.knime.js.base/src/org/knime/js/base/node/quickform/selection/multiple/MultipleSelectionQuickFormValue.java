@@ -50,7 +50,6 @@
  */
 package org.knime.js.base.node.quickform.selection.multiple;
 
-import org.apache.commons.lang.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -71,9 +70,9 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
 
     private static final String CFG_VARIABLE_VALUE = "variable_value";
 
-    private static final String DEFAULT_VARIABLE_VALUE = "";
+    private static final String[] DEFAULT_VARIABLE_VALUE = new String[0];
 
-    private String m_variableValue = DEFAULT_VARIABLE_VALUE;
+    private String[] m_variableValue = DEFAULT_VARIABLE_VALUE;
 
     /**
      * {@inheritDoc}
@@ -81,7 +80,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_VARIABLE_VALUE, m_variableValue);
+        settings.addStringArray(CFG_VARIABLE_VALUE, m_variableValue);
     }
 
     /**
@@ -90,7 +89,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setVariableValue(settings.getString(CFG_VARIABLE_VALUE));
+        setVariableValue(settings.getStringArray(CFG_VARIABLE_VALUE));
     }
 
     /**
@@ -99,39 +98,23 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setVariableValue(settings.getString(CFG_VARIABLE_VALUE, DEFAULT_VARIABLE_VALUE));
+        setVariableValue(settings.getStringArray(CFG_VARIABLE_VALUE, DEFAULT_VARIABLE_VALUE));
     }
 
     /**
      * @return the variableValue
      */
-    @JsonIgnore
-    public String getVariableValue() {
+    @JsonProperty("value")
+    public String[] getVariableValue() {
         return m_variableValue;
     }
 
     /**
      * @param variableValue the variableValue to set
      */
-    @JsonIgnore
-    public void setVariableValue(final String variableValue) {
+    @JsonProperty("value")
+    public void setVariableValue(final String[] variableValue) {
         m_variableValue = variableValue;
-    }
-
-    /**
-     * @return the variableValue
-     */
-    @JsonProperty("value")
-    public String[] getVariableValueArray() {
-        return m_variableValue.split(",");
-    }
-
-    /**
-     * @param variableValue the variableValue to set
-     */
-    @JsonProperty("value")
-    public void setVariableValueArray(final String[] variableValue) {
-        m_variableValue = StringUtils.join(variableValue, ",");
     }
 
     /**

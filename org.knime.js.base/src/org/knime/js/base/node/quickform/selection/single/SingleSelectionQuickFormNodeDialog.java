@@ -12,6 +12,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -90,7 +91,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         SingleSelectionQuickFormRepresentation representation = new SingleSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_possibleChoicesField.setText(representation.getPossibleChoices().replace(",", "\n"));
+        m_possibleChoicesField.setText(StringUtils.join(representation.getPossibleChoices(), "\n"));
         m_type.setSelectedItem(representation.getType());
         SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
@@ -106,7 +107,8 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         SingleSelectionQuickFormRepresentation representation = new SingleSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setDefaultValue((String)m_defaultField.getSelectedValue());
-        representation.setPossibleChoices(m_possibleChoicesField.getText().replace("\n", ","));
+        String possibleChoices = m_possibleChoicesField.getText();
+        representation.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
         representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
         representation.saveToNodeSettings(settings);
         SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();

@@ -28,7 +28,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings({"cast", "rawtypes", "unchecked", "deprecation" })
+@SuppressWarnings({"rawtypes", "unchecked", "deprecation" })
 public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JList m_defaultField;
@@ -96,12 +96,12 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         MultipleSelectionQuickFormRepresentation representation = new MultipleSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_possibleChoicesField.setText(representation.getPossibleChoices().replace(",", "\n"));
+        m_possibleChoicesField.setText(StringUtils.join(representation.getPossibleChoices(), "\n"));
         m_type.setSelectedItem(representation.getType());
         MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        setSelections(m_defaultField, Arrays.asList(representation.getDefaultValue().split(",")));
-        setSelections(m_valueField, Arrays.asList(value.getVariableValue().split(",")));
+        setSelections(m_defaultField, Arrays.asList(representation.getDefaultValue()));
+        setSelections(m_valueField, Arrays.asList(value.getVariableValue()));
     }
 
     /**
@@ -111,12 +111,13 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         MultipleSelectionQuickFormRepresentation representation = new MultipleSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setDefaultValue(StringUtils.join((List)Arrays.asList(m_defaultField.getSelectedValues()), ","));
-        representation.setPossibleChoices(m_possibleChoicesField.getText().replace("\n", ","));
+        representation.setDefaultValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
+        String possibleChoices = m_possibleChoicesField.getText();
+        representation.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
         representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
         representation.saveToNodeSettings(settings);
         MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
-        value.setVariableValue(StringUtils.join((List)Arrays.asList(m_valueField.getSelectedValues()), ","));
+        value.setVariableValue((Arrays.asList(m_valueField.getSelectedValues())).toArray(new String[0]));
         value.saveToNodeSettings(settings);
     }
     

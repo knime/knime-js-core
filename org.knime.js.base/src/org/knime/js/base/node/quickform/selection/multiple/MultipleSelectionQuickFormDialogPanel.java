@@ -75,7 +75,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
@@ -91,7 +90,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      * @param representation The representation containing layout information
      */
     public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices().split(",");
+        String[] choices = representation.getPossibleChoices();
         if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
             m_selectionComponent = new CheckBoxesComponent(choices, true);
         } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
@@ -109,7 +108,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      */
     @Override
     public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(StringUtils.join(m_selectionComponent.getSelections(), ","));
+        value.setVariableValue(m_selectionComponent.getSelections());
     }
 
     /**
@@ -117,7 +116,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      */
     @Override
     public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue().split(","));
+        m_selectionComponent.setSelections(value.getVariableValue());
     }
 
     private interface MultipleSelectionComponent {

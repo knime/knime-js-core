@@ -1,5 +1,6 @@
 package org.knime.js.base.node.quickform.selection.multiple;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.base.node.io.filereader.DataCellFactory;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -36,18 +37,22 @@ public class MultipleSelectionQuickFormNodeModel
 
     /** {@inheritDoc} */
     @Override
-    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
+            throws InvalidSettingsException {
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
+                StringUtils.join(getViewValue().getVariableValue(), ","));
         return new PortObjectSpec[]{createSpec()};
     }
 
     /** {@inheritDoc} */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
+    protected PortObject[] execute(final PortObject[] inObjects,
+            final ExecutionContext exec) throws Exception {
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
+                StringUtils.join(getViewValue().getVariableValue(), ","));
         final DataTableSpec outSpec = createSpec();
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
-        String[] values = getViewValue().getVariableValue().split(",");
+        String[] values = getViewValue().getVariableValue();
         DataCellFactory cellFactory = new DataCellFactory();
         DataType type = outSpec.getColumnSpec(0).getType();
         for (int i = 0; i < values.length; i++) {
@@ -56,19 +61,6 @@ public class MultipleSelectionQuickFormNodeModel
         }
         container.close();
         return new PortObject[]{container.getTable()};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MultipleSelectionQuickFormValue getDialogValue() {
-        MultipleSelectionQuickFormValue nodeValue = super.getDialogValue();
-        MultipleSelectionQuickFormRepresentation representation = getDialogRepresentation();
-        if (representation != null && representation.getFlowVariableName() != null) {
-            nodeValue.setVariableValue(getDialogRepresentation().getFlowVariableName());
-        }
-        return nodeValue;
     }
 
     /**

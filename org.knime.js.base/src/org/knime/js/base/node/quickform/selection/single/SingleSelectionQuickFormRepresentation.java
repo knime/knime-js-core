@@ -20,9 +20,9 @@ public class SingleSelectionQuickFormRepresentation extends
 
     private static final String CFG_POSSIBLE_CHOICES = "possible_choices";
 
-    private static final String DEFAULT_POSSIBLE_CHOICES = "";
+    private static final String[] DEFAULT_POSSIBLE_CHOICES = new String[0];
 
-    private String m_possibleChoices = DEFAULT_POSSIBLE_CHOICES;
+    private String[] m_possibleChoices = DEFAULT_POSSIBLE_CHOICES;
 
     private static final String CFG_TYPE = "type";
 
@@ -36,7 +36,7 @@ public class SingleSelectionQuickFormRepresentation extends
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
-        setPossibleChoices(settings.getString(CFG_POSSIBLE_CHOICES));
+        setPossibleChoices(settings.getStringArray(CFG_POSSIBLE_CHOICES));
         m_defaultValue = settings.getString(CFG_DEFAULT_VALUE);
         setType(settings.getString(CFG_TYPE));
     }
@@ -47,7 +47,7 @@ public class SingleSelectionQuickFormRepresentation extends
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
-        setPossibleChoices(settings.getString(CFG_POSSIBLE_CHOICES, DEFAULT_POSSIBLE_CHOICES));
+        setPossibleChoices(settings.getStringArray(CFG_POSSIBLE_CHOICES, DEFAULT_POSSIBLE_CHOICES));
         m_defaultValue = settings.getString(CFG_DEFAULT_VALUE, DEFAULT_DEFAULT_VALUE);
         setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
@@ -58,7 +58,7 @@ public class SingleSelectionQuickFormRepresentation extends
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
-        settings.addString(CFG_POSSIBLE_CHOICES, m_possibleChoices);
+        settings.addStringArray(CFG_POSSIBLE_CHOICES, m_possibleChoices);
         settings.addString(CFG_DEFAULT_VALUE, m_defaultValue);
         settings.addString(CFG_TYPE, m_type);
     }
@@ -98,14 +98,14 @@ public class SingleSelectionQuickFormRepresentation extends
     /**
      * @return the possibleChoices
      */
-    public String getPossibleChoices() {
+    public String[] getPossibleChoices() {
         return m_possibleChoices;
     }
 
     /**
      * @param possibleChoices the possibleChoices to set
      */
-    public void setPossibleChoices(final String possibleChoices) {
+    public void setPossibleChoices(final String[] possibleChoices) {
         m_possibleChoices = possibleChoices;
     }
 

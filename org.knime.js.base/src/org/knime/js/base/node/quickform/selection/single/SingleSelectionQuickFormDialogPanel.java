@@ -79,7 +79,7 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      * @param representation The representation containing layout information
      */
     public SingleSelectionQuickFormDialogPanel(final SingleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices().split(",");
+        String[] choices = representation.getPossibleChoices();
         if (representation.getType().equals(SingleSelectionType.RADIOBUTTONS_VERTICAL.getName())) {
             m_selectionComponent = new RadioButtonComponent(choices, true);
         } else if (representation.getType().equals(SingleSelectionType.RADIOBUTTONS_HORIZONTAL.getName())) {
