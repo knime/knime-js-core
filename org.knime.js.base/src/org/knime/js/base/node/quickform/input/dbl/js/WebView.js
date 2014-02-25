@@ -5,7 +5,6 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	doubleInput.name = "Double input";
 	var viewValue;
 	var input;
-	var viewValue;
 
 	doubleInput.init = function(representation, value) {
 		viewValue = value;

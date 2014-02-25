@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE knimeNode PUBLIC "-//UNIKN//DTD KNIME Node 2.0//EN" "http://www.knime.org/Node.dtd">
-<knimeNode icon="quickform_strsel.png" type="QuickForm">
+<knimeNode icon="./quickform_strsel.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
 	<name>Single Selection Input QuickForm</name>
 	<shortDescription>Allows selecting single value from a list of String which is returned as a String flow variable.</shortDescription>
 	<fullDescription>
@@ -23,6 +22,9 @@
 		<option name="Possible Choices">The possible choices, each line is one possible value.</option>
 		<option name="Selection Type">The type of the selection element. This can be either radio buttons with a vertical or horizontal layout, a list or a dropdown selection.</option>
 	</fullDescription>
+	<interactiveView name="Single selection">
+    	Select a single option.
+    </interactiveView>
 	<ports>
 		<outPort index="0" name="Flow Variable Output">Variable output with the given variable defined and the selected
 			option as index.</outPort>

@@ -1,13 +1,21 @@
 package org.knime.js.base.node.quickform.selection.single;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent {
 
     private static final String CFG_DEFAULT_VALUE = "default_value";
@@ -32,6 +40,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setPossibleChoices(settings.getString(CFG_POSSIBLE_CHOICES));
         m_defaultValue = settings.getString(CFG_DEFAULT_VALUE);
@@ -42,6 +51,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_POSSIBLE_CHOICES, m_possibleChoices);
         settings.addString(CFG_DEFAULT_VALUE, m_defaultValue);
@@ -51,6 +61,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -58,6 +69,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -65,6 +77,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @return the possibleChoices
      */
+    @JsonIgnore
     public String getPossibleChoices() {
         return m_possibleChoices;
     }
@@ -72,13 +85,31 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @param possibleChoices the possibleChoices to set
      */
+    @JsonIgnore
     public void setPossibleChoices(final String possibleChoices) {
         m_possibleChoices = possibleChoices;
     }
 
     /**
+     * @return the possibleChoices
+     */
+    @JsonProperty("possibleChoices")
+    public String[] getPossibleChoicesArray() {
+        return m_possibleChoices.split(",");
+    }
+
+    /**
+     * @param possibleChoices the possibleChoices to set
+     */
+    @JsonProperty("possibleChoices")
+    public void setPossibleChoicesArray(final String[] possibleChoices) {
+        m_possibleChoices = StringUtils.join(possibleChoices, ",");
+    }
+
+    /**
      * @return the type
      */
+    @JsonProperty("type")
     public String getType() {
         return m_type;
     }
@@ -86,6 +117,7 @@ public class SingleSelectionQuickFormViewRepresentation extends JSONViewContent 
     /**
      * @param type the type to set
      */
+    @JsonProperty("type")
     public void setType(final String type) {
         m_type = type;
     }

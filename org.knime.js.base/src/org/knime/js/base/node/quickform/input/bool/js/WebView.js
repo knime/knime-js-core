@@ -5,7 +5,6 @@ org_knime_js_base_node_quickform_input_bool = function() {
 	booleanInput.name = "Boolean input";
 	var viewValue;
 	var input;
-	var viewValue;
 
 	booleanInput.init = function(representation, value) {
 		viewValue = value;

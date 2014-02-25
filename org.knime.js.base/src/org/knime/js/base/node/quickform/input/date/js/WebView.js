@@ -9,7 +9,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var minInput;
 	var secInput;
 	var milInput;
-	var viewValue;
 
 	dateInput.init = function(representation, value) {
 		viewValue = value;

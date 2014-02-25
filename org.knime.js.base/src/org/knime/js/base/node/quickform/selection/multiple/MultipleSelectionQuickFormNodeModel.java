@@ -37,17 +37,17 @@ public class MultipleSelectionQuickFormNodeModel
     /** {@inheritDoc} */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getVariableValue());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
         return new PortObjectSpec[]{createSpec()};
     }
 
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getVariableValue());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
         final DataTableSpec outSpec = createSpec();
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
-        String[] values = getDialogValue().getVariableValue().split(",");
+        String[] values = getViewValue().getVariableValue().split(",");
         DataCellFactory cellFactory = new DataCellFactory();
         DataType type = outSpec.getColumnSpec(0).getType();
         for (int i = 0; i < values.length; i++) {
@@ -92,8 +92,7 @@ public class MultipleSelectionQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_selection_multiple";
     }
 
     /**

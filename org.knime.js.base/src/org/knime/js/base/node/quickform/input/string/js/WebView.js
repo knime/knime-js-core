@@ -5,7 +5,6 @@ org_knime_js_base_node_quickform_input_string = function() {
 	stringInput.name = "String input";
 	var viewValue;
 	var input;
-	var viewValue;
 
 	stringInput.init = function(representation, value) {
 		viewValue = value;

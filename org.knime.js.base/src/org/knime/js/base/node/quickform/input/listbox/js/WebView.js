@@ -5,7 +5,6 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	listboxInput.name = "Listbox input";
 	var viewValue;
 	var input;
-	var viewValue;
 
 	listboxInput.init = function(representation, value) {
 		viewValue = value;

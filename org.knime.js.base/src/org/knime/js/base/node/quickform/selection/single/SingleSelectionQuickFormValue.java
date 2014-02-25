@@ -56,9 +56,16 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class SingleSelectionQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_VARIABLE_VALUE = "variable_value";
@@ -71,6 +78,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_VARIABLE_VALUE, m_variableValue);
     }
@@ -79,6 +87,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setVariableValue(settings.getString(CFG_VARIABLE_VALUE));
     }
@@ -87,6 +96,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         setVariableValue(settings.getString(CFG_VARIABLE_VALUE, DEFAULT_VARIABLE_VALUE));
     }
@@ -94,6 +104,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
     /**
      * @return the variableValue
      */
+    @JsonProperty("value")
     public String getVariableValue() {
         return m_variableValue;
     }
@@ -101,6 +112,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
     /**
      * @param variableValue the variableValue to set
      */
+    @JsonProperty("value")
     public void setVariableValue(final String variableValue) {
         m_variableValue = variableValue;
     }
@@ -109,6 +121,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
 

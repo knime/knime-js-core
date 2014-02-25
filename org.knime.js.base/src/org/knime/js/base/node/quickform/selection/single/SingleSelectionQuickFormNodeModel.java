@@ -34,8 +34,7 @@ public class SingleSelectionQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        // TODO Auto-generated method stub
-        return null;
+        return "org_knime_js_base_node_quickform_selection_single";
     }
 
     /**
@@ -43,7 +42,7 @@ public class SingleSelectionQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getDialogValue().getVariableValue());
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
     }
 
     /**

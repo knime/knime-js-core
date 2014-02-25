@@ -50,15 +50,23 @@
  */
 package org.knime.js.base.node.quickform.selection.multiple;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class MultipleSelectionQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_VARIABLE_VALUE = "variable_value";
@@ -71,6 +79,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_VARIABLE_VALUE, m_variableValue);
     }
@@ -79,6 +88,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setVariableValue(settings.getString(CFG_VARIABLE_VALUE));
     }
@@ -87,6 +97,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         setVariableValue(settings.getString(CFG_VARIABLE_VALUE, DEFAULT_VARIABLE_VALUE));
     }
@@ -94,6 +105,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     /**
      * @return the variableValue
      */
+    @JsonIgnore
     public String getVariableValue() {
         return m_variableValue;
     }
@@ -101,14 +113,32 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     /**
      * @param variableValue the variableValue to set
      */
+    @JsonIgnore
     public void setVariableValue(final String variableValue) {
         m_variableValue = variableValue;
+    }
+
+    /**
+     * @return the variableValue
+     */
+    @JsonProperty("value")
+    public String[] getVariableValueArray() {
+        return m_variableValue.split(",");
+    }
+
+    /**
+     * @param variableValue the variableValue to set
+     */
+    @JsonProperty("value")
+    public void setVariableValueArray(final String[] variableValue) {
+        m_variableValue = StringUtils.join(variableValue, ",");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
 

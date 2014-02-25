@@ -196,6 +196,28 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.selection.single.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/selection/single/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/selection/single/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/selection/single/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.selection.multiple.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/selection/multiple/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/selection/multiple/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/selection/multiple/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -299,6 +321,28 @@
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_listbox"
             namespace="org_knime_js_base_node_quickform_input_listbox"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.selection.single.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_selection_single"
+            namespace="org_knime_js_base_node_quickform_selection_single"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.selection.multiple.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_selection_multiple"
+            namespace="org_knime_js_base_node_quickform_selection_multiple"
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
