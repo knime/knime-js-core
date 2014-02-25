@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knimeNode icon="./quickform_value_select.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+	<name>Value Selection</name>
+	<shortDescription>Takes a data table and a selected column and returns a variable with the 
+      selected value from this column.</shortDescription>
+	<fullDescription>
+		<intro>
+			<p>Takes a data table and a selected column and returns a variable 
+              with the selected value from this column. The selection can also
+              be controlled from a quickfrom (WebPortal).</p>
+		</intro>
+        <option name="Label">
+          A descriptive label that will be shown in, for instance the web port.
+        </option>
+        <option name="Description">
+          Some lines of description that will be shown in the remote control 
+          form, for instance by means of a tooltip.
+        </option>
+        <option name="Weight">
+          A weight value that influences the position of the component in
+          the final layout. Lighter elements will be placed at the top, whereas
+          heavier items will be placed nearer the bottom. The value is relative
+          to the weights of the other components in the workflow (absolute 
+          value is not relevant, only the relative comparison to other
+          elements).
+        </option>
+        <option name="Variable Name">
+          Variable identifier.
+        </option>
+        <option name="Variable Value">
+          Variable value containing the select column names.
+        </option>
+        <option name="Column Selection">
+          Column Selection panel to select a single column from.
+        </option>
+        <option name="Value Selection">
+          Value Selection panel to select a single value from.
+        </option>
+	</fullDescription>
+	<interactiveView name="Value selection">
+    	Select a value.
+    </interactiveView>
+	<ports>
+		<inPort name="Table Input" index="0">Table containing the values.</inPort>
+		<outPort index="0" name="Flow Variable Output">Variable output (string) with the selected value name.</outPort>
+	</ports>
+</knimeNode>
