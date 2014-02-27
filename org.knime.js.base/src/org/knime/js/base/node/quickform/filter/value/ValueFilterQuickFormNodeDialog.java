@@ -1,14 +1,13 @@
-package org.knime.js.base.node.quickform.selection.value;
+package org.knime.js.base.node.quickform.filter.value;
 
 import java.awt.GridBagConstraints;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -22,6 +21,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.core.node.util.filter.StringFilterPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -29,24 +29,22 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
-@SuppressWarnings({"unchecked", "rawtypes" })
-public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
+@SuppressWarnings("unchecked")
+public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final ColumnSelectionPanel m_columnField;
     
-    private final JComboBox m_defaultField;
+    private final StringFilterPanel m_defaultField;
 
-    private final JComboBox m_valueField;
+    private final StringFilterPanel m_valueField;
     
-    private final DefaultComboBoxModel m_defaultModel = new DefaultComboBoxModel();
-    
-    private final DefaultComboBoxModel m_valueModel = new DefaultComboBoxModel();
+    private String[] m_possibleValues;
 
     /** Constructors, inits fields calls layout routines. */
-    ValueSelectionQuickFormNodeDialog() {
+    ValueFilterQuickFormNodeDialog() {
         m_columnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
-        m_defaultField = new JComboBox(m_defaultModel);
-        m_valueField = new JComboBox(m_valueModel);
+        m_defaultField = new StringFilterPanel(true);
+        m_valueField = new StringFilterPanel(true);
         m_columnField.addItemListener(new ItemListener() {
             /** {@inheritDoc} */
             @Override
@@ -66,16 +64,21 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private void updateValues(final String column) {
         final DataTableSpec spec = m_columnField.getDataTableSpec();
         DataColumnSpec dcs = spec.getColumnSpec(column);
-        m_defaultModel.removeAllElements();
-        m_valueModel.removeAllElements();
-        if (dcs != null) {
+        if (dcs == null) {
+            m_possibleValues = new String[0];
+        } else {
             final Set<DataCell> vals = dcs.getDomain().getValues();
+            m_possibleValues = new String[vals.size()];
+            int i = 0;
             for (final DataCell cell : vals) {
-                String value = cell.toString();
-                m_defaultModel.addElement(value);
-                m_valueModel.addElement(value);
+                m_possibleValues[i++] = cell.toString();
             }
         }
+        List<String> excludes = Arrays.asList(m_possibleValues);
+        m_defaultField.update(new ArrayList<String>(0), excludes,
+                m_possibleValues);
+        m_valueField.update(new ArrayList<String>(0), excludes,
+                m_possibleValues);
     }
 
     /**
@@ -106,14 +109,30 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         }
         final DataTableSpec newDTS = new DataTableSpec(filteredSpecs.toArray(new DataColumnSpec[0]));
         m_columnField.update(newDTS, null);
-        ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
+        ValueFilterQuickFormRepresentation representation = new ValueFilterQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_columnField.setSelectedColumn(representation.getColumn());
-        m_defaultField.setSelectedItem(representation.getDefaultValue());
-        ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
+        List<String> defaultIncludes = Arrays.asList(representation.getDefaultValues());
+        List<String> defaultExcludes =
+                new ArrayList<String>(Math.max(0, m_possibleValues.length
+                        - defaultIncludes.size()));
+        for (String string : m_possibleValues) {
+            if (!defaultIncludes.contains(string)) {
+                defaultExcludes.add(string);
+            }
+        }
+        m_defaultField.update(defaultIncludes, defaultExcludes, m_possibleValues);
+        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setSelectedItem(value.getValue());
+        List<String> valueIncludes = Arrays.asList(value.getValues());
+        List<String> valueExcludes = new ArrayList<String>(Math.max(0, m_possibleValues.length - valueIncludes.size()));
+        for (String string : m_possibleValues) {
+            if (!valueIncludes.contains(string)) {
+                valueExcludes.add(string);
+            }
+        }
+        m_valueField.update(valueIncludes, valueExcludes, m_possibleValues);
     }
 
     /**
@@ -121,13 +140,15 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
+        ValueFilterQuickFormRepresentation representation = new ValueFilterQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setColumn(m_columnField.getSelectedColumn());
-        representation.setDefaultValue((String) m_defaultField.getSelectedItem());
+        Set<String> defaultIncludes = m_defaultField.getIncludeList();
+        representation.setDefaultValues(defaultIncludes.toArray(new String[defaultIncludes.size()]));
         representation.saveToNodeSettings(settings);
-        ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
-        value.setValue((String) m_valueField.getSelectedItem());
+        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
+        Set<String> valueIncludes = m_valueField.getIncludeList();
+        value.setValues(valueIncludes.toArray(new String[valueIncludes.size()]));
         value.saveToNodeSettings(settings);
     }
 

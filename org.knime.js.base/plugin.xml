@@ -62,6 +62,11 @@
             factory-class="org.knime.js.base.node.quickform.selection.value.ValueSelectionQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.selection.value.ValueSelectionQuickFormNodeFactory">
       </node>
+      <node
+            category-path="/quickform/filter"
+            factory-class="org.knime.js.base.node.quickform.filter.value.ValueFilterQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.filter.value.ValueFilterQuickFormNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -234,6 +239,17 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.quickform.filter.value.bundle">
+         <webResource
+               relativePathSource="src/org/knime/js/base/node/quickform/filter/value/js/"
+               relativePathTarget="org/knime/js/base/node/quickform/filter/value/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/filter/value/WebView.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -370,6 +386,17 @@
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_selection_value"
             namespace="org_knime_js_base_node_quickform_selection_value"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.filter.value.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_quickform_filter_value"
+            namespace="org_knime_js_base_node_quickform_filter_value"
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
