@@ -50,7 +50,6 @@
 	<ports>
 		<inPort name="Table Input" index="0">Table containing the values.
 		</inPort>
-		<outPort index="0" name="Filtered Table">Only rows that contain one of the
-			selected values.</outPort>
+		<outPort index="0" name="Filtered Table">Table containing the selected values.</outPort>
 	</ports>
 </knimeNode>
