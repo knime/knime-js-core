@@ -1,5 +1,6 @@
 package org.knime.js.base.node.quickform.filter.column;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -18,6 +19,22 @@ public class ColumnFilterQuickFormRepresentation extends
     private String[] m_defaultColumns = new String[0];
     
     private String[] m_possibleColumns;
+    
+    private DataTableSpec m_spec;
+    
+    /**
+     * @return the spec
+     */
+    public DataTableSpec getSpec() {
+        return m_spec;
+    }
+    
+    /**
+     * @param spec the spec to set
+     */
+    public void setSpec(final DataTableSpec spec) {
+        m_spec = spec;
+    }
     
     /**
      * {@inheritDoc}

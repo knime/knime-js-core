@@ -112,6 +112,7 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     
     private void updateColumns(final DataTableSpec spec) {
         getDialogRepresentation().setPossibleColumns(spec.getColumnNames());
+        getDialogRepresentation().setSpec(spec);
         getViewRepresentation().setPossibleColumns(spec.getColumnNames());
     }
     

@@ -126,6 +126,7 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
     
     private void updateColumns(final DataTableSpec spec) {
         getDialogRepresentation().setPossibleColumns(spec.getColumnNames());
+        getDialogRepresentation().setSpec(spec);
         getViewRepresentation().setPossibleColumns(spec.getColumnNames());
     }
 

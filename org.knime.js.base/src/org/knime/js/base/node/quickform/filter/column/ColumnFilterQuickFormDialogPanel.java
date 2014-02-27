@@ -52,11 +52,11 @@ package org.knime.js.base.node.quickform.filter.column;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.util.filter.StringFilterPanel;
+import org.knime.core.node.util.ColumnFilterPanel;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -66,21 +66,17 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 @SuppressWarnings("serial")
 public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<ColumnFilterQuickFormValue> {
 
-    private StringFilterPanel m_component;
+    private ColumnFilterPanel m_component;
     
-    private String[] m_possibleColumns;
+    private DataTableSpec m_spec;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
-        m_component = new StringFilterPanel(true);
-        m_possibleColumns = representation.getPossibleColumns();
-        if (m_possibleColumns == null) {
-            m_possibleColumns = new String[0];
-        }
-        m_component.update(new ArrayList<String>(0), Arrays.asList(m_possibleColumns),
-                m_possibleColumns);
+        m_component = new ColumnFilterPanel(true);
+        m_spec = representation.getSpec();
+        m_component.update(m_spec, false, new ArrayList<String>(0));
         addComponent(m_component);
     }
 
@@ -89,7 +85,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void saveNodeValue(final ColumnFilterQuickFormValue value) throws InvalidSettingsException {
-        Set<String> includes = m_component.getIncludeList();
+        Set<String> includes = m_component.getIncludedColumnSet();
         value.setColumns(includes.toArray(new String[includes.size()]));
     }
 
@@ -98,14 +94,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void loadNodeValue(final ColumnFilterQuickFormValue value) {
-        List<String> includes = Arrays.asList(value.getColumns());
-        List<String> excludes = new ArrayList<String>(Math.max(0, m_possibleColumns.length - includes.size()));
-        for (String string : m_possibleColumns) {
-            if (!includes.contains(string)) {
-                excludes.add(string);
-            }
-        }
-        m_component.update(includes, excludes, m_possibleColumns);
+        m_component.update(m_spec, false, Arrays.asList(value.getColumns()));
     }
 
 }

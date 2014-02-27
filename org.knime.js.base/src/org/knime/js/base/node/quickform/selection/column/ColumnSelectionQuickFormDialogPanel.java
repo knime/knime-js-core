@@ -50,25 +50,33 @@
  */
 package org.knime.js.base.node.quickform.selection.column;
 
-import javax.swing.JComboBox;
+import javax.swing.border.Border;
 
+import org.knime.core.data.DataValue;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.util.ColumnSelectionPanel;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-@SuppressWarnings({"serial", "rawtypes", "unchecked" })
+@SuppressWarnings({"serial", "unchecked" })
 public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<ColumnSelectionQuickFormValue> {
 
-    private JComboBox m_component;
+    private ColumnSelectionPanel m_component;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
-        m_component = new JComboBox(representation.getPossibleColumns());
+        m_component = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
+        try {
+            m_component.update(representation.getSpec(), null);
+        } catch (NotConfigurableException e) {
+            // Leave empty
+        }
         addComponent(m_component);
     }
 
@@ -77,7 +85,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void saveNodeValue(final ColumnSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setColumn((String)m_component.getItemAt(m_component.getSelectedIndex()));
+        value.setColumn(m_component.getSelectedColumn());
     }
 
     /**
@@ -85,7 +93,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void loadNodeValue(final ColumnSelectionQuickFormValue value) {
-        m_component.setSelectedItem(value.getColumn());
+        m_component.setSelectedColumn(value.getColumn());
     }
 
 }
