@@ -125,7 +125,6 @@ public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilte
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        // TODO
         DataTableSpec outSpec = createSpec((DataTableSpec) inObjects[0].getSpec());
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
         String[] values = getViewValue().getValues();
