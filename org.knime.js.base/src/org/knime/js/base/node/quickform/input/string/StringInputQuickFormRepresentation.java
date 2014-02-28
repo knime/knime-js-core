@@ -18,6 +18,12 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     
     private String m_regex = DEFAULT_REGEX;
     
+    private static final String CFG_ERROR_MESSAGE = "error_message";
+    
+    private static final String DEFAULT_ERROR_MESSAGE = "";
+    
+    private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
+    
     private static final String CFG_DEFAULT = "default";
     
     private String m_defaultValue;
@@ -37,12 +43,27 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     }
     
     /**
+     * @return the errorMessage
+     */
+    public String getErrorMessage() {
+        return m_errorMessage;
+    }
+    
+    /**
+     * @param errorMessage the errorMessage to set
+     */
+    public void setErrorMessage(final String errorMessage) {
+        m_errorMessage = errorMessage;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
+        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
         m_defaultValue = settings.getString(CFG_DEFAULT);
     }
     
@@ -53,6 +74,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
+        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
         m_defaultValue = settings.getString(CFG_DEFAULT, "");
     }
     
@@ -63,6 +85,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
+        settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
         settings.addString(CFG_DEFAULT, m_defaultValue);
     }
 

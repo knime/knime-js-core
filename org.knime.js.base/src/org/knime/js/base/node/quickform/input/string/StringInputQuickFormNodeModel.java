@@ -41,7 +41,16 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getString());
+        String string = getViewValue().getString();
+        if (string == null) {
+            string = "";
+        }
+        String regex = getDialogRepresentation().getRegex();
+        if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
+            throw new InvalidSettingsException(getDialogRepresentation()
+                    .getErrorMessage());
+        }
+        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), string);
     }
 
     /**

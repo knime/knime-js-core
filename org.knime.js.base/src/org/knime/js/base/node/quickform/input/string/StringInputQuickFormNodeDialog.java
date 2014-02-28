@@ -1,6 +1,7 @@
 package org.knime.js.base.node.quickform.input.string;
 
 import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -19,7 +20,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
-    private final JTextField m_regexField;
+    private final RegexPanel m_regexField;
     
     private final JTextField m_defaultField;
 
@@ -27,7 +28,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     /** Constructors, inits fields calls layout routines. */
     StringInputQuickFormNodeDialog() {
-        m_regexField = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_regexField = new RegexPanel();
         m_defaultField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_valueField = new JTextField(DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
@@ -38,7 +39,13 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        addPairToPanel("Regular Expression: ", m_regexField, panelWithGBLayout, gbc);
+        addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
+        addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
+        GridBagConstraints gbcClone = (GridBagConstraints) gbc.clone();
+        gbcClone.insets = new Insets(0, 0, 0, 0);
+        addPairToPanel("Common Regular Expressions: ",
+                m_regexField.getCommonRegexesPanel(), panelWithGBLayout,
+                gbcClone);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
     }
@@ -52,7 +59,8 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_regexField.setText(representation.getRegex());
+        m_regexField.setRegex(representation.getRegex());
+        m_regexField.setErrorMessage(representation.getErrorMessage());
         m_defaultField.setText(representation.getDefaultValue());
         StringInputQuickFormValue value = new StringInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
@@ -64,9 +72,11 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        m_regexField.commitRegexHistory();
         StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setRegex(m_regexField.getText());
+        representation.setRegex(m_regexField.getRegex());
+        representation.setErrorMessage(m_regexField.getErrorMessage());
         representation.setDefaultValue(m_defaultField.getText());
         representation.saveToNodeSettings(settings);
         StringInputQuickFormValue value = new StringInputQuickFormValue();
