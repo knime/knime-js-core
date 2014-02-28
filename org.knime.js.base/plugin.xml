@@ -315,8 +315,7 @@
             implementationBundleID="org.knime.js.base.node.rowselector.bundle"
             init-method-name="init"
             jsObjectID="knime_row_selector"
-            namespace="knime_row_selector"
-            validate-method-name="validate">
+            namespace="knime_row_selector">
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
@@ -329,8 +328,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.molecule.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_molecule"
-            namespace="org_knime_js_base_node_quickform_input_molecule"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_molecule">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -340,8 +338,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.integer.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_integer"
-            namespace="org_knime_js_base_node_quickform_input_integer"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_integer">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -351,8 +348,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.dbl.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_dbl"
-            namespace="org_knime_js_base_node_quickform_input_dbl"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_dbl">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -362,8 +358,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.bool.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_bool"
-            namespace="org_knime_js_base_node_quickform_input_bool"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_bool">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -373,8 +368,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.date.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_date"
-            namespace="org_knime_js_base_node_quickform_input_date"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_date">
          <webDependency
                webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
@@ -384,8 +378,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.listbox.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_listbox"
-            namespace="org_knime_js_base_node_quickform_input_listbox"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_listbox">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -395,8 +388,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.selection.single.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_selection_single"
-            namespace="org_knime_js_base_node_quickform_selection_single"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_selection_single">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -406,8 +398,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.selection.multiple.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_selection_multiple"
-            namespace="org_knime_js_base_node_quickform_selection_multiple"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_selection_multiple">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -420,8 +411,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.selection.value.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_selection_value"
-            namespace="org_knime_js_base_node_quickform_selection_value"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_selection_value">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -431,8 +421,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.filter.value.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_filter_value"
-            namespace="org_knime_js_base_node_quickform_filter_value"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_filter_value">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -445,8 +434,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.selection.column.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_selection_column"
-            namespace="org_knime_js_base_node_quickform_selection_column"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_selection_column">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
@@ -456,8 +444,7 @@
             implementationBundleID="org.knime.js.base.node.quickform.filter.column.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_filter_column"
-            namespace="org_knime_js_base_node_quickform_filter_column"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_filter_column">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
