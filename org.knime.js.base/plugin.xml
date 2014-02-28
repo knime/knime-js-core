@@ -411,6 +411,9 @@
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTwinlist_1.0.0">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -433,6 +436,9 @@
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTwinlist_1.0.0">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -454,6 +460,9 @@
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTwinlist_1.0.0">
          </webDependency>
       </javascriptComponent>
    </extension>

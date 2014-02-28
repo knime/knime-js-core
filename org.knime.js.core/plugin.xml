@@ -95,6 +95,17 @@
                type="CSS">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="KnimeTwinlist_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/knime_twinlist_1_0_0.js"
+               relativePathTarget="js-lib/knime/knime_twinlist_1_0_0.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/knime_twinlist_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
 
 </plugin>
