@@ -59,6 +59,17 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
+        int value = getViewValue().getInteger();
+        int min = getDialogRepresentation().getMin();
+        int max = getDialogRepresentation().getMax();
+        if (getDialogRepresentation().getUseMin() && value < min) {
+            throw new InvalidSettingsException("The set integer " + value
+                    + " is smaller than the required minimum " + min);
+        }
+        if (getDialogRepresentation().getUseMax() && value > max) {
+            throw new InvalidSettingsException("The set integer " + value
+                    + " is bigger than the required maximum " + max);
+        }
         pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getViewValue().getInteger());
     }
 
