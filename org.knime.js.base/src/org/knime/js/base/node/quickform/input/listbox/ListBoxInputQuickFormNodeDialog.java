@@ -13,6 +13,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
+import org.knime.js.base.node.quickform.input.string.RegexPanel;
 
 /**
  * 
@@ -24,6 +25,8 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     private static final int TEXT_AREA_HEIGHT = 5;
 
     private final JTextField m_separatorField;
+    
+    private final RegexPanel m_regexField;
 
     private final JTextArea m_defaultArea;
     
@@ -32,6 +35,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     /** Constructors, inits fields calls layout routines. */
     ListBoxInputQuickFormNodeDialog() {
         m_separatorField = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_regexField = new RegexPanel();
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
@@ -43,6 +47,10 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Separator: ", m_separatorField, panelWithGBLayout, gbc);
+        addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
+        addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
+        addPairToPanel("Common Regular Expressions: ",
+                m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Default List: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
         addPairToPanel("String List: ", new JScrollPane(m_valueArea), panelWithGBLayout, gbc);
     }
@@ -57,6 +65,8 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_separatorField.setText(representation.getSeparator());
+        m_regexField.setRegex(representation.getRegex());
+        m_regexField.setErrorMessage(representation.getErrorMessage());
         m_defaultArea.setText(representation.getDefaultValue());
         ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
@@ -71,6 +81,8 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         ListBoxInputQuickFormRepresentation representation = new ListBoxInputQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setSeparator(m_separatorField.getText());
+        representation.setRegex(m_regexField.getRegex());
+        representation.setErrorMessage(m_regexField.getErrorMessage());
         representation.setDefaultValue(m_defaultArea.getText());
         representation.saveToNodeSettings(settings);
         ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();

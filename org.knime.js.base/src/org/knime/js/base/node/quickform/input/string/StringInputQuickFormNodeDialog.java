@@ -1,7 +1,6 @@
 package org.knime.js.base.node.quickform.input.string;
 
 import java.awt.GridBagConstraints;
-import java.awt.Insets;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -41,11 +40,8 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
-        GridBagConstraints gbcClone = (GridBagConstraints) gbc.clone();
-        gbcClone.insets = new Insets(0, 0, 0, 0);
         addPairToPanel("Common Regular Expressions: ",
-                m_regexField.getCommonRegexesPanel(), panelWithGBLayout,
-                gbcClone);
+                m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
     }

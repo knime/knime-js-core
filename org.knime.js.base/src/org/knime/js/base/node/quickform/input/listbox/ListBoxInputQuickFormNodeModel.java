@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.listbox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -13,7 +14,6 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -30,8 +30,6 @@ public class ListBoxInputQuickFormNodeModel
         QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue,
         ListBoxInputQuickFormViewRepresentation, ListBoxInputQuickFormValue> {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(ListBoxInputQuickFormNodeModel.class);
-
     /**
      * Creates a list box input node model.
      */
@@ -47,7 +45,8 @@ public class ListBoxInputQuickFormNodeModel
 
     /** {@inheritDoc} */
     @Override
-    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) {
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        getValidatedValues();
         final String variableName = getDialogRepresentation().getFlowVariableName();
         createAndPushFlowVariable();
         return new PortObjectSpec[]{createSpec(variableName)};
@@ -57,52 +56,37 @@ public class ListBoxInputQuickFormNodeModel
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         final String variableName = getDialogRepresentation().getFlowVariableName();
-        final String value = getViewValue().getString();
-        String separator = getDialogRepresentation().getSeparator();
-        final ArrayList<String> values = new ArrayList<String>();
-        if (separator == null || separator.isEmpty()) {
-            values.add(value);
-        } else {
-            StringBuilder sepString = new StringBuilder();
-            for (int i = 0; i < separator.length(); i++) {
-                if (i > 0) {
-                    sepString.append('|');
-                }
-                char c = separator.charAt(i);
-                if (c == '|') {
-                    sepString.append("\\|");
-                } else if (c == '\\') {
-                    if (i + 1 < separator.length()) {
-                        if (separator.charAt(i + 1) == 'n') {
-                            sepString.append("\\n");
-                            i++;
-                        } else if (separator.charAt(i + 1) == 't') {
-                            sepString.append("\\t");
-                            i++;
-                        } else {
-                            // not supported
-                            LOGGER.assertLog(false,
-                                    "A back slash must not be followed by a char other than n or t; ignoring it.");
-                        }
-                    } else {
-                        // not supported
-                        LOGGER.assertLog(false, "A back slash must be followed by either a n or t; ignoring it.");
-                    }
-                } else {
-                    // a real, non-specific char
-                    sepString.append(c);
-                }
-            }
-            values.addAll(Arrays.asList(value.split(sepString.toString())));
-        }
         DataTableSpec outSpec = createSpec(variableName);
         BufferedDataContainer cont = exec.createDataContainer(outSpec, true);
+        List<String> values = getValidatedValues();
         for (int i = 0; i < values.size(); i++) {
             cont.addRowToTable(new DefaultRow(RowKey.createRowKey(i), new StringCell(values.get(i))));
         }
         cont.close();
         createAndPushFlowVariable();
         return new PortObject[]{cont.getTable()};
+    }
+    
+    private List<String> getValidatedValues() throws InvalidSettingsException {
+        final String value = getViewValue().getString();
+        String separator = getDialogRepresentation().getSeparatorRegex();
+        final ArrayList<String> values = new ArrayList<String>();
+        if (separator == null || separator.isEmpty()) {
+            values.add(value);
+        } else {
+            values.addAll(Arrays.asList(value.split(separator)));
+        }
+        String regex = getDialogRepresentation().getRegex();
+        if (regex != null && !regex.isEmpty()) {
+            for (int i = 0; i < values.size(); i++) {
+                if (!values.get(i).matches(regex)) {
+                    throw new InvalidSettingsException("Value " + (i + 1)
+                            + " is not valid:\n"
+                            + getDialogRepresentation().getErrorMessage());
+                }
+            }
+        }
+        return values;
     }
 
     private DataTableSpec createSpec(final String variableName) {

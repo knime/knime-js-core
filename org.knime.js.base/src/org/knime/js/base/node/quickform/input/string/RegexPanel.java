@@ -95,7 +95,7 @@ public class RegexPanel {
         });
         m_commonRegexesPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(0, 0, 0, 0);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1;
@@ -103,6 +103,7 @@ public class RegexPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         m_commonRegexesPanel.add(m_commonRegexes, gbc);
+        gbc.insets = new Insets(0, 5, 0, 0);
         gbc.gridx++;
         gbc.weightx = 0;
         m_commonRegexesPanel.add(assign, gbc);
