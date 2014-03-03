@@ -59,6 +59,17 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
+        double value = getViewValue().getDouble();
+        double min = getDialogRepresentation().getMin();
+        double max = getDialogRepresentation().getMax();
+        if (getDialogRepresentation().getUseMin() && value < min) {
+            throw new InvalidSettingsException("The set double " + value
+                    + " is smaller than the required minimum " + min);
+        }
+        if (getDialogRepresentation().getUseMax() && value > max) {
+            throw new InvalidSettingsException("The set double " + value
+                    + " is bigger than the required maximum " + max);
+        }
         pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getViewValue().getDouble());
     }
 

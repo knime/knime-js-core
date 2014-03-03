@@ -60,7 +60,6 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
             public void stateChanged(final ChangeEvent e) {
                 int min = (Integer)m_min.getValue();
                 if (((Integer)m_max.getValue()) < min) {
-                    //((SpinnerNumberModel)m_max.getModel()).setMinimum(min);
                     m_max.setValue(min);
                 }
             }
@@ -70,7 +69,6 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
             public void stateChanged(final ChangeEvent e) {
                 int max = (Integer)m_max.getValue();
                 if (((Integer)m_min.getValue()) > max) {
-                    //((SpinnerNumberModel)m_min.getModel()).setMaximum(max);
                     m_min.setValue(max);
                 }
             }
