@@ -71,9 +71,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DateStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
-    private static final String CFG_DATE = "date";
+    /**
+     * The default date for all date settings.
+     */
+    static final Date DEFAULT_DATE = new Date();
 
-    private static final Date DEFAULT_DATE = new Date();
+    private static final String CFG_DATE = "date";
 
     private Date m_date = DEFAULT_DATE;
 

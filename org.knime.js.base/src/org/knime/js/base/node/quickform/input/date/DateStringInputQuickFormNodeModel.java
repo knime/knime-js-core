@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.date;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -66,6 +67,17 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
+        Date value = getViewValue().getDate();
+        Date min = getDialogRepresentation().getMin();
+        Date max = getDialogRepresentation().getMax();
+        if (getDialogRepresentation().getUseMin() && value.before(min)) {
+            throw new InvalidSettingsException("The set date " + value
+                    + " is before the earliest allowed date " + min);
+        }
+        if (getDialogRepresentation().getUseMax() && value.after(max)) {
+            throw new InvalidSettingsException("The set date " + value
+                    + " is after the latest allowed date " + max);
+        }
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
                 FORMAT.format(getViewValue().getDate()));
     }

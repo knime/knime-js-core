@@ -370,7 +370,8 @@
             implementationBundleID="org.knime.js.base.node.quickform.input.date.bundle"
             init-method-name="init"
             jsObjectID="org_knime_js_base_node_quickform_input_date"
-            namespace="org_knime_js_base_node_quickform_input_date">
+            namespace="org_knime_js_base_node_quickform_input_date"
+            validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
