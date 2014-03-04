@@ -143,7 +143,10 @@ org_knime_js_base_node_quickform_input_date = function() {
 	}
 	
 	function refreshTime() {
+		// If datepicker is not disabled setDate will reopen the picker in IE
+		dateInput.datepicker('disable');
 		dateInput.datepicker('setDate', date);
+		dateInput.datepicker('enable');
 		hourInput.val(date.getHours());
 		minInput.val(date.getMinutes());
 		secInput.val(date.getSeconds());

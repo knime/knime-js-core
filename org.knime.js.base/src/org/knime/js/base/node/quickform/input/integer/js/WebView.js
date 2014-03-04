@@ -33,9 +33,15 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	
 	integerInput.validate = function() {
 		var valid;
-		var value = input.val();
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
+		var value = input.val();
+		if (!isInteger(value)) {
+			errorMessage.text('The set value is not an integer');
+			errorMessage.css('display', 'inline');
+			return false;
+		}
+		value = parseInt(value);
 		if (viewRepresentation.usemin && value<min) {
 			valid = false;
 			errorMessage.text("The set integer " + value + " is smaller than the required minimum " + min);
@@ -52,9 +58,13 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	};
 
 	integerInput.value = function() {
-		viewValue.integer = input.val();
+		viewValue.integer = parseInt(input.val());
 		return viewValue;
 	};
+	
+	function isInteger(value) {
+		return $.isNumeric(value) && value%1===0;
+	}
 	
 	return integerInput;
 	

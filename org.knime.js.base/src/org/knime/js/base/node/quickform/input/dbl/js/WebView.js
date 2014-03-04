@@ -35,9 +35,15 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	
 	doubleInput.validate = function() {
 		var valid;
-		var value = input.val();
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
+		var value = input.val();
+		if (!$.isNumeric(value)) {
+			errorMessage.text('The set value is not a double');
+			errorMessage.css('display', 'inline');
+			return false;
+		}
+		value = parseFloat(value);
 		if (viewRepresentation.usemin && value<min) {
 			valid = false;
 			errorMessage.text("The set double " + value + " is smaller than the required minimum " + min);
@@ -54,7 +60,7 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	};
 
 	doubleInput.value = function() {
-		viewValue.double = input.val();
+		viewValue.double = parseFloat(input.val());
 		return viewValue;
 	};
 	
