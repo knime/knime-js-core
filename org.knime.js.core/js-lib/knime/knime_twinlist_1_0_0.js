@@ -26,19 +26,19 @@ function twinlist() {
 		remove.width(widthMax);
 		removeAll.width(widthMax);
 		// All columns get the same height
-		var heightMax = Math.max(excludes.height(), includes.height(), span
-				.height());
-		excludes.height(heightMax);
-		includes.height(heightMax);
-		span.height(heightMax);
+		var heightMax = Math.max(excludesSpan.height(), includesSpan.height(), span.height());
+		excludes.height(heightMax-excludesHeader.height());
+		includes.height(heightMax-includesHeader.height());
+		//span.height(heightMax);
+		buttonfiller.height(heightMax-excludesHeader.height(true));
 		// Lists get the same width
-		var listWidthMax = Math.max(excludes.width(), includes.width());
+		var listWidthMax = Math.max(excludes.width(), includes.width(), 150);
 		excludes.width(listWidthMax);
 		includes.width(listWidthMax);
 		// Outer element gets overall width and height
-		element.width(excludes.outerWidth(true) + span.outerWidth(true)
-				+ includes.outerWidth(true));
-		element.height(excludes.outerHeight(true));
+		element.width(excludesSpan.outerWidth(true) + span.outerWidth(true)
+				+ includesSpan.outerWidth(true));
+		element.height(excludesSpan.outerHeight(true));
 	};
 
 	getIncludes = function() {
@@ -153,22 +153,35 @@ function twinlist() {
 	excludes = $('<select>');
 	excludes.css('float', 'left');
 	excludes.prop('multiple', true);
+	excludes.css('border-color', 'red');
 	includes = $('<select>');
 	includes.css('float', 'left');
 	includes.prop('multiple', true);
+	includes.css('border-color', 'green');
+	var excludesSpan = $('<span>');
+	excludesSpan.css('float', 'left');
+	var includesSpan = $('<span>');
+	includesSpan.css('float', 'left');
 	var span = $('<span>');
 	span.css('float', 'left');
+	var buttonfiller = $('<div>');
 	var add = $('<button type="button">&gt;</button>');
 	add.click(execAdd);
+	add.attr('title', 'Add selected to includes');
 	var addAll = $('<button type="button">&gt;&gt;</button>');
 	addAll.click(execAddAll);
+	addAll.attr('title', 'Add all to includes');
 	var remove = $('<button type="button">&lt;</button>');
 	remove.click(execRemove);
+	remove.attr('title', 'Remove selected from includes');
 	var removeAll = $('<button type="button">&lt;&lt;</button>');
 	removeAll.click(execRemoveAll);
-	element.append(excludes);
+	removeAll.attr('title', 'Remove all from includes');
+	element.append(excludesSpan);
 	element.append(span);
-	element.append(includes);
+	element.append(includesSpan);
+	span.append(buttonfiller);
+	span.append('<br>');
 	span.append(add);
 	span.append('<br>');
 	span.append(addAll);
@@ -176,6 +189,14 @@ function twinlist() {
 	span.append(remove);
 	span.append('<br>');
 	span.append(removeAll);
+	var excludesHeader = $('<span>Excludes</span>');
+	excludesSpan.append(excludesHeader);
+	excludesSpan.append($('<br>'));
+	excludesSpan.append(excludes);
+	var includesHeader = $('<span>Includes</span>');
+	includesSpan.append(includesHeader);
+	includesSpan.append($('<br>'));
+	includesSpan.append(includes);
 
 	// Define which functions are callable from the outside
 
