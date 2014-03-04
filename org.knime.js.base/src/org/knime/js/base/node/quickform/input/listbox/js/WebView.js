@@ -14,8 +14,10 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		var body = $('body');
 		input = $('<textarea>');
 		body.append(input);
+		input.css('white-space', 'nowrap');
+		input.attr('wrap', 'off');
 		input.attr('rows', '5');
-		input.attr('cols', '50');
+		input.attr('cols', '20');
 		input.attr("pattern", representation.regex);
 		input.val(viewValue.string);
 		body.append($('<br>'));

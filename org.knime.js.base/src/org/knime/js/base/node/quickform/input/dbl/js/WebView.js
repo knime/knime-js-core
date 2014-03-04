@@ -12,10 +12,17 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
-		body.append($('<span>' + infoText() + '</span>'));
 		input = $('<input>');
 		body.append(input);
-		input.attr("type", "text");
+		input.spinner({
+			step: 0.01
+		});
+		if (viewRepresentation.usemin) {
+			input.spinner('option', 'min', viewRepresentation.min);
+		}
+		if (viewRepresentation.usemax) {
+			input.spinner('option', 'max', viewRepresentation.max);
+		}
 		input.val(viewValue.double);
 		body.append($('<br>'));
 		errorMessage = $('<span>');
@@ -50,24 +57,6 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		viewValue.double = input.val();
 		return viewValue;
 	};
-	
-	function infoText() {
-		var text;
-		var usemin = viewRepresentation.usemin;
-		var usemax = viewRepresentation.usemax;
-		var min = viewRepresentation.min;
-		var max = viewRepresentation.max;
-		if (usemin && usemax) {
-			text = 'Double between ' + min + ' and ' + max + ': ';
-		} else if (usemin) {
-			text = 'Double bigger than ' + min + ': ';
-		} else if (usemax) {
-			text = 'Double smaller than ' + max + ': ';
-		} else {
-			text = '';
-		}
-		return text;
-	}
 	
 	return doubleInput;
 	

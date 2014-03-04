@@ -66,7 +66,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<DoubleInputQuickFormValue> {
 
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY,
-            Double.POSITIVE_INFINITY, 0.1));
+            Double.POSITIVE_INFINITY, 0.01));
 
     /**
      * 

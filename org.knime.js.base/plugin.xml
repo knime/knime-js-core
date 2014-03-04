@@ -343,6 +343,9 @@
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="jQueryUi_1.10.4">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -353,6 +356,9 @@
             validate-method-name="validate">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent

@@ -11,16 +11,28 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var secInput;
 	var milInput;
 	var errorMessage;
+	var date;
 
 	dateInput.init = function(representation, value) {
 		viewValue = value;
 		viewRepresentation = representation;
+		date = new Date(viewValue.date);
 		var body = $('body');
-		dateInput = body.append('<input id="date"></input>').find("#date");
-		dateInput.attr("type", "text");
+		
+		body.append('Date: ');
+		dateInput = $('<input>');
+		body.append(dateInput);
 		dateInput.datepicker({
 			dateFormat : "yy-mm-dd",
-			changeYear : true
+			changeYear : true,
+			onSelect: function(dateText) {
+				var newDate = $(this).datepicker('getDate');
+				date.setFullYear(newDate.getFullYear());
+				date.setMonth(newDate.getMonth());
+				date.setDate(newDate.getDate());
+				refreshTime();
+				$(this).blur();
+			}
 		});
 		if (viewRepresentation.usemin) {
 			dateInput.datepicker('option', 'minDate', new Date(viewRepresentation.min));
@@ -28,40 +40,50 @@ org_knime_js_base_node_quickform_input_date = function() {
 		if (viewRepresentation.usemax) {
 			dateInput.datepicker('option', 'maxDate', new Date(viewRepresentation.max));
 		}
-		var date = new Date(viewValue.date);
-		dateInput.val(paddedNumber(date.getFullYear(), 4)+'-'+paddedNumber((date.getMonth()+1), 2)+'-'+paddedNumber(date.getDate(), 2));
-		
-		hourInput = body.append('<input id="hour"></input>').find("#hour");
-		hourInput.attr("type", "text");
+
+		body.append('<br>Time: ');
+		hourInput = $('<input>');
+		body.append(hourInput);
 		hourInput.spinner({
-			min : 0,
-			max : 23
+			spin: function(event, ui) {
+				date.setHours(ui.value);
+				refreshTime();
+				return false;
+			}
 		});
-		hourInput.val(date.getHours());
 
-		minInput = body.append('<input id="min"></input>').find("#min");
-		minInput.attr("type", "text");
+		body.append(' <b>:</b> ');
+		minInput = $('<input>');
+		body.append(minInput);
 		minInput.spinner({
-			min : 0,
-			max : 59
+			spin: function(event, ui) {
+				date.setMinutes(ui.value);
+				refreshTime();
+				return false;
+			}
 		});
-		minInput.val(date.getMinutes());
 
-		secInput = body.append('<input id="sec"></input>').find("#sec");
-		secInput.attr("type", "text");
+		body.append(' <b>:</b> ');
+		secInput = $('<input>');
+		body.append(secInput);
 		secInput.spinner({
-			min : 0,
-			max : 59
+			spin: function(event, ui) {
+				date.setSeconds(ui.value)
+				refreshTime();
+				return false;
+			}
 		});
-		secInput.val(date.getSeconds());
 
-		milInput = body.append('<input id="mil"></input>').find("#mil");
-		milInput.attr("type", "text");
+		body.append(' <b>.</b> ');
+		milInput = $('<input>');
+		body.append(milInput);
 		milInput.spinner({
-			min : 0,
-			max : 999
+			spin: function(event, ui) {
+				date.setMilliseconds(ui.value);
+				refreshTime();
+				return false;
+			}
 		});
-		milInput.val(date.getMilliseconds());
 		body.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');
@@ -69,6 +91,18 @@ org_knime_js_base_node_quickform_input_date = function() {
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
 		body.append(errorMessage);
+		
+		var allInputs = $('input');
+		allInputs.height(20);
+		allInputs.width(40);
+		dateInput.width(100);
+		dateInput.css('border', '1px solid silver');
+		dateInput.css('margin-bottom', '10px');
+		allInputs.css('font-size', 'medium');
+		allInputs.attr('readonly', 'true');
+		allInputs.css('background-color', 'white');
+		
+		refreshTime();
 	};
 	
 	dateInput.validate = function() {
@@ -96,11 +130,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 	}
 
 	dateInput.value = function() {
-		var date = dateInput.datepicker('getDate');
-		date.setHours(hourInput.val());
-		date.setMinutes(minInput.val());
-		date.setSeconds(secInput.val());
-		date.setMilliseconds(milInput.val());
 		viewValue.date = date.getTime();
 		return viewValue;
 	};
@@ -111,6 +140,14 @@ org_knime_js_base_node_quickform_input_date = function() {
 	        output = '0' + output;
 	    }
 	    return output;
+	}
+	
+	function refreshTime() {
+		dateInput.datepicker('setDate', date);
+		hourInput.val(date.getHours());
+		minInput.val(date.getMinutes());
+		secInput.val(date.getSeconds());
+		milInput.val(date.getMilliseconds());
 	}
 	
 	return dateInput;

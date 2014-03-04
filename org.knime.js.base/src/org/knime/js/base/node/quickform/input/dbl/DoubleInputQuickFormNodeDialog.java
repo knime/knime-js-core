@@ -78,7 +78,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
     }
 
     private SpinnerNumberModel getSpinnerModel() {
-        return new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.1);
+        return new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.01);
     }
 
     /**
