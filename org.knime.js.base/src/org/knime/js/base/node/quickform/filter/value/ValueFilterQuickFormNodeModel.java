@@ -1,5 +1,7 @@
 package org.knime.js.base.node.quickform.filter.value;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,9 +28,11 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilterQuickFormRepresentation, 
-        ValueFilterQuickFormValue, ValueFilterQuickFormViewRepresentation, ValueFilterQuickFormValue> {
-    
+public class ValueFilterQuickFormNodeModel
+        extends
+        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue,
+        ValueFilterQuickFormViewRepresentation, ValueFilterQuickFormValue> {
+
     /** Creates a new value selection node model. */
     public ValueFilterQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
@@ -63,7 +67,8 @@ public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilte
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings)
+            throws InvalidSettingsException {
         createEmptyDialogRepresentation().loadFromNodeSettings(settings);
         createEmptyDialogValue().loadFromNodeSettings(settings);
     }
@@ -91,14 +96,15 @@ public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilte
     public ValueFilterQuickFormValue createEmptyViewValue() {
         return new ValueFilterQuickFormValue();
     }
-    
+
     /** {@inheritDoc} */
     @Override
-    public ValidationError validateViewValue(final ValueFilterQuickFormValue viewContent) {
+    public ValidationError validateViewValue(
+            final ValueFilterQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -107,38 +113,42 @@ public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilte
             throws InvalidSettingsException {
         updateValues((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
-        return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
+        return new DataTableSpec[]{createSpec((DataTableSpec)inSpecs[0])};
     }
-    
-    private DataTableSpec createSpec(final DataTableSpec inSpec) throws InvalidSettingsException {
+
+    private DataTableSpec createSpec(final DataTableSpec inSpec)
+            throws InvalidSettingsException {
         String column = getDialogRepresentation().getColumn();
         if (column != null && inSpec.containsName(column)) {
             return new DataTableSpec(inSpec.getColumnSpec(column));
         } else {
-            throw new InvalidSettingsException("Unknown column "
-                    + column + " selected.");
+            throw new InvalidSettingsException("The selected column '" + column
+                    + "' is not available.");
         }
     }
 
     /** {@inheritDoc} */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+    protected PortObject[] execute(final PortObject[] inObjects,
+            final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        DataTableSpec outSpec = createSpec((DataTableSpec) inObjects[0].getSpec());
-        BufferedDataContainer container = exec.createDataContainer(outSpec, false);
+        DataTableSpec outSpec =
+                createSpec((DataTableSpec)inObjects[0].getSpec());
+        BufferedDataContainer container =
+                exec.createDataContainer(outSpec, false);
         String[] values = getViewValue().getValues();
         DataType type = outSpec.getColumnSpec(0).getType();
         DataCellFactory cellFactory = new DataCellFactory();
         for (int i = 0; i < values.length; i++) {
-            DataCell result = cellFactory.createDataCellOfType(
-                    type, values[i]);
-            container.addRowToTable(new DefaultRow(RowKey.createRowKey(i), result));
+            DataCell result = cellFactory.createDataCellOfType(type, values[i]);
+            container.addRowToTable(new DefaultRow(RowKey.createRowKey(i),
+                    result));
         }
         container.close();
         return new PortObject[]{container.getTable()};
     }
-    
+
     private void updateValues(final DataTableSpec spec) {
         String column = getDialogRepresentation().getColumn();
         DataColumnSpec dcs = spec.getColumnSpec(column);
@@ -156,10 +166,25 @@ public class ValueFilterQuickFormNodeModel extends QuickFormNodeModel<ValueFilte
         getDialogRepresentation().setPossibleValues(values);
         getViewRepresentation().setPossibleValues(values);
     }
-    
-    private void createAndPushFlowVariable() {
+
+    private void createAndPushFlowVariable() throws InvalidSettingsException {
+        checkSelectedValues();
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
                 StringUtils.join(getViewValue().getValues(), ","));
+    }
+
+    private void checkSelectedValues() throws InvalidSettingsException {
+        List<String> possibleValues =
+                Arrays.asList(getDialogRepresentation().getPossibleValues());
+        String[] selectedValues = getViewValue().getValues();
+        for (String value : selectedValues) {
+            if (!possibleValues.contains(value)) {
+                throw new InvalidSettingsException("The selected value '"
+                        + value
+                        + "' is not among the possible values in the column '"
+                        + getDialogRepresentation().getColumn() + "'");
+            }
+        }
     }
 
 }

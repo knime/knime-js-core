@@ -1,5 +1,7 @@
 package org.knime.js.base.node.quickform.selection.column;
 
+import java.util.Arrays;
+
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -116,7 +118,10 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
         getViewRepresentation().setPossibleColumns(spec.getColumnNames());
     }
     
-    private void createAndPushFlowVariable() {
+    private void createAndPushFlowVariable() throws InvalidSettingsException {
+        if (!Arrays.asList(getDialogRepresentation().getPossibleColumns()).contains(getViewValue().getColumn())) {
+            throw new InvalidSettingsException("The selected column '" + getViewValue().getColumn() + "' is not available");
+        }
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getColumn());
     }
 

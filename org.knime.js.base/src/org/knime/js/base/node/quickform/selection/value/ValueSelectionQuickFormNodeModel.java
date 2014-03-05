@@ -1,5 +1,6 @@
 package org.knime.js.base.node.quickform.selection.value;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.knime.core.data.DataCell;
@@ -132,7 +133,13 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
         getViewRepresentation().setPossibleValues(values);
     }
     
-    private void createAndPushFlowVariable() {
+    private void createAndPushFlowVariable() throws InvalidSettingsException {
+        if (!Arrays.asList(getDialogRepresentation().getPossibleValues()).contains(getViewValue().getValue())) {
+            throw new InvalidSettingsException("The selected value '"
+                    + getViewValue().getValue()
+                    + "' is not among the possible values in the column '"
+                    + getDialogRepresentation().getColumn() + "'");
+        }
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getValue());
     }
 
