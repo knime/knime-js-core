@@ -1,10 +1,12 @@
 package org.knime.js.base.node.quickform.selection.column;
 
 import java.awt.GridBagConstraints;
+import java.util.List;
 
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
 import org.knime.core.node.InvalidSettingsException;
@@ -54,10 +56,24 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         ColumnSelectionQuickFormRepresentation representation = new ColumnSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_defaultField.setSelectedColumn(representation.getDefaultValue());
+        String selectedDefault = representation.getDefaultValue();
+        if (selectedDefault.isEmpty()) {
+            List<DataColumnSpec> cspecs = m_defaultField.getAvailableColumns();
+            if (cspecs.size() > 0) {
+                selectedDefault = cspecs.get(0).getName();
+            }
+        }
+        m_defaultField.setSelectedColumn(selectedDefault);
         ColumnSelectionQuickFormValue value = new ColumnSelectionQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        m_columnField.setSelectedColumn(value.getColumn());
+        String selectedColumn = value.getColumn();
+        if (selectedColumn.isEmpty()) {
+            List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
+            if (cspecs.size() > 0) {
+                selectedColumn = cspecs.get(0).getName();
+            }
+        }
+        m_columnField.setSelectedColumn(selectedColumn);
     }
 
     /**

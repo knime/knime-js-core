@@ -11,56 +11,60 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		var body = $('body');
 		viewRepresentation = representation;
 		viewValue = value;
-		if (viewRepresentation.type == 'Check boxes (vertical)'
-				|| viewRepresentation.type == 'Check boxes (horizontal)') {
-			var addLinebreak = viewRepresentation.type == 'Check boxes (vertical)';
-			for ( var i in viewRepresentation.possibleChoices) {
-				var choice = viewRepresentation.possibleChoices[i];
-				var button = $('<input type="checkbox" value="' + choice + '">'
-						+ choice + '</input>');
-				body.append(button);
-				if (addLinebreak) {
-					body.append('<br>');
+		if (viewRepresentation.possibleChoices.length > 0) {
+			if (viewRepresentation.type == 'Check boxes (vertical)'
+					|| viewRepresentation.type == 'Check boxes (horizontal)') {
+				var addLinebreak = viewRepresentation.type == 'Check boxes (vertical)';
+				for ( var i in viewRepresentation.possibleChoices) {
+					var choice = viewRepresentation.possibleChoices[i];
+					var button = $('<input type="checkbox" value="' + choice + '">'
+							+ choice + '</input>');
+					body.append(button);
+					if (addLinebreak) {
+						body.append('<br>');
+					}
+					if ($.inArray(choice, viewValue.value) >= 0) {
+						button.prop('checked', true);
+					}
 				}
-				if ($.inArray(choice, viewValue.value) >= 0) {
-					button.prop('checked', true);
+			} else if (viewRepresentation.type == 'List') {
+				var selection = $('<select>');
+				selection.prop('multiple', true);
+				body.append(selection);
+				for ( var i in viewRepresentation.possibleChoices) {
+					var choice = viewRepresentation.possibleChoices[i];
+					var option = $('<option>' + choice + '</option>');
+					option.appendTo(selection);
+					if ($.inArray(choice, viewValue.value) >= 0) {
+						option.prop('selected', true);
+					}
 				}
+			} else if (viewRepresentation.type == 'Twinlist') {
+				list = new twinlist();
+				body.append(list.getElement());
+				list.setAvailableValues(representation.possibleChoices);
+				list.setIncludes(value.value);
 			}
-		} else if (viewRepresentation.type == 'List') {
-			var selection = $('<select>');
-			selection.prop('multiple', true);
-			body.append(selection);
-			for ( var i in viewRepresentation.possibleChoices) {
-				var choice = viewRepresentation.possibleChoices[i];
-				var option = $('<option>' + choice + '</option>');
-				option.appendTo(selection);
-				if ($.inArray(choice, viewValue.value) >= 0) {
-					option.prop('selected', true);
-				}
-			}
-		} else if (viewRepresentation.type == 'Twinlist') {
-			list = new twinlist();
-			body.append(list.getElement());
-			list.setAvailableValues(representation.possibleChoices);
-			list.setIncludes(value.value);
 		}
 	};
 
 	multiSelection.value = function() {
-		var values = [];
-		if (viewRepresentation.type == 'Check boxes (vertical)'
-				|| viewRepresentation.type == 'Check boxes (horizontal)') {
-			$(':checked').each(function() {
-				values.push($(this).val());
-			});
-		} else if (viewRepresentation.type == 'List') {
-			$(':selected').each(function() {
-				values.push($(this).text());
-			});
-		} else if (viewRepresentation.type == 'Twinlist') {
-			values = list.getIncludes();
+		if (viewRepresentation.possibleChoices.length > 0) {
+			var values = [];
+			if (viewRepresentation.type == 'Check boxes (vertical)'
+					|| viewRepresentation.type == 'Check boxes (horizontal)') {
+				$(':checked').each(function() {
+					values.push($(this).val());
+				});
+			} else if (viewRepresentation.type == 'List') {
+				$(':selected').each(function() {
+					values.push($(this).text());
+				});
+			} else if (viewRepresentation.type == 'Twinlist') {
+				values = list.getIncludes();
+			}
+			viewValue.value = values;
 		}
-		viewValue.value = values;
 		return viewValue;
 	};
 

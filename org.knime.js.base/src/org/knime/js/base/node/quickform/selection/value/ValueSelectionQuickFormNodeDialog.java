@@ -109,11 +109,22 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_columnField.setSelectedColumn(representation.getColumn());
-        m_defaultField.setSelectedItem(representation.getDefaultValue());
+        String selectedColumn = representation.getColumn();
+        if (selectedColumn.isEmpty()) {
+            List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
+            if (cspecs.size() > 0) {
+                selectedColumn = cspecs.get(0).getName();
+            }
+        }
+        m_columnField.setSelectedColumn(selectedColumn);
+        if (representation.getDefaultValue() != null) {
+            m_defaultField.setSelectedItem(representation.getDefaultValue());
+        }
         ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
         value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setSelectedItem(value.getValue());
+        if (value.getValue() != null) {
+            m_valueField.setSelectedItem(value.getValue());
+        }
     }
 
     /**

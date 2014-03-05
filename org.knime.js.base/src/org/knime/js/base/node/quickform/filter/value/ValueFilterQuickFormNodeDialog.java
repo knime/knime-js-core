@@ -112,7 +112,14 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         ValueFilterQuickFormRepresentation representation = new ValueFilterQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        m_columnField.setSelectedColumn(representation.getColumn());
+        String selectedColumn = representation.getColumn();
+        if (selectedColumn.isEmpty()) {
+            List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
+            if (cspecs.size() > 0) {
+                selectedColumn = cspecs.get(0).getName();
+            }
+        }
+        m_columnField.setSelectedColumn(selectedColumn);
         List<String> defaultIncludes = Arrays.asList(representation.getDefaultValues());
         List<String> defaultExcludes =
                 new ArrayList<String>(Math.max(0, m_possibleValues.length

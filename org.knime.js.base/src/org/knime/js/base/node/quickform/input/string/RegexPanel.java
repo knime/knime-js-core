@@ -84,6 +84,7 @@ public class RegexPanel {
      */
     public RegexPanel() {
         JButton assign = new JButton("Assign");
+        m_regex.setBold(false);
         assign.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {

@@ -1,6 +1,7 @@
 package org.knime.js.base.node.quickform.input.integer;
 
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JCheckBox;
@@ -85,7 +86,7 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        JPanel minPanel = new JPanel();
+        JPanel minPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.insets = new Insets(0, 0, 0, 0);
         gbc2.anchor = GridBagConstraints.NORTHWEST;
@@ -99,7 +100,7 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
         gbc2.gridx++;
         gbc2.insets = new Insets(0, 5, 0, 0);
         minPanel.add(m_min, gbc2);
-        JPanel maxPanel = new JPanel();
+        JPanel maxPanel = new JPanel(new GridBagLayout());
         gbc2.weightx = 0;
         gbc2.gridx = 0;
         gbc2.insets = new Insets(0, 0, 0, 0);

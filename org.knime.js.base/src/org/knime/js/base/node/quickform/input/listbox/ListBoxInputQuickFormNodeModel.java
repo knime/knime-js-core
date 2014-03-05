@@ -58,9 +58,11 @@ public class ListBoxInputQuickFormNodeModel
         final String variableName = getDialogRepresentation().getFlowVariableName();
         DataTableSpec outSpec = createSpec(variableName);
         BufferedDataContainer cont = exec.createDataContainer(outSpec, true);
-        List<String> values = getValidatedValues();
-        for (int i = 0; i < values.size(); i++) {
-            cont.addRowToTable(new DefaultRow(RowKey.createRowKey(i), new StringCell(values.get(i))));
+        if (!getViewValue().getString().isEmpty()) {
+            List<String> values = getValidatedValues();
+            for (int i = 0; i < values.size(); i++) {
+                cont.addRowToTable(new DefaultRow(RowKey.createRowKey(i), new StringCell(values.get(i))));
+            }
         }
         cont.close();
         createAndPushFlowVariable();
