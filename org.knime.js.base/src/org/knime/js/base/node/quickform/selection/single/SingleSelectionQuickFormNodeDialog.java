@@ -136,6 +136,9 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         String selection = (String)list.getSelectedValue();
         list.setListData(m_possibleChoicesField.getText().split("\n"));
         list.setSelectedValue(selection, false);
+        if (list.getSelectedValue() == null && list.getModel().getSize() > 0) {
+            list.setSelectedIndex(0);
+        }
     }
 
 }

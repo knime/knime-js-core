@@ -22,10 +22,12 @@ org_knime_js_base_node_quickform_input_date = function() {
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
 		var body = $('body');
+		var dateElement = $('<nobr>');
+		var timeElement = $('<nobr>');
 		
-		body.append('Date: ');
+		dateElement.append('Date: ');
 		dateInput = $('<input>');
-		body.append(dateInput);
+		dateElement.append(dateInput);
 		dateInput.datepicker({
 			dateFormat : "yy-mm-dd",
 			changeYear : true,
@@ -44,10 +46,12 @@ org_knime_js_base_node_quickform_input_date = function() {
 		if (viewRepresentation.usemax) {
 			dateInput.datepicker('option', 'maxDate', new Date(viewRepresentation.max));
 		}
-
-		body.append('<br>Time: ');
+		body.append(dateElement);
+		body.append($('<br>'));
+		
+		timeElement.append('Time: ');
 		hourInput = $('<input>');
-		body.append(hourInput);
+		timeElement.append(hourInput);
 		hourInput.spinner({
 			spin: function(event, ui) {
 				date.setHours(ui.value);
@@ -61,9 +65,9 @@ org_knime_js_base_node_quickform_input_date = function() {
 			}
 		});
 
-		body.append(' <b>:</b> ');
+		timeElement.append(' <b>:</b> ');
 		minInput = $('<input>');
-		body.append(minInput);
+		timeElement.append(minInput);
 		minInput.spinner({
 			spin: function(event, ui) {
 				date.setMinutes(ui.value);
@@ -77,9 +81,9 @@ org_knime_js_base_node_quickform_input_date = function() {
 			}
 		});
 
-		body.append(' <b>:</b> ');
+		timeElement.append(' <b>:</b> ');
 		secInput = $('<input>');
-		body.append(secInput);
+		timeElement.append(secInput);
 		secInput.spinner({
 			spin: function(event, ui) {
 				date.setSeconds(ui.value);
@@ -93,9 +97,9 @@ org_knime_js_base_node_quickform_input_date = function() {
 			}
 		});
 
-		body.append(' <b>.</b> ');
+		timeElement.append(' <b>.</b> ');
 		milInput = $('<input>');
-		body.append(milInput);
+		timeElement.append(milInput);
 		milInput.spinner({
 			spin: function(event, ui) {
 				date.setMilliseconds(ui.value);
@@ -108,6 +112,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 				return false;
 			}
 		});
+		body.append(timeElement);
 		body.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');

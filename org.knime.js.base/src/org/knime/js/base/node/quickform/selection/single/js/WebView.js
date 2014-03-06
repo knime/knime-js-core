@@ -16,9 +16,14 @@ org_knime_js_base_node_quickform_selection_single = function() {
 				var addLinebreak = viewRepresentation.type == 'Radio buttons (vertical)';
 				for ( var i in viewRepresentation.possibleChoices) {
 					var choice = viewRepresentation.possibleChoices[i];
-					var button = $('<input type="radio" name="singleSelection" value="'
-							+ choice + '">' + choice + '</input>');
-					body.append(button);
+					var button = $('<input id="choice'+i+'" type="radio" name="singleSelection" value="'
+							+ choice + '"></input>');
+					var label = $('<label for="choice'+i+'">'+choice+'</label>');
+					var nobr = $('<nobr>');
+					nobr.append(button);
+					nobr.append(label);
+					body.append(nobr);
+					body.append(' ');
 					if (addLinebreak) {
 						body.append('<br>');
 					}
@@ -26,6 +31,9 @@ org_knime_js_base_node_quickform_selection_single = function() {
 						button.prop('checked', true);
 					}
 				}
+				elements = $('label');
+				elements.width(getMaxWidth(elements));
+				elements.css('display', 'inline-block');
 			} else if (viewRepresentation.type == 'List'
 					|| viewRepresentation.type == 'Dropdown') {
 				var selection = $('<select>');
@@ -58,6 +66,13 @@ org_knime_js_base_node_quickform_selection_single = function() {
 		}
 		return viewValue;
 	};
+	
+	function getMaxWidth(elements) {
+		return Math.max.apply(null, elements.map(function ()
+				{
+				    return $(this).width();
+				}).get());
+	}
 
 	return singleSelection;
 
