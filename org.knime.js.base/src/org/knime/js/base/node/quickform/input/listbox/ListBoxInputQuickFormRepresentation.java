@@ -35,6 +35,12 @@ public class ListBoxInputQuickFormRepresentation extends
     
     private String m_defaultValue;
     
+    private static final String CFG_OMIT_EMPTY = "omit_empty";
+    
+    private static final boolean DEFAULT_OMIT_EMPTY = true;
+    
+    private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
+    
     /**
      * @return the regex
      */
@@ -111,6 +117,20 @@ public class ListBoxInputQuickFormRepresentation extends
     }
     
     /**
+     * @return the omitEmpty
+     */
+    public boolean getOmitEmpty() {
+        return m_omitEmpty;
+    }
+    
+    /**
+     * @param omitEmpty the omitEmpty to set
+     */
+    public void setOmitEmpty(final boolean omitEmpty) {
+        m_omitEmpty = omitEmpty;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -119,6 +139,7 @@ public class ListBoxInputQuickFormRepresentation extends
         m_regex = settings.getString(CFG_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
         m_separator = settings.getString(CFG_SEPARATOR);
+        m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
         setDefaultValue(settings.getString(CFG_DEFAULT));
     }
     
@@ -131,6 +152,7 @@ public class ListBoxInputQuickFormRepresentation extends
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
         m_separator = settings.getString(CFG_SEPARATOR, DEFAULT_SEPARATOR);
+        m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY, DEFAULT_OMIT_EMPTY);
         setDefaultValue(settings.getString(CFG_DEFAULT, ""));
     }
     
@@ -143,6 +165,7 @@ public class ListBoxInputQuickFormRepresentation extends
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
         settings.addString(CFG_SEPARATOR, m_separator);
+        settings.addBoolean(CFG_OMIT_EMPTY, m_omitEmpty);
         settings.addString(CFG_DEFAULT, getDefaultValue());
     }
 

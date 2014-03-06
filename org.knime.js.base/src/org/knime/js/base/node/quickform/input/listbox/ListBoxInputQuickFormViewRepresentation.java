@@ -40,6 +40,12 @@ public class ListBoxInputQuickFormViewRepresentation extends JSONViewContent {
     
     private String m_defaultValue;
     
+    private static final String CFG_OMIT_EMPTY = "omit_empty";
+    
+    private static final boolean DEFAULT_OMIT_EMPTY = true;
+    
+    private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
+    
     /**
      * @return the regex
      */
@@ -123,6 +129,22 @@ public class ListBoxInputQuickFormViewRepresentation extends JSONViewContent {
     }
     
     /**
+     * @return the omitEmpty
+     */
+    @JsonProperty("omitempty")
+    public boolean getOmitEmpty() {
+        return m_omitEmpty;
+    }
+    
+    /**
+     * @param omitEmpty the omitEmpty to set
+     */
+    @JsonProperty("omitempty")
+    public void setOmitEmpty(final boolean omitEmpty) {
+        m_omitEmpty = omitEmpty;
+    }
+    
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -131,6 +153,7 @@ public class ListBoxInputQuickFormViewRepresentation extends JSONViewContent {
         m_regex = settings.getString(CFG_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
         m_separator = settings.getString(CFG_SEPARATOR);
+        m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
         setDefaultValue(settings.getString(CFG_DEFAULT));
     }
     
@@ -143,6 +166,7 @@ public class ListBoxInputQuickFormViewRepresentation extends JSONViewContent {
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
         settings.addString(CFG_SEPARATOR, m_separator);
+        settings.addBoolean(CFG_OMIT_EMPTY, m_omitEmpty);
         settings.addString(CFG_DEFAULT, getDefaultValue());
     }
 

@@ -1,7 +1,6 @@
 package org.knime.js.base.node.quickform.input.listbox;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.knime.core.data.DataColumnSpec;
@@ -58,11 +57,9 @@ public class ListBoxInputQuickFormNodeModel
         final String variableName = getDialogRepresentation().getFlowVariableName();
         DataTableSpec outSpec = createSpec(variableName);
         BufferedDataContainer cont = exec.createDataContainer(outSpec, true);
-        if (!getViewValue().getString().isEmpty()) {
-            List<String> values = getValidatedValues();
-            for (int i = 0; i < values.size(); i++) {
-                cont.addRowToTable(new DefaultRow(RowKey.createRowKey(i), new StringCell(values.get(i))));
-            }
+        List<String> values = getValidatedValues();
+        for (int i = 0; i < values.size(); i++) {
+            cont.addRowToTable(new DefaultRow(RowKey.createRowKey(i), new StringCell(values.get(i))));
         }
         cont.close();
         createAndPushFlowVariable();
@@ -70,13 +67,21 @@ public class ListBoxInputQuickFormNodeModel
     }
     
     private List<String> getValidatedValues() throws InvalidSettingsException {
+        boolean omitEmpty = getDialogRepresentation().getOmitEmpty();
         final String value = getViewValue().getString();
-        String separator = getDialogRepresentation().getSeparatorRegex();
+        String separator = getDialogRepresentation().getSeparator();
         final ArrayList<String> values = new ArrayList<String>();
         if (separator == null || separator.isEmpty()) {
-            values.add(value);
+            if (!(omitEmpty && value.isEmpty())) {
+                values.add(value);
+            }
         } else {
-            values.addAll(Arrays.asList(value.split(separator)));
+            String[] splitValue = value.split(getDialogRepresentation().getSeparatorRegex());
+            for (String val : splitValue) {
+                if (!(omitEmpty && val.isEmpty())) {
+                    values.add(val);
+                }
+            }
         }
         String regex = getDialogRepresentation().getRegex();
         if (regex != null && !regex.isEmpty()) {

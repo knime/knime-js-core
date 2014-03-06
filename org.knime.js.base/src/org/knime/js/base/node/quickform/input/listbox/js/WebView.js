@@ -8,6 +8,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	var errorMessageLine1;
 	var errorMessageLine2;
 	var separator;
+	var omitEmpty;
 
 	listboxInput.init = function(representation, value) {
 		viewValue = value;
@@ -31,17 +32,35 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		body.append(errorMessageLine1);
 		body.append($('<br>'));
 		body.append(errorMessageLine2);
-		separator = new RegExp(representation.separator);
+		if (representation.separator==null || representation.separator.length==0) {
+			separator = null;
+		} else {
+			separator = new RegExp(representation.separatorregex);
+		}
+		omitEmpty = representation.omitempty;
 	};
 
 	listboxInput.validate = function() {
 		var index;
+		var value = input.val();
 		var regex = input.attr("pattern");
+		var values = new Array();
+        if (separator == null) {
+            if (!(omitEmpty && value.length==0)) {
+                values.push(value);
+            }
+        } else {
+            var splitValue = value.split(separator);
+            for (var i=0; i<splitValue.length; i++) {
+                if (!(omitEmpty && splitValue[i].length==0)) {
+                    values.push(splitValue[i]);
+                }
+            }
+        }
 		if (regex != null && regex.length > 0) {
 			var valid = true;
-			var values = input.val().split(separator);
 			for (var i=0; i<values.length; i++) {
-				valid &= matchExact(regex, values[i]);
+				valid = valid && matchExact(regex, values[i]);
 				if (!valid) {
 					index = i+1;
 					break;

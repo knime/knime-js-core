@@ -2,6 +2,7 @@ package org.knime.js.base.node.quickform.input.listbox;
 
 import java.awt.GridBagConstraints;
 
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -26,6 +27,8 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JTextField m_separatorField;
     
+    private final JCheckBox m_omitEmptyField;
+    
     private final RegexPanel m_regexField;
 
     private final JTextArea m_defaultArea;
@@ -35,6 +38,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     /** Constructors, inits fields calls layout routines. */
     ListBoxInputQuickFormNodeDialog() {
         m_separatorField = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_omitEmptyField = new JCheckBox();
         m_regexField = new RegexPanel();
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
@@ -47,6 +51,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Separator: ", m_separatorField, panelWithGBLayout, gbc);
+        addPairToPanel("Omit empty values: ", m_omitEmptyField, panelWithGBLayout, gbc);
         addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
         addPairToPanel("Common Regular Expressions: ",
@@ -65,6 +70,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         m_separatorField.setText(representation.getSeparator());
+        m_omitEmptyField.setSelected(representation.getOmitEmpty());
         m_regexField.setRegex(representation.getRegex());
         m_regexField.setErrorMessage(representation.getErrorMessage());
         m_defaultArea.setText(representation.getDefaultValue());
@@ -81,6 +87,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         ListBoxInputQuickFormRepresentation representation = new ListBoxInputQuickFormRepresentation();
         saveSettingsTo(representation);
         representation.setSeparator(m_separatorField.getText());
+        representation.setOmitEmpty(m_omitEmptyField.isSelected());
         representation.setRegex(m_regexField.getRegex());
         representation.setErrorMessage(m_regexField.getErrorMessage());
         representation.setDefaultValue(m_defaultArea.getText());
