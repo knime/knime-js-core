@@ -76,7 +76,7 @@ public class ListBoxInputQuickFormNodeModel
                 values.add(value);
             }
         } else {
-            String[] splitValue = value.split(getDialogRepresentation().getSeparatorRegex());
+            String[] splitValue = value.split(getDialogRepresentation().getSeparatorRegex(), -1);
             for (String val : splitValue) {
                 if (!(omitEmpty && val.isEmpty())) {
                     values.add(val);

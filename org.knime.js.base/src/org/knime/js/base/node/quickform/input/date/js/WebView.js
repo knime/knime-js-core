@@ -12,11 +12,15 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var milInput;
 	var errorMessage;
 	var date;
+	var minDate;
+	var maxDate;
 
 	dateInput.init = function(representation, value) {
 		viewValue = value;
 		viewRepresentation = representation;
 		date = new Date(viewValue.date);
+		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
+		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
 		var body = $('body');
 		
 		body.append('Date: ');
@@ -47,6 +51,11 @@ org_knime_js_base_node_quickform_input_date = function() {
 		hourInput.spinner({
 			spin: function(event, ui) {
 				date.setHours(ui.value);
+				if (minDate!=null && date<minDate) {
+					date = new Date(minDate.getTime());
+				} else if (maxDate!=null && date>maxDate) {
+					date = new Date(maxDate.getTime());
+				}
 				refreshTime();
 				return false;
 			}
@@ -58,6 +67,11 @@ org_knime_js_base_node_quickform_input_date = function() {
 		minInput.spinner({
 			spin: function(event, ui) {
 				date.setMinutes(ui.value);
+				if (minDate!=null && date<minDate) {
+					date = new Date(minDate.getTime());
+				} else if (maxDate!=null && date>maxDate) {
+					date = new Date(maxDate.getTime());
+				}
 				refreshTime();
 				return false;
 			}
@@ -68,7 +82,12 @@ org_knime_js_base_node_quickform_input_date = function() {
 		body.append(secInput);
 		secInput.spinner({
 			spin: function(event, ui) {
-				date.setSeconds(ui.value)
+				date.setSeconds(ui.value);
+				if (minDate!=null && date<minDate) {
+					date = new Date(minDate.getTime());
+				} else if (maxDate!=null && date>maxDate) {
+					date = new Date(maxDate.getTime());
+				}
 				refreshTime();
 				return false;
 			}
@@ -80,6 +99,11 @@ org_knime_js_base_node_quickform_input_date = function() {
 		milInput.spinner({
 			spin: function(event, ui) {
 				date.setMilliseconds(ui.value);
+				if (minDate!=null && date<minDate) {
+					date = new Date(minDate.getTime());
+				} else if (maxDate!=null && date>maxDate) {
+					date = new Date(maxDate.getTime());
+				}
 				refreshTime();
 				return false;
 			}
@@ -104,43 +128,11 @@ org_knime_js_base_node_quickform_input_date = function() {
 		
 		refreshTime();
 	};
-	
-	dateInput.validate = function() {
-		var valid = true;
-		var value = dateInput.datepicker('getDate');
-		value.setHours(hourInput.val());
-		value.setMinutes(minInput.val());
-		value.setSeconds(secInput.val());
-		value.setMilliseconds(milInput.val());
-		var min = new Date(viewRepresentation.min);
-		var max = new Date(viewRepresentation.max);
-		if (viewRepresentation.usemin && value<min) {
-			valid = false;
-			errorMessage.text("The set date " + value + " is before the earliest allowed date " + min);
-			errorMessage.css('display', 'inline');
-		} else if (viewRepresentation.usemax && value>max) {
-			valid = false;
-			errorMessage.text("The set date " + value + " is after the latest allowed date " + max);
-			errorMessage.css('display', 'inline');
-		} else {
-			valid = true;
-			errorMessage.css('display', 'none');
-		}
-		return valid;
-	}
 
 	dateInput.value = function() {
 		viewValue.date = date.getTime();
 		return viewValue;
 	};
-	
-	function paddedNumber(number, targetLength) {
-	    var output = number + '';
-	    while (output.length < targetLength) {
-	        output = '0' + output;
-	    }
-	    return output;
-	}
 	
 	function refreshTime() {
 		// If datepicker is not disabled setDate will reopen the picker in IE
