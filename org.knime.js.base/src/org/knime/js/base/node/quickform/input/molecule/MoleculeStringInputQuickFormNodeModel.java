@@ -12,31 +12,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 public class MoleculeStringInputQuickFormNodeModel
         extends
         QuickFormFlowVariableNodeModel<MoleculeStringInputQuickFormRepresentation,
-        MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormViewRepresentation,
         MoleculeStringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected MoleculeStringInputQuickFormRepresentation createEmptyDialogRepresentation() {
+    public MoleculeStringInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new MoleculeStringInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected MoleculeStringInputQuickFormValue createEmptyDialogValue() {
-        return new MoleculeStringInputQuickFormValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MoleculeStringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new MoleculeStringInputQuickFormViewRepresentation();
     }
     
     /**

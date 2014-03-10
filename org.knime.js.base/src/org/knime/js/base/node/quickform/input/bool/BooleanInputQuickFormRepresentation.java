@@ -6,10 +6,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class BooleanInputQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<BooleanInputQuickFormValue> {
     
@@ -21,6 +28,7 @@ public class BooleanInputQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
@@ -31,6 +39,7 @@ public class BooleanInputQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         setDefaultValue(settings.getBoolean(CFG_DEFAULT, false));
@@ -40,6 +49,7 @@ public class BooleanInputQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addBoolean(CFG_DEFAULT, getDefaultValue());
@@ -49,6 +59,7 @@ public class BooleanInputQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public DialogNodePanel<BooleanInputQuickFormValue> createDialogPanel() {
         BooleanInputQuickFormDialogPanel panel = new BooleanInputQuickFormDialogPanel();
         fillDialogPanel(panel);
@@ -58,6 +69,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public boolean getDefaultValue() {
         return m_defaultValue;
     }
@@ -65,6 +77,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final boolean defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -73,6 +86,7 @@ public class BooleanInputQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void resetNodeValueToDefault(final BooleanInputQuickFormValue value) {
         value.setBoolean(getDefaultValue());        
     }

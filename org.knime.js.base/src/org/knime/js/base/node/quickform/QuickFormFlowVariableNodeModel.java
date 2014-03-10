@@ -13,16 +13,13 @@ import org.knime.core.node.web.WebViewContent;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <DREP> The configuration content of the quickform node.
- * @param <DVAL> The node value implementation of the quickform node.
- * @param <VREP> The configuration content of the quickform node.
- * @param <VVAL> The node value implementation of the quickform node.
+ * @param <REP> The configuration content of the quickform node.
+ * @param <VAL> The node value implementation of the quickform node.
  * 
  */
 public abstract class QuickFormFlowVariableNodeModel<
-        DREP extends DialogNodeRepresentation<DVAL>, DVAL extends DialogNodeValue, 
-        VREP extends WebViewContent, VVAL extends WebViewContent>
-        extends QuickFormNodeModel<DREP, DVAL, VREP, VVAL> {
+        REP extends DialogNodeRepresentation<VAL> & WebViewContent, VAL extends DialogNodeValue & WebViewContent>
+        extends QuickFormNodeModel<REP, VAL> {
 
     /** Creates a new node model with no inports and one flow variable outport. */
     protected QuickFormFlowVariableNodeModel() {

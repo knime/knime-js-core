@@ -11,31 +11,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class IntInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue,
-        IntInputQuickFormViewRepresentation, IntInputQuickFormValue> {
+        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected IntInputQuickFormRepresentation createEmptyDialogRepresentation() {
+    public IntInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new IntInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected IntInputQuickFormValue createEmptyDialogValue() {
-        return new IntInputQuickFormValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IntInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new IntInputQuickFormViewRepresentation();
     }
     
     /**
@@ -64,11 +47,11 @@ public class IntInputQuickFormNodeModel
         int max = getDialogRepresentation().getMax();
         if (getDialogRepresentation().getUseMin() && value < min) {
             throw new InvalidSettingsException("The set integer " + value
-                    + " is smaller than the required minimum " + min);
+                    + " is smaller than the allowed minimum of " + min);
         }
         if (getDialogRepresentation().getUseMax() && value > max) {
             throw new InvalidSettingsException("The set integer " + value
-                    + " is bigger than the required maximum " + max);
+                    + " is bigger than the allowed maximum of " + max);
         }
         pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getViewValue().getInteger());
     }

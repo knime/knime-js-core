@@ -60,10 +60,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SpinnerNumberModel;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
@@ -89,8 +87,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
 
     private final JTextField m_variableNameField;
 
-    private final JSpinner m_weightSpinner;
-
     private final JCheckBox m_hideInWizard;
 
     /**
@@ -104,7 +100,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         m_descriptionArea.setPreferredSize(new Dimension(100, 50));
         m_descriptionArea.setMinimumSize(new Dimension(100, 30));
         m_variableNameField = new JTextField(DEF_TEXTFIELD_WIDTH);
-        m_weightSpinner = new JSpinner(new SpinnerNumberModel(1, -100, 100, 1));
         m_hideInWizard = new JCheckBox((Icon)null, false);
         m_hideInWizard.setToolTipText("If selected, this QuickForm elements is not visible in the wizard.");
     }
@@ -135,10 +130,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         gbc.weighty = 0;
         addPairToPanel("Hide in Wizard: ", m_hideInWizard, panel, gbc);
 
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weighty = 0;
-        addPairToPanel("Weight: ", m_weightSpinner, panel, gbc);
-
         gbc.fill = GridBagConstraints.HORIZONTAL;
         addPairToPanel("Variable Name: ", m_variableNameField, panel, gbc);
 
@@ -167,7 +158,9 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
     protected final void addPairToPanel(final String label, final JComponent c, final JPanel panelWithGBLayout,
             final GridBagConstraints gbc) {
         int fill = gbc.fill;
+        Insets insets = gbc.insets;
 
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0;
@@ -175,6 +168,7 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
 
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = fill;
+        gbc.insets = insets;
         gbc.weightx = 1;
         panelWithGBLayout.add(c, gbc);
         gbc.weightx = 0;
@@ -223,20 +217,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
     }
 
     /**
-     * @return The weight
-     */
-    protected int getWeight() {
-        return (Integer)m_weightSpinner.getValue();
-    }
-
-    /**
-     * @param weight The weight
-     */
-    protected void setWeight(final int weight) {
-        m_weightSpinner.setValue(weight);
-    }
-
-    /**
      * @param representation Representation holding the content for the
      *            components
      */
@@ -244,7 +224,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
             final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
         setLabel(representation.getLabel());
         setDescription(representation.getDescription());
-        setWeight(representation.getWeight());
         setFlowVariableName(representation.getFlowVariableName());
     }
 
@@ -255,7 +234,6 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
     protected void saveSettingsTo(final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
         representation.setLabel(getLabel());
         representation.setDescription(getDescription());
-        representation.setWeight(getWeight());
         representation.setFlowVariableName(getFlowVariableName());
     }
 

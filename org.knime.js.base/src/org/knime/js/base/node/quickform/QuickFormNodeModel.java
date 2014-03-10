@@ -18,23 +18,17 @@ import org.knime.core.node.wizard.WizardNode;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <DREP> The configuration content of the quickform node.
- * @param <DVAL> The node value implementation of the quickform node.
- * @param <VREP> The configuration content of the quickform node.
- * @param <VVAL> The node value implementation of the quickform node.
+ * @param <REP> The configuration content of the quickform node.
+ * @param <VAL> The node value implementation of the quickform node.
  * 
  */
-public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<DVAL>, DVAL extends DialogNodeValue,
-        VREP extends WebViewContent, VVAL extends WebViewContent>
-        extends NodeModel implements DialogNode<DREP, DVAL>, WizardNode<VREP, VVAL> {
+public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VAL> & WebViewContent,
+        VAL extends DialogNodeValue & WebViewContent>
+        extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
 
-    private DREP m_dialogRepresentation;
+    private REP m_representation;
 
-    private DVAL m_dialogValue;
-    
-    private VREP m_viewRepresentation;
-    
-    private VVAL m_viewValue;
+    private VAL m_value;
     
     /**
      * Creates a new quickform model with the given number (and types!) of input
@@ -45,10 +39,8 @@ public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<D
      */
     protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
-        m_dialogRepresentation = createEmptyDialogRepresentation();
-        m_dialogValue = createEmptyDialogValue();
-        m_viewRepresentation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
+        m_representation = createEmptyViewRepresentation();
+        m_value = createEmptyViewValue();
     }
 
     /**
@@ -67,13 +59,13 @@ public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<D
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        DREP representation = getDialogRepresentation();
+        REP representation = getDialogRepresentation();
         representation.loadFromNodeSettings(settings);
-        DVAL value = getDialogValue();
+        VAL value = getDialogValue();
         value.loadFromNodeSettings(settings);
-        VREP viewRepresentation = getViewRepresentation();
+        REP viewRepresentation = getViewRepresentation();
         viewRepresentation.loadFromNodeSettings(settings);
-        VVAL viewValue = getViewValue();
+        VAL viewValue = getViewValue();
         viewValue.loadFromNodeSettings(settings);
     }
 
@@ -99,49 +91,39 @@ public abstract class QuickFormNodeModel<DREP extends DialogNodeRepresentation<D
      * {@inheritDoc}
      */
     @Override
-    public DREP getDialogRepresentation() {
-        return m_dialogRepresentation;
+    public REP getDialogRepresentation() {
+        return m_representation;
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public DVAL getDialogValue() {
-        return m_dialogValue;
+    public VAL getDialogValue() {
+        return m_value;
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public VREP getViewRepresentation() {
-        return m_viewRepresentation;
+    public REP getViewRepresentation() {
+        return m_representation;
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public VVAL getViewValue() {
-        return m_viewValue;
+    public VAL getViewValue() {
+        return m_value;
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final VVAL viewContent) {
-        m_viewValue = viewContent;
+    public void loadViewValue(final VAL viewContent) {
+        m_value = viewContent;
     };
-    
-    /**
-     * @return The node representation
-     */
-    protected abstract DREP createEmptyDialogRepresentation();
-
-    /**
-     * @return The node value
-     */
-    protected abstract DVAL createEmptyDialogValue();
 }

@@ -16,25 +16,20 @@
           Some lines of description that will be shown in the remote control 
           form, for instance by means of a tooltip.
         </option>
-        <option name="Weight">
-          A weight value that influences the position of the component in
-          the final layout. Lighter elements will be placed at the top, whereas
-          heavier items will be placed nearer the bottom. The value is relative
-          to the weights of the other components in the workflow (absolute 
-          value is not relevant, only the relative comparison to other
-          elements).
+        <option name="Hide in Wizard">
+          If the setting should be hidden in the wizard execution.
         </option>
         <option name="Variable Name">
           Variable identifier.
         </option>
-        <option name="Variable Value">
-          Variable value containing the select column names.
-        </option>
         <option name="Column Selection">
-          Column Selection panel to select a single column from.
+          The column containing the values.
         </option>
-        <option name="Value Selection">
-          Value Selection panel to select a single value from.
+        <option name="Default Value">
+          The value that is selected by default.
+        </option>
+        <option name="Variable Value">
+          The current variable value.
         </option>
 	</fullDescription>
 	<interactiveView name="Value selection">

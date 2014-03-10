@@ -26,8 +26,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  */
 public class ListBoxInputQuickFormNodeModel
         extends
-        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue,
-        ListBoxInputQuickFormViewRepresentation, ListBoxInputQuickFormValue> {
+        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue> {
 
     /**
      * Creates a list box input node model.
@@ -105,24 +104,8 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected ListBoxInputQuickFormRepresentation createEmptyDialogRepresentation() {
+    public ListBoxInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new ListBoxInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ListBoxInputQuickFormValue createEmptyDialogValue() {
-        return new ListBoxInputQuickFormValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ListBoxInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new ListBoxInputQuickFormViewRepresentation();
     }
     
     /**

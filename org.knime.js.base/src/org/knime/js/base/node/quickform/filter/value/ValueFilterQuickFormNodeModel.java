@@ -30,29 +30,12 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  */
 public class ValueFilterQuickFormNodeModel
         extends
-        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue,
-        ValueFilterQuickFormViewRepresentation, ValueFilterQuickFormValue> {
+        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue> {
 
     /** Creates a new value selection node model. */
     public ValueFilterQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
                 new PortType[]{BufferedDataTable.TYPE});
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ValueFilterQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new ValueFilterQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ValueFilterQuickFormValue createEmptyDialogValue() {
-        return new ValueFilterQuickFormValue();
     }
 
     /**
@@ -69,8 +52,8 @@ public class ValueFilterQuickFormNodeModel
     @Override
     protected void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
-        createEmptyDialogValue().loadFromNodeSettings(settings);
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -85,8 +68,8 @@ public class ValueFilterQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ValueFilterQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new ValueFilterQuickFormViewRepresentation();
+    public ValueFilterQuickFormRepresentation createEmptyViewRepresentation() {
+        return new ValueFilterQuickFormRepresentation();
     }
 
     /**
@@ -157,10 +140,14 @@ public class ValueFilterQuickFormNodeModel
             values = new String[0];
         } else {
             final Set<DataCell> vals = dcs.getDomain().getValues();
-            values = new String[vals.size()];
-            int i = 0;
-            for (final DataCell cell : vals) {
-                values[i++] = cell.toString();
+            if (vals == null) {
+                values = new String[0];
+            } else {
+                values = new String[vals.size()];
+                int i = 0;
+                for (final DataCell cell : vals) {
+                    values[i++] = cell.toString();
+                }
             }
         }
         getDialogRepresentation().setPossibleValues(values);

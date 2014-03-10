@@ -6,10 +6,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepresentation<IntInputQuickFormValue> {
     
     private static final String CFG_USE_MIN = "use_min";
@@ -46,6 +53,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
@@ -60,6 +68,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_defaultValue = settings.getInt(CFG_DEFAULT, DEFAULT_INTEGER);
@@ -73,6 +82,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addInt(CFG_DEFAULT, m_defaultValue);
@@ -86,6 +96,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public DialogNodePanel<IntInputQuickFormValue> createDialogPanel() {
         IntInputQuickFormDialogPanel panel = new IntInputQuickFormDialogPanel();
         fillDialogPanel(panel);
@@ -95,6 +106,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public int getDefaultValue() {
         return m_defaultValue;
     }
@@ -102,6 +114,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final int defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -110,6 +123,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void resetNodeValueToDefault(final IntInputQuickFormValue value) {
         value.setInteger(m_defaultValue);        
     }
@@ -117,6 +131,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the useMin
      */
+    @JsonProperty("usemin")
     public boolean getUseMin() {
         return m_useMin;
     }
@@ -124,6 +139,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param useMin the useMin to set
      */
+    @JsonProperty("usemin")
     public void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
@@ -131,6 +147,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the useMax
      */
+    @JsonProperty("usemax")
     public boolean getUseMax() {
         return m_useMax;
     }
@@ -138,6 +155,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param useMax the useMax to set
      */
+    @JsonProperty("usemax")
     public void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
@@ -145,6 +163,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the min
      */
+    @JsonProperty("min")
     public int getMin() {
         return m_min;
     }
@@ -152,6 +171,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param min the min to set
      */
+    @JsonProperty("min")
     public void setMin(final int min) {
         m_min = min;
     }
@@ -159,6 +179,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the max
      */
+    @JsonProperty("max")
     public int getMax() {
         return m_max;
     }
@@ -166,6 +187,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param max the max to set
      */
+    @JsonProperty("max")
     public void setMax(final int max) {
         m_max = max;
     }

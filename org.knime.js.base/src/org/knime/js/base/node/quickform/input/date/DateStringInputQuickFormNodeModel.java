@@ -14,36 +14,19 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * 
  */
 public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue,
-        DateStringInputQuickFormViewRepresentation, DateStringInputQuickFormValue> {
+        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue> {
 
     /**
      * Format for the date to string and string to date operations.
      */
     static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DateStringInputQuickFormRepresentation createEmptyDialogRepresentation() {
+    public DateStringInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new DateStringInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DateStringInputQuickFormValue createEmptyDialogValue() {
-        return new DateStringInputQuickFormValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DateStringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new DateStringInputQuickFormViewRepresentation();
     }
     
     /**

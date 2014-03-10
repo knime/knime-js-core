@@ -11,31 +11,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class DoubleInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue,
-        DoubleInputQuickFormViewRepresentation, DoubleInputQuickFormValue> {
+        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected DoubleInputQuickFormRepresentation createEmptyDialogRepresentation() {
+    public DoubleInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new DoubleInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected DoubleInputQuickFormValue createEmptyDialogValue() {
-        return new DoubleInputQuickFormValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public DoubleInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new DoubleInputQuickFormViewRepresentation();
     }
     
     /**
@@ -64,11 +47,11 @@ public class DoubleInputQuickFormNodeModel
         double max = getDialogRepresentation().getMax();
         if (getDialogRepresentation().getUseMin() && value < min) {
             throw new InvalidSettingsException("The set double " + value
-                    + " is smaller than the required minimum " + min);
+                    + " is smaller than the allowed minimum of " + min);
         }
         if (getDialogRepresentation().getUseMax() && value > max) {
             throw new InvalidSettingsException("The set double " + value
-                    + " is bigger than the required maximum " + max);
+                    + " is bigger than the allowed maximum of " + max);
         }
         pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getViewValue().getDouble());
     }

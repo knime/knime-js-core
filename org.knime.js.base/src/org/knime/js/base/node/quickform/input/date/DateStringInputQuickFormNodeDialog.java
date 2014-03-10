@@ -95,10 +95,12 @@ public class DateStringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         gbc2.gridx++;
         gbc2.insets = new Insets(0, 5, 0, 0);
         maxPanel.add(m_max, gbc2);
-        addPairToPanel("Earliest: ", minPanel, panelWithGBLayout, gbc);
-        addPairToPanel("Latest: ", maxPanel, panelWithGBLayout, gbc);
+        GridBagConstraints gbc3 = (GridBagConstraints) gbc.clone();
+        gbc3.insets = new Insets(0, 0, 0, 0);
+        addPairToPanel("Earliest: ", minPanel, panelWithGBLayout, gbc3);
+        addPairToPanel("Latest: ", maxPanel, panelWithGBLayout, gbc3);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
+        addPairToPanel("Date Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**

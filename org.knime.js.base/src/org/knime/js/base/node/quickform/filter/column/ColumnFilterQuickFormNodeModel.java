@@ -22,28 +22,12 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  * 
  */
 public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFilterQuickFormRepresentation, 
-        ColumnFilterQuickFormValue, ColumnFilterQuickFormViewRepresentation, ColumnFilterQuickFormValue> {
+        ColumnFilterQuickFormValue> {
     
     /** Creates a new value selection node model. */
     public ColumnFilterQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
                 new PortType[]{BufferedDataTable.TYPE});
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ColumnFilterQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new ColumnFilterQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ColumnFilterQuickFormValue createEmptyDialogValue() {
-        return new ColumnFilterQuickFormValue();
     }
 
     /**
@@ -59,8 +43,8 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
-        createEmptyDialogValue().loadFromNodeSettings(settings);
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -75,8 +59,8 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
      * {@inheritDoc}
      */
     @Override
-    public ColumnFilterQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new ColumnFilterQuickFormViewRepresentation();
+    public ColumnFilterQuickFormRepresentation createEmptyViewRepresentation() {
+        return new ColumnFilterQuickFormRepresentation();
     }
 
     /**

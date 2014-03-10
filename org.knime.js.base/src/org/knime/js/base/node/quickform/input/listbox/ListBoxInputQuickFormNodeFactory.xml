@@ -10,16 +10,27 @@
 		<option name="Label">A descriptive label that will be shown in, for instance the web port.</option>
 		<option name="Description">Some lines of description that will be shown in the remote control
 			form, for instance by means of a tooltip.</option>
-		<option name="Weight">A weight value that influences the position of the component in
-			the final layout. Lighter elements will be placed at the top, whereas
-			heavier items will be placed nearer the bottom. The value is relative
-			to the weights of the other components in the workflow (absolute
-			value is not relevant, only the relative comparison to other
-			elements).</option>
-		<option name="Variable/Column Name">Variable identifier and column name.</option>
-		<option name="String List">String values, separated.</option>
+        <option name="Hide in Wizard">
+          If the setting should be hidden in the wizard execution.
+        </option>
+		<option name="Variable Name">Variable identifier and column name.</option>
 		<option name="Separator">An undelimited list of char separators including \n and \t; back slashes and/or quotes are not supported.
 			All tokens are used as delimiters.</option>
+		<option name="Omit empty values">
+			If enabled empty values will be omitted from the output table and do not have to pass the check for validation.</option>
+		<option name="Regular expression">
+			Regular expression defining valid values.
+		</option>
+		<option name="Validation error message">
+			Message that will be shown if one of the values is not valid.
+		</option>
+		<option name="Common Regular Expressions">
+			A set of regular expression templates for common inputs. With the assign button you assign the regular expression and the corresponding error message to be the current settings.
+		</option>
+        <option name="Default List">
+          The value that is selected by default.
+        </option>
+		<option name="String List">String values, separated.</option>
 	</fullDescription>
 	<interactiveView name="Listbox input">
     	Input a list of strings.

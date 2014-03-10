@@ -46,11 +46,11 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		value = parseFloat(value);
 		if (viewRepresentation.usemin && value<min) {
 			valid = false;
-			errorMessage.text("The set double " + value + " is smaller than the required minimum " + min);
+			errorMessage.text("The set double " + value + " is smaller than the allowed minimum of " + min);
 			errorMessage.css('display', 'inline');
 		} else if (viewRepresentation.usemax && value>max) {
 			valid = false;
-			errorMessage.text("The set double " + value + " is bigger than the required maximum " + max);
+			errorMessage.text("The set double " + value + " is bigger than the allowed maximum of " + max);
 			errorMessage.css('display', 'inline');
 		} else {
 			valid = true;

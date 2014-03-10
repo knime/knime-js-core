@@ -71,20 +71,20 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        Dimension prefSize = new Dimension(DEF_TEXTFIELD_WIDTH, 70);
-        JScrollPane defaultPane = new JScrollPane(m_defaultField);
-        defaultPane.setPreferredSize(prefSize);
-        addPairToPanel("Default Variable Values: ", defaultPane, panelWithGBLayout, gbc);
-        JScrollPane valuePane = new JScrollPane(m_valueField);
-        valuePane.setPreferredSize(prefSize);
-        addPairToPanel("Variable Values: ", valuePane, panelWithGBLayout, gbc);
         GridBagConstraints gbc2 = (GridBagConstraints)gbc.clone();
         gbc2.fill = GridBagConstraints.BOTH;
         gbc2.weighty = 1;
+        Dimension prefSize = new Dimension(DEF_TEXTFIELD_WIDTH, 70);
+        addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
         JScrollPane choicesPane = new JScrollPane(m_possibleChoicesField);
         choicesPane.setPreferredSize(prefSize);
         addPairToPanel("Possible Choices: ", choicesPane, panelWithGBLayout, gbc2);
-        addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
+        JScrollPane defaultPane = new JScrollPane(m_defaultField);
+        defaultPane.setPreferredSize(prefSize);
+        addPairToPanel("Default Variable Values: ", defaultPane, panelWithGBLayout, gbc2);
+        JScrollPane valuePane = new JScrollPane(m_valueField);
+        valuePane.setPreferredSize(prefSize);
+        addPairToPanel("Variable Values: ", valuePane, panelWithGBLayout, gbc2);
     }
 
     /**

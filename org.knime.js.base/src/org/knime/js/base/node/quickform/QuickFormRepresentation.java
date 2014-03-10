@@ -55,13 +55,15 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeRepresentation;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.web.JSONViewContent;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
-public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> extends DialogNodeRepresentation<VAL> {
+public abstract class QuickFormRepresentation<VAL extends DialogNodeValue>
+        extends JSONViewContent implements DialogNodeRepresentation<VAL> {
 
     private static final String CFG_LABEL = "label";
 
@@ -108,7 +110,6 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
         settings.addString(CFG_LABEL, m_label);
         settings.addString(CFG_DESCRIPTION, m_description);
     }
@@ -118,7 +119,6 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
         m_label = settings.getString(CFG_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION);
     }
@@ -128,7 +128,6 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue> exten
      */
     @Override
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
         m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
     }

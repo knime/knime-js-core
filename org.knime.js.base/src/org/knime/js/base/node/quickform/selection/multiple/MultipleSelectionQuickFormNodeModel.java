@@ -25,8 +25,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  */
 public class MultipleSelectionQuickFormNodeModel
         extends
-        QuickFormNodeModel<MultipleSelectionQuickFormRepresentation, MultipleSelectionQuickFormValue,
-        MultipleSelectionQuickFormViewRepresentation, MultipleSelectionQuickFormValue> {
+        QuickFormNodeModel<MultipleSelectionQuickFormRepresentation, MultipleSelectionQuickFormValue> {
 
     /**
      * 
@@ -61,22 +60,6 @@ public class MultipleSelectionQuickFormNodeModel
         }
         container.close();
         return new PortObject[]{container.getTable()};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected MultipleSelectionQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new MultipleSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected MultipleSelectionQuickFormValue createEmptyDialogValue() {
-        return new MultipleSelectionQuickFormValue();
     }
 
     /**
@@ -119,8 +102,8 @@ public class MultipleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public MultipleSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new MultipleSelectionQuickFormViewRepresentation();
+    public MultipleSelectionQuickFormRepresentation createEmptyViewRepresentation() {
+        return new MultipleSelectionQuickFormRepresentation();
     }
 
     /**

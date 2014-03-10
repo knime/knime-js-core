@@ -51,31 +51,23 @@
 package org.knime.js.base.node.quickform.selection.multiple;
 
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EtchedBorder;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.util.filter.StringFilterPanel;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -212,155 +204,42 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
         }
 
     }
-
+    
     private class TwinlistComponent implements MultipleSelectionComponent {
-
-        private JPanel m_panel;
-
+        
+        private StringFilterPanel m_filter;
+        
         private String[] m_choices;
-
-        private JList m_includeList;
-
-        private JList m_excludeList;
-
-        private DefaultListModel m_includeModel;
-
-        private DefaultListModel m_excludeModel;
-
+        
         TwinlistComponent(final String[] choices) {
-            m_includeModel = new DefaultListModel();
-            m_excludeModel = new DefaultListModel();
+            m_filter = new StringFilterPanel(true);
             m_choices = choices;
-            m_panel = new JPanel();
-            m_includeList = new JList(m_includeModel);
-            m_excludeList = new JList(m_excludeModel);
-            m_includeList.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(final MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        removeFromSelection((List)Arrays.asList(m_includeList.getSelectedValues()));
-                    }
-                    super.mouseClicked(e);
-                }
-            });
-            m_excludeList.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(final MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        addToSelection((List)Arrays.asList(m_excludeList.getSelectedValues()));
-                    }
-                    super.mouseClicked(e);
-                }
-            });
-            JButton includeSelected = new JButton(">");
-            JButton includeAll = new JButton(">>");
-            JButton excludeSelected = new JButton("<");
-            JButton excludeAll = new JButton("<<");
-            includeSelected.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent arg0) {
-                    addToSelection((List)Arrays.asList(m_excludeList.getSelectedValues()));
-                }
-            });
-            includeAll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent arg0) {
-                    setSelections(choices);
-                }
-            });
-            excludeSelected.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent arg0) {
-                    removeFromSelection((List)Arrays.asList(m_includeList.getSelectedValues()));
-                }
-            });
-            excludeAll.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(final ActionEvent arg0) {
-                    setSelections(new String[0]);
-                }
-            });
-            JScrollPane includes = new JScrollPane(m_includeList);
-            JScrollPane excludes = new JScrollPane(m_excludeList);
-            includes.setPreferredSize(new Dimension(300, 200));
-            excludes.setPreferredSize(new Dimension(300, 200));
-            includeSelected.setPreferredSize(includeAll.getPreferredSize());
-            excludeSelected.setPreferredSize(excludeAll.getPreferredSize());
-            m_panel.setLayout(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.insets = new Insets(5, 5, 5, 5);
-            gbc.anchor = GridBagConstraints.CENTER;
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.weightx = 1;
-            gbc.weighty = 1;
-            gbc.gridheight = 4;
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-            m_panel.add(excludes, gbc);
-            gbc.fill = GridBagConstraints.NONE;
-            gbc.weightx = 0;
-            gbc.gridheight = 1;
-            gbc.gridx++;
-            m_panel.add(includeSelected, gbc);
-            gbc.gridy++;
-            m_panel.add(includeAll, gbc);
-            gbc.gridy++;
-            m_panel.add(excludeSelected, gbc);
-            gbc.gridy++;
-            m_panel.add(excludeAll, gbc);
-            gbc.fill = GridBagConstraints.BOTH;
-            gbc.weightx = 1;
-            gbc.gridheight = 4;
-            gbc.gridy = 0;
-            gbc.gridx++;
-            m_panel.add(includes, gbc);
+            m_filter.update(new ArrayList<String>(0), Arrays.asList(m_choices), m_choices);
         }
 
         @Override
         public JComponent getComponent() {
-            return m_panel;
+            return m_filter;
         }
 
         @Override
         public String[] getSelections() {
-            String[] selections = new String[m_includeModel.getSize()];
-            for (int i = 0; i < m_includeModel.getSize(); i++) {
-                selections[i] = (String)m_includeModel.getElementAt(i);
-            }
-            return selections;
+            Set<String> includes = m_filter.getIncludeList();
+            return includes.toArray(new String[includes.size()]);
         }
 
         @Override
         public void setSelections(final String[] selections) {
-            m_includeModel.removeAllElements();
-            m_excludeModel.removeAllElements();
-            List<String> selectionList = Arrays.asList(selections);
-            for (String choice : m_choices) {
-                if (selectionList.contains(choice)) {
-                    m_includeModel.addElement(choice);
-                } else {
-                    m_excludeModel.addElement(choice);
+            List<String> includes = Arrays.asList(selections);
+            List<String> excludes = new ArrayList<String>(Math.max(0, m_choices.length - includes.size()));
+            for (String string : m_choices) {
+                if (!includes.contains(string)) {
+                    excludes.add(string);
                 }
             }
+            m_filter.update(includes, excludes, m_choices);
         }
-
-        private void addToSelection(final List<String> items) {
-            for (String item : items) {
-                m_excludeModel.removeElement(item);
-                m_includeModel.addElement(item);
-            }
-            // This will rebuild the list with the original order
-            setSelections(getSelections());
-        }
-
-        private void removeFromSelection(final List<String> items) {
-            for (String item : items) {
-                m_includeModel.removeElement(item);
-                m_excludeModel.addElement(item);
-            }
-            // This will rebuild the list with the original order
-            setSelections(getSelections());
-        }
+        
     }
 
 }

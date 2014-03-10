@@ -6,10 +6,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRepresentation<DoubleInputQuickFormValue> {
     
     private static final String CFG_USE_MIN = "use_min";
@@ -46,6 +53,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
@@ -60,6 +68,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         setDefaultValue(settings.getDouble(CFG_DEFAULT, DEFAULT_DOUBLE));
@@ -73,6 +82,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addDouble(CFG_DEFAULT, getDefaultValue());
@@ -86,6 +96,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public DialogNodePanel<DoubleInputQuickFormValue> createDialogPanel() {
         DoubleInputQuickFormDialogPanel panel = new DoubleInputQuickFormDialogPanel();
         fillDialogPanel(panel);
@@ -95,6 +106,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public double getDefaultValue() {
         return m_defaultValue;
     }
@@ -102,6 +114,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final double defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -110,6 +123,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void resetNodeValueToDefault(final DoubleInputQuickFormValue value) {
         value.setDouble(getDefaultValue());
         
@@ -118,6 +132,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the useMin
      */
+    @JsonProperty("usemin")
     public boolean getUseMin() {
         return m_useMin;
     }
@@ -125,6 +140,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param useMin the useMin to set
      */
+    @JsonProperty("usemin")
     public void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
@@ -132,6 +148,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the useMax
      */
+    @JsonProperty("usemax")
     public boolean getUseMax() {
         return m_useMax;
     }
@@ -139,6 +156,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param useMax the useMax to set
      */
+    @JsonProperty("usemax")
     public void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
@@ -146,6 +164,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the min
      */
+    @JsonProperty("min")
     public double getMin() {
         return m_min;
     }
@@ -153,6 +172,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param min the min to set
      */
+    @JsonProperty("min")
     public void setMin(final double min) {
         m_min = min;
     }
@@ -160,6 +180,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the max
      */
+    @JsonProperty("max")
     public double getMax() {
         return m_max;
     }
@@ -167,6 +188,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param max the max to set
      */
+    @JsonProperty("max")
     public void setMax(final double max) {
         m_max = max;
     }

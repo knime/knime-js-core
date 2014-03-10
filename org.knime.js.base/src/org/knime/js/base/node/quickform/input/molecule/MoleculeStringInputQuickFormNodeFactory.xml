@@ -12,15 +12,15 @@
 			portal.</option>
 		<option name="Description">Some lines of description that will be shown in the remote control
 			form, for instance by means of a tooltip.</option>
-		<option name="Weight">A weight value that influences the position of the component in
-			the final layout. Lighter elements will be placed at the top, whereas
-			heavier items will be placed nearer the bottom. The value is relative
-			to the weights of the other components in the workflow (absolute
-			value is not relevant, only the relative comparison to other
-			elements).</option>
+        <option name="Hide in Wizard">
+          If the setting should be hidden in the wizard execution.
+        </option>
 		<option name="Variable Name">Variable identifier.</option>
-		<option name="Molecule String">The string representation of a molecule.</option>
 		<option name="Format">The format of the molecule string. Please note that not all molecule sketchers support all formats.</option>
+        <option name="Default Value">
+          The value that is selected by default.
+        </option>
+		<option name="Molecule String">The current molecule string.</option>
 	</fullDescription>
 	<interactiveView name="Molecule input">
     	Input a molecule.

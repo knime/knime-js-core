@@ -9,7 +9,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 public class MultipleSelectionQuickFormNodeFactory extends NodeFactory<MultipleSelectionQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<MultipleSelectionQuickFormNodeModel, MultipleSelectionQuickFormViewRepresentation,
+        WizardNodeFactoryExtension<MultipleSelectionQuickFormNodeModel, MultipleSelectionQuickFormRepresentation,
         MultipleSelectionQuickFormValue> {
 
     /**

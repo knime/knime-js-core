@@ -55,11 +55,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		hourInput.spinner({
 			spin: function(event, ui) {
 				date.setHours(ui.value);
-				if (minDate!=null && date<minDate) {
-					date = new Date(minDate.getTime());
-				} else if (maxDate!=null && date>maxDate) {
-					date = new Date(maxDate.getTime());
-				}
 				refreshTime();
 				return false;
 			}
@@ -71,11 +66,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		minInput.spinner({
 			spin: function(event, ui) {
 				date.setMinutes(ui.value);
-				if (minDate!=null && date<minDate) {
-					date = new Date(minDate.getTime());
-				} else if (maxDate!=null && date>maxDate) {
-					date = new Date(maxDate.getTime());
-				}
 				refreshTime();
 				return false;
 			}
@@ -87,11 +77,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		secInput.spinner({
 			spin: function(event, ui) {
 				date.setSeconds(ui.value);
-				if (minDate!=null && date<minDate) {
-					date = new Date(minDate.getTime());
-				} else if (maxDate!=null && date>maxDate) {
-					date = new Date(maxDate.getTime());
-				}
 				refreshTime();
 				return false;
 			}
@@ -103,11 +88,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		milInput.spinner({
 			spin: function(event, ui) {
 				date.setMilliseconds(ui.value);
-				if (minDate!=null && date<minDate) {
-					date = new Date(minDate.getTime());
-				} else if (maxDate!=null && date>maxDate) {
-					date = new Date(maxDate.getTime());
-				}
 				refreshTime();
 				return false;
 			}
@@ -140,6 +120,11 @@ org_knime_js_base_node_quickform_input_date = function() {
 	};
 	
 	function refreshTime() {
+		if (minDate!=null && date<minDate) {
+			date = new Date(minDate.getTime());
+		} else if (maxDate!=null && date>maxDate) {
+			date = new Date(maxDate.getTime());
+		}
 		// If datepicker is not disabled setDate will reopen the picker in IE
 		dateInput.datepicker('disable');
 		dateInput.datepicker('setDate', date);

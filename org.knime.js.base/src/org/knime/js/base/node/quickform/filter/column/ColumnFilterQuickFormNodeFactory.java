@@ -10,7 +10,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class ColumnFilterQuickFormNodeFactory extends NodeFactory<ColumnFilterQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<ColumnFilterQuickFormNodeModel, ColumnFilterQuickFormViewRepresentation,
+        WizardNodeFactoryExtension<ColumnFilterQuickFormNodeModel, ColumnFilterQuickFormRepresentation,
         ColumnFilterQuickFormValue> {
 
     /**

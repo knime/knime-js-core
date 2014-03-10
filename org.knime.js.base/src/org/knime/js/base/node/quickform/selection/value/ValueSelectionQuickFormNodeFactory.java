@@ -10,7 +10,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * 
  */
 public class ValueSelectionQuickFormNodeFactory extends NodeFactory<ValueSelectionQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<ValueSelectionQuickFormNodeModel, ValueSelectionQuickFormViewRepresentation,
+        WizardNodeFactoryExtension<ValueSelectionQuickFormNodeModel, ValueSelectionQuickFormRepresentation,
         ValueSelectionQuickFormValue> {
 
     /**

@@ -10,23 +10,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * 
  */
 public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, 
-        StringInputQuickFormValue, StringInputQuickFormViewRepresentation, StringInputQuickFormValue> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected StringInputQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new StringInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected StringInputQuickFormValue createEmptyDialogValue() {
-        return new StringInputQuickFormValue();
-    }
+        StringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
@@ -58,8 +42,8 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
-        createEmptyDialogValue().loadFromNodeSettings(settings);
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -74,8 +58,8 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new StringInputQuickFormViewRepresentation();
+    public StringInputQuickFormRepresentation createEmptyViewRepresentation() {
+        return new StringInputQuickFormRepresentation();
     }
 
     /**

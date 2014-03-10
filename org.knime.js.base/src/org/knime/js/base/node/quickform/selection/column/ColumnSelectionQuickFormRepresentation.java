@@ -7,10 +7,17 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ColumnSelectionQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ColumnSelectionQuickFormValue> {
     
@@ -25,6 +32,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @return the spec
      */
+    @JsonIgnore
     public DataTableSpec getSpec() {
         return m_spec;
     }
@@ -32,6 +40,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param spec the spec to set
      */
+    @JsonIgnore
     public void setSpec(final DataTableSpec spec) {
         m_spec = spec;
     }
@@ -40,6 +49,7 @@ public class ColumnSelectionQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_defaultValue = settings.getString(CFG_DEFAULT);
@@ -49,6 +59,7 @@ public class ColumnSelectionQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_defaultValue = settings.getString(CFG_DEFAULT, "");
@@ -58,6 +69,7 @@ public class ColumnSelectionQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_DEFAULT, m_defaultValue);
@@ -67,6 +79,7 @@ public class ColumnSelectionQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public DialogNodePanel<ColumnSelectionQuickFormValue> createDialogPanel() {
         ColumnSelectionQuickFormDialogPanel panel = new ColumnSelectionQuickFormDialogPanel(this);
         fillDialogPanel(panel);
@@ -76,6 +89,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
+    @JsonProperty("default")
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -83,6 +97,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
+    @JsonProperty("default")
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -91,6 +106,7 @@ public class ColumnSelectionQuickFormRepresentation extends
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void resetNodeValueToDefault(final ColumnSelectionQuickFormValue value) {
         value.setColumn(m_defaultValue);        
     }
@@ -98,6 +114,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @return the possibleColumns
      */
+    @JsonProperty("possibleColumns")
     public String[] getPossibleColumns() {
         return m_possibleColumns;
     }
@@ -105,6 +122,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param possibleColumns the possibleColumns to set
      */
+    @JsonProperty("possibleColumns")
     public void setPossibleColumns(final String[] possibleColumns) {
         m_possibleColumns = possibleColumns;
     }

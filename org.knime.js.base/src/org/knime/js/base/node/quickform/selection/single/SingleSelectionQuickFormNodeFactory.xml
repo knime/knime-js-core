@@ -10,17 +10,14 @@
 		<option name="Label">A descriptive label that will be shown in, for instance the web port.</option>
 		<option name="Description">Some lines of description that will be shown in the remote control
 			form, for instance by means of a tooltip.</option>
-		<option name="Weight">A weight value that influences the position of the component in
-			the final layout. Lighter elements will be placed at the top, whereas
-			heavier items will be placed nearer the bottom. The value is relative
-			to the weights of the other components in the workflow (absolute
-			value is not relevant, only the relative comparison to other
-			elements).</option>
+        <option name="Hide in Wizard">
+          If the setting should be hidden in the wizard execution.
+        </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Selection Type">The type of the selection element. This can be either radio buttons with a vertical or horizontal layout, a list or a dropdown selection.</option>
+		<option name="Possible Choices">The possible choices, each line is one possible value.</option>
 		<option name="Default Variable Value">Value selected by default.</option>
 		<option name="Variable Value">The current value.</option>
-		<option name="Possible Choices">The possible choices, each line is one possible value.</option>
-		<option name="Selection Type">The type of the selection element. This can be either radio buttons with a vertical or horizontal layout, a list or a dropdown selection.</option>
 	</fullDescription>
 	<interactiveView name="Single selection">
     	Select a single option.

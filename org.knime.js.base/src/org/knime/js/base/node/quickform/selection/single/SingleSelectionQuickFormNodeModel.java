@@ -10,24 +10,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class SingleSelectionQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue,
-        SingleSelectionQuickFormViewRepresentation, SingleSelectionQuickFormValue> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SingleSelectionQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new SingleSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected SingleSelectionQuickFormValue createEmptyDialogValue() {
-        return new SingleSelectionQuickFormValue();
-    }
+        QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue> {
 
     /**
      * {@inheritDoc}
@@ -67,8 +50,8 @@ public class SingleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public SingleSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new SingleSelectionQuickFormViewRepresentation();
+    public SingleSelectionQuickFormRepresentation createEmptyViewRepresentation() {
+        return new SingleSelectionQuickFormRepresentation();
     }
 
     /**

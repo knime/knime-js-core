@@ -21,28 +21,12 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  * 
  */
 public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<ColumnSelectionQuickFormRepresentation, 
-        ColumnSelectionQuickFormValue, ColumnSelectionQuickFormViewRepresentation, ColumnSelectionQuickFormValue> {
+        ColumnSelectionQuickFormValue> {
     
     /** Creates a new value selection node model. */
     public ColumnSelectionQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
                 new PortType[]{FlowVariablePortObject.TYPE});
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ColumnSelectionQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new ColumnSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ColumnSelectionQuickFormValue createEmptyDialogValue() {
-        return new ColumnSelectionQuickFormValue();
     }
 
     /**
@@ -58,8 +42,8 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
-        createEmptyDialogValue().loadFromNodeSettings(settings);
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -74,8 +58,8 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
      * {@inheritDoc}
      */
     @Override
-    public ColumnSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new ColumnSelectionQuickFormViewRepresentation();
+    public ColumnSelectionQuickFormRepresentation createEmptyViewRepresentation() {
+        return new ColumnSelectionQuickFormRepresentation();
     }
 
     /**
@@ -120,7 +104,8 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         if (!Arrays.asList(getDialogRepresentation().getPossibleColumns()).contains(getViewValue().getColumn())) {
-            throw new InvalidSettingsException("The selected column '" + getViewValue().getColumn() + "' is not available");
+            throw new InvalidSettingsException("The selected column '"
+                    + getViewValue().getColumn() + "' is not available");
         }
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getColumn());
     }

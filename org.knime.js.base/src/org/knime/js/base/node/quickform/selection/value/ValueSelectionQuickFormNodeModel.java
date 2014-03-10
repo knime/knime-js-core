@@ -24,28 +24,12 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  * 
  */
 public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSelectionQuickFormRepresentation, 
-        ValueSelectionQuickFormValue, ValueSelectionQuickFormViewRepresentation, ValueSelectionQuickFormValue> {
+        ValueSelectionQuickFormValue> {
     
     /** Creates a new value selection node model. */
     public ValueSelectionQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
                 new PortType[]{FlowVariablePortObject.TYPE});
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ValueSelectionQuickFormRepresentation createEmptyDialogRepresentation() {
-        return new ValueSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected ValueSelectionQuickFormValue createEmptyDialogValue() {
-        return new ValueSelectionQuickFormValue();
     }
 
     /**
@@ -61,8 +45,8 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyDialogRepresentation().loadFromNodeSettings(settings);
-        createEmptyDialogValue().loadFromNodeSettings(settings);
+        createEmptyViewRepresentation().loadFromNodeSettings(settings);
+        createEmptyViewValue().loadFromNodeSettings(settings);
     }
 
     /**
@@ -77,8 +61,8 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
      * {@inheritDoc}
      */
     @Override
-    public ValueSelectionQuickFormViewRepresentation createEmptyViewRepresentation() {
-        return new ValueSelectionQuickFormViewRepresentation();
+    public ValueSelectionQuickFormRepresentation createEmptyViewRepresentation() {
+        return new ValueSelectionQuickFormRepresentation();
     }
 
     /**
@@ -123,10 +107,14 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
             values = new String[0];
         } else {
             final Set<DataCell> vals = dcs.getDomain().getValues();
-            values = new String[vals.size()];
-            int i = 0;
-            for (final DataCell cell : vals) {
-                values[i++] = cell.toString();
+            if (vals == null) {
+                values = new String[0];
+            } else {
+                values = new String[vals.size()];
+                int i = 0;
+                for (final DataCell cell : vals) {
+                    values[i++] = cell.toString();
+                }
             }
         }
         getDialogRepresentation().setPossibleValues(values);

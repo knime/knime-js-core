@@ -87,8 +87,8 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Column selection: ", m_columnField, panelWithGBLayout, gbc);
-        addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
+        addPairToPanel("Default Values: ", m_defaultField, panelWithGBLayout, gbc);
+        addPairToPanel("Variable Values: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**
