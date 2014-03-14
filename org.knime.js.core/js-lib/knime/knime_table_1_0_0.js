@@ -52,6 +52,10 @@ kt = function() {
 		return dataTable.spec.numRows;
 	};
 	
+	kt.getPossibleValues = function() {
+		return dataTable.spec.possibleValues;
+	}
+	
 	kt.registerView = function(view) {
 		for (var i = 0; i < view.extensionNames.length; i++) {
 			kt_registerViewExtension(view, view.extensionNames[i]);
@@ -137,7 +141,7 @@ kt = function() {
 					changeListeners[i](changeTable);
 				}
 				changeTable = [];
-				pushData(JSON.stringify(this.exportExtension()));
+				//pushData(JSON.stringify(this.exportExtension()));
 			},
 			fireClearHilite: function() {
 				changeTable = [];
@@ -149,7 +153,7 @@ kt = function() {
 				for (var i = 0; i < clearListeners.length; i++) {
 					clearListeners[i]();
 				}
-				pushData(JSON.stringify(this.exportExtension()));
+				//pushData(JSON.stringify(this.exportExtension()));
 			},
 			exportExtension: function() {
 				var exportHilite = new Array();
