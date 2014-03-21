@@ -4,3 +4,8 @@ table,th,td {
 	border-width: 1px;
 	border-color: gray;
 }
+
+th, td {
+	padding: 0 3px;
+	font-size: 12px;
+}

@@ -7,7 +7,7 @@ knime_line_plotter = function() {
 
 	var container;
 	var margin = {top: 20, right: 20, bottom: 45, left: 50},
-	width = 910 - margin.left - margin.right,
+	width = 860 - margin.left - margin.right,
 	height = 500 - margin.top - margin.bottom;
 
 	var color;
@@ -34,6 +34,7 @@ knime_line_plotter = function() {
 			viewValue = value;
 			var knimeTable = new kt;
 			knimeTable.setDataTable(representation.table);
+			knimeTable.registerView(lineChart);
 			container = "body";
 			
 			hiliteHandler = knimeTable.getExtension("hilite");
@@ -106,7 +107,7 @@ knime_line_plotter = function() {
 			line = d3.svg.line()
 		    	.x(function(d, i) { return x(i); })
 		    	.y(function(d) { return y(d); })
-		    	.interpolate("linear");
+		    	.interpolate("basis");
 		
 			valueGroup = svg.selectAll(".valueSet")
 				.data(valueSet)
@@ -120,17 +121,38 @@ knime_line_plotter = function() {
 		
 			valueGroup.selectAll(".dot")
 		    	.data(function(d) { return d.values; })
-		    	.enter().append("circle")
-		    		.attr("class", "dot")
-		    		.attr("r", 3)
-					.attr("stroke-width", 3)
-		    		.attr("cx", function(d, i) { return x(i); })
-		    		.attr("cy", function(d) { return y(d); })
-		    		.style("fill", function(d) { return color(this.parentNode.__data__.name); });
+		    .enter().append("circle")
+		    	.attr("class", "dot")
+		    	.attr("r", 3)
+				.attr("stroke-width", 3)
+		    	.attr("cx", function(d, i) { return x(i); })
+		    	.attr("cy", function(d) { return y(d); })
+		    	.style("fill", function(d) { return color(this.parentNode.__data__.name); });
+			
+			var legend = svg.selectAll(".legend")
+				.data(color.domain())
+			.enter().append("g")
+				.attr("class", "legend")
+				.attr("transform", function(d, i) {return "translate(0," + ((i*20)+300) + ")"; });
+		
+			legend.append("rect")
+				.attr("x", width - 18)
+				.attr("width", 18)
+				.attr("height", 18)
+				.style("fill", color);
+		
+			legend.append("text")
+				.attr("x", width - 24)
+				.attr("y", 9)
+				.attr("dy", ".35em")
+				.style("text-anchor", "end")
+				.text(function(d) { return d; });
 			
 			svg.call(brush);
 			update();
 		}
+		callUpdate();
+		resize();
 	};
 
 	lineChart.hiliteChangeListener = function(changedRowIDs) {
@@ -172,7 +194,7 @@ knime_line_plotter = function() {
 		svg.selectAll(container + " .valueSet").selectAll(container + " .dot").attr("class", function(d, i) {
 			var classString = "dot";
 			if (hiliteHandler.isHilited(i)) classString += " highlighted";
-			if (hiliteHandler.isSelected(d.rowIndex)) classString += " selected";
+			//if (hiliteHandler.isSelected(d.rowIndex)) classString += " selected";
 			return classString; 
 		});
 	}
@@ -182,7 +204,19 @@ knime_line_plotter = function() {
 	};
 
 	lineChart.getComponentValue = function() {
-		return viewValue;
+		return null;
+	};
+	
+	callUpdate = function() {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.getPageValues();
+		}
+	};
+	
+	resize = function() {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.autoResize(window.frameElement.id);
+		}
 	};
 	
 	return lineChart;

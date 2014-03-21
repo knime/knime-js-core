@@ -32,7 +32,7 @@ knime_row_selector = function() {
 				} else {
 					$('.row').css('color', 'grey');
 				}
-				parent.KnimePageLoader.getPageValues();
+				callUpdate();
 			});
 			for ( var i = 0; i < knimeTable.getColumnNames().length; i++) {
 				var tableHeader = $('<th>');
@@ -60,7 +60,7 @@ knime_row_selector = function() {
 					} else {
 						$('#row' + val).css('color', 'grey');
 					}
-					parent.KnimePageLoader.getPageValues();
+					callUpdate();
 				});
 				for ( var j = 0; j < knimeTable.getColumnNames().length; j++) {
 					var columnType = knimeTable.getColumnTypes()[j];
@@ -78,6 +78,8 @@ knime_row_selector = function() {
 			body.append(table);
 			initFromValue(value);
 		}
+		callUpdate();
+		resize();
 	};
 
 	rowSelector.getComponentValue = function() {
@@ -103,6 +105,18 @@ knime_row_selector = function() {
 	function isNumber(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
 	}
+	
+	callUpdate = function() {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.getPageValues();
+		}
+	};
+	
+	resize = function() {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.autoResize(window.frameElement.id);
+		}
+	};
 
 	return rowSelector;
 }();

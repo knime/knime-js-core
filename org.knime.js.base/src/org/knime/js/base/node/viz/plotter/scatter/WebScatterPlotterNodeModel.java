@@ -47,14 +47,20 @@
  *
  * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.line;
+package org.knime.js.base.node.viz.plotter.scatter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.knime.base.data.filter.column.FilterColumnTable;
 import org.knime.base.node.viz.plotter.node.DefaultVisualizationNodeModel;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -65,17 +71,34 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONDataTable;
 import org.knime.core.node.web.JSONDataTableSpec.JSTypes;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel implements
-    WizardNode<WebLinePlotterViewContent, WebViewContent> {
+public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel implements
+    WizardNode<WebScatterPlotterViewRepresentation, WebScatterPlotterViewValue> {
 
     private JSONDataTable m_input;
+    
+    private WebScatterPlotterViewValue m_viewValue = createEmptyViewValue();
+    
+    /**
+     * 
+     */
+    public WebScatterPlotterNodeModel() {
+        super(1, 1);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DataTableSpec[] configure(DataTableSpec[] inSpecs) throws InvalidSettingsException {
+        super.configure(inSpecs);
+        return inSpecs;
+    }
 
     /**
      * {@inheritDoc}
@@ -97,14 +120,23 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         if (maxRows < inData[0].getRowCount()) {
             setWarningMessage("Only the first " + maxRows + " rows are displayed.");
         }
-        return new BufferedDataTable[0];
+        BufferedDataContainer container = exec.createDataContainer(inData[0].getDataTableSpec());
+        Set<Long> selected = new HashSet<Long>(java.util.Arrays.asList(ArrayUtils.toObject(m_viewValue.getSelections())));
+        long i = 0;
+        for (DataRow row : inData[0]) {
+            if (selected.contains(i++)) {
+                container.addRowToTable(row);
+            }
+        }
+        container.close();
+        return new BufferedDataTable[]{container.getTable()};
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void validateSettings(NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -112,7 +144,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -120,7 +152,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
+    protected void saveSettingsTo(NodeSettingsWO settings) {
         // TODO Auto-generated method stub
     }
 
@@ -139,7 +171,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+    protected void saveInternals(File nodeInternDir, ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
         // TODO Auto-generated method stub
     }
@@ -149,40 +181,40 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      */
     @Override
     public String getJavascriptObjectID() {
-        return "knime_line_plotter";
+        return "knime_scatter_plotter";
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final WebViewContent viewContent) {
-        // do nothing
+    public void loadViewValue(final WebScatterPlotterViewValue viewValue) {
+        m_viewValue = viewValue;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public WebLinePlotterViewContent getViewRepresentation() {
-        return new WebLinePlotterViewContent(m_input);
+    public WebScatterPlotterViewRepresentation getViewRepresentation() {
+        return new WebScatterPlotterViewRepresentation(m_input);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public WebViewContent getViewValue() {
-        return null;
+    public WebScatterPlotterViewValue getViewValue() {
+        return m_viewValue;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public WebLinePlotterViewContent createEmptyViewRepresentation() {
+    public WebScatterPlotterViewRepresentation createEmptyViewRepresentation() {
         try {
-            return WebLinePlotterViewContent.class.newInstance();
+            return WebScatterPlotterViewRepresentation.class.newInstance();
         } catch (Exception e) {
             return null;
         }
@@ -192,15 +224,15 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    public WebViewContent createEmptyViewValue() {
-        return null;
+    public WebScatterPlotterViewValue createEmptyViewValue() {
+        return new WebScatterPlotterViewValue();
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public ValidationError validateViewValue(final WebViewContent viewContent) {
+    public ValidationError validateViewValue(final WebScatterPlotterViewValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }
