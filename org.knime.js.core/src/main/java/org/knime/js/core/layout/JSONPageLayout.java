@@ -48,33 +48,47 @@
  * History
  *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.core;
+package org.knime.js.core.layout;
 
-import java.util.Map;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
+@JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONBlackBoard {
+public class JSONPageLayout {
 
-    private Map<String, Object> m_variables;
+    private List<JSONGridEntry> m_gridEntryList;
 
     /**
-     * @return the variables
+     * Serialization constructor. Don't use.
      */
-    public Map<String, Object> getVariables() {
-        return m_variables;
+    public JSONPageLayout() { }
+
+    /**
+     * @param gridEntryList the content list
+     */
+    public JSONPageLayout(final List<JSONGridEntry> gridEntryList) {
+        m_gridEntryList = gridEntryList;
     }
 
     /**
-     * @param variables the variables to set
+     * @return the content
      */
-    public void setVariables(final Map<String, Object> variables) {
-        m_variables = variables;
+    public List<JSONGridEntry> getGridEntryList() {
+        return m_gridEntryList;
+    }
+
+    /**
+     * @param content the content to set
+     */
+    public void setContent(final List<JSONGridEntry> content) {
+        m_gridEntryList = content;
     }
 
 }

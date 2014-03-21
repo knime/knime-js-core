@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by
+ *  Copyright (C) 2003 - 2014
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,41 +40,72 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core;
+package org.knime.js.core.layout;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONBlackBoard {
+public class JSONGridEntry {
 
-    private Map<String, Object> m_variables;
+    private JSONGridPosition m_position;
+
+    private JSONGridContent m_content;
 
     /**
-     * @return the variables
+     * Serialization constructor. Don't use.
      */
-    public Map<String, Object> getVariables() {
-        return m_variables;
+    public JSONGridEntry() { }
+
+    /**
+     * @param position the position
+     * @param content the content
+     */
+    public JSONGridEntry(final JSONGridPosition position, final JSONGridContent content) {
+        setPosition(position);
+        setContent(content);
     }
 
     /**
-     * @param variables the variables to set
+     * @return the position
      */
-    public void setVariables(final Map<String, Object> variables) {
-        m_variables = variables;
+    public JSONGridPosition getPosition() {
+        return m_position;
     }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(final JSONGridPosition position) {
+        m_position = position;
+    }
+
+    /**
+     * @return the content
+     */
+    public JSONGridContent getContent() {
+        return m_content;
+    }
+
+    /**
+     * @param content the content to set
+     */
+    public void setContent(final JSONGridContent content) {
+        m_content = content;
+    }
+
+
 
 }

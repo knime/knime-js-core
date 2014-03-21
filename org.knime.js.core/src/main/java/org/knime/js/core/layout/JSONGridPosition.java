@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by 
+ *  Copyright (C) 2003 - 2014
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,39 +40,78 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- * 
- * History
- *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * ---------------------------------------------------------------------
+ *
+ * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core;
+package org.knime.js.core.layout;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ *
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONPageLayout {
-    
-    private String m_layout;
+public class JSONGridPosition {
+
+    private int m_x;
+
+    private int m_y;
 
     /**
-     * @return the layout
+     * Serialization constructor. Don't use.
      */
-    public String getLayout() {
-        return m_layout;
-    }
-    
+    public JSONGridPosition() { }
+
     /**
-     * @param layout the layout to set
+     * @param x x
+     * @param y y
      */
-    public void setLayout(final String layout) {
-        m_layout = layout;
+    public JSONGridPosition(final int x, final int y) {
+        m_x = x;
+        m_y = y;
+    }
+
+    /**
+     * @return the x
+     */
+    public int getX() {
+        return m_x;
+    }
+
+    /**
+     * @param x the x to set
+     */
+    public void setX(final int x) {
+        m_x = x;
+    }
+
+    /**
+     * @return the y
+     */
+    public int getY() {
+        return m_y;
+    }
+
+    /**
+     * @param y the y to set
+     */
+    public void setY(final int y) {
+        m_y = y;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return m_x + " " + m_y;
     }
 
 }

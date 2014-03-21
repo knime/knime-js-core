@@ -49,6 +49,8 @@
  */
 package org.knime.js.core;
 
+import org.knime.js.core.layout.JSONPageLayout;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -91,6 +93,6 @@ public class JSONWebNodePageConfiguration {
         m_layout = layout;
     }
 
-    // TODO: insert positioning and other meta info about page
+    // TODO: insert other meta info about page
 
 }

@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by
+ *  Copyright (C) 2003 - 2014
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,41 +40,90 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME. The owner of a Node
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * Created on 17.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core;
+package org.knime.js.core.layout;
 
-import java.util.Map;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
+@JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONBlackBoard {
+public class JSONGridContent {
 
-    private Map<String, Object> m_variables;
+    private boolean m_containsView;
+
+    private String m_nodeID;
+
+    private List<JSONGridEntry> m_nestedGridContent;
+
+    private JSONGridSizing m_sizing;
 
     /**
-     * @return the variables
+     * @return the containsView
      */
-    public Map<String, Object> getVariables() {
-        return m_variables;
+    public boolean getContainsView() {
+        return m_containsView;
     }
 
     /**
-     * @param variables the variables to set
+     * @param containsView the containsView to set
      */
-    public void setVariables(final Map<String, Object> variables) {
-        m_variables = variables;
+    public void setContainsView(final boolean containsView) {
+        m_containsView = containsView;
+    }
+
+    /**
+     * @return the nodeID
+     */
+    public String getNodeID() {
+        return m_nodeID;
+    }
+
+    /**
+     * @param nodeID the nodeID to set
+     */
+    public void setNodeID(final String nodeID) {
+        m_nodeID = nodeID;
+    }
+
+    /**
+     * @return the gridContent
+     */
+    public List<JSONGridEntry> getNestedGridContent() {
+        return m_nestedGridContent;
+    }
+
+    /**
+     * @param nestedGridContent the gridContent to set
+     */
+    public void setNestedGridContent(final List<JSONGridEntry> nestedGridContent) {
+        m_nestedGridContent = nestedGridContent;
+    }
+
+    /**
+     * @return the sizing
+     */
+    public JSONGridSizing getSizing() {
+        return m_sizing;
+    }
+
+    /**
+     * @param sizing the sizing to set
+     */
+    public void setSizing(final JSONGridSizing sizing) {
+        m_sizing = sizing;
     }
 
 }
