@@ -19,7 +19,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
     /**
      * Format for the date to string and string to date operations.
      */
-    static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+    static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss.S");
 
     /**
      * {@inheritDoc}
