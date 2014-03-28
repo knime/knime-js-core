@@ -106,7 +106,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the defaultValue
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public double getDefaultValue() {
         return m_defaultValue;
     }
@@ -114,7 +114,7 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValue(final double defaultValue) {
         m_defaultValue = defaultValue;
     }

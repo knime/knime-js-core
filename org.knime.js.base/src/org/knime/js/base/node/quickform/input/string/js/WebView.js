@@ -13,7 +13,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		input = $('<input>');
 		input.attr("type", "text");
 		input.attr("pattern", representation.regex);
-		input.val(viewValue.string);
+		input.val(representation.defaultvalue);
 		body.append(input);
 		body.append($('<br>'));
 		errorMessage = $('<span>'+representation.errormessage+'</span>');

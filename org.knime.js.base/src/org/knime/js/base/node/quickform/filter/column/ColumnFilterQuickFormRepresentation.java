@@ -89,7 +89,7 @@ public class ColumnFilterQuickFormRepresentation extends
     /**
      * @return the defaultColumns
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public String[] getDefaultColumns() {
         return m_defaultColumns;
     }
@@ -97,7 +97,7 @@ public class ColumnFilterQuickFormRepresentation extends
     /**
      * @param defaultColumns the defaultColumns to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultColumns(final String[] defaultColumns) {
         m_defaultColumns = defaultColumns;
     }

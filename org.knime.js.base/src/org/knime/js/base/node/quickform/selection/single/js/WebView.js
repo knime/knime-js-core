@@ -46,7 +46,7 @@ org_knime_js_base_node_quickform_selection_single = function() {
 					var choice = viewRepresentation.possibleChoices[i];
 					var option = $('<option>' + choice + '</option>');
 					option.appendTo(selection);
-					if (choice == viewValue.value) {
+					if (choice == representation.defaultvalue) {
 						option.prop('selected', true);
 					}
 				}

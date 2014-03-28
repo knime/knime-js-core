@@ -117,7 +117,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the defaultValue
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -125,7 +125,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }

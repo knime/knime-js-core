@@ -138,7 +138,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @return the default
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public Date getDefaultValue() {
         return m_defaultValue;
     }
@@ -146,7 +146,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param defaultValue the default to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValue(final Date defaultValue) {
         m_defaultValue = defaultValue;
     }

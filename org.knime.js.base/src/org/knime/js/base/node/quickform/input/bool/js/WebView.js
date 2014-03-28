@@ -11,7 +11,7 @@ org_knime_js_base_node_quickform_input_bool = function() {
 		input = $('<input>');
 		$("body").append(input);
 		input.attr("type", "checkbox");
-		input.prop("checked", viewValue.boolean);
+		input.prop("checked", representation.defaultvalue);
 	};
 
 	booleanInput.value = function() {

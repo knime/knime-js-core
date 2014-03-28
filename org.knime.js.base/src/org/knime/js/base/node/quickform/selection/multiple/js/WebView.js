@@ -51,7 +51,7 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 				list = new twinlist();
 				body.append(list.getElement());
 				list.setAvailableValues(representation.possibleChoices);
-				list.setIncludes(value.value);
+				list.setIncludes(representation.defaultvalue);
 			}
 		}
 	};

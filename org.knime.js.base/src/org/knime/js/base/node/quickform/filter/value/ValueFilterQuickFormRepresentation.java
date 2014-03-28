@@ -95,7 +95,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @return the defaultValues
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public String[] getDefaultValues() {
         return m_defaultValues;
     }
@@ -103,7 +103,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @param defaultValues the defaultValues to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValues(final String[] defaultValues) {
         m_defaultValues = defaultValues;
     }

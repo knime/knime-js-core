@@ -69,7 +69,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public boolean getDefaultValue() {
         return m_defaultValue;
     }
@@ -77,7 +77,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValue(final boolean defaultValue) {
         m_defaultValue = defaultValue;
     }

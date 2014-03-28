@@ -16,7 +16,7 @@ org_knime_js_base_node_quickform_selection_column = function() {
 				var column = representation.possibleColumns[i];
 				var option = $('<option>' + column + '</option>');
 				option.appendTo(selection);
-				if (column == viewValue.column) {
+				if (column == representation.defaultvalue) {
 					option.prop('selected', true);
 				}
 			}

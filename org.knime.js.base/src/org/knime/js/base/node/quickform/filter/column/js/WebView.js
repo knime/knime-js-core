@@ -14,7 +14,7 @@ org_knime_js_base_node_quickform_filter_column = function() {
 		} else {
 			$('body').append(list.getElement());
 			list.setAvailableValues(representation.possibleColumns);
-			list.setIncludes(value.columns);
+			list.setIncludes(representation.defaultvalue);
 		}
 	};
 

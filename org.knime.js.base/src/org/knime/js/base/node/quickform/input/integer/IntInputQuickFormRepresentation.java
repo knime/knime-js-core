@@ -106,7 +106,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the defaultValue
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public int getDefaultValue() {
         return m_defaultValue;
     }
@@ -114,7 +114,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("default")
+    @JsonProperty("defaultvalue")
     public void setDefaultValue(final int defaultValue) {
         m_defaultValue = defaultValue;
     }
