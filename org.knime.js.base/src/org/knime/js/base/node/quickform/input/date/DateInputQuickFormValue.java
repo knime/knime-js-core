@@ -50,6 +50,7 @@
  */
 package org.knime.js.base.node.quickform.input.date;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.knime.core.node.InvalidSettingsException;
@@ -69,7 +70,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class DateStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
+public class DateInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     /**
      * The default date for all date settings.
@@ -86,7 +87,8 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(getDate()));
+        settings.addString(CFG_DATE,
+                new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(getDate()));
     }
 
     /**
@@ -97,7 +99,7 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         String value = settings.getString(CFG_DATE);
         try {
-            setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
+            setDate(new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).parse(value));
         } catch (Exception e) {
             throw new InvalidSettingsException("Can't parse date: " + value, e);
         }
@@ -109,9 +111,10 @@ public class DateStringInputQuickFormValue extends JSONViewContent implements Di
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        String value = settings.getString(CFG_DATE, DateStringInputQuickFormNodeModel.FORMAT.format(DEFAULT_DATE));
+        SimpleDateFormat sdf = new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT);
+        String value = settings.getString(CFG_DATE, sdf.format(DEFAULT_DATE));
         try {
-            setDate(DateStringInputQuickFormNodeModel.FORMAT.parse(value));
+            setDate(sdf.parse(value));
         } catch (Exception e) {
             m_date = DEFAULT_DATE;
         }

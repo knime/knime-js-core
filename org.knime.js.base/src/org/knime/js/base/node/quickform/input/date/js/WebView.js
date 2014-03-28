@@ -93,6 +93,9 @@ org_knime_js_base_node_quickform_input_date = function() {
 			}
 		});
 		body.append(timeElement);
+		if (!representation.withtime) {
+			timeElement.css('display', 'none');
+		}
 		body.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <knimeNode icon="./quickform_date.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
-	<name>Date (String) Input</name>
+	<name>Date Input</name>
 	<shortDescription>Outputs a date in a string flow variable with a given value.</shortDescription>
 	<fullDescription>
 		<intro>
@@ -14,6 +14,7 @@
           If the setting should be hidden in the wizard execution.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Selection">If a date or a date with time is selectable.</option>
 		<option name="Earliest">The earliest allowed date.</option>
 		<option name="Latest">The latest allowed date.</option>
         <option name="Default Value">

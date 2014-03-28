@@ -52,29 +52,30 @@ package org.knime.js.base.node.quickform.input.date;
 
 import java.util.Date;
 
-import javax.swing.JFormattedTextField;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerDateModel;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.util.node.quickform.in.DateStringInputQuickFormInElement;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
-import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
-public class DateStringInputQuickFormDialogPanel extends QuickFormDialogPanel<DateStringInputQuickFormValue> {
+public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInputQuickFormValue> {
 
-    private JFormattedTextField m_component;
+    private JSpinner m_component;
 
     /**
-     * 
+     * @param representation Representation to get the date format
      */
-    public DateStringInputQuickFormDialogPanel() {
-        m_component = new JFormattedTextField(DateStringInputQuickFormInElement.FORMAT);
-        m_component.setColumns(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
-        m_component.setValue(new Date());
+    public DateInputQuickFormDialogPanel(final DateInputQuickFormRepresentation representation) {
+        String format =
+                representation.getWithTime() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
+                        : DateInputQuickFormNodeModel.DATE_FORMAT;
+        m_component = new JSpinner(new SpinnerDateModel());
+        m_component.setEditor(new JSpinner.DateEditor(m_component, format));
         addComponent(m_component);
     }
 
@@ -82,7 +83,7 @@ public class DateStringInputQuickFormDialogPanel extends QuickFormDialogPanel<Da
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final DateStringInputQuickFormValue value) throws InvalidSettingsException {
+    public void saveNodeValue(final DateInputQuickFormValue value) throws InvalidSettingsException {
         value.setDate((Date)m_component.getValue());
     }
 
@@ -90,7 +91,7 @@ public class DateStringInputQuickFormDialogPanel extends QuickFormDialogPanel<Da
      * {@inheritDoc}
      */
     @Override
-    public void loadNodeValue(final DateStringInputQuickFormValue value) {
+    public void loadNodeValue(final DateInputQuickFormValue value) {
         m_component.setValue(value.getDate());
     }
 

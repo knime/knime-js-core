@@ -1,6 +1,5 @@
 package org.knime.js.base.node.quickform.input.date;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -13,28 +12,33 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateStringInputQuickFormRepresentation, DateStringInputQuickFormValue> {
-
+public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
+        <DateInputQuickFormRepresentation, DateInputQuickFormValue> {
+    
     /**
-     * Format for the date to string and string to date operations.
+     * Format string for the date to string and string to date operations.
      */
-    static final DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd;HH:mm:ss.S");
+    static final String DATE_FORMAT = "yyyy-MM-dd";
+    
+    /**
+     * Format string for the date to string and string to date operations.
+     */
+    static final String DATE_TIME_FORMAT = "yyyy-MM-dd;HH:mm:ss.S";
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DateStringInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new DateStringInputQuickFormRepresentation();
+    public DateInputQuickFormRepresentation createEmptyViewRepresentation() {
+        return new DateInputQuickFormRepresentation();
     }
     
     /**
      * {@inheritDoc}
      */
     @Override
-    public DateStringInputQuickFormValue createEmptyViewValue() {
-        return new DateStringInputQuickFormValue();
+    public DateInputQuickFormValue createEmptyViewValue() {
+        return new DateInputQuickFormValue();
     }
 
     /**
@@ -61,8 +65,10 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
             throw new InvalidSettingsException("The set date " + value
                     + " is after the latest allowed date " + max);
         }
+        SimpleDateFormat sdf =
+                new SimpleDateFormat(getDialogRepresentation().getWithTime() ? DATE_TIME_FORMAT : DATE_FORMAT);
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                FORMAT.format(getViewValue().getDate()));
+                sdf.format(getViewValue().getDate()));
     }
 
     /**
@@ -88,7 +94,7 @@ public class DateStringInputQuickFormNodeModel extends QuickFormFlowVariableNode
      */
     @Override
     public ValidationError validateViewValue(
-            final DateStringInputQuickFormValue viewContent) {
+            final DateInputQuickFormValue viewContent) {
         // TODO Auto-generated method stub
         return null;
     }

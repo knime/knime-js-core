@@ -9,16 +9,16 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * 
  */
-public class DateStringInputQuickFormNodeFactory extends NodeFactory<DateStringInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<DateStringInputQuickFormNodeModel, DateStringInputQuickFormRepresentation,
-        DateStringInputQuickFormValue> {
+public class DateInputQuickFormNodeFactory extends NodeFactory<DateInputQuickFormNodeModel> implements
+        WizardNodeFactoryExtension<DateInputQuickFormNodeModel, DateInputQuickFormRepresentation,
+        DateInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DateStringInputQuickFormNodeModel createNodeModel() {
-        return new DateStringInputQuickFormNodeModel();
+    public DateInputQuickFormNodeModel createNodeModel() {
+        return new DateInputQuickFormNodeModel();
     }
 
     /**
@@ -33,8 +33,8 @@ public class DateStringInputQuickFormNodeFactory extends NodeFactory<DateStringI
      * {@inheritDoc}
      */
     @Override
-    public NodeView<DateStringInputQuickFormNodeModel> createNodeView(final int viewIndex,
-            final DateStringInputQuickFormNodeModel nodeModel) {
+    public NodeView<DateInputQuickFormNodeModel> createNodeView(final int viewIndex,
+            final DateInputQuickFormNodeModel nodeModel) {
         return null;
     }
 
@@ -51,6 +51,6 @@ public class DateStringInputQuickFormNodeFactory extends NodeFactory<DateStringI
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DateStringInputQuickFormNodeDialog();
+        return new DateInputQuickFormNodeDialog();
     }
 }
