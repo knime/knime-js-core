@@ -5,14 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.knime.base.node.io.filereader.DataCellFactory;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DataType;
-import org.knime.core.data.RowKey;
-import org.knime.core.data.def.DefaultRow;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
@@ -96,18 +93,7 @@ public class ValueFilterQuickFormNodeModel
             throws InvalidSettingsException {
         updateValues((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
-        return new DataTableSpec[]{createSpec((DataTableSpec)inSpecs[0])};
-    }
-
-    private DataTableSpec createSpec(final DataTableSpec inSpec)
-            throws InvalidSettingsException {
-        String column = getDialogRepresentation().getColumn();
-        if (column != null && inSpec.containsName(column)) {
-            return new DataTableSpec(inSpec.getColumnSpec(column));
-        } else {
-            throw new InvalidSettingsException("The selected column '" + column
-                    + "' is not available.");
-        }
+        return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
 
     /** {@inheritDoc} */
@@ -116,17 +102,22 @@ public class ValueFilterQuickFormNodeModel
             final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        DataTableSpec outSpec =
-                createSpec((DataTableSpec)inObjects[0].getSpec());
+        BufferedDataTable inTable = (BufferedDataTable)inObjects[0];
         BufferedDataContainer container =
-                exec.createDataContainer(outSpec, false);
-        String[] values = getViewValue().getValues();
-        DataType type = outSpec.getColumnSpec(0).getType();
-        DataCellFactory cellFactory = new DataCellFactory();
-        for (int i = 0; i < values.length; i++) {
-            DataCell result = cellFactory.createDataCellOfType(type, values[i]);
-            container.addRowToTable(new DefaultRow(RowKey.createRowKey(i),
-                    result));
+                exec.createDataContainer(inTable.getDataTableSpec(), false);
+        List<String> values = Arrays.asList(getViewValue().getValues());
+        int colIndex;
+        for (colIndex = 0; colIndex < inTable.getDataTableSpec().getNumColumns(); colIndex++) {
+            if (inTable.getDataTableSpec().getColumnSpec(colIndex).getName()
+                    .equals(getViewRepresentation().getColumn())) {
+                break;
+            }
+        }
+        inTable.getDataTableSpec().getColumnSpec(getViewRepresentation().getColumn());
+        for (DataRow row : inTable) {
+            if (values.contains(row.getCell(colIndex).toString())) {
+                container.addRowToTable(row);
+            }
         }
         container.close();
         return new PortObject[]{container.getTable()};

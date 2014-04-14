@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.BufferedDataContainer;
+import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -117,12 +117,15 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        updateColumns((DataTableSpec) inObjects[0].getSpec());
+        DataTableSpec inSpec = (DataTableSpec) inObjects[0].getSpec();
+        updateColumns(inSpec);
         createAndPushFlowVariable();
         DataTableSpec outSpec = createSpec((DataTableSpec) inObjects[0].getSpec());
-        BufferedDataContainer container = exec.createDataContainer(outSpec, false);
-        container.close();
-        return new PortObject[]{container.getTable()};
+        ColumnRearranger rearranger = new ColumnRearranger(inSpec);
+        rearranger.keepOnly(outSpec.getColumnNames());
+        BufferedDataTable outTable = exec.createColumnRearrangeTable((BufferedDataTable)inObjects[0],
+                rearranger, exec);
+        return new BufferedDataTable[]{outTable};
     }
     
     private void createAndPushFlowVariable() {
