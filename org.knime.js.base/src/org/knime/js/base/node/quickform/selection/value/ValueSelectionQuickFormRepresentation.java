@@ -32,6 +32,12 @@ public class ValueSelectionQuickFormRepresentation extends
     
     private String[] m_possibleValues;
     
+    private static final String CFG_COLUMN_TYPE = "columnType";
+    
+    private static final ColumnType DEFAULT_COLUMN_TYPE = ColumnType.All;
+    
+    private ColumnType m_columnType = DEFAULT_COLUMN_TYPE;
+    
     /**
      * @return the column
      */
@@ -57,6 +63,7 @@ public class ValueSelectionQuickFormRepresentation extends
         super.loadFromNodeSettings(settings);
         m_column = settings.getString(CFG_COLUMN);
         m_defaultValue = settings.getString(CFG_DEFAULT);
+        m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE));
     }
     
     /**
@@ -68,6 +75,7 @@ public class ValueSelectionQuickFormRepresentation extends
         super.loadFromNodeSettingsInDialog(settings);
         m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
         m_defaultValue = settings.getString(CFG_DEFAULT, "");
+        m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE, DEFAULT_COLUMN_TYPE.name()));
     }
     
     /**
@@ -79,6 +87,7 @@ public class ValueSelectionQuickFormRepresentation extends
         super.saveToNodeSettings(settings);
         settings.addString(CFG_COLUMN, m_column);
         settings.addString(CFG_DEFAULT, m_defaultValue);
+        settings.addString(CFG_COLUMN_TYPE, m_columnType.name());
     }
 
     /**
@@ -131,6 +140,20 @@ public class ValueSelectionQuickFormRepresentation extends
     @JsonProperty("possibleValues")
     public void setPossibleValues(final String[] possibleValues) {
         m_possibleValues = possibleValues;
+    }
+    
+    /**
+     * @return the columnType
+     */
+    public ColumnType getColumnType() {
+        return m_columnType;
+    }
+    
+    /**
+     * @param columnType the columnType to set
+     */
+    public void setColumnType(final ColumnType columnType) {
+        m_columnType = columnType;
     }
 
 }

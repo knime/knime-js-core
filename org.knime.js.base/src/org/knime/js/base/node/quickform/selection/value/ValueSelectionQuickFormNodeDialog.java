@@ -1,6 +1,8 @@
 package org.knime.js.base.node.quickform.selection.value;
 
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -16,6 +18,9 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataValue;
+import org.knime.core.data.DoubleValue;
+import org.knime.core.data.IntValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -31,6 +36,8 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 @SuppressWarnings({"unchecked", "rawtypes" })
 public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
+    
+    private final JComboBox<ColumnType> m_columnType;
 
     private final ColumnSelectionPanel m_columnField;
     
@@ -41,9 +48,18 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private final DefaultComboBoxModel m_defaultModel = new DefaultComboBoxModel();
     
     private final DefaultComboBoxModel m_valueModel = new DefaultComboBoxModel();
+    
+    private final List<DataColumnSpec> m_specs = new ArrayList<DataColumnSpec>();
 
     /** Constructors, inits fields calls layout routines. */
     ValueSelectionQuickFormNodeDialog() {
+        m_columnType = new JComboBox<ColumnType>(ColumnType.values());
+        m_columnType.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                updateAvailableColumns();
+            }
+        });
         m_columnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
         m_defaultField = new JComboBox(m_defaultModel);
         m_valueField = new JComboBox(m_valueModel);
@@ -61,6 +77,45 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         });
         createAndAddTab();
+    }
+    
+    private void updateAvailableColumns() {
+        List<DataColumnSpec> specs = new ArrayList<DataColumnSpec>();
+        switch ((ColumnType)m_columnType.getSelectedItem()) {
+        case String:
+            for (DataColumnSpec colSpec : m_specs) {
+                if (colSpec.getType().isCompatible(StringValue.class)) {
+                    specs.add(colSpec);
+                }
+            }
+            break;
+        case Integer:
+            for (DataColumnSpec colSpec : m_specs) {
+                if (colSpec.getType().isCompatible(IntValue.class)) {
+                    specs.add(colSpec);
+                }
+            }
+            break;
+        case Double:
+            for (DataColumnSpec colSpec : m_specs) {
+                if (colSpec.getType().isCompatible(DoubleValue.class)) {
+                    specs.add(colSpec);
+                }
+            }
+            break;
+        default:
+            specs = m_specs;
+        }
+        final DataTableSpec newDTS = new DataTableSpec(specs.toArray(new DataColumnSpec[0]));
+        try {
+            m_columnField.update(newDTS, null);
+            // If no exception has been thrown there is min 1 column available
+            m_columnField.setSelectedIndex(0);
+        } catch (NotConfigurableException e) {
+            // newDTS is empty
+            m_defaultModel.removeAllElements();
+            m_valueModel.removeAllElements();
+        }
     }
 
     private void updateValues(final String column) {
@@ -83,6 +138,7 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Column type: ", m_columnType, panelWithGBLayout, gbc);
         addPairToPanel("Column selection: ", m_columnField, panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("Variable Value: ", m_valueField, panelWithGBLayout, gbc);
@@ -95,28 +151,22 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
         final DataTableSpec spec = (DataTableSpec) specs[0];
-        final List<DataColumnSpec> filteredSpecs = new ArrayList<DataColumnSpec>();
         for (DataColumnSpec cspec : spec) {
             if (cspec.getDomain().hasValues()) {
-                filteredSpecs.add(cspec);
+                m_specs.add(cspec);
             }
         }
-        if (filteredSpecs.size() == 0) {
+        if (m_specs.size() == 0) {
             throw new NotConfigurableException("Data does not contain any column with domain values.");
         }
-        final DataTableSpec newDTS = new DataTableSpec(filteredSpecs.toArray(new DataColumnSpec[0]));
-        m_columnField.update(newDTS, null);
         ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
         String selectedColumn = representation.getColumn();
-        if (selectedColumn.isEmpty()) {
-            List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
-            if (cspecs.size() > 0) {
-                selectedColumn = cspecs.get(0).getName();
-            }
+        m_columnType.setSelectedItem(representation.getColumnType());
+        if (!selectedColumn.isEmpty()) {
+            m_columnField.setSelectedColumn(selectedColumn);
         }
-        m_columnField.setSelectedColumn(selectedColumn);
         if (representation.getDefaultValue() != null) {
             m_defaultField.setSelectedItem(representation.getDefaultValue());
         }
@@ -132,8 +182,12 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        if (m_columnField.getSelectedColumn() == null) {
+            throw new InvalidSettingsException("No column selected");
+        }
         ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
+        representation.setColumnType((ColumnType)m_columnType.getSelectedItem());
         representation.setColumn(m_columnField.getSelectedColumn());
         representation.setDefaultValue((String) m_defaultField.getSelectedItem());
         representation.saveToNodeSettings(settings);

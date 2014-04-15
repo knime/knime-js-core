@@ -128,7 +128,19 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
                     + "' is not among the possible values in the column '"
                     + getDialogRepresentation().getColumn() + "'");
         }
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getValue());
+        String variableName = getViewRepresentation().getFlowVariableName();
+        String value = getViewValue().getValue();
+        switch (getViewRepresentation().getColumnType()) {
+        case Integer:
+            pushFlowVariableInt(variableName, Integer.parseInt(value));
+            break;
+        case Double:
+            pushFlowVariableDouble(variableName, Double.parseDouble(value));
+            break;
+        default:
+            pushFlowVariableString(variableName, value);
+            break;
+        }
     }
 
 }
