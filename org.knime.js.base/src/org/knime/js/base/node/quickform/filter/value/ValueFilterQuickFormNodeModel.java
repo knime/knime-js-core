@@ -2,11 +2,8 @@ package org.knime.js.base.node.quickform.filter.value;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -91,7 +88,7 @@ public class ValueFilterQuickFormNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        updateValues((DataTableSpec)inSpecs[0]);
+        getViewRepresentation().setFromSpec(((DataTableSpec)inSpecs[0]));
         createAndPushFlowVariable();
         return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
@@ -100,7 +97,7 @@ public class ValueFilterQuickFormNodeModel
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
-        updateValues(((DataTable)inObjects[0]).getDataTableSpec());
+        getViewRepresentation().setFromSpec(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
         BufferedDataTable inTable = (BufferedDataTable)inObjects[0];
         BufferedDataContainer container =
@@ -109,11 +106,11 @@ public class ValueFilterQuickFormNodeModel
         int colIndex;
         for (colIndex = 0; colIndex < inTable.getDataTableSpec().getNumColumns(); colIndex++) {
             if (inTable.getDataTableSpec().getColumnSpec(colIndex).getName()
-                    .equals(getViewRepresentation().getColumn())) {
+                    .equals(getViewValue().getColumn())) {
                 break;
             }
         }
-        inTable.getDataTableSpec().getColumnSpec(getViewRepresentation().getColumn());
+        inTable.getDataTableSpec().getColumnSpec(getViewValue().getColumn());
         for (DataRow row : inTable) {
             if (values.contains(row.getCell(colIndex).toString())) {
                 container.addRowToTable(row);
@@ -123,28 +120,6 @@ public class ValueFilterQuickFormNodeModel
         return new PortObject[]{container.getTable()};
     }
 
-    private void updateValues(final DataTableSpec spec) {
-        String column = getDialogRepresentation().getColumn();
-        DataColumnSpec dcs = spec.getColumnSpec(column);
-        String[] values;
-        if (dcs == null) {
-            values = new String[0];
-        } else {
-            final Set<DataCell> vals = dcs.getDomain().getValues();
-            if (vals == null) {
-                values = new String[0];
-            } else {
-                values = new String[vals.size()];
-                int i = 0;
-                for (final DataCell cell : vals) {
-                    values[i++] = cell.toString();
-                }
-            }
-        }
-        getDialogRepresentation().setPossibleValues(values);
-        getViewRepresentation().setPossibleValues(values);
-    }
-
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         checkSelectedValues();
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
@@ -152,15 +127,14 @@ public class ValueFilterQuickFormNodeModel
     }
 
     private void checkSelectedValues() throws InvalidSettingsException {
-        List<String> possibleValues =
-                Arrays.asList(getDialogRepresentation().getPossibleValues());
+        List<String> possibleValues = getViewRepresentation().getPossibleValues().get(getViewValue().getColumn());
         String[] selectedValues = getViewValue().getValues();
         for (String value : selectedValues) {
             if (!possibleValues.contains(value)) {
                 throw new InvalidSettingsException("The selected value '"
                         + value
                         + "' is not among the possible values in the column '"
-                        + getDialogRepresentation().getColumn() + "'");
+                        + getViewValue().getColumn() + "'");
             }
         }
     }

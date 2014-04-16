@@ -68,6 +68,12 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ValueFilterQuickFormValue extends JSONViewContent implements DialogNodeValue {
+    
+    private static final String CFG_COLUMN = "column";
+    
+    private static final String DEFAULT_COLUMN = "";
+    
+    private String m_column = DEFAULT_COLUMN;
 
     private static final String CFG_VALUES = "values";
     
@@ -81,6 +87,7 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(CFG_COLUMN, m_column);
         settings.addStringArray(CFG_VALUES, getValues());
     }
 
@@ -91,7 +98,8 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) 
             throws InvalidSettingsException {
-        setValues(settings.getStringArray(CFG_VALUES));
+        m_column = settings.getString(CFG_COLUMN);
+        m_values = settings.getStringArray(CFG_VALUES);
     }
 
     /**
@@ -100,7 +108,24 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setValues(settings.getStringArray(CFG_VALUES, DEFAULT_VALUES));
+        m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
+        m_values = settings.getStringArray(CFG_VALUES, DEFAULT_VALUES);
+    }
+    
+    /**
+     * @return the column
+     */
+    @JsonProperty("column")
+    public String getColumn() {
+        return m_column;
+    }
+    
+    /**
+     * @param column the column to set
+     */
+    @JsonProperty("column")
+    public void setColumn(final String column) {
+        m_column = column;
     }
 
     /**
