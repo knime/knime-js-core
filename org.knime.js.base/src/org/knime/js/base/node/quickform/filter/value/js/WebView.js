@@ -44,7 +44,6 @@ org_knime_js_base_node_quickform_filter_value = function() {
 
 	function selectionChanged() {
 		var col = colselection.find(':selected').text();
-		alert(JSON.stringify(viewRepresentation.possibleValues[col]));
 		list.setAvailableValues(viewRepresentation.possibleValues[col]);
 	}
 	
