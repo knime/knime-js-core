@@ -1,10 +1,7 @@
 package org.knime.js.base.node.quickform.selection.value;
 
-import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -100,33 +97,16 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     }
     
     private void updateValues(final DataTableSpec spec) {
-        String column = getDialogRepresentation().getColumn();
-        DataColumnSpec dcs = spec.getColumnSpec(column);
-        String[] values;
-        if (dcs == null) {
-            values = new String[0];
-        } else {
-            final Set<DataCell> vals = dcs.getDomain().getValues();
-            if (vals == null) {
-                values = new String[0];
-            } else {
-                values = new String[vals.size()];
-                int i = 0;
-                for (final DataCell cell : vals) {
-                    values[i++] = cell.toString();
-                }
-            }
-        }
-        getDialogRepresentation().setPossibleValues(values);
-        getViewRepresentation().setPossibleValues(values);
+        getViewRepresentation().setFromSpec(spec);
     }
     
     private void createAndPushFlowVariable() throws InvalidSettingsException {
-        if (!Arrays.asList(getDialogRepresentation().getPossibleValues()).contains(getViewValue().getValue())) {
+        List<String> values = getViewRepresentation().getPossibleValues().get(getViewValue().getColumn());
+        if (values == null || !values.contains(getViewValue().getValue())) {
             throw new InvalidSettingsException("The selected value '"
                     + getViewValue().getValue()
                     + "' is not among the possible values in the column '"
-                    + getDialogRepresentation().getColumn() + "'");
+                    + getViewValue().getColumn() + "'");
         }
         String variableName = getViewRepresentation().getFlowVariableName();
         String value = getViewValue().getValue();

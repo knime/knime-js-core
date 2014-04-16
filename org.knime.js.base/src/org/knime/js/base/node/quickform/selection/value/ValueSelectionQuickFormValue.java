@@ -68,22 +68,19 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ValueSelectionQuickFormValue extends JSONViewContent implements DialogNodeValue {
+    
+    private static final String CFG_COLUMN = "column";
+    
+    private static final String DEFAULT_COLUMN = "";
+    
+    private String m_column = DEFAULT_COLUMN;
 
     private static final String CFG_VALUE = "value";
     
     private static final String DEFAULT_VALUE = "";
 
     private String m_value = DEFAULT_VALUE;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_VALUE, getValue());
-    }
-
+    
     /**
      * {@inheritDoc}
      */
@@ -91,6 +88,7 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) 
             throws InvalidSettingsException {
+        m_column = settings.getString(CFG_COLUMN);
         setValue(settings.getString(CFG_VALUE));
     }
 
@@ -100,7 +98,45 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
         setValue(settings.getString(CFG_VALUE, DEFAULT_VALUE));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(CFG_COLUMN, m_column);
+        settings.addString(CFG_VALUE, getValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void validateSettings(final NodeSettingsRO settings) 
+            throws InvalidSettingsException {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /**
+     * @return the column
+     */
+    @JsonProperty("column")
+    public String getColumn() {
+        return m_column;
+    }
+
+    /**
+     * @param column the column to set
+     */
+    @JsonProperty("column")
+    public void setColumn(final String column) {
+        m_column = column;
     }
 
     /**
@@ -118,15 +154,5 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
     public void setValue(final String value) {
         m_value = value;
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings) 
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
-    }
+    
 }
