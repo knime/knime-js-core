@@ -27,9 +27,8 @@ function twinlist() {
 		removeAll.width(widthMax);
 		// All columns get the same height
 		var heightMax = Math.max(excludesSpan.height(), includesSpan.height(), span.height());
-		excludes.height(heightMax-excludesHeader.height());
-		includes.height(heightMax-includesHeader.height());
-		//span.height(heightMax);
+		excludes.height(excludes.height() + heightMax - excludesSpan.height());
+		includes.height(includes.height() + heightMax - includesSpan.height());
 		buttonfiller.height(heightMax-excludesHeader.height(true));
 		// Lists get the same width
 		var listWidthMax = Math.max(excludes.width(), includes.width(), 150);
