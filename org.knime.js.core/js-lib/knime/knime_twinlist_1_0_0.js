@@ -94,16 +94,15 @@ function twinlist() {
 	refreshLists = function() {
 		var inc = getIncludes();
 		var exc = getExcludes();
-		var excludeAll = inc.length + exc.length < 1;
 		excludes.empty();
 		includes.empty();
 		for ( var i in values) {
 			var value = values[i];
 			var option = $('<option>' + value + '</option>');
-			if (excludeAll || contains(exc, value)) {
-				option.appendTo(excludes);
-			} else if (contains(inc, value)) {
+			if (contains(inc, value)) {
 				option.appendTo(includes);
+			} else {
+				option.appendTo(excludes);
 			}
 		}
 		refreshListeners();
