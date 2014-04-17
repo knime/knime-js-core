@@ -4,6 +4,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -33,7 +34,7 @@ public class MultipleSelectionQuickFormRepresentation extends
 
     private static final String CFG_TYPE = "type";
 
-    private static final String DEFAULT_TYPE = MultipleSelectionType.TWINLIST.getName();
+    private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
 
     private String m_type = DEFAULT_TYPE;
 

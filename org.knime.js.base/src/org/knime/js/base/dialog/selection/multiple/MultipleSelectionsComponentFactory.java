@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,65 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Jan 6, 2014 (winter): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.single;
+package org.knime.js.base.dialog.selection.multiple;
 
 /**
- * Different UI types for a single selection.
  * 
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-enum SingleSelectionType {
-
+public final class MultipleSelectionsComponentFactory {
+    
     /**
-     * Radio buttons (vertical).
+     * Check boxes horizontally aligned.
      */
-    RADIOBUTTONS_VERTICAL("Radio buttons (vertical)"),
+    public static final String CHECK_BOXES_HORIZONTAL = "Check boxes (horizontal)";
+    
     /**
-     * Radio buttons (horizontal).
+     * Check boxes vertically aligned.
      */
-    RADIOBUTTONS_HORIZONTAL("Radio buttons (horizontal)"),
+    public static final String CHECK_BOXES_VERTICAL = "Check boxes (vertical)";
+    
     /**
-     * Single selection list.
+     * List.
      */
-    LIST("List"),
+    public static final String LIST = "List";
+    
     /**
-     * Dropdown list.
+     * Include list and exclude list.
      */
-    DROPDOWN("Dropdown");
-
-    private String m_name;
-
-    /**
-     * @param name Name of the type.
-     */
-    SingleSelectionType(final String name) {
-        m_name = name;
+    public static final String TWINLIST = "Twinlist";
+    
+    private MultipleSelectionsComponentFactory() {
+        
     }
-
+    
     /**
-     * @return the name
+     * @return List of available MultipleSelectionsComponents
      */
-    String getName() {
-        return m_name;
+    public static String[] listMultipleSelectionsComponents() {
+        return new String[]{CHECK_BOXES_HORIZONTAL, CHECK_BOXES_VERTICAL, LIST, TWINLIST};
     }
-
+    
     /**
-     * @return List of the names of all types.
+     * @param component Name of the component to create
+     * @param choices Choices available in the component
+     * @return MultipleSelectionsComponent corresponding to the given component name
      */
-    static String[] getAllTypes() {
-        return new String[]{RADIOBUTTONS_VERTICAL.getName(), RADIOBUTTONS_HORIZONTAL.getName(), LIST.getName(),
-                DROPDOWN.getName()};
+    public static MultipleSelectionsComponent createMultipleSelectionsComponent(final String component,
+            final String[] choices) {
+        if (CHECK_BOXES_HORIZONTAL.equals(component)) {
+            return new CheckBoxesComponent(choices, false);
+        } else if (CHECK_BOXES_VERTICAL.equals(component)) {
+            return new CheckBoxesComponent(choices, true);
+        } else if (LIST.equals(component)) {
+            return new ListComponent(choices);
+        } else if (TWINLIST.equals(component)) {
+            return new TwinlistComponent(choices);
+        } else {
+            return null;
+        }
     }
 
 }

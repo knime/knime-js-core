@@ -67,7 +67,7 @@ import org.apache.commons.lang.ArrayUtils;
  * 
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-public class ListComponent implements MultipleSelectionComponent {
+public class ListComponent implements MultipleSelectionsComponent {
 
     private static final int MIN_WIDTH = 200;
 

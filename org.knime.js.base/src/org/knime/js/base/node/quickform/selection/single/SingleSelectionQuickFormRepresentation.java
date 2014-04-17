@@ -4,6 +4,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -33,7 +34,7 @@ public class SingleSelectionQuickFormRepresentation extends
 
     private static final String CFG_TYPE = "type";
 
-    private static final String DEFAULT_TYPE = SingleSelectionType.DROPDOWN.getName();
+    private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
 
     private String m_type = DEFAULT_TYPE;
 

@@ -51,10 +51,8 @@
 package org.knime.js.base.node.quickform.selection.single;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.single.DropdownComponent;
-import org.knime.js.base.dialog.selection.single.ListComponent;
-import org.knime.js.base.dialog.selection.single.RadioButtonComponent;
 import org.knime.js.base.dialog.selection.single.SingleSelectionComponent;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -70,15 +68,8 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      */
     public SingleSelectionQuickFormDialogPanel(final SingleSelectionQuickFormRepresentation representation) {
         String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(SingleSelectionType.RADIOBUTTONS_VERTICAL.getName())) {
-            m_selectionComponent = new RadioButtonComponent(choices, true);
-        } else if (representation.getType().equals(SingleSelectionType.RADIOBUTTONS_HORIZONTAL.getName())) {
-            m_selectionComponent = new RadioButtonComponent(choices, false);
-        } else if (representation.getType().equals(SingleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(SingleSelectionType.DROPDOWN.getName())) {
-            m_selectionComponent = new DropdownComponent(choices);
-        } 
+        m_selectionComponent =
+                SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType(), choices);
         addComponent(m_selectionComponent.getComponent());
     }
 

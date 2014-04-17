@@ -63,7 +63,7 @@ import javax.swing.JPanel;
  * 
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-public class CheckBoxesComponent implements MultipleSelectionComponent {
+public class CheckBoxesComponent implements MultipleSelectionsComponent {
 
     private JPanel m_panel = new JPanel();
 

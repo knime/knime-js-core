@@ -51,10 +51,8 @@
 package org.knime.js.base.node.quickform.selection.multiple;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponent;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -63,22 +61,15 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 @SuppressWarnings("serial")
 public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
 
-    private MultipleSelectionComponent m_selectionComponent;
+    private MultipleSelectionsComponent m_selectionComponent;
 
     /**
      * @param representation The representation containing layout information
      */
     public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
         String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
-        }
+        m_selectionComponent =
+                MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType(), choices);
         addComponent(m_selectionComponent.getComponent());
     }
 

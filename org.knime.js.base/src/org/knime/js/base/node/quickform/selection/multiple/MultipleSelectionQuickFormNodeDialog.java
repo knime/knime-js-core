@@ -23,6 +23,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -62,7 +63,7 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
                 refreshChoices();
             }
         });
-        m_type = new JComboBox(MultipleSelectionType.getAllTypes());
+        m_type = new JComboBox(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
         createAndAddTab();
     }
 

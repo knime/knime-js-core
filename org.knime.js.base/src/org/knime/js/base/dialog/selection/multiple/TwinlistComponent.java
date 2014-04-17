@@ -63,7 +63,7 @@ import org.knime.core.node.util.filter.StringFilterPanel;
  * 
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-public class TwinlistComponent implements MultipleSelectionComponent {
+public class TwinlistComponent implements MultipleSelectionsComponent {
     
     private StringFilterPanel m_filter;
     

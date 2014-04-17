@@ -48,29 +48,63 @@
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.dialog.selection.multiple;
-
-import javax.swing.JComponent;
+package org.knime.js.base.dialog.selection.single;
 
 /**
  * 
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-public interface MultipleSelectionComponent {
-
+public final class SingleSelectionComponentFactory {
+    
     /**
-     * @return The JComponent
+     * Radio buttons horizontally aligned.
      */
-    public JComponent getComponent();
-
+    public static final String RADIO_BUTTONS_HORIZONTAL = "Radio buttons (horizontal)";
+    
     /**
-     * @return The selected items
+     * Radio buttons vertically aligned.
      */
-    public String[] getSelections();
-
+    public static final String RADIO_BUTTONS_VERTICAL = "Radio buttons (vertical)";
+    
     /**
-     * @param selections The items that will be selected
+     * List.
      */
-    public void setSelections(final String[] selections);
+    public static final String LIST = "List";
+    
+    /**
+     * Dropdown menu.
+     */
+    public static final String DROPDOWN = "Dropdown";
+    
+    private SingleSelectionComponentFactory() {
+        
+    }
+    
+    /**
+     * @return List of available SingleSelectionComponents
+     */
+    public static String[] listSingleSelectionComponents() {
+        return new String[]{RADIO_BUTTONS_HORIZONTAL, RADIO_BUTTONS_VERTICAL, LIST, DROPDOWN};
+    }
+    
+    /**
+     * @param component Name of the component to create
+     * @param choices Choices available in the component
+     * @return SingleSelectionComponent corresponding to the given component name
+     */
+    public static SingleSelectionComponent createSingleSelectionComponent(final String component,
+            final String[] choices) {
+        if (RADIO_BUTTONS_HORIZONTAL.equals(component)) {
+            return new RadioButtonComponent(choices, false);
+        } else if (RADIO_BUTTONS_VERTICAL.equals(component)) {
+            return new RadioButtonComponent(choices, true);
+        } else if (LIST.equals(component)) {
+            return new ListComponent(choices);
+        } else if (DROPDOWN.equals(component)) {
+            return new DropdownComponent(choices);
+        } else {
+            return null;
+        }
+    }
 
 }

@@ -18,6 +18,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -57,7 +58,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
                 refreshChoices();
             }
         });
-        m_type = new JComboBox(SingleSelectionType.getAllTypes());
+        m_type = new JComboBox(SingleSelectionComponentFactory.listSingleSelectionComponents());
         createAndAddTab();
     }
 

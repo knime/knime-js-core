@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,31 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Jan 6, 2014 (winter): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.multiple;
+
+import javax.swing.JComponent;
 
 /**
- * Different UI types for a single selection.
  * 
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-enum MultipleSelectionType {
+public interface MultipleSelectionsComponent {
 
     /**
-     * Check boxes (vertical).
+     * @return The JComponent
      */
-    CHECKBOXES_VERTICAL("Check boxes (vertical)"),
-    /**
-     * Check boxes (horizontal).
-     */
-    CHECKBOXES_HORIZONTAL("Check boxes (horizontal)"),
-    /**
-     * Multiple selection list.
-     */
-    LIST("List"),
-    /**
-     * Twinlist.
-     */
-    TWINLIST("Twinlist");
-
-    private String m_name;
+    public JComponent getComponent();
 
     /**
-     * @param name Name of the type.
+     * @return The selected items
      */
-    MultipleSelectionType(final String name) {
-        m_name = name;
-    }
+    public String[] getSelections();
 
     /**
-     * @return the name
+     * @param selections The items that will be selected
      */
-    String getName() {
-        return m_name;
-    }
-
-    /**
-     * @return List of the names of all types.
-     */
-    static String[] getAllTypes() {
-        return new String[]{CHECKBOXES_VERTICAL.getName(), CHECKBOXES_HORIZONTAL.getName(), LIST.getName(),
-                TWINLIST.getName()};
-    }
+    public void setSelections(final String[] selections);
 
 }
