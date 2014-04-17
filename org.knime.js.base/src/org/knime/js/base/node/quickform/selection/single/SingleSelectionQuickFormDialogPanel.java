@@ -50,27 +50,17 @@
  */
 package org.knime.js.base.node.quickform.selection.single;
 
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.ButtonGroup;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.ListSelectionModel;
-import javax.swing.border.EtchedBorder;
-
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.js.base.dialog.selection.single.DropdownComponent;
+import org.knime.js.base.dialog.selection.single.ListComponent;
+import org.knime.js.base.dialog.selection.single.RadioButtonComponent;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponent;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings({"serial", "rawtypes", "unchecked", "deprecation" })
+@SuppressWarnings("serial")
 public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<SingleSelectionQuickFormValue> {
 
     private SingleSelectionComponent m_selectionComponent;
@@ -106,127 +96,6 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
     @Override
     public void loadNodeValue(final SingleSelectionQuickFormValue value) {
         m_selectionComponent.setSelection(value.getVariableValue());
-    }
-
-    private interface SingleSelectionComponent {
-
-        public JComponent getComponent();
-
-        public String getSelection();
-
-        public void setSelection(final String selection);
-
-    }
-
-    private class RadioButtonComponent implements SingleSelectionComponent {
-
-        private JPanel m_panel = new JPanel();
-
-        private List<JRadioButton> m_buttons = new ArrayList<JRadioButton>();
-
-        RadioButtonComponent(final String[] choices, final boolean vertical) {
-            int rows = vertical ? choices.length : 1;
-            int cols = vertical ? 1 : choices.length;
-            GridLayout layout = new GridLayout(rows, cols);
-            m_panel.setLayout(layout);
-            ButtonGroup buttonGroup = new ButtonGroup();
-            for (String choice : choices) {
-                JRadioButton button = new JRadioButton(choice);
-                m_buttons.add(button);
-                buttonGroup.add(button);
-                m_panel.add(button);
-            }
-        }
-
-        @Override
-        public JComponent getComponent() {
-            return m_panel;
-        }
-
-        @Override
-        public String getSelection() {
-            String selection = "";
-            for (JRadioButton button : m_buttons) {
-                if (button.isSelected()) {
-                    selection = button.getText();
-                    break;
-                }
-            }
-            return selection;
-        }
-        
-        @Override
-        public void setSelection(final String selection) {
-            for (JRadioButton button : m_buttons) {
-                if (button.getText().equals(selection)) {
-                    button.setSelected(true);
-                    break;
-                }
-            }
-        }
-
-    }
-
-    private class ListComponent implements SingleSelectionComponent {
-
-        private static final int MIN_WIDTH = 200;
-
-        private JList m_list;
-
-        ListComponent(final String[] choices) {
-            m_list = new JList(choices);
-            m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            m_list.setBorder(new EtchedBorder());
-            if (m_list.getPreferredSize().width < MIN_WIDTH) {
-                m_list.setPreferredSize(new Dimension(MIN_WIDTH, m_list.getPreferredSize().height));
-            }
-        }
-
-        @Override
-        public JComponent getComponent() {
-            return m_list;
-        }
-
-        @Override
-        public String getSelection() {
-            Object[] values = m_list.getSelectedValues();
-            if (values.length > 0) {
-                return (String)values[0];
-            } else {
-                return null;
-            }
-        }
-
-        @Override
-        public void setSelection(final String selection) {
-            m_list.setSelectedValue(selection, true);
-        }
-
-    }
-
-    private class DropdownComponent implements SingleSelectionComponent {
-
-        private JComboBox m_comboBox;
-
-        DropdownComponent(final String[] choices) {
-            m_comboBox = new JComboBox(choices);
-        }
-
-        @Override
-        public JComponent getComponent() {
-            return m_comboBox;
-        }
-
-        @Override
-        public String getSelection() {
-            return (String)m_comboBox.getItemAt(m_comboBox.getSelectedIndex());
-        }
-
-        @Override
-        public void setSelection(final String selection) {
-            m_comboBox.setSelectedItem(selection);
-        }
-
     }
 
 }

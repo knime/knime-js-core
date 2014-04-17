@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,72 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.multiple;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
-import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 /**
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * 
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
+public class CheckBoxesComponent implements MultipleSelectionComponent {
 
-    private MultipleSelectionComponent m_selectionComponent;
+    private JPanel m_panel = new JPanel();
 
-    /**
-     * @param representation The representation containing layout information
-     */
-    public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
+    private List<JCheckBox> m_boxes = new ArrayList<JCheckBox>();
+
+    public CheckBoxesComponent(final String[] choices, final boolean vertical) {
+        int rows = vertical ? choices.length : 1;
+        int cols = vertical ? 1 : choices.length;
+        GridLayout layout = new GridLayout(rows, cols);
+        m_panel.setLayout(layout);
+        for (String choice : choices) {
+            JCheckBox box = new JCheckBox(choice);
+            m_boxes.add(box);
+            m_panel.add(box);
         }
-        addComponent(m_selectionComponent.getComponent());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(m_selectionComponent.getSelections());
+    public JComponent getComponent() {
+        return m_panel;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+    public String[] getSelections() {
+        List<String> selections = new ArrayList<String>();
+        for (JCheckBox box : m_boxes) {
+            if (box.isSelected()) {
+                selections.add(box.getText());
+            }
+        }
+        return selections.toArray(new String[selections.size()]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSelections(final String[] selections) {
+        List<String> selectionList = Arrays.asList(selections);
+        for (JCheckBox box : m_boxes) {
+            box.setSelected(selectionList.contains(box.getText()));
+        }
     }
 
 }

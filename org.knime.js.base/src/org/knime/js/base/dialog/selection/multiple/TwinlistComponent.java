@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,65 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.multiple;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
-import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.JComponent;
+
+import org.knime.core.node.util.filter.StringFilterPanel;
 
 /**
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * 
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
-
-    private MultipleSelectionComponent m_selectionComponent;
+public class TwinlistComponent implements MultipleSelectionComponent {
+    
+    private StringFilterPanel m_filter;
+    
+    private String[] m_choices;
+    
+    public TwinlistComponent(final String[] choices) {
+        m_filter = new StringFilterPanel(true);
+        m_choices = choices;
+        m_filter.update(new ArrayList<String>(0), Arrays.asList(m_choices), m_choices);
+    }
 
     /**
-     * @param representation The representation containing layout information
+     * {@inheritDoc}
      */
-    public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
+    @Override
+    public JComponent getComponent() {
+        return m_filter;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String[] getSelections() {
+        Set<String> includes = m_filter.getIncludeList();
+        return includes.toArray(new String[includes.size()]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setSelections(final String[] selections) {
+        List<String> includes = Arrays.asList(selections);
+        List<String> excludes = new ArrayList<String>(Math.max(0, m_choices.length - includes.size()));
+        for (String string : m_choices) {
+            if (!includes.contains(string)) {
+                excludes.add(string);
+            }
         }
-        addComponent(m_selectionComponent.getComponent());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(m_selectionComponent.getSelections());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+        m_filter.update(includes, excludes, m_choices);
     }
 
 }

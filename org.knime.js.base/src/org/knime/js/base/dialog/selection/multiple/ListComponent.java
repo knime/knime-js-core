@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,73 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.multiple;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
-import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import java.awt.Dimension;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EtchedBorder;
+
+import org.apache.commons.lang.ArrayUtils;
 
 /**
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * 
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
+public class ListComponent implements MultipleSelectionComponent {
 
-    private MultipleSelectionComponent m_selectionComponent;
+    private static final int MIN_WIDTH = 200;
 
-    /**
-     * @param representation The representation containing layout information
-     */
-    public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
+    private JList<String> m_list;
+
+    public ListComponent(final String[] choices) {
+        m_list = new JList<String>(choices);
+        m_list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        m_list.setBorder(new EtchedBorder());
+        if (m_list.getPreferredSize().width < MIN_WIDTH) {
+            m_list.setPreferredSize(new Dimension(MIN_WIDTH, m_list.getPreferredSize().height));
         }
-        addComponent(m_selectionComponent.getComponent());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(m_selectionComponent.getSelections());
+    public JComponent getComponent() {
+        return m_list;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public String[] getSelections() {
+        return (Arrays.asList(m_list.getSelectedValues())).toArray(new String[0]);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+    public void setSelections(final String[] selections) {
+        List<Integer> indices = new ArrayList<Integer>(selections.length);
+        List<String> selectionsList = Arrays.asList(selections);
+        ListModel<String> model = m_list.getModel();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (selectionsList.contains(model.getElementAt(i))) {
+                indices.add(i);
+            }
+        }
+        m_list.setSelectedIndices(ArrayUtils.toPrimitive(indices.toArray(new Integer[indices.size()])));
     }
 
 }

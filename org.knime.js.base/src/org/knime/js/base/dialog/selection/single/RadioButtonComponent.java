@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,81 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.single;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
-import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.ButtonGroup;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 
 /**
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * 
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
+public class RadioButtonComponent implements SingleSelectionComponent {
 
-    private MultipleSelectionComponent m_selectionComponent;
+    private JPanel m_panel = new JPanel();
+
+    private List<JRadioButton> m_buttons = new ArrayList<JRadioButton>();
 
     /**
-     * @param representation The representation containing layout information
+     * @param choices The available items
+     * @param vertical If true the radio buttons are aligned vertically, otherwise they are aligned
      */
-    public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
+    public RadioButtonComponent(final String[] choices, final boolean vertical) {
+        int rows = vertical ? choices.length : 1;
+        int cols = vertical ? 1 : choices.length;
+        GridLayout layout = new GridLayout(rows, cols);
+        m_panel.setLayout(layout);
+        ButtonGroup buttonGroup = new ButtonGroup();
+        for (String choice : choices) {
+            JRadioButton button = new JRadioButton(choice);
+            m_buttons.add(button);
+            buttonGroup.add(button);
+            m_panel.add(button);
         }
-        addComponent(m_selectionComponent.getComponent());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(m_selectionComponent.getSelections());
+    public JComponent getComponent() {
+        return m_panel;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+    public String getSelection() {
+        String selection = "";
+        for (JRadioButton button : m_buttons) {
+            if (button.isSelected()) {
+                selection = button.getText();
+                break;
+            }
+        }
+        return selection;
+    }
+
+    /**
+     * {@inheritDoc}
+     */ 
+    @Override
+    public void setSelection(final String selection) {
+        for (JRadioButton button : m_buttons) {
+            if (button.getText().equals(selection)) {
+                button.setSelected(true);
+                break;
+            }
+        }
     }
 
 }

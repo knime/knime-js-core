@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,56 +46,67 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
+ *   Apr 17, 2014 ("Patrick Winter"): created
  */
-package org.knime.js.base.node.quickform.selection.multiple;
+package org.knime.js.base.dialog.selection.single;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.CheckBoxesComponent;
-import org.knime.js.base.dialog.selection.multiple.ListComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionComponent;
-import org.knime.js.base.dialog.selection.multiple.TwinlistComponent;
-import org.knime.js.base.node.quickform.QuickFormDialogPanel;
+import java.awt.Dimension;
+
+import javax.swing.JComponent;
+import javax.swing.JList;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EtchedBorder;
 
 /**
- * @author Patrick Winter, KNIME.com, Zurich, Switzerland
+ * 
+ * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
-@SuppressWarnings("serial")
-public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<MultipleSelectionQuickFormValue> {
+public class ListComponent implements SingleSelectionComponent {
 
-    private MultipleSelectionComponent m_selectionComponent;
+    private static final int MIN_WIDTH = 200;
+
+    private JList<String> m_list;
 
     /**
-     * @param representation The representation containing layout information
+     * @param choices The available items
      */
-    public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
-        String[] choices = representation.getPossibleChoices();
-        if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_VERTICAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, true);
-        } else if (representation.getType().equals(MultipleSelectionType.CHECKBOXES_HORIZONTAL.getName())) {
-            m_selectionComponent = new CheckBoxesComponent(choices, false);
-        } else if (representation.getType().equals(MultipleSelectionType.LIST.getName())) {
-            m_selectionComponent = new ListComponent(choices);
-        } else if (representation.getType().equals(MultipleSelectionType.TWINLIST.getName())) {
-            m_selectionComponent = new TwinlistComponent(choices);
+    public ListComponent(final String[] choices) {
+        m_list = new JList<String>(choices);
+        m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        m_list.setBorder(new EtchedBorder());
+        if (m_list.getPreferredSize().width < MIN_WIDTH) {
+            m_list.setPreferredSize(new Dimension(MIN_WIDTH, m_list.getPreferredSize().height));
         }
-        addComponent(m_selectionComponent.getComponent());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setVariableValue(m_selectionComponent.getSelections());
+    public JComponent getComponent() {
+        return m_list;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public String getSelection() {
+        Object[] values = m_list.getSelectedValues();
+        if (values.length > 0) {
+            return (String)values[0];
+        } else {
+            return null;
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+    public void setSelection(final String selection) {
+        m_list.setSelectedValue(selection, true);
     }
 
 }
