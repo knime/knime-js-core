@@ -48,19 +48,27 @@
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-function twinlistMultipleSelections() {
-	var list;
-	this.getComponent = function() {
-		return list.getElement();
+org_knime_js_base_node_quickform_input_molecule = function() {
+	var moleculeInput = {
+			version: "1.0.0"
 	};
-	this.setChoices = function(choices) {
-		list.setAvailableValues(choices);
+	moleculeInput.name = "Molecule input";
+	var viewValue;
+	var input;
+
+	moleculeInput.init = function(representation, value) {
+		viewValue = value;
+		input = $('<input>');
+		$("body").append(input);
+		input.attr("type", "text");
+		input.val(representation.defaultvalue);
 	};
-	this.getSelections = function() {
-		return list.getIncludes();
+
+	moleculeInput.value = function() {
+		viewValue.moleculeString = input.val();
+		return viewValue;
 	};
-	this.setSelections = function(selections) {
-		list.setIncludes(selections);
-	};
-	list = new twinlist();
-}
+	
+	return moleculeInput;
+	
+}();

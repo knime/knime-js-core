@@ -48,19 +48,38 @@
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-function twinlistMultipleSelections() {
-	var list;
-	this.getComponent = function() {
-		return list.getElement();
+org_knime_js_base_node_quickform_selection_multiple = function() {
+	var multiSelection = {
+		version : "1.0.0"
 	};
-	this.setChoices = function(choices) {
-		list.setAvailableValues(choices);
+	multiSelection.name = "Multiple selections";
+	var viewValue;
+	var selector;
+
+	multiSelection.init = function(representation, value) {
+		var body = $('body');
+		viewValue = value;
+		if (representation.possibleChoices.length > 0) {
+			if (representation.type == 'Check boxes (vertical)') {
+				selector = new checkBoxesMultipleSelections(true);
+			} else if (representation.type == 'Check boxes (horizontal)') {
+				selector = new checkBoxesMultipleSelections(false);
+			} else if (representation.type == 'List') {
+				selector = new listMultipleSelections();
+			} else {
+				selector = new twinlistMultipleSelections();
+			}
+			body.append(selector.getComponent());
+			selector.setChoices(representation.possibleChoices);
+			selector.setSelections(representation.defaultvalue);
+		}
 	};
-	this.getSelections = function() {
-		return list.getIncludes();
+
+	multiSelection.value = function() {
+		viewValue.value = selector.getSelections();
+		return viewValue;
 	};
-	this.setSelections = function(selections) {
-		list.setIncludes(selections);
-	};
-	list = new twinlist();
-}
+
+	return multiSelection;
+
+}();

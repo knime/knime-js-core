@@ -48,19 +48,65 @@
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-function twinlistMultipleSelections() {
-	var list;
-	this.getComponent = function() {
-		return list.getElement();
+org_knime_js_base_node_quickform_filter_value = function() {
+	var valueFilter = {
+			version: "1.0.0"
 	};
-	this.setChoices = function(choices) {
-		list.setAvailableValues(choices);
+	valueFilter.name = "Value filter";
+	var viewValue;
+	var viewRepresentation;
+	var colselection;
+	var selector;
+
+	valueFilter.init = function(representation, value) {
+		var body = $('body');
+		viewValue = value;
+		viewRepresentation = representation;
+		if (representation.possibleValues == null) {
+			body.append("Error: No data available");
+		} else {
+			if (!representation.lockColumn) {
+				colselection = $('<select>');
+				body.append(colselection);
+				body.append($('<br>'));
+				for ( var key in representation.possibleValues) {
+					var option = $('<option>' + key + '</option>');
+					option.appendTo(colselection);
+					if (key == representation.defaultColumn) {
+						option.prop('selected', true);
+					}
+				}
+				colselection.change(selectionChanged);
+			}
+			if (viewRepresentation.type == 'Check boxes (vertical)') {
+				selector = new checkBoxesMultipleSelections(true);
+			} else if (viewRepresentation.type == 'Check boxes (horizontal)') {
+				selector = new checkBoxesMultipleSelections(false);
+			} else if (viewRepresentation.type == 'List') {
+				selector = new listMultipleSelections();
+			} else {
+				selector = new twinlistMultipleSelections();
+			}
+			body.append(selector.getComponent());
+			selector.setChoices(viewRepresentation.possibleValues[representation.defaultColumn]);
+			selector.setSelections(representation.defaultValues);
+		}
 	};
-	this.getSelections = function() {
-		return list.getIncludes();
+
+	valueFilter.value = function() {
+		viewValue.values = selector.getSelections();
+		if (!viewRepresentation.lockColumn) {
+			viewValue.column = colselection.find(':selected').text();
+		}
+		return viewValue;
 	};
-	this.setSelections = function(selections) {
-		list.setIncludes(selections);
-	};
-	list = new twinlist();
-}
+
+	function selectionChanged() {
+		var col = colselection.find(':selected').text();
+		selector.setChoices(viewRepresentation.possibleValues[col]);
+		selector.setSelection([]);
+	}
+	
+	return valueFilter;
+	
+}();

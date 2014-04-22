@@ -48,19 +48,27 @@
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-function twinlistMultipleSelections() {
-	var list;
-	this.getComponent = function() {
-		return list.getElement();
+org_knime_js_base_node_quickform_input_bool = function() {
+	var booleanInput = {
+			version: "1.0.0"
 	};
-	this.setChoices = function(choices) {
-		list.setAvailableValues(choices);
+	booleanInput.name = "Boolean input";
+	var viewValue;
+	var input;
+
+	booleanInput.init = function(representation, value) {
+		viewValue = value;
+		input = $('<input>');
+		$("body").append(input);
+		input.attr("type", "checkbox");
+		input.prop("checked", representation.defaultvalue);
 	};
-	this.getSelections = function() {
-		return list.getIncludes();
+
+	booleanInput.value = function() {
+		viewValue.boolean = input.prop("checked");
+		return viewValue;
 	};
-	this.setSelections = function(selections) {
-		list.setIncludes(selections);
-	};
-	list = new twinlist();
-}
+	
+	return booleanInput;
+	
+}();

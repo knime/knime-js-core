@@ -48,19 +48,40 @@
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
-function twinlistMultipleSelections() {
-	var list;
-	this.getComponent = function() {
-		return list.getElement();
+org_knime_js_base_node_quickform_selection_column = function() {
+	var columnSelection = {
+			version: "1.0.0"
 	};
-	this.setChoices = function(choices) {
-		list.setAvailableValues(choices);
+	columnSelection.name = "Column selection";
+	var viewValue;
+	var selector
+
+	columnSelection.init = function(representation, value) {
+		var body = $('body');
+		viewValue = value;
+		if (representation.possibleColumns == null) {
+			body.append("Error: No data available");
+		} else {
+			if (representation.type == 'Radio buttons (vertical)') {
+				selector = new radioButtonSingleSelection(true);
+			} else if (representation.type == 'Radio buttons (horizontal)') {
+				selector = new radioButtonSingleSelection(false);
+			} else if (representation.type == 'List') {
+				selector = new listSingleSelection();
+			} else {
+				selector = new dropdownSingleSelection();
+			}
+			body.append(selector.getComponent());
+			selector.setChoices(representation.possibleColumns);
+			selector.setSelection(representation.defaultColumn);
+		}
 	};
-	this.getSelections = function() {
-		return list.getIncludes();
+
+	columnSelection.value = function() {
+		viewValue.column = selector.getSelection();
+		return viewValue;
 	};
-	this.setSelections = function(selections) {
-		list.setIncludes(selections);
-	};
-	list = new twinlist();
-}
+	
+	return columnSelection;
+	
+}();
