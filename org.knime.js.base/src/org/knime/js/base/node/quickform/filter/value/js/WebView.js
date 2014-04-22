@@ -5,20 +5,20 @@ org_knime_js_base_node_quickform_filter_value = function() {
 	valueFilter.name = "Value filter";
 	var viewValue;
 	var viewRepresentation;
-	var list;
 	var colselection;
+	var selector;
 
 	valueFilter.init = function(representation, value) {
-		list = new twinlist();
+		var body = $('body');
 		viewValue = value;
 		viewRepresentation = representation;
 		if (representation.possibleValues == null) {
-			$('body').append("Error: No data available");
+			body.append("Error: No data available");
 		} else {
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
-				$('body').append(colselection);
-				$('body').append($('<br>'));
+				body.append(colselection);
+				body.append($('<br>'));
 				for ( var key in representation.possibleValues) {
 					var option = $('<option>' + key + '</option>');
 					option.appendTo(colselection);
@@ -28,14 +28,23 @@ org_knime_js_base_node_quickform_filter_value = function() {
 				}
 				colselection.change(selectionChanged);
 			}
-			$('body').append(list.getElement());
-			list.setAvailableValues(representation.possibleValues[representation.defaultColumn]);
-			list.setIncludes(representation.defaultValues);
+			if (viewRepresentation.type == 'Check boxes (vertical)') {
+				selector = new checkBoxesMultipleSelections(true);
+			} else if (viewRepresentation.type == 'Check boxes (horizontal)') {
+				selector = new checkBoxesMultipleSelections(false);
+			} else if (viewRepresentation.type == 'List') {
+				selector = new listMultipleSelections();
+			} else {
+				selector = new twinlistMultipleSelections();
+			}
+			body.append(selector.getComponent());
+			selector.setChoices(viewRepresentation.possibleValues[representation.defaultColumn]);
+			selector.setSelections(representation.defaultValues);
 		}
 	};
 
 	valueFilter.value = function() {
-		viewValue.values = list.getIncludes();
+		viewValue.values = selector.getSelections();
 		if (!viewRepresentation.lockColumn) {
 			viewValue.column = colselection.find(':selected').text();
 		}
@@ -44,8 +53,8 @@ org_knime_js_base_node_quickform_filter_value = function() {
 
 	function selectionChanged() {
 		var col = colselection.find(':selected').text();
-		list.setAvailableValues(viewRepresentation.possibleValues[col]);
-		list.setExcludes(viewRepresentation.possibleValues[col]);
+		selector.setChoices(viewRepresentation.possibleValues[col]);
+		selector.setSelection([]);
 	}
 	
 	return valueFilter;

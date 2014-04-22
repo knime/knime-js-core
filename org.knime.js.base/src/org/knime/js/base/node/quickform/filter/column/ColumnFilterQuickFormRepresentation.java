@@ -1,10 +1,10 @@
 package org.knime.js.base.node.quickform.filter.column;
 
-import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -21,29 +21,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class ColumnFilterQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ColumnFilterQuickFormValue> {
     
-    private static final String CFG_DEFAULT = "default";
+    private static final String CFG_DEFAULT_COLUMNS = "defaultColumns";
     
-    private String[] m_defaultColumns = new String[0];
+    private static final String[] DEFAULT_DEFAULT_COLUMNS = new String[0];
     
-    private String[] m_possibleColumns;
+    private String[] m_defaultColumns = DEFAULT_DEFAULT_COLUMNS;
     
-    private DataTableSpec m_spec;
+    private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
     
-    /**
-     * @return the spec
-     */
-    @JsonIgnore
-    public DataTableSpec getSpec() {
-        return m_spec;
-    }
+    private static final String[] DEFAULT_POSSIBLE_COLUMNS = new String[0];
     
-    /**
-     * @param spec the spec to set
-     */
-    @JsonIgnore
-    public void setSpec(final DataTableSpec spec) {
-        m_spec = spec;
-    }
+    private String[] m_possibleColumns = DEFAULT_POSSIBLE_COLUMNS;
+
+    private static final String CFG_TYPE = "type";
+
+    private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
+
+    private String m_type = DEFAULT_TYPE;
     
     /**
      * {@inheritDoc}
@@ -52,7 +46,9 @@ public class ColumnFilterQuickFormRepresentation extends
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
-        m_defaultColumns = settings.getStringArray(CFG_DEFAULT);
+        m_defaultColumns = settings.getStringArray(CFG_DEFAULT_COLUMNS);
+        m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
+        setType(settings.getString(CFG_TYPE));
     }
     
     /**
@@ -62,7 +58,9 @@ public class ColumnFilterQuickFormRepresentation extends
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
-        m_defaultColumns = settings.getStringArray(CFG_DEFAULT, new String[0]);
+        m_defaultColumns = settings.getStringArray(CFG_DEFAULT_COLUMNS, DEFAULT_DEFAULT_COLUMNS);
+        m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
+        setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
     
     /**
@@ -72,7 +70,9 @@ public class ColumnFilterQuickFormRepresentation extends
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
-        settings.addStringArray(CFG_DEFAULT, m_defaultColumns);
+        settings.addStringArray(CFG_DEFAULT_COLUMNS, m_defaultColumns);
+        settings.addStringArray(CFG_POSSIBLE_COLUMNS, m_possibleColumns);
+        settings.addString(CFG_TYPE, m_type);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ColumnFilterQuickFormRepresentation extends
     /**
      * @return the defaultColumns
      */
-    @JsonProperty("defaultvalue")
+    @JsonProperty("defaultColumns")
     public String[] getDefaultColumns() {
         return m_defaultColumns;
     }
@@ -97,7 +97,7 @@ public class ColumnFilterQuickFormRepresentation extends
     /**
      * @param defaultColumns the defaultColumns to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonProperty("defaultColumns")
     public void setDefaultColumns(final String[] defaultColumns) {
         m_defaultColumns = defaultColumns;
     }
@@ -125,6 +125,22 @@ public class ColumnFilterQuickFormRepresentation extends
     @JsonProperty("possibleColumns")
     public void setPossibleColumns(final String[] possibleColumns) {
         m_possibleColumns = possibleColumns;
+    }
+
+    /**
+     * @return the type
+     */
+    @JsonProperty("type")
+    public String getType() {
+        return m_type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    @JsonProperty("type")
+    public void setType(final String type) {
+        m_type = type;
     }
 
 }

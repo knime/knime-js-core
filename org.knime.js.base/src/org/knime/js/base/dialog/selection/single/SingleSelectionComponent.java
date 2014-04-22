@@ -62,6 +62,11 @@ public interface SingleSelectionComponent {
      * @return The JComponent
      */
     public JComponent getComponent();
+    
+    /**
+     * @param choices The available choices
+     */
+    public void setChoices(final String[] choices);
 
     /**
      * @return The selected item

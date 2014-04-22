@@ -65,13 +65,28 @@ import javax.swing.JPanel;
  */
 public class CheckBoxesComponent implements MultipleSelectionsComponent {
 
-    private JPanel m_panel = new JPanel();
+    private final JPanel m_panel = new JPanel();
 
     private List<JCheckBox> m_boxes = new ArrayList<JCheckBox>();
+    
+    private final boolean m_vertical;
 
-    public CheckBoxesComponent(final String[] choices, final boolean vertical) {
-        int rows = vertical ? choices.length : 1;
-        int cols = vertical ? 1 : choices.length;
+    /**
+     * @param vertical If true the radio buttons are aligned vertically, otherwise they are aligned
+     */
+    CheckBoxesComponent(final boolean vertical) {
+        m_vertical = vertical;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
+        m_panel.removeAll();
+        m_boxes.clear();
+        int rows = m_vertical ? choices.length : 1;
+        int cols = m_vertical ? 1 : choices.length;
         GridLayout layout = new GridLayout(rows, cols);
         m_panel.setLayout(layout);
         for (String choice : choices) {
@@ -79,6 +94,7 @@ public class CheckBoxesComponent implements MultipleSelectionsComponent {
             m_boxes.add(box);
             m_panel.add(box);
         }
+        m_panel.revalidate();
     }
 
     /**

@@ -69,8 +69,19 @@ public class TwinlistComponent implements MultipleSelectionsComponent {
     
     private String[] m_choices;
     
-    public TwinlistComponent(final String[] choices) {
+    /**
+     * Create TwinlistComponent.
+     */
+    TwinlistComponent() {
         m_filter = new StringFilterPanel(true);
+        m_choices = new String[0];
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
         m_choices = choices;
         m_filter.update(new ArrayList<String>(0), Arrays.asList(m_choices), m_choices);
     }

@@ -50,6 +50,7 @@
  */
 package org.knime.js.base.dialog.selection.single;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
@@ -60,12 +61,26 @@ import javax.swing.JComponent;
 public class DropdownComponent implements SingleSelectionComponent {
 
     private JComboBox<String> m_comboBox;
+    
+    private DefaultComboBoxModel<String> m_comboBoxModel;
 
     /**
-     * @param choices The available items
+     * Create DropdownComponent.
      */
-    public DropdownComponent(final String[] choices) {
-        m_comboBox = new JComboBox<String>(choices);
+    DropdownComponent() {
+        m_comboBoxModel = new DefaultComboBoxModel<String>();
+        m_comboBox = new JComboBox<String>(m_comboBoxModel);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
+        m_comboBoxModel.removeAllElements();
+        for (String choice : choices) {
+            m_comboBoxModel.addElement(choice);
+        }
     }
 
     /**

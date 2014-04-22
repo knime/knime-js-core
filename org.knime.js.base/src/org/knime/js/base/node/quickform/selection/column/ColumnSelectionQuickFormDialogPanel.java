@@ -50,34 +50,27 @@
  */
 package org.knime.js.base.node.quickform.selection.column;
 
-import javax.swing.border.Border;
-
-import org.knime.core.data.DataValue;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponent;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-@SuppressWarnings({"serial", "unchecked" })
+@SuppressWarnings("serial")
 public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<ColumnSelectionQuickFormValue> {
-
-    private ColumnSelectionPanel m_component;
+    
+    private SingleSelectionComponent m_column;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
-        m_component = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
-        try {
-            m_component.update(representation.getSpec(), null);
-        } catch (NotConfigurableException e) {
-            // Leave empty
-        }
-        addComponent(m_component);
+        m_column = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
+        m_column.setChoices(representation.getPossibleColumns());
+        addComponent(m_column.getComponent());
     }
 
     /**
@@ -85,7 +78,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void saveNodeValue(final ColumnSelectionQuickFormValue value) throws InvalidSettingsException {
-        value.setColumn(m_component.getSelectedColumn());
+        value.setColumn(m_column.getSelection());
     }
 
     /**
@@ -93,7 +86,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void loadNodeValue(final ColumnSelectionQuickFormValue value) {
-        m_component.setSelectedColumn(value.getColumn());
+        m_column.setSelection(value.getColumn());
     }
 
 }

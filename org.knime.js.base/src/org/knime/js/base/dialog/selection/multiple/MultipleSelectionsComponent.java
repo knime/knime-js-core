@@ -57,6 +57,11 @@ import javax.swing.JComponent;
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public interface MultipleSelectionsComponent {
+    
+    /**
+     * @param choices The available choices
+     */
+    public void setChoices(final String[] choices);
 
     /**
      * @return The JComponent

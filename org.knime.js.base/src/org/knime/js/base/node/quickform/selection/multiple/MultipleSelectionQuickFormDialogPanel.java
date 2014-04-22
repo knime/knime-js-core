@@ -69,7 +69,8 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
     public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
-                MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType(), choices);
+                MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
+        m_selectionComponent.setChoices(choices);
         addComponent(m_selectionComponent.getComponent());
     }
 

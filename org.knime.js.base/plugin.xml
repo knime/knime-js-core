@@ -303,6 +303,44 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="SingleSelection">
+         <webResource
+               relativePathSource="src/org/knime/js/base/dialog/selection/single/js/"
+               relativePathTarget="src/org/knime/js/base/dialog/selection/single/js/">
+         </webResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/single/js/DropdownSingleSelection.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/single/js/ListSingleSelection.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/single/js/RadioButtonSingleSelection.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="MultipleSelections">
+         <webResource
+               relativePathSource="src/org/knime/js/base/dialog/selection/multiple/js/"
+               relativePathTarget="src/org/knime/js/base/dialog/selection/multiple/js/">
+         </webResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/CheckBoxesMultipleSelections.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/ListMultipleSelections.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/TwinlistMultipleSelections.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -433,6 +471,9 @@
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="SingleSelection">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -446,6 +487,9 @@
          <webDependency
                webResourceBundleID="KnimeTwinlist_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="MultipleSelections">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -455,6 +499,9 @@
             namespace="org_knime_js_base_node_quickform_selection_value">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="SingleSelection">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -469,6 +516,9 @@
          <webDependency
                webResourceBundleID="KnimeTwinlist_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="MultipleSelections">
+         </webDependency>
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -478,6 +528,9 @@
             namespace="org_knime_js_base_node_quickform_selection_column">
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="SingleSelection">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -491,6 +544,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeTwinlist_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="MultipleSelections">
          </webDependency>
       </javascriptComponent>
    </extension>

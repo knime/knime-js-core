@@ -4,27 +4,31 @@ org_knime_js_base_node_quickform_selection_column = function() {
 	};
 	columnSelection.name = "Column selection";
 	var viewValue;
+	var selector
 
 	columnSelection.init = function(representation, value) {
+		var body = $('body');
 		viewValue = value;
 		if (representation.possibleColumns == null) {
-			$('body').append("Error: No data available");
+			body.append("Error: No data available");
 		} else {
-			var selection = $('<select>');
-			$('body').append(selection);
-			for ( var i in representation.possibleColumns) {
-				var column = representation.possibleColumns[i];
-				var option = $('<option>' + column + '</option>');
-				option.appendTo(selection);
-				if (column == representation.defaultvalue) {
-					option.prop('selected', true);
-				}
+			if (representation.type == 'Radio buttons (vertical)') {
+				selector = new radioButtonSingleSelection(true);
+			} else if (representation.type == 'Radio buttons (horizontal)') {
+				selector = new radioButtonSingleSelection(false);
+			} else if (representation.type == 'List') {
+				selector = new listSingleSelection();
+			} else {
+				selector = new dropdownSingleSelection();
 			}
+			body.append(selector.getComponent());
+			selector.setChoices(representation.possibleColumns);
+			selector.setSelection(representation.defaultColumn);
 		}
 	};
 
 	columnSelection.value = function() {
-		viewValue.column = $(':selected').text();
+		viewValue.column = selector.getSelection();
 		return viewValue;
 	};
 	

@@ -52,6 +52,7 @@ package org.knime.js.base.dialog.selection.single;
 
 import java.awt.Dimension;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListSelectionModel;
@@ -66,14 +67,29 @@ public class ListComponent implements SingleSelectionComponent {
     private static final int MIN_WIDTH = 200;
 
     private JList<String> m_list;
+    
+    private DefaultListModel<String> m_listModel;
 
     /**
-     * @param choices The available items
+     * Create ListComponent.
      */
-    public ListComponent(final String[] choices) {
-        m_list = new JList<String>(choices);
+    ListComponent() {
+        m_listModel = new DefaultListModel<String>();
+        m_list = new JList<String>(m_listModel);
         m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_list.setBorder(new EtchedBorder());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
+        m_listModel.removeAllElements();
+        m_list.setPreferredSize(null);
+        for (String choice : choices) {
+            m_listModel.addElement(choice);
+        }
         if (m_list.getPreferredSize().width < MIN_WIDTH) {
             m_list.setPreferredSize(new Dimension(MIN_WIDTH, m_list.getPreferredSize().height));
         }

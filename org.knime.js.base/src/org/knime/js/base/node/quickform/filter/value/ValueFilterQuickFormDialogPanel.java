@@ -55,17 +55,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.util.filter.StringFilterPanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponent;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -77,26 +74,21 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
     
     private JComboBox<String> m_column;
 
-    private StringFilterPanel m_values;
-    
-    private Map<String, List<String>> m_possibleValuesMap;
+    private MultipleSelectionsComponent m_values;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ValueFilterQuickFormDialogPanel(final ValueFilterQuickFormRepresentation representation) {
-        m_possibleValuesMap = representation.getPossibleValues();
+        m_values = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_column = new JComboBox<String>(representation.getPossibleColumns());
         m_column.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
                 List<String> possibleValues = representation.getPossibleValues().get(m_column.getSelectedItem());
-                m_values.update(new ArrayList<String>(0), possibleValues,
-                        possibleValues.toArray(new String[possibleValues.size()]));
+                m_values.setChoices(possibleValues.toArray(new String[possibleValues.size()]));
             }
         });
-        m_values = new StringFilterPanel(true);
-        m_values.update(new ArrayList<String>(0), new ArrayList<String>(0), new String[0]);
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -108,7 +100,7 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
         gbc.gridy = 0;
         panel.add(m_column, gbc);
         gbc.gridy++;
-        panel.add(m_values, gbc);
+        panel.add(m_values.getComponent(), gbc);
         addComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
     }
@@ -118,8 +110,7 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
      */
     @Override
     public void saveNodeValue(final ValueFilterQuickFormValue value) throws InvalidSettingsException {
-        Set<String> includes = m_values.getIncludeList();
-        value.setValues(includes.toArray(new String[includes.size()]));
+        value.setValues(m_values.getSelections());
         value.setColumn((String)m_column.getSelectedItem());
     }
 
@@ -129,15 +120,7 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
     @Override
     public void loadNodeValue(final ValueFilterQuickFormValue value) {
         m_column.setSelectedItem(value.getColumn());
-        List<String> possibleValues = m_possibleValuesMap.get(value.getColumn());
-        List<String> includes = Arrays.asList(value.getValues());
-        List<String> excludes = new ArrayList<String>(Math.max(0, possibleValues.size() - includes.size()));
-        for (String string : possibleValues) {
-            if (!includes.contains(string)) {
-                excludes.add(string);
-            }
-        }
-        m_values.update(includes, excludes, possibleValues.toArray(new String[possibleValues.size()]));
+        m_values.setSelections(value.getValues());
     }
 
 }

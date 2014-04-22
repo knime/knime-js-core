@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -25,6 +26,7 @@ import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionPanel;
 import org.knime.core.node.util.filter.StringFilterPanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -48,9 +50,12 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     private String[] m_possibleValues;
     
     private DataTableSpec m_spec;
+    
+    private final JComboBox<String> m_type;
 
     /** Constructors, inits fields calls layout routines. */
     ValueFilterQuickFormNodeDialog() {
+        m_type = new JComboBox<String>(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
         m_lockColumn = new JCheckBox();
         m_defaultColumnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
         m_columnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
@@ -121,6 +126,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Lock column: ", m_lockColumn, panelWithGBLayout, gbc);
         addPairToPanel("Default column selection: ", m_defaultColumnField, panelWithGBLayout, gbc);
         addPairToPanel("Default Values: ", m_defaultField, panelWithGBLayout, gbc);
@@ -187,6 +193,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         }
         m_valueField.update(valueIncludes, valueExcludes, m_possibleValues);
         m_lockColumn.setSelected(representation.getLockColumn());
+        m_type.setSelectedItem(representation.getType());
     }
 
     /**
@@ -201,6 +208,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         Set<String> defaultIncludes = m_defaultField.getIncludeList();
         representation.setDefaultValues(defaultIncludes.toArray(new String[defaultIncludes.size()]));
         representation.setFromSpec(m_spec);
+        representation.setType((String)m_type.getSelectedItem());
         representation.saveToNodeSettings(settings);
         ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
         Set<String> valueIncludes = m_valueField.getIncludeList();

@@ -30,6 +30,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -57,9 +58,12 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private final DefaultComboBoxModel m_valueModel = new DefaultComboBoxModel();
     
     private DataTableSpec m_tableSpec;
+    
+    private final JComboBox<String> m_type;
 
     /** Constructors, inits fields calls layout routines. */
     ValueSelectionQuickFormNodeDialog() {
+        m_type = new JComboBox<String>(SingleSelectionComponentFactory.listSingleSelectionComponents());
         m_lockColumn = new JCheckBox();
         m_columnType = new JComboBox<ColumnType>(ColumnType.values());
         m_columnType.addActionListener(new ActionListener() {
@@ -181,6 +185,7 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Column type: ", m_columnType, panelWithGBLayout, gbc);
         addPairToPanel("Lock column: ", m_lockColumn, panelWithGBLayout, gbc);
         addPairToPanel("Default column selection: ", m_defaultColumnField, panelWithGBLayout, gbc);
@@ -227,6 +232,7 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
             m_valueField.setSelectedItem(value.getValue());
         }
         m_lockColumn.setSelected(representation.getLockColumn());
+        m_type.setSelectedItem(representation.getType());
     }
 
     /**
@@ -247,6 +253,7 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         representation.setLockColumn(m_lockColumn.isSelected());
         representation.setFromSpec(m_tableSpec);
         representation.setDefaultColumn(m_defaultColumnField.getSelectedColumn());
+        representation.setType((String)m_type.getSelectedItem());
         representation.saveToNodeSettings(settings);
         ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
         value.setValue((String) m_valueField.getSelectedItem());

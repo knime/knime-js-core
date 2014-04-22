@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.ListModel;
@@ -72,11 +73,29 @@ public class ListComponent implements MultipleSelectionsComponent {
     private static final int MIN_WIDTH = 200;
 
     private JList<String> m_list;
+    
+    private DefaultListModel<String> m_listModel;
 
-    public ListComponent(final String[] choices) {
-        m_list = new JList<String>(choices);
+    /**
+     * Create ListComponent.
+     */
+    ListComponent() {
+        m_listModel = new DefaultListModel<String>();
+        m_list = new JList<String>(m_listModel);
         m_list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         m_list.setBorder(new EtchedBorder());
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
+        m_listModel.removeAllElements();
+        m_list.setPreferredSize(null);
+        for (String choice : choices) {
+            m_listModel.addElement(choice);
+        }
         if (m_list.getPreferredSize().width < MIN_WIDTH) {
             m_list.setPreferredSize(new Dimension(MIN_WIDTH, m_list.getPreferredSize().height));
         }

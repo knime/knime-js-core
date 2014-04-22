@@ -65,17 +65,28 @@ import javax.swing.JRadioButton;
  */
 public class RadioButtonComponent implements SingleSelectionComponent {
 
-    private JPanel m_panel = new JPanel();
+    private final JPanel m_panel = new JPanel();
+    
+    private final boolean m_vertical;
 
     private List<JRadioButton> m_buttons = new ArrayList<JRadioButton>();
 
     /**
-     * @param choices The available items
      * @param vertical If true the radio buttons are aligned vertically, otherwise they are aligned
      */
-    public RadioButtonComponent(final String[] choices, final boolean vertical) {
-        int rows = vertical ? choices.length : 1;
-        int cols = vertical ? 1 : choices.length;
+    RadioButtonComponent(final boolean vertical) {
+        m_vertical = vertical;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setChoices(final String[] choices) {
+        m_panel.removeAll();
+        m_buttons.clear();
+        int rows = m_vertical ? choices.length : 1;
+        int cols = m_vertical ? 1 : choices.length;
         GridLayout layout = new GridLayout(rows, cols);
         m_panel.setLayout(layout);
         ButtonGroup buttonGroup = new ButtonGroup();
@@ -85,6 +96,7 @@ public class RadioButtonComponent implements SingleSelectionComponent {
             buttonGroup.add(button);
             m_panel.add(button);
         }
+        m_panel.revalidate();
     }
 
     /**

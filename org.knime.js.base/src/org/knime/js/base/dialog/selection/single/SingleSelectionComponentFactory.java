@@ -89,19 +89,17 @@ public final class SingleSelectionComponentFactory {
     
     /**
      * @param component Name of the component to create
-     * @param choices Choices available in the component
      * @return SingleSelectionComponent corresponding to the given component name
      */
-    public static SingleSelectionComponent createSingleSelectionComponent(final String component,
-            final String[] choices) {
+    public static SingleSelectionComponent createSingleSelectionComponent(final String component) {
         if (RADIO_BUTTONS_HORIZONTAL.equals(component)) {
-            return new RadioButtonComponent(choices, false);
+            return new RadioButtonComponent(false);
         } else if (RADIO_BUTTONS_VERTICAL.equals(component)) {
-            return new RadioButtonComponent(choices, true);
+            return new RadioButtonComponent(true);
         } else if (LIST.equals(component)) {
-            return new ListComponent(choices);
+            return new ListComponent();
         } else if (DROPDOWN.equals(component)) {
-            return new DropdownComponent(choices);
+            return new DropdownComponent();
         } else {
             return null;
         }

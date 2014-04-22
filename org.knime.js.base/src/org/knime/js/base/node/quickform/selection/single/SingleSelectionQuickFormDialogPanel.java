@@ -69,7 +69,8 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
     public SingleSelectionQuickFormDialogPanel(final SingleSelectionQuickFormRepresentation representation) {
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
-                SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType(), choices);
+                SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
+        m_selectionComponent.setChoices(choices);
         addComponent(m_selectionComponent.getComponent());
     }
 

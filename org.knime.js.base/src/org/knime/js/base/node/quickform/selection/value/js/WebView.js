@@ -5,19 +5,20 @@ org_knime_js_base_node_quickform_selection_value = function() {
 	valueSelection.name = "Value selection";
 	var viewValue;
 	var viewRepresentation;
-	var selection;
 	var colselection;
+	var selector;
 
 	valueSelection.init = function(representation, value) {
+		var body = $('body');
 		viewRepresentation = representation;
 		viewValue = value;
 		if (representation.possibleValues == null) {
-			$('body').append("Error: No data available");
+			body.append("Error: No data available");
 		} else {
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
-				$('body').append(colselection);
-				$('body').append($('<br>'));
+				body.append(colselection);
+				body.append($('<br>'));
 				for ( var key in representation.possibleValues) {
 					var option = $('<option>' + key + '</option>');
 					option.appendTo(colselection);
@@ -27,21 +28,23 @@ org_knime_js_base_node_quickform_selection_value = function() {
 				}
 				colselection.change(selectionChanged);
 			}
-			selection = $('<select>');
-			$('body').append(selection);
-			for (var i in representation.possibleValues[representation.defaultColumn]) {
-				var value = representation.possibleValues[representation.defaultColumn][i];
-				var option = $('<option>' + value + '</option>');
-				option.appendTo(selection);
-				if (value == representation.defaultValue) {
-					option.prop('selected', true);
-				}
+			if (representation.type == 'Radio buttons (vertical)') {
+				selector = new radioButtonSingleSelection(true);
+			} else if (representation.type == 'Radio buttons (horizontal)') {
+				selector = new radioButtonSingleSelection(false);
+			} else if (representation.type == 'List') {
+				selector = new listSingleSelection();
+			} else {
+				selector = new dropdownSingleSelection();
 			}
+			body.append(selector.getComponent());
+			selector.setChoices(viewRepresentation.possibleValues[representation.defaultColumn]);
+			selector.setSelection(representation.defaultValue);
 		}
 	};
 
 	valueSelection.value = function() {
-		viewValue.value = selection.find(':selected').text();
+		viewValue.value = selector.getSelection();
 		if (!viewRepresentation.lockColumn) {
 			viewValue.column = colselection.find(':selected').text();
 		}
@@ -49,17 +52,11 @@ org_knime_js_base_node_quickform_selection_value = function() {
 	};
 
 	function selectionChanged() {
-		selection.empty();
 		var col = colselection.find(':selected').text();
-		var first = true;
-		for (var i in viewRepresentation.possibleValues[col]) {
-			var value = viewRepresentation.possibleValues[col][i];
-			var option = $('<option>' + value + '</option>');
-			option.appendTo(selection);
-			if (first) {
-				option.prop('selected', true);
-				first = false;
-			}
+		var possibleValues = viewRepresentation.possibleValues[col];
+		selector.setChoices(possibleValues);
+		if (possibleValues.length > 0) {
+			selector.setSelection(possibleValues[0]);
 		}
 	}
 

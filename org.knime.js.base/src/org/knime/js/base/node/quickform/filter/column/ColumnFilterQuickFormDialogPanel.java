@@ -50,13 +50,9 @@
  */
 package org.knime.js.base.node.quickform.filter.column;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
-
-import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.util.ColumnFilterPanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponent;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -65,19 +61,16 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
  */
 @SuppressWarnings("serial")
 public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<ColumnFilterQuickFormValue> {
-
-    private ColumnFilterPanel m_component;
     
-    private DataTableSpec m_spec;
+    private MultipleSelectionsComponent m_columns;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
-        m_component = new ColumnFilterPanel(true);
-        m_spec = representation.getSpec();
-        m_component.update(m_spec, false, new ArrayList<String>(0));
-        addComponent(m_component);
+        m_columns = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
+        m_columns.setChoices(representation.getPossibleColumns());
+        addComponent(m_columns.getComponent());
     }
 
     /**
@@ -85,8 +78,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void saveNodeValue(final ColumnFilterQuickFormValue value) throws InvalidSettingsException {
-        Set<String> includes = m_component.getIncludedColumnSet();
-        value.setColumns(includes.toArray(new String[includes.size()]));
+        value.setColumns(m_columns.getSelections());
     }
 
     /**
@@ -94,7 +86,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void loadNodeValue(final ColumnFilterQuickFormValue value) {
-        m_component.update(m_spec, false, Arrays.asList(value.getColumns()));
+        m_columns.setSelections(value.getColumns());
     }
 
 }

@@ -3,6 +3,7 @@ package org.knime.js.base.node.quickform.selection.column;
 import java.awt.GridBagConstraints;
 import java.util.List;
 
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
@@ -15,6 +16,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
@@ -28,9 +30,14 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private final ColumnSelectionPanel m_defaultField;
 
     private final ColumnSelectionPanel m_columnField;
+    
+    private final JComboBox<String> m_type;
+    
+    private String[] m_possibleColumns;
 
     /** Constructors, inits fields calls layout routines. */
     ColumnSelectionQuickFormNodeDialog() {
+        m_type = new JComboBox<String>(SingleSelectionComponentFactory.listSingleSelectionComponents());
         m_defaultField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
         m_columnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
         createAndAddTab();
@@ -41,6 +48,7 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Default column: ", m_defaultField, panelWithGBLayout, gbc);
         addPairToPanel("Column selection: ", m_columnField, panelWithGBLayout, gbc);
     }
@@ -51,12 +59,14 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        m_defaultField.update((DataTableSpec) specs[0], null);
-        m_columnField.update((DataTableSpec) specs[0], null);
+        DataTableSpec spec = (DataTableSpec) specs[0];
+        m_defaultField.update(spec, null);
+        m_columnField.update(spec, null);
+        m_possibleColumns = spec.getColumnNames();
         ColumnSelectionQuickFormRepresentation representation = new ColumnSelectionQuickFormRepresentation();
         representation.loadFromNodeSettingsInDialog(settings);
         loadSettingsFrom(representation);
-        String selectedDefault = representation.getDefaultValue();
+        String selectedDefault = representation.getDefaultColumn();
         if (selectedDefault.isEmpty()) {
             List<DataColumnSpec> cspecs = m_defaultField.getAvailableColumns();
             if (cspecs.size() > 0) {
@@ -74,6 +84,7 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_columnField.setSelectedColumn(selectedColumn);
+        m_type.setSelectedItem(representation.getType());
     }
 
     /**
@@ -83,7 +94,9 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         ColumnSelectionQuickFormRepresentation representation = new ColumnSelectionQuickFormRepresentation();
         saveSettingsTo(representation);
-        representation.setDefaultValue(m_defaultField.getSelectedColumn());
+        representation.setDefaultColumn(m_defaultField.getSelectedColumn());
+        representation.setType((String)m_type.getSelectedItem());
+        representation.setPossibleColumns(m_possibleColumns);
         representation.saveToNodeSettings(settings);
         ColumnSelectionQuickFormValue value = new ColumnSelectionQuickFormValue();
         value.setColumn(m_columnField.getSelectedColumn());

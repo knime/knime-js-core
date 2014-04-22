@@ -2,7 +2,6 @@ package org.knime.js.base.node.quickform.filter.value;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +14,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
+import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -52,6 +52,12 @@ public class ValueFilterQuickFormRepresentation extends
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
     
     private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
+
+    private static final String CFG_TYPE = "type";
+
+    private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
+
+    private String m_type = DEFAULT_TYPE;
     
     /**
      * {@inheritDoc}
@@ -68,6 +74,7 @@ public class ValueFilterQuickFormRepresentation extends
         for (String column : columns) {
             m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column)));
         }
+        setType(settings.getString(CFG_TYPE));
     }
     
     /**
@@ -85,6 +92,7 @@ public class ValueFilterQuickFormRepresentation extends
         for (String column : columns) {
             m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column, new String[0])));
         }
+        setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
     
     /**
@@ -103,6 +111,7 @@ public class ValueFilterQuickFormRepresentation extends
             List<String> values = m_possibleValues.get(key);
             settings.addStringArray(key, values.toArray(new String[values.size()]));
         }
+        settings.addString(CFG_TYPE, m_type);
     }
 
     /**
@@ -202,7 +211,7 @@ public class ValueFilterQuickFormRepresentation extends
             }
         }
         DataTableSpec filteredSpec = new DataTableSpec(specs.toArray(new DataColumnSpec[specs.size()]));
-        Map<String, List<String>> values = new HashMap<String, List<String>>();
+        Map<String, List<String>> values = new TreeMap<String, List<String>>();
         for (DataColumnSpec colSpec : filteredSpec) {
             final Set<DataCell> vals = colSpec.getDomain().getValues();
             if (vals != null) {
@@ -214,6 +223,22 @@ public class ValueFilterQuickFormRepresentation extends
             }
         }
         m_possibleValues = values;
+    }
+
+    /**
+     * @return the type
+     */
+    @JsonProperty("type")
+    public String getType() {
+        return m_type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    @JsonProperty("type")
+    public void setType(final String type) {
+        m_type = type;
     }
 
 }

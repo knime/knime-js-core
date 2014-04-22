@@ -57,45 +57,42 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponent;
+import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-@SuppressWarnings({"serial", "rawtypes", "unchecked" })
+@SuppressWarnings("serial")
 public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<ValueSelectionQuickFormValue> {
     
     private JComboBox<String> m_column;
-
-    private JComboBox<String> m_value;
     
-    private DefaultComboBoxModel m_valuesModel;
+    private SingleSelectionComponent m_value;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ValueSelectionQuickFormDialogPanel(final ValueSelectionQuickFormRepresentation representation) {
+        m_value = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column = new JComboBox<String>(representation.getPossibleColumns());
         m_column.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                m_valuesModel.removeAllElements();
                 List<String> possibleValues = representation.getPossibleValues().get(m_column.getSelectedItem());
                 if (possibleValues != null) {
-                    for (String value : representation.getPossibleValues().get(m_column.getSelectedItem())) {
-                        m_valuesModel.addElement(value);
-                    }
+                    m_value.setChoices(possibleValues.toArray(new String[possibleValues.size()]));
+                } else {
+                    m_value.setChoices(new String[0]);
                 }
             }
         });
-        m_valuesModel = new DefaultComboBoxModel<String>();
-        m_value = new JComboBox(m_valuesModel);
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -107,7 +104,7 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
         gbc.gridy = 0;
         panel.add(m_column, gbc);
         gbc.gridy++;
-        panel.add(m_value, gbc);
+        panel.add(m_value.getComponent(), gbc);
         addComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
     }
@@ -118,7 +115,7 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
     @Override
     public void saveNodeValue(final ValueSelectionQuickFormValue value) throws InvalidSettingsException {
         value.setColumn((String)m_column.getSelectedItem());
-        value.setValue(m_value.getItemAt(m_value.getSelectedIndex()));
+        value.setValue(m_value.getSelection());
     }
 
     /**
@@ -127,7 +124,7 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
     @Override
     public void loadNodeValue(final ValueSelectionQuickFormValue value) {
         m_column.setSelectedItem(value.getColumn());
-        m_value.setSelectedItem(value.getValue());
+        m_value.setSelection(value.getValue());
     }
 
 }

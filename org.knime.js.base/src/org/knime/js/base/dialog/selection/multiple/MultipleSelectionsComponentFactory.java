@@ -89,19 +89,17 @@ public final class MultipleSelectionsComponentFactory {
     
     /**
      * @param component Name of the component to create
-     * @param choices Choices available in the component
      * @return MultipleSelectionsComponent corresponding to the given component name
      */
-    public static MultipleSelectionsComponent createMultipleSelectionsComponent(final String component,
-            final String[] choices) {
+    public static MultipleSelectionsComponent createMultipleSelectionsComponent(final String component) {
         if (CHECK_BOXES_HORIZONTAL.equals(component)) {
-            return new CheckBoxesComponent(choices, false);
+            return new CheckBoxesComponent(false);
         } else if (CHECK_BOXES_VERTICAL.equals(component)) {
-            return new CheckBoxesComponent(choices, true);
+            return new CheckBoxesComponent(true);
         } else if (LIST.equals(component)) {
-            return new ListComponent(choices);
+            return new ListComponent();
         } else if (TWINLIST.equals(component)) {
-            return new TwinlistComponent(choices);
+            return new TwinlistComponent();
         } else {
             return null;
         }
