@@ -26,8 +26,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
         VAL extends DialogNodeValue & WebViewContent>
         extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
 
-    private REP m_representation;
-
+    private final REP m_representation;
     private VAL m_value;
     
     /**

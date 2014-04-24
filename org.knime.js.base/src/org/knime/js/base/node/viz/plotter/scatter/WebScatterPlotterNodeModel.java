@@ -81,7 +81,6 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
     WizardNode<WebScatterPlotterViewRepresentation, WebScatterPlotterViewValue> {
 
     private JSONDataTable m_input;
-    
     private WebScatterPlotterViewValue m_viewValue = createEmptyViewValue();
     
     /**
@@ -95,7 +94,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
         super.configure(inSpecs);
         return inSpecs;
     }
@@ -111,8 +110,9 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         DataTable filter = new FilterColumnTable(inData[0], false, getExcludedColumns());
         int maxRows = getEndIndex();
         m_input = new JSONDataTable(filter, 1, maxRows, exec);
-        Object[][] extensions = new Object[maxRows][1];
-        for (int i = 0; i < maxRows; i++) {
+        int numRows = m_input.getSpec().getNumRows();
+        Object[][] extensions = new Object[numRows][1];
+        for (int i = 0; i < numRows; i++) {
             extensions[i][0] = false;
         }
         m_input.setExtensions(extensions);
@@ -136,7 +136,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -144,7 +144,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    protected void loadValidatedSettingsFrom(NodeSettingsRO settings) throws InvalidSettingsException {
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
     
@@ -152,8 +152,8 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    protected void saveSettingsTo(NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+     // TODO Auto-generated method stub
     }
 
     /**
@@ -171,7 +171,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(File nodeInternDir, ExecutionMonitor exec) throws IOException,
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
         // TODO Auto-generated method stub
     }
@@ -236,7 +236,5 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
 
 }

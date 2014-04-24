@@ -48,13 +48,21 @@ kt = function() {
 		return dataTable.spec.colTypes;
 	};
 	
+	kt.getNumColumns = function() {
+		return dataTable.spec.numColumns;
+	};
+	
 	kt.getNumRows = function() {
 		return dataTable.spec.numRows;
 	};
 	
 	kt.getPossibleValues = function() {
 		return dataTable.spec.possibleValues;
-	}
+	};
+	
+	kt.getRowKeys = function() {
+		return dataTable.rowKeys;
+	};
 	
 	kt.registerView = function(view) {
 		for (var i = 0; i < view.extensionNames.length; i++) {

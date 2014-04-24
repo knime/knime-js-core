@@ -88,8 +88,9 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         DataTable filter = new FilterColumnTable(inData[0], false, getExcludedColumns());
         int maxRows = getEndIndex();
         m_input = new JSONDataTable(filter, 1, maxRows, exec);
-        Object[][] extensions = new Object[maxRows][1];
-        for (int i = 0; i < maxRows; i++) {
+        int numRows = m_input.getSpec().getNumRows();
+        Object[][] extensions = new Object[numRows][1];
+        for (int i = 0; i < numRows; i++) {
             extensions[i][0] = false;
         }
         m_input.setExtensions(extensions);
@@ -204,7 +205,4 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         // TODO Auto-generated method stub
         return null;
     }
-    
-    
-
 }

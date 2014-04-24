@@ -79,7 +79,7 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
 
     private JSONDataTable m_input;
 
-    private RowSelectorRepresentation m_representation = createEmptyViewRepresentation();
+    private final RowSelectorRepresentation m_representation = createEmptyViewRepresentation();
 
     private RowSelectorValue m_value = createEmptyViewValue();
 
