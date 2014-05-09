@@ -6,7 +6,7 @@
 		<intro>
 			<p>Outputs a molecule string in the specified format. The molecule can
 				also be sketched or its string representation be edited in a quick
-				form (web portal).</p>
+				form (KNIME WebPortal).</p>
 		</intro>
 		<option name="Label">A descriptive label that will be shown in, for instance the web
 			portal.</option>
