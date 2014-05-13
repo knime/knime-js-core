@@ -40,66 +40,40 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
- *
- * Created on 09.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * ------------------------------------------------------------------------
+ * 
+ * History
+ *   05.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.plotter.scatter;
+package org.knime.js.base.node.ui;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
+import org.fife.rsyntaxarea.internal.RSyntaxAreaActivator;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 /**
- *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * 
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class WebScatterPlotterNodeFactory extends NodeFactory<WebScatterPlotterNodeModel> implements
-    WizardNodeFactoryExtension<WebScatterPlotterNodeModel, WebScatterPlotterViewRepresentation, WebScatterPlotterViewValue> {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public WebScatterPlotterNodeModel createNodeModel() {
-        return new WebScatterPlotterNodeModel();
+@SuppressWarnings("serial")
+public class JSSnippetTextArea extends RSyntaxTextArea {
+    
+    static {
+        RSyntaxAreaActivator.ensureWorkaroundBug3692Applied();
     }
-
+    
     /**
-     * {@inheritDoc}
+     * 
      */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<WebScatterPlotterNodeModel> createNodeView(final int viewIndex,
-        final WebScatterPlotterNodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new WebScatterPlotterNodeDialog();
+    public JSSnippetTextArea() {
+        super(20,60);
+        
+        setCodeFoldingEnabled(true);
+        setSyntaxEditingStyle(SYNTAX_STYLE_JAVASCRIPT);
+        setAntiAliasingEnabled(true);
+        
     }
 
 }

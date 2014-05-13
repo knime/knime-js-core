@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by
+ *  Copyright (C) 2003 - 2013
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -46,78 +46,72 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   Feb 3, 2014 ("Patrick Winter"): created
+ *   30.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.plotter.scatter;
+package org.knime.js.base.node.viz.generic;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class WebScatterPlotterViewValue extends JSONViewContent {
+public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel> implements
+    WizardNodeFactoryExtension<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue> {
     
-    private static final String CFG_SELECTIONS = "selections";
-    
-    private long[] m_selections = new long[0];
-    
+    private final GenericJSViewConfig m_config = new GenericJSViewConfig();
     /**
-     * Default constructor for bean initialization.
+     * {@inheritDoc}
      */
-    public WebScatterPlotterViewValue() {
-     // do nothing
-    }
-    
-    /**
-     * @param selections the selections
-     */
-    public WebScatterPlotterViewValue(final long[] selections) {
-        setSelections(selections);
-    }
-    
-    /**
-     * @return the selections
-     */
-    @JsonProperty("selections")
-    public long[] getSelections() {
-        return m_selections;
-    }
-    
-    /**
-     * @param selections the selections to set
-     */
-    @JsonProperty("selections")
-    public void setSelections(final long[] selections) {
-        m_selections = selections;
+    @Override
+    public GenericJSViewNodeModel createNodeModel() {
+        return new GenericJSViewNodeModel(m_config);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addLongArray(CFG_SELECTIONS, m_selections);
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_selections = settings.getLongArray(CFG_SELECTIONS);
+    public NodeView<GenericJSViewNodeModel> createNodeView(final int viewIndex, final GenericJSViewNodeModel nodeModel) {
+        return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new GenericJSViewNodeDialogPane(m_config);
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getInteractiveViewName() {
+        String name = m_config.getViewName();
+        if (name == null || name.isEmpty()) {
+            return super.getInteractiveViewName();
+        }
+        return name;
+    }
 }

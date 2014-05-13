@@ -47,7 +47,7 @@
  *
  * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.scatter;
+package org.knime.js.base.node.viz.plotter.scatter_own;
 
 import java.io.File;
 import java.io.IOException;
@@ -181,7 +181,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      */
     @Override
     public String getJavascriptObjectID() {
-        return "knime_scatter_plotter";
+        return "knime_scatter_plotter_own";
     }
 
     /**

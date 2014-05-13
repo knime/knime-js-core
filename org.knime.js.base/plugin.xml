@@ -80,8 +80,21 @@
       <node
             after="org.knime.base.node.viz.plotter.scatter.ScatterPlotterNodeFactory"
             category-path="/view"
-            factory-class="org.knime.js.base.node.viz.plotter.scatter.WebScatterPlotterNodeFactory"
-            id="org.knime.js.base.node.viz.plotter.scatter.WebScatterPlotterNodeFactory">
+            factory-class="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory">
+      </node>
+      <node
+            after="org.knime.base.node.viz.table.TableNodeFactory"
+            category-path="/view"
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
+            id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
+      </node>
+      <node
+            category-path="/view"
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
+            id="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory">
       </node>
    </extension>
    <extension
@@ -118,7 +131,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.string.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/string/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/string/"
                relativePathTarget="org/knime/js/base/node/quickform/input/string/">
          </webResource>
          <importResource
@@ -129,7 +142,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.viz.plotter.line.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/viz/plotter/line/web/"
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/line/"
                relativePathTarget="org/knime/js/base/node/viz/plotter/line/">
          </webResource>
          <importResource
@@ -144,7 +157,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.rowselector.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/rowselector/web/"
+               relativePathSource="js-src/org/knime/js/base/node/rowselector/"
                relativePathTarget="org/knime/js/base/node/rowselector/">
          </webResource>
          <importResource
@@ -157,9 +170,20 @@
          </importResource>
       </webResourceBundle>
       <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.viz.table.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/table/"
+               relativePathTarget="org/knime/js/base/node/viz/table/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/table/web-template.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.molecule.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/molecule/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/molecule/"
                relativePathTarget="org/knime/js/base/node/quickform/input/molecule/">
          </webResource>
          <importResource
@@ -170,7 +194,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.integer.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/integer/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/integer/"
                relativePathTarget="org/knime/js/base/node/quickform/input/integer/">
          </webResource>
          <importResource
@@ -181,7 +205,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.dbl.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/dbl/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/dbl/"
                relativePathTarget="org/knime/js/base/node/quickform/input/dbl/">
          </webResource>
          <importResource
@@ -192,7 +216,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.bool.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/bool/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/bool/"
                relativePathTarget="org/knime/js/base/node/quickform/input/bool/">
          </webResource>
          <importResource
@@ -203,7 +227,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.date.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/date/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/date/"
                relativePathTarget="org/knime/js/base/node/quickform/input/date/">
          </webResource>
          <importResource
@@ -214,7 +238,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.input.listbox.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/input/listbox/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/listbox/"
                relativePathTarget="org/knime/js/base/node/quickform/input/listbox/">
          </webResource>
          <importResource
@@ -223,24 +247,24 @@
          </importResource>
       </webResourceBundle>
       <webResourceBundle
-            webResourceBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle">
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.scatter_own.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/viz/plotter/scatter/web/"
-               relativePathTarget="org/knime/js/base/node/viz/plotter/scatter/">
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/scatter_own/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/scatter_own/">
          </webResource>
          <importResource
-               relativePath="org/knime/js/base/node/viz/plotter/scatter/web-template.js"
+               relativePath="org/knime/js/base/node/viz/plotter/scatter_own/web-template.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="org/knime/js/base/node/viz/plotter/scatter/styles.css"
+               relativePath="org/knime/js/base/node/viz/plotter/scatter_own/styles.css"
                type="CSS">
          </importResource>
       </webResourceBundle>
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.selection.single.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/selection/single/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/selection/single/"
                relativePathTarget="org/knime/js/base/node/quickform/selection/single/">
          </webResource>
          <importResource
@@ -251,7 +275,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.selection.multiple.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/selection/multiple/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/selection/multiple/"
                relativePathTarget="org/knime/js/base/node/quickform/selection/multiple/">
          </webResource>
          <importResource
@@ -262,7 +286,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.selection.value.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/selection/value/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/selection/value/"
                relativePathTarget="org/knime/js/base/node/quickform/selection/value/">
          </webResource>
          <importResource
@@ -273,7 +297,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.filter.value.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/filter/value/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/filter/value/"
                relativePathTarget="org/knime/js/base/node/quickform/filter/value/">
          </webResource>
          <importResource
@@ -284,7 +308,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.selection.column.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/selection/column/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/selection/column/"
                relativePathTarget="org/knime/js/base/node/quickform/selection/column/">
          </webResource>
          <importResource
@@ -295,7 +319,7 @@
       <webResourceBundle
             webResourceBundleID="org.knime.js.base.node.quickform.filter.column.bundle">
          <webResource
-               relativePathSource="src/org/knime/js/base/node/quickform/filter/column/js/"
+               relativePathSource="js-src/org/knime/js/base/node/quickform/filter/column/"
                relativePathTarget="org/knime/js/base/node/quickform/filter/column/">
          </webResource>
          <importResource
@@ -341,6 +365,32 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="KnimeTableView_1.0.0">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/util/table/view/"
+               relativePathTarget="org/knime/js/base/util/table/view/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/util/table/view/knime_table_view_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="org/knime/js/base/util/table/view/styles.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="GenericJSView">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/generic/"
+               relativePathTarget="org/knime/js/base/node/viz/generic/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/generic/template.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -367,6 +417,23 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.table.bundle"
+            init-method-name="init"
+            jsObjectID="knime_table_viewer"
+            namespace="knime_table_viewer"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTable_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTableView_1.0.0">
          </webDependency>
       </javascriptComponent>
       <javascriptComponent
@@ -450,9 +517,9 @@
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"
-            implementationBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.scatter_own.bundle"
             init-method-name="init"
-            jsObjectID="knime_scatter_plotter"
+            jsObjectID="knime_scatter_plotter_own"
             namespace="knime_scatter_plotter"
             validate-method-name="validate">
          <webDependency
@@ -547,6 +614,20 @@
          </webDependency>
          <webDependency
                webResourceBundleID="MultipleSelections">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="GenericJSView"
+            init-method-name="init"
+            jsObjectID="knime_generic_view"
+            namespace="knime_generic_view"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="RequireJS_2.1.8">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
       </javascriptComponent>
    </extension>

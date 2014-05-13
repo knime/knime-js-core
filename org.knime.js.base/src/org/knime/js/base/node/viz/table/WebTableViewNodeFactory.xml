@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knimeNode icon="./table.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+    <name>Table View (web enabled)</name>
+    <shortDescription>Displays data in a table view.</shortDescription>
+    <fullDescription>
+        <intro> Displays data in a table view. If the number of rows is 
+        unknown, the view counts the number of rows when opened. Furthermore, 
+        rows can be selected and hilited.</intro>
+    </fullDescription>
+    <interactiveView name="Table View">
+        Displays the data in a table view.
+    </interactiveView>
+    <ports>
+        <inPort index="0" name="Input to display">
+            Input table to display.
+        </inPort>
+    </ports>
+</knimeNode>

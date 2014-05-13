@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
+ *  Copyright (C) by
  *  University of Konstanz, Germany and
  *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
@@ -40,43 +40,51 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
- *
- * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * ------------------------------------------------------------------------
+ * 
+ * History
+ *   14.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.plotter.scatter;
+package org.knime.js.base.util.table;
 
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONDataTable;
 import org.knime.core.node.web.JSONViewContent;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
- *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * 
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class WebScatterPlotterViewRepresentation extends JSONViewContent {
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+public class WebTableViewRepresentation extends JSONViewContent {
 
     private JSONDataTable m_table;
-
-    /** Default constructor for bean initialization. */
-    public WebScatterPlotterViewRepresentation() {
-        // do nothing
-    }
-
+    
+    /** Serialization constructor. Don't use. */
+    public WebTableViewRepresentation() { }
+    
     /**
-     * @param table The table used to construct the view.
+     * @param table
      */
-    public WebScatterPlotterViewRepresentation(final JSONDataTable table) {
+    public WebTableViewRepresentation(final JSONDataTable table) {
         setTable(table);
     }
-
+    
     /**
      * @return The JSON data table.
      */
+    @JsonProperty("table")
     public JSONDataTable getTable() {
         return m_table;
     }
@@ -84,26 +92,27 @@ public class WebScatterPlotterViewRepresentation extends JSONViewContent {
     /**
      * @param table The table to set.
      */
+    @JsonProperty("table")
     public void setTable(final JSONDataTable table) {
         m_table = table;
     }
-
+    
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+        // TODO save table?
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) {
-        // TODO Auto-generated method stub
-
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        // TODO load table?
     }
 
 }
