@@ -25,16 +25,16 @@ kt = function() {
 		dataTable.spec = dataTableSpec;
 	}
 	
-	kt.getData = function() {
-		return dataTable.data;
-	};
+	kt.getRows = function() {
+		return dataTable.rows;
+	}
 	
 	kt.getColumn = function(columnID) {
 		if (columnID < dataTable.spec.numColumns) {
 			var col = [];
 			
 			for (var i = 0; i < kt.getNumRows(); i++) {
-				col.push(dataTable.data[i][columnID]);
+				col.push(dataTable.rows[i].data[columnID]);
 			}
 			return col;
 		}
@@ -60,9 +60,9 @@ kt = function() {
 		return dataTable.spec.possibleValues;
 	};
 	
-	kt.getRowKeys = function() {
-		return dataTable.rowKeys;
-	};
+	kt.getRowColors = function() {
+		return dataTable.spec.rowColorValues;
+	}
 	
 	kt.registerView = function(view) {
 		for (var i = 0; i < view.extensionNames.length; i++) {
