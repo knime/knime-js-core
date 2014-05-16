@@ -53,17 +53,17 @@ package org.knime.js.base.node.quickform;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeRepresentation;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
+import org.knime.core.quickform.QuickFormRepresentation;
 
 /**
  * 
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
-public abstract class QuickFormRepresentation<VAL extends DialogNodeValue>
-        extends JSONViewContent implements DialogNodeRepresentation<VAL> {
+public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
+        extends JSONViewContent implements QuickFormRepresentation<VAL> {
 
     private static final String CFG_LABEL = "label";
 
@@ -80,6 +80,7 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue>
     /**
      * @return the label
      */
+    @Override
     public String getLabel() {
         return m_label;
     }
@@ -94,6 +95,7 @@ public abstract class QuickFormRepresentation<VAL extends DialogNodeValue>
     /**
      * @return the description
      */
+    @Override
     public String getDescription() {
         return m_description;
     }

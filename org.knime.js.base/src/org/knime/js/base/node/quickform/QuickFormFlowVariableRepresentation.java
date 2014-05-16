@@ -62,7 +62,7 @@ import org.knime.core.node.workflow.FlowVariable;
  * @param <VAL> The value class handled by this representation
  */
 public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNodeValue> extends
-        QuickFormRepresentation<VAL> {
+        QuickFormRepresentationImpl<VAL> {
 
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
