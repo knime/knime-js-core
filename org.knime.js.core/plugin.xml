@@ -6,48 +6,6 @@
    <extension
          point="org.knime.js.core.webResources">
       <webResourceBundle
-            debug="true"
-            name="D3"
-            version="3.2.8"
-            webResourceBundleID="D3_3.2.8_Debug">
-         <webResource
-               relativePathSource="js-lib/d3/d3.v3_2_8.js"
-               relativePathTarget="js-lib/d3/d3.v3_2_8.js">
-         </webResource>
-         <importResource
-               relativePath="js-lib/d3/d3.v3_2_8.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="D3"
-            version="3.2.8"
-            webResourceBundleID="D3_3.2.8">
-         <webResource
-               relativePathSource="js-lib/d3/d3.v3_2_8.min.js"
-               relativePathTarget="js-lib/d3/d3.v3_2_8.min.js">
-         </webResource>
-         <importResource
-               relativePath="js-lib/d3/d3.v3_2_8.min.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="true"
-            name="Knime Table"
-            version="1.0.0"
-            webResourceBundleID="KnimeTable_1.0.0">
-         <webResource
-               relativePathSource="js-lib/knime/knime_table_1_0_0.js"
-               relativePathTarget="js-lib/knime/knime_table_1_0_0.js">
-         </webResource>
-         <importResource
-               relativePath="js-lib/knime/knime_table_1_0_0.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
             debug="false"
             name="RequireJS"
             version="2.1.8"
@@ -90,25 +48,88 @@
          </importResource>
       </webResourceBundle>
       <webResourceBundle
-            debug="false"
+            debug="true"
             name="jQuery UI"
             version="1.10.4"
-            webResourceBundleID="jQueryUi_1.10.4">
+            webResourceBundleID="jQueryUi_1.10.4_Debug">
          <webResource
-               relativePathSource="js-lib/jQueryUI/"
-               relativePathTarget="js-lib/jQueryUI/">
+               relativePathSource="js-lib/jQueryUI/debug/"
+               relativePathTarget="js-lib/jQueryUI/debug/">
          </webResource>
          <importResource
-               relativePath="js-lib/jQueryUI/ui/jquery-ui.min.js"
+               relativePath="js-lib/jQueryUI/debug/ui/jquery-ui.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/jQueryUI/themes/base/jquery-ui.min.css"
+               relativePath="js-lib/jQueryUI/debug/themes/base/jquery-ui.min.css"
                type="CSS">
          </importResource>
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="jQuery UI"
+            version="1.10.4"
+            webResourceBundleID="jQueryUi_1.10.4">
+         <webResource
+               relativePathSource="js-lib/jQueryUI/min/"
+               relativePathTarget="js-lib/jQueryUI/min/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/min/ui/jquery-ui.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/min/themes/base/jquery-ui.min.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="D3"
+            version="3.2.8"
+            webResourceBundleID="D3_3.2.8_Debug">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_2_8.js"
+               relativePathTarget="js-lib/d3/d3.v3_2_8.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_2_8.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="D3"
+            version="3.2.8"
+            webResourceBundleID="D3_3.2.8">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_2_8.min.js"
+               relativePathTarget="js-lib/d3/d3.v3_2_8.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_2_8.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Knime Table"
+            version="1.0.0"
+            webResourceBundleID="KnimeTable_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/knime_table_1_0_0.js"
+               relativePathTarget="js-lib/knime/knime_table_1_0_0.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/knime_table_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
