@@ -55,7 +55,7 @@
          <attribute name="jsObjectID" type="string" use="required">
             <annotation>
                <documentation>
-                  Object ID that is used in the Javascript implementation.
+                  Unique ID to identify the JavaScript implementation of a node.
 Good practice is to use the Java package name of the node using the resource, like org_knime_js_base_node_quickform_input_string
                </documentation>
             </annotation>
@@ -63,35 +63,35 @@ Good practice is to use the Java package name of the node using the resource, li
          <attribute name="namespace" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The namespace that is to prefixed for all method calls.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="init-method-name" type="string" use="default" value="init">
             <annotation>
                <documentation>
-                  
+                  The name of the init method.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="validate-method-name" type="string" use="default" value="validate">
             <annotation>
                <documentation>
-                  
+                  The name of the validate method.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="getComponentValue-method-name" type="string" use="default" value="getComponentValue">
             <annotation>
                <documentation>
-                  
+                  The name of the get component value method.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="implementationBundleID" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The ID of the webResourceBundle containing the implementation for this JavaScript component.
                </documentation>
                <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/@webResourceBundleID"/>
