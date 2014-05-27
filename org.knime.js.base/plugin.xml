@@ -96,6 +96,13 @@
             factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
             id="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory">
       </node>
+      <node
+            after="org.knime.base.node.viz.plotter.scatter.ScatterPlotterNodeFactory"
+            category-path="/view"
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -391,6 +398,17 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/scatter/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/scatter/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/plotter/scatter/knime-scatter-plot.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -628,6 +646,17 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
+         </webDependency>
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle"
+            init-method-name="init"
+            jsObjectID="org_knime_js_base_node_viz_plotter_scatter"
+            namespace="knime_scatter_plot"
+            validate-method-name="validate">
+         <webDependency
+               webResourceBundleID="noname_1.0.0">
          </webDependency>
       </javascriptComponent>
    </extension>

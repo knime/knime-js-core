@@ -52,6 +52,7 @@
          <sequence>
             <element ref="webResource" minOccurs="1" maxOccurs="unbounded"/>
             <element ref="importResource" minOccurs="0" maxOccurs="unbounded"/>
+            <element ref="webDependency" minOccurs="0" maxOccurs="unbounded"/>
          </sequence>
          <attribute name="webResourceBundleID" type="string" use="required">
             <annotation>
@@ -111,6 +112,21 @@
                   </enumeration>
                </restriction>
             </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="webDependency">
+      <complexType>
+         <attribute name="webResourceBundleID" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/@webResourceBundleID"/>
+               </appInfo>
+            </annotation>
          </attribute>
       </complexType>
    </element>

@@ -59,9 +59,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class JSONKeyedValues3DDataset {
 
     private String[] m_columnKeys;
-
     private String[] m_rowKeys;
-
     private KeyedValues3DSeries[] m_series;
 
     /** Serialization constructor. Don't use. */
@@ -126,7 +124,7 @@ public class JSONKeyedValues3DDataset {
      */
     @JsonAutoDetect
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    static class KeyedValues3DSeries {
+    public static class KeyedValues3DSeries {
 
         private String m_seriesKey;
 

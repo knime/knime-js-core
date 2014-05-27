@@ -47,7 +47,11 @@
  */
 package org.knime.js.core.datasets;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -58,12 +62,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONKeyedValuesRow {
 
-    /** Serialization constructor. Don't use. */
-    public JSONKeyedValuesRow() { }
-
     private String m_rowKey;
 
     private double[] m_values;
+    private Map<String, String> m_properties;
+
+    /** Serialization constructor. Don't use. */
+    public JSONKeyedValuesRow() { }
+
+    /**
+     * @param rowkey
+     * @param values
+     */
+    public JSONKeyedValuesRow(final String rowkey, final double[] values) {
+        m_rowKey = rowkey;
+        m_values = values;
+        m_properties = new HashMap<String, String>();
+    }
 
     /**
      * @return the rowKey
@@ -93,4 +108,44 @@ public class JSONKeyedValuesRow {
         m_values = values;
     }
 
+    /**
+     * @return the properties
+     */
+    public Map<String, String> getProperties() {
+        return m_properties;
+    }
+
+    /**
+     * @param properties the properties to set
+     */
+    public void setProperties(final Map<String, String> properties) {
+        m_properties = properties;
+    }
+
+    /**
+     * @param colorValue the value to set
+     * @throws IllegalArgumentException if parameter length is not equal to values array length
+     */
+    @JsonIgnore
+    public void setColor(final String colorValue) throws IllegalArgumentException {
+        m_properties.put("color", colorValue);
+    }
+
+    /**
+     * @param shapeValue the value to set
+     * @throws IllegalArgumentException if parameter length is not equal to values array length
+     */
+    @JsonIgnore
+    public void setShapes(final String shapeValue) throws IllegalArgumentException {
+        m_properties.put("shape", shapeValue);
+    }
+
+    /**
+     * @param sizeValue the value to set
+     * @throws IllegalArgumentException if parameter length is not equal to values array length
+     */
+    @JsonIgnore
+    public void setSizes(final String sizeValue) throws IllegalArgumentException {
+        m_properties.put("size", sizeValue);
+    }
 }

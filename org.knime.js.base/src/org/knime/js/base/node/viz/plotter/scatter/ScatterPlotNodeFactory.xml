@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knimeNode icon="../../js.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+	<name>Scatter Plot</name>
+	
+	<shortDescription>
+	    Nice view
+	</shortDescription>
+	
+	<fullDescription>
+		<intro>		
+    	    <p>Creates a nice view.
+	       	</p>
+		</intro>
+		
+	</fullDescription>
+	
+	<interactiveView name="Scatter Plot">
+		The generated scatter plot.
+	</interactiveView>
+	<ports>
+		<inPort index="0" name="Display data">Data table with data to display</inPort>
+	</ports>	
+</knimeNode>

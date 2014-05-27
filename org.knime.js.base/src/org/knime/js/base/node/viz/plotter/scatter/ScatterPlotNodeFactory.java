@@ -1,6 +1,9 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *
+ *  Copyright (C) 2003 - 2013
+ *  University of Konstanz, Germany and
+ *  KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -37,75 +40,68 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
- * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   13.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.plotter.scatter_own;
+package org.knime.js.base.node.viz.plotter.scatter;
 
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONDataTable;
-import org.knime.core.node.web.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class WebScatterPlotterViewRepresentation extends JSONViewContent {
+public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> implements
+    WizardNodeFactoryExtension<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue> {
 
-    private JSONDataTable m_table;
-
-    /** Default constructor for bean initialization. */
-    public WebScatterPlotterViewRepresentation() {
-        // do nothing
-    }
+    private final ScatterPlotViewConfig m_config = new ScatterPlotViewConfig();
 
     /**
-     * @param table The table used to construct the view.
+     * {@inheritDoc}
      */
-    public WebScatterPlotterViewRepresentation(final JSONDataTable table) {
-        setTable(table);
-    }
-
-    /**
-     * @return The JSON data table.
-     */
-    public JSONDataTable getTable() {
-        return m_table;
-    }
-
-    /**
-     * @param table The table to set.
-     */
-    public void setTable(final JSONDataTable table) {
-        m_table = table;
+    @Override
+    public ScatterPlotNodeModel createNodeModel() {
+        return new ScatterPlotNodeModel(m_config);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) {
-        // TODO Auto-generated method stub
+    public NodeView<ScatterPlotNodeModel> createNodeView(final int viewIndex, final ScatterPlotNodeModel nodeModel) {
+        return null;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new ScatterPlotNodeDialogPane(m_config);
     }
 
 }

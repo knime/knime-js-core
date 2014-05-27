@@ -37,11 +37,11 @@
  *  License, the License does not apply to Nodes, you are not required to
  *  license Nodes under the License, and you are granted a license to
  *  prepare and propagate Nodes, in each case even if such Nodes are
- *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  propagated with or for interoperation with KNIME. The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -74,14 +74,13 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class GenericJSViewNodeModel extends NodeModel implements
     WizardNode<GenericJSViewRepresentation, GenericJSViewValue>, FlowVariableProvider {
 
-    DataTableSpec m_inSpec;
-
+    private final Object m_lock = new Object();
     private final GenericJSViewConfig m_config;
 
     private GenericJSViewRepresentation m_representation;
@@ -100,7 +99,7 @@ public class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        m_inSpec = inSpecs[0];
+        //nothing to do?
         return null;
     }
 
@@ -110,13 +109,16 @@ public class GenericJSViewNodeModel extends NodeModel implements
     @Override
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
         throws Exception {
-        //create JSON table
-        JSONDataTable table = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
 
-        m_representation.setJsCode(parseTextAndReplaceVariables());
-        m_representation.setCssCode(m_config.getCssCode());
-        m_representation.setTable(table);
-        setPathsFromLibNames(m_config.getDependencies());
+        synchronized (m_lock) {
+            //create JSON table
+            JSONDataTable table = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
+
+            m_representation.setJsCode(parseTextAndReplaceVariables());
+            m_representation.setCssCode(m_config.getCssCode());
+            m_representation.setTable(table);
+            setPathsFromLibNames(m_config.getDependencies());
+        }
         return null;
     }
 
@@ -142,6 +144,7 @@ public class GenericJSViewNodeModel extends NodeModel implements
 
     private static final String ATTR_TYPE = "type";
 
+    // change to display only a select number of dependencies
     private void setPathsFromLibNames(final String[] libNames) {
         ArrayList<String> jsPaths = new ArrayList<String>();
         ArrayList<String> cssPaths = new ArrayList<String>();
@@ -201,7 +204,9 @@ public class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     public GenericJSViewRepresentation getViewRepresentation() {
-        return m_representation;
+        synchronized (m_lock) {
+            return m_representation;
+        }
     }
 
     /**
@@ -296,7 +301,9 @@ public class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     protected void reset() {
-        m_representation = createEmptyViewRepresentation();
+        synchronized (m_lock) {
+            m_representation = createEmptyViewRepresentation();
+        }
     }
 
 }

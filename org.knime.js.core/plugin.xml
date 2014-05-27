@@ -4,7 +4,6 @@
    <extension-point id="webResources" name="Web Resources" schema="schema/webResources.exsd"/>
    <extension-point id="javascriptComponents" name="Javascript Components" schema="schema/javascriptComponents.exsd"/>
    <extension
-         id="org.knime.js.code.js-lib"
          point="org.knime.js.core.webResources">
       <webResourceBundle
             webResourceBundleID="D3_3.2.8_Debug">
@@ -105,6 +104,28 @@
                relativePath="js-lib/knime/knime_twinlist_1_0_0.js"
                type="JAVASCRIPT">
          </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            webResourceBundleID="noname_1.0.0">
+         <webResource
+               relativePathSource="js-lib/noname/"
+               relativePathTarget="js-lib/noname/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/noname/noname.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noname/opentip-native.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noname/opentip.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.2.8">
+         </webDependency>
       </webResourceBundle>
    </extension>
 
