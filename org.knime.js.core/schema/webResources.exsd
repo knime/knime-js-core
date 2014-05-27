@@ -48,6 +48,11 @@
    </element>
 
    <element name="webResourceBundle">
+      <annotation>
+         <documentation>
+            A webResourceBundle describes a bundle of different resources (JavaScript, CSS and other files) to be made available to a web enabled node.
+         </documentation>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="webResource" minOccurs="1" maxOccurs="unbounded"/>
@@ -57,35 +62,36 @@
          <attribute name="webResourceBundleID" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The unique id of the bundle. Good practice is to incorporate the name, version and debug attributes.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The human readable name of the bundle to be used for display.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="version" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The version number of the bundle.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="debug" type="boolean" use="required">
             <annotation>
                <documentation>
-                  
+                  The debug flag describes the nature of this bundle. Usually production bundles include sources that are optimized and minified, where as debug bundles contain sources that are not optimized and preserve the original variable and method names to allow for easier debugging. 
+It is good practice to always provide a production and debug bundle.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="description" type="string">
             <annotation>
                <documentation>
-                  
+                  The optional description of a bundle to be used for display.
                </documentation>
             </annotation>
          </attribute>
@@ -93,11 +99,17 @@
    </element>
 
    <element name="webResource">
+      <annotation>
+         <documentation>
+            A webResource describes a file or folder to be made available to be referenced by any node utilizing this bundle.
+If the resource is a folder, all contents of that folder are made available.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="relativePathSource" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The plugin-relative path to the source file or folder.
                </documentation>
                <appInfo>
                   <meta.attribute kind="resource"/>
@@ -107,7 +119,7 @@
          <attribute name="relativePathTarget" type="string">
             <annotation>
                <documentation>
-                  
+                  The destination-relative path to the file or folder.
                </documentation>
             </annotation>
          </attribute>
@@ -115,11 +127,16 @@
    </element>
 
    <element name="importResource">
+      <annotation>
+         <documentation>
+            An importResource describes and JavaScript or stylesheet to be included in the header of a generated HTML file.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="relativePath" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The destination-relative path to the JavaScript or stylesheet file.
                </documentation>
                <appInfo>
                   <meta.attribute kind="identifier" basedOn=""/>
@@ -129,7 +146,7 @@
          <attribute name="type" use="required">
             <annotation>
                <documentation>
-                  
+                  The type of resource.
                </documentation>
             </annotation>
             <simpleType>
@@ -145,11 +162,16 @@
    </element>
 
    <element name="webDependency">
+      <annotation>
+         <documentation>
+            A bundle can define an arbitrary amount of bundle dependencies.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="webResourceBundleID" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The id of the bundle dependency.
                </documentation>
                <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/@webResourceBundleID"/>
