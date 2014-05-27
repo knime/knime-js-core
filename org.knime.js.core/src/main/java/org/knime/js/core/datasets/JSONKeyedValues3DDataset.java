@@ -47,6 +47,10 @@
  */
 package org.knime.js.core.datasets;
 
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -56,7 +60,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONKeyedValues3DDataset {
+public class JSONKeyedValues3DDataset implements JSONDataset {
 
     private String[] m_columnKeys;
     private String[] m_rowKeys;
@@ -119,12 +123,42 @@ public class JSONKeyedValues3DDataset {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addStringArray("colKeys", m_columnKeys);
+        settings.addStringArray("rowKeys", m_rowKeys);
+        settings.addInt("numSeries", m_series.length);
+        for (int seriesID = 0; seriesID < m_series.length; seriesID++) {
+            NodeSettingsWO seriesSettings = settings.addNodeSettings("series_" + seriesID);
+            m_series[seriesID].saveToNodeSettings(seriesSettings);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
+        m_columnKeys = settings.getStringArray("colKeys");
+        m_rowKeys = settings.getStringArray("rowKeys");
+        int numSeries = settings.getInt("numSeries");
+        m_series = new KeyedValues3DSeries[numSeries];
+        for (int seriesID = 0; seriesID < numSeries; seriesID++) {
+            NodeSettingsRO seriesSettings = settings.getNodeSettings("series_" + seriesID);
+            m_series[seriesID] = new KeyedValues3DSeries();
+            m_series[seriesID].loadFromNodeSettings(seriesSettings);
+        }
+    }
+
+    /**
      *
      * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
      */
     @JsonAutoDetect
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-    public static class KeyedValues3DSeries {
+    public static class KeyedValues3DSeries implements JSONDataset {
 
         private String m_seriesKey;
 
@@ -170,6 +204,32 @@ public class JSONKeyedValues3DDataset {
             m_rows = rows;
         }
 
-    }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void saveToNodeSettings(final NodeSettingsWO settings) {
+            settings.addString("seriesKey", m_seriesKey);
+            settings.addInt("numRows", m_rows.length);
+            for (int rowID = 0; rowID < m_rows.length; rowID++) {
+                NodeSettingsWO rowSettings = settings.addNodeSettings("row_" + rowID);
+                m_rows[rowID].saveToNodeSettings(rowSettings);
+            }
+        }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+            m_seriesKey = settings.getString("seriesKey");
+            int numRows = settings.getInt("numRows");
+            m_rows = new JSONKeyedValuesRow[numRows];
+            for (int rowID = 0; rowID < m_rows.length; rowID++) {
+                NodeSettingsRO rowSettings = settings.getNodeSettings("row_" + rowID);
+                m_rows[rowID] = new JSONKeyedValuesRow();
+                m_rows[rowID].loadFromNodeSettings(rowSettings);
+            }
+        }
+    }
 }

@@ -49,6 +49,11 @@ package org.knime.js.core.datasets;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,7 +65,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONKeyedValuesRow {
+public class JSONKeyedValuesRow implements JSONDataset {
 
     private String m_rowKey;
 
@@ -127,7 +132,7 @@ public class JSONKeyedValuesRow {
      * @throws IllegalArgumentException if parameter length is not equal to values array length
      */
     @JsonIgnore
-    public void setColor(final String colorValue) throws IllegalArgumentException {
+    public void setColor(final String colorValue) {
         m_properties.put("color", colorValue);
     }
 
@@ -136,7 +141,7 @@ public class JSONKeyedValuesRow {
      * @throws IllegalArgumentException if parameter length is not equal to values array length
      */
     @JsonIgnore
-    public void setShapes(final String shapeValue) throws IllegalArgumentException {
+    public void setShapes(final String shapeValue) {
         m_properties.put("shape", shapeValue);
     }
 
@@ -145,7 +150,40 @@ public class JSONKeyedValuesRow {
      * @throws IllegalArgumentException if parameter length is not equal to values array length
      */
     @JsonIgnore
-    public void setSizes(final String sizeValue) throws IllegalArgumentException {
+    public void setSizes(final String sizeValue) {
         m_properties.put("size", sizeValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString("rowKey", m_rowKey);
+        settings.addDoubleArray("values", m_values);
+        settings.addInt("numProperties", m_properties.size());
+        int propertyID = 0;
+        for (Entry<String, String> propertyEntry : m_properties.entrySet()) {
+            NodeSettingsWO propSettings = settings.addNodeSettings("property_" + propertyID++);
+            propSettings.addString("key", propertyEntry.getKey());
+            propSettings.addString("value", propertyEntry.getValue());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
+        m_rowKey = settings.getString("rowKey");
+        m_values = settings.getDoubleArray("values");
+        int numProperties = settings.getInt("numProperties");
+        m_properties = new HashMap<String, String>();
+        for (int propertyID = 0; propertyID < numProperties; propertyID++) {
+            NodeSettingsRO propSettings = settings.getNodeSettings("property_" + propertyID);
+            String propKey = propSettings.getString("key");
+            String propValue = propSettings.getString("value");
+            m_properties.put(propKey, propValue);
+        }
     }
 }

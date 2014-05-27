@@ -49,10 +49,7 @@
 
    <element name="javascriptComponent">
       <complexType>
-         <sequence>
-            <element ref="webDependency" minOccurs="0" maxOccurs="unbounded"/>
-         </sequence>
-         <attribute name="jsObjectID" type="string" use="required">
+         <attribute name="javascriptComponentID" type="string" use="required">
             <annotation>
                <documentation>
                   Unique ID to identify the JavaScript implementation of a node.
@@ -92,21 +89,6 @@ Good practice is to use the Java package name of the node using the resource, li
             <annotation>
                <documentation>
                   The ID of the webResourceBundle containing the implementation for this JavaScript component.
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/@webResourceBundleID"/>
-               </appInfo>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="webDependency">
-      <complexType>
-         <attribute name="webResourceBundleID" type="string" use="required">
-            <annotation>
-               <documentation>
-                  
                </documentation>
                <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/@webResourceBundleID"/>

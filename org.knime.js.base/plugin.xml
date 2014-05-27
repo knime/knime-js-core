@@ -566,7 +566,7 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.string.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_string"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_string"
             namespace="org_knime_js_base_node_quickform_input_string"
             validate-method-name="validate">
       </javascriptComponent>
@@ -574,7 +574,7 @@
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.plotter.line.bundle"
             init-method-name="init"
-            jsObjectID="knime_line_plotter"
+            javascriptComponentID="knime_line_plotter"
             namespace="knime_line_plotter"
             validate-method-name="validate">
       </javascriptComponent>
@@ -582,7 +582,7 @@
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.rowselector.bundle"
             init-method-name="init"
-            jsObjectID="knime_row_selector"
+            javascriptComponentID="knime_row_selector"
             namespace="knime_row_selector"
             validate-method-name="validate">
       </javascriptComponent>
@@ -590,7 +590,7 @@
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.table.bundle"
             init-method-name="init"
-            jsObjectID="knime_table_viewer"
+            javascriptComponentID="knime_table_viewer"
             namespace="knime_table_viewer"
             validate-method-name="validate">
       </javascriptComponent>
@@ -598,7 +598,7 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.molecule.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_molecule"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_molecule"
             namespace="org_knime_js_base_node_quickform_input_molecule"
             validate-method-name="validate">
       </javascriptComponent>
@@ -606,7 +606,7 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.integer.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_integer"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_integer"
             namespace="org_knime_js_base_node_quickform_input_integer"
             validate-method-name="validate">
       </javascriptComponent>
@@ -614,7 +614,7 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.dbl.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_dbl"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_dbl"
             namespace="org_knime_js_base_node_quickform_input_dbl"
             validate-method-name="validate">
       </javascriptComponent>
@@ -622,7 +622,7 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.bool.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_bool"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_bool"
             namespace="org_knime_js_base_node_quickform_input_bool"
             validate-method-name="validate">
       </javascriptComponent>
@@ -630,14 +630,14 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.date.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_date"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_date"
             namespace="org_knime_js_base_node_quickform_input_date">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.listbox.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_input_listbox"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_listbox"
             namespace="org_knime_js_base_node_quickform_input_listbox"
             validate-method-name="validate">
       </javascriptComponent>
@@ -645,7 +645,7 @@
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.plotter.scatter_own.bundle"
             init-method-name="init"
-            jsObjectID="knime_scatter_plotter_own"
+            javascriptComponentID="knime_scatter_plotter_own"
             namespace="knime_scatter_plotter"
             validate-method-name="validate">
       </javascriptComponent>
@@ -653,49 +653,49 @@
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.selection.single.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_selection_single"
+            javascriptComponentID="org_knime_js_base_node_quickform_selection_single"
             namespace="org_knime_js_base_node_quickform_selection_single">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.selection.multiple.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_selection_multiple"
+            javascriptComponentID="org_knime_js_base_node_quickform_selection_multiple"
             namespace="org_knime_js_base_node_quickform_selection_multiple">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.selection.value.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_selection_value"
+            javascriptComponentID="org_knime_js_base_node_quickform_selection_value"
             namespace="org_knime_js_base_node_quickform_selection_value">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.filter.value.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_filter_value"
+            javascriptComponentID="org_knime_js_base_node_quickform_filter_value"
             namespace="org_knime_js_base_node_quickform_filter_value">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.selection.column.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_selection_column"
+            javascriptComponentID="org_knime_js_base_node_quickform_selection_column"
             namespace="org_knime_js_base_node_quickform_selection_column">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.filter.column.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_quickform_filter_column"
+            javascriptComponentID="org_knime_js_base_node_quickform_filter_column"
             namespace="org_knime_js_base_node_quickform_filter_column">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="GenericJSView"
             init-method-name="init"
-            jsObjectID="knime_generic_view"
+            javascriptComponentID="knime_generic_view"
             namespace="knime_generic_view"
             validate-method-name="validate">
       </javascriptComponent>
@@ -703,7 +703,7 @@
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle"
             init-method-name="init"
-            jsObjectID="org_knime_js_base_node_viz_plotter_scatter"
+            javascriptComponentID="org_knime_js_base_node_viz_plotter_scatter"
             namespace="knime_scatter_plot"
             validate-method-name="validate">
       </javascriptComponent>

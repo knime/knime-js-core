@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -43,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   27.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.core.datasets;
 
@@ -51,87 +52,21 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONKeyedValues2DDataset implements JSONDataset {
-
-    private String[] m_columnKeys;
-
-    private JSONKeyedValuesRow[] m_rows;
-
-    /** Serialization constructor. Don't use. */
-    public JSONKeyedValues2DDataset() { }
+public interface JSONDataset {
 
     /**
-     * @param columnKeys
-     * @param rows
+     * @param settings The settings to save to.
      */
-    public JSONKeyedValues2DDataset(final String[] columnKeys, final JSONKeyedValuesRow[] rows) {
-        m_columnKeys = columnKeys;
-        m_rows = rows;
-    }
+    public void saveToNodeSettings(NodeSettingsWO settings);
 
     /**
-     * @return the columnKeys
+     * @param settings The settings to load from.
+     * @throws InvalidSettingsException
      */
-    public String[] getColumnKeys() {
-        return m_columnKeys;
-    }
-
-    /**
-     * @param columnKeys the columnKeys to set
-     */
-    public void setColumnKeys(final String[] columnKeys) {
-        m_columnKeys = columnKeys;
-    }
-
-    /**
-     * @return the rows
-     */
-    public JSONKeyedValuesRow[] getRows() {
-        return m_rows;
-    }
-
-    /**
-     * @param rows the rows to set
-     */
-    public void setRows(final JSONKeyedValuesRow[] rows) {
-        m_rows = rows;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addStringArray("columnKeys", getColumnKeys());
-        settings.addInt("numRows", m_rows.length);
-        for (int rowID = 0; rowID < m_rows.length; rowID++) {
-            NodeSettingsWO rowSettings = settings.addNodeSettings("row_" + rowID);
-            m_rows[rowID].saveToNodeSettings(rowSettings);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
-        m_columnKeys = settings.getStringArray("columnKeys");
-        int numRows = settings.getInt("numRows");
-        m_rows = new JSONKeyedValuesRow[numRows];
-        for (int rowID = 0; rowID < m_rows.length; rowID++) {
-            NodeSettingsRO rowSettings = settings.getNodeSettings("row_" + rowID);
-            m_rows[rowID] = new JSONKeyedValuesRow();
-            m_rows[rowID].loadFromNodeSettings(rowSettings);
-        }
-    }
+    public void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException;
 
 }
