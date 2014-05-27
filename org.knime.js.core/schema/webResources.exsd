@@ -61,6 +61,34 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="version" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="debug" type="boolean" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -94,7 +122,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="identifier" basedOn="org.knime.js.core.webResources/webResourceBundle/webResource/@relativePathTarget"/>
+                  <meta.attribute kind="identifier" basedOn=""/>
                </appInfo>
             </annotation>
          </attribute>
