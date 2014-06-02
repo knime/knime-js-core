@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Feb 3, 2014 ("Patrick Winter"): created
  */
@@ -69,7 +69,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
- * 
+ *
  * @author "Patrick Winter", University of Konstanz
  */
 public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSelectorRepresentation, RowSelectorValue> {
@@ -81,7 +81,7 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
     private RowSelectorValue m_value = createEmptyViewValue();
 
     /**
-     * 
+     *
      */
     public RowSelectorNodeModel() {
         super(1, 1);
@@ -127,7 +127,7 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final RowSelectorValue viewContent) {
+    public void loadViewValue(final RowSelectorValue viewContent, final boolean useAsDefault) {
         m_value = viewContent;
     }
 

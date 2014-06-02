@@ -195,7 +195,7 @@ public class GenericJSViewNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final GenericJSViewValue viewContent) {
+    public void loadViewValue(final GenericJSViewValue viewContent, final boolean useAsDefault) {
         // do nothing
     }
 

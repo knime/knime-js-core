@@ -117,36 +117,41 @@ public class ScatterPlotNodeModel extends NodeModel implements
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws Exception {
         synchronized (m_lock) {
-            ColumnRearranger c = createNumericColumnRearranger(inData[0].getDataTableSpec());
-            BufferedDataTable filteredTable = exec.createColumnRearrangeTable(inData[0], c, exec.createSubProgress(0.5));
-            //construct dataset
-            if (m_config.getMaxRows() < filteredTable.getRowCount()) {
-                setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
-            }
-            JSONDataTable table = new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.5));
-            int numColumns = table.getSpec().getNumColumns();
-            String[] rowKeys = new String[table.getSpec().getNumRows()];
-            JSONKeyedValuesRow[] rowValues = new JSONKeyedValuesRow[table.getSpec().getNumRows()];
-            JSONDataTableRow[] tableRows = table.getRows();
-            for (int rowID = 0; rowID < rowValues.length; rowID++) {
-                JSONDataTableRow currentRow = tableRows[rowID];
-                rowKeys[rowID] = currentRow.getRowKey();
-                double[] rowData = new double[numColumns];
-                Object[] tableData = currentRow.getData();
-                for (int colID = 0; colID < numColumns; colID++) {
-                    if (tableData[colID] instanceof Double) {
-                        rowData[colID] = (double)tableData[colID];
-                    }
+            if (m_representation.getKeyedDataset() == null || m_viewValue.getxColumn() == null) {
+                ColumnRearranger c = createNumericColumnRearranger(inData[0].getDataTableSpec());
+                BufferedDataTable filteredTable =
+                    exec.createColumnRearrangeTable(inData[0], c, exec.createSubProgress(0.5));
+                //construct dataset
+                if (m_config.getMaxRows() < filteredTable.getRowCount()) {
+                    setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
                 }
-                rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
-                rowValues[rowID].setColor(table.getSpec().getRowColorValues()[rowID]);
-            }
-            KeyedValues3DSeries series = new KeyedValues3DSeries("series", rowValues);
-            JSONKeyedValues3DDataset dataset = new JSONKeyedValues3DDataset(table.getSpec().getColNames(),
-                rowKeys, new KeyedValues3DSeries[]{series});
+                JSONDataTable table =
+                    new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.5));
+                int numColumns = table.getSpec().getNumColumns();
+                String[] rowKeys = new String[table.getSpec().getNumRows()];
+                JSONKeyedValuesRow[] rowValues = new JSONKeyedValuesRow[table.getSpec().getNumRows()];
+                JSONDataTableRow[] tableRows = table.getRows();
+                for (int rowID = 0; rowID < rowValues.length; rowID++) {
+                    JSONDataTableRow currentRow = tableRows[rowID];
+                    rowKeys[rowID] = currentRow.getRowKey();
+                    double[] rowData = new double[numColumns];
+                    Object[] tableData = currentRow.getData();
+                    for (int colID = 0; colID < numColumns; colID++) {
+                        if (tableData[colID] instanceof Double) {
+                            rowData[colID] = (double)tableData[colID];
+                        }
+                    }
+                    rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
+                    rowValues[rowID].setColor(table.getSpec().getRowColorValues()[rowID]);
+                }
+                KeyedValues3DSeries series = new KeyedValues3DSeries("series", rowValues);
+                JSONKeyedValues3DDataset dataset =
+                    new JSONKeyedValues3DDataset(table.getSpec().getColNames(), rowKeys,
+                        new KeyedValues3DSeries[]{series});
 
-            m_representation.setKeyedDataset(dataset);
-            copyConfigToView();
+                m_representation.setKeyedDataset(dataset);
+                copyConfigToView();
+            }
         }
         return null;
     }
@@ -177,9 +182,12 @@ public class ScatterPlotNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final ScatterPlotViewValue viewValue) {
+    public void loadViewValue(final ScatterPlotViewValue viewValue, final boolean useAsDefault) {
         synchronized (m_lock) {
             m_viewValue = viewValue;
+            if (useAsDefault) {
+                copyValueToConfig();
+            }
         }
     }
 
@@ -222,6 +230,18 @@ public class ScatterPlotNodeModel extends NodeModel implements
         m_viewValue.setyAxisMin(m_config.getyAxisMin());
         m_viewValue.setyAxisMax(m_config.getyAxisMax());
         m_viewValue.setDotSize(m_config.getDotSize());
+    }
+
+    private void copyValueToConfig() {
+        m_config.setxColumn(m_viewValue.getxColumn());
+        m_config.setyColumn(m_viewValue.getyColumn());
+        m_config.setxAxisLabel(m_viewValue.getxAxisLabel());
+        m_config.setyAxisLabel(m_viewValue.getyAxisLabel());
+        m_config.setxAxisMin(m_viewValue.getxAxisMin());
+        m_config.setxAxisMax(m_viewValue.getxAxisMax());
+        m_config.setyAxisMin(m_viewValue.getyAxisMin());
+        m_config.setyAxisMax(m_viewValue.getyAxisMax());
+        m_config.setDotSize(m_viewValue.getDotSize());
     }
 
     /**

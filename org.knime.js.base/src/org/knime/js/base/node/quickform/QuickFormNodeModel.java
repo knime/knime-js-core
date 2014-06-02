@@ -64,7 +64,7 @@ import org.knime.core.node.wizard.WizardNode;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * @param <REP> The configuration content of the quickform node.
  * @param <VAL> The node value implementation of the quickform node.
- * 
+ *
  */
 public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VAL> & WebViewContent,
         VAL extends DialogNodeValue & WebViewContent>
@@ -72,11 +72,11 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
 
     private final REP m_representation;
     private VAL m_value;
-    
+
     /**
      * Creates a new quickform model with the given number (and types!) of input
      * and output types.
-     * 
+     *
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
      */
@@ -137,7 +137,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public REP getDialogRepresentation() {
         return m_representation;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -145,7 +145,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public VAL getDialogValue() {
         return m_value;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -153,7 +153,7 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public REP getViewRepresentation() {
         return m_representation;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -161,12 +161,15 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public VAL getViewValue() {
         return m_value;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final VAL viewContent) {
+    public void loadViewValue(final VAL viewContent, final boolean useAsDefault) {
         m_value = viewContent;
+        if (useAsDefault) {
+            // TODO: overwrite node settings
+        }
     };
 }

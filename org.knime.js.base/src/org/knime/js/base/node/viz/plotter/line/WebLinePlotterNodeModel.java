@@ -97,7 +97,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         }
         return new BufferedDataTable[0];
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -105,7 +105,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -113,7 +113,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -132,7 +132,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         ContainerTable table = DataContainer.readFromZip(f);
         m_input = new JSONDataTable(table, 1, getEndIndex(), exec);*/
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -154,7 +154,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final WebViewContent viewContent) {
+    public void loadViewValue(final WebViewContent viewContent, final boolean useAsDefault) {
         // do nothing
     }
 
@@ -193,7 +193,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     public WebViewContent createEmptyViewValue() {
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */

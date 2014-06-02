@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -63,18 +63,18 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
- * @param <REP> 
- * @param <VAL> 
+ * @param <REP>
+ * @param <VAL>
  */
-public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, VAL extends WebTableViewValue> 
+public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, VAL extends WebTableViewValue>
         extends NodeModel implements WizardNode<REP, VAL> {
 
     private JSONDataTable m_input;
     private REP m_viewRepresentation;
     private VAL m_viewValue;
-    
+
     /**
      * Creates a new model with the given number (and types!) of input and
      * output types.
@@ -84,7 +84,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     protected WebTableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -93,7 +93,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         // TODO Auto-generated method stub
         return new PortObjectSpec[0];
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -104,7 +104,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         getViewRepresentation().setTable(m_input);
         return new PortObject[0];
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -115,7 +115,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         }
         return m_viewRepresentation;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -126,7 +126,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         }
         return m_viewValue;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -135,15 +135,15 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final VAL viewContent) {
-        m_viewValue = viewContent;        
+    public void loadViewValue(final VAL viewContent, final boolean useAsDefault) {
+        m_viewValue = viewContent;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -208,5 +208,5 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
     }
-    
+
 }

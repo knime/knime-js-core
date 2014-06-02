@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   05.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -85,22 +85,26 @@ import org.knime.js.core.JSONWebNode;
 import org.osgi.framework.FrameworkUtil;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class GenericJSViewNodeDialogPane extends NodeDialogPane {
 
     private static final String ID_WEB_RES = "org.knime.js.core.webResources";
     private static final String ATTR_RES_BUNDLE_ID = "webResourceBundleID";
-    
+    private static final String ATTR_RES_BUNDLE_NAME = "name";
+    private static final String ATTR_RES_BUNDLE_VERSION = "version";
+    private static final String ATTR_RES_BUNDLE_DEBUG = "debug";
+    private static final String ATTR_RES_BUNDLE_DESCRIPTION = "description";
+
     private final GenericJSViewConfig m_config;
-    
+
     private final JTextField m_viewName;
     private final JList m_flowVarList;
     private final JTable m_dependenciesTable;
     private final JSSnippetTextArea m_jsTextArea;
     private final CSSSnippetTextArea m_cssTextArea;
-    
+
     /**
      * Initializes new dialog pane.
      */
@@ -155,6 +159,15 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         };
         m_dependenciesTable = new JTable(tableModel);
         m_dependenciesTable.getColumnModel().getColumn(0).setMaxWidth(30);
+        /*m_dependenciesTable.setDefaultRenderer(String.class, new TableCellRenderer() {
+
+            @Override
+            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
+                final int row, final int column) {
+                // TODO Auto-generated method stub
+                return null;
+            }
+        })*/
         addTab("JavaScript View", initLayout());
     }
 
@@ -214,7 +227,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private List<String> getAvailableLibraries() {
         List<String> availableLibraries = new ArrayList<String>();
         String libBundleName = FrameworkUtil.getBundle(JSONWebNode.class).getSymbolicName();
-        
+
         IExtensionRegistry registry = Platform.getExtensionRegistry();
         IExtensionPoint point = registry.getExtensionPoint(ID_WEB_RES);
         if (point == null) {
@@ -230,6 +243,13 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
                     continue;
                 }
                 String resBundleID = e.getAttribute(ATTR_RES_BUNDLE_ID);
+                String resBundleName = e.getAttribute(ATTR_RES_BUNDLE_NAME);
+                String resBundleVersion = e.getAttribute(ATTR_RES_BUNDLE_VERSION);
+                boolean resBundleDebug = Boolean.parseBoolean(e.getAttribute(ATTR_RES_BUNDLE_DEBUG));
+                String resBundleDisplay = resBundleName + " - Version " + resBundleVersion;
+                if (resBundleDebug) {
+                    resBundleDisplay += " - Debug";
+                }
                 availableLibraries.add(resBundleID);
             }
         }
@@ -253,5 +273,16 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         m_config.setDependencies(dependencies.toArray(new String[0]));
         m_config.saveSettings(settings);
     }
+
+    /*public static class JSLibrary {
+
+        private String id;
+        private String display;
+
+        public JSLibrary(id, display) {
+            // TODO Auto-generated constructor stub
+        }
+
+    }*/
 
 }

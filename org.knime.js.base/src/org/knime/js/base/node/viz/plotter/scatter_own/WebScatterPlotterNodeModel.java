@@ -79,14 +79,14 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
 
     private JSONDataTable m_input;
     private WebScatterPlotterViewValue m_viewValue = createEmptyViewValue();
-    
+
     /**
-     * 
+     *
      */
     public WebScatterPlotterNodeModel() {
         super(1, 1);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -128,7 +128,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         container.close();
         return new BufferedDataTable[]{container.getTable()};
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -136,7 +136,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -144,7 +144,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -163,7 +163,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         ContainerTable table = DataContainer.readFromZip(f);
         m_input = new JSONDataTable(table, 1, getEndIndex(), exec);*/
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -185,7 +185,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final WebScatterPlotterViewValue viewValue) {
+    public void loadViewValue(final WebScatterPlotterViewValue viewValue, final boolean useAsDefault) {
         m_viewValue = viewValue;
     }
 
@@ -224,7 +224,7 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
     public WebScatterPlotterViewValue createEmptyViewValue() {
         return new WebScatterPlotterViewValue();
     }
-    
+
     /**
      * {@inheritDoc}
      */
