@@ -217,6 +217,11 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         settings.addBoolean(ScatterPlotViewConfig.ALLOW_DOT_SIZE_CHANGE, getAllowDotSizeChange());
         settings.addBoolean(ScatterPlotViewConfig.ALLOW_ZOOMING, getAllowZooming());
         settings.addBoolean(ScatterPlotViewConfig.ALLOW_PANNING, getAllowPanning());
+        settings.addBoolean("hasDataset", m_keyedDataset != null);
+        if (m_keyedDataset != null) {
+            NodeSettingsWO datasetSettings = settings.addNodeSettings("dataset");
+            m_keyedDataset.saveToNodeSettings(datasetSettings);
+        }
     }
 
     /**
@@ -232,5 +237,12 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         setAllowDotSizeChange(settings.getBoolean(ScatterPlotViewConfig.ALLOW_DOT_SIZE_CHANGE));
         setAllowZooming(settings.getBoolean(ScatterPlotViewConfig.ALLOW_ZOOMING));
         setAllowPanning(settings.getBoolean(ScatterPlotViewConfig.ALLOW_PANNING));
+        m_keyedDataset = null;
+        boolean hasDataset = settings.getBoolean("hasDataset");
+        if (hasDataset) {
+            NodeSettingsRO datasetSettings = settings.getNodeSettings("dataset");
+            m_keyedDataset = new JSONKeyedValues3DDataset();
+            m_keyedDataset.loadFromNodeSettings(datasetSettings);
+        }
     }
 }

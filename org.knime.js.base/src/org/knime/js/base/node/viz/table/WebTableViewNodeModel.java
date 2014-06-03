@@ -41,25 +41,20 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   23.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.base.node.viz.table;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.port.PortType;
 import org.knime.js.base.util.table.WebTableNodeModel;
 import org.knime.js.base.util.table.WebTableViewRepresentation;
 import org.knime.js.base.util.table.WebTableViewValue;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue> {
@@ -76,26 +71,6 @@ public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewReprese
     @Override
     public String getJavascriptObjectID() {
         return "knime_table_viewer";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        // TODO Auto-generated method stub
-        
     }
 
 }

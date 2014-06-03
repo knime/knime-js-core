@@ -140,7 +140,7 @@ public class JSONKeyedValues3DDataset implements JSONDataset {
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_columnKeys = settings.getStringArray("colKeys");
         m_rowKeys = settings.getStringArray("rowKeys");
         int numSeries = settings.getInt("numSeries");

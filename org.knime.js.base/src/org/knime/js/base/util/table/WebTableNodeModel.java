@@ -47,12 +47,19 @@
  */
 package org.knime.js.base.util.table;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeModel;
+import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
@@ -83,6 +90,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     protected WebTableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
+        m_viewRepresentation = createEmptyViewRepresentation();
+        m_viewValue = createEmptyViewValue();
     }
 
     /**
@@ -170,6 +179,30 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        NodeSettings settings = new NodeSettings("table");
+        m_input.saveJSONToNodeSettings(settings);
+        File f = new File(nodeInternDir, "jsonTable.xml");
+        settings.saveToXML(new FileOutputStream(f));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        File f = new File(nodeInternDir, "jsonTable.xml");
+        NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(f));
+        m_input = JSONDataTable.loadFromNodeSettings(settings);
+        m_viewRepresentation.setTable(m_input);
     }
 
     /**
