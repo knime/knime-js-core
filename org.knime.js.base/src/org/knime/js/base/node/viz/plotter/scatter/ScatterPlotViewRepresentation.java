@@ -68,14 +68,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class ScatterPlotViewRepresentation extends JSONViewContent {
 
     private JSONKeyedValues3DDataset m_keyedDataset;
-    private boolean m_allowViewConfiguration;
+    private boolean m_enableViewConfiguration;
+    private boolean m_enableTitleChange;
+    private boolean m_enableSubtitleChange;
     private boolean m_enableXColumnChange;
     private boolean m_enableYColumnChange;
     private boolean m_enableXAxisLabelEdit;
     private boolean m_enableYAxisLabelEdit;
-    private boolean m_allowDotSizeChange;
-    private boolean m_allowZooming;
-    private boolean m_allowPanning;
+    private boolean m_enableDotSizeChange;
+    private boolean m_enableZooming;
+    private boolean m_enablePanning;
 
 
     /**
@@ -95,15 +97,43 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     /**
      * @return the allowViewConfiguration
      */
-    public boolean getAllowViewConfiguration() {
-        return m_allowViewConfiguration;
+    public boolean getEnableViewConfiguration() {
+        return m_enableViewConfiguration;
     }
 
     /**
-     * @param allowViewConfiguration the allowViewConfiguration to set
+     * @param enableViewConfiguration the allowViewConfiguration to set
      */
-    public void setAllowViewConfiguration(final boolean allowViewConfiguration) {
-        m_allowViewConfiguration = allowViewConfiguration;
+    public void setEnableViewConfiguration(final boolean enableViewConfiguration) {
+        m_enableViewConfiguration = enableViewConfiguration;
+    }
+
+    /**
+     * @return the enableTitleChange
+     */
+    public boolean getEnableTitleChange() {
+        return m_enableTitleChange;
+    }
+
+    /**
+     * @param enableTitleChange the enableTitleChange to set
+     */
+    public void setEnableTitleChange(final boolean enableTitleChange) {
+        m_enableTitleChange = enableTitleChange;
+    }
+
+    /**
+     * @return the enableSubtitleChange
+     */
+    public boolean getEnableSubtitleChange() {
+        return m_enableSubtitleChange;
+    }
+
+    /**
+     * @param enableSubtitleChange the enableSubtitleChange to set
+     */
+    public void setEnableSubtitleChange(final boolean enableSubtitleChange) {
+        m_enableSubtitleChange = enableSubtitleChange;
     }
 
     /**
@@ -165,43 +195,43 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     /**
      * @return the allowDotSizeChange
      */
-    public boolean getAllowDotSizeChange() {
-        return m_allowDotSizeChange;
+    public boolean getEnableDotSizeChange() {
+        return m_enableDotSizeChange;
     }
 
     /**
-     * @param allowDotSizeChange the allowDotSizeChange to set
+     * @param enableDotSizeChange the allowDotSizeChange to set
      */
-    public void setAllowDotSizeChange(final boolean allowDotSizeChange) {
-        m_allowDotSizeChange = allowDotSizeChange;
+    public void setEnableDotSizeChange(final boolean enableDotSizeChange) {
+        m_enableDotSizeChange = enableDotSizeChange;
     }
 
     /**
      * @return the allowZooming
      */
-    public boolean getAllowZooming() {
-        return m_allowZooming;
+    public boolean getEnableZooming() {
+        return m_enableZooming;
     }
 
     /**
-     * @param allowZooming the allowZooming to set
+     * @param enableZooming the allowZooming to set
      */
-    public void setAllowZooming(final boolean allowZooming) {
-        m_allowZooming = allowZooming;
+    public void setEnableZooming(final boolean enableZooming) {
+        m_enableZooming = enableZooming;
     }
 
     /**
      * @return the allowPanning
      */
-    public boolean getAllowPanning() {
-        return m_allowPanning;
+    public boolean getEnablePanning() {
+        return m_enablePanning;
     }
 
     /**
-     * @param allowPanning the allowPanning to set
+     * @param enablePanning the allowPanning to set
      */
-    public void setAllowPanning(final boolean allowPanning) {
-        m_allowPanning = allowPanning;
+    public void setEnablePanning(final boolean enablePanning) {
+        m_enablePanning = enablePanning;
     }
 
     /**
@@ -209,14 +239,16 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(ScatterPlotViewConfig.ALLOW_CONFIG, getAllowViewConfiguration());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_CONFIG, getEnableViewConfiguration());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_TTILE_CHANGE, getEnableTitleChange());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_X_COL_CHANGE, getEnableXColumnChange());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_Y_COL_CHANGE, getEnableYColumnChange());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_X_LABEL_EDIT, getEnableXAxisLabelEdit());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT, getEnableYAxisLabelEdit());
-        settings.addBoolean(ScatterPlotViewConfig.ALLOW_DOT_SIZE_CHANGE, getAllowDotSizeChange());
-        settings.addBoolean(ScatterPlotViewConfig.ALLOW_ZOOMING, getAllowZooming());
-        settings.addBoolean(ScatterPlotViewConfig.ALLOW_PANNING, getAllowPanning());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE, getEnableDotSizeChange());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING, getEnableZooming());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_PANNING, getEnablePanning());
         settings.addBoolean("hasDataset", m_keyedDataset != null);
         if (m_keyedDataset != null) {
             NodeSettingsWO datasetSettings = settings.addNodeSettings("dataset");
@@ -229,14 +261,16 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setAllowViewConfiguration(settings.getBoolean(ScatterPlotViewConfig.ALLOW_CONFIG));
+        setEnableViewConfiguration(settings.getBoolean(ScatterPlotViewConfig.ENABLE_CONFIG));
+        setEnableTitleChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_TTILE_CHANGE));
+        setEnableSubtitleChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_SUBTTILE_CHANGE));
         setEnableXColumnChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_X_COL_CHANGE));
         setEnableYColumnChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_Y_COL_CHANGE));
         setEnableXAxisLabelEdit(settings.getBoolean(ScatterPlotViewConfig.ENABLE_X_LABEL_EDIT));
         setEnableYAxisLabelEdit(settings.getBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT));
-        setAllowDotSizeChange(settings.getBoolean(ScatterPlotViewConfig.ALLOW_DOT_SIZE_CHANGE));
-        setAllowZooming(settings.getBoolean(ScatterPlotViewConfig.ALLOW_ZOOMING));
-        setAllowPanning(settings.getBoolean(ScatterPlotViewConfig.ALLOW_PANNING));
+        setEnableDotSizeChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE));
+        setEnableZooming(settings.getBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING));
+        setEnablePanning(settings.getBoolean(ScatterPlotViewConfig.ENABLE_PANNING));
         m_keyedDataset = null;
         boolean hasDataset = settings.getBoolean("hasDataset");
         if (hasDataset) {

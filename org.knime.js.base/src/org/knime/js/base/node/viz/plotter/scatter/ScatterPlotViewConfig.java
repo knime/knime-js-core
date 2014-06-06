@@ -60,14 +60,18 @@ import org.knime.core.node.NodeSettingsWO;
  */
 public class ScatterPlotViewConfig {
 
-    static final String ALLOW_CONFIG = "allowViewConfiguration";
+    static final String ENABLE_CONFIG = "enableViewConfiguration";
+    static final String ENABLE_TTILE_CHANGE = "enableTitleChange";
+    static final String ENABLE_SUBTTILE_CHANGE = "enableSubtitleChange";
     static final String ENABLE_X_COL_CHANGE = "enableXColumnChange";
     static final String ENABLE_Y_COL_CHANGE = "enableYColumnChange";
     static final String ENABLE_X_LABEL_EDIT = "enableXAxisLabelEdit";
     static final String ENABLE_Y_LABEL_EDIT = "enableYAxisLabelEdit";
-    static final String ALLOW_DOT_SIZE_CHANGE = "allowDotSizeChange";
-    static final String ALLOW_ZOOMING = "allowZooming";
-    static final String ALLOW_PANNING = "allowPanning";
+    static final String ENABLE_DOT_SIZE_CHANGE = "enableDotSizeChange";
+    static final String ENABLE_ZOOMING = "enableZooming";
+    static final String ENABLE_PANNING = "enablePanning";
+    static final String CHART_TITLE = "chartTitle";
+    static final String CHART_SUBTITLE = "chartSubtitle";
     static final String X_COL = "xCol";
     static final String Y_COL = "yCol";
     static final String MAX_ROWS = "maxRows";
@@ -80,15 +84,19 @@ public class ScatterPlotViewConfig {
     static final String DOT_SIZE = "dot_size";
 
 
-    private boolean m_allowViewConfiguration = false;
+    private boolean m_enableViewConfiguration = false;
+    private boolean m_enableTitleChange = false;
+    private boolean m_enableSubtitleChange = false;
     private boolean m_enableXColumnChange = false;
     private boolean m_enableYColumnChange = false;
     private boolean m_enableXAxisLabelEdit = false;
     private boolean m_enableYAxisLabelEdit = false;
-    private boolean m_allowDotSizeChange = false;
-    private boolean m_allowZooming = true;
-    private boolean m_allowPanning = true;
+    private boolean m_enableDotSizeChange = false;
+    private boolean m_enableZooming = true;
+    private boolean m_enablePanning = true;
     private int m_maxRows = 2500;
+    private String m_chartTitle;
+    private String m_chartSubtitle;
     private String m_xColumn;
     private String m_yColumn;
     private String m_xAxisLabel;
@@ -98,6 +106,34 @@ public class ScatterPlotViewConfig {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize = 3;
+
+    /**
+     * @return the chartTitle
+     */
+    public String getChartTitle() {
+        return m_chartTitle;
+    }
+
+    /**
+     * @param chartTitle the chartTitle to set
+     */
+    public void setChartTitle(final String chartTitle) {
+        m_chartTitle = chartTitle;
+    }
+
+    /**
+     * @return the chartSubtitle
+     */
+    public String getChartSubtitle() {
+        return m_chartSubtitle;
+    }
+
+    /**
+     * @param chartSubtitle the chartSubtitle to set
+     */
+    public void setChartSubtitle(final String chartSubtitle) {
+        m_chartSubtitle = chartSubtitle;
+    }
 
     /**
      * @return the xColumn
@@ -172,15 +208,43 @@ public class ScatterPlotViewConfig {
     /**
      * @return the allowViewConfiguration
      */
-    public boolean getAllowViewConfiguration() {
-        return m_allowViewConfiguration;
+    public boolean getEnableViewConfiguration() {
+        return m_enableViewConfiguration;
     }
 
     /**
-     * @param allowViewConfiguration the allowViewConfiguration to set
+     * @param enableViewConfiguration the allowViewConfiguration to set
      */
-    public void setAllowViewConfiguration(final boolean allowViewConfiguration) {
-        m_allowViewConfiguration = allowViewConfiguration;
+    public void setEnableViewConfiguration(final boolean enableViewConfiguration) {
+        m_enableViewConfiguration = enableViewConfiguration;
+    }
+
+    /**
+     * @return the allowTitleChange
+     */
+    public boolean getEnableTitleChange() {
+        return m_enableTitleChange;
+    }
+
+    /**
+     * @param enableTitleChange the allowTitleChange to set
+     */
+    public void setEnableTitleChange(final boolean enableTitleChange) {
+        m_enableTitleChange = enableTitleChange;
+    }
+
+    /**
+     * @return the allowSubtitleChange
+     */
+    public boolean getEnableSubtitleChange() {
+        return m_enableSubtitleChange;
+    }
+
+    /**
+     * @param enableSubtitleChange the allowSubtitleChange to set
+     */
+    public void setEnableSubtitleChange(final boolean enableSubtitleChange) {
+        m_enableSubtitleChange = enableSubtitleChange;
     }
 
     /**
@@ -242,15 +306,15 @@ public class ScatterPlotViewConfig {
     /**
      * @return the allowDotSizeChange
      */
-    public boolean getAllowDotSizeChange() {
-        return m_allowDotSizeChange;
+    public boolean getEnableDotSizeChange() {
+        return m_enableDotSizeChange;
     }
 
     /**
-     * @param allowDotSizeChange the allowDotSizeChange to set
+     * @param enableDotSizeChange the allowDotSizeChange to set
      */
-    public void setAllowDotSizeChange(final boolean allowDotSizeChange) {
-        m_allowDotSizeChange = allowDotSizeChange;
+    public void setEnableDotSizeChange(final boolean enableDotSizeChange) {
+        m_enableDotSizeChange = enableDotSizeChange;
     }
 
     /**
@@ -312,29 +376,29 @@ public class ScatterPlotViewConfig {
     /**
      * @return the allowZooming
      */
-    public boolean getAllowZooming() {
-        return m_allowZooming;
+    public boolean getEnableZooming() {
+        return m_enableZooming;
     }
 
     /**
-     * @param allowZooming the allowZooming to set
+     * @param enableZooming the allowZooming to set
      */
-    public void setAllowZooming(final boolean allowZooming) {
-        m_allowZooming = allowZooming;
+    public void setEnableZooming(final boolean enableZooming) {
+        m_enableZooming = enableZooming;
     }
 
     /**
      * @return the allowPanning
      */
-    public boolean getAllowPanning() {
-        return m_allowPanning;
+    public boolean getEnablePanning() {
+        return m_enablePanning;
     }
 
     /**
-     * @param allowPanning the allowPanning to set
+     * @param enablePanning the allowPanning to set
      */
-    public void setAllowPanning(final boolean allowPanning) {
-        m_allowPanning = allowPanning;
+    public void setEnablePanning(final boolean enablePanning) {
+        m_enablePanning = enablePanning;
     }
 
     /**
@@ -355,14 +419,18 @@ public class ScatterPlotViewConfig {
      * @param settings To save to.
      */
     public void saveSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(ALLOW_CONFIG, getAllowViewConfiguration());
+        settings.addBoolean(ENABLE_CONFIG, getEnableViewConfiguration());
+        settings.addBoolean(ENABLE_TTILE_CHANGE, getEnableTitleChange());
+        settings.addBoolean(ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
         settings.addBoolean(ENABLE_X_COL_CHANGE, getEnableXColumnChange());
         settings.addBoolean(ENABLE_Y_COL_CHANGE, getEnableYColumnChange());
         settings.addBoolean(ENABLE_X_LABEL_EDIT, getEnableXAxisLabelEdit());
         settings.addBoolean(ENABLE_Y_LABEL_EDIT, getEnableYAxisLabelEdit());
-        settings.addBoolean(ALLOW_DOT_SIZE_CHANGE, getAllowDotSizeChange());
-        settings.addBoolean(ALLOW_ZOOMING, getAllowZooming());
-        settings.addBoolean(ALLOW_PANNING, getAllowPanning());
+        settings.addBoolean(ENABLE_DOT_SIZE_CHANGE, getEnableDotSizeChange());
+        settings.addBoolean(ENABLE_ZOOMING, getEnableZooming());
+        settings.addBoolean(ENABLE_PANNING, getEnablePanning());
+        settings.addString(CHART_TITLE, getChartTitle());
+        settings.addString(CHART_SUBTITLE, getChartSubtitle());
         settings.addString(X_COL, getxColumn());
         settings.addString(Y_COL, getyColumn());
         settings.addInt(MAX_ROWS, getMaxRows());
@@ -380,14 +448,18 @@ public class ScatterPlotViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setAllowViewConfiguration(settings.getBoolean(ALLOW_CONFIG));
+        setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG));
+        setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE));
+        setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE));
         setEnableXColumnChange(settings.getBoolean(ENABLE_X_COL_CHANGE));
         setEnableYColumnChange(settings.getBoolean(ENABLE_Y_COL_CHANGE));
         setEnableXAxisLabelEdit(settings.getBoolean(ENABLE_X_LABEL_EDIT));
         setEnableYAxisLabelEdit(settings.getBoolean(ENABLE_Y_LABEL_EDIT));
-        setAllowDotSizeChange(settings.getBoolean(ALLOW_DOT_SIZE_CHANGE));
-        setAllowZooming(settings.getBoolean(ALLOW_ZOOMING));
-        setAllowPanning(settings.getBoolean(ALLOW_PANNING));
+        setEnableDotSizeChange(settings.getBoolean(ENABLE_DOT_SIZE_CHANGE));
+        setEnableZooming(settings.getBoolean(ENABLE_ZOOMING));
+        setEnablePanning(settings.getBoolean(ENABLE_PANNING));
+        setChartTitle(settings.getString(CHART_TITLE));
+        setChartSubtitle(settings.getString(CHART_SUBTITLE));
         setxColumn(settings.getString(X_COL));
         setyColumn(settings.getString(Y_COL));
         setMaxRows(settings.getInt(MAX_ROWS));
@@ -409,14 +481,18 @@ public class ScatterPlotViewConfig {
      * @param settings To load from.
      */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
-        setAllowViewConfiguration(settings.getBoolean(ALLOW_CONFIG, false));
+        setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG, false));
+        setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE, false));
+        setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE, false));
         setEnableXColumnChange(settings.getBoolean(ENABLE_X_COL_CHANGE, false));
         setEnableYColumnChange(settings.getBoolean(ENABLE_Y_COL_CHANGE, false));
         setEnableXAxisLabelEdit(settings.getBoolean(ENABLE_X_LABEL_EDIT, false));
         setEnableYAxisLabelEdit(settings.getBoolean(ENABLE_Y_LABEL_EDIT, false));
-        setAllowDotSizeChange(settings.getBoolean(ALLOW_DOT_SIZE_CHANGE, false));
-        setAllowZooming(settings.getBoolean(ALLOW_ZOOMING, true));
-        setAllowPanning(settings.getBoolean(ALLOW_PANNING, true));
+        setEnableDotSizeChange(settings.getBoolean(ENABLE_DOT_SIZE_CHANGE, false));
+        setEnableZooming(settings.getBoolean(ENABLE_ZOOMING, true));
+        setEnablePanning(settings.getBoolean(ENABLE_PANNING, true));
+        setChartTitle(settings.getString(CHART_TITLE, null));
+        setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
         setyColumn(settings.getString(Y_COL, null));
         setMaxRows(settings.getInt(MAX_ROWS, 2500));

@@ -66,6 +66,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ScatterPlotViewValue extends JSONViewContent {
 
+    private String m_chartTitle;
+    private String m_chartSubtitle;
     private String m_xAxisLabel;
     private String m_yAxisLabel;
     private String m_xColumn;
@@ -75,6 +77,34 @@ public class ScatterPlotViewValue extends JSONViewContent {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize;
+
+    /**
+     * @return the chartTitle
+     */
+    public String getChartTitle() {
+        return m_chartTitle;
+    }
+
+    /**
+     * @param chartTitle the chartTitle to set
+     */
+    public void setChartTitle(final String chartTitle) {
+        m_chartTitle = chartTitle;
+    }
+
+    /**
+     * @return the chartSubtitle
+     */
+    public String getChartSubtitle() {
+        return m_chartSubtitle;
+    }
+
+    /**
+     * @param chartSubtitle the chartSubtitle to set
+     */
+    public void setChartSubtitle(final String chartSubtitle) {
+        m_chartSubtitle = chartSubtitle;
+    }
 
     /**
      * @return the xAxisLabel
@@ -207,6 +237,8 @@ public class ScatterPlotViewValue extends JSONViewContent {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(ScatterPlotViewConfig.CHART_TITLE, getChartTitle());
+        settings.addString(ScatterPlotViewConfig.CHART_SUBTITLE, getChartSubtitle());
         settings.addString(ScatterPlotViewConfig.X_COL, getxColumn());
         settings.addString(ScatterPlotViewConfig.Y_COL, getyColumn());
         settings.addString(ScatterPlotViewConfig.X_AXIS_LABEL, getxAxisLabel());
@@ -223,6 +255,8 @@ public class ScatterPlotViewValue extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setChartTitle(settings.getString(ScatterPlotViewConfig.CHART_TITLE));
+        setChartSubtitle(settings.getString(ScatterPlotViewConfig.CHART_SUBTITLE));
         setxColumn(settings.getString(ScatterPlotViewConfig.X_COL));
         setyColumn(settings.getString(ScatterPlotViewConfig.Y_COL));
         setxAxisLabel(settings.getString(ScatterPlotViewConfig.X_AXIS_LABEL));

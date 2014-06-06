@@ -150,7 +150,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="noname"
+            name="noname Charting Library"
             version="1.0.0"
             webResourceBundleID="noname_1.0.0">
          <webResource

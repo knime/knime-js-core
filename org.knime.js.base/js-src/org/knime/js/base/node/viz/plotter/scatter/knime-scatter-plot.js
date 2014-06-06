@@ -4,7 +4,8 @@ knime_scatter_plot = function() {
 	var _representation = null;
 	var _value = null;
 	var _keyedDataset = null;
-	var chart = null;
+	var chartManager = null;
+	var containerID = "scatterContainer";
 	
 	view.init = function(representation, value) {
 		_representation = representation;
@@ -27,7 +28,7 @@ knime_scatter_plot = function() {
 			}
 			
 			drawChart();
-			if (_representation.allowViewConfiguration) {
+			if (_representation.enableViewConfiguration) {
 				drawControls();
 			}
 		} catch(err) {
@@ -56,48 +57,93 @@ knime_scatter_plot = function() {
 			alert("No column set for y axis!");
 			return;
 		}
-		if (!_value.xAxisLabel) {
-			_value.xAxisLabel = _value.xColumn;
-		}
-		if (!_value.yAxisLabel) {
-			_value.yAxisLabel = _value.yColumn;
-		}
+		var xAxisLabel = _value.xAxisLabel ? _value.xAxisLabel : _value.xColumn;
+		var yAxisLabel = _value.yAxisLabel ? _value.yAxisLabel : _value.yColumn;
+		
 		var dataset = buildXYDataset();
-		chart = noname.Charts.createScatterChart(dataset, _value.xAxisLabel, _value.yAxisLabel);
-		var container = "scatterContainer";
-		//chart.plot.renderer.toolTipHandler = xyToolTipHandler;
+		//chart = noname.Charts.createScatterChart("Scatter Plot", "Subtitle", dataset, xAxisLabel, yAxisLabel);
 		d3.select("html").style("width", "100%").style("height", "100%").style("overflow", "hidden");
 		d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
-		var chartHeight = _representation.allowViewConfiguration ? "80%" : "100%";
-		d3.select("body").attr("id", "body").append("div").attr("id", container).style("width", "100%").style("height", chartHeight).style("box-sizing", "border-box");
+		var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
+		d3.select("body").attr("id", "body").append("div").attr("id", containerID).style("width", "100%").style("height", chartHeight).style("box-sizing", "border-box").style("overflow", "hidden").style("margin", "0");
 		
-		chart.width(Math.max(400, document.getElementById(container).clientWidth));
-		chart.height(Math.max(300, document.getElementById(container).clientHeight));
-		chart.build(container);
+		//chart.build(container);
+				
+		var plot = new noname.XYPlot(dataset);
+        plot.getXAxis().setLabel(xAxisLabel);
+        plot.getXAxis().setLabelFont(new noname.Font("sans-serif", 12, true));
+        //plot.getXAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
+        plot.getYAxis().setLabel(yAxisLabel);
+        plot.getYAxis().setLabelFont(new noname.Font("sans-serif", 12, true));
+        //plot.getYAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
+        
+        plot.renderer = new noname.ScatterRenderer(plot);
+        var chart = new noname.Chart(plot);
+        chart.titleAnchor(new noname.Anchor2D(noname.RefPt2D.TOP_LEFT));
+        chart.title(noname.Charts.createTitleElement(_value.chartTitle, _value.chartSubtitle, chart.titleAnchor()));
+        chart._legendBuilder = null;
+		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
+        var svg = document.getElementById("chart_svg");
+        chartManager = new noname.ChartManager(svg, chart);
+        setChartDimensions();
+        chartManager.refreshDisplay();                
+        var win = document.defaultView || document.parentWindow;
+        win.onresize = resize;
+	};
+	
+	resize = function(event) {
+		setChartDimensions();
+        chartManager.refreshDisplay();
+	};
+	
+	setChartDimensions = function() {
+		var container = document.getElementById(containerID);
+		var w = Math.max(400, container.clientWidth);
+        var h = Math.max(300, container.clientHeight);
+        chartManager.getChart().width(w).height(h);
 	};
 	
 	updateChart = function() {
-		var plot = chart.plot();
+		var plot = chartManager.getChart().getPlot();
 		plot.setDataset(buildXYDataset());
-		plot.autoCalcBounds();
-		plot.update(chart);
+		//plot.autoCalcBounds();
+		chartManager.refreshDisplay();
+		//plot.update(chart);
 	};
 	
 	drawControls = function() {
-		/*allowViewConfiguration;
-	    enableXColumnChange;
-	    enableYColumnChange;
-	    enableXAxisLabelEdit;
-	    enableYAxisLabelEdit;
-	    allowDotSizeChange;
-	    allowZooming;
-	    allowPanning;*/
-	    var controlContainer = d3.select("body").append("table")
+		
+	    var controlContainer = d3.select("body").insert("table", "#" + containerID + " ~ *")
 	    	.attr("id", "scatterControls")
 	    	/*.style("width", "100%")*/
 	    	.style("padding", "10px")
 	    	.style("margin", "0 auto")
 	    	.style("box-sizing", "border-box");
+	    
+	    if (_representation.enableTitleChange || _representation.enableSubtitleChange) {
+	    	var titleEditContainer = controlContainer.append("tr");
+	    	if (_representation.enableTitleChange) {
+	    		titleEditContainer.append("td").append("label").attr("for", "chartTitleText").text("Chart Title:").style("margin-right", "5px");
+	    		var chartTitleText = titleEditContainer.append("td").append("input").attr("type", "text").attr("id", "chartTitleText").attr("name", "chartTitleText")
+	    		.on("blur", function() {
+	    			_value.chartTitle = document.getElementById("chartTitleText").value;
+	    			//TODO update chart
+	    		});
+	    		if (_representation.enableYAxisLabelEdit) {
+	    			chartTitleText.style("margin-right", "10px");
+	    		}
+	    		document.getElementById("chartTitleText").value = _value.chartTitle;
+	    	}
+	    	if (_representation.enableSubtitleChange) {
+	    		titleEditContainer.append("td").append("label").attr("for", "chartSubtitleText").text("Chart Subtitle:").style("margin-right", "5px");
+	    		titleEditContainer.append("td").append("input").attr("type", "text").attr("id", "chartSubtitleText").attr("name", "chartSubtitleText")
+	    		.on("blur", function() {
+	    			_value.chartSubtitle = document.getElementById("chartSubtitleText").value;
+	    			//TODO update chart
+	    		});
+	    		document.getElementById("chartSubtitleText").value = _value.chartSubtitle;
+	    	}
+	    }
 	    
 	    if (_representation.enableXColumnChange || _representation.enableYColumnChange) {
 	    	var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
@@ -138,7 +184,7 @@ knime_scatter_plot = function() {
 	    		var xAxisText = axisLabelContainer.append("td").append("input").attr("type", "text").attr("id", "xAxisText").attr("name", "xAxisText")
 	    		.on("blur", function() {
 	    			_value.xAxisLabel = document.getElementById("xAxisText").value;
-	    			updateChart();
+	    			chartManager.getChart().getPlot().getXAxis().setLabel(_value.xAxisLabel);
 	    		});
 	    		if (_representation.enableYAxisLabelEdit) {
 	    			xAxisText.style("margin-right", "10px");
@@ -150,12 +196,12 @@ knime_scatter_plot = function() {
 	    		axisLabelContainer.append("td").append("input").attr("type", "text").attr("id", "yAxisText").attr("name", "yAxisText")
 	    		.on("blur", function() {
 	    			_value.yAxisLabel = document.getElementById("yAxisText").value;
-	    			updateChart();
+	    			chartManager.getChart().getPlot().getYAxis().setLabel(_value.yAxisLabel);
 	    		});
 	    		document.getElementById("yAxisText").value = _value.yAxisLabel;
 	    	}
 	    }
-	    if (_representation.allowDotSizeChange) {
+	    if (_representation.enableDotSizeChange) {
 	    	var dotSizeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
 	    	dotSizeContainer.append("td").append("label").attr("for", "dotSizeInput").text("Dot Size:").style("margin-right", "5px");
 	    	dotSizeContainer.append("td").append("input").attr("type", "number").attr("id", "dotSizeInput").attr("name", "dotSizeInput").attr("value", _value.dotSize);

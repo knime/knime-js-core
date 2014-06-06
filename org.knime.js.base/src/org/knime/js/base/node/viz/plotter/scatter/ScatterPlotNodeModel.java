@@ -212,15 +212,19 @@ public class ScatterPlotNodeModel extends NodeModel implements
     }
 
     private void copyConfigToView() {
-        m_representation.setAllowViewConfiguration(m_config.getAllowViewConfiguration());
+        m_representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
+        m_representation.setEnableTitleChange(m_config.getEnableTitleChange());
+        m_representation.setEnableSubtitleChange(m_config.getEnableSubtitleChange());
         m_representation.setEnableXColumnChange(m_config.getEnableXColumnChange());
         m_representation.setEnableYColumnChange(m_config.getEnableYColumnChange());
         m_representation.setEnableXAxisLabelEdit(m_config.getEnableXAxisLabelEdit());
         m_representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
-        m_representation.setAllowDotSizeChange(m_config.getAllowDotSizeChange());
-        m_representation.setAllowZooming(m_config.getAllowZooming());
-        m_representation.setAllowPanning(m_config.getAllowPanning());
+        m_representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
+        m_representation.setEnableZooming(m_config.getEnableZooming());
+        m_representation.setEnablePanning(m_config.getEnablePanning());
 
+        m_viewValue.setChartTitle(m_config.getChartTitle());
+        m_viewValue.setChartSubtitle(m_config.getChartSubtitle());
         m_viewValue.setxColumn(m_config.getxColumn());
         m_viewValue.setyColumn(m_config.getyColumn());
         m_viewValue.setxAxisLabel(m_config.getxAxisLabel());
@@ -233,6 +237,8 @@ public class ScatterPlotNodeModel extends NodeModel implements
     }
 
     private void copyValueToConfig() {
+        m_config.setChartTitle(m_viewValue.getChartTitle());
+        m_config.setChartSubtitle(m_viewValue.getChartSubtitle());
         m_config.setxColumn(m_viewValue.getxColumn());
         m_config.setyColumn(m_viewValue.getyColumn());
         m_config.setxAxisLabel(m_viewValue.getxAxisLabel());
