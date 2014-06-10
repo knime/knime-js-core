@@ -43,23 +43,24 @@ knime_table_view = function(table, containerElement) {
 		}
 		for ( var i = 0; i < knimeTable.getNumRows(); i++) {
 			var tableRow = $('<tr>');
-			table.append(tableRow);
 			tableRow.attr('id', 'row' + i);
 			tableRow.attr('class', 'knimeTableRow');
 			
 			if (showRowKeys) {
 				var rowKeyCell = $('<td>');
 				rowKeyCell.attr('class', 'knimeTableCell knimeTableRowKeyCell');
+				var rowKeyWrapper = $('<div>');
+				rowKeyWrapper.attr('class', 'knimeTableRowKeyWrapper');
 				var colorBox = $('<div>');
 				colorBox.attr('class', 'knimeTableRowColor');
 				colorBox.css('background-color', knimeTable.getRowColors()[i]);
 				colorBox.css('width', 16).css('height', 16);
-				rowKeyCell.append(colorBox);
+				rowKeyWrapper.append(colorBox);
 				var rowKeyTextBox = $('<div>');
 				rowKeyTextBox.attr('class', 'knimeTableRowKeyText');
 				rowKeyTextBox.text(knimeTable.getRows()[i].rowKey);
-				rowKeyCell.append(rowKeyTextBox);
-				
+				rowKeyWrapper.append(rowKeyTextBox);
+				rowKeyCell.append(rowKeyWrapper);
 				tableRow.append(rowKeyCell);
 			}
 			
@@ -67,16 +68,17 @@ knime_table_view = function(table, containerElement) {
 				var columnType = knimeTable.getColumnTypes()[j];
 				var tableData = $('<td>');
 				tableData.attr('class', 'knimeTableCell');
-				tableRow.append(tableData);
 				if (columnType=="boolean" || columnType=="number" || columnType=="string") {
 					tableData.text(knimeTable.getRows()[i].data[j]);
 							/*knimeTable.getColumn(j)[i]);*/
 				} else if (columnType=="png") {
 					var image = $('<img>');
 					tableData.append(image);
-					image.attr('src', 'data:image/png;base64,' + knimeTable.getRows[i].data[j]);
+					image.attr('src', 'data:image/png;base64,' + knimeTable.getRows()[i].data[j]);
 				}
+				tableRow.append(tableData);
 			}
+			table.append(tableRow);
 		}
 		container.append(table);
 		for (var i = 0; i < additionalDrawFunctions.length; i++) {

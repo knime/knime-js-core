@@ -8,11 +8,19 @@ knime_table_viewer = function() {
 		if (representation.table == null) {
 			body.append("Error: No data available");
 		} else {
-			var knimeTable = new kt();
-			knimeTable.setDataTable(representation.table);
-			table_view = new knime_table_view(knimeTable, body);
-			table_view.setShowRowKeys(true);
-			table_view.draw();
+			try {
+				var knimeTable = new kt();
+				knimeTable.setDataTable(representation.table);
+				table_view = new knime_table_view(knimeTable, body);
+				table_view.setShowRowKeys(true);
+				table_view.draw();
+			} catch (err) {
+				if (err.stack) {
+					alert(err.stack);
+				} else {
+					alert (err);
+				}
+			}
 		}
 	};
 	

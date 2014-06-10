@@ -31,17 +31,16 @@ table.knimeTableView .knimeTableRowKeyCell {
 	background-color: #E5E5E5;
 	font-style: italic;
 	padding-left: 0;
+	white-space: nowrap;
 }
 
 table.knimeTableView .knimeTableRowColor {
-	float: left;
+	display: inline-block;
 	margin-right: 3px;
+	vertical-align: middle;
 }
 
 table.knimeTableView .knimeTableRowKeyText {
-	float: left;
-}
-
-table.knimeTableView .knimeTableRowKeyText:after {
-	clear: both;
+	display: inline-block;
+	vertical-align: middle;
 }
