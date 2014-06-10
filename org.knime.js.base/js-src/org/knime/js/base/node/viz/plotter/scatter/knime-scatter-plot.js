@@ -9,6 +9,8 @@ knime_scatter_plot = function() {
 	
 	var minWidth = 400;
 	var minHeight = 300;
+	var defaultFont = "sans-serif";
+	var defaultFontSize = 12;
 	
 	view.init = function(representation, value) {
 		_representation = representation;
@@ -82,10 +84,10 @@ knime_scatter_plot = function() {
 				
 		var plot = new noname.XYPlot(dataset);
         plot.getXAxis().setLabel(xAxisLabel);
-        plot.getXAxis().setLabelFont(new noname.Font("sans-serif", 12, true));
+        plot.getXAxis().setLabelFont(new noname.Font(defaultFont, defaultFontSize, true));
         //plot.getXAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
         plot.getYAxis().setLabel(yAxisLabel);
-        plot.getYAxis().setLabelFont(new noname.Font("sans-serif", 12, true));
+        plot.getYAxis().setLabelFont(new noname.Font(defaultFont, defaultFontSize, true));
         //plot.getYAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
         
         plot.renderer = new noname.ScatterRenderer(plot);
@@ -120,7 +122,7 @@ knime_scatter_plot = function() {
 		var plot = chartManager.getChart().getPlot();
 		plot.setDataset(buildXYDataset());
 		//plot.autoCalcBounds();
-		chartManager.refreshDisplay();
+		//chartManager.refreshDisplay();
 		//plot.update(chart);
 	};
 	
@@ -131,16 +133,23 @@ knime_scatter_plot = function() {
 	    	/*.style("width", "100%")*/
 	    	.style("padding", "10px")
 	    	.style("margin", "0 auto")
-	    	.style("box-sizing", "border-box");
+	    	.style("box-sizing", "border-box")
+	    	.style("font-family", defaultFont)
+	    	.style("font-size", defaultFontSize+"px");
 	    
 	    if (_representation.enableTitleChange || _representation.enableSubtitleChange) {
 	    	var titleEditContainer = controlContainer.append("tr");
 	    	if (_representation.enableTitleChange) {
 	    		titleEditContainer.append("td").append("label").attr("for", "chartTitleText").text("Chart Title:").style("margin-right", "5px");
-	    		var chartTitleText = titleEditContainer.append("td").append("input").attr("type", "text").attr("id", "chartTitleText").attr("name", "chartTitleText")
+	    		var chartTitleText = titleEditContainer.append("td").append("input")
+	    			.attr("type", "text")
+	    			.attr("id", "chartTitleText")
+	    			.attr("name", "chartTitleText")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
 	    			_value.chartTitle = document.getElementById("chartTitleText").value;
-	    			//TODO update chart
+	    			chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
 	    		});
 	    		if (_representation.enableYAxisLabelEdit) {
 	    			chartTitleText.style("margin-right", "10px");
@@ -149,10 +158,15 @@ knime_scatter_plot = function() {
 	    	}
 	    	if (_representation.enableSubtitleChange) {
 	    		titleEditContainer.append("td").append("label").attr("for", "chartSubtitleText").text("Chart Subtitle:").style("margin-right", "5px");
-	    		titleEditContainer.append("td").append("input").attr("type", "text").attr("id", "chartSubtitleText").attr("name", "chartSubtitleText")
+	    		titleEditContainer.append("td").append("input")
+	    			.attr("type", "text")
+	    			.attr("id", "chartSubtitleText")
+	    			.attr("name", "chartSubtitleText")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
 	    			_value.chartSubtitle = document.getElementById("chartSubtitleText").value;
-	    			//TODO update chart
+	    			chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
 	    		});
 	    		document.getElementById("chartSubtitleText").value = _value.chartSubtitle;
 	    	}
@@ -162,7 +176,11 @@ knime_scatter_plot = function() {
 	    	var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
 	    	if (_representation.enableXColumnChange) {
 	    		columnChangeContainer.append("td").append("label").attr("for", "xColumnSelect").text("X Column:").style("margin-right", "5px");
-	    		var xSelect = columnChangeContainer.append("td").append("select").attr("id", "xColumnSelect").attr("name", "xColumnSelect");
+	    		var xSelect = columnChangeContainer.append("td").append("select")
+	    			.attr("id", "xColumnSelect")
+	    			.attr("name", "xColumnSelect")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px");
 	    		var columnKeys = _keyedDataset.columnKeys();
 	    		for (var colID = 0; colID < columnKeys.length; colID++) {
 	    			xSelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
@@ -178,7 +196,11 @@ knime_scatter_plot = function() {
 	    	}
 	    	if (_representation.enableYColumnChange) {
 	    		columnChangeContainer.append("td").append("label").attr("for", "yColumnSelect").text("Y Column:").style("margin-right", "5px");
-	    		var ySelect = columnChangeContainer.append("td").append("select").attr("id", "yColumnSelect").attr("name", "yColumnSelect");
+	    		var ySelect = columnChangeContainer.append("td").append("select")
+	    			.attr("id", "yColumnSelect")
+	    			.attr("name", "yColumnSelect")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px");
 	    		var columnKeys = _keyedDataset.columnKeys();
 	    		for (var colID = 0; colID < columnKeys.length; colID++) {
 	    			ySelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
@@ -194,7 +216,12 @@ knime_scatter_plot = function() {
 	    	var axisLabelContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
 	    	if (_representation.enableXAxisLabelEdit) {
 	    		axisLabelContainer.append("td").append("label").attr("for", "xAxisText").text("X Axis Label:").style("margin-right", "5px");
-	    		var xAxisText = axisLabelContainer.append("td").append("input").attr("type", "text").attr("id", "xAxisText").attr("name", "xAxisText")
+	    		var xAxisText = axisLabelContainer.append("td").append("input")
+	    			.attr("type", "text")
+	    			.attr("id", "xAxisText")
+	    			.attr("name", "xAxisText")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
 	    			_value.xAxisLabel = document.getElementById("xAxisText").value;
 	    			chartManager.getChart().getPlot().getXAxis().setLabel(_value.xAxisLabel);
@@ -206,7 +233,12 @@ knime_scatter_plot = function() {
 	    	}
 	    	if (_representation.enableYAxisLabelEdit) {
 	    		axisLabelContainer.append("td").append("label").attr("for", "yAxisText").text("Y Axis Label:").style("margin-right", "5px");
-	    		axisLabelContainer.append("td").append("input").attr("type", "text").attr("id", "yAxisText").attr("name", "yAxisText")
+	    		axisLabelContainer.append("td").append("input")
+	    			.attr("type", "text")
+	    			.attr("id", "yAxisText")
+	    			.attr("name", "yAxisText")
+	    			.style("font-family", defaultFont)
+	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
 	    			_value.yAxisLabel = document.getElementById("yAxisText").value;
 	    			chartManager.getChart().getPlot().getYAxis().setLabel(_value.yAxisLabel);
@@ -217,7 +249,13 @@ knime_scatter_plot = function() {
 	    if (_representation.enableDotSizeChange) {
 	    	var dotSizeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
 	    	dotSizeContainer.append("td").append("label").attr("for", "dotSizeInput").text("Dot Size:").style("margin-right", "5px");
-	    	dotSizeContainer.append("td").append("input").attr("type", "number").attr("id", "dotSizeInput").attr("name", "dotSizeInput").attr("value", _value.dotSize);
+	    	dotSizeContainer.append("td").append("input")
+	    		.attr("type", "number")
+	    		.attr("id", "dotSizeInput")
+	    		.attr("name", "dotSizeInput")
+	    		.attr("value", _value.dotSize)
+	    		.style("font-family", defaultFont)
+	    		.style("font-size", defaultFontSize+"px");
 	    }
 	};
 	
