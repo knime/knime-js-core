@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -40,66 +41,29 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *   23.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   10.06.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.table;
+package org.knime.js.base.util.table;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
-import org.knime.js.base.util.table.WebTableNodeDialogPane;
-import org.knime.js.base.util.table.WebTableViewRepresentation;
-import org.knime.js.base.util.table.WebTableViewValue;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class WebTableViewNodeFactory extends NodeFactory<WebTableViewNodeModel> implements
-    WizardNodeFactoryExtension<WebTableViewNodeModel, WebTableViewRepresentation, WebTableViewValue> {
+public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
 
     /**
-     * {@inheritDoc}
+     * Creates a new dialog pane.
      */
-    @Override
-    public WebTableViewNodeModel createNodeModel() {
-        return new WebTableViewNodeModel();
+    public WebTableNodeDialogPane() {
+        super();
+        addDialogComponent(new DialogComponentNumber(new SettingsModelIntegerBounded(
+            WebTableNodeModel.CFG_END, WebTableNodeModel.END, 1, Integer.MAX_VALUE), "No. of rows to display:", 10));
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<WebTableViewNodeModel> createNodeView(final int viewIndex, final WebTableViewNodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new WebTableNodeDialogPane();
-    }
-
 }

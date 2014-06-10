@@ -73,31 +73,31 @@
             factory-class="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
       </node>
-      <node
+      <!-- <node
             after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             category-path="/labs/quickform/view"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
-            id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/>
+            id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/> -->
       <node
-            after="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
+            after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory">
       </node>
-      <node
+      <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
             category-path="/labs/quickform/view"
             factory-class="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory">
-      </node>
-      <node
+      </node> -->
+      <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
             category-path="/labs/quickform/view"
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
-            id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/>
+            id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
-            after="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
+            after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
@@ -157,7 +157,7 @@
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </webResourceBundle>
-      <webResourceBundle
+      <!-- <webResourceBundle
             debug="true"
             name="Line Plotter"
             version="1.0.0"
@@ -180,8 +180,8 @@
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
-      </webResourceBundle>
-      <webResourceBundle
+      </webResourceBundle> -->
+      <!-- <webResourceBundle
             debug="true"
             name="Row Selector"
             version="1.0.0"
@@ -204,7 +204,7 @@
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
-      </webResourceBundle>
+      </webResourceBundle> -->
       <webResourceBundle
             debug="true"
             name="Table"
@@ -330,7 +330,7 @@
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </webResourceBundle>
-      <webResourceBundle
+      <!-- <webResourceBundle
             debug="true"
             name="Scatter Plot Own"
             version="1.0.0"
@@ -353,7 +353,7 @@
          <webDependency
                webResourceBundleID="KnimeTable_1.0.0">
          </webDependency>
-      </webResourceBundle>
+      </webResourceBundle> -->
       <webResourceBundle
             debug="true"
             name="Single Selection Quickform"
@@ -567,7 +567,7 @@
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
-      <javascriptComponent
+      <!-- <javascriptComponent
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.plotter.line.bundle"
             init-method-name="init"
@@ -575,8 +575,8 @@
             name="DEV Line Chart"
             namespace="knime_line_plotter"
             validate-method-name="validate">
-      </javascriptComponent>
-      <javascriptComponent
+      </javascriptComponent> -->
+      <!-- <javascriptComponent
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.rowselector.bundle"
             init-method-name="init"
@@ -584,8 +584,8 @@
             name="DEV Table Row Selector"
             namespace="knime_row_selector"
             validate-method-name="validate">
-      </javascriptComponent>
-      <javascriptComponent
+      </javascriptComponent> -->
+      <!-- <javascriptComponent
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.plotter.scatter_own.bundle"
             init-method-name="init"
@@ -593,7 +593,7 @@
             name="DEV Scatter Plot"
             namespace="knime_scatter_plotter"
             validate-method-name="validate">
-      </javascriptComponent>
+      </javascriptComponent> -->
       <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.string.bundle"

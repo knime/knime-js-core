@@ -62,6 +62,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -78,9 +79,17 @@ import org.knime.core.node.wizard.WizardNode;
 public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, VAL extends WebTableViewValue>
         extends NodeModel implements WizardNode<REP, VAL> {
 
+    /** Config key for the last displayed row. */
+    public static final String CFG_END = "end";
+    /** Default end row for table creation. */
+    public static final int END = 500;
+
     private JSONDataTable m_input;
     private REP m_viewRepresentation;
     private VAL m_viewValue;
+
+    private final SettingsModelIntegerBounded m_maxRows
+        = createLastDisplayedRowModel(END);
 
     /**
      * Creates a new model with the given number (and types!) of input and
@@ -92,6 +101,15 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         super(inPortTypes, outPortTypes);
         m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
+    }
+
+    /** @param end The last row index to display.
+     * @return settings model for the max row count property.
+     * */
+    static SettingsModelIntegerBounded createLastDisplayedRowModel(
+            final int end) {
+        return new SettingsModelIntegerBounded(
+                CFG_END, end, 1, Integer.MAX_VALUE);
     }
 
     /**
@@ -109,8 +127,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         BufferedDataTable dataTable = (BufferedDataTable)inObjects[0];
-        m_input = new JSONDataTable(dataTable, 1, dataTable.getRowCount(), exec);
+        m_input = new JSONDataTable(dataTable, 1, m_maxRows.getIntValue(), exec);
         getViewRepresentation().setTable(m_input);
+        if (m_maxRows.getIntValue() < dataTable.getRowCount()) {
+            setWarningMessage("Only the first "
+                    + m_maxRows.getIntValue() + " rows are displayed.");
+        }
         return new PortObject[0];
     }
 
@@ -210,8 +232,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+        m_maxRows.saveSettingsTo(settings);
     }
 
     /**
@@ -219,8 +240,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        m_maxRows.validateSettings(settings);
     }
 
     /**
@@ -228,8 +248,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        m_maxRows.loadSettingsFrom(settings);
     }
 
     /**
@@ -240,6 +259,13 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_input = null;
         m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
+    }
+
+    /**
+     * @return the last row index
+     */
+    public int getEndIndex() {
+        return m_maxRows.getIntValue();
     }
 
 }
