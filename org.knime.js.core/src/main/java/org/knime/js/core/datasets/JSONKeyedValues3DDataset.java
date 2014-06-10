@@ -157,7 +157,6 @@ public class JSONKeyedValues3DDataset implements JSONDataset {
      * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
      */
     @JsonAutoDetect
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     public static class KeyedValues3DSeries implements JSONDataset {
 
         private String m_seriesKey;

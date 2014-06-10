@@ -48,7 +48,6 @@
 package org.knime.js.core.datasets;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
@@ -56,7 +55,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @param <I> The concrete implementation of a dataset series item.
  */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONDatasetSeries<I extends JSONDatasetSeriesItem> {
 
     private String m_seriesKey;

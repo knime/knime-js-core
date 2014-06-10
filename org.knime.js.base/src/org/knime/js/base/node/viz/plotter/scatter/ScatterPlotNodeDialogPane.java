@@ -66,6 +66,7 @@ import javax.swing.event.ChangeListener;
 
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
@@ -124,8 +125,8 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
         // Change to include string columns when JS library supports it
-        m_xColComboBox = new ColumnSelectionPanel("Choose column for x axis", DoubleValue.class);
-        m_yColComboBox = new ColumnSelectionPanel("Choose column for y axis", DoubleValue.class);
+        m_xColComboBox = new ColumnSelectionPanel("Choose column for x axis", DoubleValue.class, StringValue.class);
+        m_yColComboBox = new ColumnSelectionPanel("Choose column for y axis", DoubleValue.class, StringValue.class);
         m_xAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_yAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_dotSize = new JSpinner();

@@ -4,28 +4,27 @@ if (!noname) {
 }
 noname.Charts = {};
 noname.Charts.createTitleElement = function(title, subtitle, anchor) {
-  if (title) {
-    var titleFont = new noname.Font("Palatino, serif", 16, true, false);
-    var halign = noname.HAlign.LEFT;
-    var refPt = anchor ? anchor.refPt() : noname.RefPt2D.TOP_LEFT;
-    if (noname.RefPt2D.isHorizontalCenter(refPt)) {
-      halign = noname.HAlign.CENTER;
-    } else {
-      if (noname.RefPt2D.isRight(refPt)) {
-        halign = noname.HAlign.RIGHT;
-      }
+  noname.Args.requireString(title);
+  var titleFont = new noname.Font("Palatino, serif", 16, true, false);
+  var halign = noname.HAlign.LEFT;
+  var refPt = anchor ? anchor.refPt() : noname.RefPt2D.TOP_LEFT;
+  if (noname.RefPt2D.isHorizontalCenter(refPt)) {
+    halign = noname.HAlign.CENTER;
+  } else {
+    if (noname.RefPt2D.isRight(refPt)) {
+      halign = noname.HAlign.RIGHT;
     }
-    var titleElement = (new noname.TextElement(title)).font(titleFont).halign(halign);
-    if (subtitle) {
-      var subtitleFont = new noname.Font("Palatino, serif", 12, false, true);
-      var subtitleElement = (new noname.TextElement(subtitle)).font(subtitleFont).halign(halign);
-      var composite = new noname.GridElement;
-      composite.add(titleElement, "R1", "C1");
-      composite.add(subtitleElement, "R2", "C1");
-      return composite;
-    } else {
-      return new noname.TextElement(title);
-    }
+  }
+  var titleElement = (new noname.TextElement(title)).font(titleFont).halign(halign);
+  if (subtitle) {
+    var subtitleFont = new noname.Font("Palatino, serif", 12, false, true);
+    var subtitleElement = (new noname.TextElement(subtitle)).font(subtitleFont).halign(halign);
+    var composite = new noname.GridElement;
+    composite.add(titleElement, "R1", "C1");
+    composite.add(subtitleElement, "R2", "C1");
+    return composite;
+  } else {
+    return new noname.TextElement(title);
   }
 };
 noname.Charts.createPieChart = function(title, subtitle, dataset) {
@@ -86,8 +85,8 @@ noname.Charts.createScatterChart = function(title, subtitle, dataset, xAxisLabel
   plot.getYAxis().setLabel(yAxisLabel);
   plot.renderer = new noname.ScatterRenderer(plot);
   var chart = new noname.Chart(plot);
-  chart.initMargin({top:5, right:5, left:30, bottom:20});
-  chart.title(noname.Charts.createTitleElement(title, subtitle, chart.titleAnchor()));
+  chart.setPadding(5, 5, 5, 5);
+  chart.setTitle(title, subtitle, chart.getTitleAnchor());
   return chart;
 };
 noname.Charts.createXYLineChart = function(title, subtitle, dataset, xAxisLabel, yAxisLabel) {
@@ -118,7 +117,8 @@ noname.Charts.createXYBarChart = function(title, subtitle, dataset, xAxisLabel, 
   var renderer = new noname.XYBarRenderer;
   plot.setRenderer(renderer);
   var chart = new noname.Chart(plot);
-  chart.title(noname.Charts.createTitleElement(title, subtitle, chart.titleAnchor()));
+  var titleAnchor = new noname.Anchor2D(noname.RefPt2D.TOP_LEFT);
+  chart.setTitle(title, subtitle, titleAnchor);
   return chart;
 };
 noname.Chart = function(plot) {
@@ -126,13 +126,14 @@ noname.Chart = function(plot) {
     throw new Error("Use 'new' for construction.");
   }
   this._elementId;
-  this._width = 400;
-  this._height = 240;
-  this._initMargin = {top:5, right:5, bottom:5, left:5};
-  this._title = null;
+  this._size = new noname.Dimension(400, 240);
+  var white = new noname.Color(255, 255, 255);
+  this._backgroundPainter = new noname.StandardRectanglePainter(white, null);
+  this._padding = new noname.Insets(4, 4, 4, 4);
+  this._titleElement = null;
   this._titleAnchor = new noname.Anchor2D(noname.RefPt2D.TOP_LEFT);
   this._plot = plot;
-  this._legendBuilder = new noname.LegendBuilder;
+  this._legendBuilder = new noname.StandardLegendBuilder;
   this._legendAnchor = new noname.Anchor2D(noname.RefPt2D.BOTTOM_RIGHT);
   this._listeners = [];
   var plotListener = function(c) {
@@ -144,109 +145,88 @@ noname.Chart = function(plot) {
   plot.addListener(plotListener);
   plot.chart = this;
 };
-noname.Chart.prototype.elementId = function(str) {
-  if (!arguments.length) {
-    return this._elementId;
-  }
-  this._elementId = str;
-  return this;
+noname.Chart.prototype.getElementID = function() {
+  return this._elementId;
 };
-noname.Chart.prototype.width = function(value) {
-  if (!arguments.length) {
-    return this._width;
-  }
-  this._width = value;
-  return this;
+noname.Chart.prototype.setElementID = function(id) {
+  this._elementId = id;
 };
-noname.Chart.prototype.height = function(value) {
-  if (!arguments.length) {
-    return this._height;
-  }
-  this._height = value;
-  return this;
+noname.Chart.prototype.getSize = function() {
+  return this._size;
 };
-noname.Chart.prototype.initMargin = function(obj) {
-  if (!arguments.length) {
-    return this._initMargin;
+noname.Chart.prototype.setSize = function(width, height, notify) {
+  this._size = new noname.Dimension(width, height);
+  if (notify !== false) {
+    this.notifyListeners();
   }
-  this._initMargin = obj;
-  return this;
 };
-noname.Chart.prototype.margin = function() {
-  return this._margin;
+noname.Chart.prototype.getBackground = function() {
+  return this._backgroundPainter;
 };
-noname.Chart.prototype.title = function(t) {
-  if (!arguments.length) {
-    return this._title;
+noname.Chart.prototype.setBackground = function(painter, notify) {
+  this._backgroundPainter = painter;
+  if (notify !== false) {
+    this.notifyListeners();
   }
-  this._title = t;
-  return this;
 };
-noname.Chart.prototype.titleAnchor = function(anchor) {
-  if (!arguments.length) {
-    return this._titleAnchor;
+noname.Chart.prototype.setBackgroundColor = function(color, notify) {
+  var painter = new noname.StandardRectanglePainter(color);
+  this.setBackground(painter, notify);
+};
+noname.Chart.prototype.getPadding = function() {
+  return this._padding;
+};
+noname.Chart.prototype.setPadding = function(top, left, bottom, right, notify) {
+  this._padding = new noname.Insets(top, left, bottom, right);
+  if (notify !== false) {
+    this.notifyListeners();
   }
+};
+noname.Chart.prototype.getTitleElement = function() {
+  return this._titleElement;
+};
+noname.Chart.prototype.setTitleElement = function(title, notify) {
+  this._title = title;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.Chart.prototype.setTitle = function(title, subtitle, anchor, notify) {
+  var title = noname.Charts.createTitleElement(title, subtitle, anchor);
+  this.setTitleElement(title, notify);
+};
+noname.Chart.prototype.updateTitle = function(title, font, color) {
+};
+noname.Chart.prototype.updateSubtitle = function(subtitle, font, color) {
+};
+noname.Chart.prototype.getTitleAnchor = function() {
+  return this._titleAnchor;
+};
+noname.Chart.prototype.setTitleAnchor = function(anchor, notify) {
   this._titleAnchor = anchor;
-  return this;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
 };
 noname.Chart.prototype.getPlot = function() {
   return this._plot;
 };
-noname.Chart.prototype.plot = function(obj) {
-  throw new Error("This method is replaced by getPlot().");if (!arguments.length) {
-    return this._plot;
-  }
-  this._plot = obj;
-  return this;
+noname.Chart.prototype.getLegendBuilder = function() {
+  return this._legendBuilder;
 };
-noname.Chart.prototype.plotChanged = function(plot) {
+noname.Chart.prototype.setLegendBuilder = function(builder, notify) {
+  this._legendBuilder = builder;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
 };
-noname.Chart.prototype.build = function(id) {
-  this.elementId(id);
-  var element = document.getElementById(id);
-  var doc = element.ownerDocument;
-  var win = document.defaultView || document.parentWindow;
-  var container = d3.select("#" + id);
-  var chart = this;
-  var resize = function() {
-    chart.width(element.clientWidth).height(element.clientHeight);
-    container.select("svg").remove();
-    chart.build(id);
-  };
-  win.onresize = resize;
-  var chartBounds = new noname.Rectangle(0, 0, chart.width(), chart.height());
-  var svg = container.append("svg").attr("width", this._width).attr("height", this._height).attr("overflow", "hidden");
-  var context = new noname.SVGContext2D(svg[0][0]);
-  var adjMargin = {top:this._initMargin.top, right:this._initMargin.right, bottom:this._initMargin.bottom, left:this._initMargin.left};
-  if (this._title) {
-    var titleDim = this._title.preferredSize(context, chartBounds);
-    this._adjustMargin(adjMargin, titleDim, this._titleAnchor);
-  }
-  if (this._legendBuilder) {
-    var legend = this._legendBuilder.createLegend(chart.getPlot(), "anchor", "orientation", "style");
-    var legendDim = legend.preferredSize(context, chartBounds);
-    this._adjustMargin(adjMargin, legendDim, this._legendAnchor);
-  }
-  this._margin = adjMargin;
-  var defs = svg.append("defs");
-  var filter = defs.append("filter").attr("id", "glow1");
-  filter.append("feColorMatrix").attr("type", "matrix").attr("values", "0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0");
-  filter.append("feGaussianBlur").attr("stdDeviation", 2.5).attr("result", "blur");
-  var feMerge = filter.append("feMerge");
-  feMerge.append("feMergeNode").attr("in", "blur");
-  feMerge.append("feMergeNode").attr("in", "SourceGraphic");
-  var svgg = svg.append("g");
-  svgg.append("rect").attr("x", 0.5).attr("y", 0.5).attr("width", this._width - 1).attr("height", this._height - 1).attr("style", "fill:rgb(255,255,255);stroke-width:1;stroke:rgb(100,100,100)");
-  this._plot.build(this, svgg);
-  if (this._legendBuilder) {
-    var fitter = new noname.Fit2D(this._legendAnchor);
-    var dest = fitter.fit(legendDim, chartBounds);
-    legend.draw(context, dest);
-  }
-  if (this._title) {
-    var fitter = new noname.Fit2D(this._titleAnchor);
-    var dest = fitter.fit(titleDim, chartBounds);
-    this._title.draw(context, dest);
+noname.Chart.prototype.getLegendAnchor = function() {
+  return this._legendAnchor;
+};
+noname.Chart.prototype.setLegendAnchor = function(anchor, notify) {
+  this._legendAnchor = anchor;
+  if (notify !== false) {
+    this.notifyListeners();
   }
 };
 noname.Chart.prototype._adjustMargin = function(margin, dim, anchor) {
@@ -259,8 +239,9 @@ noname.Chart.prototype._adjustMargin = function(margin, dim, anchor) {
   }
 };
 noname.Chart.prototype.draw = function(ctx, bounds) {
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(bounds.x(), bounds.y(), bounds.width(), bounds.height());
+  if (this._backgroundPainter) {
+    this._backgroundPainter.paint(ctx, bounds);
+  }
   var titleDim = new noname.Dimension(0, 0);
   var legendDim = new noname.Dimension(0, 0);
   if (this._title) {
@@ -271,10 +252,11 @@ noname.Chart.prototype.draw = function(ctx, bounds) {
     legend = this._legendBuilder.createLegend(this._plot, "anchor", "orientation", "style");
     legendDim = legend.preferredSize(ctx, bounds);
   }
-  var px = this.initMargin().left;
-  var py = this.initMargin().top + titleDim.height();
-  var pw = this.width() - this.initMargin().left - this.initMargin().right;
-  var ph = this.height() - this.initMargin().top - this.initMargin().bottom - titleDim.height() - legendDim.height();
+  var padding = this.getPadding();
+  var px = padding.left();
+  var py = padding.top() + titleDim.height();
+  var pw = this._size.width() - padding.left() - padding.right();
+  var ph = this._size.height() - padding.top() - padding.bottom() - titleDim.height() - legendDim.height();
   this._plotArea = new noname.Rectangle(px, py, pw, ph);
   this._plot.draw(ctx, bounds, this._plotArea);
   if (legend) {
@@ -300,125 +282,54 @@ noname.Chart.prototype.notifyListeners = function() {
     f(chart);
   });
 };
-noname.Chart2D = function(plot) {
-  if (!(this instanceof noname.Chart2D)) {
-    throw new Error("Use 'new' for construction.");
-  }
-  this._elementId;
-  this._width = 400;
-  this._height = 240;
-  this._initMargin = {top:5, right:5, bottom:5, left:5};
-  this._title = null;
-  this._titleAnchor = new noname.Anchor2D(noname.RefPt2D.TOP_LEFT);
-  this._plot = plot;
-  this._legendBuilder = new noname.LegendBuilder;
-  this._legendAnchor = new noname.Anchor2D(noname.RefPt2D.BOTTOM_RIGHT);
-  this._listeners = [];
-  var plotListener = function(c) {
-    var chart = c;
-    return function(plot) {
-      chart.notifyListeners();
-    };
-  }(this);
-  plot.addListener(plotListener);
-  plot.chart = this;
-};
-noname.Chart2D.prototype.elementId = function(str) {
-  if (!arguments.length) {
-    return this._elementId;
-  }
-  this._elementId = str;
-  return this;
-};
-noname.Chart2D.prototype.width = function(value) {
-  if (!arguments.length) {
-    return this._width;
-  }
-  this._width = value;
-  return this;
-};
-noname.Chart2D.prototype.height = function(value) {
-  if (!arguments.length) {
-    return this._height;
-  }
-  this._height = value;
-  return this;
-};
-noname.Chart2D.prototype.initMargin = function(obj) {
-  if (!arguments.length) {
-    return this._initMargin;
-  }
-  this._initMargin = obj;
-  return this;
-};
-noname.Chart2D.prototype.margin = function() {
-  return this._margin;
-};
-noname.Chart2D.prototype.title = function(t) {
-  if (!arguments.length) {
+noname.Chart.prototype.title = function(t) {
+  throw new Error("Use get/setTitle()");if (!arguments.length) {
     return this._title;
   }
   this._title = t;
   return this;
 };
-noname.Chart2D.prototype.titleAnchor = function(anchor) {
-  if (!arguments.length) {
+noname.Chart.prototype.titleAnchor = function(anchor) {
+  throw new Error("Use get/setTitleAnchor.");if (!arguments.length) {
     return this._titleAnchor;
   }
   this._titleAnchor = anchor;
   return this;
 };
-noname.Chart2D.prototype.getPlot = function() {
-  return this._plot;
-};
-noname.Chart2D.prototype.plot = function(obj) {
+noname.Chart.prototype.plot = function(obj) {
   throw new Error("This method is replaced by getPlot().");if (!arguments.length) {
     return this._plot;
   }
   this._plot = obj;
   return this;
 };
-noname.Chart2D.prototype.draw = function(ctx, bounds) {
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(bounds.x(), bounds.y(), bounds.width(), bounds.height());
-  var titleDim = new noname.Dimension(0, 0);
-  var legendDim = new noname.Dimension(0, 0);
-  if (this._title) {
-    titleDim = this._title.preferredSize(ctx, bounds);
+noname.Chart.prototype.width = function(value) {
+  throw new Error("Use get/setSize() instead.");if (!arguments.length) {
+    return this._width;
   }
-  var legend;
-  if (this._legendBuilder) {
-    legend = this._legendBuilder.createLegend(this._plot, "anchor", "orientation", "style");
-    legendDim = legend.preferredSize(ctx, bounds);
-  }
-  var px = this.margin().left;
-  var py = this.margin().top + titleDim.height();
-  var pw = this.width() - this.margin().left - this.margin().right;
-  var ph = this.height() - this.margin().top - this.margin().bottom - titleDim.height() - legendDim.height();
-  this._plotArea = new noname.Rectangle(px, py, pw, ph);
-  this._plot.draw(ctx, bounds, this._plotArea);
-  if (legend) {
-    var fitter = new noname.Fit2D(this._legendAnchor);
-    var dest = fitter.fit(legendDim, bounds);
-    legend.draw(ctx, dest);
-  }
-  if (this._title) {
-    var fitter = new noname.Fit2D(this._titleAnchor);
-    var dest = fitter.fit(titleDim, bounds);
-    this._title.draw(ctx, dest);
-  }
+  this._width = value;
+  return this;
 };
-noname.Chart2D.prototype.plotArea = function() {
-  return this._plotArea;
+noname.Chart.prototype.height = function(value) {
+  throw new Error("Use get/setSize() instead.");if (!arguments.length) {
+    return this._height;
+  }
+  this._height = value;
+  return this;
 };
-noname.Chart2D.prototype.addListener = function(f) {
-  this._listeners.push(f);
+noname.Chart.prototype.initMargin = function(obj) {
+  throw new Error("Use get/setPadding() instead.");if (!arguments.length) {
+    return this._initMargin;
+  }
+  this._initMargin = obj;
+  return this;
 };
-noname.Chart2D.prototype.notifyListeners = function() {
-  var chart = this;
-  this._listeners.forEach(function(f) {
-    f(chart);
-  });
+noname.Chart.prototype.elementId = function(str) {
+  throw new Error("Use get/setElementID()");if (!arguments.length) {
+    return this._elementId;
+  }
+  this._elementId = str;
+  return this;
 };
 noname.ChartManager = function(element, chart) {
   if (!(this instanceof noname.ChartManager)) {
@@ -450,7 +361,8 @@ noname.ChartManager.prototype.getChart = function() {
   return this._chart;
 };
 noname.ChartManager.prototype.refreshDisplay = function() {
-  var bounds = new noname.Rectangle(0, 0, this._chart.width(), this._chart.height());
+  var size = this._chart.getSize();
+  var bounds = new noname.Rectangle(0, 0, size.width(), size.height());
   this._ctx.clear();
   this._chart.draw(this._ctx, bounds);
 };
@@ -516,7 +428,7 @@ noname.ChartManager.prototype.installMouseOutHandler = function(element) {
 };
 noname.ChartManager.prototype.installMouseWheelHandler = function(element) {
   var my = this;
-  element.onmousewheel = function(event) {
+  var linkFunction = function(event) {
     var propogate = true;
     if (my._liveMouseHandler !== null) {
       propogate = my._liveMouseHandler.mouseWheel(event);
@@ -527,6 +439,8 @@ noname.ChartManager.prototype.installMouseWheelHandler = function(element) {
     });
     return propogate;
   };
+  var mousewheelevt = /Firefox/i.test(navigator.userAgent) ? "DOMMouseScroll" : "mousewheel";
+  element.addEventListener(mousewheelevt, linkFunction, false);
 };
 noname.Utils = {};
 noname.Utils.makeArrayOf = function(value, length) {
@@ -753,10 +667,10 @@ noname.Color = function(red, green, blue, alpha) {
   if (!(this instanceof noname.Color)) {
     throw new Error("Use 'new' for constructor.");
   }
-  this.red = red;
-  this.green = green;
-  this.blue = blue;
-  this.alpha = alpha === 0 ? 0 : alpha || 255;
+  this._red = red;
+  this._green = green;
+  this._blue = blue;
+  this._alpha = alpha === 0 ? 0 : alpha || 255;
 };
 noname.Color.fromStr = function(s) {
   if (s.length === 4) {
@@ -779,8 +693,8 @@ noname.Color.fromStr = function(s) {
   }
 };
 noname.Color.prototype.rgbaStr = function() {
-  var alphaPercent = this.alpha / 255;
-  return "rgba(" + this.red + "," + this.green + "," + this.blue + "," + alphaPercent.toFixed(2) + ")";
+  var alphaPercent = this._alpha / 255;
+  return "rgba(" + this._red + "," + this._green + "," + this._blue + "," + alphaPercent.toFixed(2) + ")";
 };
 noname.Dimension = function(w, h) {
   if (!(this instanceof noname.Dimension)) {
@@ -1413,37 +1327,45 @@ noname.Transform.prototype.rotate = function(theta) {
   this.shearY = n10;
   this.scaleY = n11;
 };
-noname.BaseElement = function(store) {
+noname.BaseElement = function(instance) {
   if (!(this instanceof noname.BaseElement)) {
     throw new Error("Use 'new' for construction.");
   }
-  if (!store) {
-    store = this;
+  if (!instance) {
+    instance = this;
   }
-  store._insets = new noname.Insets(2, 2, 2, 2);
-  store._refPt = noname.RefPt2D.CENTER;
-  store._backgroundPainter = null;
+  noname.BaseElement.init(instance);
 };
-noname.BaseElement.prototype.insets = function(obj) {
+var class___ = noname.BaseElement;
+var proto___ = class___.prototype;
+class___.init = function(instance) {
+  instance._insets = new noname.Insets(2, 2, 2, 2);
+  instance._refPt = noname.RefPt2D.CENTER;
+  instance._backgroundPainter = null;
+};
+proto___.insets = function(obj) {
   if (!arguments.length) {
     return this._insets;
   }
   this._insets = obj;
   return this;
 };
-noname.BaseElement.prototype.refPt = function(value) {
+proto___.refPt = function(value) {
   if (!arguments.length) {
     return this._refPt;
   }
   this._refPt = value;
   return this;
 };
-noname.BaseElement.prototype.backgroundPainter = function(painter) {
+proto___.backgroundPainter = function(painter) {
   if (!arguments.length) {
     return this._backgroundPainter;
   }
   this._backgroundPainter = painter;
   return this;
+};
+proto___.receive = function(visitor) {
+  visitor.visit(this);
 };
 noname.FlowElement = function() {
   if (!(this instanceof noname.FlowElement)) {
@@ -1744,36 +1666,34 @@ noname.StandardRectanglePainter = function(fillColor, strokeColor) {
   this._fillColor = fillColor;
   this._strokeColor = strokeColor;
 };
-noname.StandardRectanglePainter.prototype.paint = function(context, bounds) {
-  var rect = context.element("rect");
+noname.StandardRectanglePainter.prototype.paint = function(ctx, bounds) {
+  var rect = ctx.element("rect");
   rect.setAttribute("x", bounds.x());
   rect.setAttribute("y", bounds.y());
   rect.setAttribute("width", bounds.width());
   rect.setAttribute("height", bounds.height());
   var styleStr = "";
-  if (this._fillColor !== null) {
+  if (this._fillColor) {
     styleStr += "fill: " + this._fillColor.rgbaStr() + "; ";
   }
-  if (this._strokeColor !== null) {
+  if (this._strokeColor) {
     styleStr += "stroke: " + this._strokeColor.rgbaStr() + "; ";
   }
   rect.setAttribute("style", styleStr);
-  context.append(rect);
+  ctx.append(rect);
 };
 noname.TextElement = function(textStr) {
   if (!(this instanceof noname.TextElement)) {
     throw new Error("Use 'new' for construction.");
   }
-  new noname.BaseElement(this);
+  noname.BaseElement.init(this);
   this._text = textStr;
   this._font = new noname.Font("Palatino, serif", 16);
   this._color = "black";
   this._halign = noname.HAlign.LEFT;
   this._backgroundPainter = new noname.StandardRectanglePainter(new noname.Color(255, 255, 255, 0.3), new noname.Color(0, 0, 0, 0));
 };
-noname.TextElement.prototype.insets = noname.BaseElement.prototype.insets;
-noname.TextElement.prototype.refPt = noname.BaseElement.prototype.refPt;
-noname.TextElement.prototype.backgroundPainter = noname.BaseElement.prototype.backgroundPainter;
+noname.TextElement.prototype = new noname.BaseElement;
 noname.TextElement.prototype.text = function(str) {
   if (!arguments.length) {
     return this._text;
@@ -1848,16 +1768,43 @@ noname.TextElement.prototype.draw = function(context, bounds) {
   context.append(t);
 };
 noname.LegendBuilder = function() {
-  if (!(this instanceof noname.LegendBuilder)) {
-    return new noname.LegendBuilder;
-  }
 };
 noname.LegendBuilder.prototype.createLegend = function(plot, anchor, orientation, style) {
+};
+noname.LegendItemInfo = function(key, color) {
+  this.seriesKey = key || "";
+  this.label = key || "";
+  this.description = "";
+  this.shape = null;
+  this.color = color;
+};
+noname.StandardLegendBuilder = function(instance) {
+  if (!(this instanceof noname.StandardLegendBuilder)) {
+    throw new Error("Use 'new' for constructor.");
+  }
+  if (!instance) {
+    instance = this;
+  }
+  noname.StandardLegendBuilder.init(instance);
+};
+class___ = noname.StandardLegendBuilder;
+proto___ = class___.prototype;
+class___.init = function(instance) {
+  instance._font = new noname.Font("Palatino, serif", 12);
+};
+proto___.getFont = function() {
+  return this._font;
+};
+proto___.setFont = function(font) {
+  this._font = font;
+};
+proto___.createLegend = function(plot, anchor, orientation, style) {
   var info = plot.legendInfo();
   var result = new noname.FlowElement;
+  var me = this;
   info.forEach(function(info) {
     var shape = (new noname.RectangleElement(8, 5)).setFillColor(info.color);
-    var text = (new noname.TextElement(info.label)).font(new noname.Font("Palatino, serif", 12));
+    var text = (new noname.TextElement(info.label)).font(me._font);
     var item = new noname.GridElement;
     item.add(shape, "R1", "C1");
     item.add(text, "R1", "C2");
@@ -1865,12 +1812,33 @@ noname.LegendBuilder.prototype.createLegend = function(plot, anchor, orientation
   });
   return result;
 };
-noname.LegendItemInfo = function() {
-  this.seriesKey = "";
-  this.label = "";
-  this.description = "";
-  this.shape = null;
-  this.color = new noname.Color(0, 0, 0);
+noname.FixedLegendBuilder = function() {
+  if (!(this instanceof noname.FixedLegendBuilder)) {
+    throw new Error("Use 'new' for constructor.");
+  }
+  noname.StandardLegendBuilder.init(this);
+  this._info = [];
+};
+noname.FixedLegendBuilder.prototype = new noname.StandardLegendBuilder;
+noname.FixedLegendBuilder.prototype.add = function(key, color) {
+  this._info.push(new noname.LegendItemInfo(key, color));
+};
+noname.FixedLegendBuilder.prototype.clear = function() {
+  this._info = [];
+};
+noname.FixedLegendBuilder.prototype.createLegend = function(plot, anchor, orientation, style) {
+  var info = this._info;
+  var result = new noname.FlowElement;
+  var legendBuilder = this;
+  info.forEach(function(info) {
+    var shape = (new noname.RectangleElement(8, 5)).setFillColor(info.color);
+    var text = (new noname.TextElement(info.label)).font(legendBuilder.getFont());
+    var item = new noname.GridElement;
+    item.add(shape, "R1", "C1");
+    item.add(text, "R1", "C2");
+    result.add(item);
+  });
+  return result;
 };
 noname.AxisSpace = function(top, left, bottom, right) {
   if (!(this instanceof noname.AxisSpace)) {
@@ -1928,67 +1896,162 @@ noname.LabelOrientation = {PERPENDICULAR:"PERPENDICULAR", PARALLEL:"PARALLEL"};
 if (Object.freeze) {
   Object.freeze(noname.LabelOrientation);
 }
-;noname.LinearAxis = function(label) {
-  if (!(this instanceof noname.LinearAxis)) {
-    return new noname.LinearAxis;
+;noname.BaseValueAxis = function(label, instance) {
+  if (!(this instanceof noname.BaseValueAxis)) {
+    throw new Error("Use 'new' for construction.");
   }
+  if (!instance) {
+    instance = this;
+  }
+  noname.BaseValueAxis.init(instance);
+  instance._label = label;
+};
+class___ = noname.BaseValueAxis;
+proto___ = class___.prototype;
+class___.init = function(instance) {
+  instance._listeners = [];
+  instance._labelFont = new noname.Font("Palatino;serif", 12, true, false);
+  instance._labelColor = new noname.Color(0, 0, 0);
+  instance._labelMargin = new noname.Insets(2, 2, 2, 2);
+  instance._tickLabelFont = new noname.Font("san-serif", 14);
+  instance._tickLabelColor = new noname.Color(0, 0, 0);
+  instance._axisLineColor = new noname.Color(100, 100, 100);
+  instance._axisLineStroke = new noname.Stroke(0.5);
+  instance._gridLinesVisible = true;
+  instance._gridLineStroke = new noname.Stroke(1);
+  instance._gridLineColor = new noname.Color(255, 255, 255);
+};
+proto___.getLabel = function() {
+  return this._label;
+};
+proto___.setLabel = function(label, notify) {
   this._label = label;
-  this._labelFont = new noname.Font("Palatino;serif", 12, true, false);
-  this._labelMargin = new noname.Insets(2, 2, 2, 2);
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getLabelFont = function() {
+  return this._labelFont;
+};
+proto___.setLabelFont = function(font, notify) {
+  this._labelFont = font;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getLabelColor = function() {
+  return this._labelColor;
+};
+proto___.setLabelColor = function(color, notify) {
+  this._labelColor = color;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getLabelMargin = function() {
+  return this._labelMargin;
+};
+proto___.setLabelMargin = function(margin, notify) {
+  this._labelMargin = margin;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getTickLabelFont = function() {
+  return this._tickLabelFont;
+};
+proto___.setTickLabelFont = function(font, notify) {
+  this._tickLabelFont = font;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getTickLabelColor = function() {
+  return this._tickLabelColor;
+};
+proto___.setTickLabelColor = function(color, notify) {
+  this._tickLabelColor = color;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getAxisLineColor = function() {
+  return this._axisLineColor;
+};
+proto___.setAxisLineColor = function(color, notify) {
+  this._axisLineColor = color;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getAxisLineStroke = function() {
+  return this._axisLineStroke;
+};
+proto___.setAxisLineStroke = function(stroke, notify) {
+  this._axisLineStroke = stroke;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.addListener = function(listener) {
+  this._listeners.push(listener);
+};
+proto___.notifyListeners = function() {
+  var axis = this;
+  this._listeners.forEach(function(listener) {
+    listener(axis);
+  });
+};
+proto___.isGridLinesVisible = function() {
+  return this._gridLinesVisible;
+};
+proto___.setGridLinesVisible = function(visible, notify) {
+  this._gridLinesVisible = visible !== false;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getGridLineStroke = function() {
+  return this._gridLineStroke;
+};
+proto___.setGridLineStroke = function(stroke, notify) {
+  this._gridLineStroke = stroke;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+proto___.getGridLineColor = function() {
+  return this._gridLineColor;
+};
+proto___.setGridLineColor = function(color, notify) {
+  this._gridLineColor = color;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.LinearAxis = function(label) {
+  if (!(this instanceof noname.LinearAxis)) {
+    throw new Error("Use 'new' with constructor.");
+  }
+  noname.BaseValueAxis.init(this);
   this._autoRange = true;
   this._autoRangeIncludesZero = false;
   this._lowerMargin = 0.05;
   this._upperMargin = 0.05;
   this._lowerBound = 0;
   this._upperBound = 1;
-  this._listeners = [];
-  this.nice = true;
-  this.scaleD3 = d3.scale.linear();
-  this._axisLineColor = new noname.Color(100, 100, 100);
-  this._axisLineStroke = new noname.Stroke(0.5);
   this._tickSelector = new noname.NumberTickSelector;
   this._formatter = new noname.NumberFormat;
-  this.tickMarkInnerLength = 0;
-  this.tickMarkOuterLength = 2;
-  this.tickMarkStroke = new noname.Stroke(0.5);
-  this.tickMarkColor = new noname.Color(100, 100, 100);
-  this.tickLabelFont = new noname.Font("san-serif", 14);
-  this.tickLabelMargin = new noname.Insets(2, 2, 2, 2);
-  this.tickLabelColor = new noname.Color(0, 0, 0);
-  this.tickLabelFactor = 1.4;
-  this.tickLabelOrientation = null;
+  this._tickMarkInnerLength = 0;
+  this._tickMarkOuterLength = 2;
+  this._tickMarkStroke = new noname.Stroke(0.5);
+  this._tickMarkColor = new noname.Color(100, 100, 100);
+  this._tickLabelMargin = new noname.Insets(2, 2, 2, 2);
+  this._tickLabelFactor = 1.4;
+  this._tickLabelOrientation = null;
   this._tickLabelFormatOverride = null;
-  this._gridLinesVisible = true;
-  this._gridLineStroke = new noname.Stroke(1);
-  this._gridLineColor = new noname.Color(255, 255, 255);
 };
-noname.LinearAxis.prototype.getLabel = function() {
-  return this._label;
-};
-noname.LinearAxis.prototype.setLabel = function(label, notify) {
-  this._label = label;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.getLabelFont = function() {
-  return this._labelFont;
-};
-noname.LinearAxis.prototype.setLabelFont = function(font, notify) {
-  this._labelFont = font;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.getLabelMargin = function() {
-  return this._labelMargin;
-};
-noname.LinearAxis.prototype.setLabelMargin = function(margin, notify) {
-  this._labelMargin = margin;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
+noname.LinearAxis.prototype = new noname.BaseValueAxis;
 noname.LinearAxis.prototype.isAutoRange = function() {
   return this._autoRange;
 };
@@ -2025,56 +2088,11 @@ noname.LinearAxis.prototype.setUpperMargin = function(margin, notify) {
     this.notifyListeners();
   }
 };
-noname.LinearAxis.prototype.getAxisLineColor = function() {
-  return this._axisLineColor;
-};
-noname.LinearAxis.prototype.setAxisLineColor = function(color, notify) {
-  this._axisLineColor = color;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.getAxisLineStroke = function() {
-  return this._axisLineStroke;
-};
-noname.LinearAxis.prototype.setAxisLineStroke = function(stroke, notify) {
-  this._axisLineStroke = stroke;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
 noname.LinearAxis.prototype.getTickLabelFormatOverride = function() {
   return this._tickLabelFormatOverride;
 };
 noname.LinearAxis.prototype.setTickLabelFormatOverride = function(formatter, notify) {
   this._tickLabelFormatOverride = formatter;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.isGridLinesVisible = function() {
-  return this._gridLinesVisible;
-};
-noname.LinearAxis.prototype.setGridLinesVisible = function(visible, notify) {
-  this._gridLinesVisible = visible !== false;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.getGridLineStroke = function() {
-  return this._gridLineStroke;
-};
-noname.LinearAxis.prototype.setGridLineStroke = function(stroke, notify) {
-  this._gridLineStroke = stroke;
-  if (notify !== false) {
-    this.notifyListeners();
-  }
-};
-noname.LinearAxis.prototype.getGridLineColor = function() {
-  return this._gridLineColor;
-};
-noname.LinearAxis.prototype.setGridLineColor = function(color, notify) {
-  this._gridLineColor = color;
   if (notify !== false) {
     this.notifyListeners();
   }
@@ -2091,10 +2109,6 @@ noname.LinearAxis.prototype.updateDomain = function(min, max) {
   }
   this._lowerBound = min - lowAdj;
   this._upperBound = max + highAdj;
-  this.scaleD3.domain([min - lowAdj, max + highAdj]);
-  if (this.nice) {
-    this.scaleD3.nice();
-  }
 };
 noname.LinearAxis.prototype.valueToCoordinate = function(value, r0, r1) {
   noname.Args.requireNumber(r0, "r0");
@@ -2112,11 +2126,11 @@ noname.LinearAxis.prototype._calcTickSize = function(ctx, area, edge) {
   var result = Number.NaN;
   var pixels = area.length(edge);
   var range = this._upperBound - this._lowerBound;
-  var orientation = this._tickLabelOrientation(edge);
+  var orientation = this._resolveTickLabelOrientation(edge);
   var selector = this._tickSelector;
   if (orientation === noname.LabelOrientation.PERPENDICULAR) {
     var textHeight = ctx.textDim("123").height();
-    var maxTicks = pixels / (textHeight * this.tickLabelFactor);
+    var maxTicks = pixels / (textHeight * this._tickLabelFactor);
     if (maxTicks > 2) {
       var tickSize = selector.select(range / 2);
       var tickCount = Math.floor(range / tickSize);
@@ -2132,7 +2146,7 @@ noname.LinearAxis.prototype._calcTickSize = function(ctx, area, edge) {
   } else {
     if (orientation === noname.LabelOrientation.PARALLEL) {
       selector.select(range);
-      ctx.setFont(this.tickLabelFont);
+      ctx.setFont(this._tickLabelFont);
       var done = false;
       while (!done) {
         if (selector.previous()) {
@@ -2146,7 +2160,7 @@ noname.LinearAxis.prototype._calcTickSize = function(ctx, area, edge) {
           if (w == 0 && (s0.length > 0 && s1.length > 0)) {
             return Number.NaN;
           }
-          var n = Math.floor(pixels / (w * this.tickLabelFactor));
+          var n = Math.floor(pixels / (w * this._tickLabelFactor));
           if (n < range / selector.currentTickSize()) {
             selector.next();
             this._formatter = selector.currentTickFormat();
@@ -2161,8 +2175,8 @@ noname.LinearAxis.prototype._calcTickSize = function(ctx, area, edge) {
   }
   return result;
 };
-noname.LinearAxis.prototype._tickLabelOrientation = function(edge) {
-  var result = this.tickLabelOrientation;
+noname.LinearAxis.prototype._resolveTickLabelOrientation = function(edge) {
+  var result = this._tickLabelOrientation;
   if (!result) {
     if (edge === noname.RectangleEdge.LEFT || edge === noname.RectangleEdge.RIGHT) {
       result = noname.LabelOrientation.PERPENDICULAR;
@@ -2177,7 +2191,7 @@ noname.LinearAxis.prototype._tickLabelOrientation = function(edge) {
   return result;
 };
 noname.LinearAxis.prototype.reserveSpace = function(ctx, plot, bounds, area, edge) {
-  var space = this.tickMarkOuterLength;
+  var space = this._tickMarkOuterLength;
   if (this._label) {
     ctx.setFont(this._labelFont);
     var dim = ctx.textDim(this._label);
@@ -2194,8 +2208,8 @@ noname.LinearAxis.prototype.reserveSpace = function(ctx, plot, bounds, area, edg
     }
   }
   var ticks = this.ticks(ctx, plot, area, edge);
-  ctx.setFont(this.tickLabelFont);
-  var orientation = this._tickLabelOrientation(edge);
+  ctx.setFont(this._tickLabelFont);
+  var orientation = this._resolveTickLabelOrientation(edge);
   if (orientation === noname.LabelOrientation.PERPENDICULAR) {
     var max = 0;
     ticks.forEach(function(t) {
@@ -2209,10 +2223,10 @@ noname.LinearAxis.prototype.reserveSpace = function(ctx, plot, bounds, area, edg
     }
   }
   if (noname.RectangleEdge.isTopOrBottom(edge)) {
-    space += this.tickLabelMargin.top() + this.tickLabelMargin.bottom();
+    space += this._tickLabelMargin.top() + this._tickLabelMargin.bottom();
   } else {
     if (noname.RectangleEdge.isLeftOrRight(edge)) {
-      space += this.tickLabelMargin.left() + this.tickLabelMargin.right();
+      space += this._tickLabelMargin.left() + this._tickLabelMargin.right();
     } else {
       throw new Error("Unrecognised edge code: " + edge);
     }
@@ -2258,8 +2272,8 @@ noname.LinearAxis.prototype.draw = function(ctx, plot, bounds, dataArea, offset)
   var isTop = edge === noname.RectangleEdge.TOP;
   var isBottom = edge === noname.RectangleEdge.BOTTOM;
   if (isLeft || isRight) {
-    ctx.setFont(this.tickLabelFont);
-    ctx.setFillColor(this.tickLabelColor);
+    ctx.setFont(this._tickLabelFont);
+    ctx.setFillColor(this._tickLabelColor);
     var maxTickLabelWidth = 0;
     for (var i = 0;i < ticks.length;i++) {
       var tick = ticks[i];
@@ -2269,20 +2283,20 @@ noname.LinearAxis.prototype.draw = function(ctx, plot, bounds, dataArea, offset)
         ctx.setLineColor(this._gridLineColor);
         ctx.drawLine(x, Math.round(yy), x + w, Math.round(yy));
       }
-      if (this.tickMarkInnerLength + this.tickMarkOuterLength > 0) {
-        ctx.setLineStroke(this.tickMarkStroke);
-        ctx.setLineColor(this.tickMarkColor);
+      if (this._tickMarkInnerLength + this._tickMarkOuterLength > 0) {
+        ctx.setLineStroke(this._tickMarkStroke);
+        ctx.setLineColor(this._tickMarkColor);
         if (isRight) {
-          ctx.drawLine(x + w + offset - this.tickMarkInnerLength, yy, x + w + offset + this.tickMarkOuterLength, yy);
+          ctx.drawLine(x + w + offset - this._tickMarkInnerLength, yy, x + w + offset + this._tickMarkOuterLength, yy);
         } else {
-          ctx.drawLine(x - offset - this.tickMarkOuterLength, yy, x - offset + this.tickMarkInnerLength, yy);
+          ctx.drawLine(x - offset - this._tickMarkOuterLength, yy, x - offset + this._tickMarkInnerLength, yy);
         }
       }
       if (isRight) {
-        var adj = offset + this.tickMarkOuterLength + this.tickLabelMargin.left();
+        var adj = offset + this._tickMarkOuterLength + this._tickLabelMargin.left();
         var dim = ctx.drawAlignedString(tick.label, x + w + adj, yy, noname.TextAnchor.CENTER_LEFT);
       } else {
-        var adj = offset + this.tickMarkOuterLength + this.tickLabelMargin.right();
+        var adj = offset + this._tickMarkOuterLength + this._tickLabelMargin.right();
         var dim = ctx.drawAlignedString(tick.label, x - adj, yy, noname.TextAnchor.CENTER_RIGHT);
       }
       maxTickLabelWidth = Math.max(maxTickLabelWidth, dim.width());
@@ -2296,23 +2310,24 @@ noname.LinearAxis.prototype.draw = function(ctx, plot, bounds, dataArea, offset)
     }
     if (this._label) {
       ctx.setFont(this._labelFont);
+      ctx.setFillColor(this._labelColor);
       if (isRight) {
-        var adj = offset + maxTickLabelWidth + this.tickMarkOuterLength + this.tickLabelMargin.left() + this.tickLabelMargin.right() + this._labelMargin.left();
+        var adj = offset + maxTickLabelWidth + this._tickMarkOuterLength + this._tickLabelMargin.left() + this._tickLabelMargin.right() + this._labelMargin.left();
         ctx.drawRotatedString(this._label, x + w + adj, y + h / 2, noname.TextAnchor.BOTTOM_CENTER, Math.PI / 2);
       } else {
-        var adj = offset + maxTickLabelWidth + this.tickMarkOuterLength + this.tickLabelMargin.left() + this.tickLabelMargin.right() + this._labelMargin.right();
+        var adj = offset + maxTickLabelWidth + this._tickMarkOuterLength + this._tickLabelMargin.left() + this._tickLabelMargin.right() + this._labelMargin.right();
         ctx.drawRotatedString(this._label, x - adj, y + h / 2, noname.TextAnchor.BOTTOM_CENTER, -Math.PI / 2);
       }
     }
   } else {
     if (isTop || isBottom) {
-      ctx.setFont(this.tickLabelFont);
-      ctx.setFillColor(this.tickLabelColor);
-      var gap = offset + this.tickMarkOuterLength;
+      ctx.setFont(this._tickLabelFont);
+      ctx.setFillColor(this._tickLabelColor);
+      var gap = offset + this._tickMarkOuterLength;
       if (isTop) {
-        gap += this.tickLabelMargin.bottom();
+        gap += this._tickLabelMargin.bottom();
       } else {
-        gap += this.tickLabelMargin.top();
+        gap += this._tickLabelMargin.top();
       }
       for (var i = 0;i < ticks.length;i++) {
         var tick = ticks[i];
@@ -2322,14 +2337,14 @@ noname.LinearAxis.prototype.draw = function(ctx, plot, bounds, dataArea, offset)
           ctx.setLineColor(this._gridLineColor);
           ctx.drawLine(Math.round(xx), y, Math.round(xx), y + h);
         }
-        if (this.tickMarkInnerLength + this.tickMarkOuterLength > 0) {
-          ctx.setLineStroke(this.tickMarkStroke);
-          ctx.setLineColor(this.tickMarkColor);
+        if (this._tickMarkInnerLength + this._tickMarkOuterLength > 0) {
+          ctx.setLineStroke(this._tickMarkStroke);
+          ctx.setLineColor(this._tickMarkColor);
           if (isTop) {
-            ctx.drawLine(xx, y - offset - this.tickMarkOuterLength, xx, y - offset + this.tickMarkInnerLength);
+            ctx.drawLine(xx, y - offset - this._tickMarkOuterLength, xx, y - offset + this._tickMarkInnerLength);
             ctx.drawAlignedString(tick.label, xx, y - gap, noname.TextAnchor.BOTTOM_CENTER);
           } else {
-            ctx.drawLine(xx, y + h + offset - this.tickMarkInnerLength, xx, y + h + offset + this.tickMarkOuterLength);
+            ctx.drawLine(xx, y + h + offset - this._tickMarkInnerLength, xx, y + h + offset + this._tickMarkOuterLength);
             ctx.drawAlignedString(tick.label, xx, y + h + gap, noname.TextAnchor.TOP_CENTER);
           }
         }
@@ -2343,10 +2358,11 @@ noname.LinearAxis.prototype.draw = function(ctx, plot, bounds, dataArea, offset)
       }
       if (this._label) {
         ctx.setFont(this._labelFont);
+        ctx.setFillColor(this._labelColor);
         if (isTop) {
-          ctx.drawAlignedString(this._label, x + w / 2, y - gap - this.tickLabelMargin.bottom() - this._labelMargin.top() - this.tickLabelFont.size, noname.TextAnchor.BOTTOM_CENTER);
+          ctx.drawAlignedString(this._label, x + w / 2, y - gap - this._tickLabelMargin.bottom() - this._labelMargin.top() - this._tickLabelFont.size, noname.TextAnchor.BOTTOM_CENTER);
         } else {
-          ctx.drawAlignedString(this._label, x + w / 2, y + h + gap + this.tickLabelMargin.bottom() + this._labelMargin.top() + this.tickLabelFont.size, noname.TextAnchor.TOP_CENTER);
+          ctx.drawAlignedString(this._label, x + w / 2, y + h + gap + this._tickLabelMargin.bottom() + this._labelMargin.top() + this._tickLabelFont.size, noname.TextAnchor.TOP_CENTER);
         }
       }
     }
@@ -2390,15 +2406,6 @@ noname.LinearAxis.prototype.pan = function(percent, notify) {
   if (notify !== false) {
     this.notifyListeners();
   }
-};
-noname.LinearAxis.prototype.addListener = function(listener) {
-  this._listeners.push(listener);
-};
-noname.LinearAxis.prototype.notifyListeners = function() {
-  var axis = this;
-  this._listeners.forEach(function(listener) {
-    listener(axis);
-  });
 };
 noname.NumberTickSelector = function(percentage) {
   if (!(this instanceof noname.NumberTickSelector)) {
@@ -2474,6 +2481,7 @@ noname.NumberTickSelector.prototype.previous = function() {
   }
   throw new Error("Factor should be 1, 2 or 5: " + this._factor);
 };
+var d3;
 noname.OrdinalAxis = function(label) {
   if (!(this instanceof noname.OrdinalAxis)) {
     return new noname.OrdinalAxis;
@@ -2671,7 +2679,6 @@ noname.PiePlot.prototype.legendInfo = function() {
   });
   return info;
 };
-var d3;
 noname.XYPlot = function(dataset) {
   if (!(this instanceof noname.XYPlot)) {
     throw new Error("Use 'new' for construction.");
@@ -2716,7 +2723,6 @@ noname.XYPlot.prototype.setDataset = function(dataset, notify) {
   this._datasetListener = function(plot) {
     var me = plot;
     return function(dataset) {
-      var x;
       me.updateBounds = true;
       me.update(plot.chart);
     };
@@ -2727,6 +2733,32 @@ noname.XYPlot.prototype.setDataset = function(dataset, notify) {
   if (notify !== false) {
     this.notifyListeners();
   }
+};
+noname.XYPlot.prototype.getBackground = function() {
+  return this._plotBackground;
+};
+noname.XYPlot.prototype.setBackground = function(painter, notify) {
+  this._plotBackground = painter;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.XYPlot.prototype.setBackgroundColor = function(color, notify) {
+  var painter = new noname.StandardRectanglePainter(color, null);
+  this.setBackground(painter, notify);
+};
+noname.XYPlot.prototype.getDataBackground = function() {
+  return this._dataBackground;
+};
+noname.XYPlot.prototype.setDataBackground = function(painter, notify) {
+  this._dataBackground = painter;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.XYPlot.prototype.setDataBackgroundColor = function(color, notify) {
+  var painter = new noname.StandardRectanglePainter(color, null);
+  this.setDataBackground(painter, notify);
 };
 noname.XYPlot.prototype.datasetChanged = function() {
   if (this._xAxis.isAutoRange()) {
@@ -2954,6 +2986,52 @@ noname.ColorSource.prototype.getColor = function(series, item) {
 noname.ColorSource.prototype.getLegendColor = function(series) {
   return this._colors[series % this._colors.length];
 };
+noname.BaseXYRenderer = function(instance) {
+  if (!(this instanceof noname.BaseXYRenderer)) {
+    throw new Error("Use 'new' for constructor.");
+  }
+  if (!instance) {
+    instance = this;
+  }
+  noname.BaseXYRenderer.init(instance);
+};
+noname.BaseXYRenderer.init = function(instance) {
+  var lineColors = noname.Colors.colorsAsObjects(noname.Colors.fancyLight());
+  var fillColors = noname.Colors.colorsAsObjects(noname.Colors.fancyLight());
+  instance._lineColorSource = new noname.ColorSource(lineColors);
+  instance._fillColorSource = new noname.ColorSource(fillColors);
+  instance._listeners = [];
+};
+noname.BaseXYRenderer.prototype.getLineColorSource = function() {
+  return this._lineColorSource;
+};
+noname.BaseXYRenderer.prototype.setLineColorSource = function(cs, notify) {
+  this._lineColorSource = cs;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.BaseXYRenderer.prototype.getFillColorSource = function() {
+  return this._fillColorSource;
+};
+noname.BaseXYRenderer.prototype.setFillColorSource = function(cs, notify) {
+  this._fillColorSource = cs;
+  if (notify !== false) {
+    this.notifyListeners();
+  }
+};
+noname.BaseXYRenderer.prototype.passCount = function() {
+  return 1;
+};
+noname.BaseXYRenderer.prototype.addListener = function(f) {
+  this._listeners.push(f);
+};
+noname.BaseXYRenderer.prototype.notifyListeners = function() {
+  var plot = this;
+  this._listeners.forEach(function(f) {
+    f(plot);
+  });
+};
 noname.BarRenderer = function() {
   if (!(this instanceof noname.BarRenderer)) {
     return new noname.BarRenderer;
@@ -3074,21 +3152,11 @@ noname.ScatterRenderer = function(plot) {
   if (!(this instanceof noname.ScatterRenderer)) {
     throw new Error("Use 'new' for constructors.");
   }
+  noname.BaseXYRenderer.init(this);
   this._plot = plot;
-  this.colors = d3.scale.category10();
-  this.radius = 3;
-  this.toolTipHandler = null;
-  this.listeners = [];
-  var colors = [];
-  noname.Colors.fancyLight().forEach(function(s) {
-    colors.push(noname.Color.fromStr(s));
-  });
-  this.fillColors = colors;
-  this._lineColorSource = new noname.ColorSource(colors);
+  this._radius = 3;
 };
-noname.ScatterRenderer.prototype.getLineColorSource = function() {
-  return this._lineColorSource;
-};
+noname.ScatterRenderer.prototype = new noname.BaseXYRenderer;
 noname.ScatterRenderer.prototype.itemFillColorStr = function(seriesKey, itemKey) {
   var dataset = this._plot.getDataset();
   var c = dataset.getProperty(seriesKey, itemKey, "color");
@@ -3110,63 +3178,11 @@ noname.ScatterRenderer.prototype.itemStrokeColor = function(seriesKey, itemKey) 
   }
   return "none";
 };
-noname.ScatterRenderer.prototype.update = function(chart, plot, xscale, yscale, datag) {
-  var renderg = datag.select(".scatter");
-  var me = this;
-  var seriesg = renderg.selectAll(".series").data(plot._dataset.data.series);
-  var toolTipHandler = this.toolTipHandler;
-  seriesg.enter().append("g").attr("class", "series").attr("noname:seriesKey", function(d) {
-    return d.seriesKey;
-  }).on("mouseover", function(datum) {
-    if (toolTipHandler) {
-    }
-  }).on("mouseout", function(d) {
-    if (toolTipHandler) {
-    }
-  });
-  seriesg.exit().remove();
-  var itemg = seriesg.selectAll("circle").data(function(d) {
-    return d.items;
-  }, function(d, i) {
-    return d.key;
-  });
-  itemg.enter().append("circle").attr("r", 0).attr("cx", function(d) {
-    return xscale(d.x);
-  }).attr("cy", function(d) {
-    return yscale(d.y);
-  }).style("fill", function(d) {
-    var seriesKey = this.parentNode.__data__.seriesKey;
-    return me.itemFillColorStr(seriesKey, d.key);
-  }).style("stroke", function(d) {
-    var seriesKey = this.parentNode.__data__.seriesKey;
-    return me.itemStrokeColor(seriesKey, d.key);
-  }).style("filter", function(d) {
-    var seriesKey = this.parentNode.__data__.seriesKey;
-    if (me._plot._dataset.isSelected("hilite", seriesKey, d.key)) {
-      return "url(#glow1)";
-    }
-    return "none";
-  });
-  itemg.attr("cx", function(d) {
-    return xscale(d.x);
-  }).attr("cy", function(d) {
-    return yscale(d.y);
-  }).attr("r", this.radius);
-  itemg.exit().remove();
-};
-noname.ScatterRenderer.prototype.build = function(chart, plot, xscale, yscale, datag) {
-  datag.append("g").attr("class", "scatter");
-  this.update(chart, plot, xscale, yscale, datag);
-};
-noname.ScatterRenderer.prototype.passCount = function() {
-  return 1;
-};
 noname.ScatterRenderer.prototype.drawItem = function(ctx, dataArea, plot, dataset, seriesIndex, itemIndex, pass) {
   var seriesKey = dataset.seriesKey(seriesIndex);
   var itemKey = dataset.getItemKey(seriesIndex, itemIndex);
   var x = dataset.x(seriesIndex, itemIndex);
   var y = dataset.y(seriesIndex, itemIndex);
-  var xRange = new noname.Range(dataArea.x(), dataArea.x() + dataArea.width());
   var xx = plot.getXAxis().valueToCoordinate(x, dataArea.minX(), dataArea.maxX());
   var yy = plot.getYAxis().valueToCoordinate(y, dataArea.maxY(), dataArea.minY());
   var str = dataset.getProperty(seriesKey, itemKey, "color");
@@ -3177,7 +3193,7 @@ noname.ScatterRenderer.prototype.drawItem = function(ctx, dataArea, plot, datase
     color = this.itemFillColor(seriesKey, itemKey);
   }
   ctx.setFillColor(color);
-  ctx.drawCircle(xx, yy, 4);
+  ctx.drawCircle(xx, yy, this._radius);
 };
 noname.StackedAreaRenderer = function() {
   if (!(this instanceof noname.StackedAreaRenderer)) {
@@ -3312,24 +3328,9 @@ noname.XYLineRenderer = function() {
   if (!(this instanceof noname.XYLineRenderer)) {
     return new noname.XYLineRenderer;
   }
-  this.colors = d3.scale.category10();
-  this.toolTipHandler = null;
-  this.listeners = [];
-  var colors = [];
-  noname.Colors.fancyLight().forEach(function(s) {
-    colors.push(noname.Color.fromStr(s));
-  });
-  this.fillColors = colors;
-  this._lineColorSource = new noname.ColorSource(colors);
+  noname.BaseXYRenderer.init(this);
 };
-noname.XYLineRenderer.prototype.getLineColorSource = function() {
-  return this._lineColorSource;
-};
-noname.XYLineRenderer.prototype.setLineColorSource = function(cs, notify) {
-  this._lineColorSource = cs;
-  if (notify !== false) {
-  }
-};
+noname.XYLineRenderer.prototype = new noname.BaseXYRenderer;
 noname.XYLineRenderer.prototype.build = function(chart, plot, xscale, yscale, datag) {
   datag.append("g").attr("class", "line");
   this.update(chart, plot, xscale, yscale, datag);
@@ -3493,18 +3494,24 @@ noname.WheelHandler = function(manager, modifier) {
   this.manager = manager;
   this.modifier = modifier;
 };
-noname.WheelHandler.prototype.mouseDown = function(e) {
+proto___ = noname.WheelHandler.prototype;
+proto___.mouseDown = function(e) {
 };
-noname.WheelHandler.prototype.mouseMove = function(e) {
+proto___.mouseMove = function(e) {
 };
-noname.WheelHandler.prototype.mouseUp = function(e) {
+proto___.mouseUp = function(e) {
 };
-noname.WheelHandler.prototype.mouseOver = function(e) {
+proto___.mouseOver = function(e) {
 };
-noname.WheelHandler.prototype.mouseOut = function(e) {
+proto___.mouseOut = function(e) {
 };
-noname.WheelHandler.prototype.mouseWheel = function(e) {
-  var delta = e.wheelDelta / 720 * 0.2 + 1;
+proto___.mouseWheel = function(e) {
+  var delta;
+  if (e.wheelDelta) {
+    delta = e.wheelDelta / 720 * 0.2 + 1;
+  } else {
+    delta = e.detail * -0.05 + 1;
+  }
   var plot = this.manager.getChart().getPlot();
   var zoomX = plot.isXZoomable();
   var zoomY = plot.isYZoomable();
@@ -3618,6 +3625,50 @@ noname.DatasetUtils.extractStackBaseValues = function(dataset, baseline) {
         negBase = negBase + y;
       }
     }
+  }
+  return result;
+};
+noname.DatasetUtils.extractXYDatasetFromColumns2D = function(dataset, xcol, ycol, seriesKey) {
+  var result = new noname.XYDataset;
+  seriesKey = seriesKey || "series 1";
+  for (var r = 0;r < dataset.rowCount();r++) {
+    var rowKey = dataset.rowKey(r);
+    var x = dataset.valueByKey(rowKey, xcol);
+    var y = dataset.valueByKey(rowKey, ycol);
+    result.add(seriesKey, x, y);
+    var xPropKeys = dataset.propertyKeys(rowKey, xcol);
+    var yPropKeys = dataset.propertyKeys(rowKey, ycol);
+    var itemKey = result.getItemKey(0, result.itemCount(0) - 1);
+    xPropKeys.forEach(function(key) {
+      var p = dataset.getProperty(rowKey, xcol, key);
+      result.setProperty(seriesKey, itemKey, key, p);
+    });
+    yPropKeys.forEach(function(key) {
+      var p = dataset.getProperty(rowKey, ycol, key);
+      result.setProperty(seriesKey, itemKey, key, p);
+    });
+  }
+  return result;
+};
+noname.DatasetUtils.extractXYDatasetFromRows2D = function(dataset, xrow, yrow, seriesKey) {
+  var result = new noname.XYDataset;
+  seriesKey = seriesKey || "series 1";
+  for (var c = 0;c < dataset.columnCount();c++) {
+    var colKey = dataset.columnKey(c);
+    var x = dataset.valueByKey(xrow, colKey);
+    var y = dataset.valueByKey(yrow, colKey);
+    result.add(seriesKey, x, y);
+    var xPropKeys = dataset.propertyKeys(xrow, colKey);
+    var yPropKeys = dataset.propertyKeys(yrow, colKey);
+    var itemKey = result.getItemKey(0, result.itemCount(0) - 1);
+    xPropKeys.forEach(function(key) {
+      var p = dataset.getProperty(xrow, colKey, key);
+      result.setProperty(seriesKey, itemKey, key, p);
+    });
+    yPropKeys.forEach(function(key) {
+      var p = dataset.getProperty(yrow, colKey, key);
+      result.setProperty(seriesKey, itemKey, key, p);
+    });
   }
   return result;
 };
@@ -4296,6 +4347,16 @@ noname.KeyedValues2DDataset.prototype.setProperty = function(rowKey, columnKey, 
   }
   map.put(propertyKey, value);
 };
+noname.KeyedValues2DDataset.prototype.propertyKeys = function(rowKey, columnKey) {
+  var rowIndex = this.rowIndex(rowKey);
+  var columnIndex = this.columnIndex(columnKey);
+  var map = this.properties[rowIndex][columnIndex];
+  if (map) {
+    return map.keys();
+  } else {
+    return[];
+  }
+};
 noname.KeyedValues2DDataset.prototype.clearProperties = function(rowKey, columnKey) {
   var rowIndex = this.rowIndex(rowKey);
   var columnIndex = this.columnIndex(columnKey);
@@ -4639,11 +4700,14 @@ noname.Map.prototype.remove = function(key) {
   }
 };
 noname.Range = function(lowerBound, upperBound) {
-  this.lowerBound = lowerBound;
-  this.upperBound = upperBound;
+  this._lowerBound = lowerBound;
+  this._upperBound = upperBound;
 };
 noname.Range.prototype.length = function() {
-  return this.upperBound - this.lowerBound;
+  return this._upperBound - this._lowerBound;
+};
+noname.Range.prototype.percent = function(value) {
+  return(value - this._lowerBounds) / this.length();
 };
 noname.XYDataset = function() {
   this.data = {"series":[]};

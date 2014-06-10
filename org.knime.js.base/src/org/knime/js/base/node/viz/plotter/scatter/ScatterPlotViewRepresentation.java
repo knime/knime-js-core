@@ -54,7 +54,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.JSONViewContent;
-import org.knime.js.core.datasets.JSONKeyedValues3DDataset;
+import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -67,7 +67,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ScatterPlotViewRepresentation extends JSONViewContent {
 
-    private JSONKeyedValues3DDataset m_keyedDataset;
+    private JSONKeyedValues2DDataset m_keyedDataset;
     private boolean m_enableViewConfiguration;
     private boolean m_enableTitleChange;
     private boolean m_enableSubtitleChange;
@@ -83,14 +83,14 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     /**
      * @return the keyedDataset
      */
-    public JSONKeyedValues3DDataset getKeyedDataset() {
+    public JSONKeyedValues2DDataset getKeyedDataset() {
         return m_keyedDataset;
     }
 
     /**
      * @param keyedDataset the keyedDataset to set
      */
-    public void setKeyedDataset(final JSONKeyedValues3DDataset keyedDataset) {
+    public void setKeyedDataset(final JSONKeyedValues2DDataset keyedDataset) {
         m_keyedDataset = keyedDataset;
     }
 
@@ -275,7 +275,7 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         boolean hasDataset = settings.getBoolean("hasDataset");
         if (hasDataset) {
             NodeSettingsRO datasetSettings = settings.getNodeSettings("dataset");
-            m_keyedDataset = new JSONKeyedValues3DDataset();
+            m_keyedDataset = new JSONKeyedValues2DDataset();
             m_keyedDataset.loadFromNodeSettings(datasetSettings);
         }
     }

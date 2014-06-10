@@ -107,7 +107,6 @@ public class JSONXYDataset {
      * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
      */
     @JsonAutoDetect
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
     static class XYDatasetSeriesItem extends JSONDatasetSeriesItem {
 
         private double m_x;

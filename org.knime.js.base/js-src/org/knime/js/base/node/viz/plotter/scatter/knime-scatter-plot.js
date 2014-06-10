@@ -7,22 +7,25 @@ knime_scatter_plot = function() {
 	var chartManager = null;
 	var containerID = "scatterContainer";
 	
+	var minWidth = 400;
+	var minHeight = 300;
+	
 	view.init = function(representation, value) {
 		_representation = representation;
 		_value = value;
 		try {
-			_keyedDataset = new noname.KeyedValues3DDataset();
+			_keyedDataset = new noname.KeyedValues2DDataset();
 			//_keyedDataset.load(_representation.keyedDataset);
-			var seriesKey = _representation.keyedDataset.series[0].seriesKey;
-			for (var rowIndex = 0; rowIndex < _representation.keyedDataset.rowKeys.length; rowIndex++) {
-				var rowKey = _representation.keyedDataset.rowKeys[rowIndex];
-				var row = _representation.keyedDataset.series[0].rows[rowIndex];
+			//var seriesKey = _representation.keyedDataset.series[0].seriesKey;
+			for (var rowIndex = 0; rowIndex < _representation.keyedDataset.rows.length; rowIndex++) {
+				var rowKey = _representation.keyedDataset.rows[rowIndex].rowKey;
+				var row = _representation.keyedDataset.rows[rowIndex];
 				for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
 					var columnKey = _representation.keyedDataset.columnKeys[col];
-					_keyedDataset.add(seriesKey, rowKey, columnKey, row.values[col]);
+					_keyedDataset.add(rowKey, columnKey, row.values[col]);
 					var properties = row.properties;
 					for (var propertyKey in properties) {
-						_keyedDataset.setProperty(seriesKey, rowKey, columnKey, propertyKey, properties[propertyKey]);
+						_keyedDataset.setProperty(rowKey, columnKey, propertyKey, properties[propertyKey]);
 					}
 				}
 			}
@@ -44,7 +47,7 @@ knime_scatter_plot = function() {
 	};
 	
 	buildXYDataset = function() {
-		var xyDataset = noname.DatasetUtils.extractXYDatasetFromColumns(_keyedDataset, _value.xColumn, _value.yColumn);
+		var xyDataset = noname.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
 		return xyDataset;
 	};
 	
@@ -62,10 +65,18 @@ knime_scatter_plot = function() {
 		
 		var dataset = buildXYDataset();
 		//chart = noname.Charts.createScatterChart("Scatter Plot", "Subtitle", dataset, xAxisLabel, yAxisLabel);
-		d3.select("html").style("width", "100%").style("height", "100%").style("overflow", "hidden");
+		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
 		d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
 		var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
-		d3.select("body").attr("id", "body").append("div").attr("id", containerID).style("width", "100%").style("height", chartHeight).style("box-sizing", "border-box").style("overflow", "hidden").style("margin", "0");
+		d3.select("body").attr("id", "body").append("div")
+			.attr("id", containerID)
+			.style("width", "100%")
+			.style("height", chartHeight)
+			.style("min-width", minWidth + "px")
+			.style("min-height", minHeight + "px")
+			.style("box-sizing", "border-box")
+			.style("overflow", "hidden")
+			.style("margin", "0");
 		
 		//chart.build(container);
 				
@@ -79,9 +90,11 @@ knime_scatter_plot = function() {
         
         plot.renderer = new noname.ScatterRenderer(plot);
         var chart = new noname.Chart(plot);
-        chart.titleAnchor(new noname.Anchor2D(noname.RefPt2D.TOP_LEFT));
-        chart.title(noname.Charts.createTitleElement(_value.chartTitle, _value.chartSubtitle, chart.titleAnchor()));
-        chart._legendBuilder = null;
+        chart.setTitleAnchor(new noname.Anchor2D(noname.RefPt2D.TOP_LEFT));
+        var chartTitle = _value.chartTitle ? _value.chartTitle : "";
+        var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
+        chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
+        chart.setLegendBuilder(null);
 		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
         var svg = document.getElementById("chart_svg");
         chartManager = new noname.ChartManager(svg, chart);
@@ -98,9 +111,9 @@ knime_scatter_plot = function() {
 	
 	setChartDimensions = function() {
 		var container = document.getElementById(containerID);
-		var w = Math.max(400, container.clientWidth);
-        var h = Math.max(300, container.clientHeight);
-        chartManager.getChart().width(w).height(h);
+		var w = Math.max(minWidth, container.clientWidth);
+        var h = Math.max(minHeight, container.clientHeight);
+        chartManager.getChart().setSize(w, h);
 	};
 	
 	updateChart = function() {
