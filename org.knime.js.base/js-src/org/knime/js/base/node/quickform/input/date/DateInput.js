@@ -67,8 +67,8 @@ org_knime_js_base_node_quickform_input_date = function() {
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
 		var body = $('body');
-		var dateElement = $('<nobr>');
-		var timeElement = $('<nobr>');
+		var dateElement = $('<div style="display:inline-block">');
+		var timeElement = $('<div style="display:inline-block">');
 		
 		dateElement.append('Date: ');
 		dateInput = $('<input>');
