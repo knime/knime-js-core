@@ -54,20 +54,20 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
         <DateInputQuickFormRepresentation, DateInputQuickFormValue> {
-    
+
     /**
      * Format string for the date to string and string to date operations.
      */
     static final String DATE_FORMAT = "yyyy-MM-dd";
-    
+
     /**
      * Format string for the date to string and string to date operations.
      */
-    static final String DATE_TIME_FORMAT = "yyyy-MM-dd;HH:mm:ss.S";
+    static final String DATE_TIME_FORMAT = "yyyy-MM-dd;HH:mm";
 
     /**
      * {@inheritDoc}
@@ -76,7 +76,7 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
     public DateInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new DateInputQuickFormRepresentation();
     }
-    
+
     /**
      * {@inheritDoc}
      */

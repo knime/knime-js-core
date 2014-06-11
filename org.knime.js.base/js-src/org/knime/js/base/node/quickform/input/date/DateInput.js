@@ -55,8 +55,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var dateInput;
 	var hourInput;
 	var minInput;
-	var secInput;
-	var milInput;
 	var errorMessage;
 	var date;
 	var minDate;
@@ -119,28 +117,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 				return false;
 			}
 		});
-
-		timeElement.append(' <b>:</b> ');
-		secInput = $('<input>');
-		timeElement.append(secInput);
-		secInput.spinner({
-			spin: function(event, ui) {
-				date.setSeconds(ui.value);
-				refreshTime();
-				return false;
-			}
-		});
-
-		timeElement.append(' <b>.</b> ');
-		milInput = $('<input>');
-		timeElement.append(milInput);
-		milInput.spinner({
-			spin: function(event, ui) {
-				date.setMilliseconds(ui.value);
-				refreshTime();
-				return false;
-			}
-		});
+		
 		body.append(timeElement);
 		if (!representation.withtime) {
 			timeElement.css('display', 'none');
@@ -183,8 +160,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		dateInput.datepicker('enable');
 		hourInput.val(date.getHours());
 		minInput.val(date.getMinutes());
-		secInput.val(date.getSeconds());
-		milInput.val(date.getMilliseconds());
 	}
 	
 	return dateInput;
