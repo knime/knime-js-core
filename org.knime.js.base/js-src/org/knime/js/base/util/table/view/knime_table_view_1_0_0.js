@@ -16,6 +16,8 @@ knime_table_view = function(table, containerElement) {
 	var sortColumn = null;
 	var sortAscending = true;
 	
+	var drawingStartTime = 0;
+	
 	var additionalDrawFunctions = [];
 	
 	tableView.draw = function() {
@@ -24,6 +26,7 @@ knime_table_view = function(table, containerElement) {
 		}
 		var table = $('<table>');
 		table.attr('class', 'knimeTableView');
+		container.append(table);
 		if (showColumnHeader || sortable) {
 			var headerRow = $('<tr>');
 			headerRow.attr('class', 'knimeTableRow knimeTableHeaderRow');
@@ -41,7 +44,44 @@ knime_table_view = function(table, containerElement) {
 				}
 			}
 		}
-		for ( var i = 0; i < knimeTable.getNumRows(); i++) {
+		var initialChunkSize = 20;
+		drawingStartTime = new Date().getTime();
+		_renderChunk(table, 0, initialChunkSize);
+		
+		for (var i = 0; i < additionalDrawFunctions.length; i++) {
+			additionalDrawFunctions[i]();
+		}
+		tableDrawn = true;
+	};
+	
+	_renderChunk = function(table, startIndex, chunkSize) {
+		var startTime = new Date().getTime();
+		var endIndex  = Math.min(knimeTable.getNumRows(), startIndex + chunkSize);
+		_renderRows(table, startIndex, endIndex);
+		var endTime = new Date().getTime();
+		var chunkDuration = endTime - startTime;
+		//var timeRemaining = (knimeTable.getNumRows() - endIndex) * totalDrawDuration / endIndex;
+		//console.log("Rendered row " + startIndex + " to " + (endIndex-1) + ". Took " + chunkDuration + "ms. Estimated time remaining: " + Math.round(timeRemaining) + "ms.");
+		var newChunkSize = chunkSize;
+		if (startIndex + chunkSize < knimeTable.getNumRows()) {
+			if (chunkDuration > 300) {
+				newChunkSize = Math.max(1, Math.floor(chunkSize / 2));
+			} else if (chunkDuration < 100) {
+				newChunkSize = chunkSize * 2;
+			}
+			setTimeout((function(t, i, c) {
+				return function() {
+					_renderChunk(t, i, c);
+				};
+			})(table, startIndex + chunkSize, newChunkSize), chunkDuration);
+		} else {
+			//var totalDrawDuration = new Date().getTime() - drawingStartTime;
+			//console.log("Total layout time " + totalDrawDuration + "ms.");
+		}
+	};
+	
+	_renderRows = function(table, startIndex, endIndex) {
+		for ( var i = startIndex; i < endIndex; i++) {
 			var tableRow = $('<tr>');
 			tableRow.attr('id', 'row' + i);
 			tableRow.attr('class', 'knimeTableRow');
@@ -66,25 +106,24 @@ knime_table_view = function(table, containerElement) {
 			
 			for ( var j = 0; j < knimeTable.getNumColumns(); j++) {
 				var columnType = knimeTable.getColumnTypes()[j];
+				var cellContent = knimeTable.getRows()[i].data[j];
 				var tableData = $('<td>');
 				tableData.attr('class', 'knimeTableCell');
-				if (columnType=="boolean" || columnType=="number" || columnType=="string") {
-					tableData.text(knimeTable.getRows()[i].data[j]);
-							/*knimeTable.getColumn(j)[i]);*/
-				} else if (columnType=="png") {
+				if (columnType === "boolean" || columnType === "number" || columnType === "string") {
+					tableData.text(cellContent);
+					/*knimeTable.getColumn(j)[i]);*/
+				} else if (columnType === "svg") {
+					tableData.append($.parseHTML(cellContent));
+				}
+				else if (columnType === "png") {
 					var image = $('<img>');
 					tableData.append(image);
-					image.attr('src', 'data:image/png;base64,' + knimeTable.getRows()[i].data[j]);
+					image.attr('src', 'data:image/png;base64,' + cellContent);
 				}
 				tableRow.append(tableData);
 			}
 			table.append(tableRow);
 		}
-		container.append(table);
-		for (var i = 0; i < additionalDrawFunctions.length; i++) {
-			additionalDrawFunctions[i]();
-		}
-		tableDrawn = true;
 	};
 	
 	tableView.redraw = function() {
