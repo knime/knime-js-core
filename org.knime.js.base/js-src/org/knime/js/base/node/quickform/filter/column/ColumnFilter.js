@@ -74,6 +74,7 @@ org_knime_js_base_node_quickform_filter_column = function() {
 			selector.setChoices(representation.possibleColumns);
 			selector.setSelections(representation.defaultColumns);
 		}
+		resizeParent();
 	};
 
 	columnFilter.value = function() {

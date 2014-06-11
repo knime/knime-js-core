@@ -173,6 +173,20 @@
                webResourceBundleID="D3_3.2.8">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="KNIME Quickform Utils"
+            version="1.0.0"
+            webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/knime_quickform_utils_1_0_0.js"
+               relativePathTarget="js-lib/knime/knime_quickform_utils_1_0_0.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/knime_quickform_utils_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
 
 </plugin>

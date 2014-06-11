@@ -90,6 +90,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			selector.setChoices(viewRepresentation.possibleValues[representation.defaultColumn]);
 			selector.setSelections(representation.defaultValues);
 		}
+		resizeParent();
 	};
 
 	valueFilter.value = function() {

@@ -71,6 +71,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
 		body.append(errorMessage);
+		resizeParent();
 	};
 
 	stringInput.validate = function() {

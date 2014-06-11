@@ -141,6 +141,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 		allInputs.css('background-color', 'white');
 		
 		refreshTime();
+		resizeParent();
 	};
 
 	dateInput.value = function() {
