@@ -61,6 +61,8 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		viewValue = value;
 		var body = $('body');
 		input = $('<textarea>');
+		body.attr("title", representation.description);
+		body.append("<b>" + representation.label + "</b><br>");
 		body.append(input);
 		input.css('white-space', 'pre');
 		input.css('overflow', 'auto');

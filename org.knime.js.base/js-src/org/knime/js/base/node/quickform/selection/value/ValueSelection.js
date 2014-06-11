@@ -57,6 +57,8 @@ org_knime_js_base_node_quickform_selection_value = function() {
 
 	valueSelection.init = function(representation, value) {
 		var body = $('body');
+		body.attr('title', representation.description);
+		body.append("<b>" + representation.label + "</b><br>");
 		viewRepresentation = representation;
 		viewValue = value;
 		if (representation.possibleValues == null) {

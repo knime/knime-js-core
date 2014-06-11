@@ -55,6 +55,8 @@ org_knime_js_base_node_quickform_selection_single = function() {
 
 	singleSelection.init = function(representation, value) {
 		var body = $('body');
+		body.attr('title', representation.description);
+		body.append('<b>' + representation.label + '</b><br>');
 		viewValue = value;
 		if (representation.possibleChoices.length > 0) {
 			if (representation.type == 'Radio buttons (vertical)') {

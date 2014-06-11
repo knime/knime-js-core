@@ -42,7 +42,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -55,11 +55,18 @@ import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.web.JSONViewContent;
 import org.knime.core.quickform.QuickFormRepresentation;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
         extends JSONViewContent implements QuickFormRepresentation<VAL> {
 
@@ -79,6 +86,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
      * @return the label
      */
     @Override
+    @JsonProperty("label")
     public String getLabel() {
         return m_label;
     }
@@ -86,6 +94,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
     /**
      * @param label the label to set
      */
+    @JsonProperty("label")
     public void setLabel(final String label) {
         m_label = label;
     }
@@ -94,6 +103,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
      * @return the description
      */
     @Override
+    @JsonProperty("description")
     public String getDescription() {
         return m_description;
     }
@@ -101,6 +111,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
     /**
      * @param description the description to set
      */
+    @JsonProperty("description")
     public void setDescription(final String description) {
         m_description = description;
     }
@@ -109,6 +120,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_LABEL, m_label);
         settings.addString(CFG_DESCRIPTION, m_description);
@@ -118,6 +130,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_label = settings.getString(CFG_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION);
@@ -127,6 +140,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
@@ -135,6 +149,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
     /**
      * @param panel The panel to fill
      */
+    @JsonIgnore
     protected void fillDialogPanel(final QuickFormDialogPanel<VAL> panel) {
         panel.setLabel(m_label);
         panel.setDescription(m_description);

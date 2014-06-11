@@ -60,6 +60,8 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		viewRepresentation = representation;
 		var body = $('body');
 		input = $('<input>');
+		body.attr("title", representation.description);
+		body.append(representation.label + " ");
 		body.append(input);
 		input.spinner({
 			step: 0.01

@@ -57,6 +57,8 @@ org_knime_js_base_node_quickform_filter_value = function() {
 
 	valueFilter.init = function(representation, value) {
 		var body = $('body');
+		body.attr('title', representation.description);
+		body.append("<b>" + representation.label + "</b><br>");
 		viewValue = value;
 		viewRepresentation = representation;
 		if (representation.possibleValues == null) {
