@@ -107,6 +107,10 @@ public class JSONDataTableSpec {
         }
     }
 
+    /**
+     * @param colType the column type to determine.
+     * @return The corresponding JS column type.
+     */
     static JSTypes getJSONType(final DataType colType) {
         JSTypes type;
         if (colType.isCompatible(SvgValue.class)) {

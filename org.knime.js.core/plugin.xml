@@ -150,23 +150,23 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="noname Charting Library"
-            version="1.0.0"
-            webResourceBundleID="noname_1.0.0">
+            name="JSFreeChart"
+            version="0.5.0"
+            webResourceBundleID="jsFreeChart_0.5">
          <webResource
-               relativePathSource="js-lib/noname/"
-               relativePathTarget="js-lib/noname/">
+               relativePathSource="js-lib/JSFreeChart/"
+               relativePathTarget="js-lib/JSFreeChart/">
          </webResource>
          <importResource
-               relativePath="js-lib/noname/noname.js"
+               relativePath="js-lib/JSFreeChart/jsfreechart.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/noname/opentip-native.js"
+               relativePath="js-lib/JSFreeChart/opentip-native.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/noname/opentip.css"
+               relativePath="js-lib/JSFreeChart/opentip.css"
                type="CSS">
          </importResource>
          <webDependency

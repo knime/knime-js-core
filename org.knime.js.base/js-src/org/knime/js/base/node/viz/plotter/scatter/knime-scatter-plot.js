@@ -16,19 +16,19 @@ knime_scatter_plot = function() {
 		_representation = representation;
 		_value = value;
 		try {
-			_keyedDataset = new noname.KeyedValues2DDataset();
+			_keyedDataset = new jsfc.KeyedValues2DDataset();
 			//_keyedDataset.load(_representation.keyedDataset);
 			//var seriesKey = _representation.keyedDataset.series[0].seriesKey;
 			for (var rowIndex = 0; rowIndex < _representation.keyedDataset.rows.length; rowIndex++) {
 				var rowKey = _representation.keyedDataset.rows[rowIndex].rowKey;
 				var row = _representation.keyedDataset.rows[rowIndex];
+				var properties = row.properties;
 				for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
 					var columnKey = _representation.keyedDataset.columnKeys[col];
 					_keyedDataset.add(rowKey, columnKey, row.values[col]);
-					var properties = row.properties;
-					for (var propertyKey in properties) {
-						_keyedDataset.setProperty(rowKey, columnKey, propertyKey, properties[propertyKey]);
-					}
+				}
+				for (var propertyKey in properties) {
+					_keyedDataset.setRowProperty(rowKey, propertyKey, properties[propertyKey]);
 				}
 			}
 			
@@ -49,7 +49,7 @@ knime_scatter_plot = function() {
 	};
 	
 	buildXYDataset = function() {
-		var xyDataset = noname.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
+		var xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
 		return xyDataset;
 	};
 	
@@ -66,7 +66,7 @@ knime_scatter_plot = function() {
 		var yAxisLabel = _value.yAxisLabel ? _value.yAxisLabel : _value.yColumn;
 		
 		var dataset = buildXYDataset();
-		//chart = noname.Charts.createScatterChart("Scatter Plot", "Subtitle", dataset, xAxisLabel, yAxisLabel);
+		//chart = jsfc.Charts.createScatterChart("Scatter Plot", "Subtitle", dataset, xAxisLabel, yAxisLabel);
 		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
 		d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
 		var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
@@ -82,24 +82,24 @@ knime_scatter_plot = function() {
 		
 		//chart.build(container);
 				
-		var plot = new noname.XYPlot(dataset);
+		var plot = new jsfc.XYPlot(dataset);
         plot.getXAxis().setLabel(xAxisLabel);
-        plot.getXAxis().setLabelFont(new noname.Font(defaultFont, defaultFontSize, true));
-        //plot.getXAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
+        plot.getXAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
+        //plot.getXAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
         plot.getYAxis().setLabel(yAxisLabel);
-        plot.getYAxis().setLabelFont(new noname.Font(defaultFont, defaultFontSize, true));
-        //plot.getYAxis().setTickLabelFont(new noname.Font("sans-serif", 10));
+        plot.getYAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
+        //plot.getYAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
         
-        plot.renderer = new noname.ScatterRenderer(plot);
-        var chart = new noname.Chart(plot);
-        chart.setTitleAnchor(new noname.Anchor2D(noname.RefPt2D.TOP_LEFT));
+        plot.renderer = new jsfc.ScatterRenderer(plot);
+        var chart = new jsfc.Chart(plot);
+        chart.setTitleAnchor(new jsfc.Anchor2D(jsfc.RefPt2D.TOP_LEFT));
         var chartTitle = _value.chartTitle ? _value.chartTitle : "";
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
         chart.setLegendBuilder(null);
 		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
         var svg = document.getElementById("chart_svg");
-        chartManager = new noname.ChartManager(svg, chart);
+        chartManager = new jsfc.ChartManager(svg, chart);
         setChartDimensions();
         chartManager.refreshDisplay();                
         var win = document.defaultView || document.parentWindow;

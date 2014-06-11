@@ -605,7 +605,7 @@
                type="JAVASCRIPT">
          </importResource>
          <webDependency
-               webResourceBundleID="noname_1.0.0">
+               webResourceBundleID="jsFreeChart_0.5">
          </webDependency>
       </webResourceBundle>
    </extension>
