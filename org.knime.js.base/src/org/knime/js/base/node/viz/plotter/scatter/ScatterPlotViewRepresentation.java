@@ -53,7 +53,7 @@ package org.knime.js.base.node.viz.plotter.scatter;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONViewContent;
+import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

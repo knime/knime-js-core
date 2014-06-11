@@ -65,10 +65,10 @@ import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONDataTable;
-import org.knime.core.node.web.JSONDataTableSpec.JSTypes;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JSONDataTableSpec.JSTypes;
 
 /**
  *

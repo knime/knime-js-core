@@ -48,7 +48,6 @@ package org.knime.js.core;
 
 import java.util.List;
 
-import org.knime.core.node.web.JSONViewContent;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;

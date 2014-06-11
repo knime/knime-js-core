@@ -40,92 +40,61 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- * 
- * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * ---------------------------------------------------------------------
+ *
+ * Created on 30.04.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.quickform.input.molecule;
+package org.knime.js.base.node.select.value;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
-import org.knime.js.core.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.knime.core.node.web.WebResourceLocator;
+import org.knime.core.node.web.WebResourceLocator.WebResourceType;
+import org.knime.core.node.web.WebTemplate;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class MoleculeStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
+public class InteractiveValueSelectWebViewTemplate implements WebTemplate {
 
-    private static final String CFG_STRING = "moleculeString";
-    
-    private static final String DEFAULT_STRING = "";
-    
-    private String m_moleculeString = DEFAULT_STRING;
-    
+
+
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_STRING, getMoleculeString());
+    public WebResourceLocator[] getWebResources() {
+        WebResourceLocator locator = new WebResourceLocator("org.knime.base", "js-lib/node/preprocess/select/value/web-template.js", WebResourceType.JAVASCRIPT);
+        return new WebResourceLocator[]{locator};
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setMoleculeString(settings.getString(CFG_STRING));
+    public String getNamespace() {
+        return "knime_select_value";
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setMoleculeString(settings.getString(CFG_STRING, DEFAULT_STRING));
-    }
-
-    /**
-     * @return the moleculeString
-     */
-    @JsonProperty("moleculeString")
-    public String getMoleculeString() {
-        return m_moleculeString;
-    }
-
-    /**
-     * @param moleculeString the moleculeString to set
-     */
-    @JsonProperty("moleculeString")
-    public void setMoleculeString(final String moleculeString) {
-        m_moleculeString = moleculeString;
+    public String getPullViewContentMethodName() {
+        return "pullViewContent";
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
+    public String getInitMethodName() {
+        return "init";
     }
 
-    
-    
+    /**
+     * {@inheritDoc}
+     */
+    public String getValidateMethodName() {
+        return "validate";
+    }
 }

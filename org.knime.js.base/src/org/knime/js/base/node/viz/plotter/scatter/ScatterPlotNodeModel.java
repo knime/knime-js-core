@@ -72,10 +72,10 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONDataTable;
-import org.knime.core.node.web.JSONDataTable.JSONDataTableRow;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 

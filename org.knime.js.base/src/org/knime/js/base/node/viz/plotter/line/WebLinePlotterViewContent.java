@@ -48,8 +48,8 @@ package org.knime.js.base.node.viz.plotter.line;
 
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.web.JSONDataTable;
-import org.knime.core.node.web.JSONViewContent;
+import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JSONViewContent;
 
 /**
  *

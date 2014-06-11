@@ -40,92 +40,82 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- * 
- * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * ---------------------------------------------------------------------
+ *
+ * Created on 30.04.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.quickform.input.molecule;
+package org.knime.js.base.node.select.value;
 
-import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.js.core.JSONViewContent;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class MoleculeStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
+public class InteractiveValueSelectViewContent extends JSONViewContent {
 
-    private static final String CFG_STRING = "moleculeString";
-    
-    private static final String DEFAULT_STRING = "";
-    
-    private String m_moleculeString = DEFAULT_STRING;
-    
+    private String[] m_possibleValues;
+    private String[] m_selectedValues;
+
+    /** Default constructor for bean initialization.  */
+    public InteractiveValueSelectViewContent() {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param possibleValues
+     * @param selectedValues
+     */
+    public InteractiveValueSelectViewContent(final String[] possibleValues, final String[] selectedValues) {
+        m_possibleValues = possibleValues;
+        m_selectedValues = selectedValues;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getPossibleValues() {
+        return m_possibleValues;
+    }
+    /**
+     * @param possibleValues
+     */
+    public void setPossibleValues(final String[] possibleValues) {
+        this.m_possibleValues = possibleValues;
+    }
+
+    /**
+     * @return
+     */
+    public String[] getSelectedValues() {
+        return m_selectedValues;
+    }
+    /**
+     * @param selectedValues
+     */
+    public void setSelectedValues(final String[] selectedValues) {
+        this.m_selectedValues = selectedValues;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_STRING, getMoleculeString());
+        settings.addStringArray("possibleValues", m_possibleValues);
+        settings.addStringArray("selectedValues", m_selectedValues);
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setMoleculeString(settings.getString(CFG_STRING));
+    public void loadFromNodeSettings(final NodeSettingsRO settings) {
+        m_possibleValues = settings.getStringArray("possibleValues", new String[0]);
+        m_selectedValues = settings.getStringArray("selectedValues", new String[0]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setMoleculeString(settings.getString(CFG_STRING, DEFAULT_STRING));
-    }
-
-    /**
-     * @return the moleculeString
-     */
-    @JsonProperty("moleculeString")
-    public String getMoleculeString() {
-        return m_moleculeString;
-    }
-
-    /**
-     * @param moleculeString the moleculeString to set
-     */
-    @JsonProperty("moleculeString")
-    public void setMoleculeString(final String moleculeString) {
-        m_moleculeString = moleculeString;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
-    }
-
-    
-    
 }

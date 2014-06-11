@@ -40,92 +40,81 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
- * 
- * History
- *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * ---------------------------------------------------------------------
+ *
+ * Created on 30.04.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.quickform.input.molecule;
+package org.knime.js.base.node.select.value;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.DialogNodeValue;
-import org.knime.js.core.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class MoleculeStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
+public class InteractiveValueSelectNodeFactory extends NodeFactory<InteractiveValueSelectNodeModel>
+                implements WizardNodeFactoryExtension<InteractiveValueSelectNodeModel,
+                InteractiveValueSelectViewContent, InteractiveValueSelectViewContent> {
 
-    private static final String CFG_STRING = "moleculeString";
-    
-    private static final String DEFAULT_STRING = "";
-    
-    private String m_moleculeString = DEFAULT_STRING;
-    
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_STRING, getMoleculeString());
+    public InteractiveValueSelectNodeModel createNodeModel() {
+        return new InteractiveValueSelectNodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setMoleculeString(settings.getString(CFG_STRING));
+    protected int getNrNodeViews() {
+        return 0;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setMoleculeString(settings.getString(CFG_STRING, DEFAULT_STRING));
-    }
-
-    /**
-     * @return the moleculeString
-     */
-    @JsonProperty("moleculeString")
-    public String getMoleculeString() {
-        return m_moleculeString;
-    }
-
-    /**
-     * @param moleculeString the moleculeString to set
-     */
-    @JsonProperty("moleculeString")
-    public void setMoleculeString(final String moleculeString) {
-        m_moleculeString = moleculeString;
+    public NodeView<InteractiveValueSelectNodeModel> createNodeView(final int viewIndex,
+                                                                    final InteractiveValueSelectNodeModel nodeModel) {
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        
+    protected boolean hasDialog() {
+        return true;
     }
 
-    
-    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new InteractiveValueSelectNodeDialog();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getWizardViewName() {
+        return getInteractiveViewName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    /*@SuppressWarnings("unchecked")
+    @Override
+    public InteractiveWebNodeView<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent>
+            createInteractiveView(final InteractiveValueSelectNodeModel model) {
+        return new InteractiveWebNodeView<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent>(
+                model, getInteractiveWebViewTemplate(), InteractiveValueSelectViewContent.class);
+    }*/
 }

@@ -74,6 +74,11 @@
             id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
       </node>
       <!-- <node
+            expert-flag="false"
+            factory-class="org.knime.base.node.preproc.select.value.InteractiveValueSelectNodeFactory"
+            id="org.knime.base.node.preproc.select.value.InteractiveValueSelectNodeFactory">
+      </node> -->
+      <!-- <node
             after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             category-path="/labs/quickform/view"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
