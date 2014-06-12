@@ -51,6 +51,7 @@ import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
@@ -84,6 +85,9 @@ import org.knime.js.base.node.ui.JSSnippetTextArea;
 import org.knime.js.core.JSONWebNode;
 import org.osgi.framework.FrameworkUtil;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
@@ -98,6 +102,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private static final String ATTR_RES_BUNDLE_DESCRIPTION = "description";
 
     private final GenericJSViewConfig m_config;
+    private BiMap<String, String> m_availableLibraries;
 
     private final JTextField m_viewName;
     private final JList m_flowVarList;
@@ -205,15 +210,19 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         }
         DefaultTableModel tableModel = (DefaultTableModel)m_dependenciesTable.getModel();
         tableModel.setRowCount(0);
-        List<String> availableLibraries = getAvailableLibraries();
-        for(String lib : availableLibraries) {
+        m_availableLibraries = getAvailableLibraries();
+        System.out.println(m_availableLibraries);
+        List<String> libNameList = new ArrayList<String>(m_availableLibraries.values());
+        Collections.sort(libNameList);
+        for(String lib : libNameList) {
             tableModel.addRow(new Object[]{false, lib});
         }
         m_config.loadSettingsForDialog(settings);
         String[] activeLibs = m_config.getDependencies();
         for (String lib: activeLibs) {
+            String displayLib = m_availableLibraries.get(lib);
             for(int i = 0; i < tableModel.getRowCount(); i++) {
-                if (lib.equals(tableModel.getValueAt(i, 1))) {
+                if (tableModel.getValueAt(i, 1).equals(displayLib)) {
                     tableModel.setValueAt(true, i, 0);
                     break;
                 }
@@ -224,8 +233,17 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         m_cssTextArea.setText(m_config.getCssCode());
     }
 
-    private List<String> getAvailableLibraries() {
-        List<String> availableLibraries = new ArrayList<String>();
+    private BiMap<String, String> getAvailableLibraries() {
+        BiMap<String, String> availableLibraries = HashBiMap.create();
+        availableLibraries.put("jsFreeChart_0.5", "JSFreeChart - Version 0.5.0");
+        availableLibraries.put("D3_3.2.8", "D3 - Version 3.2.8");
+        availableLibraries.put("jQuery_1.11.0", "jQuery - Version 1.11.0");
+        availableLibraries.put("jQueryUi_1.10.4", "jQuery UI - Version 1.10.4");
+        return availableLibraries;
+    }
+
+    private BiMap<String, String> getAllAvailableLibraries() {
+        BiMap<String, String> availableLibraries = HashBiMap.create();
         String libBundleName = FrameworkUtil.getBundle(JSONWebNode.class).getSymbolicName();
 
         IExtensionRegistry registry = Platform.getExtensionRegistry();
@@ -250,7 +268,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
                 if (resBundleDebug) {
                     resBundleDisplay += " - Debug";
                 }
-                availableLibraries.add(resBundleID);
+                availableLibraries.forcePut(resBundleID, resBundleDisplay);
             }
         }
         return availableLibraries;
@@ -264,7 +282,8 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         List<String> dependencies = new ArrayList<String>();
         for (int row = 0; row < m_dependenciesTable.getRowCount(); row++) {
             if ((boolean)m_dependenciesTable.getValueAt(row, 0)) {
-                dependencies.add((String)m_dependenciesTable.getValueAt(row, 1));
+                String libDisplay = (String)m_dependenciesTable.getValueAt(row, 1);
+                dependencies.add(m_availableLibraries.inverse().get(libDisplay));
             }
         }
         m_config.setViewName(m_viewName.getText());
