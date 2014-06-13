@@ -56,6 +56,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.knime.core.data.DataColumnSpec;
@@ -110,7 +112,20 @@ public class ScatterPlotNodeModel extends NodeModel implements
      */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        // do nothing?
+        List<String> allAllowedCols = new LinkedList<String>();
+
+        for (DataColumnSpec colspec : inSpecs[0]) {
+            if (colspec.getType().isCompatible(DoubleValue.class)
+                    || colspec.getType().isCompatible(StringValue.class)) {
+                allAllowedCols.add(colspec.getName());
+            }
+        }
+
+        if (inSpecs[0].getNumColumns() < 1
+                || allAllowedCols.size() < 1) {
+            throw new InvalidSettingsException("Data table must have"
+                    + " at least one numerical or categorical column.");
+        }
         return null;
     }
 
@@ -168,7 +183,7 @@ public class ScatterPlotNodeModel extends NodeModel implements
                     m_viewValue.setxColumn(table.getSpec().getColNames()[0]);
                 }
                 if (m_viewValue.getyColumn() == null || m_viewValue.getyColumn().trim().isEmpty()) {
-                    m_viewValue.setyColumn(table.getSpec().getColNames()[1]);
+                    m_viewValue.setyColumn(table.getSpec().getColNames()[table.getSpec().getNumColumns()>1 ? 1 : 0]);
                 }
             }
         }

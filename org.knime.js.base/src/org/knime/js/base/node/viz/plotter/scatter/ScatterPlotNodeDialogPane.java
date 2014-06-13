@@ -261,7 +261,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
 
         String yCol = m_config.getyColumn();
         if (yCol == null || yCol.isEmpty()) {
-            yCol = specs[0].getColumnNames()[1];
+            yCol = specs[0].getColumnNames()[specs[0].getNumColumns() > 1 ? 1 : 0];
         }
 
         m_xColComboBox.update(specs[0], xCol);
