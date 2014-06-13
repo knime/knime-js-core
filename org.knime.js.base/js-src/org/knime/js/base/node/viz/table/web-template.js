@@ -5,7 +5,7 @@ knime_table_viewer = function() {
 	
 	table_viewer.init = function(representation, value) {
 		var body = $('body');
-		if (representation.table == null) {
+		if (!representation.table) {
 			body.append("Error: No data available");
 		} else {
 			try {

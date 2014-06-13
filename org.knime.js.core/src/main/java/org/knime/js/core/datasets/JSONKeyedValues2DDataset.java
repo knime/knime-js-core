@@ -47,11 +47,16 @@
  */
 package org.knime.js.core.datasets;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -63,7 +68,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class JSONKeyedValues2DDataset implements JSONDataset {
 
     private String[] m_columnKeys;
-
+    private Map<String, String>[] m_symbols;
     private JSONKeyedValuesRow[] m_rows;
 
     /** Serialization constructor. Don't use. */
@@ -76,6 +81,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     public JSONKeyedValues2DDataset(final String[] columnKeys, final JSONKeyedValuesRow[] rows) {
         m_columnKeys = columnKeys;
         m_rows = rows;
+        m_symbols = new Map[m_columnKeys.length];
     }
 
     /**
@@ -90,6 +96,29 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
      */
     public void setColumnKeys(final String[] columnKeys) {
         m_columnKeys = columnKeys;
+    }
+
+    /**
+     * @return the symbols
+     */
+    public Map<String, String>[] getSymbols() {
+        return m_symbols;
+    }
+
+    /**
+     * @param symbols the symbols to set
+     */
+    public void setSymbols(final Map<String, String>[] symbols) {
+        m_symbols = symbols;
+    }
+
+    /**
+     * @param symbols
+     * @param index
+     */
+    @JsonIgnore
+    public void setSymbol(final Map<String, String> symbols, final int index) {
+        m_symbols[index] = symbols;
     }
 
     /**
@@ -112,6 +141,24 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addStringArray("columnKeys", getColumnKeys());
+        int propSize = 0;
+        if (m_symbols != null) {
+            for (int i = 0; i < m_symbols.length; i++) {
+                Map<String, String> properties = m_symbols[i];
+                if (properties != null) {
+                    NodeSettingsWO propSettings = settings.addNodeSettings("symbols_" + propSize++);
+                    propSettings.addInt("index", i);
+                    propSettings.addInt("numSymbols", properties.size());
+                    int propertyID = 0;
+                    for (Entry<String, String> propertyEntry : properties.entrySet()) {
+                        NodeSettingsWO singlePropSettings = propSettings.addNodeSettings("symbol_" + propertyID++);
+                        singlePropSettings.addString("key", propertyEntry.getKey());
+                        singlePropSettings.addString("value", propertyEntry.getValue());
+                    }
+                }
+            }
+        }
+        settings.addInt("colPropsSize", propSize);
         settings.addInt("numRows", m_rows.length);
         for (int rowID = 0; rowID < m_rows.length; rowID++) {
             NodeSettingsWO rowSettings = settings.addNodeSettings("row_" + rowID);
@@ -125,6 +172,21 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
         m_columnKeys = settings.getStringArray("columnKeys");
+        m_symbols = new Map[m_columnKeys.length];
+        int numColProperties = settings.getInt("colPropsSize");
+        for (int curColProperty = 0; curColProperty < numColProperties; curColProperty++) {
+            NodeSettingsRO colPropertySettings = settings.getNodeSettings("symbols_" + curColProperty);
+            int index = colPropertySettings.getInt("index");
+            int numProperties = colPropertySettings.getInt("numSymbols");
+            Map<String, String> curPropertyMap = new HashMap<String, String>();
+            for (int curProperty = 0; curProperty < numProperties; curProperty++) {
+                NodeSettingsRO propertySettings = colPropertySettings.getNodeSettings("symbol_" + curProperty);
+                String key = propertySettings.getString("key");
+                String value = propertySettings.getString("value");
+                curPropertyMap.put(key, value);
+            }
+            m_symbols[index] = curPropertyMap;
+        }
         int numRows = settings.getInt("numRows");
         m_rows = new JSONKeyedValuesRow[numRows];
         for (int rowID = 0; rowID < m_rows.length; rowID++) {
@@ -133,5 +195,4 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
             m_rows[rowID].loadFromNodeSettings(rowSettings);
         }
     }
-
 }

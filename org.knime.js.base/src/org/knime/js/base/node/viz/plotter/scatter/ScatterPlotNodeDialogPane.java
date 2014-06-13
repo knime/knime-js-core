@@ -204,16 +204,16 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         panel.add(m_enableXAxisLabelEditCheckBox, c);
         c.gridx += 2;
         panel.add(m_enableYAxisLabelEditCheckBox, c);
-        c.gridx = 0;
-        c.gridy++;
         c.gridwidth = 1;
+        /*c.gridx = 0;
+        c.gridy++;
         panel.add(new JLabel("Dot size: "), c);
         c.gridx++;
         m_dotSize.setPreferredSize(new Dimension(100, 20));
         panel.add(m_dotSize, c);
         c.gridx++;
         c.gridwidth = 2;
-        panel.add(m_enableDotSizeChangeCheckBox, c);
+        panel.add(m_enableDotSizeChangeCheckBox, c);*/
         c.gridx = 0;
         c.gridy++;
         panel.add(m_allowZoomingCheckBox, c);

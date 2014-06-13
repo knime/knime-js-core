@@ -54,7 +54,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
@@ -155,9 +157,19 @@ public class ScatterPlotNodeModel extends NodeModel implements
                     new JSONKeyedValues3DDataset(table.getSpec().getColNames(), rowKeys,
                         new KeyedValues3DSeries[]{series});*/
                 JSONKeyedValues2DDataset dataset = new JSONKeyedValues2DDataset(table.getSpec().getColNames(), rowValues);
-
+                for (int col = 0; col < table.getSpec().getNumColumns(); col++) {
+                    if (table.getSpec().getColTypes()[col] == "string" && table.getSpec().getPossibleValues().get(col) != null) {
+                        dataset.setSymbol(getSymbolMap(table.getSpec().getPossibleValues().get(col)), col);
+                    }
+                }
                 m_representation.setKeyedDataset(dataset);
                 copyConfigToView();
+                if (m_viewValue.getxColumn() == null || m_viewValue.getxColumn().trim().isEmpty()) {
+                    m_viewValue.setxColumn(table.getSpec().getColNames()[0]);
+                }
+                if (m_viewValue.getyColumn() == null || m_viewValue.getyColumn().trim().isEmpty()) {
+                    m_viewValue.setyColumn(table.getSpec().getColNames()[1]);
+                }
             }
         }
         return null;
@@ -174,12 +186,6 @@ public class ScatterPlotNodeModel extends NodeModel implements
         return c;
     }
 
-    /**
-     * @param string
-     * @param table
-     * @param colID
-     * @return
-     */
     private int getOrdinalFromStringValue(final String stringValue, final JSONDataTable table, final int colID) {
         LinkedHashSet<Object> possibleValues = table.getSpec().getPossibleValues().get(colID);
         if (possibleValues != null) {
@@ -192,6 +198,16 @@ public class ScatterPlotNodeModel extends NodeModel implements
             }
         }
         return -1;
+    }
+
+    private Map<String, String> getSymbolMap(final LinkedHashSet<Object> linkedHashSet) {
+        Map<String, String> symbolMap = new HashMap<String, String>();
+        Integer ordinal = 0;
+        for (Object value: linkedHashSet) {
+            symbolMap.put(ordinal.toString(), value.toString());
+            ordinal++;
+        }
+        return symbolMap;
     }
 
     /**
@@ -318,7 +334,7 @@ public class ScatterPlotNodeModel extends NodeModel implements
             m_viewValue.loadFromNodeSettings(valSettings);
         } catch (InvalidSettingsException e) {
             // what to do?
-            LOGGER.error("Error loading internals: ", e);
+            LOGGER.error("Error loading internals: " + e.getMessage(), e);
         }
     }
 

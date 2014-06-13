@@ -13,6 +13,10 @@ knime_scatter_plot = function() {
 	var defaultFontSize = 12;
 	
 	view.init = function(representation, value) {
+		if (!representation.keyedDataset) {
+			d3.select("body").text("Error: No data available");
+			return;
+		}
 		_representation = representation;
 		_value = value;
 		try {
@@ -29,6 +33,18 @@ knime_scatter_plot = function() {
 				}
 				for (var propertyKey in properties) {
 					_keyedDataset.setRowProperty(rowKey, propertyKey, properties[propertyKey]);
+				}
+			}
+			
+			for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
+				var symbolProp = _representation.keyedDataset.symbols[col];
+				if (symbolProp) {
+					var columnKey = _representation.keyedDataset.columnKeys[col];
+					var symbols = [];
+					for (var symbolKey in symbolProp) {
+						symbols.push({"symbol": symbolProp[symbolKey], "value": symbolKey});
+					}
+					_keyedDataset.setColumnProperty(columnKey, "symbols", symbols);
 				}
 			}
 			
@@ -121,9 +137,38 @@ knime_scatter_plot = function() {
 	updateChart = function() {
 		var plot = chartManager.getChart().getPlot();
 		plot.setDataset(buildXYDataset());
-		//plot.autoCalcBounds();
+		plot.getXAxis().setAutoRange(true);
+		plot.getYAxis().setAutoRange(true);
 		//chartManager.refreshDisplay();
 		//plot.update(chart);
+	};
+	
+	updateTitle = function() {
+		_value.chartTitle = document.getElementById("chartTitleText").value;
+		chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
+	};
+	
+	updateSubtitle = function() {
+		_value.chartSubtitle = document.getElementById("chartSubtitleText").value;
+		chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
+	};
+	
+	updateXAxisLabel = function() {
+		_value.xAxisLabel = document.getElementById("xAxisText").value;
+		var newAxisLabel = _value.xAxisLabel;
+		if (!_value.xAxisLabel) {
+			newAxisLabel = _value.xColumn;
+		}
+		chartManager.getChart().getPlot().getXAxis().setLabel(newAxisLabel);
+	};
+	
+	updateYAxisLabel = function() {
+		_value.yAxisLabel = document.getElementById("yAxisText").value;
+		var newAxisLabel = _value.yAxisLabel;
+		if (!_value.xAxisLabel) {
+			newAxisLabel = _value.yColumn;
+		}
+		chartManager.getChart().getPlot().getYAxis().setLabel(newAxisLabel);
 	};
 	
 	drawControls = function() {
@@ -148,8 +193,12 @@ knime_scatter_plot = function() {
 	    			.style("font-family", defaultFont)
 	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
-	    			_value.chartTitle = document.getElementById("chartTitleText").value;
-	    			chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
+	    			updateTitle();
+	    		})
+	    		.on("keypress", function() {
+	    			if ( d3.event.keyCode == 13 ) {
+	    				updateTitle();
+	    			}
 	    		});
 	    		if (_representation.enableYAxisLabelEdit) {
 	    			chartTitleText.style("margin-right", "10px");
@@ -165,8 +214,12 @@ knime_scatter_plot = function() {
 	    			.style("font-family", defaultFont)
 	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
-	    			_value.chartSubtitle = document.getElementById("chartSubtitleText").value;
-	    			chartManager.getChart().setTitle(_value.chartTitle, _value.chartSubtitle, chartManager.getChart().getTitleAnchor());
+	    			updateSubtitle();
+	    		})
+	    		.on("keypress", function() {
+	    			if ( d3.event.keyCode == 13 ) {
+	    				updateSubtitle();
+	    			}
 	    		});
 	    		document.getElementById("chartSubtitleText").value = _value.chartSubtitle;
 	    	}
@@ -188,6 +241,9 @@ knime_scatter_plot = function() {
 	    		document.getElementById("xColumnSelect").value = _value.xColumn;
 	    		xSelect.on("change", function() {
 	    			_value.xColumn = document.getElementById("xColumnSelect").value;
+	    			if (!_value.xAxisLabel) {
+	    				chartManager.getChart().getPlot().getXAxis().setLabel(_value.xColumn, false);
+	    			}
 	    			updateChart();
 	    		});
 	    		if (_representation.enableYColumnChange) {
@@ -208,6 +264,9 @@ knime_scatter_plot = function() {
 	    		document.getElementById("yColumnSelect").value = _value.yColumn;
 	    		ySelect.on("change", function() {
 	    			_value.yColumn = document.getElementById("yColumnSelect").value;
+	    			if (!_value.yAxisLabel) {
+	    				chartManager.getChart().getPlot().getYAxis().setLabel(_value.yColumn, false);
+	    			}
 	    			updateChart();
 	    		});
 	    	}
@@ -223,8 +282,12 @@ knime_scatter_plot = function() {
 	    			.style("font-family", defaultFont)
 	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
-	    			_value.xAxisLabel = document.getElementById("xAxisText").value;
-	    			chartManager.getChart().getPlot().getXAxis().setLabel(_value.xAxisLabel);
+	    			updateXAxisLabel();
+	    		})
+	    		.on("keypress", function() {
+	    			if ( d3.event.keyCode == 13 ) {
+	    				updateXAxisLabel();
+	    			}
 	    		});
 	    		if (_representation.enableYAxisLabelEdit) {
 	    			xAxisText.style("margin-right", "10px");
@@ -240,8 +303,12 @@ knime_scatter_plot = function() {
 	    			.style("font-family", defaultFont)
 	    			.style("font-size", defaultFontSize+"px")
 	    		.on("blur", function() {
-	    			_value.yAxisLabel = document.getElementById("yAxisText").value;
-	    			chartManager.getChart().getPlot().getYAxis().setLabel(_value.yAxisLabel);
+	    			updateYAxisLabel();
+	    		})
+	    		.on("keypress", function() {
+	    			if ( d3.event.keyCode == 13 ) {
+	    				updateYAxisLabel();
+	    			}
 	    		});
 	    		document.getElementById("yAxisText").value = _value.yAxisLabel;
 	    	}
