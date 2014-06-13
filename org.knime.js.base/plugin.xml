@@ -506,19 +506,19 @@
             version="1.0.0"
             webResourceBundleID="SingleSelection">
          <webResource
-               relativePathSource="src/org/knime/js/base/dialog/selection/single/js/"
-               relativePathTarget="src/org/knime/js/base/dialog/selection/single/js/">
+               relativePathSource="js-src/org/knime/js/base/dialog/selection/single/"
+               relativePathTarget="org/knime/js/base/dialog/selection/single/">
          </webResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/single/js/DropdownSingleSelection.js"
+               relativePath="org/knime/js/base/dialog/selection/single/DropdownSingleSelection.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/single/js/ListSingleSelection.js"
+               relativePath="org/knime/js/base/dialog/selection/single/ListSingleSelection.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/single/js/RadioButtonSingleSelection.js"
+               relativePath="org/knime/js/base/dialog/selection/single/RadioButtonSingleSelection.js"
                type="JAVASCRIPT">
          </importResource>
          <webDependency
@@ -531,19 +531,19 @@
             version="1.0.0"
             webResourceBundleID="MultipleSelections">
          <webResource
-               relativePathSource="src/org/knime/js/base/dialog/selection/multiple/js/"
-               relativePathTarget="src/org/knime/js/base/dialog/selection/multiple/js/">
+               relativePathSource="js-src/org/knime/js/base/dialog/selection/multiple/"
+               relativePathTarget="org/knime/js/base/dialog/selection/multiple/">
          </webResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/CheckBoxesMultipleSelections.js"
+               relativePath="org/knime/js/base/dialog/selection/multiple/CheckBoxesMultipleSelections.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/ListMultipleSelections.js"
+               relativePath="org/knime/js/base/dialog/selection/multiple/ListMultipleSelections.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="src/org/knime/js/base/dialog/selection/multiple/js/TwinlistMultipleSelections.js"
+               relativePath="org/knime/js/base/dialog/selection/multiple/TwinlistMultipleSelections.js"
                type="JAVASCRIPT">
          </importResource>
          <webDependency
