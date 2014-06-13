@@ -48,8 +48,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -57,7 +55,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  *
  */
 public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateInputQuickFormRepresentation, DateInputQuickFormValue> {
+        <DateInputQuickFormRepresentation, DateInputQuickFormValue, DateInputQuickFormConfig> {
+
+    /**
+     * @param config
+     */
+    protected DateInputQuickFormNodeModel(final DateInputQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * Format string for the date to string and string to date operations.
@@ -98,49 +103,43 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        Date value = getViewValue().getDate();
-        Date min = getDialogRepresentation().getMin();
-        Date max = getDialogRepresentation().getMax();
-        if (getDialogRepresentation().getUseMin() && value.before(min)) {
+        Date value = isReexecute() ? getViewValue().getDate() : getConfig().getDate();
+        Date min = getConfig().getMin();
+        Date max = getConfig().getMax();
+        if (getConfig().getUseMin() && value.before(min)) {
             throw new InvalidSettingsException("The set date " + value
                     + " is before the earliest allowed date " + min);
         }
-        if (getDialogRepresentation().getUseMax() && value.after(max)) {
+        if (getConfig().getUseMax() && value.after(max)) {
             throw new InvalidSettingsException("The set date " + value
                     + " is after the latest allowed date " + max);
         }
         SimpleDateFormat sdf =
-                new SimpleDateFormat(getDialogRepresentation().getWithTime() ? DATE_TIME_FORMAT : DATE_FORMAT);
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                sdf.format(getViewValue().getDate()));
+                new SimpleDateFormat(getConfig().getWithTime() ? DATE_TIME_FORMAT : DATE_FORMAT);
+        pushFlowVariableString(getConfig().getFlowVariableName(),
+                sdf.format(value));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setUseMin(getConfig().getUseMin());
+        getViewRepresentation().setUseMax(getConfig().getUseMax());
+        getViewRepresentation().setMin(getConfig().getMin());
+        getViewRepresentation().setMax(getConfig().getMax());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getViewRepresentation().setWithTime(getConfig().getWithTime());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ValidationError validateViewValue(
-            final DateInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyValueToConfig() {
+        getConfig().setDate(getViewValue().getDate());
     }
 
 }

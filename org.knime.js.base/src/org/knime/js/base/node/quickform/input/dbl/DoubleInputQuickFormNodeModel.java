@@ -45,17 +45,19 @@
 package org.knime.js.base.node.quickform.input.dbl;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class DoubleInputQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue> {
+        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue, DoubleInputQuickFormConfig> {
+
+    DoubleInputQuickFormNodeModel(final DoubleInputQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * {@inheritDoc}
@@ -64,7 +66,7 @@ public class DoubleInputQuickFormNodeModel
     public DoubleInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new DoubleInputQuickFormRepresentation();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -86,43 +88,38 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        double value = getViewValue().getDouble();
-        double min = getDialogRepresentation().getMin();
-        double max = getDialogRepresentation().getMax();
-        if (getDialogRepresentation().getUseMin() && value < min) {
+        double value;
+        if (isReexecute()) {
+            value = getViewValue().getDouble();
+        } else {
+            value = getConfig().getDouble();
+        }
+        double min = getConfig().getMin();
+        double max = getConfig().getMax();
+        if (getConfig().getUseMin() && value < min) {
             throw new InvalidSettingsException("The set double " + value
                     + " is smaller than the allowed minimum of " + min);
         }
-        if (getDialogRepresentation().getUseMax() && value > max) {
+        if (getConfig().getUseMax() && value > max) {
             throw new InvalidSettingsException("The set double " + value
                     + " is bigger than the allowed maximum of " + max);
         }
-        pushFlowVariableDouble(getDialogRepresentation().getFlowVariableName(), getViewValue().getDouble());
+        pushFlowVariableDouble(getConfig().getFlowVariableName(), value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setUseMin(getConfig().getUseMin());
+        getViewRepresentation().setUseMax(getConfig().getUseMax());
+        getViewRepresentation().setMin(getConfig().getMin());
+        getViewRepresentation().setMax(getConfig().getMax());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
-    }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final DoubleInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyValueToConfig() {
+        getConfig().setDouble(getViewValue().getDouble());
     }
 
 }

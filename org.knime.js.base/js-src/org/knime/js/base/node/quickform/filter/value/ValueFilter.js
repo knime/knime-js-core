@@ -64,6 +64,12 @@ org_knime_js_base_node_quickform_filter_value = function() {
 		if (representation.possibleValues == null) {
 			body.append("Error: No data available");
 		} else {
+			var columnSelection;
+			if (typeof value.column != undefined && value.column != null) {
+				columnSelection = value.column;
+			} else {
+				columnSelection = representation.defaultColumn;
+			}
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
 				body.append(colselection);
@@ -71,7 +77,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 				for ( var key in representation.possibleValues) {
 					var option = $('<option>' + key + '</option>');
 					option.appendTo(colselection);
-					if (key == representation.defaultColumn) {
+					if (key == columnSelection) {
 						option.prop('selected', true);
 					}
 				}
@@ -87,8 +93,14 @@ org_knime_js_base_node_quickform_filter_value = function() {
 				selector = new twinlistMultipleSelections();
 			}
 			body.append(selector.getComponent());
-			selector.setChoices(viewRepresentation.possibleValues[representation.defaultColumn]);
-			selector.setSelections(representation.defaultValues);
+			selector.setChoices(viewRepresentation.possibleValues[columnSelection]);
+			var selections;
+			if (typeof value.values != undefined && value.values != null) {
+				selections = value.values;
+			} else {
+				selections = representation.defaultValues;
+			}
+			selector.setSelections(selections);
 		}
 		resizeParent();
 	};

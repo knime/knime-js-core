@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -67,11 +67,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class MoleculeStringInputQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_STRING = "moleculeString";
-    
+
     private static final String DEFAULT_STRING = "";
-    
-    private String m_moleculeString = DEFAULT_STRING;
-    
+
+    private String m_moleculeString = null;
+
     /**
      * {@inheritDoc}
      */
@@ -123,9 +123,9 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 
-    
-    
+
+
 }

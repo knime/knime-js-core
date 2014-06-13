@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -59,24 +59,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ValueFilterQuickFormValue extends JSONViewContent implements DialogNodeValue {
-    
+
     private static final String CFG_COLUMN = "column";
-    
+
     private static final String DEFAULT_COLUMN = "";
-    
-    private String m_column = DEFAULT_COLUMN;
+
+    private String m_column = null;
 
     private static final String CFG_VALUES = "values";
-    
+
     private static final String[] DEFAULT_VALUES = new String[0];
 
-    private String[] m_values = DEFAULT_VALUES;
+    private String[] m_values = null;
 
     /**
      * {@inheritDoc}
@@ -93,7 +93,7 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
      */
     @Override
     @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) 
+    public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         m_column = settings.getString(CFG_COLUMN);
         m_values = settings.getStringArray(CFG_VALUES);
@@ -108,7 +108,7 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
         m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
         m_values = settings.getStringArray(CFG_VALUES, DEFAULT_VALUES);
     }
-    
+
     /**
      * @return the column
      */
@@ -116,7 +116,7 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
     public String getColumn() {
         return m_column;
     }
-    
+
     /**
      * @param column the column to set
      */
@@ -146,9 +146,9 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
      */
     @Override
     @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings) 
+    public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 }

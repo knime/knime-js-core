@@ -61,7 +61,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 import org.knime.js.base.node.quickform.input.string.RegexPanel;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
@@ -70,17 +70,20 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     private static final int TEXT_AREA_HEIGHT = 5;
 
     private final JTextField m_separatorField;
-    
+
     private final JCheckBox m_omitEmptyField;
-    
+
     private final RegexPanel m_regexField;
 
     private final JTextArea m_defaultArea;
-    
+
     private final JTextArea m_valueArea;
-    
+
+    private ListBoxInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    ListBoxInputQuickFormNodeDialog() {
+    ListBoxInputQuickFormNodeDialog(final ListBoxInputQuickFormConfig config) {
+        m_config = config;
         m_separatorField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_omitEmptyField = new JCheckBox();
         m_regexField = new RegexPanel();
@@ -110,17 +113,14 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        ListBoxInputQuickFormRepresentation representation = new ListBoxInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_separatorField.setText(representation.getSeparator());
-        m_omitEmptyField.setSelected(representation.getOmitEmpty());
-        m_regexField.setRegex(representation.getRegex());
-        m_regexField.setErrorMessage(representation.getErrorMessage());
-        m_defaultArea.setText(representation.getDefaultValue());
-        ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueArea.setText(value.getString());
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
+        m_separatorField.setText(m_config.getSeparator());
+        m_omitEmptyField.setSelected(m_config.getOmitEmpty());
+        m_regexField.setRegex(m_config.getRegex());
+        m_regexField.setErrorMessage(m_config.getErrorMessage());
+        m_defaultArea.setText(m_config.getDefaultValue());
+        m_valueArea.setText(m_config.getString());
     }
 
     /**
@@ -128,17 +128,14 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        ListBoxInputQuickFormRepresentation representation = new ListBoxInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setSeparator(m_separatorField.getText());
-        representation.setOmitEmpty(m_omitEmptyField.isSelected());
-        representation.setRegex(m_regexField.getRegex());
-        representation.setErrorMessage(m_regexField.getErrorMessage());
-        representation.setDefaultValue(m_defaultArea.getText());
-        representation.saveToNodeSettings(settings);
-        ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
-        value.setString(m_valueArea.getText());
-        value.saveToNodeSettings(settings);
+        super.saveSettingsTo(m_config);
+        m_config.setSeparator(m_separatorField.getText());
+        m_config.setOmitEmpty(m_omitEmptyField.isSelected());
+        m_config.setRegex(m_regexField.getRegex());
+        m_config.setErrorMessage(m_regexField.getErrorMessage());
+        m_config.setDefaultValue(m_defaultArea.getText());
+        m_config.setString(m_valueArea.getText());
+        m_config.saveSettings(settings);
     }
 
 }

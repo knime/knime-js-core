@@ -62,22 +62,25 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
-    
+
     private final ColumnFilterPanel m_defaultField;
 
     private final ColumnFilterPanel m_valueField;
-    
+
     private final JComboBox<String> m_type;
-    
+
     private String[] m_possibleColumns;
 
+    private ColumnFilterQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    ColumnFilterQuickFormNodeDialog() {
+    ColumnFilterQuickFormNodeDialog(final ColumnFilterQuickFormConfig config) {
+        m_config = config;
         m_type = new JComboBox<String>(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
         m_defaultField = new ColumnFilterPanel(true);
         m_valueField = new ColumnFilterPanel(true);
@@ -100,16 +103,13 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
+        m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
         DataTableSpec spec = (DataTableSpec) specs[0];
         m_possibleColumns = spec.getColumnNames();
-        ColumnFilterQuickFormRepresentation representation = new ColumnFilterQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultField.update(spec, false, Arrays.asList(representation.getDefaultColumns()));
-        ColumnFilterQuickFormValue value = new ColumnFilterQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.update(spec, false, Arrays.asList(value.getColumns()));
-        m_type.setSelectedItem(representation.getType());
+        m_defaultField.update(spec, false, Arrays.asList(m_config.getDefaultColumns()));
+        m_valueField.update(spec, false, Arrays.asList(m_config.getColumns()));
+        m_type.setSelectedItem(m_config.getType());
     }
 
     /**
@@ -117,17 +117,14 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        ColumnFilterQuickFormRepresentation representation = new ColumnFilterQuickFormRepresentation();
-        saveSettingsTo(representation);
+        saveSettingsTo(m_config);
         Set<String> defaultIncludes = m_defaultField.getIncludedColumnSet();
-        representation.setDefaultColumns(defaultIncludes.toArray(new String[defaultIncludes.size()]));
-        representation.setType((String)m_type.getSelectedItem());
-        representation.setPossibleColumns(m_possibleColumns);
-        representation.saveToNodeSettings(settings);
-        ColumnFilterQuickFormValue value = new ColumnFilterQuickFormValue();
+        m_config.setDefaultColumns(defaultIncludes.toArray(new String[defaultIncludes.size()]));
+        m_config.setType((String)m_type.getSelectedItem());
+        m_config.setPossibleColumns(m_possibleColumns);
         Set<String> valueIncludes = m_valueField.getIncludedColumnSet();
-        value.setColumns(valueIncludes.toArray(new String[valueIncludes.size()]));
-        value.saveToNodeSettings(settings);
+        m_config.setColumns(valueIncludes.toArray(new String[valueIncludes.size()]));
+        m_config.saveSettings(settings);
     }
 
 }

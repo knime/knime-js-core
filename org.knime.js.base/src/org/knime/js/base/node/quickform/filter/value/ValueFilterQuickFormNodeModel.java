@@ -55,25 +55,23 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ValueFilterQuickFormNodeModel
         extends
-        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue> {
+        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue, ValueFilterQuickFormConfig> {
 
     /** Creates a new value selection node model. */
-    public ValueFilterQuickFormNodeModel() {
+    public ValueFilterQuickFormNodeModel(final ValueFilterQuickFormConfig config) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE});
+                new PortType[]{BufferedDataTable.TYPE}, config);
     }
 
     /**
@@ -82,24 +80,6 @@ public class ValueFilterQuickFormNodeModel
     @Override
     public String getJavascriptObjectID() {
         return "org_knime_js_base_node_quickform_filter_value";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        createEmptyViewRepresentation().loadFromNodeSettings(settings);
-        createEmptyViewValue().loadFromNodeSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // not used
     }
 
     /**
@@ -118,21 +98,13 @@ public class ValueFilterQuickFormNodeModel
         return new ValueFilterQuickFormValue();
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(
-            final ValueFilterQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        getViewRepresentation().setFromSpec(((DataTableSpec)inSpecs[0]));
+        getConfig().setFromSpec(((DataTableSpec)inSpecs[0]));
         createAndPushFlowVariable();
         return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
@@ -141,46 +113,72 @@ public class ValueFilterQuickFormNodeModel
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
-        getViewRepresentation().setFromSpec(((DataTable)inObjects[0]).getDataTableSpec());
+        getConfig().setFromSpec(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
         BufferedDataTable inTable = (BufferedDataTable)inObjects[0];
         BufferedDataContainer container =
                 exec.createDataContainer(inTable.getDataTableSpec(), false);
-        List<String> values = Arrays.asList(getViewValue().getValues());
+        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
+        List<String> values = Arrays.asList(isReexecute() ? getViewValue().getValues() : getConfig().getValues());
         int colIndex;
         for (colIndex = 0; colIndex < inTable.getDataTableSpec().getNumColumns(); colIndex++) {
             if (inTable.getDataTableSpec().getColumnSpec(colIndex).getName()
-                    .equals(getViewValue().getColumn())) {
+                    .equals(column)) {
                 break;
             }
         }
-        inTable.getDataTableSpec().getColumnSpec(getViewValue().getColumn());
+        inTable.getDataTableSpec().getColumnSpec(column);
         for (DataRow row : inTable) {
             if (values.contains(row.getCell(colIndex).toString())) {
                 container.addRowToTable(row);
             }
         }
         container.close();
+        copyConfigToView();
+        setExecuted();
         return new PortObject[]{container.getTable()};
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         checkSelectedValues();
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                StringUtils.join(getViewValue().getValues(), ","));
+        String[] values = isReexecute() ? getViewValue().getValues() : getConfig().getValues();
+        pushFlowVariableString(getConfig().getFlowVariableName(),
+                StringUtils.join(values, ","));
     }
 
     private void checkSelectedValues() throws InvalidSettingsException {
-        List<String> possibleValues = getViewRepresentation().getPossibleValues().get(getViewValue().getColumn());
-        String[] selectedValues = getViewValue().getValues();
+        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
+        List<String> possibleValues = getConfig().getPossibleValues().get(column);
+        String[] selectedValues = isReexecute() ? getViewValue().getValues() : getConfig().getValues();
         for (String value : selectedValues) {
             if (!possibleValues.contains(value)) {
                 throw new InvalidSettingsException("The selected value '"
                         + value
                         + "' is not among the possible values in the column '"
-                        + getViewValue().getColumn() + "'");
+                        + column + "'");
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
+        getViewRepresentation().setDefaultValues(getConfig().getDefaultValues());
+        getViewRepresentation().setLockColumn(getConfig().getLockColumn());
+        getViewRepresentation().setType(getConfig().getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyValueToConfig() {
+        getConfig().setColumn(getViewValue().getColumn());
+        getConfig().setValues(getViewValue().getValues());
     }
 
 }

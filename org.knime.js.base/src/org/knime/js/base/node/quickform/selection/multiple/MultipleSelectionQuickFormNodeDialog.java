@@ -84,10 +84,13 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JComboBox m_type;
 
+    private MultipleSelectionQuickFormConfig m_config;
+
     /**
      * Constructors, inits fields calls layout routines.
      */
-    MultipleSelectionQuickFormNodeDialog() {
+    MultipleSelectionQuickFormNodeDialog(final MultipleSelectionQuickFormConfig config) {
+        m_config = config;
         m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         m_valueField = new JList();
@@ -133,40 +136,6 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-            throws NotConfigurableException {
-        MultipleSelectionQuickFormRepresentation representation = new MultipleSelectionQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_possibleChoicesField.setText(StringUtils.join(representation.getPossibleChoices(), "\n"));
-        m_type.setSelectedItem(representation.getType());
-        MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        setSelections(m_defaultField, Arrays.asList(representation.getDefaultValue()));
-        setSelections(m_valueField, Arrays.asList(value.getVariableValue()));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        MultipleSelectionQuickFormRepresentation representation = new MultipleSelectionQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
-        String possibleChoices = m_possibleChoicesField.getText();
-        representation.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
-        representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
-        representation.saveToNodeSettings(settings);
-        MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
-        value.setVariableValue((Arrays.asList(m_valueField.getSelectedValues())).toArray(new String[0]));
-        value.saveToNodeSettings(settings);
-    }
-    
-    /**
      * Refreshes the default and value fields based on changes in the current
      * choices, while keeping the selection.
      */
@@ -178,7 +147,7 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     /**
      * Refreshes the given list based on changes in the current
      * choices, while keeping the selection.
-     * 
+     *
      * @param list The list that will be refreshed
      */
     private void refreshChoices(final JList list) {
@@ -186,10 +155,10 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         list.setListData(m_possibleChoicesField.getText().split("\n"));
         setSelections(list, selections);
     }
-    
+
     /**
      * Sets the selections in the given list to the given selections.
-     * 
+     *
      * @param list The list where the selections will be applied
      * @param selections The new selections
      */
@@ -202,6 +171,34 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         list.setSelectedIndices(ArrayUtils.toPrimitive(indices.toArray(new Integer[indices.size()])));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+            throws NotConfigurableException {
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
+        m_possibleChoicesField.setText(StringUtils.join(m_config.getPossibleChoices(), "\n"));
+        m_type.setSelectedItem(m_config.getType());
+        setSelections(m_defaultField, Arrays.asList(m_config.getDefaultValue()));
+        setSelections(m_valueField, Arrays.asList(m_config.getVariableValue()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        saveSettingsTo(m_config);
+        m_config.setDefaultValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
+        String possibleChoices = m_possibleChoicesField.getText();
+        m_config.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
+        m_config.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
+        m_config.setVariableValue((Arrays.asList(m_valueField.getSelectedValues())).toArray(new String[0]));
+        m_config.saveSettings(settings);
     }
 
 }

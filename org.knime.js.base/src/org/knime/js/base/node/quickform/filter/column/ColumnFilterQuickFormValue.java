@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -67,10 +67,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class ColumnFilterQuickFormValue extends JSONViewContent implements DialogNodeValue {
 
     private static final String CFG_COLUMNS = "columns";
-    
+
     private static final String[] DEFAULT_COLUMNS = new String[0];
 
-    private String[] m_columns = DEFAULT_COLUMNS;
+    private String[] m_columns = null;
 
     /**
      * {@inheritDoc}
@@ -86,7 +86,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
      */
     @Override
     @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) 
+    public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         setColumns(settings.getStringArray(CFG_COLUMNS));
     }
@@ -121,9 +121,9 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
      */
     @Override
     @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings) 
+    public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 }

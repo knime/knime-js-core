@@ -54,24 +54,22 @@ import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
-public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFilterQuickFormRepresentation, 
-        ColumnFilterQuickFormValue> {
-    
+public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFilterQuickFormRepresentation,
+        ColumnFilterQuickFormValue, ColumnFilterQuickFormConfig> {
+
     /** Creates a new value selection node model. */
-    public ColumnFilterQuickFormNodeModel() {
+    public ColumnFilterQuickFormNodeModel(final ColumnFilterQuickFormConfig config) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE});
+                new PortType[]{BufferedDataTable.TYPE}, config);
     }
 
     /**
@@ -80,23 +78,6 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
     @Override
     public String getJavascriptObjectID() {
         return "org_knime_js_base_node_quickform_filter_column";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyViewRepresentation().loadFromNodeSettings(settings);
-        createEmptyViewValue().loadFromNodeSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // not used
     }
 
     /**
@@ -114,14 +95,7 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
     public ColumnFilterQuickFormValue createEmptyViewValue() {
         return new ColumnFilterQuickFormValue();
     }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final ColumnFilterQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -132,9 +106,9 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         createAndPushFlowVariable();
         return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
     }
-    
+
     private DataTableSpec createSpec(final DataTableSpec inSpec) throws InvalidSettingsException {
-        final String[] values = getViewValue().getColumns();
+        final String[] values = isReexecute() ? getViewValue().getColumns() : getConfig().getColumns();
         final List<DataColumnSpec> cspecs = new ArrayList<DataColumnSpec>();
         List<String> unknownCols = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
@@ -151,9 +125,9 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         }
         return new DataTableSpec(cspecs.toArray(new DataColumnSpec[cspecs.size()]));
     }
-    
+
     private void updateColumns(final DataTableSpec spec) {
-        getViewRepresentation().setPossibleColumns(spec.getColumnNames());
+        getConfig().setPossibleColumns(spec.getColumnNames());
     }
 
     /** {@inheritDoc} */
@@ -167,12 +141,34 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         rearranger.keepOnly(outSpec.getColumnNames());
         BufferedDataTable outTable = exec.createColumnRearrangeTable((BufferedDataTable)inObjects[0],
                 rearranger, exec);
+        copyConfigToView();
+        setExecuted();
         return new BufferedDataTable[]{outTable};
     }
-    
+
     private void createAndPushFlowVariable() {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                StringUtils.join(getViewValue().getColumns(), ","));
+        String[] columns = isReexecute() ? getViewValue().getColumns() : getConfig().getColumns();
+        pushFlowVariableString(getConfig().getFlowVariableName(),
+                StringUtils.join(columns, ","));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setDefaultColumns(getConfig().getDefaultColumns());
+        getViewRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
+        getViewRepresentation().setType(getConfig().getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyValueToConfig() {
+        getConfig().setColumns(getViewValue().getColumns());
     }
 
 }

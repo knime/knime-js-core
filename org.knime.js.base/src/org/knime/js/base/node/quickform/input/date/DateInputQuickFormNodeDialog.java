@@ -68,7 +68,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
@@ -91,8 +91,11 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JRadioButton m_dateAndTime;
 
+    private DateInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    DateInputQuickFormNodeDialog() {
+    DateInputQuickFormNodeDialog(final DateInputQuickFormConfig config) {
+        m_config = config;
         m_date = new JRadioButton("Date");
         m_date.setActionCommand("date");
         m_dateAndTime = new JRadioButton("Date and Time");
@@ -186,26 +189,33 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Date Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
+    private void updateFormat() {
+        String format =
+                m_dateAndTime.isSelected() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
+                        : DateInputQuickFormNodeModel.DATE_FORMAT;
+        m_min.setEditor(new JSpinner.DateEditor(m_min, format));
+        m_max.setEditor(new JSpinner.DateEditor(m_max, format));
+        m_defaultField.setEditor(new JSpinner.DateEditor(m_defaultField, format));
+        m_valueField.setEditor(new JSpinner.DateEditor(m_valueField, format));
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        DateInputQuickFormRepresentation representation = new DateInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultField.setValue(representation.getDefaultValue());
-        m_useMin.setSelected(representation.getUseMin());
-        m_useMax.setSelected(representation.getUseMax());
-        m_min.setValue(representation.getMin());
-        m_max.setValue(representation.getMax());
-        DateInputQuickFormValue value = new DateInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setValue(value.getDate());
+        m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
+        m_defaultField.setValue(m_config.getDefaultValue());
+        m_useMin.setSelected(m_config.getUseMin());
+        m_useMax.setSelected(m_config.getUseMax());
+        m_min.setValue(m_config.getMin());
+        m_max.setValue(m_config.getMax());
+        m_valueField.setValue(m_config.getDate());
         m_min.setEnabled(m_useMin.isSelected());
         m_max.setEnabled(m_useMax.isSelected());
-        if (representation.getWithTime()) {
+        if (m_config.getWithTime()) {
             m_dateAndTime.setSelected(true);
         } else {
             m_date.setSelected(true);
@@ -218,28 +228,15 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        DateInputQuickFormRepresentation representation = new DateInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue((Date)m_defaultField.getValue());
-        representation.setUseMin(m_useMin.isSelected());
-        representation.setUseMax(m_useMax.isSelected());
-        representation.setMin((Date)m_min.getValue());
-        representation.setMax((Date)m_max.getValue());
-        representation.setWithTime(m_dateAndTime.isSelected());
-        representation.saveToNodeSettings(settings);
-        DateInputQuickFormValue value = new DateInputQuickFormValue();
-        value.setDate((Date)m_valueField.getValue());
-        value.saveToNodeSettings(settings);
-    }
-
-    private void updateFormat() {
-        String format =
-                m_dateAndTime.isSelected() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
-                        : DateInputQuickFormNodeModel.DATE_FORMAT;
-        m_min.setEditor(new JSpinner.DateEditor(m_min, format));
-        m_max.setEditor(new JSpinner.DateEditor(m_max, format));
-        m_defaultField.setEditor(new JSpinner.DateEditor(m_defaultField, format));
-        m_valueField.setEditor(new JSpinner.DateEditor(m_valueField, format));
+        saveSettingsTo(m_config);
+        m_config.setDefaultValue((Date)m_defaultField.getValue());
+        m_config.setUseMin(m_useMin.isSelected());
+        m_config.setUseMax(m_useMax.isSelected());
+        m_config.setMin((Date)m_min.getValue());
+        m_config.setMax((Date)m_max.getValue());
+        m_config.setWithTime(m_dateAndTime.isSelected());
+        m_config.setDate((Date)m_valueField.getValue());
+        m_config.saveSettings(settings);
     }
 
 }

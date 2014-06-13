@@ -63,26 +63,29 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
-    
+
     private final JCheckBox m_useMin;
-    
+
     private final JCheckBox m_useMax;
-    
+
     private final JSpinner m_min;
-    
+
     private final JSpinner m_max;
 
     private final JSpinner m_defaultSpinner;
-    
+
     private final JSpinner m_valueSpinner;
 
+    private DoubleInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    DoubleInputQuickFormNodeDialog() {
+    DoubleInputQuickFormNodeDialog(final DoubleInputQuickFormConfig config) {
+        m_config = config;
         m_useMin = new JCheckBox();
         m_useMax = new JCheckBox();
         m_min = new JSpinner(getSpinnerModel());
@@ -166,17 +169,14 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        DoubleInputQuickFormRepresentation representation = new DoubleInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultSpinner.setValue(representation.getDefaultValue());
-        m_useMin.setSelected(representation.getUseMin());
-        m_useMax.setSelected(representation.getUseMax());
-        m_min.setValue(representation.getMin());
-        m_max.setValue(representation.getMax());
-        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueSpinner.setValue(value.getDouble());
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
+        m_defaultSpinner.setValue(m_config.getDefaultValue());
+        m_useMin.setSelected(m_config.getUseMin());
+        m_useMax.setSelected(m_config.getUseMax());
+        m_min.setValue(m_config.getMin());
+        m_max.setValue(m_config.getMax());
+        m_valueSpinner.setValue(m_config.getDouble());
         m_min.setEnabled(m_useMin.isSelected());
         m_max.setEnabled(m_useMax.isSelected());
     }
@@ -186,17 +186,14 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        DoubleInputQuickFormRepresentation representation = new DoubleInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue((Double)m_defaultSpinner.getValue());
-        representation.setUseMin(m_useMin.isSelected());
-        representation.setUseMax(m_useMax.isSelected());
-        representation.setMin((Double)m_min.getValue());
-        representation.setMax((Double)m_max.getValue());
-        representation.saveToNodeSettings(settings);
-        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue();
-        value.setDouble((Double)m_valueSpinner.getValue());
-        value.saveToNodeSettings(settings);
+        super.saveSettingsTo(m_config);
+        m_config.setDefaultValue((Double)m_defaultSpinner.getValue());
+        m_config.setUseMin(m_useMin.isSelected());
+        m_config.setUseMax(m_useMax.isSelected());
+        m_config.setMin((Double)m_min.getValue());
+        m_config.setMax((Double)m_max.getValue());
+        m_config.setDouble((Double)m_valueSpinner.getValue());
+        m_config.saveSettings(settings);
     }
 
 }

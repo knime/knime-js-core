@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ValueFilterQuickFormNodeFactory extends NodeFactory<ValueFilterQuickFormNodeModel> implements
         WizardNodeFactoryExtension<ValueFilterQuickFormNodeModel, ValueFilterQuickFormRepresentation,
         ValueFilterQuickFormValue> {
+
+    private ValueFilterQuickFormConfig m_config = new ValueFilterQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ValueFilterQuickFormNodeModel createNodeModel() {
-        return new ValueFilterQuickFormNodeModel();
+        return new ValueFilterQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class ValueFilterQuickFormNodeFactory extends NodeFactory<ValueFilterQuic
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ValueFilterQuickFormNodeDialog();
+        return new ValueFilterQuickFormNodeDialog(m_config);
     }
 }

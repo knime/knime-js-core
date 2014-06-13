@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -70,7 +70,7 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
 
     private static final int DEFAULT_INTEGER = 0;
 
-    private int m_integer = DEFAULT_INTEGER;
+    private Integer m_integer = null;
 
     /**
      * {@inheritDoc}
@@ -103,7 +103,7 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
      * @return the string
      */
     @JsonProperty("integer")
-    public int getInteger() {
+    public Integer getInteger() {
         return m_integer;
     }
 
@@ -111,7 +111,7 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
      * @param integer the string to set
      */
     @JsonProperty("integer")
-    public void setInteger(final int integer) {
+    public void setInteger(final Integer integer) {
         m_integer = integer;
     }
 
@@ -123,7 +123,7 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

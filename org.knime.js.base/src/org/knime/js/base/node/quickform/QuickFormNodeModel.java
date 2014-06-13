@@ -45,18 +45,22 @@
 package org.knime.js.base.node.quickform;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
+import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNode;
-import org.knime.core.node.dialog.DialogNodeRepresentation;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 
@@ -66,12 +70,18 @@ import org.knime.core.node.wizard.WizardNode;
  * @param <VAL> The node value implementation of the quickform node.
  *
  */
-public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VAL> & WebViewContent,
-        VAL extends DialogNodeValue & WebViewContent>
+public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl<VAL>,
+        VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig>
         extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
 
-    private final REP m_representation;
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(QuickFormNodeModel.class);
+
+    private CONF m_config;
+
+    private REP m_representation;
     private VAL m_value;
+
+    private boolean m_isReexecute = false;
 
     /**
      * Creates a new quickform model with the given number (and types!) of input
@@ -80,36 +90,15 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
      */
-    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
+    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final CONF config) {
         super(inPortTypes, outPortTypes);
         m_representation = createEmptyViewRepresentation();
         m_value = createEmptyViewValue();
+        m_config = config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) {
-        getDialogRepresentation().saveToNodeSettings(settings);
-        getDialogValue().saveToNodeSettings(settings);
-        getViewRepresentation().saveToNodeSettings(settings);
-        getViewValue().saveToNodeSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
-        REP representation = getDialogRepresentation();
-        representation.loadFromNodeSettings(settings);
-        VAL value = getDialogValue();
-        value.loadFromNodeSettings(settings);
-        REP viewRepresentation = getViewRepresentation();
-        viewRepresentation.loadFromNodeSettings(settings);
-        VAL viewValue = getViewValue();
-        viewValue.loadFromNodeSettings(settings);
+    protected CONF getConfig() {
+        return m_config;
     }
 
     /**
@@ -118,7 +107,19 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     @Override
     protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        // do nothing
+        File repFile = new File(nodeInternDir, "representation.xml");
+        File valFile = new File(nodeInternDir, "value.xml");
+        NodeSettingsRO repSettings = NodeSettings.loadFromXML(new FileInputStream(repFile));
+        NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
+        m_representation = createEmptyViewRepresentation();
+        m_value = createEmptyViewValue();
+        try {
+            m_representation.loadFromNodeSettings(repSettings);
+            m_value.loadFromNodeSettings(valSettings);
+        } catch (InvalidSettingsException e) {
+            // what to do?
+            LOGGER.error("Error loading internals: ", e);
+        }
     }
 
     /**
@@ -127,7 +128,18 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     @Override
     protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        // do nothing
+        NodeSettings repSettings = new NodeSettings("representation");
+        NodeSettings valSettings = new NodeSettings("value");
+        if (m_representation != null) {
+            m_representation.saveToNodeSettings(repSettings);
+        }
+        if (m_value != null) {
+            m_value.saveToNodeSettings(valSettings);
+        }
+        File repFile = new File(nodeInternDir, "representation.xml");
+        File valFile = new File(nodeInternDir, "value.xml");
+        repSettings.saveToXML(new FileOutputStream(repFile));
+        valSettings.saveToXML(new FileOutputStream(valFile));
     }
 
     /**
@@ -169,7 +181,59 @@ public abstract class QuickFormNodeModel<REP extends DialogNodeRepresentation<VA
     public void loadViewValue(final VAL viewContent, final boolean useAsDefault) {
         m_value = viewContent;
         if (useAsDefault) {
-            // TODO: overwrite node settings
+            copyValueToConfig();
         }
     };
+
+    @Override
+    protected void reset() {
+        m_representation = createEmptyViewRepresentation();
+        m_value = createEmptyViewValue();
+        m_isReexecute = false;
+    }
+
+    protected void setExecuted() {
+        m_isReexecute = true;
+    }
+
+    protected boolean isReexecute() {
+        return m_isReexecute;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_config.loadSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_config.saveSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        //
+    }
+
+    @Override
+    public ValidationError validateViewValue(final VAL viewContent) {
+        return null;
+    };
+
+    protected void copyConfigToView() {
+        getViewRepresentation().setLabel(getConfig().getLabel());
+        getViewRepresentation().setDescription(getConfig().getDescription());
+    }
+
+    abstract protected void copyValueToConfig();
+
 }

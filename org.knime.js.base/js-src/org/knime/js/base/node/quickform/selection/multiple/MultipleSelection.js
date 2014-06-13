@@ -70,7 +70,13 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 			}
 			body.append(selector.getComponent());
 			selector.setChoices(representation.possibleChoices);
-			selector.setSelections(representation.defaultvalue);
+			var selections;
+			if (typeof value.value != undefined && value.value != null) {
+				selections = value.value;
+			} else {
+				selections = representation.defaultvalue;
+			}
+			selector.setSelections(selections);
 		}
 		resizeParent();
 	};

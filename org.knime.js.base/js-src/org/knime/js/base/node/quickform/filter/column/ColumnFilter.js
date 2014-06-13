@@ -72,7 +72,13 @@ org_knime_js_base_node_quickform_filter_column = function() {
 			}
 			body.append(selector.getComponent());
 			selector.setChoices(representation.possibleColumns);
-			selector.setSelections(representation.defaultColumns);
+			var selections;
+			if (typeof value.columns != undefined && value.columns != null) {
+				selections = value.columns;
+			} else {
+				selections = representation.defaultColumns;
+			}
+			selector.setSelections(selections);
 		}
 		resizeParent();
 	};

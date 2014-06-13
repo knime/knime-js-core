@@ -72,7 +72,13 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		if (viewRepresentation.usemax) {
 			input.spinner('option', 'max', viewRepresentation.max);
 		}
-		input.val(representation.defaultvalue);
+		var doubleValue;
+		if (typeof value.double != undefined && value.double != null) {
+			doubleValue = value.double;
+		} else {
+			doubleValue = representation.defaultvalue;
+		}
+		input.val(doubleValue);
 		body.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');

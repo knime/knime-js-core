@@ -57,20 +57,23 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final RegexPanel m_regexField;
-    
+
     private final JTextField m_defaultField;
 
     private final JTextField m_valueField;
 
+    private StringInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    StringInputQuickFormNodeDialog() {
+    StringInputQuickFormNodeDialog(final StringInputQuickFormConfig config) {
+        m_config = config;
         m_regexField = new RegexPanel();
         m_defaultField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_valueField = new JTextField(DEF_TEXTFIELD_WIDTH);
@@ -96,15 +99,12 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_regexField.setRegex(representation.getRegex());
-        m_regexField.setErrorMessage(representation.getErrorMessage());
-        m_defaultField.setText(representation.getDefaultValue());
-        StringInputQuickFormValue value = new StringInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setText(value.getString());
+        m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
+        m_regexField.setRegex(m_config.getRegex());
+        m_regexField.setErrorMessage(m_config.getErrorMessage());
+        m_defaultField.setText(m_config.getDefaultValue());
+        m_valueField.setText(m_config.getString());
     }
 
     /**
@@ -113,15 +113,12 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         m_regexField.commitRegexHistory();
-        StringInputQuickFormRepresentation representation = new StringInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setRegex(m_regexField.getRegex());
-        representation.setErrorMessage(m_regexField.getErrorMessage());
-        representation.setDefaultValue(m_defaultField.getText());
-        representation.saveToNodeSettings(settings);
-        StringInputQuickFormValue value = new StringInputQuickFormValue();
-        value.setString(m_valueField.getText());
-        value.saveToNodeSettings(settings);
+        saveSettingsTo(m_config);
+        m_config.setRegex(m_regexField.getRegex());
+        m_config.setErrorMessage(m_regexField.getErrorMessage());
+        m_config.setDefaultValue(m_defaultField.getText());
+        m_config.setString(m_valueField.getText());
+        m_config.saveSettings(settings);
     }
 
 }

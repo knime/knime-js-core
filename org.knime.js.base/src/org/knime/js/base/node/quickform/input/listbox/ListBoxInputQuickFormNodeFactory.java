@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQuickFormNodeModel> implements
         WizardNodeFactoryExtension<ListBoxInputQuickFormNodeModel, ListBoxInputQuickFormRepresentation,
         ListBoxInputQuickFormValue> {
+
+    private ListBoxInputQuickFormConfig m_config = new ListBoxInputQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ListBoxInputQuickFormNodeModel createNodeModel() {
-        return new ListBoxInputQuickFormNodeModel();
+        return new ListBoxInputQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ListBoxInputQuickFormNodeDialog();
+        return new ListBoxInputQuickFormNodeDialog(m_config);
     }
 }

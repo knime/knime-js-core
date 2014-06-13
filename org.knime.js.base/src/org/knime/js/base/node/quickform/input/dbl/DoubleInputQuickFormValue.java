@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -59,7 +59,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -70,7 +70,7 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
 
     private static final double DEFAULT_DOUBLE = 0;
 
-    private double m_double = DEFAULT_DOUBLE;
+    private Double m_double = null;
 
     /**
      * {@inheritDoc}
@@ -103,7 +103,7 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
      * @return the string
      */
     @JsonProperty("double")
-    public double getDouble() {
+    public Double getDouble() {
         return m_double;
     }
 
@@ -111,7 +111,7 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
      * @param dbl the string to set
      */
     @JsonProperty("double")
-    public void setDouble(final double dbl) {
+    public void setDouble(final Double dbl) {
         m_double = dbl;
     }
 
@@ -123,7 +123,7 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

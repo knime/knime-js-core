@@ -65,7 +65,6 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
@@ -213,25 +212,21 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         m_variableNameField.setText(flowVariableName);
     }
 
-    /**
-     * @param representation Representation holding the content for the
-     *            components
-     */
     protected void loadSettingsFrom(
-            final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
-        setLabel(representation.getLabel());
-        setDescription(representation.getDescription());
-        setFlowVariableName(representation.getFlowVariableName());
+            final QuickFormFlowVariableConfig config) {
+        setLabel(config.getLabel());
+        setDescription(config.getDescription());
+        setFlowVariableName(config.getFlowVariableName());
     }
 
     /**
      * @param representation The representation to put the content of the
      *            components into
      */
-    protected void saveSettingsTo(final QuickFormFlowVariableRepresentation<? extends DialogNodeValue> representation) {
-        representation.setLabel(getLabel());
-        representation.setDescription(getDescription());
-        representation.setFlowVariableName(getFlowVariableName());
+    protected void saveSettingsTo(final QuickFormFlowVariableConfig config) {
+        config.setLabel(getLabel());
+        config.setDescription(getDescription());
+        config.setFlowVariableName(getFlowVariableName());
     }
 
     /** {@inheritDoc} */

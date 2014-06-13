@@ -46,7 +46,6 @@ package org.knime.js.base.node.quickform;
 
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.dialog.DialogNodeRepresentation;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -59,15 +58,15 @@ import org.knime.core.node.web.WebViewContent;
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  * @param <REP> The configuration content of the quickform node.
  * @param <VAL> The node value implementation of the quickform node.
- * 
+ *
  */
 public abstract class QuickFormFlowVariableNodeModel<
-        REP extends DialogNodeRepresentation<VAL> & WebViewContent, VAL extends DialogNodeValue & WebViewContent>
-        extends QuickFormNodeModel<REP, VAL> {
+        REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormFlowVariableConfig>
+        extends QuickFormNodeModel<REP, VAL, CONF> {
 
     /** Creates a new node model with no inports and one flow variable outport. */
-    protected QuickFormFlowVariableNodeModel() {
-        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE});
+    protected QuickFormFlowVariableNodeModel(final CONF config) {
+        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE}, config);
     }
 
     /** {@inheritDoc} */
@@ -81,16 +80,27 @@ public abstract class QuickFormFlowVariableNodeModel<
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         createAndPushFlowVariable();
+        copyConfigToView();
+        setExecuted();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
     /**
      * Subclasses will publish their flow variables here. Called from configure
      * and execute.
-     * 
+     *
      * @throws InvalidSettingsException If settings are invalid.
      */
     protected abstract void createAndPushFlowVariable()
             throws InvalidSettingsException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setFlowVariableName(getConfig().getFlowVariableName());
+    }
 
 }

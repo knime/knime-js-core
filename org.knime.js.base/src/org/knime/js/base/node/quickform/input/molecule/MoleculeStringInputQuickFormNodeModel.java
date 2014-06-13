@@ -45,18 +45,23 @@
 package org.knime.js.base.node.quickform.input.molecule;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class MoleculeStringInputQuickFormNodeModel
         extends
         QuickFormFlowVariableNodeModel<MoleculeStringInputQuickFormRepresentation,
-        MoleculeStringInputQuickFormValue> {
+        MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormConfig> {
+
+    /**
+     * @param config
+     */
+    protected MoleculeStringInputQuickFormNodeModel(final MoleculeStringInputQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * {@inheritDoc}
@@ -65,7 +70,7 @@ public class MoleculeStringInputQuickFormNodeModel
     public MoleculeStringInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new MoleculeStringInputQuickFormRepresentation();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -87,7 +92,16 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getMoleculeString());
+        String string;
+        if (isReexecute()) {
+            string = getViewValue().getMoleculeString();
+        } else {
+            string = getConfig().getMoleculeString();
+        }
+        if (string == null) {
+            string = "";
+        }
+        pushFlowVariableString(getConfig().getFlowVariableName(), string);
         pushFlowVariableString("molecule_format", getDialogRepresentation().getFormat());
     }
 
@@ -95,25 +109,18 @@ public class MoleculeStringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setFormat(getConfig().getFormat());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
-    }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final MoleculeStringInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyValueToConfig() {
+        getConfig().setMoleculeString(getViewValue().getMoleculeString());
     }
 
 }

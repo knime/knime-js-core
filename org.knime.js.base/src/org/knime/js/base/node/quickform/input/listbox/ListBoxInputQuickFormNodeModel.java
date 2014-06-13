@@ -57,31 +57,29 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ListBoxInputQuickFormNodeModel
         extends
-        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue> {
+        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue, ListBoxInputQuickFormConfig> {
 
     /**
      * Creates a list box input node model.
      */
-    protected ListBoxInputQuickFormNodeModel() {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
+    protected ListBoxInputQuickFormNodeModel(final ListBoxInputQuickFormConfig config) {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, config);
     }
 
     private void createAndPushFlowVariable() {
-        final String variableName = getDialogRepresentation().getFlowVariableName();
-        final String value = getViewValue().getString();
+        final String variableName = getConfig().getFlowVariableName();
+        final String value = isReexecute() ? getViewValue().getString() : getConfig().getString();
         pushFlowVariableString(variableName, value);
     }
 
@@ -89,7 +87,7 @@ public class ListBoxInputQuickFormNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         getValidatedValues();
-        final String variableName = getDialogRepresentation().getFlowVariableName();
+        final String variableName = getConfig().getFlowVariableName();
         createAndPushFlowVariable();
         return new PortObjectSpec[]{createSpec(variableName)};
     }
@@ -97,7 +95,7 @@ public class ListBoxInputQuickFormNodeModel
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        final String variableName = getDialogRepresentation().getFlowVariableName();
+        final String variableName = getConfig().getFlowVariableName();
         DataTableSpec outSpec = createSpec(variableName);
         BufferedDataContainer cont = exec.createDataContainer(outSpec, true);
         List<String> values = getValidatedValues();
@@ -106,33 +104,35 @@ public class ListBoxInputQuickFormNodeModel
         }
         cont.close();
         createAndPushFlowVariable();
+        copyConfigToView();
+        setExecuted();
         return new PortObject[]{cont.getTable()};
     }
-    
+
     private List<String> getValidatedValues() throws InvalidSettingsException {
-        boolean omitEmpty = getDialogRepresentation().getOmitEmpty();
-        final String value = getViewValue().getString();
-        String separator = getDialogRepresentation().getSeparator();
+        boolean omitEmpty = getConfig().getOmitEmpty();
+        final String value = isReexecute() ? getViewValue().getString() : getConfig().getString();
+        String separator = getConfig().getSeparator();
         final ArrayList<String> values = new ArrayList<String>();
         if (separator == null || separator.isEmpty()) {
             if (!(omitEmpty && value.isEmpty())) {
                 values.add(value);
             }
         } else {
-            String[] splitValue = value.split(getDialogRepresentation().getSeparatorRegex(), -1);
+            String[] splitValue = value.split(getConfig().getSeparatorRegex(), -1);
             for (String val : splitValue) {
                 if (!(omitEmpty && val.isEmpty())) {
                     values.add(val);
                 }
             }
         }
-        String regex = getDialogRepresentation().getRegex();
+        String regex = getConfig().getRegex();
         if (regex != null && !regex.isEmpty()) {
             for (int i = 0; i < values.size(); i++) {
                 if (!values.get(i).matches(regex)) {
                     throw new InvalidSettingsException("Value " + (i + 1)
                             + " is not valid:\n"
-                            + getDialogRepresentation().getErrorMessage());
+                            + getConfig().getErrorMessage());
                 }
             }
         }
@@ -151,7 +151,7 @@ public class ListBoxInputQuickFormNodeModel
     public ListBoxInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new ListBoxInputQuickFormRepresentation();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -172,24 +172,21 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setRegex(getConfig().getRegex());
+        getViewRepresentation().setSeparator(getConfig().getSeparator());
+        getViewRepresentation().setOmitEmpty(getConfig().getOmitEmpty());
+        getViewRepresentation().setErrorMessage(getConfig().getErrorMessage());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final ListBoxInputQuickFormValue viewContent) {
-        return null;
+    protected void copyValueToConfig() {
+        getConfig().setString(getViewValue().getString());
     }
 
 }

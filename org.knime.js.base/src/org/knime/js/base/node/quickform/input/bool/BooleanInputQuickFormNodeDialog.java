@@ -57,20 +57,25 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
+    private final BooleanInputQuickFormConfig m_config;
+
     private final JCheckBox m_defaultField;
-    
+
     private final JCheckBox m_valueField;
 
     /** Constructors, inits fields calls layout routines. */
-    BooleanInputQuickFormNodeDialog() {
+    BooleanInputQuickFormNodeDialog(final BooleanInputQuickFormConfig config) {
+        m_config = config;
         m_defaultField = new JCheckBox();
+        m_defaultField.setSelected(m_config.getDefaultValue());
         m_valueField = new JCheckBox();
+        m_valueField.setSelected(m_config.getBoolean());
         createAndAddTab();
     }
 
@@ -89,13 +94,10 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultField.setSelected(representation.getDefaultValue());
-        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueField.setSelected(value.getBoolean());
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
+        m_defaultField.setSelected(m_config.getDefaultValue());
+        m_valueField.setSelected(m_config.getBoolean());
     }
 
     /**
@@ -103,13 +105,10 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        BooleanInputQuickFormRepresentation representation = new BooleanInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue(m_defaultField.isSelected());
-        representation.saveToNodeSettings(settings);
-        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
-        value.setBoolean(m_valueField.isSelected());
-        value.saveToNodeSettings(settings);
+        m_config.setDefaultValue(m_defaultField.isSelected());
+        m_config.setBoolean(m_valueField.isSelected());
+        super.saveSettingsTo(m_config);
+        m_config.saveSettings(settings);
     }
 
 }

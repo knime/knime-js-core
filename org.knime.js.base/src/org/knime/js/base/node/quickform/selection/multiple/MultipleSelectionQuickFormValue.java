@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -69,7 +69,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
 
     private static final String[] DEFAULT_VARIABLE_VALUE = new String[0];
 
-    private String[] m_variableValue = DEFAULT_VARIABLE_VALUE;
+    private String[] m_variableValue = null;
 
     /**
      * {@inheritDoc}

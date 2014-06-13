@@ -74,7 +74,7 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
@@ -84,21 +84,24 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     private final JCheckBox m_lockColumn;
 
     private final ColumnSelectionPanel m_defaultColumnField;
-    
+
     private final StringFilterPanel m_defaultField;
 
     private final ColumnSelectionPanel m_columnField;
 
     private final StringFilterPanel m_valueField;
-    
+
     private String[] m_possibleValues;
-    
+
     private DataTableSpec m_spec;
-    
+
     private final JComboBox<String> m_type;
 
+    private ValueFilterQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    ValueFilterQuickFormNodeDialog() {
+    ValueFilterQuickFormNodeDialog(final ValueFilterQuickFormConfig config) {
+        m_config = config;
         m_type = new JComboBox<String>(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
         m_lockColumn = new JCheckBox();
         m_defaultColumnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
@@ -184,6 +187,8 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
         final DataTableSpec spec = (DataTableSpec) specs[0];
         final List<DataColumnSpec> filteredSpecs = new ArrayList<DataColumnSpec>();
         for (DataColumnSpec cspec : spec) {
@@ -197,10 +202,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         m_spec = new DataTableSpec(filteredSpecs.toArray(new DataColumnSpec[0]));
         m_defaultColumnField.update(m_spec, null);
         m_columnField.update(m_spec, null);
-        ValueFilterQuickFormRepresentation representation = new ValueFilterQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        String selectedDefaultColumn = representation.getDefaultColumn();
+        String selectedDefaultColumn = m_config.getDefaultColumn();
         if (selectedDefaultColumn.isEmpty()) {
             List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
             if (cspecs.size() > 0) {
@@ -208,7 +210,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_defaultColumnField.setSelectedColumn(selectedDefaultColumn);
-        List<String> defaultIncludes = Arrays.asList(representation.getDefaultValues());
+        List<String> defaultIncludes = Arrays.asList(m_config.getDefaultValues());
         List<String> defaultExcludes =
                 new ArrayList<String>(Math.max(0, m_possibleValues.length
                         - defaultIncludes.size()));
@@ -218,8 +220,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_defaultField.update(defaultIncludes, defaultExcludes, m_possibleValues);
-        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
-        String selectedColumn = value.getColumn();
+        String selectedColumn = m_config.getColumn();
         if (selectedColumn.isEmpty()) {
             List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
             if (cspecs.size() > 0) {
@@ -227,8 +228,7 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_columnField.setSelectedColumn(selectedColumn);
-        value.loadFromNodeSettingsInDialog(settings);
-        List<String> valueIncludes = Arrays.asList(value.getValues());
+        List<String> valueIncludes = Arrays.asList(m_config.getValues());
         List<String> valueExcludes = new ArrayList<String>(Math.max(0, m_possibleValues.length - valueIncludes.size()));
         for (String string : m_possibleValues) {
             if (!valueIncludes.contains(string)) {
@@ -236,8 +236,8 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_valueField.update(valueIncludes, valueExcludes, m_possibleValues);
-        m_lockColumn.setSelected(representation.getLockColumn());
-        m_type.setSelectedItem(representation.getType());
+        m_lockColumn.setSelected(m_config.getLockColumn());
+        m_type.setSelectedItem(m_config.getType());
     }
 
     /**
@@ -245,20 +245,17 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        ValueFilterQuickFormRepresentation representation = new ValueFilterQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setLockColumn(m_lockColumn.isSelected());
-        representation.setDefaultColumn(m_defaultColumnField.getSelectedColumn());
+        saveSettingsTo(m_config);
+        m_config.setLockColumn(m_lockColumn.isSelected());
+        m_config.setDefaultColumn(m_defaultColumnField.getSelectedColumn());
         Set<String> defaultIncludes = m_defaultField.getIncludeList();
-        representation.setDefaultValues(defaultIncludes.toArray(new String[defaultIncludes.size()]));
-        representation.setFromSpec(m_spec);
-        representation.setType((String)m_type.getSelectedItem());
-        representation.saveToNodeSettings(settings);
-        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
+        m_config.setDefaultValues(defaultIncludes.toArray(new String[defaultIncludes.size()]));
+        m_config.setFromSpec(m_spec);
+        m_config.setType((String)m_type.getSelectedItem());
         Set<String> valueIncludes = m_valueField.getIncludeList();
-        value.setValues(valueIncludes.toArray(new String[valueIncludes.size()]));
-        value.setColumn(m_columnField.getSelectedColumn());
-        value.saveToNodeSettings(settings);
+        m_config.setValues(valueIncludes.toArray(new String[valueIncludes.size()]));
+        m_config.setColumn(m_columnField.getSelectedColumn());
+        m_config.saveSettings(settings);
     }
 
 }

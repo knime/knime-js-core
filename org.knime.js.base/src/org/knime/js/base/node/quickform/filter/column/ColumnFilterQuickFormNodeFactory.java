@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ColumnFilterQuickFormNodeFactory extends NodeFactory<ColumnFilterQuickFormNodeModel> implements
         WizardNodeFactoryExtension<ColumnFilterQuickFormNodeModel, ColumnFilterQuickFormRepresentation,
         ColumnFilterQuickFormValue> {
+
+    private ColumnFilterQuickFormConfig m_config = new ColumnFilterQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ColumnFilterQuickFormNodeModel createNodeModel() {
-        return new ColumnFilterQuickFormNodeModel();
+        return new ColumnFilterQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class ColumnFilterQuickFormNodeFactory extends NodeFactory<ColumnFilterQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ColumnFilterQuickFormNodeDialog();
+        return new ColumnFilterQuickFormNodeDialog(m_config);
     }
 }

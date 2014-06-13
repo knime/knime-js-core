@@ -74,9 +74,12 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
 
     private final JTextArea m_valueArea;
 
+    private MoleculeStringInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
     @SuppressWarnings("unchecked")
-    MoleculeStringInputQuickFormNodeDialog() {
+    MoleculeStringInputQuickFormNodeDialog(final MoleculeStringInputQuickFormConfig config) {
+        m_config = config;
         m_formatBox = new JComboBox(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
@@ -100,14 +103,10 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        MoleculeStringInputQuickFormRepresentation representation = new MoleculeStringInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultArea.setText(representation.getDefaultValue());
-        m_formatBox.setSelectedItem(representation.getFormat());
-        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueArea.setText(value.getMoleculeString());
+        m_config.loadSettingsInDialog(settings);
+        m_defaultArea.setText(m_config.getDefaultValue());
+        m_formatBox.setSelectedItem(m_config.getFormat());
+        m_valueArea.setText(m_config.getMoleculeString());
     }
 
     /**
@@ -115,14 +114,11 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        MoleculeStringInputQuickFormRepresentation representation = new MoleculeStringInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setFormat(m_formatBox.getSelectedItem().toString());
-        representation.setDefaultValue(m_defaultArea.getText());
-        representation.saveToNodeSettings(settings);
-        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue();
-        value.setMoleculeString(m_valueArea.getText());
-        value.saveToNodeSettings(settings);
+        saveSettingsTo(m_config);
+        m_config.setFormat(m_formatBox.getSelectedItem().toString());
+        m_config.setDefaultValue(m_defaultArea.getText());
+        m_config.setMoleculeString(m_valueArea.getText());
+        m_config.saveSettings(settings);
     }
 
 }

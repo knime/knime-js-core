@@ -72,7 +72,13 @@ org_knime_js_base_node_quickform_selection_column = function() {
 			}
 			body.append(selector.getComponent());
 			selector.setChoices(representation.possibleColumns);
-			selector.setSelection(representation.defaultColumn);
+			var selection;
+			if (typeof value.column != undefined && value.column != null) {
+				selection = value.column;
+			} else {
+				selection = representation.defaultvalue;
+			}
+			selector.setSelection(selection);
 		}
 		resizeParent();
 	};

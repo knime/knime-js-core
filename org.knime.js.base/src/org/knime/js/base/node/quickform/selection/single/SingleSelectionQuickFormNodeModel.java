@@ -45,8 +45,6 @@
 package org.knime.js.base.node.quickform.selection.single;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -54,7 +52,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class SingleSelectionQuickFormNodeModel
         extends
-        QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue> {
+        QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue, SingleSelectionQuickFormConfig> {
+
+    /**
+     * @param config
+     */
+    protected SingleSelectionQuickFormNodeModel(final SingleSelectionQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * {@inheritDoc}
@@ -69,25 +74,8 @@ public class SingleSelectionQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), getViewValue().getVariableValue());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
+        String value = isReexecute() ? getViewValue().getVariableValue() : getConfig().getVariableValue();
+        pushFlowVariableString(getConfig().getFlowVariableName(), value);
     }
 
     /**
@@ -110,10 +98,19 @@ public class SingleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ValidationError validateViewValue(
-            final SingleSelectionQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getViewRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
+        getViewRepresentation().setType(getConfig().getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyValueToConfig() {
+        getConfig().setVariableValue(getViewValue().getVariableValue());
     }
 
 }

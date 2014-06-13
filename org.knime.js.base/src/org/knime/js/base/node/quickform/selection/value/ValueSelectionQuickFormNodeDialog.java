@@ -78,19 +78,19 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
  *         Konstanz
  */
 @SuppressWarnings({"unchecked", "rawtypes" })
 public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
-    
+
     private final JComboBox<ColumnType> m_columnType;
 
     private final JCheckBox m_lockColumn;
 
     private final ColumnSelectionPanel m_defaultColumnField;
-    
+
     private final JComboBox m_defaultField;
 
     private final DefaultComboBoxModel m_defaultModel = new DefaultComboBoxModel();
@@ -98,15 +98,18 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private final ColumnSelectionPanel m_columnField;
 
     private final JComboBox m_valueField;
-    
+
     private final DefaultComboBoxModel m_valueModel = new DefaultComboBoxModel();
-    
+
     private DataTableSpec m_tableSpec;
-    
+
     private final JComboBox<String> m_type;
 
+    private ValueSelectionQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    ValueSelectionQuickFormNodeDialog() {
+    ValueSelectionQuickFormNodeDialog(final ValueSelectionQuickFormConfig config) {
+        m_config = config;
         m_type = new JComboBox<String>(SingleSelectionComponentFactory.listSingleSelectionComponents());
         m_lockColumn = new JCheckBox();
         m_columnType = new JComboBox<ColumnType>(ColumnType.values());
@@ -160,7 +163,7 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         });
         createAndAddTab();
     }
-    
+
     private void updateAvailableColumns() {
         List<DataColumnSpec> specs = new ArrayList<DataColumnSpec>();
         switch ((ColumnType)m_columnType.getSelectedItem()) {
@@ -244,6 +247,8 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
+        m_config.loadSettingsInDialog(settings);
+        super.loadSettingsFrom(m_config);
         m_tableSpec = (DataTableSpec) specs[0];
         boolean hasValues = false;
         for (DataColumnSpec cspec : m_tableSpec) {
@@ -255,28 +260,23 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         if (!hasValues) {
             throw new NotConfigurableException("Data does not contain any column with domain values.");
         }
-        ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_columnType.setSelectedItem(representation.getColumnType());
-        ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        String selectedColumn = value.getColumn();
+        m_columnType.setSelectedItem(m_config.getColumnType());
+        String selectedColumn = m_config.getColumn();
         if (!selectedColumn.isEmpty()) {
             m_columnField.setSelectedColumn(selectedColumn);
         }
-        String selectedDefaultColumn = representation.getDefaultColumn();
+        String selectedDefaultColumn = m_config.getDefaultColumn();
         if (!selectedDefaultColumn.isEmpty()) {
             m_defaultColumnField.setSelectedColumn(selectedDefaultColumn);
         }
-        if (representation.getDefaultValue() != null) {
-            m_defaultField.setSelectedItem(representation.getDefaultValue());
+        if (m_config.getDefaultValue() != null) {
+            m_defaultField.setSelectedItem(m_config.getDefaultValue());
         }
-        if (value.getValue() != null) {
-            m_valueField.setSelectedItem(value.getValue());
+        if (m_config.getValue() != null) {
+            m_valueField.setSelectedItem(m_config.getValue());
         }
-        m_lockColumn.setSelected(representation.getLockColumn());
-        m_type.setSelectedItem(representation.getType());
+        m_lockColumn.setSelected(m_config.getLockColumn());
+        m_type.setSelectedItem(m_config.getType());
     }
 
     /**
@@ -290,19 +290,16 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         if (m_columnField.getSelectedColumn() == null) {
             throw new InvalidSettingsException("No column selected");
         }
-        ValueSelectionQuickFormRepresentation representation = new ValueSelectionQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setColumnType((ColumnType)m_columnType.getSelectedItem());
-        representation.setDefaultValue((String) m_defaultField.getSelectedItem());
-        representation.setLockColumn(m_lockColumn.isSelected());
-        representation.setFromSpec(m_tableSpec);
-        representation.setDefaultColumn(m_defaultColumnField.getSelectedColumn());
-        representation.setType((String)m_type.getSelectedItem());
-        representation.saveToNodeSettings(settings);
-        ValueSelectionQuickFormValue value = new ValueSelectionQuickFormValue();
-        value.setValue((String) m_valueField.getSelectedItem());
-        value.setColumn(m_columnField.getSelectedColumn());
-        value.saveToNodeSettings(settings);
+        saveSettingsTo(m_config);
+        m_config.setColumnType((ColumnType)m_columnType.getSelectedItem());
+        m_config.setDefaultValue((String) m_defaultField.getSelectedItem());
+        m_config.setLockColumn(m_lockColumn.isSelected());
+        m_config.setFromSpec(m_tableSpec);
+        m_config.setDefaultColumn(m_defaultColumnField.getSelectedColumn());
+        m_config.setType((String)m_type.getSelectedItem());
+        m_config.setValue((String) m_valueField.getSelectedItem());
+        m_config.setColumn(m_columnField.getSelectedColumn());
+        m_config.saveSettings(settings);
     }
 
 }

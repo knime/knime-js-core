@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class BooleanInputQuickFormNodeFactory extends NodeFactory<BooleanInputQuickFormNodeModel> implements
         WizardNodeFactoryExtension<BooleanInputQuickFormNodeModel, BooleanInputQuickFormRepresentation,
         BooleanInputQuickFormValue> {
+
+    BooleanInputQuickFormConfig m_config = new BooleanInputQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public BooleanInputQuickFormNodeModel createNodeModel() {
-        return new BooleanInputQuickFormNodeModel();
+        return new BooleanInputQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class BooleanInputQuickFormNodeFactory extends NodeFactory<BooleanInputQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new BooleanInputQuickFormNodeDialog();
+        return new BooleanInputQuickFormNodeDialog(m_config);
     }
 }

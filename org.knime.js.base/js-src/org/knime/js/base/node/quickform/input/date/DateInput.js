@@ -63,7 +63,13 @@ org_knime_js_base_node_quickform_input_date = function() {
 	dateInput.init = function(representation, value) {
 		viewValue = value;
 		viewRepresentation = representation;
-		date = new Date(representation.defaultvalue);
+		var dateValue;
+		if (typeof value.date != undefined && value.date != null) {
+			dateValue = value.date;
+		} else {
+			dateValue = representation.defaultvalue;
+		}
+		date = new Date(dateValue);
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
 		var body = $('body');

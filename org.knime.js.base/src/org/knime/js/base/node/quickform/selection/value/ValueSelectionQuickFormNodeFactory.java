@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ValueSelectionQuickFormNodeFactory extends NodeFactory<ValueSelectionQuickFormNodeModel> implements
         WizardNodeFactoryExtension<ValueSelectionQuickFormNodeModel, ValueSelectionQuickFormRepresentation,
         ValueSelectionQuickFormValue> {
+
+    private ValueSelectionQuickFormConfig m_config = new ValueSelectionQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ValueSelectionQuickFormNodeModel createNodeModel() {
-        return new ValueSelectionQuickFormNodeModel();
+        return new ValueSelectionQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class ValueSelectionQuickFormNodeFactory extends NodeFactory<ValueSelecti
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ValueSelectionQuickFormNodeDialog();
+        return new ValueSelectionQuickFormNodeDialog(m_config);
     }
 }

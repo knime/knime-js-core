@@ -57,11 +57,9 @@ import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
@@ -69,13 +67,13 @@ import org.knime.js.base.node.quickform.QuickFormNodeModel;
  */
 public class MultipleSelectionQuickFormNodeModel
         extends
-        QuickFormNodeModel<MultipleSelectionQuickFormRepresentation, MultipleSelectionQuickFormValue> {
+        QuickFormNodeModel<MultipleSelectionQuickFormRepresentation, MultipleSelectionQuickFormValue, MultipleSelectionQuickFormConfig> {
 
     /**
-     * 
+     *
      */
-    public MultipleSelectionQuickFormNodeModel() {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
+    public MultipleSelectionQuickFormNodeModel(final MultipleSelectionQuickFormConfig config) {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, config);
     }
 
     /** {@inheritDoc} */
@@ -103,6 +101,8 @@ public class MultipleSelectionQuickFormNodeModel
             container.addRowToTable(new DefaultRow(RowKey.createRowKey(i), result));
         }
         container.close();
+        copyConfigToView();
+        setExecuted();
         return new PortObject[]{container.getTable()};
     }
 
@@ -112,24 +112,6 @@ public class MultipleSelectionQuickFormNodeModel
     @Override
     public String getJavascriptObjectID() {
         return "org_knime_js_base_node_quickform_selection_multiple";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
     }
 
     private DataTableSpec createSpec() throws InvalidSettingsException {
@@ -162,10 +144,19 @@ public class MultipleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ValidationError validateViewValue(
-            final MultipleSelectionQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getViewRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
+        getViewRepresentation().setType(getConfig().getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyValueToConfig() {
+        getConfig().setVariableValue(getViewValue().getVariableValue());
     }
 
 }

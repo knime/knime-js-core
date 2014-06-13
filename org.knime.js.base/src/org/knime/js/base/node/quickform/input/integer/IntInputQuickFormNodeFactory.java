@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class IntInputQuickFormNodeFactory extends NodeFactory<IntInputQuickFormNodeModel> implements
         WizardNodeFactoryExtension<IntInputQuickFormNodeModel, IntInputQuickFormRepresentation,
         IntInputQuickFormValue> {
+
+    private IntInputQuickFormConfig m_config = new IntInputQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public IntInputQuickFormNodeModel createNodeModel() {
-        return new IntInputQuickFormNodeModel();
+        return new IntInputQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class IntInputQuickFormNodeFactory extends NodeFactory<IntInputQuickFormN
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new IntInputQuickFormNodeDialog();
+        return new IntInputQuickFormNodeDialog(m_config);
     }
 }

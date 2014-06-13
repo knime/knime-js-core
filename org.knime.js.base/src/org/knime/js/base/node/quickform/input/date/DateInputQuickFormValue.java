@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.10.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -62,7 +62,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -76,7 +76,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
 
     private static final String CFG_DATE = "date";
 
-    private Date m_date = DEFAULT_DATE;
+    private Date m_date = null;
 
     /**
      * {@inheritDoc}
@@ -141,7 +141,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

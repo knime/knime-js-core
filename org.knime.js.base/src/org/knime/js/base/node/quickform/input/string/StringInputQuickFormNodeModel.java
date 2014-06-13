@@ -45,16 +45,21 @@
 package org.knime.js.base.node.quickform.input.string;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
-public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation, 
-        StringInputQuickFormValue> {
+public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation,
+        StringInputQuickFormValue, StringInputQuickFormConfig> {
+
+    /**
+     * @param config
+     */
+    protected StringInputQuickFormNodeModel(final StringInputQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * {@inheritDoc}
@@ -63,39 +68,27 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     public String getJavascriptObjectID() {
         return "org_knime_js_base_node_quickform_input_string";
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        String string = getViewValue().getString();
+        String string;
+        if (isReexecute()) {
+            string = getViewValue().getString();
+        } else {
+            string = getConfig().getString();
+        }
         if (string == null) {
             string = "";
         }
-        String regex = getDialogRepresentation().getRegex();
+        String regex = getConfig().getRegex();
         if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
-            throw new InvalidSettingsException(getDialogRepresentation()
+            throw new InvalidSettingsException(getConfig()
                     .getErrorMessage());
         }
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(), string);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyViewRepresentation().loadFromNodeSettings(settings);
-        createEmptyViewValue().loadFromNodeSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // not used
+        pushFlowVariableString(getConfig().getFlowVariableName(), string);
     }
 
     /**
@@ -113,12 +106,18 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     public StringInputQuickFormValue createEmptyViewValue() {
         return new StringInputQuickFormValue();
     }
-    
-    /** {@inheritDoc} */
+
     @Override
-    public ValidationError validateViewValue(final StringInputQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void copyConfigToView() {
+        getViewRepresentation().setRegex(getConfig().getRegex());
+        getViewRepresentation().setErrorMessage(getConfig().getErrorMessage());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    }
+
+    @Override
+    protected void copyValueToConfig() {
+        super.copyConfigToView();
+        getConfig().setString(getViewValue().getString());
     }
 
 }

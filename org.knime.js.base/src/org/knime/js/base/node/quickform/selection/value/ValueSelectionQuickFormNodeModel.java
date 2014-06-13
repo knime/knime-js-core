@@ -51,26 +51,24 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.flowvariable.FlowVariablePortObject;
 import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
-public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSelectionQuickFormRepresentation, 
-        ValueSelectionQuickFormValue> {
-    
+public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSelectionQuickFormRepresentation,
+        ValueSelectionQuickFormValue, ValueSelectionQuickFormConfig> {
+
     /** Creates a new value selection node model. */
-    public ValueSelectionQuickFormNodeModel() {
+    public ValueSelectionQuickFormNodeModel(final ValueSelectionQuickFormConfig config) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{FlowVariablePortObject.TYPE});
+                new PortType[]{FlowVariablePortObject.TYPE}, config);
     }
 
     /**
@@ -79,23 +77,6 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     @Override
     public String getJavascriptObjectID() {
         return "org_knime_js_base_node_quickform_selection_value";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        createEmptyViewRepresentation().loadFromNodeSettings(settings);
-        createEmptyViewValue().loadFromNodeSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void reset() {
-        // not used
     }
 
     /**
@@ -113,14 +94,7 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     public ValueSelectionQuickFormValue createEmptyViewValue() {
         return new ValueSelectionQuickFormValue();
     }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final ValueSelectionQuickFormValue viewContent) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -137,24 +111,27 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
+        copyConfigToView();
+        setExecuted();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
-    
+
     private void updateValues(final DataTableSpec spec) {
         getViewRepresentation().setFromSpec(spec);
     }
-    
+
     private void createAndPushFlowVariable() throws InvalidSettingsException {
-        List<String> values = getViewRepresentation().getPossibleValues().get(getViewValue().getColumn());
-        if (values == null || !values.contains(getViewValue().getValue())) {
+        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
+        String value = isReexecute() ? getViewValue().getValue() : getConfig().getValue();
+        List<String> values = getConfig().getPossibleValues().get(column);
+        if (values == null || !values.contains(value)) {
             throw new InvalidSettingsException("The selected value '"
-                    + getViewValue().getValue()
+                    + value
                     + "' is not among the possible values in the column '"
-                    + getViewValue().getColumn() + "'");
+                    + column + "'");
         }
-        String variableName = getViewRepresentation().getFlowVariableName();
-        String value = getViewValue().getValue();
-        switch (getViewRepresentation().getColumnType()) {
+        String variableName = getConfig().getFlowVariableName();
+        switch (getConfig().getColumnType()) {
         case Integer:
             pushFlowVariableInt(variableName, Integer.parseInt(value));
             break;
@@ -165,6 +142,28 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
             pushFlowVariableString(variableName, value);
             break;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setColumnType(getConfig().getColumnType());
+        getViewRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getViewRepresentation().setLockColumn(getConfig().getLockColumn());
+        getViewRepresentation().setType(getConfig().getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyValueToConfig() {
+        getConfig().setColumn(getViewValue().getColumn());
+        getConfig().setValue(getViewValue().getValue());
     }
 
 }

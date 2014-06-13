@@ -63,25 +63,28 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
-    
+
     private final JCheckBox m_useMin;
-    
+
     private final JCheckBox m_useMax;
-    
+
     private final JSpinner m_min;
-    
+
     private final JSpinner m_max;
 
     private final JSpinner m_defaultSpinner;
-    
+
     private final JSpinner m_valueSpinner;
 
+    private IntInputQuickFormConfig m_config;
+
     /** Constructors, inits fields calls layout routines. */
-    IntInputQuickFormNodeDialog() {
+    IntInputQuickFormNodeDialog(final IntInputQuickFormConfig config) {
+        m_config = config;
         m_useMin = new JCheckBox();
         m_useMax = new JCheckBox();
         m_min = new JSpinner(getSpinnerModel());
@@ -165,17 +168,14 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
-        IntInputQuickFormRepresentation representation = new IntInputQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_defaultSpinner.setValue(representation.getDefaultValue());
-        m_useMin.setSelected(representation.getUseMin());
-        m_useMax.setSelected(representation.getUseMax());
-        m_min.setValue(representation.getMin());
-        m_max.setValue(representation.getMax());
-        IntInputQuickFormValue value = new IntInputQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_valueSpinner.setValue(value.getInteger());
+        m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
+        m_defaultSpinner.setValue(m_config.getDefaultValue());
+        m_useMin.setSelected(m_config.getUseMin());
+        m_useMax.setSelected(m_config.getUseMax());
+        m_min.setValue(m_config.getMin());
+        m_max.setValue(m_config.getMax());
+        m_valueSpinner.setValue(m_config.getInteger());
         m_min.setEnabled(m_useMin.isSelected());
         m_max.setEnabled(m_useMax.isSelected());
     }
@@ -185,17 +185,14 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        IntInputQuickFormRepresentation representation = new IntInputQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue((Integer)m_defaultSpinner.getValue());
-        representation.setUseMin(m_useMin.isSelected());
-        representation.setUseMax(m_useMax.isSelected());
-        representation.setMin((Integer)m_min.getValue());
-        representation.setMax((Integer)m_max.getValue());
-        representation.saveToNodeSettings(settings);
-        IntInputQuickFormValue value = new IntInputQuickFormValue();
-        value.setInteger((Integer)m_valueSpinner.getValue());
-        value.saveToNodeSettings(settings);
+        saveSettingsTo(m_config);
+        m_config.setDefaultValue((Integer)m_defaultSpinner.getValue());
+        m_config.setUseMin(m_useMin.isSelected());
+        m_config.setUseMax(m_useMax.isSelected());
+        m_config.setMin((Integer)m_min.getValue());
+        m_config.setMax((Integer)m_max.getValue());
+        m_config.setInteger((Integer)m_valueSpinner.getValue());
+        m_config.saveSettings(settings);
     }
 
 }

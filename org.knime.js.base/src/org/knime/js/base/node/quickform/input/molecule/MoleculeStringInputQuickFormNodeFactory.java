@@ -51,19 +51,21 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class MoleculeStringInputQuickFormNodeFactory extends NodeFactory<MoleculeStringInputQuickFormNodeModel>
         implements
         WizardNodeFactoryExtension<MoleculeStringInputQuickFormNodeModel,
         MoleculeStringInputQuickFormRepresentation, MoleculeStringInputQuickFormValue> {
 
+    private MoleculeStringInputQuickFormConfig m_config = new MoleculeStringInputQuickFormConfig();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public MoleculeStringInputQuickFormNodeModel createNodeModel() {
-        return new MoleculeStringInputQuickFormNodeModel();
+        return new MoleculeStringInputQuickFormNodeModel(m_config);
     }
 
     /**
@@ -96,6 +98,6 @@ public class MoleculeStringInputQuickFormNodeFactory extends NodeFactory<Molecul
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new MoleculeStringInputQuickFormNodeDialog();
+        return new MoleculeStringInputQuickFormNodeDialog(m_config);
     }
 }

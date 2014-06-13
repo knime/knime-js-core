@@ -45,17 +45,19 @@
 package org.knime.js.base.node.quickform.input.bool;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class BooleanInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue> {
+    extends
+    QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormConfig> {
+
+    BooleanInputQuickFormNodeModel(final BooleanInputQuickFormConfig config) {
+        super(config);
+    }
 
     /**
      * {@inheritDoc}
@@ -64,7 +66,7 @@ public class BooleanInputQuickFormNodeModel
     public BooleanInputQuickFormRepresentation createEmptyViewRepresentation() {
         return new BooleanInputQuickFormRepresentation();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -86,33 +88,24 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        pushFlowVariableInt(getDialogRepresentation().getFlowVariableName(), getViewValue().getBoolean() ? 1 : 0);
+        boolean value;
+        if (isReexecute()) {
+            value = getViewValue().getBoolean();
+        } else {
+            value = getConfig().getBoolean();
+        }
+        pushFlowVariableInt(getConfig().getFlowVariableName(), value ? 1 : 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+    protected void copyConfigToView() {
+        super.copyConfigToView();
+        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void reset() {
-        // TODO Auto-generated method stub
-
+    protected void copyValueToConfig() {
+        getConfig().setBoolean(getViewValue().getBoolean());
     }
-    
-    /** {@inheritDoc} */
-    @Override
-    public ValidationError validateViewValue(final BooleanInputQuickFormValue viewContent) {
-        return null;
-    }
-
-    
 
 }

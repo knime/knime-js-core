@@ -79,10 +79,13 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JComboBox m_type;
 
+    private SingleSelectionQuickFormConfig m_config;
+
     /**
      * Constructors, inits fields calls layout routines.
      */
-    SingleSelectionQuickFormNodeDialog() {
+    SingleSelectionQuickFormNodeDialog(final SingleSelectionQuickFormConfig config) {
+        m_config = config;
         m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_valueField = new JList();
@@ -127,41 +130,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Variable Value: ", valuePane, panelWithGBLayout, gbc2);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
-            throws NotConfigurableException {
-        SingleSelectionQuickFormRepresentation representation = new SingleSelectionQuickFormRepresentation();
-        representation.loadFromNodeSettingsInDialog(settings);
-        loadSettingsFrom(representation);
-        m_possibleChoicesField.setText(StringUtils.join(representation.getPossibleChoices(), "\n"));
-        m_type.setSelectedItem(representation.getType());
-        SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
-        value.loadFromNodeSettingsInDialog(settings);
-        m_defaultField.setSelectedValue(representation.getDefaultValue(), true);
-        m_valueField.setSelectedValue(value.getVariableValue(), true);
-    }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        SingleSelectionQuickFormRepresentation representation = new SingleSelectionQuickFormRepresentation();
-        saveSettingsTo(representation);
-        representation.setDefaultValue((String)m_defaultField.getSelectedValue());
-        String possibleChoices = m_possibleChoicesField.getText();
-        representation.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
-        representation.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
-        representation.saveToNodeSettings(settings);
-        SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
-        value.setVariableValue((String)m_valueField.getSelectedValue());
-        value.saveToNodeSettings(settings);
-    }
-
-    
     /**
      * Refreshes the default and value fields based on changes in the current
      * choices, while keeping the selection.
@@ -174,7 +143,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     /**
      * Refreshes the given list based on changes in the current
      * choices, while keeping the selection.
-     * 
+     *
      * @param list The list that will be refreshed
      */
     private void refreshChoices(final JList list) {
@@ -184,6 +153,34 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         if (list.getSelectedValue() == null && list.getModel().getSize() > 0) {
             list.setSelectedIndex(0);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
+            throws NotConfigurableException {
+        m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
+        m_possibleChoicesField.setText(StringUtils.join(m_config.getPossibleChoices(), "\n"));
+        m_type.setSelectedItem(m_config.getType());
+        m_defaultField.setSelectedValue(m_config.getDefaultValue(), true);
+        m_valueField.setSelectedValue(m_config.getVariableValue(), true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        saveSettingsTo(m_config);
+        m_config.setDefaultValue((String)m_defaultField.getSelectedValue());
+        String possibleChoices = m_possibleChoicesField.getText();
+        m_config.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
+        m_config.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
+        m_config.setVariableValue((String)m_valueField.getSelectedValue());
+        m_config.saveSettings(settings);
     }
 
 }

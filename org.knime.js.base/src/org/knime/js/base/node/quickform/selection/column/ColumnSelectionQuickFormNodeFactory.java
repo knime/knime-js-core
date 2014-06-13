@@ -51,18 +51,20 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * 
+ *
  */
 public class ColumnSelectionQuickFormNodeFactory extends NodeFactory<ColumnSelectionQuickFormNodeModel> implements
         WizardNodeFactoryExtension<ColumnSelectionQuickFormNodeModel, ColumnSelectionQuickFormRepresentation,
         ColumnSelectionQuickFormValue> {
+
+    private ColumnSelectionQuickFormConfig m_config = new ColumnSelectionQuickFormConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public ColumnSelectionQuickFormNodeModel createNodeModel() {
-        return new ColumnSelectionQuickFormNodeModel();
+        return new ColumnSelectionQuickFormNodeModel(m_config);
     }
 
     /**
@@ -95,6 +97,6 @@ public class ColumnSelectionQuickFormNodeFactory extends NodeFactory<ColumnSelec
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ColumnSelectionQuickFormNodeDialog();
+        return new ColumnSelectionQuickFormNodeDialog(m_config);
     }
 }

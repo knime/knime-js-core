@@ -56,12 +56,14 @@ public class MultipleSelectionQuickFormNodeFactory extends NodeFactory<MultipleS
         WizardNodeFactoryExtension<MultipleSelectionQuickFormNodeModel, MultipleSelectionQuickFormRepresentation,
         MultipleSelectionQuickFormValue> {
 
+    private MultipleSelectionQuickFormConfig m_config = new MultipleSelectionQuickFormConfig();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public MultipleSelectionQuickFormNodeModel createNodeModel() {
-        return new MultipleSelectionQuickFormNodeModel();
+        return new MultipleSelectionQuickFormNodeModel(m_config);
     }
 
     /**
@@ -94,6 +96,6 @@ public class MultipleSelectionQuickFormNodeFactory extends NodeFactory<MultipleS
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new MultipleSelectionQuickFormNodeDialog();
+        return new MultipleSelectionQuickFormNodeDialog(m_config);
     }
 }
