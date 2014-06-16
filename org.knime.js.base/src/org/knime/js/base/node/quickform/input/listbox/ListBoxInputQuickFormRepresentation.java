@@ -56,42 +56,42 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ListBoxInputQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ListBoxInputQuickFormValue> {
-    
+
     private static final String CFG_REGEX = "regex";
-    
+
     private static final String DEFAULT_REGEX = "";
-    
+
     private String m_regex = DEFAULT_REGEX;
-    
+
     private static final String CFG_ERROR_MESSAGE = "error_message";
-    
+
     private static final String DEFAULT_ERROR_MESSAGE = "";
-    
+
     private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
-    
+
     private static final String CFG_SEPARATOR = "separator";
-    
+
     private static final String DEFAULT_SEPARATOR = "\\n";
-    
+
     private String m_separator = DEFAULT_SEPARATOR;
-    
+
     private static final String CFG_DEFAULT = "default";
-    
-    private String m_defaultValue;
-    
+
+    private String m_defaultValue = "";
+
     private static final String CFG_OMIT_EMPTY = "omit_empty";
-    
+
     private static final boolean DEFAULT_OMIT_EMPTY = true;
-    
+
     private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
-    
+
     /**
      * @return the regex
      */
@@ -99,7 +99,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public String getRegex() {
         return m_regex;
     }
-    
+
     /**
      * @param regex the regex to set
      */
@@ -107,7 +107,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void setRegex(final String regex) {
         m_regex = regex;
     }
-    
+
     /**
      * @return the errorMessage
      */
@@ -115,7 +115,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public String getErrorMessage() {
         return m_errorMessage;
     }
-    
+
     /**
      * @param errorMessage the errorMessage to set
      */
@@ -123,7 +123,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
-    
+
     /**
      * @return the separator
      */
@@ -131,7 +131,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public String getSeparator() {
         return m_separator;
     }
-    
+
     /**
      * @param separator the separator to set
      */
@@ -139,7 +139,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void setSeparator(final String separator) {
         m_separator = separator;
     }
-    
+
     /**
      * @return separatorRegex
      */
@@ -173,7 +173,7 @@ public class ListBoxInputQuickFormRepresentation extends
         }
         return sepString.toString();
     }
-    
+
     /**
      * @return the omitEmpty
      */
@@ -181,7 +181,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public boolean getOmitEmpty() {
         return m_omitEmpty;
     }
-    
+
     /**
      * @param omitEmpty the omitEmpty to set
      */
@@ -189,7 +189,7 @@ public class ListBoxInputQuickFormRepresentation extends
     public void setOmitEmpty(final boolean omitEmpty) {
         m_omitEmpty = omitEmpty;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -203,7 +203,7 @@ public class ListBoxInputQuickFormRepresentation extends
         m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
         setDefaultValue(settings.getString(CFG_DEFAULT));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -217,7 +217,7 @@ public class ListBoxInputQuickFormRepresentation extends
         m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY, DEFAULT_OMIT_EMPTY);
         setDefaultValue(settings.getString(CFG_DEFAULT, ""));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -238,7 +238,7 @@ public class ListBoxInputQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public DialogNodePanel<ListBoxInputQuickFormValue> createDialogPanel() {
-        ListBoxInputQuickFormDialogPanel panel = new ListBoxInputQuickFormDialogPanel();
+        ListBoxInputQuickFormDialogPanel panel = new ListBoxInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
     }
@@ -265,7 +265,7 @@ public class ListBoxInputQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final ListBoxInputQuickFormValue value) {
-        value.setString(getDefaultValue());        
+        value.setString(getDefaultValue());
     }
 
 }

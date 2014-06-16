@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -56,7 +56,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
@@ -65,10 +65,13 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY,
             Double.POSITIVE_INFINITY, 0.01));
 
+    private DoubleInputQuickFormRepresentation m_representation;
+
     /**
-     * 
+     *
      */
-    public DoubleInputQuickFormDialogPanel() {
+    public DoubleInputQuickFormDialogPanel(final DoubleInputQuickFormRepresentation representation) {
+        m_representation = representation;
         m_component.setPreferredSize(new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH).getPreferredSize());
         addComponent(m_component);
     }
@@ -86,7 +89,8 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      */
     @Override
     public void loadNodeValue(final DoubleInputQuickFormValue value) {
-        m_component.setValue(value.getDouble());
+        double dbl = value.getDouble() != null ? value.getDouble() : m_representation.getDefaultValue();
+        m_component.setValue(dbl);
     }
 
 }

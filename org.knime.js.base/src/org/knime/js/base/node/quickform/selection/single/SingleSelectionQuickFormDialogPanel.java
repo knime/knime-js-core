@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -60,10 +60,13 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
     private SingleSelectionComponent m_selectionComponent;
 
+    private SingleSelectionQuickFormRepresentation m_representation;
+
     /**
      * @param representation The representation containing layout information
      */
     public SingleSelectionQuickFormDialogPanel(final SingleSelectionQuickFormRepresentation representation) {
+        m_representation = representation;
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
                 SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
@@ -84,6 +87,7 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      */
     @Override
     public void loadNodeValue(final SingleSelectionQuickFormValue value) {
+        String selection = value.getVariableValue() != null ? value.getVariableValue() : m_representation.getDefaultValue();
         m_selectionComponent.setSelection(value.getVariableValue());
     }
 

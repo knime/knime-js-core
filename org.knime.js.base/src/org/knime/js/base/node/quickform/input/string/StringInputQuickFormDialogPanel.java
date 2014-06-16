@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -54,7 +54,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
@@ -62,10 +62,13 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
 
     private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
+    private StringInputQuickFormRepresentation m_representation;
+
     /**
-     * 
+     *
      */
-    public StringInputQuickFormDialogPanel() {
+    public StringInputQuickFormDialogPanel(final StringInputQuickFormRepresentation representation) {
+        m_representation = representation;
         addComponent(m_component);
     }
 
@@ -82,7 +85,8 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      */
     @Override
     public void loadNodeValue(final StringInputQuickFormValue value) {
-        m_component.setText(value.getString());
+        String string = value.getString() != null ? value.getString() : m_representation.getDefaultValue();
+        m_component.setText(string);
     }
 
 }

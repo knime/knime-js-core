@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -63,20 +63,23 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
 public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueFilterQuickFormValue> {
-    
+
     private JComboBox<String> m_column;
 
     private MultipleSelectionsComponent m_values;
+
+    private ValueFilterQuickFormRepresentation m_representation;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ValueFilterQuickFormDialogPanel(final ValueFilterQuickFormRepresentation representation) {
+        m_representation = representation;
         m_values = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_column = new JComboBox<String>(representation.getPossibleColumns());
         m_column.addActionListener(new ActionListener() {
@@ -116,6 +119,8 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
      */
     @Override
     public void loadNodeValue(final ValueFilterQuickFormValue value) {
+        String column = value.getColumn() != null ? value.getColumn() : m_representation.getDefaultColumn();
+        String[] values = value.getValues() != null ? value.getValues() : m_representation.getDefaultValues();
         m_column.setSelectedItem(value.getColumn());
         m_values.setSelections(value.getValues());
     }

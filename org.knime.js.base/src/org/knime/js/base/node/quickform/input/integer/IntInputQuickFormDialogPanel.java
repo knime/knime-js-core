@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -54,7 +54,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
@@ -62,10 +62,13 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
 
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
 
+    private IntInputQuickFormRepresentation m_representation;
+
     /**
-     * 
+     *
      */
-    public IntInputQuickFormDialogPanel() {
+    public IntInputQuickFormDialogPanel(final IntInputQuickFormRepresentation representation) {
+        m_representation = representation;
         addComponent(m_component);
     }
 
@@ -82,7 +85,8 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
      */
     @Override
     public void loadNodeValue(final IntInputQuickFormValue value) {
-        m_component.setValue(value.getInteger());
+        int integer = value.getInteger() != null ? value.getInteger() : m_representation.getDefaultValue();
+        m_component.setValue(integer);
     }
 
 }

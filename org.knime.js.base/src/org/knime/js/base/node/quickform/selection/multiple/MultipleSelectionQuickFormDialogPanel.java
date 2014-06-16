@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -60,10 +60,13 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
 
     private MultipleSelectionsComponent m_selectionComponent;
 
+    private MultipleSelectionQuickFormRepresentation m_representation;
+
     /**
      * @param representation The representation containing layout information
      */
     public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
+        m_representation = representation;
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
                 MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
@@ -84,7 +87,8 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      */
     @Override
     public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
-        m_selectionComponent.setSelections(value.getVariableValue());
+        String[] selections = value.getVariableValue() != null ? value.getVariableValue() : m_representation.getDefaultValue();
+        m_selectionComponent.setSelections(selections);
     }
 
 }

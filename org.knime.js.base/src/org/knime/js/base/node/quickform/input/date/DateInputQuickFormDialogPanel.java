@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -56,7 +56,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
@@ -64,10 +64,13 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
 
     private JSpinner m_component;
 
+    private DateInputQuickFormRepresentation m_representation;
+
     /**
      * @param representation Representation to get the date format
      */
     public DateInputQuickFormDialogPanel(final DateInputQuickFormRepresentation representation) {
+        m_representation = representation;
         String format =
                 representation.getWithTime() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
                         : DateInputQuickFormNodeModel.DATE_FORMAT;
@@ -89,7 +92,8 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
      */
     @Override
     public void loadNodeValue(final DateInputQuickFormValue value) {
-        m_component.setValue(value.getDate());
+        Date date = value.getDate() != null ? value.getDate() : m_representation.getDefaultValue();
+        m_component.setValue(date);
     }
 
 }

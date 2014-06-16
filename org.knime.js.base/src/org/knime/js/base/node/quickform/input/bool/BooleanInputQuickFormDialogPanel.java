@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -53,7 +53,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
@@ -61,10 +61,13 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
 
     private JCheckBox m_component = new JCheckBox();
 
+    private BooleanInputQuickFormRepresentation m_representation;
+
     /**
-     * 
+     *
      */
-    public BooleanInputQuickFormDialogPanel() {
+    public BooleanInputQuickFormDialogPanel(final BooleanInputQuickFormRepresentation representation) {
+        m_representation = representation;
         addComponent(m_component);
     }
 
@@ -81,7 +84,8 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
      */
     @Override
     public void loadNodeValue(final BooleanInputQuickFormValue value) {
-        m_component.setSelected(value.getBoolean());
+        boolean bool = value.getBoolean() != null ? value.getBoolean() : m_representation.getDefaultValue();
+        m_component.setSelected(bool);
     }
 
 }

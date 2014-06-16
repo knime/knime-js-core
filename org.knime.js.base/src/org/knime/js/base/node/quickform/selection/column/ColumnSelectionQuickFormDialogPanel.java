@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -53,18 +53,21 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
 public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<ColumnSelectionQuickFormValue> {
-    
+
     private SingleSelectionComponent m_column;
+
+    private ColumnSelectionQuickFormRepresentation m_representation;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
+        m_representation = representation;
         m_column = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column.setChoices(representation.getPossibleColumns());
         addComponent(m_column.getComponent());
@@ -83,6 +86,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void loadNodeValue(final ColumnSelectionQuickFormValue value) {
+        String column = value.getColumn() != null ? value.getColumn() : m_representation.getDefaultColumn();
         m_column.setSelection(value.getColumn());
     }
 

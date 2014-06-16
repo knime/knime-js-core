@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -53,18 +53,21 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("serial")
 public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<ColumnFilterQuickFormValue> {
-    
+
     private MultipleSelectionsComponent m_columns;
+
+    private ColumnFilterQuickFormRepresentation m_representation;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
+        m_representation = representation;
         m_columns = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_columns.setChoices(representation.getPossibleColumns());
         addComponent(m_columns.getComponent());
@@ -83,7 +86,8 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void loadNodeValue(final ColumnFilterQuickFormValue value) {
-        m_columns.setSelections(value.getColumns());
+        String[] columns = value.getColumns() != null ? value.getColumns() : m_representation.getDefaultColumns();
+        m_columns.setSelections(columns);
     }
 
 }

@@ -56,7 +56,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -74,9 +74,9 @@ public class MoleculeStringInputQuickFormRepresentation extends
     private static final String DEFAULT_FORMAT = DEFAULT_FORMATS[0];
 
     private String m_format = DEFAULT_FORMAT;
-    
+
     private static final String CFG_DEFAULT = "default";
-    
+
     private String m_defaultValue = "";
 
     /**
@@ -134,7 +134,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public DialogNodePanel<MoleculeStringInputQuickFormValue> createDialogPanel() {
-        MoleculeStringInputQuickFormDialogPanel panel = new MoleculeStringInputQuickFormDialogPanel();
+        MoleculeStringInputQuickFormDialogPanel panel = new MoleculeStringInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
     }

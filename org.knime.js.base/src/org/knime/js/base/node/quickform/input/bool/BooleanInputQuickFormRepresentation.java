@@ -56,17 +56,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class BooleanInputQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<BooleanInputQuickFormValue> {
-    
+
     private static final String CFG_DEFAULT = "default";
-    
-    private boolean m_defaultValue;
+
+    private boolean m_defaultValue = false;
 
     /**
      * {@inheritDoc}
@@ -78,7 +78,7 @@ public class BooleanInputQuickFormRepresentation extends
         super.loadFromNodeSettings(settings);
         setDefaultValue(settings.getBoolean(CFG_DEFAULT));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -88,7 +88,7 @@ public class BooleanInputQuickFormRepresentation extends
         super.loadFromNodeSettingsInDialog(settings);
         setDefaultValue(settings.getBoolean(CFG_DEFAULT, false));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -98,14 +98,14 @@ public class BooleanInputQuickFormRepresentation extends
         super.saveToNodeSettings(settings);
         settings.addBoolean(CFG_DEFAULT, getDefaultValue());
     }
-    
+
     /**
      * {@inheritDoc}
      */
     @Override
     @JsonIgnore
     public DialogNodePanel<BooleanInputQuickFormValue> createDialogPanel() {
-        BooleanInputQuickFormDialogPanel panel = new BooleanInputQuickFormDialogPanel();
+        BooleanInputQuickFormDialogPanel panel = new BooleanInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
     }
@@ -132,7 +132,7 @@ public class BooleanInputQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final BooleanInputQuickFormValue value) {
-        value.setBoolean(getDefaultValue());        
+        value.setBoolean(getDefaultValue());
     }
 
 }

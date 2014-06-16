@@ -56,29 +56,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRepresentation<StringInputQuickFormValue> {
-    
+
     private static final String CFG_REGEX = "regex";
-    
+
     private static final String DEFAULT_REGEX = "";
-    
+
     private String m_regex = DEFAULT_REGEX;
-    
+
     private static final String CFG_ERROR_MESSAGE = "error_message";
-    
+
     private static final String DEFAULT_ERROR_MESSAGE = "";
-    
+
     private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
-    
+
     private static final String CFG_DEFAULT = "default";
-    
-    private String m_defaultValue;
-    
+
+    private String m_defaultValue = "";
+
     /**
      * @return the regex
      */
@@ -86,7 +86,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public String getRegex() {
         return m_regex;
     }
-    
+
     /**
      * @param regex the regex to set
      */
@@ -94,7 +94,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void setRegex(final String regex) {
         m_regex = regex;
     }
-    
+
     /**
      * @return the errorMessage
      */
@@ -102,7 +102,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public String getErrorMessage() {
         return m_errorMessage;
     }
-    
+
     /**
      * @param errorMessage the errorMessage to set
      */
@@ -110,7 +110,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     public void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -122,7 +122,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
         m_defaultValue = settings.getString(CFG_DEFAULT);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -134,7 +134,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
         m_defaultValue = settings.getString(CFG_DEFAULT, "");
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -153,7 +153,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     @Override
     @JsonIgnore
     public DialogNodePanel<StringInputQuickFormValue> createDialogPanel() {
-        StringInputQuickFormDialogPanel panel = new StringInputQuickFormDialogPanel();
+        StringInputQuickFormDialogPanel panel = new StringInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
     }
@@ -180,7 +180,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final StringInputQuickFormValue value) {
-        value.setString(m_defaultValue);        
+        value.setString(m_defaultValue);
     }
 
 }
