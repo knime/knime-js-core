@@ -78,7 +78,9 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addInt(CFG_INTEGER, getInteger());
+        if (m_integer != null) {
+            settings.addInt(CFG_INTEGER, m_integer);
+        }
     }
 
     /**
@@ -87,7 +89,11 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setInteger(settings.getInt(CFG_INTEGER));
+        try {
+            m_integer = settings.getInt(CFG_INTEGER);
+        } catch (InvalidSettingsException e) {
+            m_integer = null;
+        }
     }
 
     /**
@@ -96,7 +102,7 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setInteger(settings.getInt(CFG_INTEGER, DEFAULT_INTEGER));
+        m_integer = settings.getInt(CFG_INTEGER, DEFAULT_INTEGER);
     }
 
     /**

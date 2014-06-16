@@ -78,7 +78,9 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addBoolean(CFG_BOOLEAN, getBoolean());
+        if (m_boolean != null) {
+            settings.addBoolean(CFG_BOOLEAN, m_boolean);
+        }
     }
 
     /**
@@ -87,7 +89,11 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setBoolean(settings.getBoolean(CFG_BOOLEAN));
+        try {
+            m_boolean = settings.getBoolean(CFG_BOOLEAN);
+        } catch (InvalidSettingsException e) {
+            m_boolean = null;
+        }
     }
 
     /**
@@ -96,7 +102,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setBoolean(settings.getBoolean(CFG_BOOLEAN, DEFAULT_BOOLEAN));
+        m_boolean = settings.getBoolean(CFG_BOOLEAN, DEFAULT_BOOLEAN);
     }
 
     /**

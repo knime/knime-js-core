@@ -84,8 +84,8 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_DATE,
-                new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(getDate()));
+        String dateString = m_date != null ? new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(m_date) : null;
+        settings.addString(CFG_DATE, dateString);
     }
 
     /**
@@ -95,10 +95,14 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         String value = settings.getString(CFG_DATE);
-        try {
-            setDate(new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).parse(value));
-        } catch (Exception e) {
-            throw new InvalidSettingsException("Can't parse date: " + value, e);
+        if (value == null) {
+            m_date = null;
+        } else {
+            try {
+                setDate(new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).parse(value));
+            } catch (Exception e) {
+                throw new InvalidSettingsException("Can't parse date: " + value, e);
+            }
         }
     }
 
@@ -110,10 +114,14 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         SimpleDateFormat sdf = new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT);
         String value = settings.getString(CFG_DATE, sdf.format(DEFAULT_DATE));
-        try {
-            setDate(sdf.parse(value));
-        } catch (Exception e) {
-            m_date = DEFAULT_DATE;
+        if (value == null) {
+            m_date = null;
+        } else {
+            try {
+                setDate(sdf.parse(value));
+            } catch (Exception e) {
+                m_date = DEFAULT_DATE;
+            }
         }
     }
 

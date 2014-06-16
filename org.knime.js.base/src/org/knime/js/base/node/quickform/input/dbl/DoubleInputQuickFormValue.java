@@ -78,7 +78,9 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addDouble(CFG_DOUBLE, getDouble());
+        if (m_double != null) {
+            settings.addDouble(CFG_DOUBLE, m_double);
+        }
     }
 
     /**
@@ -87,7 +89,11 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setDouble(settings.getDouble(CFG_DOUBLE));
+        try {
+            m_double = settings.getDouble(CFG_DOUBLE);
+        } catch (InvalidSettingsException e) {
+            m_double = null;
+        }
     }
 
     /**
@@ -96,7 +102,7 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        setDouble(settings.getDouble(CFG_DOUBLE, DEFAULT_DOUBLE));
+        m_double = settings.getDouble(CFG_DOUBLE, DEFAULT_DOUBLE);
     }
 
     /**
