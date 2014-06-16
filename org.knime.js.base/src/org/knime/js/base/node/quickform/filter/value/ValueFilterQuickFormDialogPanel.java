@@ -121,8 +121,8 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
     public void loadNodeValue(final ValueFilterQuickFormValue value) {
         String column = value.getColumn() != null ? value.getColumn() : m_representation.getDefaultColumn();
         String[] values = value.getValues() != null ? value.getValues() : m_representation.getDefaultValues();
-        m_column.setSelectedItem(value.getColumn());
-        m_values.setSelections(value.getValues());
+        m_column.setSelectedItem(column);
+        m_values.setSelections(values);
     }
 
 }
