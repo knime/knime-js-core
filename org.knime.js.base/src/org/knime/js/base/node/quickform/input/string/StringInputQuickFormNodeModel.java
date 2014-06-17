@@ -109,6 +109,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
 
     @Override
     protected void copyConfigToView() {
+        super.copyConfigToView();
         getViewRepresentation().setRegex(getConfig().getRegex());
         getViewRepresentation().setErrorMessage(getConfig().getErrorMessage());
         getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
@@ -118,6 +119,17 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     protected void copyValueToConfig() {
         super.copyConfigToView();
         getConfig().setString(getViewValue().getString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setRegex(getConfig().getRegex());
+        getDialogRepresentation().setErrorMessage(getConfig().getErrorMessage());
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
 }

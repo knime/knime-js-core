@@ -73,6 +73,7 @@ public abstract class QuickFormFlowVariableNodeModel<
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -101,6 +102,15 @@ public abstract class QuickFormFlowVariableNodeModel<
     protected void copyConfigToView() {
         super.copyConfigToView();
         getViewRepresentation().setFlowVariableName(getConfig().getFlowVariableName());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setFlowVariableName(getConfig().getFlowVariableName());
     }
 
 }

@@ -106,6 +106,7 @@ public class ValueFilterQuickFormNodeModel
             throws InvalidSettingsException {
         getConfig().setFromSpec(((DataTableSpec)inSpecs[0]));
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
 
@@ -179,6 +180,18 @@ public class ValueFilterQuickFormNodeModel
     protected void copyValueToConfig() {
         getConfig().setColumn(getViewValue().getColumn());
         getConfig().setValues(getViewValue().getValues());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
+        getDialogRepresentation().setDefaultValues(getConfig().getDefaultValues());
+        getDialogRepresentation().setLockColumn(getConfig().getLockColumn());
+        getDialogRepresentation().setType(getConfig().getType());
     }
 
 }

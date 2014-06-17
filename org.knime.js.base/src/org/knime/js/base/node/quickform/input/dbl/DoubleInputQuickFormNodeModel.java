@@ -122,4 +122,17 @@ public class DoubleInputQuickFormNodeModel
         getConfig().setDouble(getViewValue().getDouble());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setUseMin(getConfig().getUseMin());
+        getDialogRepresentation().setUseMax(getConfig().getUseMax());
+        getDialogRepresentation().setMin(getConfig().getMin());
+        getDialogRepresentation().setMax(getConfig().getMax());
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    }
+
 }

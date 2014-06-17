@@ -123,4 +123,14 @@ public class MoleculeStringInputQuickFormNodeModel
         getConfig().setMoleculeString(getViewValue().getMoleculeString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setFormat(getConfig().getFormat());
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    }
+
 }

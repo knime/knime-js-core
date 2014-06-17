@@ -103,6 +103,7 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
             throws InvalidSettingsException {
         updateColumns((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -146,6 +147,17 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     @Override
     protected void copyValueToConfig() {
         getConfig().setColumn(getViewValue().getColumn());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
+        getDialogRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
+        getDialogRepresentation().setType(getConfig().getType());
     }
 
 }

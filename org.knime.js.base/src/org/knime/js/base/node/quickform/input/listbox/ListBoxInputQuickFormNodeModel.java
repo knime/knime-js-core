@@ -89,6 +89,7 @@ public class ListBoxInputQuickFormNodeModel
         getValidatedValues();
         final String variableName = getConfig().getFlowVariableName();
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new PortObjectSpec[]{createSpec(variableName)};
     }
 
@@ -187,6 +188,19 @@ public class ListBoxInputQuickFormNodeModel
     @Override
     protected void copyValueToConfig() {
         getConfig().setString(getViewValue().getString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setRegex(getConfig().getRegex());
+        getDialogRepresentation().setSeparator(getConfig().getSeparator());
+        getDialogRepresentation().setOmitEmpty(getConfig().getOmitEmpty());
+        getDialogRepresentation().setErrorMessage(getConfig().getErrorMessage());
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
     }
 
 }

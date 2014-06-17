@@ -113,4 +113,15 @@ public class SingleSelectionQuickFormNodeModel
         getConfig().setVariableValue(getViewValue().getVariableValue());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getDialogRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
+        getDialogRepresentation().setType(getConfig().getType());
+    }
+
 }

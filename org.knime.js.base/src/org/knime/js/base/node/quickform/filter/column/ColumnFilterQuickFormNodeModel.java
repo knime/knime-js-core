@@ -104,6 +104,7 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
             throws InvalidSettingsException {
         updateColumns((DataTableSpec) inSpecs[0]);
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
     }
 
@@ -169,6 +170,17 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
     @Override
     protected void copyValueToConfig() {
         getConfig().setColumns(getViewValue().getColumns());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultColumns(getConfig().getDefaultColumns());
+        getDialogRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
+        getDialogRepresentation().setType(getConfig().getType());
     }
 
 }

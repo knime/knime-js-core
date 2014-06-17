@@ -103,6 +103,7 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
             throws InvalidSettingsException {
         updateValues((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
+        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -164,6 +165,19 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     protected void copyValueToConfig() {
         getConfig().setColumn(getViewValue().getColumn());
         getConfig().setValue(getViewValue().getValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setColumnType(getConfig().getColumnType());
+        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getDialogRepresentation().setLockColumn(getConfig().getLockColumn());
+        getDialogRepresentation().setType(getConfig().getType());
     }
 
 }

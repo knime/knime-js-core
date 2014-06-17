@@ -82,6 +82,7 @@ public class MultipleSelectionQuickFormNodeModel
             throws InvalidSettingsException {
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
                 StringUtils.join(getViewValue().getVariableValue(), ","));
+        copyConfigToDialog();
         return new PortObjectSpec[]{createSpec()};
     }
 
@@ -157,6 +158,17 @@ public class MultipleSelectionQuickFormNodeModel
     @Override
     protected void copyValueToConfig() {
         getConfig().setVariableValue(getViewValue().getVariableValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+        getDialogRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
+        getDialogRepresentation().setType(getConfig().getType());
     }
 
 }

@@ -108,4 +108,13 @@ public class BooleanInputQuickFormNodeModel
         getConfig().setBoolean(getViewValue().getBoolean());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void copyConfigToDialog() {
+        super.copyConfigToDialog();
+        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    }
+
 }
