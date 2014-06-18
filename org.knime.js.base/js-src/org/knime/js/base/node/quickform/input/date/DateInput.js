@@ -61,6 +61,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var maxDate;
 
 	dateInput.init = function(representation, value) {
+		injectCSS('.ui-widget {font-family: inherit; font-size: 1.0em;}');
 		viewValue = value;
 		viewRepresentation = representation;
 		var dateValue;
@@ -156,7 +157,10 @@ org_knime_js_base_node_quickform_input_date = function() {
 			dateInput.blur();
 			dateInput.datepicker("hide");
 		}, 0);
-		injectCSS('.ui-widget {font-family: inherit; font-size: 1.0em;}');
+		dateInput.blur(callUpdate());
+		hourInput.blur(callUpdate());
+		minInput.blur(callUpdate());
+		callUpdate();
 	};
 
 	dateInput.value = function() {

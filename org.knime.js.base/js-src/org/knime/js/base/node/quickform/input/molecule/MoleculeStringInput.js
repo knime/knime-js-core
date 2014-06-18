@@ -70,7 +70,9 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 			stringValue = representation.defaultvalue;
 		}
 		input.val(stringValue);
+		input.blur(callUpdate());
 		resizeParent();
+		callUpdate();
 	};
 
 	moleculeInput.value = function() {

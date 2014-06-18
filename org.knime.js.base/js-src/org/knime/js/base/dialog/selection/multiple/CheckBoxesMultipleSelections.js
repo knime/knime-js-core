@@ -46,6 +46,15 @@
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
 function checkBoxesMultipleSelections(vertical) {
+	var valueChangedListeners = new Array();
+	this.addValueChangedListener = function(listener) {
+		valueChangedListeners.push(listener);
+	}
+	notifyListeners = function() {
+		for (var i = 0; i < valueChangedListeners.length; i++) {
+			valueChangedListeners[i]();
+		}
+	}
 	var span;
 	var vert;
 	this.getComponent = function() {
@@ -66,6 +75,7 @@ function checkBoxesMultipleSelections(vertical) {
 			if (vert) {
 				span.append('<br>');
 			}
+			button.blur(notifyListeners());
 		}
 		var elements = span.find('label');
 		elements.width(getMaxWidth(elements));

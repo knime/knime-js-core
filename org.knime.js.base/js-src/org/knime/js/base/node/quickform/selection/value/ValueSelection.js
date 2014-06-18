@@ -82,6 +82,7 @@ org_knime_js_base_node_quickform_selection_value = function() {
 					if (key == columnSelection) {
 						option.prop('selected', true);
 					}
+					option.blur(callUpdate());
 				}
 				colselection.change(selectionChanged);
 			}
@@ -103,8 +104,10 @@ org_knime_js_base_node_quickform_selection_value = function() {
 				valueSelection = representation.defaultValue;
 			}
 			selector.setSelection(valueSelection);
+			selector.addValueChangedListener(callUpdate());
 		}
 		resizeParent();
+		callUpdate();
 	};
 
 	valueSelection.value = function() {

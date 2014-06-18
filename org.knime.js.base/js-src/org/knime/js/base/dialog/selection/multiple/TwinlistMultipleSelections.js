@@ -47,6 +47,9 @@
  */
 function twinlistMultipleSelections() {
 	var list;
+	this.addValueChangedListener = function(listener) {
+		list.addSelectionChangedListener(listener);
+	}
 	this.getComponent = function() {
 		return list.getElement();
 	};

@@ -46,6 +46,15 @@
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
 function dropdownSingleSelection() {
+	var valueChangedListeners = new Array();
+	this.addValueChangedListener = function(listener) {
+		valueChangedListeners.push(listener);
+	}
+	notifyListeners = function() {
+		for (var i = 0; i < valueChangedListeners.length; i++) {
+			valueChangedListeners[i]();
+		}
+	}
 	var select;
 	this.getComponent = function() {
 		return select;
@@ -56,6 +65,7 @@ function dropdownSingleSelection() {
 			var choice = choices[i];
 			var option = $('<option>' + choice + '</option>');
 			option.appendTo(select);
+			option.blur(notifyListeners());
 		}
 	};
 	this.getSelection = function() {

@@ -79,8 +79,10 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 				selections = representation.defaultvalue;
 			}
 			selector.setSelections(selections);
+			selector.addValueChangedListener(callUpdate());
 		}
 		resizeParent();
+		callUpdate();
 	};
 
 	multiSelection.value = function() {
