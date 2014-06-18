@@ -171,6 +171,7 @@ public class ValueFilterQuickFormNodeModel
         getViewRepresentation().setDefaultValues(getConfig().getDefaultValues());
         getViewRepresentation().setLockColumn(getConfig().getLockColumn());
         getViewRepresentation().setType(getConfig().getType());
+        getViewRepresentation().setPossibleValues(getConfig().getPossibleValues());
     }
 
     /**

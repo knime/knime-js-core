@@ -67,7 +67,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
@@ -88,13 +88,13 @@ public class ValueFilterQuickFormRepresentation extends
     private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
 
     private static final String CFG_DEFAULT_VALUES = "default";
-    
+
     private static final String[] DEFAULT_DEFAULT_VALUES = new String[0];
-    
+
     private String[] m_defaultValues = DEFAULT_DEFAULT_VALUES;
-    
+
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-    
+
     private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
 
     private static final String CFG_TYPE = "type";
@@ -102,7 +102,7 @@ public class ValueFilterQuickFormRepresentation extends
     private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
 
     private String m_type = DEFAULT_TYPE;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -120,7 +120,7 @@ public class ValueFilterQuickFormRepresentation extends
         }
         setType(settings.getString(CFG_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -138,7 +138,7 @@ public class ValueFilterQuickFormRepresentation extends
         }
         setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -175,7 +175,7 @@ public class ValueFilterQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final ValueFilterQuickFormValue value) {
-        value.setValues(m_defaultValues);        
+        value.setValues(m_defaultValues);
     }
 
     /**
@@ -240,6 +240,11 @@ public class ValueFilterQuickFormRepresentation extends
     @JsonProperty("possibleValues")
     public Map<String, List<String>> getPossibleValues() {
         return m_possibleValues;
+    }
+
+    @JsonProperty("possibleValues")
+    public void setPossibleValues(final Map<String, List<String>> possibleValues) {
+        m_possibleValues = possibleValues;
     }
 
     /**
