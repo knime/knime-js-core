@@ -252,6 +252,12 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_allowZoomingCheckBox.setSelected(m_config.getEnableZooming());
         m_allowPanningCheckBox.setSelected(m_config.getEnablePanning());
 
+        // disable zooming/panning controls TODO remove when zooming/panning does not freeze UI
+        m_allowZoomingCheckBox.setSelected(false);
+        m_allowPanningCheckBox.setSelected(false);
+        m_allowZoomingCheckBox.setEnabled(false);
+        m_allowPanningCheckBox.setEnabled(false);
+
         m_chartTitleTextField.setText(m_config.getChartTitle());
         m_chartSubtitleTextField.setText(m_config.getChartSubtitle());
         String xCol = m_config.getxColumn();

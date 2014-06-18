@@ -115,7 +115,9 @@ knime_scatter_plot = function() {
         chart.setLegendBuilder(null);
 		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
         var svg = document.getElementById("chart_svg");
-        chartManager = new jsfc.ChartManager(svg, chart);
+        var zoomEnabled = _representation.enableZooming;
+        var panEnabled = _representation.enablePanning;
+        chartManager = new jsfc.ChartManager(svg, chart, zoomEnabled, zoomEnabled, panEnabled);
         setChartDimensions();
         chartManager.refreshDisplay();                
         var win = document.defaultView || document.parentWindow;
