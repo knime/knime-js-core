@@ -52,3 +52,13 @@ resizeParent = function() {
 		parent.KnimePageLoader.autoResize(window.frameElement.id);
 	}
 };
+
+callUpdate = function() {
+	if (parent != undefined && parent.KnimePageLoader != undefined) {
+		parent.KnimePageLoader.getPageValues();
+	}
+};
+
+function injectCSS(rule) {
+	var div = $("<div />", {html: '<style>' + rule + '</style>'}).appendTo("head");    
+}

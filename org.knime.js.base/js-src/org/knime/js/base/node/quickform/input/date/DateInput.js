@@ -156,6 +156,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 			dateInput.blur();
 			dateInput.datepicker("hide");
 		}, 0);
+		injectCSS('.ui-widget {font-family: inherit; font-size: 1.0em;}');
 	};
 
 	dateInput.value = function() {
