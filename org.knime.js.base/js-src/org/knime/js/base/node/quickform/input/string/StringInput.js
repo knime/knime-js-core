@@ -56,6 +56,8 @@ org_knime_js_base_node_quickform_input_string = function() {
 
 	stringInput.init = function(representation, value) {
 		var body = $('body');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
 		viewValue = value;
 		input = $('<input>');
 		input.attr("type", "text");
@@ -67,16 +69,16 @@ org_knime_js_base_node_quickform_input_string = function() {
 			stringValue = representation.defaultvalue;
 		}
 		input.val(stringValue);
-		body.attr("title", representation.description);
-		body.append(representation.label + " ");
-		body.append(input);
-		body.append($('<br>'));
+		qfdiv.attr("title", representation.description);
+		qfdiv.append(representation.label + " ");
+		qfdiv.append(input);
+		qfdiv.append($('<br>'));
 		errorMessage = $('<span>'+representation.errormessage+'</span>');
 		errorMessage.css('display', 'none');
 		errorMessage.css('color', 'red');
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
-		body.append(errorMessage);
+		qfdiv.append(errorMessage);
 		resizeParent();
 	};
 

@@ -94,7 +94,9 @@ public class MultipleSelectionQuickFormNodeModel
                 StringUtils.join(getViewValue().getVariableValue(), ","));
         final DataTableSpec outSpec = createSpec();
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
-        String[] values = getViewValue().getVariableValue();
+        String[] values =
+            getViewValue().getVariableValue() != null ? getViewValue().getVariableValue() : getConfig()
+                .getVariableValue();
         DataCellFactory cellFactory = new DataCellFactory();
         DataType type = outSpec.getColumnSpec(0).getType();
         for (int i = 0; i < values.length; i++) {

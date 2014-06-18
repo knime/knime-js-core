@@ -55,8 +55,10 @@ org_knime_js_base_node_quickform_selection_single = function() {
 
 	singleSelection.init = function(representation, value) {
 		var body = $('body');
-		body.attr('title', representation.description);
-		body.append('<b>' + representation.label + '</b><br>');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
+		qfdiv.attr('title', representation.description);
+		qfdiv.append('<b>' + representation.label + '</b><br>');
 		viewValue = value;
 		if (representation.possibleChoices.length > 0) {
 			if (representation.type == 'Radio buttons (vertical)') {
@@ -68,7 +70,7 @@ org_knime_js_base_node_quickform_selection_single = function() {
 			} else {
 				selector = new dropdownSingleSelection();
 			}
-			body.append(selector.getComponent());
+			qfdiv.append(selector.getComponent());
 			selector.setChoices(representation.possibleChoices);
 			var selection;
 			if (typeof value.value != undefined && value.value != null) {

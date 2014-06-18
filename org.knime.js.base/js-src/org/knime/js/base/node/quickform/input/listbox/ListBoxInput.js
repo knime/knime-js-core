@@ -60,10 +60,12 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	listboxInput.init = function(representation, value) {
 		viewValue = value;
 		var body = $('body');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
 		input = $('<textarea>');
-		body.attr("title", representation.description);
-		body.append("<b>" + representation.label + "</b><br>");
-		body.append(input);
+		qfdiv.attr("title", representation.description);
+		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append(input);
 		input.css('white-space', 'pre');
 		input.css('overflow', 'auto');
 		input.attr('wrap', 'off');
@@ -77,7 +79,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 			stringValue = representation.defaultvalue;
 		}
 		input.val(stringValue);
-		body.append($('<br>'));
+		qfdiv.append($('<br>'));
 		errorMessageLine1 = $('<span>');
 		errorMessageLine2 = $('<span>'+representation.errormessage+'</span>');
 		errorMessages = errorMessageLine1.add(errorMessageLine2);
@@ -85,9 +87,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		errorMessages.css('color', 'red');
 		errorMessages.css('font-style', 'italic');
 		errorMessages.css('font-size', '75%');
-		body.append(errorMessageLine1);
-		body.append($('<br>'));
-		body.append(errorMessageLine2);
+		qfdiv.append(errorMessageLine1);
+		qfdiv.append($('<br>'));
+		qfdiv.append(errorMessageLine2);
 		if (representation.separator==null || representation.separator.length==0) {
 			separator = null;
 		} else {

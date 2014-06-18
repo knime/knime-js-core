@@ -59,10 +59,12 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
 		input = $('<input>');
-		body.attr("title", representation.description);
-		body.append(representation.label + " ");
-		body.append(input);
+		qfdiv.attr("title", representation.description);
+		qfdiv.append(representation.label + " ");
+		qfdiv.append(input);
 		input.spinner({
 			step: 0.01
 		});
@@ -79,13 +81,13 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 			doubleValue = representation.defaultvalue;
 		}
 		input.val(doubleValue);
-		body.append($('<br>'));
+		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');
 		errorMessage.css('color', 'red');
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
-		body.append(errorMessage);
+		qfdiv.append(errorMessage);
 		resizeParent();
 	};
 	

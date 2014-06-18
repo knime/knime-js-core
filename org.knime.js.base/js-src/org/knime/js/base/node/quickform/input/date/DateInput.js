@@ -73,13 +73,15 @@ org_knime_js_base_node_quickform_input_date = function() {
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
 		var body = $('body');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
 		var dateElement = $('<div style="display:inline-block">');
 		var timeElement = $('<div style="display:inline-block">');
 		
 		dateElement.append('Date: ');
 		dateInput = $('<input>');
-		body.attr("title", representation.description);
-		body.append("<b>" + representation.label + "</b><br>");
+		qfdiv.attr("title", representation.description);
+		qfdiv.append("<b>" + representation.label + "</b><br>");
 		dateElement.append(dateInput);
 		dateInput.datepicker({
 			showAnim : "",
@@ -100,8 +102,8 @@ org_knime_js_base_node_quickform_input_date = function() {
 		if (viewRepresentation.usemax) {
 			dateInput.datepicker('option', 'maxDate', new Date(viewRepresentation.max));
 		}
-		body.append(dateElement);
-		body.append($('<br>'));
+		qfdiv.append(dateElement);
+		qfdiv.append($('<br>'));
 		
 		timeElement.append('Time: ');
 		hourInput = $('<input>');
@@ -125,17 +127,17 @@ org_knime_js_base_node_quickform_input_date = function() {
 			}
 		});
 		
-		body.append(timeElement);
+		qfdiv.append(timeElement);
 		if (!representation.withtime) {
 			timeElement.css('display', 'none');
 		}
-		body.append($('<br>'));
+		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');
 		errorMessage.css('color', 'red');
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
-		body.append(errorMessage);
+		qfdiv.append(errorMessage);
 		
 		var allInputs = $('input');
 		allInputs.height(20);

@@ -57,12 +57,14 @@ org_knime_js_base_node_quickform_filter_value = function() {
 
 	valueFilter.init = function(representation, value) {
 		var body = $('body');
-		body.attr('title', representation.description);
-		body.append("<b>" + representation.label + "</b><br>");
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
+		qfdiv.attr('title', representation.description);
+		qfdiv.append("<b>" + representation.label + "</b><br>");
 		viewValue = value;
 		viewRepresentation = representation;
 		if (representation.possibleValues == null) {
-			body.append("Error: No data available");
+			qfdiv.append("Error: No data available");
 		} else {
 			var columnSelection;
 			if (typeof value.column != undefined && value.column != null) {
@@ -72,8 +74,8 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			}
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
-				body.append(colselection);
-				body.append($('<br>'));
+				qfdiv.append(colselection);
+				qfdiv.append($('<br>'));
 				for ( var key in representation.possibleValues) {
 					var option = $('<option>' + key + '</option>');
 					option.appendTo(colselection);
@@ -92,7 +94,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			} else {
 				selector = new twinlistMultipleSelections();
 			}
-			body.append(selector.getComponent());
+			qfdiv.append(selector.getComponent());
 			selector.setChoices(viewRepresentation.possibleValues[columnSelection]);
 			var selections;
 			if (typeof value.values != undefined && value.values != null) {
