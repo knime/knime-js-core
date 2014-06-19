@@ -48,18 +48,17 @@
 package org.knime.js.base.util.table;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
@@ -77,14 +76,17 @@ import org.knime.js.core.JSONDataTable;
  * @param <VAL>
  */
 public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, VAL extends WebTableViewValue>
-        extends NodeModel implements WizardNode<REP, VAL> {
+        extends NodeModel implements WizardNode<REP, VAL>, BufferedDataTableHolder {
 
     /** Config key for the last displayed row. */
     public static final String CFG_END = "end";
     /** Default end row for table creation. */
-    public static final int END = 500;
+    public static final int END = 2500;
 
-    private JSONDataTable m_input;
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(WebTableNodeModel.class);
+
+    private BufferedDataTable m_table;
+    private JSONDataTable m_jsonTable;
     private REP m_viewRepresentation;
     private VAL m_viewValue;
 
@@ -126,14 +128,18 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        BufferedDataTable dataTable = (BufferedDataTable)inObjects[0];
-        m_input = new JSONDataTable(dataTable, 1, m_maxRows.getIntValue(), exec);
-        getViewRepresentation().setTable(m_input);
-        if (m_maxRows.getIntValue() < dataTable.getRowCount()) {
+        m_table = (BufferedDataTable)inObjects[0];
+        createJSONTableFromBufferedDataTable(exec);
+        m_viewRepresentation.setTable(m_jsonTable);
+        return new PortObject[0];
+    }
+
+    private void createJSONTableFromBufferedDataTable(final ExecutionContext exec) throws CanceledExecutionException {
+        m_jsonTable = new JSONDataTable(m_table, 1, m_maxRows.getIntValue(), exec);
+        if (m_maxRows.getIntValue() < m_table.getRowCount()) {
             setWarningMessage("Only the first "
                     + m_maxRows.getIntValue() + " rows are displayed.");
         }
-        return new PortObject[0];
     }
 
     /**
@@ -143,6 +149,14 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public REP getViewRepresentation() {
         if (m_viewRepresentation == null) {
             m_viewRepresentation = createEmptyViewRepresentation();
+        }
+        if (m_table != null && m_jsonTable == null) {
+            try {
+                createJSONTableFromBufferedDataTable(null);
+                m_viewRepresentation.setTable(m_jsonTable);
+            } catch (Exception e) {
+                LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
+            }
         }
         return m_viewRepresentation;
     }
@@ -209,10 +223,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
-        NodeSettings settings = new NodeSettings("table");
-        m_input.saveJSONToNodeSettings(settings);
+        /*NodeSettings settings = new NodeSettings("table");
+        m_jsonTable.saveJSONToNodeSettings(settings);
         File f = new File(nodeInternDir, "jsonTable.xml");
-        settings.saveToXML(new FileOutputStream(f));
+        settings.saveToXML(new FileOutputStream(f));*/
     }
 
     /**
@@ -221,10 +235,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
-        File f = new File(nodeInternDir, "jsonTable.xml");
+        /*File f = new File(nodeInternDir, "jsonTable.xml");
         NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(f));
-        m_input = JSONDataTable.loadFromNodeSettings(settings);
-        m_viewRepresentation.setTable(m_input);
+        m_jsonTable = JSONDataTable.loadFromNodeSettings(settings);
+        m_viewRepresentation.setTable(m_jsonTable);*/
     }
 
     /**
@@ -256,7 +270,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void reset() {
-        m_input = null;
+        m_table = null;
+        m_jsonTable = null;
         m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
     }
@@ -266,6 +281,22 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     public int getEndIndex() {
         return m_maxRows.getIntValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedDataTable[] getInternalTables() {
+        return new BufferedDataTable[]{m_table};
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInternalTables(final BufferedDataTable[] tables) {
+        m_table = tables[0];
     }
 
 }

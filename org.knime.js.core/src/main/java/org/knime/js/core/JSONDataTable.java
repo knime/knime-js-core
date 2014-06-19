@@ -215,6 +215,10 @@ public class JSONDataTable {
                     possVals.add(getJSONCellValue(cell));
                 }
             }
+            if (execMon != null) {
+                execMon.setProgress(((double)currentRowNumber - firstRow) / numOfRows,
+                    "Creating JSON table. Processing row " + (currentRowNumber - firstRow) + " of " + numOfRows);
+            }
         }
 
         // TODO: Add extensions (color, shape, size, inclusion, selection, hiliting, ...)

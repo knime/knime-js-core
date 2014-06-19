@@ -90,10 +90,11 @@ import org.knime.js.core.datasets.JSONKeyedValuesRow;
 public class ScatterPlotNodeModel extends NodeModel implements
     WizardNode<ScatterPlotViewRepresentation, ScatterPlotViewValue> {
 
-    private final static NodeLogger LOGGER = NodeLogger.getLogger(ScatterPlotNodeModel.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(ScatterPlotNodeModel.class);
 
     private final Object m_lock = new Object();
     private final ScatterPlotViewConfig m_config;
+    private BufferedDataTable m_table;
     private ScatterPlotViewRepresentation m_representation;
     private ScatterPlotViewValue m_viewValue;
 
@@ -136,17 +137,20 @@ public class ScatterPlotNodeModel extends NodeModel implements
     protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws Exception {
         synchronized (m_lock) {
+            m_table = inData[0];
             if (m_representation.getKeyedDataset() == null || m_viewValue.getxColumn() == null) {
                 ColumnRearranger c = createNumericColumnRearranger(inData[0].getDataTableSpec());
                 BufferedDataTable filteredTable =
-                    exec.createColumnRearrangeTable(inData[0], c, exec.createSubProgress(0.3));
+                    exec.createColumnRearrangeTable(inData[0], c, exec.createSubProgress(0.1));
+                exec.setProgress(0.1);
                 //construct dataset
                 if (m_config.getMaxRows() < filteredTable.getRowCount()) {
                     setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
                 }
                 JSONDataTable table =
-                    new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.3));
-                ExecutionMonitor progress = exec.createSubProgress(0.4);
+                    new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.8));
+                exec.setProgress(0.9);
+                ExecutionMonitor datasetExecutionMonitor = exec.createSubProgress(0.1);
                 int numColumns = table.getSpec().getNumColumns();
                 String[] rowKeys = new String[table.getSpec().getNumRows()];
                 JSONKeyedValuesRow[] rowValues = new JSONKeyedValuesRow[table.getSpec().getNumRows()];
@@ -165,15 +169,15 @@ public class ScatterPlotNodeModel extends NodeModel implements
                     }
                     rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
                     rowValues[rowID].setColor(table.getSpec().getRowColorValues()[rowID]);
-                    progress.setProgress(((double)rowID) / rowValues.length);
+                    datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length,
+                        "Creating dataset, processing row " + rowID + " of " + rowValues.length + ".");
                 }
-                /*KeyedValues3DSeries series = new KeyedValues3DSeries("series", rowValues);
-                JSONKeyedValues3DDataset dataset =
-                    new JSONKeyedValues3DDataset(table.getSpec().getColNames(), rowKeys,
-                        new KeyedValues3DSeries[]{series});*/
-                JSONKeyedValues2DDataset dataset = new JSONKeyedValues2DDataset(table.getSpec().getColNames(), rowValues);
+
+                JSONKeyedValues2DDataset dataset =
+                    new JSONKeyedValues2DDataset(table.getSpec().getColNames(), rowValues);
                 for (int col = 0; col < table.getSpec().getNumColumns(); col++) {
-                    if (table.getSpec().getColTypes()[col] == "string" && table.getSpec().getPossibleValues().get(col) != null) {
+                    if (table.getSpec().getColTypes()[col] == "string"
+                        && table.getSpec().getPossibleValues().get(col) != null) {
                         dataset.setSymbol(getSymbolMap(table.getSpec().getPossibleValues().get(col)), col);
                     }
                 }
@@ -187,6 +191,7 @@ public class ScatterPlotNodeModel extends NodeModel implements
                 }
             }
         }
+        exec.setProgress(1);
         return null;
     }
 
