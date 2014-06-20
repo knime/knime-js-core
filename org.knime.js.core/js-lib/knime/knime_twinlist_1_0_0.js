@@ -54,8 +54,20 @@ function twinlist() {
 	var values;
 	var excludes;
 	var includes;
+	
+	var selectionChangedListeners = new Array();
 
 	// Define inner functions
+	
+	addSelectionChangedListener = function(listener) {
+		selectionChangedListeners.push(listener);
+	}
+	
+	notifyListeners = function() {
+		for (var i = 0; i < selectionChangedListeners.length; i++) {
+			selectionChangedListeners[i]();
+		}
+	}
 
 	setAvailableValues = function(newValues) {
 		values = newValues;
@@ -154,6 +166,7 @@ function twinlist() {
 			}
 		}
 		refreshListeners();
+		notifyListeners();
 	};
 
 	contains = function(array, value) {
@@ -253,5 +266,6 @@ function twinlist() {
 	this.getExcludes = getExcludes;
 	this.getElement = getElement;
 	this.refreshSize = refreshSize;
+	this.addSelectionChangedListener = addSelectionChangedListener;
 
 }
