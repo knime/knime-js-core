@@ -149,7 +149,7 @@
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
-            debug="true"
+            debug="false"
             name="JSFreeChart"
             version="0.5.0"
             webResourceBundleID="jsFreeChart_0.5">
@@ -186,6 +186,40 @@
                relativePath="js-lib/knime/knime_quickform_utils_1_0_0.js"
                type="JAVASCRIPT">
          </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="jQuery Number Format"
+            version="2.1.3"
+            webResourceBundleID="jQueryNumberFormat_2.1.3_Debug">
+         <webResource
+               relativePathSource="js-lib/jQueryNumberFormat/debug/"
+               relativePathTarget="js-lib/jQueryNumberFormat/debug/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQueryNumberFormat/debug/jquery.number.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="jQuery Number Format"
+            version="2.1.3"
+            webResourceBundleID="jQueryNumberFormat_2.1.3">
+         <webResource
+               relativePathSource="js-lib/jQueryNumberFormat/min/"
+               relativePathTarget="js-lib/jQueryNumberFormat/min/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQueryNumberFormat/min/jquery.number.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
       </webResourceBundle>
    </extension>
 
