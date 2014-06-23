@@ -103,4 +103,16 @@ public class SingleSelectionQuickFormNodeModel
         return new SingleSelectionQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected SingleSelectionQuickFormRepresentation getRepresentation() {
+        SingleSelectionQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getVariableValue());
+        representation.setPossibleChoices(getConfig().getPossibleChoices());
+        representation.setType(getConfig().getType());
+        return representation;
+    }
+
 }

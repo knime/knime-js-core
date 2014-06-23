@@ -111,4 +111,18 @@ public class IntInputQuickFormNodeModel
         return new IntInputQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected IntInputQuickFormRepresentation getRepresentation() {
+        IntInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getInteger());
+        representation.setMax(getConfig().getMax());
+        representation.setMin(getConfig().getMin());
+        representation.setUseMax(getConfig().getUseMax());
+        representation.setUseMin(getConfig().getUseMin());
+        return representation;
+    }
+
 }

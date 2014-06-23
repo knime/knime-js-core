@@ -167,4 +167,16 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         return new ColumnFilterQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ColumnFilterQuickFormRepresentation getRepresentation() {
+        ColumnFilterQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultColumns(getConfig().getDefaultValue().getColumns());
+        representation.setPossibleColumns(getConfig().getPossibleColumns());
+        representation.setType(getConfig().getType());
+        return representation;
+    }
+
 }

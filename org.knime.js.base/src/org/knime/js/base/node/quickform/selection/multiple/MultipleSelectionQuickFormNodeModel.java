@@ -155,4 +155,16 @@ public class MultipleSelectionQuickFormNodeModel
         return new MultipleSelectionQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MultipleSelectionQuickFormRepresentation getRepresentation() {
+        MultipleSelectionQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getVariableValue());
+        representation.setPossibleChoices(getConfig().getPossibleChoices());
+        representation.setType(getConfig().getType());
+        return representation;
+    }
+
 }

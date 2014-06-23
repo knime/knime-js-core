@@ -109,4 +109,15 @@ public class MoleculeStringInputQuickFormNodeModel
         return new MoleculeStringInputQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MoleculeStringInputQuickFormRepresentation getRepresentation() {
+        MoleculeStringInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getMoleculeString());
+        representation.setFormat(getConfig().getFormat());
+        return representation;
+    }
+
 }

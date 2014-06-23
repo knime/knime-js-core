@@ -106,6 +106,18 @@ public class ValueFilterQuickFormNodeModel
             throws InvalidSettingsException {
         getConfig().setFromSpec(((DataTableSpec)inSpecs[0]));
         createAndPushFlowVariable();
+        DataTableSpec inTable = (DataTableSpec)inSpecs[0];
+        String column = getRelevantValue().getColumn();
+        int colIndex;
+        for (colIndex = 0; colIndex < inTable.getNumColumns(); colIndex++) {
+            if (inTable.getColumnSpec(colIndex).getName()
+                    .equals(column)) {
+                break;
+            }
+        }
+        if (colIndex >= inTable.getNumColumns()) {
+            throw new InvalidSettingsException("The column '" + "' was not found");
+        }
         return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
 
@@ -177,6 +189,20 @@ public class ValueFilterQuickFormNodeModel
     @Override
     public ValueFilterQuickFormConfig createEmptyConfig() {
         return new ValueFilterQuickFormConfig();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ValueFilterQuickFormRepresentation getRepresentation() {
+        ValueFilterQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
+        representation.setDefaultValues(getConfig().getDefaultValue().getValues());
+        representation.setLockColumn(getConfig().getLockColumn());
+        representation.setPossibleValues(getConfig().getPossibleValues());
+        representation.setType(getConfig().getType());
+        return representation;
     }
 
 }

@@ -110,15 +110,6 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
             // what to do?
             LOGGER.error("Error loading internals: ", e);
         }
-        File dvalFile = new File(nodeInternDir, "dialogvalue.xml");
-        NodeSettingsRO dvalSettings = NodeSettings.loadFromXML(new FileInputStream(dvalFile));
-        m_dialogValue = createEmptyViewValue();
-        try {
-            m_dialogValue.loadFromNodeSettings(dvalSettings);
-        } catch (InvalidSettingsException e) {
-            // what to do?
-            LOGGER.error("Error loading internals: ", e);
-        }
     }
 
     /**
@@ -133,12 +124,6 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         }
         File valFile = new File(nodeInternDir, "viewvalue.xml");
         valSettings.saveToXML(new FileOutputStream(valFile));
-        NodeSettings dvalSettings = new NodeSettings("dialogvalue");
-        if (m_dialogValue != null) {
-            m_dialogValue.saveToNodeSettings(dvalSettings);
-        }
-        File dvalFile = new File(nodeInternDir, "dialogvalue.xml");
-        dvalSettings.saveToXML(new FileOutputStream(dvalFile));
     }
 
     abstract public CONF createEmptyConfig();

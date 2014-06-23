@@ -108,4 +108,16 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         return new StringInputQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected StringInputQuickFormRepresentation getRepresentation() {
+        StringInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getString());
+        representation.setErrorMessage(getConfig().getErrorMessage());
+        representation.setRegex(getConfig().getRegex());
+        return representation;
+    }
+
 }

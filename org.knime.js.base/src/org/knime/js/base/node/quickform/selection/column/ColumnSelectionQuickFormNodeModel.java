@@ -144,4 +144,16 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
         return new ColumnSelectionQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ColumnSelectionQuickFormRepresentation getRepresentation() {
+        ColumnSelectionQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
+        representation.setPossibleColumns(getConfig().getPossibleColumns());
+        representation.setType(getConfig().getType());
+        return representation;
+    }
+
 }

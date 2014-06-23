@@ -160,4 +160,18 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
         return new ValueSelectionQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ValueSelectionQuickFormRepresentation getRepresentation() {
+        ValueSelectionQuickFormRepresentation representation = super.getRepresentation();
+        representation.setColumnType(getConfig().getColumnType());
+        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
+        representation.setDefaultValue(getConfig().getDefaultValue().getValue());
+        representation.setLockColumn(getConfig().getLockColumn());
+        representation.setType(getConfig().getType());
+        return representation;
+    }
+
 }

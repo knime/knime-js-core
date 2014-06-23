@@ -183,4 +183,18 @@ public class ListBoxInputQuickFormNodeModel
         return new ListBoxInputQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListBoxInputQuickFormRepresentation getRepresentation() {
+        ListBoxInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getString());
+        representation.setErrorMessage(getConfig().getErrorMessage());
+        representation.setOmitEmpty(getConfig().getOmitEmpty());
+        representation.setRegex(getConfig().getRegex());
+        representation.setSeparator(getConfig().getSeparator());
+        return representation;
+    }
+
 }

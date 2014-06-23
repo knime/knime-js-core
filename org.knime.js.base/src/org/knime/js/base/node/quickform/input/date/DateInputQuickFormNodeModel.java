@@ -129,4 +129,19 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
         return new DateInputQuickFormConfig();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DateInputQuickFormRepresentation getRepresentation() {
+        DateInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getDate());
+        representation.setMax(getConfig().getMax());
+        representation.setMin(getConfig().getMin());
+        representation.setUseMax(getConfig().getUseMax());
+        representation.setUseMin(getConfig().getUseMin());
+        representation.setWithTime(getConfig().getWithTime());
+        return representation;
+    }
+
 }
