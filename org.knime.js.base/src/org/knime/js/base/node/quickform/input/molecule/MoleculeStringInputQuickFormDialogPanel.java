@@ -62,13 +62,11 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
 
     private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
-    private MoleculeStringInputQuickFormRepresentation m_representation;
-
     /**
      *
      */
     public MoleculeStringInputQuickFormDialogPanel(final MoleculeStringInputQuickFormRepresentation representation) {
-        m_representation = representation;
+        m_component.setText(representation.getDefaultValue());
         addComponent(m_component);
     }
 
@@ -85,8 +83,9 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      */
     @Override
     public void loadNodeValue(final MoleculeStringInputQuickFormValue value) {
-        String string = value.getMoleculeString() != null ? value.getMoleculeString() : m_representation.getDefaultValue();
-        m_component.setText(string);
+        if (value != null) {
+            m_component.setText(value.getMoleculeString());
+        }
     }
 
 }

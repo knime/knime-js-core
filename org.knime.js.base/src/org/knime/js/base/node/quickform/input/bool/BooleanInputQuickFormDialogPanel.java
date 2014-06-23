@@ -68,6 +68,7 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
      */
     public BooleanInputQuickFormDialogPanel(final BooleanInputQuickFormRepresentation representation) {
         m_representation = representation;
+        m_component.setSelected(representation.getDefaultValue());
         addComponent(m_component);
     }
 
@@ -84,8 +85,9 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
      */
     @Override
     public void loadNodeValue(final BooleanInputQuickFormValue value) {
-        boolean bool = value.getBoolean();
-        m_component.setSelected(bool);
+        if (value != null) {
+            m_component.setSelected(value.getBoolean());
+        }
     }
 
 }

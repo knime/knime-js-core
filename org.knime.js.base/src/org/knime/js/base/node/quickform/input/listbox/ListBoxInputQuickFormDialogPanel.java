@@ -63,13 +63,11 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
 
     private JTextArea m_component = new JTextArea(5, QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
-    private ListBoxInputQuickFormRepresentation m_representation;
-
     /**
      *
      */
     public ListBoxInputQuickFormDialogPanel(final ListBoxInputQuickFormRepresentation representation) {
-        m_representation = representation;
+        m_component.setText(representation.getDefaultValue());
         addComponent(new JScrollPane(m_component));
     }
 
@@ -86,8 +84,9 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
      */
     @Override
     public void loadNodeValue(final ListBoxInputQuickFormValue value) {
-        String string = value.getString() != null ? value.getString() : m_representation.getDefaultValue();
-        m_component.setText(string);
+        if (value != null) {
+            m_component.setText(value.getString());
+        }
     }
 
 }

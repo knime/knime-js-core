@@ -62,13 +62,11 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
 
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
 
-    private IntInputQuickFormRepresentation m_representation;
-
     /**
      *
      */
     public IntInputQuickFormDialogPanel(final IntInputQuickFormRepresentation representation) {
-        m_representation = representation;
+        m_component.setValue(representation.getDefaultValue());
         addComponent(m_component);
     }
 
@@ -85,8 +83,9 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
      */
     @Override
     public void loadNodeValue(final IntInputQuickFormValue value) {
-        int integer = value.getInteger();
-        m_component.setValue(integer);
+        if (value != null) {
+            m_component.setValue(value.getInteger());
+        }
     }
 
 }

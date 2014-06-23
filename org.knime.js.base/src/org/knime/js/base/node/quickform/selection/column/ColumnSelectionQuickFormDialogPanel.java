@@ -61,15 +61,13 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
 
     private SingleSelectionComponent m_column;
 
-    private ColumnSelectionQuickFormRepresentation m_representation;
-
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
-        m_representation = representation;
         m_column = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column.setChoices(representation.getPossibleColumns());
+        m_column.setSelection(representation.getDefaultColumn());
         addComponent(m_column.getComponent());
     }
 
@@ -86,8 +84,9 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void loadNodeValue(final ColumnSelectionQuickFormValue value) {
-        String column = value.getColumn() != null ? value.getColumn() : m_representation.getDefaultColumn();
-        m_column.setSelection(column);
+        if (value != null) {
+            m_column.setSelection(value.getColumn());
+        }
     }
 
 }

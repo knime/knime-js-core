@@ -62,13 +62,11 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
 
     private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
-    private StringInputQuickFormRepresentation m_representation;
-
     /**
      *
      */
     public StringInputQuickFormDialogPanel(final StringInputQuickFormRepresentation representation) {
-        m_representation = representation;
+        m_component.setText(representation.getDefaultValue());
         addComponent(m_component);
     }
 
@@ -85,8 +83,9 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      */
     @Override
     public void loadNodeValue(final StringInputQuickFormValue value) {
-        String string = value.getString() != null ? value.getString() : m_representation.getDefaultValue();
-        m_component.setText(string);
+        if (value != null) {
+            m_component.setText(value.getString());
+        }
     }
 
 }

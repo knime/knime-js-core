@@ -65,14 +65,12 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY,
             Double.POSITIVE_INFINITY, 0.01));
 
-    private DoubleInputQuickFormRepresentation m_representation;
-
     /**
      *
      */
     public DoubleInputQuickFormDialogPanel(final DoubleInputQuickFormRepresentation representation) {
-        m_representation = representation;
         m_component.setPreferredSize(new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH).getPreferredSize());
+        m_component.setValue(representation.getDefaultValue());
         addComponent(m_component);
     }
 
@@ -89,8 +87,9 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      */
     @Override
     public void loadNodeValue(final DoubleInputQuickFormValue value) {
-        double dbl = value.getDouble();
-        m_component.setValue(dbl);
+        if (value != null) {
+            m_component.setValue(value.getDouble());
+        }
     }
 
 }

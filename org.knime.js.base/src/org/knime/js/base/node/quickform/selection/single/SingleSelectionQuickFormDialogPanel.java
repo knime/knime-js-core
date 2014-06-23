@@ -60,17 +60,15 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
 
     private SingleSelectionComponent m_selectionComponent;
 
-    private SingleSelectionQuickFormRepresentation m_representation;
-
     /**
      * @param representation The representation containing layout information
      */
     public SingleSelectionQuickFormDialogPanel(final SingleSelectionQuickFormRepresentation representation) {
-        m_representation = representation;
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
                 SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_selectionComponent.setChoices(choices);
+        m_selectionComponent.setSelection(representation.getDefaultValue());
         addComponent(m_selectionComponent.getComponent());
     }
 
@@ -87,8 +85,9 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      */
     @Override
     public void loadNodeValue(final SingleSelectionQuickFormValue value) {
-        String selection = value.getVariableValue() != null ? value.getVariableValue() : m_representation.getDefaultValue();
-        m_selectionComponent.setSelection(selection);
+        if (value != null) {
+            m_selectionComponent.setSelection(value.getVariableValue());
+        }
     }
 
 }
