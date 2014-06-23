@@ -47,6 +47,8 @@ package org.knime.js.base.node.quickform.input.dbl;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -89,15 +91,15 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_min = new JSpinner(getSpinnerModel());
         m_max = new JSpinner(getSpinnerModel());
         m_defaultSpinner = new JSpinner(getSpinnerModel());
-        m_useMin.addChangeListener(new ChangeListener() {
+        m_useMin.addItemListener(new ItemListener() {
             @Override
-            public void stateChanged(final ChangeEvent e) {
+            public void itemStateChanged(final ItemEvent e) {
                 m_min.setEnabled(m_useMin.isSelected());
             }
         });
-        m_useMax.addChangeListener(new ChangeListener() {
+        m_useMax.addItemListener(new ItemListener() {
             @Override
-            public void stateChanged(final ChangeEvent e) {
+            public void itemStateChanged(final ItemEvent e) {
                 m_max.setEnabled(m_useMax.isSelected());
             }
         });
@@ -119,6 +121,8 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
                 }
             }
         });
+        m_min.setEnabled(m_useMin.isSelected());
+        m_max.setEnabled(m_useMax.isSelected());
         createAndAddTab();
     }
 
@@ -167,7 +171,7 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
         super.loadSettingsFrom(m_config);
-        m_defaultSpinner.setValue(m_config.getDefaultValue());
+        m_defaultSpinner.setValue(m_config.getDefaultValue().getDouble());
         m_useMin.setSelected(m_config.getUseMin());
         m_useMax.setSelected(m_config.getUseMax());
         m_min.setValue(m_config.getMin());

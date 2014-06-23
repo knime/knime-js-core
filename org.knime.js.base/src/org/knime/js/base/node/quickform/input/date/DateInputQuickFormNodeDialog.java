@@ -49,6 +49,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
@@ -57,8 +59,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -116,18 +116,20 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_min = new JSpinner(new SpinnerDateModel());
         m_max = new JSpinner(new SpinnerDateModel());
         m_defaultField = new JSpinner(new SpinnerDateModel());
-        m_useMin.addChangeListener(new ChangeListener() {
+        m_useMin.addItemListener(new ItemListener() {
             @Override
-            public void stateChanged(final ChangeEvent e) {
+            public void itemStateChanged(final ItemEvent e) {
                 m_min.setEnabled(m_useMin.isSelected());
             }
         });
-        m_useMax.addChangeListener(new ChangeListener() {
+        m_useMax.addItemListener(new ItemListener() {
             @Override
-            public void stateChanged(final ChangeEvent e) {
+            public void itemStateChanged(final ItemEvent e) {
                 m_max.setEnabled(m_useMax.isSelected());
             }
         });
+        m_min.setEnabled(m_useMin.isSelected());
+        m_max.setEnabled(m_useMax.isSelected());
         createAndAddTab();
     }
 
@@ -202,7 +204,7 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
         loadSettingsFrom(m_config);
-        m_defaultField.setValue(m_config.getDefaultValue());
+        m_defaultField.setValue(m_config.getDefaultValue().getDate());
         m_useMin.setSelected(m_config.getUseMin());
         m_useMax.setSelected(m_config.getUseMax());
         m_min.setValue(m_config.getMin());
