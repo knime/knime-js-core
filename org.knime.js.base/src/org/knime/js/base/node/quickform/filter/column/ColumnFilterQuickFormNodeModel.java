@@ -67,9 +67,9 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         ColumnFilterQuickFormValue, ColumnFilterQuickFormConfig> {
 
     /** Creates a new value selection node model. */
-    public ColumnFilterQuickFormNodeModel(final ColumnFilterQuickFormConfig config) {
+    public ColumnFilterQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE}, config);
+                new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**
@@ -104,12 +104,11 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
             throws InvalidSettingsException {
         updateColumns((DataTableSpec) inSpecs[0]);
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
     }
 
     private DataTableSpec createSpec(final DataTableSpec inSpec) throws InvalidSettingsException {
-        final String[] values = isReexecute() ? getViewValue().getColumns() : getConfig().getColumns();
+        final String[] values = getRelevantValue().getColumns();
         final List<DataColumnSpec> cspecs = new ArrayList<DataColumnSpec>();
         List<String> unknownCols = new ArrayList<String>();
         for (int i = 0; i < values.length; i++) {
@@ -142,26 +141,14 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         rearranger.keepOnly(outSpec.getColumnNames());
         BufferedDataTable outTable = exec.createColumnRearrangeTable((BufferedDataTable)inObjects[0],
                 rearranger, exec);
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new BufferedDataTable[]{outTable};
     }
 
     private void createAndPushFlowVariable() {
-        String[] columns = isReexecute() ? getViewValue().getColumns() : getConfig().getColumns();
+        final String[] values = getRelevantValue().getColumns();
         pushFlowVariableString(getConfig().getFlowVariableName(),
-                StringUtils.join(columns, ","));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultColumns(getConfig().getDefaultColumns());
-        getViewRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
-        getViewRepresentation().setType(getConfig().getType());
+                StringUtils.join(values, ","));
     }
 
     /**
@@ -169,18 +156,15 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
      */
     @Override
     protected void copyValueToConfig() {
-        getConfig().setColumns(getViewValue().getColumns());
+        getConfig().getDefaultValue().setColumns(getViewValue().getColumns());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultColumns(getConfig().getDefaultColumns());
-        getDialogRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
-        getDialogRepresentation().setType(getConfig().getType());
+    public ColumnFilterQuickFormConfig createEmptyConfig() {
+        return new ColumnFilterQuickFormConfig();
     }
 
 }

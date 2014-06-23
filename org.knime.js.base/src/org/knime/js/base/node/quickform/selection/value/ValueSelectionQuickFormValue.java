@@ -70,13 +70,13 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
 
     private static final String DEFAULT_COLUMN = "";
 
-    private String m_column = null;
+    private String m_column = DEFAULT_COLUMN;
 
     private static final String CFG_VALUE = "value";
 
     private static final String DEFAULT_VALUE = "";
 
-    private String m_value = null;
+    private String m_value = DEFAULT_VALUE;
 
     /**
      * {@inheritDoc}

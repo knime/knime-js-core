@@ -73,7 +73,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author winter
  */
-public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
+public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<ValueSelectionQuickFormValue> {
 
     private static final String CFG_COLUMN_TYPE = "columnType";
 
@@ -87,18 +87,6 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
 
     private boolean m_lockColumn = DEFAULT_LOCK_COLUMN;
 
-    private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-
-    private static final String DEFAULT_DEFAULT_COLUMN = "";
-
-    private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
-
-    private static final String CFG_DEFAULT_VALUE = "default";
-
-    private static final String DEFAULT_DEFAULT_VALUE = "";
-
-    private String m_defaultValue = DEFAULT_DEFAULT_VALUE;
-
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
 
     private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
@@ -108,18 +96,6 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
 
     private String m_type = DEFAULT_TYPE;
-
-    private static final String CFG_COLUMN = "column";
-
-    private static final String DEFAULT_COLUMN = "";
-
-    private String m_column = DEFAULT_COLUMN;
-
-    private static final String CFG_VALUE = "value";
-
-    private static final String DEFAULT_VALUE = "";
-
-    private String m_value = DEFAULT_VALUE;
 
     ColumnType getColumnType() {
         return m_columnType;
@@ -135,22 +111,6 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
 
     void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
-    }
-
-    String getDefaultColumn() {
-        return m_defaultColumn;
-    }
-
-    void setDefaultColumn(final String defaultColumn) {
-        m_defaultColumn = defaultColumn;
-    }
-
-    String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
     }
 
     Map<String, List<String>> getPossibleValues() {
@@ -169,39 +129,18 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
         m_type = type;
     }
 
-    String getColumn() {
-        return m_column;
-    }
-
-    void setColumn(final String column) {
-        m_column = column;
-    }
-
-    String getValue() {
-        return m_value;
-    }
-
-    void setValue(final String value) {
-        m_value = value;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
         settings.addString(CFG_COLUMN_TYPE, m_columnType.name());
         settings.addBoolean(CFG_LOCK_COLUMN, m_lockColumn);
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
-        settings.addString(CFG_DEFAULT_VALUE, m_defaultValue);
         settings.addStringArray(CFG_POSSIBLE_COLUMNS,
             m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]));
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
         for (String key : m_possibleValues.keySet()) {
             List<String> values = m_possibleValues.get(key);
             settings.addStringArray(key, values.toArray(new String[values.size()]));
         }
         settings.addString(CFG_TYPE, m_type);
-        settings.addString(CFG_COLUMN, m_column);
-        settings.addString(CFG_VALUE, m_value);
     }
 
     @Override
@@ -209,33 +148,25 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
         super.loadSettings(settings);
         m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE));
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         for (String column : columns) {
             m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column)));
         }
         m_type = settings.getString(CFG_TYPE);
-        m_column = settings.getString(CFG_COLUMN);
-        m_value = settings.getString(CFG_VALUE);
     }
 
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE, DEFAULT_DEFAULT_VALUE);
         m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE, DEFAULT_COLUMN_TYPE.name()));
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN, DEFAULT_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN, DEFAULT_DEFAULT_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, new String[0]);
         for (String column : columns) {
             m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column, new String[0])));
         }
         m_type = settings.getString(CFG_TYPE, DEFAULT_TYPE);
-        m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
-        m_value = settings.getString(CFG_VALUE, DEFAULT_VALUE);
     }
 
     /**
@@ -282,6 +213,14 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
             }
         }
         m_possibleValues = values;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ValueSelectionQuickFormValue createEmptyValue() {
+        return new ValueSelectionQuickFormValue();
     }
 
 }

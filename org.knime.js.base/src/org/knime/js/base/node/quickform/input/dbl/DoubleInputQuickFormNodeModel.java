@@ -55,10 +55,6 @@ public class DoubleInputQuickFormNodeModel
         extends
         QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue, DoubleInputQuickFormConfig> {
 
-    DoubleInputQuickFormNodeModel(final DoubleInputQuickFormConfig config) {
-        super(config);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -88,12 +84,7 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        double value;
-        if (isReexecute()) {
-            value = getViewValue().getDouble();
-        } else {
-            value = getConfig().getDouble();
-        }
+        double value = getRelevantValue().getDouble();
         double min = getConfig().getMin();
         double max = getConfig().getMax();
         if (getConfig().getUseMin() && value < min) {
@@ -108,31 +99,16 @@ public class DoubleInputQuickFormNodeModel
     }
 
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setUseMin(getConfig().getUseMin());
-        getViewRepresentation().setUseMax(getConfig().getUseMax());
-        getViewRepresentation().setMin(getConfig().getMin());
-        getViewRepresentation().setMax(getConfig().getMax());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-    }
-
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setDouble(getViewValue().getDouble());
+        getConfig().getDefaultValue().setDouble(getViewValue().getDouble());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setUseMin(getConfig().getUseMin());
-        getDialogRepresentation().setUseMax(getConfig().getUseMax());
-        getDialogRepresentation().setMin(getConfig().getMin());
-        getDialogRepresentation().setMax(getConfig().getMax());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public DoubleInputQuickFormConfig createEmptyConfig() {
+        return new DoubleInputQuickFormConfig();
     }
 
 }

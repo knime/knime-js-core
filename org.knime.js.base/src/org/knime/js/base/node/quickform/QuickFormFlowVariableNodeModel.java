@@ -61,19 +61,18 @@ import org.knime.core.node.web.WebViewContent;
  *
  */
 public abstract class QuickFormFlowVariableNodeModel<
-        REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormFlowVariableConfig>
+        REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormFlowVariableConfig<VAL>>
         extends QuickFormNodeModel<REP, VAL, CONF> {
 
     /** Creates a new node model with no inports and one flow variable outport. */
-    protected QuickFormFlowVariableNodeModel(final CONF config) {
-        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE}, config);
+    protected QuickFormFlowVariableNodeModel() {
+        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE});
     }
 
     /** {@inheritDoc} */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -81,8 +80,7 @@ public abstract class QuickFormFlowVariableNodeModel<
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         createAndPushFlowVariable();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
@@ -94,23 +92,5 @@ public abstract class QuickFormFlowVariableNodeModel<
      */
     protected abstract void createAndPushFlowVariable()
             throws InvalidSettingsException;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setFlowVariableName(getConfig().getFlowVariableName());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setFlowVariableName(getConfig().getFlowVariableName());
-    }
 
 }

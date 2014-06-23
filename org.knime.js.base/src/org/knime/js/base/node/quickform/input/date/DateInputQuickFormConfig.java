@@ -61,7 +61,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateInputQuickFormValue> {
 
     private static final String CFG_USE_MIN = "use_min";
     private static final boolean DEFAULT_USE_MIN = false;
@@ -75,14 +75,9 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String CFG_MAX = "max";
     private static final Date DEFAULT_MAX = DateInputQuickFormValue.DEFAULT_DATE;
     private Date m_max = DEFAULT_MAX;
-    private static final String CFG_DEFAULT = "default";
-    private static final Date DEFAULT_DATE = DateInputQuickFormValue.DEFAULT_DATE;
-    private Date m_defaultValue = DEFAULT_DATE;
     private static final String CFG_WITH_TIME = "with_time";
     private static final boolean DEFAULT_WITH_TIME = true;
     private boolean m_withTime = DEFAULT_WITH_TIME;
-    private static final String CFG_DATE = "date";
-    private Date m_date = DEFAULT_DATE;
 
     boolean getUseMin() {
         return m_useMin;
@@ -116,28 +111,12 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_max = max;
     }
 
-    Date getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final Date defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
     boolean getWithTime() {
         return m_withTime;
     }
 
     void setWithTime(final boolean withTime) {
         m_withTime = withTime;
-    }
-
-    Date getDate() {
-        return m_date;
-    }
-
-    void setDate(final Date date) {
-        m_date = date;
     }
 
     @Override
@@ -148,9 +127,7 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
         settings.addBoolean(CFG_USE_MAX, m_useMax);
         settings.addString(CFG_MIN, sdf.format(m_min));
         settings.addString(CFG_MAX, sdf.format(m_max));
-        settings.addString(CFG_DEFAULT, sdf.format(m_defaultValue));
         settings.addBoolean(CFG_WITH_TIME, m_withTime);
-        settings.addString(CFG_DATE, sdf.format(m_date));
     }
 
     @Override
@@ -163,8 +140,6 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
         try {
             m_min = sdf.parse(settings.getString(CFG_MIN));
             m_max = sdf.parse(settings.getString(CFG_MAX));
-            m_defaultValue = sdf.parse(settings.getString(CFG_DEFAULT));
-            m_date = sdf.parse(settings.getString(CFG_DATE));
         } catch (ParseException e) {
             throw new InvalidSettingsException("Could not parse date format", e);
         }
@@ -180,14 +155,18 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig {
         try {
             m_min = sdf.parse(settings.getString(CFG_MIN, sdf.format(DEFAULT_MIN)));
             m_max = sdf.parse(settings.getString(CFG_MAX, sdf.format(DEFAULT_MAX)));
-            m_defaultValue = sdf.parse(settings.getString(CFG_DEFAULT, sdf.format(DEFAULT_DATE)));
-            m_date = sdf.parse(settings.getString(CFG_DATE, sdf.format(DEFAULT_DATE)));
         } catch (ParseException e) {
             m_min = DEFAULT_MIN;
             m_max = DEFAULT_MAX;
-            m_defaultValue = DEFAULT_DATE;
-            m_date = DEFAULT_DATE;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DateInputQuickFormValue createEmptyValue() {
+        return new DateInputQuickFormValue();
     }
 
 }

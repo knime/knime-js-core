@@ -85,7 +85,7 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
      */
     @Override
     public void loadNodeValue(final IntInputQuickFormValue value) {
-        int integer = value.getInteger() != null ? value.getInteger() : m_representation.getDefaultValue();
+        int integer = value.getInteger();
         m_component.setValue(integer);
     }
 

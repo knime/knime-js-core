@@ -63,12 +63,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		qfdiv.append(representation.label + " ");
 		qfdiv.append(input);
 		input.attr("type", "text");
-		var stringValue;
-		if (typeof value.moleculeString != undefined && value.moleculeString != null) {
-			stringValue = value.moleculeString;
-		} else {
-			stringValue = representation.defaultvalue;
-		}
+		var stringValue = value.moleculeString;
 		input.val(stringValue);
 		input.blur(callUpdate());
 		resizeParent();

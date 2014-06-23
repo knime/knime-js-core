@@ -74,12 +74,7 @@ org_knime_js_base_node_quickform_filter_column = function() {
 			}
 			qfdiv.append(selector.getComponent());
 			selector.setChoices(representation.possibleColumns);
-			var selections;
-			if (typeof value.columns != undefined && value.columns != null) {
-				selections = value.columns;
-			} else {
-				selections = representation.defaultColumns;
-			}
+			var selections = value.columns;
 			selector.setSelections(selections);
 			selector.addValueChangedListener(callUpdate());
 		}

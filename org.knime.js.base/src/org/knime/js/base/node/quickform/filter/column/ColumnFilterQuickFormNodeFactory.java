@@ -57,14 +57,12 @@ public class ColumnFilterQuickFormNodeFactory extends NodeFactory<ColumnFilterQu
         WizardNodeFactoryExtension<ColumnFilterQuickFormNodeModel, ColumnFilterQuickFormRepresentation,
         ColumnFilterQuickFormValue> {
 
-    private ColumnFilterQuickFormConfig m_config = new ColumnFilterQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ColumnFilterQuickFormNodeModel createNodeModel() {
-        return new ColumnFilterQuickFormNodeModel(m_config);
+        return new ColumnFilterQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class ColumnFilterQuickFormNodeFactory extends NodeFactory<ColumnFilterQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ColumnFilterQuickFormNodeDialog(m_config);
+        return new ColumnFilterQuickFormNodeDialog();
     }
 }

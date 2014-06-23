@@ -79,19 +79,16 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JSpinner m_defaultSpinner;
 
-    private final JSpinner m_valueSpinner;
-
     private DoubleInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    DoubleInputQuickFormNodeDialog(final DoubleInputQuickFormConfig config) {
-        m_config = config;
+    DoubleInputQuickFormNodeDialog() {
+        m_config = new DoubleInputQuickFormConfig();
         m_useMin = new JCheckBox();
         m_useMax = new JCheckBox();
         m_min = new JSpinner(getSpinnerModel());
         m_max = new JSpinner(getSpinnerModel());
         m_defaultSpinner = new JSpinner(getSpinnerModel());
-        m_valueSpinner = new JSpinner(getSpinnerModel());
         m_useMin.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
@@ -160,7 +157,6 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Minimum: ", minPanel, panelWithGBLayout, gbc);
         addPairToPanel("Maximum: ", maxPanel, panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", m_defaultSpinner, panelWithGBLayout, gbc);
-        addPairToPanel("Double Value: ", m_valueSpinner, panelWithGBLayout, gbc);
     }
 
     /**
@@ -176,7 +172,6 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_useMax.setSelected(m_config.getUseMax());
         m_min.setValue(m_config.getMin());
         m_max.setValue(m_config.getMax());
-        m_valueSpinner.setValue(m_config.getDouble());
         m_min.setEnabled(m_useMin.isSelected());
         m_max.setEnabled(m_useMax.isSelected());
     }
@@ -187,12 +182,11 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         super.saveSettingsTo(m_config);
-        m_config.setDefaultValue((Double)m_defaultSpinner.getValue());
+        m_config.getDefaultValue().setDouble((Double)m_defaultSpinner.getValue());
         m_config.setUseMin(m_useMin.isSelected());
         m_config.setUseMax(m_useMax.isSelected());
         m_config.setMin((Double)m_min.getValue());
         m_config.setMax((Double)m_max.getValue());
-        m_config.setDouble((Double)m_valueSpinner.getValue());
         m_config.saveSettings(settings);
     }
 

@@ -83,8 +83,6 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JSpinner m_defaultField;
 
-    private final JSpinner m_valueField;
-
     private final ButtonGroup m_withTime;
 
     private final JRadioButton m_date;
@@ -94,8 +92,8 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
     private DateInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    DateInputQuickFormNodeDialog(final DateInputQuickFormConfig config) {
-        m_config = config;
+    DateInputQuickFormNodeDialog() {
+        m_config = new DateInputQuickFormConfig();
         m_date = new JRadioButton("Date");
         m_date.setActionCommand("date");
         m_dateAndTime = new JRadioButton("Date and Time");
@@ -118,7 +116,6 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_min = new JSpinner(new SpinnerDateModel());
         m_max = new JSpinner(new SpinnerDateModel());
         m_defaultField = new JSpinner(new SpinnerDateModel());
-        m_valueField = new JSpinner(new SpinnerDateModel());
         m_useMin.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
@@ -186,7 +183,6 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Earliest: ", minPanel, panelWithGBLayout, gbc3);
         addPairToPanel("Latest: ", maxPanel, panelWithGBLayout, gbc3);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("Date Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     private void updateFormat() {
@@ -196,7 +192,6 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_min.setEditor(new JSpinner.DateEditor(m_min, format));
         m_max.setEditor(new JSpinner.DateEditor(m_max, format));
         m_defaultField.setEditor(new JSpinner.DateEditor(m_defaultField, format));
-        m_valueField.setEditor(new JSpinner.DateEditor(m_valueField, format));
     }
 
     /**
@@ -212,7 +207,6 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_useMax.setSelected(m_config.getUseMax());
         m_min.setValue(m_config.getMin());
         m_max.setValue(m_config.getMax());
-        m_valueField.setValue(m_config.getDate());
         m_min.setEnabled(m_useMin.isSelected());
         m_max.setEnabled(m_useMax.isSelected());
         if (m_config.getWithTime()) {
@@ -229,13 +223,12 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        m_config.setDefaultValue((Date)m_defaultField.getValue());
+        m_config.getDefaultValue().setDate((Date)m_defaultField.getValue());
         m_config.setUseMin(m_useMin.isSelected());
         m_config.setUseMax(m_useMax.isSelected());
         m_config.setMin((Date)m_min.getValue());
         m_config.setMax((Date)m_max.getValue());
         m_config.setWithTime(m_dateAndTime.isSelected());
-        m_config.setDate((Date)m_valueField.getValue());
         m_config.saveSettings(settings);
     }
 

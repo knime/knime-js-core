@@ -73,8 +73,6 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final ColumnSelectionPanel m_defaultField;
 
-    private final ColumnSelectionPanel m_columnField;
-
     private final JComboBox<String> m_type;
 
     private String[] m_possibleColumns;
@@ -82,11 +80,10 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     private ColumnSelectionQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    ColumnSelectionQuickFormNodeDialog(final ColumnSelectionQuickFormConfig config) {
-        m_config = config;
+    ColumnSelectionQuickFormNodeDialog() {
+        m_config = new ColumnSelectionQuickFormConfig();
         m_type = new JComboBox<String>(SingleSelectionComponentFactory.listSingleSelectionComponents());
         m_defaultField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
-        m_columnField = new ColumnSelectionPanel((Border) null, new Class[]{DataValue.class});
         createAndAddTab();
     }
 
@@ -97,7 +94,6 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Default column: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("Column selection: ", m_columnField, panelWithGBLayout, gbc);
     }
 
     /**
@@ -110,9 +106,8 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         super.loadSettingsFrom(m_config);
         DataTableSpec spec = (DataTableSpec) specs[0];
         m_defaultField.update(spec, null);
-        m_columnField.update(spec, null);
         m_possibleColumns = spec.getColumnNames();
-        String selectedDefault = m_config.getDefaultColumn();
+        String selectedDefault = m_config.getDefaultValue().getColumn();
         if (selectedDefault.isEmpty()) {
             List<DataColumnSpec> cspecs = m_defaultField.getAvailableColumns();
             if (cspecs.size() > 0) {
@@ -120,14 +115,6 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
             }
         }
         m_defaultField.setSelectedColumn(selectedDefault);
-        String selectedColumn = m_config.getColumn();
-        if (selectedColumn.isEmpty()) {
-            List<DataColumnSpec> cspecs = m_columnField.getAvailableColumns();
-            if (cspecs.size() > 0) {
-                selectedColumn = cspecs.get(0).getName();
-            }
-        }
-        m_columnField.setSelectedColumn(selectedColumn);
         m_type.setSelectedItem(m_config.getType());
     }
 
@@ -137,10 +124,9 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        m_config.setDefaultColumn(m_defaultField.getSelectedColumn());
+        m_config.getDefaultValue().setColumn(m_defaultField.getSelectedColumn());
         m_config.setType((String)m_type.getSelectedItem());
         m_config.setPossibleColumns(m_possibleColumns);
-        m_config.setColumn(m_columnField.getSelectedColumn());
         m_config.saveSettings(settings);
     }
 

@@ -66,9 +66,9 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
         ColumnSelectionQuickFormValue, ColumnSelectionQuickFormConfig> {
 
     /** Creates a new value selection node model. */
-    public ColumnSelectionQuickFormNodeModel(final ColumnSelectionQuickFormConfig config) {
+    public ColumnSelectionQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{FlowVariablePortObject.TYPE}, config);
+                new PortType[]{FlowVariablePortObject.TYPE});
     }
 
     /**
@@ -103,7 +103,6 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
             throws InvalidSettingsException {
         updateColumns((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -112,8 +111,7 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateColumns(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
@@ -122,7 +120,7 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {
-        String value = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
+        String value = getRelevantValue().getColumn();
         if (!Arrays.asList(getConfig().getPossibleColumns()).contains(value)) {
             throw new InvalidSettingsException("The selected column '"
                     + value + "' is not available");
@@ -134,30 +132,16 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getViewRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
-        getViewRepresentation().setType(getConfig().getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setColumn(getViewValue().getColumn());
+        getConfig().getDefaultValue().setColumn(getViewValue().getColumn());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getDialogRepresentation().setPossibleColumns(getConfig().getPossibleColumns());
-        getDialogRepresentation().setType(getConfig().getType());
+    public ColumnSelectionQuickFormConfig createEmptyConfig() {
+        return new ColumnSelectionQuickFormConfig();
     }
 
 }

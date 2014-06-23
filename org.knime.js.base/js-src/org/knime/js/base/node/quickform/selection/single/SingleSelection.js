@@ -72,12 +72,7 @@ org_knime_js_base_node_quickform_selection_single = function() {
 			}
 			qfdiv.append(selector.getComponent());
 			selector.setChoices(representation.possibleChoices);
-			var selection;
-			if (typeof value.value != undefined && value.value != null) {
-				selection = value.value;
-			} else {
-				selection = representation.defaultvalue;
-			}
+			var selection = value.value;
 			selector.setSelection(selection);
 			selector.addValueChangedListener(callUpdate());
 		}

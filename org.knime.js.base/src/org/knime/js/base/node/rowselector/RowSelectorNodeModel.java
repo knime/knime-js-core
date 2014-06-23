@@ -227,4 +227,13 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

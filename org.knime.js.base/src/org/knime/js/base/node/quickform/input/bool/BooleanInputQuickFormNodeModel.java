@@ -55,10 +55,6 @@ public class BooleanInputQuickFormNodeModel
     extends
     QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormConfig> {
 
-    BooleanInputQuickFormNodeModel(final BooleanInputQuickFormConfig config) {
-        super(config);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -88,33 +84,28 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        boolean value;
-        if (isReexecute()) {
-            value = getViewValue().getBoolean();
-        } else {
-            value = getConfig().getBoolean();
-        }
+        boolean value = getRelevantValue().getBoolean();
         pushFlowVariableInt(getConfig().getFlowVariableName(), value ? 1 : 0);
     }
 
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    protected BooleanInputQuickFormRepresentation getRepresentation() {
+        BooleanInputQuickFormRepresentation representation = super.getRepresentation();
+        representation.setDefaultValue(getConfig().getDefaultValue().getBoolean());
+        return representation;
     }
 
     @Override
     protected void copyValueToConfig() {
-        getConfig().setBoolean(getViewValue().getBoolean());
+        getConfig().getDefaultValue().setBoolean(getViewValue().getBoolean());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public BooleanInputQuickFormConfig createEmptyConfig() {
+        return new BooleanInputQuickFormConfig();
     }
 
 }

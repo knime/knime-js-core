@@ -234,4 +234,13 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

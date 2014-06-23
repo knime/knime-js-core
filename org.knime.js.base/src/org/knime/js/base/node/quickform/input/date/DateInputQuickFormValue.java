@@ -76,7 +76,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
 
     private static final String CFG_DATE = "date";
 
-    private Date m_date = null;
+    private Date m_date = DEFAULT_DATE;
 
     /**
      * {@inheritDoc}
@@ -149,7 +149,6 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 
 }

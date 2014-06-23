@@ -66,9 +66,9 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
         ValueSelectionQuickFormValue, ValueSelectionQuickFormConfig> {
 
     /** Creates a new value selection node model. */
-    public ValueSelectionQuickFormNodeModel(final ValueSelectionQuickFormConfig config) {
+    public ValueSelectionQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{FlowVariablePortObject.TYPE}, config);
+                new PortType[]{FlowVariablePortObject.TYPE});
     }
 
     /**
@@ -103,7 +103,6 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
             throws InvalidSettingsException {
         updateValues((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE};
     }
 
@@ -112,8 +111,7 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
@@ -122,8 +120,8 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {
-        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
-        String value = isReexecute() ? getViewValue().getValue() : getConfig().getValue();
+        String column = getRelevantValue().getColumn();
+        String value = getRelevantValue().getValue();
         List<String> values = getConfig().getPossibleValues().get(column);
         if (values == null || !values.contains(value)) {
             throw new InvalidSettingsException("The selected value '"
@@ -149,35 +147,17 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setColumnType(getConfig().getColumnType());
-        getViewRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getViewRepresentation().setLockColumn(getConfig().getLockColumn());
-        getViewRepresentation().setType(getConfig().getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setColumn(getViewValue().getColumn());
-        getConfig().setValue(getViewValue().getValue());
+        getConfig().getDefaultValue().setColumn(getViewValue().getColumn());
+        getConfig().getDefaultValue().setValue(getViewValue().getValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setColumnType(getConfig().getColumnType());
-        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getDialogRepresentation().setLockColumn(getConfig().getLockColumn());
-        getDialogRepresentation().setType(getConfig().getType());
+    public ValueSelectionQuickFormConfig createEmptyConfig() {
+        return new ValueSelectionQuickFormConfig();
     }
 
 }

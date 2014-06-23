@@ -70,7 +70,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
 
     private static final String[] DEFAULT_COLUMNS = new String[0];
 
-    private String[] m_columns = null;
+    private String[] m_columns = DEFAULT_COLUMNS;
 
     /**
      * {@inheritDoc}
@@ -124,6 +124,5 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

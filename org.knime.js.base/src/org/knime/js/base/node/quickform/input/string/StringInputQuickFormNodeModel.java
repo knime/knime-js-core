@@ -55,13 +55,6 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         StringInputQuickFormValue, StringInputQuickFormConfig> {
 
     /**
-     * @param config
-     */
-    protected StringInputQuickFormNodeModel(final StringInputQuickFormConfig config) {
-        super(config);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -74,12 +67,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        String string;
-        if (isReexecute()) {
-            string = getViewValue().getString();
-        } else {
-            string = getConfig().getString();
-        }
+        String string = getRelevantValue().getString();
         if (string == null) {
             string = "";
         }
@@ -108,28 +96,16 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
     }
 
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setRegex(getConfig().getRegex());
-        getViewRepresentation().setErrorMessage(getConfig().getErrorMessage());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-    }
-
-    @Override
     protected void copyValueToConfig() {
-        super.copyConfigToView();
-        getConfig().setString(getViewValue().getString());
+        getConfig().getDefaultValue().setString(getViewValue().getString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setRegex(getConfig().getRegex());
-        getDialogRepresentation().setErrorMessage(getConfig().getErrorMessage());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public StringInputQuickFormConfig createEmptyConfig() {
+        return new StringInputQuickFormConfig();
     }
 
 }

@@ -57,7 +57,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig<DoubleInputQuickFormValue> {
 
     private static final String CFG_USE_MIN = "use_min";
     private static final boolean DEFAULT_USE_MIN = false;
@@ -71,11 +71,6 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String CFG_MAX = "max";
     private static final double DEFAULT_MAX = 1.0;
     private double m_max = DEFAULT_MAX;
-    private static final String CFG_DEFAULT = "default";
-    private static final double DEFAULT_DOUBLE = 0.0;
-    private double m_defaultValue = DEFAULT_DOUBLE;
-    private static final String CFG_DOUBLE = "double";
-    private double m_double = DEFAULT_DOUBLE;
 
     boolean getUseMin() {
         return m_useMin;
@@ -109,22 +104,6 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_max = max;
     }
 
-    double getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final double defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    double getDouble() {
-        return m_double;
-    }
-
-    void setDouble(final double dbl) {
-        m_double = dbl;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -132,8 +111,6 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
         settings.addBoolean(CFG_USE_MAX, m_useMax);
         settings.addDouble(CFG_MIN, m_min);
         settings.addDouble(CFG_MAX, m_max);
-        settings.addDouble(CFG_DEFAULT, m_defaultValue);
-        settings.addDouble(CFG_DOUBLE, m_double);
     }
 
     @Override
@@ -143,8 +120,6 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_useMax = settings.getBoolean(CFG_USE_MAX);
         m_min = settings.getDouble(CFG_MIN);
         m_max = settings.getDouble(CFG_MAX);
-        m_defaultValue = settings.getDouble(CFG_DEFAULT);
-        m_double = settings.getDouble(CFG_DOUBLE);
     }
 
     @Override
@@ -154,8 +129,14 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_useMax = settings.getBoolean(CFG_USE_MAX, DEFAULT_USE_MAX);
         m_min = settings.getDouble(CFG_MIN, DEFAULT_MIN);
         m_max = settings.getDouble(CFG_MAX, DEFAULT_MAX);
-        m_defaultValue = settings.getDouble(CFG_DEFAULT, DEFAULT_DOUBLE);
-        m_double = settings.getDouble(CFG_DOUBLE, DEFAULT_DOUBLE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected DoubleInputQuickFormValue createEmptyValue() {
+        return new DoubleInputQuickFormValue();
     }
 
 }

@@ -70,7 +70,7 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
 
     private static final String DEFAULT_STRING = "";
 
-    private String m_string = null;
+    private String m_string = DEFAULT_STRING;
 
     /**
      * {@inheritDoc}
@@ -124,6 +124,5 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

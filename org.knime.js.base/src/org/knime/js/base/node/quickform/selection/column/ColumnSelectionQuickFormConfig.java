@@ -58,13 +58,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
-
-    private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-
-    private static final String DEFAULT_DEFAULT_COLUMN = "";
-
-    private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
+public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<ColumnSelectionQuickFormValue> {
 
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
 
@@ -77,20 +71,6 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig 
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
 
     private String m_type = DEFAULT_TYPE;
-
-    private static final String CFG_COLUMN = "column";
-
-    private static final String DEFAULT_COLUMN = "";
-
-    private String m_column = DEFAULT_COLUMN;
-
-    String getDefaultColumn() {
-        return m_defaultColumn;
-    }
-
-    void setDefaultColumn(final String defaultColumn) {
-        m_defaultColumn = defaultColumn;
-    }
 
     String[] getPossibleColumns() {
         return m_possibleColumns;
@@ -108,39 +88,33 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig 
         m_type = type;
     }
 
-    String getColumn() {
-        return m_column;
-    }
-
-    void setColumn(final String column) {
-        m_column = column;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
         settings.addStringArray(CFG_POSSIBLE_COLUMNS, m_possibleColumns);
         settings.addString(CFG_TYPE, m_type);
-        settings.addString(CFG_COLUMN, m_column);
     }
 
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN);
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         m_type = settings.getString(CFG_TYPE);
-        m_column = settings.getString(CFG_COLUMN);
     }
 
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN, DEFAULT_DEFAULT_COLUMN);
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
         m_type = settings.getString(CFG_TYPE, DEFAULT_TYPE);
-        m_column = settings.getString(CFG_COLUMN, DEFAULT_COLUMN);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ColumnSelectionQuickFormValue createEmptyValue() {
+        return new ColumnSelectionQuickFormValue();
     }
 
 }

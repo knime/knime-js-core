@@ -72,12 +72,7 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		if (viewRepresentation.usemax) {
 			input.spinner('option', 'max', viewRepresentation.max);
 		}
-		var integerValue;
-		if (typeof value.integer != undefined && value.integer != null) {
-			integerValue = value.integer;
-		} else {
-			integerValue = representation.defaultvalue;
-		}
+		var integerValue = value.integer;
 		input.val(integerValue);
 		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');

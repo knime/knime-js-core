@@ -70,7 +70,7 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
 
     private static final String DEFAULT_STRING = "";
 
-    private String m_moleculeString = null;
+    private String m_moleculeString = DEFAULT_STRING;
 
     /**
      * {@inheritDoc}
@@ -123,7 +123,6 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 
 

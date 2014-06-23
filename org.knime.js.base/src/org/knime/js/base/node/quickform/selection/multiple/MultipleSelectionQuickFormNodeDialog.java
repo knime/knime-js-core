@@ -78,8 +78,6 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JList m_defaultField;
 
-    private final JList m_valueField;
-
     private final JTextArea m_possibleChoicesField;
 
     private final JComboBox m_type;
@@ -89,12 +87,10 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     /**
      * Constructors, inits fields calls layout routines.
      */
-    MultipleSelectionQuickFormNodeDialog(final MultipleSelectionQuickFormConfig config) {
-        m_config = config;
+    MultipleSelectionQuickFormNodeDialog() {
+        m_config = new MultipleSelectionQuickFormConfig();
         m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        m_valueField = new JList();
-        m_valueField.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         m_possibleChoicesField = new JTextArea();
         m_possibleChoicesField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -130,9 +126,6 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         JScrollPane defaultPane = new JScrollPane(m_defaultField);
         defaultPane.setPreferredSize(prefSize);
         addPairToPanel("Default Variable Values: ", defaultPane, panelWithGBLayout, gbc2);
-        JScrollPane valuePane = new JScrollPane(m_valueField);
-        valuePane.setPreferredSize(prefSize);
-        addPairToPanel("Variable Values: ", valuePane, panelWithGBLayout, gbc2);
     }
 
     /**
@@ -141,7 +134,6 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     private void refreshChoices() {
         refreshChoices(m_defaultField);
-        refreshChoices(m_valueField);
     }
 
     /**
@@ -183,8 +175,7 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         super.loadSettingsFrom(m_config);
         m_possibleChoicesField.setText(StringUtils.join(m_config.getPossibleChoices(), "\n"));
         m_type.setSelectedItem(m_config.getType());
-        setSelections(m_defaultField, Arrays.asList(m_config.getDefaultValue()));
-        setSelections(m_valueField, Arrays.asList(m_config.getVariableValue()));
+        setSelections(m_defaultField, Arrays.asList(m_config.getDefaultValue().getVariableValue()));
     }
 
     /**
@@ -193,11 +184,10 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        m_config.setDefaultValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
+        m_config.getDefaultValue().setVariableValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
         String possibleChoices = m_possibleChoicesField.getText();
         m_config.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
         m_config.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
-        m_config.setVariableValue((Arrays.asList(m_valueField.getSelectedValues())).toArray(new String[0]));
         m_config.saveSettings(settings);
     }
 

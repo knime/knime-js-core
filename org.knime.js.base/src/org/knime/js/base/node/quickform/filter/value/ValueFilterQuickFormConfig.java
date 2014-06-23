@@ -70,25 +70,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  * @author winter
  */
-public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
+public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<ValueFilterQuickFormValue> {
 
     private static final String CFG_LOCK_COLUMN = "lockColumn";
 
     private static final boolean DEFAULT_LOCK_COLUMN = false;
 
     private boolean m_lockColumn = DEFAULT_LOCK_COLUMN;
-
-    private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-
-    private static final String DEFAULT_DEFAULT_COLUMN = "";
-
-    private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
-
-    private static final String CFG_DEFAULT_VALUES = "default";
-
-    private static final String[] DEFAULT_DEFAULT_VALUES = new String[0];
-
-    private String[] m_defaultValues = DEFAULT_DEFAULT_VALUES;
 
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
 
@@ -100,40 +88,12 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
 
     private String m_type = DEFAULT_TYPE;
 
-    private static final String CFG_COLUMN = "column";
-
-    private static final String DEFAULT_COLUMN = "";
-
-    private String m_column = DEFAULT_COLUMN;
-
-    private static final String CFG_VALUES = "values";
-
-    private static final String[] DEFAULT_VALUES = new String[0];
-
-    private String[] m_values = DEFAULT_VALUES;
-
     boolean getLockColumn() {
         return m_lockColumn;
     }
 
     void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
-    }
-
-    String getDefaultColumn() {
-        return m_defaultColumn;
-    }
-
-    void setDefaultColumn(final String defaultColumn) {
-        m_defaultColumn = defaultColumn;
-    }
-
-    String[] getDefaultValues() {
-        return m_defaultValues;
-    }
-
-    void setDefaultValues(final String[] defaultValues) {
-        m_defaultValues = defaultValues;
     }
 
     Map<String, List<String>> getPossibleValues() {
@@ -152,30 +112,12 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
         m_type = type;
     }
 
-    String getColumn() {
-        return m_column;
-    }
-
-    void setColumn(final String column) {
-        m_column = column;
-    }
-
-    String[] getValues() {
-        return m_values;
-    }
-
-    void setValues(final String[] values) {
-        m_values = values;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
-        settings.addStringArray(CFG_DEFAULT_VALUES, m_defaultValues);
         settings.addBoolean(CFG_LOCK_COLUMN, m_lockColumn);
         settings.addStringArray(CFG_POSSIBLE_COLUMNS,
                 m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]));
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
         for (String key : m_possibleValues.keySet()) {
             List<String> values = m_possibleValues.get(key);
             settings.addStringArray(key, values.toArray(new String[values.size()]));
@@ -186,9 +128,7 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
-        m_defaultValues = settings.getStringArray(CFG_DEFAULT_VALUES, DEFAULT_DEFAULT_VALUES);
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         for (String column : columns) {
@@ -200,9 +140,7 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
-        m_defaultValues = settings.getStringArray(CFG_DEFAULT_VALUES, DEFAULT_DEFAULT_VALUES);
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN, DEFAULT_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN, DEFAULT_DEFAULT_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, new String[0]);
         for (String column : columns) {
@@ -236,6 +174,14 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig {
             }
         }
         m_possibleValues = values;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ValueFilterQuickFormValue createEmptyValue() {
+        return new ValueFilterQuickFormValue();
     }
 
 }

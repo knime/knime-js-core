@@ -71,19 +71,14 @@ import org.knime.core.node.wizard.WizardNode;
  *
  */
 public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl<VAL>,
-        VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig>
+        VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig<VAL>>
         extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(QuickFormNodeModel.class);
 
-    private CONF m_config;
-
-    private REP m_dialogRepresentation;
-    private VAL m_dialogValue;
-    private REP m_viewRepresentation;
-    private VAL m_viewValue;
-
-    private boolean m_isReexecute = false;
+    private CONF m_config = createEmptyConfig();
+    private VAL m_dialogValue = null;
+    private VAL m_viewValue = null;
 
     /**
      * Creates a new quickform model with the given number (and types!) of input
@@ -92,13 +87,8 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
      */
-    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final CONF config) {
+    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
-        m_viewRepresentation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
-        m_dialogRepresentation = createEmptyViewRepresentation();
-        m_dialogValue = createEmptyViewValue();
-        m_config = config;
     }
 
     protected CONF getConfig() {
@@ -111,27 +101,19 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     @Override
     protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        File repFile = new File(nodeInternDir, "viewrepresentation.xml");
         File valFile = new File(nodeInternDir, "viewvalue.xml");
-        NodeSettingsRO repSettings = NodeSettings.loadFromXML(new FileInputStream(repFile));
         NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
-        m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
         try {
-            m_viewRepresentation.loadFromNodeSettings(repSettings);
             m_viewValue.loadFromNodeSettings(valSettings);
         } catch (InvalidSettingsException e) {
             // what to do?
             LOGGER.error("Error loading internals: ", e);
         }
-        File drepFile = new File(nodeInternDir, "dialogrepresentation.xml");
         File dvalFile = new File(nodeInternDir, "dialogvalue.xml");
-        NodeSettingsRO drepSettings = NodeSettings.loadFromXML(new FileInputStream(drepFile));
         NodeSettingsRO dvalSettings = NodeSettings.loadFromXML(new FileInputStream(dvalFile));
-        m_dialogRepresentation = createEmptyViewRepresentation();
         m_dialogValue = createEmptyViewValue();
         try {
-            m_dialogRepresentation.loadFromNodeSettings(drepSettings);
             m_dialogValue.loadFromNodeSettings(dvalSettings);
         } catch (InvalidSettingsException e) {
             // what to do?
@@ -145,46 +127,36 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     @Override
     protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
-        NodeSettings repSettings = new NodeSettings("viewrepresentation");
         NodeSettings valSettings = new NodeSettings("viewvalue");
-        if (m_viewRepresentation != null) {
-            m_viewRepresentation.saveToNodeSettings(repSettings);
-        }
         if (m_viewValue != null) {
             m_viewValue.saveToNodeSettings(valSettings);
         }
-        File repFile = new File(nodeInternDir, "viewrepresentation.xml");
         File valFile = new File(nodeInternDir, "viewvalue.xml");
-        repSettings.saveToXML(new FileOutputStream(repFile));
         valSettings.saveToXML(new FileOutputStream(valFile));
-        NodeSettings drepSettings = new NodeSettings("dialogrepresentation");
         NodeSettings dvalSettings = new NodeSettings("dialogvalue");
-        if (m_dialogRepresentation != null) {
-            m_dialogRepresentation.saveToNodeSettings(drepSettings);
-        }
         if (m_dialogValue != null) {
             m_dialogValue.saveToNodeSettings(dvalSettings);
         }
-        File drepFile = new File(nodeInternDir, "dialogrepresentation.xml");
         File dvalFile = new File(nodeInternDir, "dialogvalue.xml");
-        drepSettings.saveToXML(new FileOutputStream(drepFile));
         dvalSettings.saveToXML(new FileOutputStream(dvalFile));
     }
+
+    abstract public CONF createEmptyConfig();
 
     /**
      * {@inheritDoc}
      */
     @Override
     public REP getDialogRepresentation() {
-        return m_dialogRepresentation;
+        return getRepresentation();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public VAL getDialogValue() {
-        return m_dialogValue;
+    public VAL createEmptyDialogValue() {
+        return createEmptyViewValue();
     }
 
     /**
@@ -192,7 +164,14 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
      */
     @Override
     public REP getViewRepresentation() {
-        return m_viewRepresentation;
+        return getRepresentation();
+    }
+
+    protected REP getRepresentation() {
+        REP representation = createEmptyViewRepresentation();
+        representation.setLabel(getConfig().getLabel());
+        representation.setDescription(getConfig().getDescription());
+        return representation;
     }
 
     /**
@@ -212,21 +191,11 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         if (useAsDefault) {
             copyValueToConfig();
         }
-    };
+    }
 
     @Override
     protected void reset() {
-        m_viewRepresentation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
-        m_isReexecute = false;
-    }
-
-    protected void setExecuted() {
-        m_isReexecute = true;
-    }
-
-    protected boolean isReexecute() {
-        return m_isReexecute;
+        m_viewValue = null;
     }
 
     /**
@@ -256,18 +225,50 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     @Override
     public ValidationError validateViewValue(final VAL viewContent) {
         return null;
-    };
-
-    protected void copyConfigToView() {
-        getViewRepresentation().setLabel(getConfig().getLabel());
-        getViewRepresentation().setDescription(getConfig().getDescription());
     }
 
     abstract protected void copyValueToConfig();
 
-    protected void copyConfigToDialog() {
-        getDialogRepresentation().setLabel(getConfig().getLabel());
-        getDialogRepresentation().setDescription(getConfig().getDescription());
+    /** {@inheritDoc} */
+    @Override
+    public void setDialogValue(final VAL value) {
+        m_dialogValue = value;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public VAL getDialogValue() {
+        return m_dialogValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInDialog() {
+        return m_config.getHideInDialog();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        return m_config.getHideInWizard();
+    }
+
+    protected VAL getRelevantValue() {
+        if (m_viewValue != null) {
+            return m_viewValue;
+        } else if (m_dialogValue != null) {
+            return m_dialogValue;
+        } else {
+            return m_config.getDefaultValue();
+        }
+    }
+
+    protected void updateViewValue() {
+        m_viewValue = getRelevantValue();
     }
 
 }

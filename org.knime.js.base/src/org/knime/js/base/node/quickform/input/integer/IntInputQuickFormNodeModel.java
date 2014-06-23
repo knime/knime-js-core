@@ -56,13 +56,6 @@ public class IntInputQuickFormNodeModel
         QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue, IntInputQuickFormConfig> {
 
     /**
-     * @param config
-     */
-    protected IntInputQuickFormNodeModel(final IntInputQuickFormConfig config) {
-        super(config);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -91,12 +84,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        int value;
-        if (isReexecute()) {
-            value = getViewValue().getInteger();
-        } else {
-            value = getConfig().getInteger();
-        }
+        int value = getRelevantValue().getInteger();
         int min = getConfig().getMin();
         int max = getConfig().getMax();
         if (getConfig().getUseMin() && value < min) {
@@ -111,31 +99,16 @@ public class IntInputQuickFormNodeModel
     }
 
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setUseMin(getConfig().getUseMin());
-        getViewRepresentation().setUseMax(getConfig().getUseMax());
-        getViewRepresentation().setMin(getConfig().getMin());
-        getViewRepresentation().setMax(getConfig().getMax());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-    }
-
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setInteger(getViewValue().getInteger());
+        getConfig().getDefaultValue().setInteger(getViewValue().getInteger());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setUseMin(getConfig().getUseMin());
-        getDialogRepresentation().setUseMax(getConfig().getUseMax());
-        getDialogRepresentation().setMin(getConfig().getMin());
-        getDialogRepresentation().setMax(getConfig().getMax());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public IntInputQuickFormConfig createEmptyConfig() {
+        return new IntInputQuickFormConfig();
     }
 
 }

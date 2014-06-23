@@ -70,7 +70,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
 
     private static final String DEFAULT_STRING = "";
 
-    private String m_string = null;
+    private String m_string = DEFAULT_STRING;
 
     /**
      * {@inheritDoc}
@@ -123,7 +123,6 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 
 }

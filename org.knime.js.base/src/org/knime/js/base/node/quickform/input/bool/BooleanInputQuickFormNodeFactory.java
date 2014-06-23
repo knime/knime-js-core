@@ -57,14 +57,12 @@ public class BooleanInputQuickFormNodeFactory extends NodeFactory<BooleanInputQu
         WizardNodeFactoryExtension<BooleanInputQuickFormNodeModel, BooleanInputQuickFormRepresentation,
         BooleanInputQuickFormValue> {
 
-    BooleanInputQuickFormConfig m_config = new BooleanInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public BooleanInputQuickFormNodeModel createNodeModel() {
-        return new BooleanInputQuickFormNodeModel(m_config);
+        return new BooleanInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class BooleanInputQuickFormNodeFactory extends NodeFactory<BooleanInputQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new BooleanInputQuickFormNodeDialog(m_config);
+        return new BooleanInputQuickFormNodeDialog();
     }
 }

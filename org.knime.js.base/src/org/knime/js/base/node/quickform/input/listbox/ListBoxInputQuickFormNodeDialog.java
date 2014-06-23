@@ -77,18 +77,15 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JTextArea m_defaultArea;
 
-    private final JTextArea m_valueArea;
-
     private ListBoxInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    ListBoxInputQuickFormNodeDialog(final ListBoxInputQuickFormConfig config) {
-        m_config = config;
+    ListBoxInputQuickFormNodeDialog() {
+        m_config = new ListBoxInputQuickFormConfig();
         m_separatorField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_omitEmptyField = new JCheckBox();
         m_regexField = new RegexPanel();
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
-        m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -104,7 +101,6 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Common Regular Expressions: ",
                 m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Default List: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
-        addPairToPanel("String List: ", new JScrollPane(m_valueArea), panelWithGBLayout, gbc);
     }
 
     /**
@@ -119,8 +115,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_omitEmptyField.setSelected(m_config.getOmitEmpty());
         m_regexField.setRegex(m_config.getRegex());
         m_regexField.setErrorMessage(m_config.getErrorMessage());
-        m_defaultArea.setText(m_config.getDefaultValue());
-        m_valueArea.setText(m_config.getString());
+        m_defaultArea.setText(m_config.getDefaultValue().getString());
     }
 
     /**
@@ -133,8 +128,7 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.setOmitEmpty(m_omitEmptyField.isSelected());
         m_config.setRegex(m_regexField.getRegex());
         m_config.setErrorMessage(m_regexField.getErrorMessage());
-        m_config.setDefaultValue(m_defaultArea.getText());
-        m_config.setString(m_valueArea.getText());
+        m_config.getDefaultValue().setString(m_defaultArea.getText());
         m_config.saveSettings(settings);
     }
 

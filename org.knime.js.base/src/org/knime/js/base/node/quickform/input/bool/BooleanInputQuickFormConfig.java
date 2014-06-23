@@ -48,58 +48,20 @@
  */
 package org.knime.js.base.node.quickform.input.bool;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
  *
  * @author winter
  */
-public class BooleanInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class BooleanInputQuickFormConfig extends QuickFormFlowVariableConfig<BooleanInputQuickFormValue> {
 
-    private static final String CFG_DEFAULT = "default";
-    private static final String CFG_BOOLEAN = "boolean";
-
-    private boolean m_defaultValue = false;
-    private boolean m_boolean = false;
-
-    boolean getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final boolean defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    boolean getBoolean() {
-        return m_boolean;
-    }
-
-    void setBoolean(final boolean bool) {
-        m_boolean = bool;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void saveSettings(final NodeSettingsWO settings) {
-        super.saveSettings(settings);
-        settings.addBoolean(CFG_DEFAULT, m_defaultValue);
-        settings.addBoolean(CFG_BOOLEAN, m_boolean);
-    }
-
-    @Override
-    public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadSettings(settings);
-        m_defaultValue = settings.getBoolean(CFG_DEFAULT);
-        m_boolean = settings.getBoolean(CFG_BOOLEAN);
-    }
-
-    @Override
-    public void loadSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadSettingsInDialog(settings);
-        m_defaultValue = settings.getBoolean(CFG_DEFAULT, false);
-        m_boolean = settings.getBoolean(CFG_BOOLEAN, false);
+    protected BooleanInputQuickFormValue createEmptyValue() {
+        return new BooleanInputQuickFormValue();
     }
 
 }

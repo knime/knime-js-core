@@ -70,7 +70,7 @@ public class ColumnSelectionQuickFormValue extends JSONViewContent implements Di
 
     private static final String DEFAULT_COLUMN = "";
 
-    private String m_column = null;
+    private String m_column = DEFAULT_COLUMN;
 
     /**
      * {@inheritDoc}
@@ -124,6 +124,5 @@ public class ColumnSelectionQuickFormValue extends JSONViewContent implements Di
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

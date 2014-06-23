@@ -67,15 +67,11 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JCheckBox m_defaultField;
 
-    private final JCheckBox m_valueField;
-
     /** Constructors, inits fields calls layout routines. */
-    BooleanInputQuickFormNodeDialog(final BooleanInputQuickFormConfig config) {
-        m_config = config;
+    BooleanInputQuickFormNodeDialog() {
+        m_config = new BooleanInputQuickFormConfig();
         m_defaultField = new JCheckBox();
-        m_defaultField.setSelected(m_config.getDefaultValue());
-        m_valueField = new JCheckBox();
-        m_valueField.setSelected(m_config.getBoolean());
+        m_defaultField.setSelected(m_config.getDefaultValue().getBoolean());
         createAndAddTab();
     }
 
@@ -85,7 +81,6 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("Boolean Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**
@@ -96,8 +91,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
         super.loadSettingsFrom(m_config);
-        m_defaultField.setSelected(m_config.getDefaultValue());
-        m_valueField.setSelected(m_config.getBoolean());
+        m_defaultField.setSelected(m_config.getDefaultValue().getBoolean());
     }
 
     /**
@@ -105,8 +99,7 @@ public class BooleanInputQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        m_config.setDefaultValue(m_defaultField.isSelected());
-        m_config.setBoolean(m_valueField.isSelected());
+        m_config.getDefaultValue().setBoolean(m_defaultField.isSelected());
         super.saveSettingsTo(m_config);
         m_config.saveSettings(settings);
     }

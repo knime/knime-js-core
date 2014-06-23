@@ -56,14 +56,12 @@ public class SingleSelectionQuickFormNodeFactory extends NodeFactory<SingleSelec
         WizardNodeFactoryExtension<SingleSelectionQuickFormNodeModel, SingleSelectionQuickFormRepresentation,
         SingleSelectionQuickFormValue> {
 
-    private SingleSelectionQuickFormConfig m_config = new SingleSelectionQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public SingleSelectionQuickFormNodeModel createNodeModel() {
-        return new SingleSelectionQuickFormNodeModel(m_config);
+        return new SingleSelectionQuickFormNodeModel();
     }
 
     /**
@@ -96,6 +94,6 @@ public class SingleSelectionQuickFormNodeFactory extends NodeFactory<SingleSelec
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new SingleSelectionQuickFormNodeDialog(m_config);
+        return new SingleSelectionQuickFormNodeDialog();
     }
 }

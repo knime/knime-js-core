@@ -72,8 +72,8 @@ public class MultipleSelectionQuickFormNodeModel
     /**
      *
      */
-    public MultipleSelectionQuickFormNodeModel(final MultipleSelectionQuickFormConfig config) {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, config);
+    public MultipleSelectionQuickFormNodeModel() {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
     }
 
     /** {@inheritDoc} */
@@ -81,8 +81,7 @@ public class MultipleSelectionQuickFormNodeModel
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                StringUtils.join(getViewValue().getVariableValue(), ","));
-        copyConfigToDialog();
+                StringUtils.join(getRelevantValue().getVariableValue(), ","));
         return new PortObjectSpec[]{createSpec()};
     }
 
@@ -91,12 +90,10 @@ public class MultipleSelectionQuickFormNodeModel
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
         pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
-                StringUtils.join(getViewValue().getVariableValue(), ","));
+                StringUtils.join(getRelevantValue().getVariableValue(), ","));
         final DataTableSpec outSpec = createSpec();
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
-        String[] values =
-            getViewValue().getVariableValue() != null ? getViewValue().getVariableValue() : getConfig()
-                .getVariableValue();
+        String[] values = getRelevantValue().getVariableValue();
         DataCellFactory cellFactory = new DataCellFactory();
         DataType type = outSpec.getColumnSpec(0).getType();
         for (int i = 0; i < values.length; i++) {
@@ -104,8 +101,7 @@ public class MultipleSelectionQuickFormNodeModel
             container.addRowToTable(new DefaultRow(RowKey.createRowKey(i), result));
         }
         container.close();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{container.getTable()};
     }
 
@@ -147,30 +143,16 @@ public class MultipleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getViewRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
-        getViewRepresentation().setType(getConfig().getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setVariableValue(getViewValue().getVariableValue());
+        getConfig().getDefaultValue().setVariableValue(getViewValue().getVariableValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getDialogRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
-        getDialogRepresentation().setType(getConfig().getType());
+    public MultipleSelectionQuickFormConfig createEmptyConfig() {
+        return new MultipleSelectionQuickFormConfig();
     }
 
 }

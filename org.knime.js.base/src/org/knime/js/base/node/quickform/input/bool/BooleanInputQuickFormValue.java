@@ -70,7 +70,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
 
     private static final boolean DEFAULT_BOOLEAN = false;
 
-    private Boolean m_boolean = null;
+    private boolean m_boolean = DEFAULT_BOOLEAN;
 
     /**
      * {@inheritDoc}
@@ -78,9 +78,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        if (m_boolean != null) {
-            settings.addBoolean(CFG_BOOLEAN, m_boolean);
-        }
+        settings.addBoolean(CFG_BOOLEAN, m_boolean);
     }
 
     /**
@@ -89,11 +87,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        try {
-            m_boolean = settings.getBoolean(CFG_BOOLEAN);
-        } catch (InvalidSettingsException e) {
-            m_boolean = null;
-        }
+        m_boolean = settings.getBoolean(CFG_BOOLEAN);
     }
 
     /**
@@ -109,7 +103,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * @return the string
      */
     @JsonProperty("boolean")
-    public Boolean getBoolean() {
+    public boolean getBoolean() {
         return m_boolean;
     }
 
@@ -117,7 +111,7 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      * @param bool the boolean to set
      */
     @JsonProperty("boolean")
-    public void setBoolean(final Boolean bool) {
+    public void setBoolean(final boolean bool) {
         m_boolean = bool;
     }
 
@@ -129,7 +123,6 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 
 }

@@ -58,13 +58,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class ColumnFilterQuickFormConfig extends QuickFormFlowVariableConfig {
-
-    private static final String CFG_DEFAULT_COLUMNS = "defaultColumns";
-
-    private static final String[] DEFAULT_DEFAULT_COLUMNS = new String[0];
-
-    private String[] m_defaultColumns = DEFAULT_DEFAULT_COLUMNS;
+public class ColumnFilterQuickFormConfig extends QuickFormFlowVariableConfig<ColumnFilterQuickFormValue> {
 
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
 
@@ -77,20 +71,6 @@ public class ColumnFilterQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
 
     private String m_type = DEFAULT_TYPE;
-
-    private static final String CFG_COLUMNS = "columns";
-
-    private static final String[] DEFAULT_COLUMNS = new String[0];
-
-    private String[] m_columns = DEFAULT_COLUMNS;
-
-    String[] getDefaultColumns() {
-        return m_defaultColumns;
-    }
-
-    void setDefaultColumns(final String[] defaultColumns) {
-        m_defaultColumns = defaultColumns;
-    }
 
     String[] getPossibleColumns() {
         return m_possibleColumns;
@@ -108,39 +88,33 @@ public class ColumnFilterQuickFormConfig extends QuickFormFlowVariableConfig {
         m_type = type;
     }
 
-    String[] getColumns() {
-        return m_columns;
-    }
-
-    void setColumns(final String[] columns) {
-        m_columns = columns;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
-        settings.addStringArray(CFG_DEFAULT_COLUMNS, m_defaultColumns);
         settings.addStringArray(CFG_POSSIBLE_COLUMNS, m_possibleColumns);
         settings.addString(CFG_TYPE, m_type);
-        settings.addStringArray(CFG_COLUMNS, m_columns);
     }
 
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
-        m_defaultColumns = settings.getStringArray(CFG_DEFAULT_COLUMNS);
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         m_type = settings.getString(CFG_TYPE);
-        m_columns = settings.getStringArray(CFG_COLUMNS);
     }
 
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
-        m_defaultColumns = settings.getStringArray(CFG_DEFAULT_COLUMNS, DEFAULT_DEFAULT_COLUMNS);
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
         m_type = settings.getString(CFG_TYPE, DEFAULT_TYPE);
-        m_columns = settings.getStringArray(CFG_COLUMNS, DEFAULT_COLUMNS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ColumnFilterQuickFormValue createEmptyValue() {
+        return new ColumnFilterQuickFormValue();
     }
 
 }

@@ -66,12 +66,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 		if (representation.possibleValues == null) {
 			qfdiv.append("Error: No data available");
 		} else {
-			var columnSelection;
-			if (typeof value.column != undefined && value.column != null) {
-				columnSelection = value.column;
-			} else {
-				columnSelection = representation.defaultColumn;
-			}
+			var columnSelection = value.column;
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
 				qfdiv.append(colselection);

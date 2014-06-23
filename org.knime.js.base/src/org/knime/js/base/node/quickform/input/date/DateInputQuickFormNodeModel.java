@@ -58,13 +58,6 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
         <DateInputQuickFormRepresentation, DateInputQuickFormValue, DateInputQuickFormConfig> {
 
     /**
-     * @param config
-     */
-    protected DateInputQuickFormNodeModel(final DateInputQuickFormConfig config) {
-        super(config);
-    }
-
-    /**
      * Format string for the date to string and string to date operations.
      */
     static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -103,7 +96,7 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        Date value = isReexecute() ? getViewValue().getDate() : getConfig().getDate();
+        Date value = getRelevantValue().getDate();
         Date min = getConfig().getMin();
         Date max = getConfig().getMax();
         if (getConfig().getUseMin() && value.before(min)) {
@@ -124,36 +117,16 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setUseMin(getConfig().getUseMin());
-        getViewRepresentation().setUseMax(getConfig().getUseMax());
-        getViewRepresentation().setMin(getConfig().getMin());
-        getViewRepresentation().setMax(getConfig().getMax());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getViewRepresentation().setWithTime(getConfig().getWithTime());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setDate(getViewValue().getDate());
+        getConfig().getDefaultValue().setDate(getViewValue().getDate());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setUseMin(getConfig().getUseMin());
-        getDialogRepresentation().setUseMax(getConfig().getUseMax());
-        getDialogRepresentation().setMin(getConfig().getMin());
-        getDialogRepresentation().setMax(getConfig().getMax());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getDialogRepresentation().setWithTime(getConfig().getWithTime());
+    public DateInputQuickFormConfig createEmptyConfig() {
+        return new DateInputQuickFormConfig();
     }
 
 }

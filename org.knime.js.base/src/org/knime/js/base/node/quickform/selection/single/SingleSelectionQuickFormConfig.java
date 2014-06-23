@@ -58,28 +58,14 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig {
+public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<SingleSelectionQuickFormValue> {
 
-    private static final String CFG_DEFAULT_VALUE = "default_value";
-    private static final String DEFAULT_DEFAULT_VALUE = "";
-    private String m_defaultValue = DEFAULT_DEFAULT_VALUE;
     private static final String CFG_POSSIBLE_CHOICES = "possible_choices";
     private static final String[] DEFAULT_POSSIBLE_CHOICES = new String[0];
     private String[] m_possibleChoices = DEFAULT_POSSIBLE_CHOICES;
     private static final String CFG_TYPE = "type";
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
     private String m_type = DEFAULT_TYPE;
-    private static final String CFG_VARIABLE_VALUE = "variable_value";
-    private static final String DEFAULT_VARIABLE_VALUE = "";
-    private String m_variableValue = DEFAULT_VARIABLE_VALUE;
-
-    String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
 
     String[] getPossibleChoices() {
         return m_possibleChoices;
@@ -97,39 +83,33 @@ public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig 
         m_type = type;
     }
 
-    String getVariableValue() {
-        return m_variableValue;
-    }
-
-    void setVariableValue(final String variableValue) {
-        m_variableValue = variableValue;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
-        settings.addString(CFG_DEFAULT_VALUE, m_defaultValue);
         settings.addStringArray(CFG_POSSIBLE_CHOICES, m_possibleChoices);
         settings.addString(CFG_TYPE, m_type);
-        settings.addString(CFG_VARIABLE_VALUE, m_variableValue);
     }
 
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE);
         m_possibleChoices = settings.getStringArray(CFG_POSSIBLE_CHOICES);
         m_type = settings.getString(CFG_TYPE);
-        m_variableValue = settings.getString(CFG_VARIABLE_VALUE);
     }
 
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE, DEFAULT_DEFAULT_VALUE);
         m_possibleChoices = settings.getStringArray(CFG_POSSIBLE_CHOICES, DEFAULT_POSSIBLE_CHOICES);
         m_type = settings.getString(CFG_TYPE, DEFAULT_TYPE);
-        m_variableValue = settings.getString(CFG_VARIABLE_VALUE, DEFAULT_VARIABLE_VALUE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected SingleSelectionQuickFormValue createEmptyValue() {
+        return new SingleSelectionQuickFormValue();
     }
 
 }

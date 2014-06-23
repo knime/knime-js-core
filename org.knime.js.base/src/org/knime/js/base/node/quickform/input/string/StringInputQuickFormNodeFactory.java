@@ -57,14 +57,12 @@ public class StringInputQuickFormNodeFactory extends NodeFactory<StringInputQuic
         WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormRepresentation,
         StringInputQuickFormValue> {
 
-    private StringInputQuickFormConfig m_config = new StringInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public StringInputQuickFormNodeModel createNodeModel() {
-        return new StringInputQuickFormNodeModel(m_config);
+        return new StringInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class StringInputQuickFormNodeFactory extends NodeFactory<StringInputQuic
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new StringInputQuickFormNodeDialog(m_config);
+        return new StringInputQuickFormNodeDialog();
     }
 }

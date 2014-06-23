@@ -69,7 +69,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
 
     private static final String[] DEFAULT_VARIABLE_VALUE = new String[0];
 
-    private String[] m_variableValue = null;
+    private String[] m_variableValue = DEFAULT_VARIABLE_VALUE;
 
     /**
      * {@inheritDoc}
@@ -121,6 +121,5 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

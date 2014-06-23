@@ -70,8 +70,6 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final ColumnFilterPanel m_defaultField;
 
-    private final ColumnFilterPanel m_valueField;
-
     private final JComboBox<String> m_type;
 
     private String[] m_possibleColumns;
@@ -79,11 +77,10 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     private ColumnFilterQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    ColumnFilterQuickFormNodeDialog(final ColumnFilterQuickFormConfig config) {
-        m_config = config;
+    ColumnFilterQuickFormNodeDialog() {
+        m_config = new ColumnFilterQuickFormConfig();
         m_type = new JComboBox<String>(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
         m_defaultField = new ColumnFilterPanel(true);
-        m_valueField = new ColumnFilterPanel(true);
         createAndAddTab();
     }
 
@@ -94,7 +91,6 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Default Columns: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("Columns: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**
@@ -107,8 +103,7 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         loadSettingsFrom(m_config);
         DataTableSpec spec = (DataTableSpec) specs[0];
         m_possibleColumns = spec.getColumnNames();
-        m_defaultField.update(spec, false, Arrays.asList(m_config.getDefaultColumns()));
-        m_valueField.update(spec, false, Arrays.asList(m_config.getColumns()));
+        m_defaultField.update(spec, false, Arrays.asList(m_config.getDefaultValue().getColumns()));
         m_type.setSelectedItem(m_config.getType());
     }
 
@@ -119,11 +114,9 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
         Set<String> defaultIncludes = m_defaultField.getIncludedColumnSet();
-        m_config.setDefaultColumns(defaultIncludes.toArray(new String[defaultIncludes.size()]));
+        m_config.getDefaultValue().setColumns(defaultIncludes.toArray(new String[defaultIncludes.size()]));
         m_config.setType((String)m_type.getSelectedItem());
         m_config.setPossibleColumns(m_possibleColumns);
-        Set<String> valueIncludes = m_valueField.getIncludedColumnSet();
-        m_config.setColumns(valueIncludes.toArray(new String[valueIncludes.size()]));
         m_config.saveSettings(settings);
     }
 

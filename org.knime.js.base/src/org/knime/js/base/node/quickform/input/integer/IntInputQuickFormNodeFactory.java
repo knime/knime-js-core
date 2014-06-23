@@ -57,14 +57,12 @@ public class IntInputQuickFormNodeFactory extends NodeFactory<IntInputQuickFormN
         WizardNodeFactoryExtension<IntInputQuickFormNodeModel, IntInputQuickFormRepresentation,
         IntInputQuickFormValue> {
 
-    private IntInputQuickFormConfig m_config = new IntInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public IntInputQuickFormNodeModel createNodeModel() {
-        return new IntInputQuickFormNodeModel(m_config);
+        return new IntInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class IntInputQuickFormNodeFactory extends NodeFactory<IntInputQuickFormN
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new IntInputQuickFormNodeDialog(m_config);
+        return new IntInputQuickFormNodeDialog();
     }
 }

@@ -57,7 +57,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<StringInputQuickFormValue> {
 
     private static final String CFG_REGEX = "regex";
     private static final String DEFAULT_REGEX = "";
@@ -65,11 +65,6 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String CFG_ERROR_MESSAGE = "error_message";
     private static final String DEFAULT_ERROR_MESSAGE = "";
     private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
-    private static final String CFG_DEFAULT = "default";
-    private String m_defaultValue;
-    private static final String CFG_STRING = "string";
-    private static final String DEFAULT_STRING = "";
-    private String m_string = DEFAULT_STRING;
 
     String getRegex() {
         return m_regex;
@@ -87,29 +82,11 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_errorMessage = errorMessage;
     }
 
-    String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    String getString() {
-        return m_string;
-    }
-
-    void setString(final String string) {
-        m_string = string;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
-        settings.addString(CFG_DEFAULT, m_defaultValue);
-        settings.addString(CFG_STRING, m_string);
     }
 
     @Override
@@ -117,8 +94,6 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig {
         super.loadSettings(settings);
         m_regex = settings.getString(CFG_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
-        m_defaultValue = settings.getString(CFG_DEFAULT);
-        m_string = settings.getString(CFG_STRING);
     }
 
     @Override
@@ -126,8 +101,14 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig {
         super.loadSettingsInDialog(settings);
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
-        m_defaultValue = settings.getString(CFG_DEFAULT, DEFAULT_STRING);
-        m_string = settings.getString(CFG_STRING, DEFAULT_STRING);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected StringInputQuickFormValue createEmptyValue() {
+        return new StringInputQuickFormValue();
     }
 
 }

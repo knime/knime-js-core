@@ -69,7 +69,7 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
 
     private static final String DEFAULT_VARIABLE_VALUE = "";
 
-    private String m_variableValue = null;
+    private String m_variableValue = DEFAULT_VARIABLE_VALUE;
 
     /**
      * {@inheritDoc}
@@ -121,6 +121,5 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
     @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

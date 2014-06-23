@@ -69,9 +69,9 @@ public class ValueFilterQuickFormNodeModel
         QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue, ValueFilterQuickFormConfig> {
 
     /** Creates a new value selection node model. */
-    public ValueFilterQuickFormNodeModel(final ValueFilterQuickFormConfig config) {
+    public ValueFilterQuickFormNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE}, config);
+                new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**
@@ -106,7 +106,6 @@ public class ValueFilterQuickFormNodeModel
             throws InvalidSettingsException {
         getConfig().setFromSpec(((DataTableSpec)inSpecs[0]));
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new DataTableSpec[]{(DataTableSpec)inSpecs[0]};
     }
 
@@ -119,14 +118,17 @@ public class ValueFilterQuickFormNodeModel
         BufferedDataTable inTable = (BufferedDataTable)inObjects[0];
         BufferedDataContainer container =
                 exec.createDataContainer(inTable.getDataTableSpec(), false);
-        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
-        List<String> values = Arrays.asList(isReexecute() ? getViewValue().getValues() : getConfig().getValues());
+        String column = getRelevantValue().getColumn();
+        List<String> values = Arrays.asList(getRelevantValue().getValues());
         int colIndex;
         for (colIndex = 0; colIndex < inTable.getDataTableSpec().getNumColumns(); colIndex++) {
             if (inTable.getDataTableSpec().getColumnSpec(colIndex).getName()
                     .equals(column)) {
                 break;
             }
+        }
+        if (colIndex >= inTable.getDataTableSpec().getNumColumns()) {
+            throw new InvalidSettingsException("The column '" + "' was not found");
         }
         inTable.getDataTableSpec().getColumnSpec(column);
         for (DataRow row : inTable) {
@@ -135,23 +137,22 @@ public class ValueFilterQuickFormNodeModel
             }
         }
         container.close();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{container.getTable()};
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         checkSelectedValues();
-        String[] values = isReexecute() ? getViewValue().getValues() : getConfig().getValues();
+        List<String> values = Arrays.asList(getRelevantValue().getValues());
         pushFlowVariableString(getConfig().getFlowVariableName(),
                 StringUtils.join(values, ","));
     }
 
     private void checkSelectedValues() throws InvalidSettingsException {
-        String column = isReexecute() ? getViewValue().getColumn() : getConfig().getColumn();
+        String column = getRelevantValue().getColumn();
+        List<String> values = Arrays.asList(getRelevantValue().getValues());
         List<String> possibleValues = getConfig().getPossibleValues().get(column);
-        String[] selectedValues = isReexecute() ? getViewValue().getValues() : getConfig().getValues();
-        for (String value : selectedValues) {
+        for (String value : values) {
             if (!possibleValues.contains(value)) {
                 throw new InvalidSettingsException("The selected value '"
                         + value
@@ -165,34 +166,17 @@ public class ValueFilterQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getViewRepresentation().setDefaultValues(getConfig().getDefaultValues());
-        getViewRepresentation().setLockColumn(getConfig().getLockColumn());
-        getViewRepresentation().setType(getConfig().getType());
-        getViewRepresentation().setPossibleValues(getConfig().getPossibleValues());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setColumn(getViewValue().getColumn());
-        getConfig().setValues(getViewValue().getValues());
+        getConfig().getDefaultValue().setColumn(getViewValue().getColumn());
+        getConfig().getDefaultValue().setValues(getViewValue().getValues());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultColumn(getConfig().getDefaultColumn());
-        getDialogRepresentation().setDefaultValues(getConfig().getDefaultValues());
-        getDialogRepresentation().setLockColumn(getConfig().getLockColumn());
-        getDialogRepresentation().setType(getConfig().getType());
+    public ValueFilterQuickFormConfig createEmptyConfig() {
+        return new ValueFilterQuickFormConfig();
     }
 
 }

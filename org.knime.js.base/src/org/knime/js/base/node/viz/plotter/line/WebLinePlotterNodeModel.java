@@ -202,4 +202,13 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
         // TODO Auto-generated method stub
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

@@ -63,12 +63,7 @@ org_knime_js_base_node_quickform_input_bool = function() {
 		qfdiv.append(representation.label + " ");
 		qfdiv.append(input);
 		input.attr("type", "checkbox");
-		var checked;
-		if (typeof value.boolean != undefined && value.boolean != null) {
-			checked = value.boolean;
-		} else {
-			checked = representation.defaultvalue;
-		}
+		var checked = value.boolean;
 		input.prop("checked", checked);
 		input.blur(callUpdate());
 		resizeParent();

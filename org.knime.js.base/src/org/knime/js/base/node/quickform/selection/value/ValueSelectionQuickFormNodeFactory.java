@@ -57,14 +57,12 @@ public class ValueSelectionQuickFormNodeFactory extends NodeFactory<ValueSelecti
         WizardNodeFactoryExtension<ValueSelectionQuickFormNodeModel, ValueSelectionQuickFormRepresentation,
         ValueSelectionQuickFormValue> {
 
-    private ValueSelectionQuickFormConfig m_config = new ValueSelectionQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ValueSelectionQuickFormNodeModel createNodeModel() {
-        return new ValueSelectionQuickFormNodeModel(m_config);
+        return new ValueSelectionQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class ValueSelectionQuickFormNodeFactory extends NodeFactory<ValueSelecti
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ValueSelectionQuickFormNodeDialog(m_config);
+        return new ValueSelectionQuickFormNodeDialog();
     }
 }

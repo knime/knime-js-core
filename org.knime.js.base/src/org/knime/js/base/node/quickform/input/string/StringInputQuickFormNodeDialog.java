@@ -67,16 +67,13 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JTextField m_defaultField;
 
-    private final JTextField m_valueField;
-
     private StringInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
-    StringInputQuickFormNodeDialog(final StringInputQuickFormConfig config) {
-        m_config = config;
+    StringInputQuickFormNodeDialog() {
+        m_config = new StringInputQuickFormConfig();
         m_regexField = new RegexPanel();
         m_defaultField = new JTextField(DEF_TEXTFIELD_WIDTH);
-        m_valueField = new JTextField(DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -90,7 +87,6 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Common Regular Expressions: ",
                 m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
-        addPairToPanel("String Value: ", m_valueField, panelWithGBLayout, gbc);
     }
 
     /**
@@ -103,8 +99,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         loadSettingsFrom(m_config);
         m_regexField.setRegex(m_config.getRegex());
         m_regexField.setErrorMessage(m_config.getErrorMessage());
-        m_defaultField.setText(m_config.getDefaultValue());
-        m_valueField.setText(m_config.getString());
+        m_defaultField.setText(m_config.getDefaultValue().getString());
     }
 
     /**
@@ -116,8 +111,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
         saveSettingsTo(m_config);
         m_config.setRegex(m_regexField.getRegex());
         m_config.setErrorMessage(m_regexField.getErrorMessage());
-        m_config.setDefaultValue(m_defaultField.getText());
-        m_config.setString(m_valueField.getText());
+        m_config.getDefaultValue().setString(m_defaultField.getText());
         m_config.saveSettings(settings);
     }
 

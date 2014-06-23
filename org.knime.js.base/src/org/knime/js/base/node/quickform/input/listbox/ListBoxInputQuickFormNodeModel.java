@@ -73,13 +73,13 @@ public class ListBoxInputQuickFormNodeModel
     /**
      * Creates a list box input node model.
      */
-    protected ListBoxInputQuickFormNodeModel(final ListBoxInputQuickFormConfig config) {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, config);
+    protected ListBoxInputQuickFormNodeModel() {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
     }
 
     private void createAndPushFlowVariable() {
         final String variableName = getConfig().getFlowVariableName();
-        final String value = isReexecute() ? getViewValue().getString() : getConfig().getString();
+        final String value = getRelevantValue().getString();
         pushFlowVariableString(variableName, value);
     }
 
@@ -89,7 +89,6 @@ public class ListBoxInputQuickFormNodeModel
         getValidatedValues();
         final String variableName = getConfig().getFlowVariableName();
         createAndPushFlowVariable();
-        copyConfigToDialog();
         return new PortObjectSpec[]{createSpec(variableName)};
     }
 
@@ -105,14 +104,13 @@ public class ListBoxInputQuickFormNodeModel
         }
         cont.close();
         createAndPushFlowVariable();
-        copyConfigToView();
-        setExecuted();
+        updateViewValue();
         return new PortObject[]{cont.getTable()};
     }
 
     private List<String> getValidatedValues() throws InvalidSettingsException {
         boolean omitEmpty = getConfig().getOmitEmpty();
-        final String value = isReexecute() ? getViewValue().getString() : getConfig().getString();
+        final String value = getRelevantValue().getString();
         String separator = getConfig().getSeparator();
         final ArrayList<String> values = new ArrayList<String>();
         if (separator == null || separator.isEmpty()) {
@@ -173,34 +171,16 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setRegex(getConfig().getRegex());
-        getViewRepresentation().setSeparator(getConfig().getSeparator());
-        getViewRepresentation().setOmitEmpty(getConfig().getOmitEmpty());
-        getViewRepresentation().setErrorMessage(getConfig().getErrorMessage());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setString(getViewValue().getString());
+        getConfig().getDefaultValue().setString(getViewValue().getString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setRegex(getConfig().getRegex());
-        getDialogRepresentation().setSeparator(getConfig().getSeparator());
-        getDialogRepresentation().setOmitEmpty(getConfig().getOmitEmpty());
-        getDialogRepresentation().setErrorMessage(getConfig().getErrorMessage());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public ListBoxInputQuickFormConfig createEmptyConfig() {
+        return new ListBoxInputQuickFormConfig();
     }
 
 }

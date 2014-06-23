@@ -57,14 +57,12 @@ public class DateInputQuickFormNodeFactory extends NodeFactory<DateInputQuickFor
         WizardNodeFactoryExtension<DateInputQuickFormNodeModel, DateInputQuickFormRepresentation,
         DateInputQuickFormValue> {
 
-    private DateInputQuickFormConfig m_config = new DateInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public DateInputQuickFormNodeModel createNodeModel() {
-        return new DateInputQuickFormNodeModel(m_config);
+        return new DateInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class DateInputQuickFormNodeFactory extends NodeFactory<DateInputQuickFor
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DateInputQuickFormNodeDialog(m_config);
+        return new DateInputQuickFormNodeDialog();
     }
 }

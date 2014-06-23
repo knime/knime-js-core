@@ -57,13 +57,6 @@ public class MoleculeStringInputQuickFormNodeModel
         MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormConfig> {
 
     /**
-     * @param config
-     */
-    protected MoleculeStringInputQuickFormNodeModel(final MoleculeStringInputQuickFormConfig config) {
-        super(config);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -92,12 +85,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        String string;
-        if (isReexecute()) {
-            string = getViewValue().getMoleculeString();
-        } else {
-            string = getConfig().getMoleculeString();
-        }
+        String string = getRelevantValue().getMoleculeString();
         if (string == null) {
             string = "";
         }
@@ -109,28 +97,16 @@ public class MoleculeStringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setFormat(getConfig().getFormat());
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setMoleculeString(getViewValue().getMoleculeString());
+        getConfig().getDefaultValue().setMoleculeString(getViewValue().getMoleculeString());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setFormat(getConfig().getFormat());
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
+    public MoleculeStringInputQuickFormConfig createEmptyConfig() {
+        return new MoleculeStringInputQuickFormConfig();
     }
 
 }

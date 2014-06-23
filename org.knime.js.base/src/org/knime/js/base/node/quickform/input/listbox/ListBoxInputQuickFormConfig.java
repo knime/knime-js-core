@@ -57,7 +57,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<ListBoxInputQuickFormValue> {
 
     private static final String CFG_REGEX = "regex";
     private static final String DEFAULT_REGEX = "";
@@ -68,14 +68,9 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String CFG_SEPARATOR = "separator";
     private static final String DEFAULT_SEPARATOR = "\\n";
     private String m_separator = DEFAULT_SEPARATOR;
-    private static final String CFG_DEFAULT = "default";
-    private String m_defaultValue;
     private static final String CFG_OMIT_EMPTY = "omit_empty";
     private static final boolean DEFAULT_OMIT_EMPTY = true;
     private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
-    private static final String CFG_STRING = "string";
-    private static final String DEFAULT_STRING = "";
-    private String m_string = DEFAULT_STRING;
 
     String getRegex() {
         return m_regex;
@@ -101,28 +96,12 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_separator = separator;
     }
 
-    String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
     boolean getOmitEmpty() {
         return m_omitEmpty;
     }
 
     void setOmitEmpty(final boolean omitEmpty) {
         m_omitEmpty = omitEmpty;
-    }
-
-    String getString() {
-        return m_string;
-    }
-
-    void setString(final String string) {
-        m_string = string;
     }
 
     /**
@@ -164,9 +143,7 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
         settings.addString(CFG_REGEX, m_regex);
         settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
         settings.addString(CFG_SEPARATOR, m_separator);
-        settings.addString(CFG_DEFAULT, m_defaultValue);
         settings.addBoolean(CFG_OMIT_EMPTY, m_omitEmpty);
-        settings.addString(CFG_STRING, m_string);
     }
 
     @Override
@@ -175,9 +152,7 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_regex = settings.getString(CFG_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
         m_separator = settings.getString(CFG_SEPARATOR);
-        m_defaultValue = settings.getString(CFG_DEFAULT);
         m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
-        m_string = settings.getString(CFG_STRING);
     }
 
     @Override
@@ -186,9 +161,15 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
         m_separator = settings.getString(CFG_SEPARATOR, DEFAULT_SEPARATOR);
-        m_defaultValue = settings.getString(CFG_DEFAULT, DEFAULT_STRING);
         m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY, DEFAULT_OMIT_EMPTY);
-        m_string = settings.getString(CFG_STRING, DEFAULT_STRING);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected ListBoxInputQuickFormValue createEmptyValue() {
+        return new ListBoxInputQuickFormValue();
     }
 
 }

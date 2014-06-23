@@ -73,4 +73,13 @@ public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewReprese
         return "knime_table_viewer";
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

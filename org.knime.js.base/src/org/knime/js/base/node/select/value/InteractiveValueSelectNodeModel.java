@@ -261,4 +261,13 @@ public class InteractiveValueSelectNodeModel extends NodeModel implements Wizard
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

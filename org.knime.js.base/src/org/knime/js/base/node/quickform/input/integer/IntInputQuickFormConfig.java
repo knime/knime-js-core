@@ -57,7 +57,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig<IntInputQuickFormValue> {
 
     private static final String CFG_USE_MIN = "use_min";
     private static final boolean DEFAULT_USE_MIN = false;
@@ -71,11 +71,6 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
     private static final String CFG_MAX = "max";
     private static final int DEFAULT_MAX = 100;
     private int m_max = DEFAULT_MAX;
-    private static final String CFG_DEFAULT = "default";
-    private static final int DEFAULT_INTEGER = 0;
-    private int m_defaultValue = DEFAULT_INTEGER;
-    private static final String CFG_INTEGER = "integer";
-    private int m_integer = DEFAULT_INTEGER;
 
     boolean getUseMin() {
         return m_useMin;
@@ -109,22 +104,6 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_max = max;
     }
 
-    int getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final int defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    int getInteger() {
-        return m_integer;
-    }
-
-    void setInteger(final int integer) {
-        m_integer = integer;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -132,8 +111,6 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
         settings.addBoolean(CFG_USE_MAX, m_useMax);
         settings.addInt(CFG_MIN, m_min);
         settings.addInt(CFG_MAX, m_max);
-        settings.addInt(CFG_DEFAULT, m_defaultValue);
-        settings.addInt(CFG_INTEGER, m_integer);
     }
 
     @Override
@@ -143,8 +120,6 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_useMax = settings.getBoolean(CFG_USE_MAX);
         m_min = settings.getInt(CFG_MIN);
         m_max = settings.getInt(CFG_MAX);
-        m_defaultValue = settings.getInt(CFG_DEFAULT);
-        m_integer = settings.getInt(CFG_INTEGER);
     }
 
     @Override
@@ -154,8 +129,14 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig {
         m_useMax = settings.getBoolean(CFG_USE_MAX, DEFAULT_USE_MAX);
         m_min = settings.getInt(CFG_MIN, DEFAULT_MIN);
         m_max = settings.getInt(CFG_MAX, DEFAULT_MAX);
-        m_defaultValue = settings.getInt(CFG_DEFAULT, DEFAULT_INTEGER);
-        m_integer = settings.getInt(CFG_INTEGER, DEFAULT_INTEGER);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected IntInputQuickFormValue createEmptyValue() {
+        return new IntInputQuickFormValue();
     }
 
 }

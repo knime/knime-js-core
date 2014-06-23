@@ -72,18 +72,15 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
 
     private final JTextArea m_defaultArea;
 
-    private final JTextArea m_valueArea;
-
     private MoleculeStringInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
     @SuppressWarnings("unchecked")
-    MoleculeStringInputQuickFormNodeDialog(final MoleculeStringInputQuickFormConfig config) {
-        m_config = config;
+    MoleculeStringInputQuickFormNodeDialog() {
+        m_config = new MoleculeStringInputQuickFormConfig();
         m_formatBox = new JComboBox(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
-        m_valueArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -94,7 +91,6 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Format: ", m_formatBox, panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
-        addPairToPanel("Molecule String: ", new JScrollPane(m_valueArea), panelWithGBLayout, gbc);
     }
 
     /**
@@ -104,9 +100,8 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
-        m_defaultArea.setText(m_config.getDefaultValue());
+        m_defaultArea.setText(m_config.getDefaultValue().getMoleculeString());
         m_formatBox.setSelectedItem(m_config.getFormat());
-        m_valueArea.setText(m_config.getMoleculeString());
     }
 
     /**
@@ -116,8 +111,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
         m_config.setFormat(m_formatBox.getSelectedItem().toString());
-        m_config.setDefaultValue(m_defaultArea.getText());
-        m_config.setMoleculeString(m_valueArea.getText());
+        m_config.getDefaultValue().setMoleculeString(m_defaultArea.getText());
         m_config.saveSettings(settings);
     }
 

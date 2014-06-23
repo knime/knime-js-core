@@ -57,14 +57,12 @@ public class DoubleInputQuickFormNodeFactory extends NodeFactory<DoubleInputQuic
         WizardNodeFactoryExtension<DoubleInputQuickFormNodeModel, DoubleInputQuickFormRepresentation,
         DoubleInputQuickFormValue> {
 
-    DoubleInputQuickFormConfig m_config = new DoubleInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public DoubleInputQuickFormNodeModel createNodeModel() {
-        return new DoubleInputQuickFormNodeModel(m_config);
+        return new DoubleInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class DoubleInputQuickFormNodeFactory extends NodeFactory<DoubleInputQuic
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new DoubleInputQuickFormNodeDialog(m_config);
+        return new DoubleInputQuickFormNodeDialog();
     }
 }

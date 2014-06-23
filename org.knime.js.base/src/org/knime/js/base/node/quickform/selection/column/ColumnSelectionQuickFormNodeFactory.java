@@ -57,14 +57,12 @@ public class ColumnSelectionQuickFormNodeFactory extends NodeFactory<ColumnSelec
         WizardNodeFactoryExtension<ColumnSelectionQuickFormNodeModel, ColumnSelectionQuickFormRepresentation,
         ColumnSelectionQuickFormValue> {
 
-    private ColumnSelectionQuickFormConfig m_config = new ColumnSelectionQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ColumnSelectionQuickFormNodeModel createNodeModel() {
-        return new ColumnSelectionQuickFormNodeModel(m_config);
+        return new ColumnSelectionQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class ColumnSelectionQuickFormNodeFactory extends NodeFactory<ColumnSelec
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ColumnSelectionQuickFormNodeDialog(m_config);
+        return new ColumnSelectionQuickFormNodeDialog();
     }
 }

@@ -64,12 +64,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 		injectCSS('.ui-widget {font-family: inherit; font-size: 1.0em;}');
 		viewValue = value;
 		viewRepresentation = representation;
-		var dateValue;
-		if (typeof value.date != undefined && value.date != null) {
-			dateValue = value.date;
-		} else {
-			dateValue = representation.defaultvalue;
-		}
+		var dateValue = value.date;
 		date = new Date(dateValue);
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;

@@ -57,14 +57,12 @@ public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQu
         WizardNodeFactoryExtension<ListBoxInputQuickFormNodeModel, ListBoxInputQuickFormRepresentation,
         ListBoxInputQuickFormValue> {
 
-    private ListBoxInputQuickFormConfig m_config = new ListBoxInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ListBoxInputQuickFormNodeModel createNodeModel() {
-        return new ListBoxInputQuickFormNodeModel(m_config);
+        return new ListBoxInputQuickFormNodeModel();
     }
 
     /**
@@ -97,6 +95,6 @@ public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQu
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ListBoxInputQuickFormNodeDialog(m_config);
+        return new ListBoxInputQuickFormNodeDialog();
     }
 }

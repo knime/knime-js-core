@@ -55,13 +55,6 @@ public class SingleSelectionQuickFormNodeModel
         QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue, SingleSelectionQuickFormConfig> {
 
     /**
-     * @param config
-     */
-    protected SingleSelectionQuickFormNodeModel(final SingleSelectionQuickFormConfig config) {
-        super(config);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -74,7 +67,7 @@ public class SingleSelectionQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
-        String value = isReexecute() ? getViewValue().getVariableValue() : getConfig().getVariableValue();
+        String value = getRelevantValue().getVariableValue();
         pushFlowVariableString(getConfig().getFlowVariableName(), value);
     }
 
@@ -98,30 +91,16 @@ public class SingleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToView() {
-        super.copyConfigToView();
-        getViewRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getViewRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
-        getViewRepresentation().setType(getConfig().getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void copyValueToConfig() {
-        getConfig().setVariableValue(getViewValue().getVariableValue());
+        getConfig().getDefaultValue().setVariableValue(getViewValue().getVariableValue());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void copyConfigToDialog() {
-        super.copyConfigToDialog();
-        getDialogRepresentation().setDefaultValue(getConfig().getDefaultValue());
-        getDialogRepresentation().setPossibleChoices(getConfig().getPossibleChoices());
-        getDialogRepresentation().setType(getConfig().getType());
+    public SingleSelectionQuickFormConfig createEmptyConfig() {
+        return new SingleSelectionQuickFormConfig();
     }
 
 }

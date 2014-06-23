@@ -58,14 +58,12 @@ public class MoleculeStringInputQuickFormNodeFactory extends NodeFactory<Molecul
         WizardNodeFactoryExtension<MoleculeStringInputQuickFormNodeModel,
         MoleculeStringInputQuickFormRepresentation, MoleculeStringInputQuickFormValue> {
 
-    private MoleculeStringInputQuickFormConfig m_config = new MoleculeStringInputQuickFormConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public MoleculeStringInputQuickFormNodeModel createNodeModel() {
-        return new MoleculeStringInputQuickFormNodeModel(m_config);
+        return new MoleculeStringInputQuickFormNodeModel();
     }
 
     /**
@@ -98,6 +96,6 @@ public class MoleculeStringInputQuickFormNodeFactory extends NodeFactory<Molecul
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new MoleculeStringInputQuickFormNodeDialog(m_config);
+        return new MoleculeStringInputQuickFormNodeDialog();
     }
 }

@@ -57,16 +57,11 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
  *
  * @author winter
  */
-public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableConfig {
+public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableConfig<MoleculeStringInputQuickFormValue> {
 
     private static final String CFG_FORMAT = "format";
     private static final String DEFAULT_FORMAT = MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS[0];
     private String m_format = DEFAULT_FORMAT;
-    private static final String CFG_DEFAULT = "default";
-    private String m_defaultValue = "";
-    private static final String CFG_STRING = "moleculeString";
-    private static final String DEFAULT_STRING = "";
-    private String m_moleculeString = DEFAULT_STRING;
 
     String getFormat() {
         return m_format;
@@ -76,44 +71,30 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
         m_format = format;
     }
 
-    String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    String getMoleculeString() {
-        return m_moleculeString;
-    }
-
-    void setMoleculeString(final String moleculeString) {
-        m_moleculeString = moleculeString;
-    }
-
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
         settings.addString(CFG_FORMAT, m_format);
-        settings.addString(CFG_DEFAULT, m_defaultValue);
-        settings.addString(CFG_STRING, m_moleculeString);
     }
 
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
         m_format = settings.getString(CFG_FORMAT);
-        m_defaultValue = settings.getString(CFG_DEFAULT);
-        m_moleculeString = settings.getString(CFG_STRING);
     }
 
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
         m_format = settings.getString(CFG_FORMAT, DEFAULT_FORMAT);
-        m_defaultValue = settings.getString(CFG_DEFAULT, DEFAULT_STRING);
-        m_moleculeString = settings.getString(CFG_STRING, DEFAULT_STRING);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MoleculeStringInputQuickFormValue createEmptyValue() {
+        return new MoleculeStringInputQuickFormValue();
     }
 
 }

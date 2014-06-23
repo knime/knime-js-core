@@ -72,12 +72,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		input.attr('rows', '5');
 		input.attr('cols', '20');
 		input.attr("pattern", representation.regex);
-		var stringValue;
-		if (typeof value.string != undefined && value.string != null) {
-			stringValue = value.string;
-		} else {
-			stringValue = representation.defaultvalue;
-		}
+		var stringValue = value.string;
 		input.val(stringValue);
 		qfdiv.append($('<br>'));
 		errorMessageLine1 = $('<span>');

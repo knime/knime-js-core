@@ -51,12 +51,13 @@ package org.knime.js.base.node.quickform;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  *
  * @author winter
  */
-public class QuickFormFlowVariableConfig extends QuickFormConfig {
+public abstract class QuickFormFlowVariableConfig<VAL extends DialogNodeValue> extends QuickFormConfig<VAL> {
 
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 

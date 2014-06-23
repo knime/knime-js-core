@@ -51,21 +51,30 @@ package org.knime.js.base.node.quickform;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
  *
  * @author winter
  */
-public class QuickFormConfig {
+public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
 
     private static final String CFG_LABEL = "label";
     private static final String CFG_DESCRIPTION = "description";
+    private static final String CFG_HIDE_IN_WIZARD = "hideInWizard";
+    private static final String CFG_HIDE_IN_DIALOG = "hideInDialog";
+    private static final String CFG_DEFAULT_VALUE = "defaultVale";
 
     private static final String DEFAULT_LABEL = "Label";
     private static final String DEFAULT_DESCRIPTION = "Enter Description";
+    private static final boolean DEFAULT_HIDE_IN_WIZARD = false;
+    private static final boolean DEFAULT_HIDE_IN_DIALOG = false;
 
     private String m_label = DEFAULT_LABEL;
     private String m_description = DEFAULT_DESCRIPTION;
+    private boolean m_hideInWizard = DEFAULT_HIDE_IN_WIZARD;
+    private boolean m_hideInDialog = DEFAULT_HIDE_IN_DIALOG;
+    private VAL m_defaultValue = createEmptyValue();
 
     public String getLabel() {
         return m_label;
@@ -83,19 +92,60 @@ public class QuickFormConfig {
         this.m_description = description;
     }
 
+    public boolean getHideInWizard() {
+        return m_hideInWizard;
+    }
+
+    public void setHideInWizard(final boolean hideInWizard) {
+        m_hideInWizard = hideInWizard;
+    }
+
+    public boolean getHideInDialog() {
+        return m_hideInDialog;
+    }
+
+    public void setHideInDialog(final boolean hideInDialog) {
+        m_hideInDialog = hideInDialog;
+    }
+
     public void saveSettings(final NodeSettingsWO settings) {
+        NodeSettingsWO defaultValueSettings = settings.addNodeSettings(CFG_DEFAULT_VALUE);
+        m_defaultValue.saveToNodeSettings(defaultValueSettings);
         settings.addString(CFG_LABEL, m_label);
         settings.addString(CFG_DESCRIPTION, m_description);
+        settings.addBoolean(CFG_HIDE_IN_WIZARD, m_hideInWizard);
+        settings.addBoolean(CFG_HIDE_IN_DIALOG, m_hideInDialog);
     }
 
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        NodeSettingsRO defaultValueSettings = settings.getNodeSettings(CFG_DEFAULT_VALUE);
+        m_defaultValue = createEmptyValue();
+        m_defaultValue.loadFromNodeSettings(defaultValueSettings);
         m_label = settings.getString(CFG_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION);
+        m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD);
+        m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG);
     }
 
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
+        m_defaultValue = createEmptyValue();
+        NodeSettingsRO defaultValueSettings;
+        try {
+            defaultValueSettings = settings.getNodeSettings(CFG_DEFAULT_VALUE);
+            m_defaultValue.loadFromNodeSettingsInDialog(defaultValueSettings);
+        } catch (InvalidSettingsException e) {
+            // Stay with defaults
+        }
         m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
+        m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD, DEFAULT_HIDE_IN_WIZARD);
+        m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG, DEFAULT_HIDE_IN_DIALOG);
     }
+
+    public VAL getDefaultValue() {
+        return m_defaultValue;
+    }
+
+    protected abstract VAL createEmptyValue();
 
 }

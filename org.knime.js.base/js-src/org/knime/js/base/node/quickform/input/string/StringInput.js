@@ -62,12 +62,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		input = $('<input>');
 		input.attr("type", "text");
 		input.attr("pattern", representation.regex);
-		var stringValue;
-		if (typeof value.string != undefined && value.string != null) {
-			stringValue = value.string;
-		} else {
-			stringValue = representation.defaultvalue;
-		}
+		var stringValue = value.string;
 		input.val(stringValue);
 		qfdiv.attr("title", representation.description);
 		qfdiv.append(representation.label + " ");

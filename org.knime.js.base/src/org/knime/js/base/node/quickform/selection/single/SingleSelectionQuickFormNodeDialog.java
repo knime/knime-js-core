@@ -73,8 +73,6 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
 
     private final JList m_defaultField;
 
-    private final JList m_valueField;
-
     private final JTextArea m_possibleChoicesField;
 
     private final JComboBox m_type;
@@ -84,12 +82,10 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     /**
      * Constructors, inits fields calls layout routines.
      */
-    SingleSelectionQuickFormNodeDialog(final SingleSelectionQuickFormConfig config) {
-        m_config = config;
+    SingleSelectionQuickFormNodeDialog() {
+        m_config = new SingleSelectionQuickFormConfig();
         m_defaultField = new JList();
         m_defaultField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        m_valueField = new JList();
-        m_valueField.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_possibleChoicesField = new JTextArea();
         m_possibleChoicesField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -125,9 +121,6 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         JScrollPane defaultPane = new JScrollPane(m_defaultField);
         defaultPane.setPreferredSize(prefSize);
         addPairToPanel("Default Variable Value: ", defaultPane, panelWithGBLayout, gbc2);
-        JScrollPane valuePane = new JScrollPane(m_valueField);
-        valuePane.setPreferredSize(prefSize);
-        addPairToPanel("Variable Value: ", valuePane, panelWithGBLayout, gbc2);
     }
 
 
@@ -137,7 +130,6 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     private void refreshChoices() {
         refreshChoices(m_defaultField);
-        refreshChoices(m_valueField);
     }
 
     /**
@@ -165,8 +157,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         loadSettingsFrom(m_config);
         m_possibleChoicesField.setText(StringUtils.join(m_config.getPossibleChoices(), "\n"));
         m_type.setSelectedItem(m_config.getType());
-        m_defaultField.setSelectedValue(m_config.getDefaultValue(), true);
-        m_valueField.setSelectedValue(m_config.getVariableValue(), true);
+        m_defaultField.setSelectedValue(m_config.getDefaultValue().getVariableValue(), true);
     }
 
     /**
@@ -175,11 +166,10 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        m_config.setDefaultValue((String)m_defaultField.getSelectedValue());
+        m_config.getDefaultValue().setVariableValue((String)m_defaultField.getSelectedValue());
         String possibleChoices = m_possibleChoicesField.getText();
         m_config.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
         m_config.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));
-        m_config.setVariableValue((String)m_valueField.getSelectedValue());
         m_config.saveSettings(settings);
     }
 

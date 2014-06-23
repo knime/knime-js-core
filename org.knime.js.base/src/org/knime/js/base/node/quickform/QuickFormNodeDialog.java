@@ -85,6 +85,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
 
     private final JCheckBox m_hideInWizard;
 
+    private final JCheckBox m_hideInDialog;
+
     /**
      * Inits fields, sub-classes should call the {@link #createAndAddTab()}
      * method when they are done initializing their fields.
@@ -98,6 +100,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         m_variableNameField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_hideInWizard = new JCheckBox((Icon)null, false);
         m_hideInWizard.setToolTipText("If selected, this QuickForm elements is not visible in the wizard.");
+        m_hideInDialog = new JCheckBox((Icon)null, false);
+        m_hideInDialog.setToolTipText("If selected, this QuickForm elements is not visible in the dialog.");
     }
 
     /**
@@ -125,6 +129,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         gbc.fill = GridBagConstraints.NONE;
         gbc.weighty = 0;
         addPairToPanel("Hide in Wizard: ", m_hideInWizard, panel, gbc);
+
+        addPairToPanel("Hide in Dialog: ", m_hideInDialog, panel, gbc);
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         addPairToPanel("Variable Name: ", m_variableNameField, panel, gbc);
@@ -205,6 +211,22 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         return m_variableNameField.getText();
     }
 
+    protected boolean getHideInWizard() {
+        return m_hideInWizard.isSelected();
+    }
+
+    protected void setHideInWizard(final boolean hideInWizard) {
+        m_hideInWizard.setSelected(hideInWizard);
+    }
+
+    protected boolean getHideInDialog() {
+        return m_hideInDialog.isSelected();
+    }
+
+    protected void setHideInDialog(final boolean hideInDialog) {
+        m_hideInDialog.setSelected(hideInDialog);
+    }
+
     /**
      * @param flowVariableName The flow variable name
      */
@@ -217,6 +239,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         setLabel(config.getLabel());
         setDescription(config.getDescription());
         setFlowVariableName(config.getFlowVariableName());
+        setHideInWizard(config.getHideInWizard());
+        setHideInDialog(config.getHideInDialog());
     }
 
     /**
@@ -227,6 +251,8 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         config.setLabel(getLabel());
         config.setDescription(getDescription());
         config.setFlowVariableName(getFlowVariableName());
+        config.setHideInWizard(getHideInWizard());
+        config.setHideInDialog(getHideInDialog());
     }
 
     /** {@inheritDoc} */

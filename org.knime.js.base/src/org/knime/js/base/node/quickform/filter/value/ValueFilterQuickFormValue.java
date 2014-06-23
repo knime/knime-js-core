@@ -70,13 +70,13 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
 
     private static final String DEFAULT_COLUMN = "";
 
-    private String m_column = null;
+    private String m_column = DEFAULT_COLUMN;
 
     private static final String CFG_VALUES = "values";
 
     private static final String[] DEFAULT_VALUES = new String[0];
 
-    private String[] m_values = null;
+    private String[] m_values = DEFAULT_VALUES;
 
     /**
      * {@inheritDoc}
@@ -149,6 +149,5 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
-
     }
 }

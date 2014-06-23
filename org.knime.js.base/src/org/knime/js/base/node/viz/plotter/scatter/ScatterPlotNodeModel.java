@@ -414,4 +414,13 @@ public class ScatterPlotNodeModel extends NodeModel implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }
