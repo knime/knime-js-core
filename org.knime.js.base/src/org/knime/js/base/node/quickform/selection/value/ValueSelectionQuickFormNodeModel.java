@@ -171,6 +171,7 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
         representation.setDefaultValue(getConfig().getDefaultValue().getValue());
         representation.setLockColumn(getConfig().getLockColumn());
         representation.setType(getConfig().getType());
+        representation.setPossibleValues(getConfig().getPossibleValues());
         return representation;
     }
 

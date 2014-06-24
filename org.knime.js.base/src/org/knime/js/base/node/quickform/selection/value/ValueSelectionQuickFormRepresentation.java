@@ -70,14 +70,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ValueSelectionQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ValueSelectionQuickFormValue> {
-    
+
     private static final String CFG_COLUMN_TYPE = "columnType";
 
     private static final ColumnType DEFAULT_COLUMN_TYPE = ColumnType.All;
@@ -97,13 +97,13 @@ public class ValueSelectionQuickFormRepresentation extends
     private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
 
     private static final String CFG_DEFAULT_VALUE = "default";
-    
+
     private static final String DEFAULT_DEFAULT_VALUE = "";
-    
+
     private String m_defaultValue = DEFAULT_DEFAULT_VALUE;
-    
+
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-    
+
     private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
 
     private static final String CFG_TYPE = "type";
@@ -111,7 +111,7 @@ public class ValueSelectionQuickFormRepresentation extends
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
 
     private String m_type = DEFAULT_TYPE;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -130,7 +130,7 @@ public class ValueSelectionQuickFormRepresentation extends
         }
         setType(settings.getString(CFG_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -149,7 +149,7 @@ public class ValueSelectionQuickFormRepresentation extends
         }
         setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -187,7 +187,7 @@ public class ValueSelectionQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final ValueSelectionQuickFormValue value) {
-        value.setValue(m_defaultValue);        
+        value.setValue(m_defaultValue);
     }
 
     /**
@@ -260,6 +260,11 @@ public class ValueSelectionQuickFormRepresentation extends
     @JsonProperty("possibleColumns")
     public String[] getPossibleColumns() {
         return m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]);
+    }
+
+    @JsonIgnore
+    public void setPossibleValues(final Map<String, List<String>> possibleValues) {
+        m_possibleValues = possibleValues;
     }
 
     /**
