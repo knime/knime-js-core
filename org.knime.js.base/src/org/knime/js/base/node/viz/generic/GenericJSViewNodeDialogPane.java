@@ -60,7 +60,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -104,7 +103,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private final GenericJSViewConfig m_config;
     private BiMap<String, String> m_availableLibraries;
 
-    private final JTextField m_viewName;
+    //private final JTextField m_viewName;
     private final JList m_flowVarList;
     private final JTable m_dependenciesTable;
     private final JSSnippetTextArea m_jsTextArea;
@@ -115,7 +114,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
      */
     public GenericJSViewNodeDialogPane(final GenericJSViewConfig config) {
         m_config = config;
-        m_viewName = new JTextField(20);
+        //m_viewName = new JTextField(20);
         m_flowVarList = new JList(new DefaultListModel());
         m_flowVarList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_flowVarList.setCellRenderer(new FlowVariableListCellRenderer());
@@ -181,7 +180,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
      */
     private JPanel initLayout() {
         JPanel p = new JPanel(new BorderLayout());
-        p.add(m_viewName, BorderLayout.NORTH);
+        //p.add(m_viewName, BorderLayout.NORTH);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(m_flowVarList, BorderLayout.NORTH);
@@ -228,7 +227,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
                 }
             }
         }
-        m_viewName.setText(m_config.getViewName());
+        //m_viewName.setText(m_config.getViewName());
         m_jsTextArea.setText(m_config.getJsCode());
         m_cssTextArea.setText(m_config.getCssCode());
     }
@@ -286,7 +285,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
                 dependencies.add(m_availableLibraries.inverse().get(libDisplay));
             }
         }
-        m_config.setViewName(m_viewName.getText());
+        //m_config.setViewName(m_viewName.getText());
         m_config.setJsCode(m_jsTextArea.getText());
         m_config.setCssCode(m_cssTextArea.getText());
         m_config.setDependencies(dependencies.toArray(new String[0]));

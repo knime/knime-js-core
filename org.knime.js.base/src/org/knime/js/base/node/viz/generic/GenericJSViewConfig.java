@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   06.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -52,84 +52,84 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class GenericJSViewConfig {
-    
+
     private static final String JS_CODE = "jsCode";
     private static final String CSS_CODE = "cssCode";
     private static final String DEPENDENCIES = "dependencies";
-    private static final String VIEW_NAME = "viewName";
-    
+    //private static final String VIEW_NAME = "viewName";
+
     private String m_jsCode;
     private String m_cssCode;
     private String[] m_dependencies;
-    private String m_viewName;
-    
+    //private String m_viewName;
+
     /**
-     * 
+     *
      */
     public GenericJSViewConfig() {
         m_dependencies = new String[0];
     }
-    
+
     /**
      * @return the jsCode
      */
     public String getJsCode() {
         return m_jsCode;
     }
-    
+
     /**
      * @param jsCode the jsCode to set
      */
     public void setJsCode(final String jsCode) {
         m_jsCode = jsCode;
     }
-    
+
     /**
      * @return the cssCode
      */
     public String getCssCode() {
         return m_cssCode;
     }
-    
+
     /**
      * @param cssCode the cssCode to set
      */
     public void setCssCode(final String cssCode) {
         m_cssCode = cssCode;
     }
-    
+
     /**
      * @return the dependencies
      */
     public String[] getDependencies() {
         return m_dependencies;
     }
-    
+
     /**
      * @param dependencies the dependencies to set
      */
     public void setDependencies(final String[] dependencies) {
         m_dependencies = dependencies;
     }
-    
+
     /**
      * @return the viewName
      */
-    public String getViewName() {
+    /*public String getViewName() {
         return m_viewName;
-    }
-    
+    }*/
+
     /**
      * @param viewName the viewName to set
      */
-    public void setViewName(final String viewName) {
+    /*public void setViewName(final String viewName) {
         m_viewName = viewName;
-    }
-    
+    }*/
+
     /** Saves current parameters to settings object.
      * @param settings To save to.
      */
@@ -137,9 +137,9 @@ public class GenericJSViewConfig {
         settings.addString(JS_CODE, m_jsCode);
         settings.addString(CSS_CODE, m_cssCode);
         settings.addStringArray(DEPENDENCIES, m_dependencies);
-        settings.addString(VIEW_NAME, m_viewName);
+        //settings.addString(VIEW_NAME, m_viewName);
     }
-    
+
     /** Loads parameters in NodeModel.
      * @param settings To load from.
      * @throws InvalidSettingsException If incomplete or wrong.
@@ -148,9 +148,9 @@ public class GenericJSViewConfig {
         m_jsCode = settings.getString(JS_CODE);
         m_cssCode = settings.getString(CSS_CODE);
         m_dependencies = settings.getStringArray(DEPENDENCIES);
-        m_viewName = settings.getString(VIEW_NAME);
+        //m_viewName = settings.getString(VIEW_NAME);
     }
-    
+
     /** Loads parameters in Dialog.
      * @param settings To load from.
      */
@@ -158,6 +158,6 @@ public class GenericJSViewConfig {
         m_jsCode = settings.getString(JS_CODE, "");
         m_cssCode = settings.getString(CSS_CODE, "");
         m_dependencies = settings.getStringArray(DEPENDENCIES, new String[0]);
-        m_viewName = settings.getString(VIEW_NAME, "");
+        //m_viewName = settings.getString(VIEW_NAME, "");
     }
 }

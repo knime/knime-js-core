@@ -235,6 +235,9 @@
          <webDependency
                webResourceBundleID="KnimeTableView_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="jQueryNumberFormat_2.1.3">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"

@@ -20,6 +20,8 @@ knime_scatter_plot = function() {
 		_representation = representation;
 		_value = value;
 		try {
+			console.time("Parse and build 2DDataset");
+			console.time("Total init time");
 			_keyedDataset = new jsfc.KeyedValues2DDataset();
 			//_keyedDataset.load(_representation.keyedDataset);
 			//var seriesKey = _representation.keyedDataset.series[0].seriesKey;
@@ -47,11 +49,20 @@ knime_scatter_plot = function() {
 					_keyedDataset.setColumnProperty(columnKey, "symbols", symbols);
 				}
 			}
+			console.timeEnd("Parse and build 2DDataset");
+
+			d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
+			d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
+			var layoutContainer = "layoutContainer";
+			d3.select("body").attr("id", "body").append("div").attr("id", layoutContainer)
+				.style("width", "100%").style("height", "100%")
+				.style("min-width", minWidth + "px").style("min-height", (minHeight + getControlHeight()) + "px");
 			
-			drawChart();
+			drawChart(layoutContainer);
 			if (_representation.enableViewConfiguration) {
-				drawControls();
+				drawControls(layoutContainer);
 			}
+			console.timeEnd("Total init time");
 		} catch(err) {
 			if (err.stack) {
 				alert(err.stack);
@@ -65,11 +76,13 @@ knime_scatter_plot = function() {
 	};
 	
 	buildXYDataset = function() {
+		console.time("Building XYDataset");
 		var xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
+		console.timeEnd("Building XYDataset");
 		return xyDataset;
 	};
 	
-	drawChart = function() {
+	drawChart = function(layoutContainer) {
 		if (!_value.xColumn) {
 			alert("No column set for x axis!");
 			return;
@@ -82,11 +95,11 @@ knime_scatter_plot = function() {
 		var yAxisLabel = _value.yAxisLabel ? _value.yAxisLabel : _value.yColumn;
 		
 		var dataset = buildXYDataset();
-		//chart = jsfc.Charts.createScatterChart("Scatter Plot", "Subtitle", dataset, xAxisLabel, yAxisLabel);
-		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
-		d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
+
+		console.time("Building chart");
+		
 		var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
-		d3.select("body").attr("id", "body").append("div")
+		d3.select("#"+layoutContainer).append("div")
 			.attr("id", containerID)
 			.style("width", "100%")
 			.style("height", chartHeight)
@@ -99,6 +112,7 @@ knime_scatter_plot = function() {
 		//chart.build(container);
 				
 		var plot = new jsfc.XYPlot(dataset);
+		plot.setStaggerRendering(true);
         plot.getXAxis().setLabel(xAxisLabel);
         plot.getXAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //plot.getXAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
@@ -117,9 +131,12 @@ knime_scatter_plot = function() {
         var svg = document.getElementById("chart_svg");
         var zoomEnabled = _representation.enableZooming;
         var panEnabled = _representation.enablePanning;
-        chartManager = new jsfc.ChartManager(svg, chart, zoomEnabled, zoomEnabled, panEnabled);
+        chartManager = new jsfc.ChartManager(svg, chart, false, zoomEnabled, panEnabled);
         setChartDimensions();
-        chartManager.refreshDisplay();                
+        console.timeEnd("Building chart");
+        console.time("Refreshing Display");
+        chartManager.refreshDisplay();
+        console.timeEnd("Refreshing Display");
         var win = document.defaultView || document.parentWindow;
         win.onresize = resize;
 	};
@@ -173,16 +190,18 @@ knime_scatter_plot = function() {
 		chartManager.getChart().getPlot().getYAxis().setLabel(newAxisLabel);
 	};
 	
-	drawControls = function() {
+	drawControls = function(layoutContainer) {
 		
-	    var controlContainer = d3.select("body").insert("table", "#" + containerID + " ~ *")
+	    var controlContainer = d3.select("#"+layoutContainer).insert("table", "#" + containerID + " ~ *")
 	    	.attr("id", "scatterControls")
 	    	/*.style("width", "100%")*/
 	    	.style("padding", "10px")
 	    	.style("margin", "0 auto")
 	    	.style("box-sizing", "border-box")
 	    	.style("font-family", defaultFont)
-	    	.style("font-size", defaultFontSize+"px");
+	    	.style("font-size", defaultFontSize+"px")
+	    	.style("border-spacing", 0)
+	    	.style("border-collapse", "collapse");
 	    
 	    if (_representation.enableTitleChange || _representation.enableSubtitleChange) {
 	    	var titleEditContainer = controlContainer.append("tr");
@@ -326,6 +345,17 @@ knime_scatter_plot = function() {
 	    		.style("font-family", defaultFont)
 	    		.style("font-size", defaultFontSize+"px");
 	    }
+	};
+	
+	getControlHeight = function() {
+		var rows = 0;
+		var sizeFactor = 25;
+		var padding = 20;
+		if (_representation.enableTitleChange || _representation.enableSubtitleChange) rows++;
+		if (_representation.enableXColumnChange || _representation.enableYColumnChange) rows++;
+		if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) rows++;
+		if (_representation.enableDotSizeChange) rows++;
+		return rows * sizeFactor + padding;
 	};
 	
 	view.validate = function() {

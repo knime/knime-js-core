@@ -18,6 +18,8 @@ knime_table_view = function(table, containerElement) {
 	
 	var drawingStartTime = 0;
 	
+	var formatterForType = {};
+	
 	var additionalDrawFunctions = [];
 	
 	tableView.draw = function() {
@@ -108,10 +110,14 @@ knime_table_view = function(table, containerElement) {
 				var columnType = knimeTable.getColumnTypes()[j];
 				var cellContent = knimeTable.getRows()[i].data[j];
 				var tableData = $('<td>');
-				tableData.attr('class', 'knimeTableCell');
+				tableData.attr('class', 'knimeTableCell ' + columnType);
 				if (columnType === "boolean" || columnType === "number" || columnType === "string") {
-					tableData.text(cellContent);
-					/*knimeTable.getColumn(j)[i]);*/
+					var formatter = tableView.getFormatterForType(columnType);
+					var textContent = cellContent;
+					if (formatter) {
+						textContent = formatter.format(cellContent);
+					}
+					tableData.text(textContent);
 				} else if (columnType === "svg") {
 					tableData.append($.parseHTML(cellContent));
 				}
@@ -151,6 +157,21 @@ knime_table_view = function(table, containerElement) {
 		return showRowKeys;
 	};
 	
+	tableView.getFormatterForType = function(type) {
+		for (var i = 0; i < formatterForType.length; i++) {
+			var formatter = formatterForType[i];
+			if (formatter.type === type) {
+				return formatter;
+			}
+		}
+	};
+	
+	tableView.setNumberFormatter = function(decimal_places, decimal_separator, thousands_separator) {
+		formatterForType.push({type: "number", format: function(value) {
+			return $.number(value, decimal_places, decimal_separator, thousands_separator);
+		}});
+	};
+		
 	tableView.setSortable = function(isSortable, redraw) {
 		sortable = isSortable;
 		redraw && tableView.redraw();

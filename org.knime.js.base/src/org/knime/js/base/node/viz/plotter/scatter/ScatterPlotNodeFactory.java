@@ -62,14 +62,12 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> implements
     WizardNodeFactoryExtension<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue> {
 
-    private final ScatterPlotViewConfig m_config = new ScatterPlotViewConfig();
-
     /**
      * {@inheritDoc}
      */
     @Override
     public ScatterPlotNodeModel createNodeModel() {
-        return new ScatterPlotNodeModel(m_config);
+        return new ScatterPlotNodeModel(new ScatterPlotViewConfig());
     }
 
     /**
@@ -101,7 +99,7 @@ public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> im
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ScatterPlotNodeDialogPane(m_config);
+        return new ScatterPlotNodeDialogPane(new ScatterPlotViewConfig());
     }
 
 }

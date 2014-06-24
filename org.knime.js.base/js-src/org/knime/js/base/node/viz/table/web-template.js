@@ -13,6 +13,10 @@ knime_table_viewer = function() {
 				knimeTable.setDataTable(representation.table);
 				table_view = new knime_table_view(knimeTable, body);
 				table_view.setShowRowKeys(true);
+				if (representation.numberFormatter) {
+					var f = representation.numberFormatter;
+					table_view.setNumberFormatter(f.decimalPlaces, f.decimalSeparator, f.thousandsSeparator);
+				}
 				table_view.draw();
 			} catch (err) {
 				if (err.stack) {

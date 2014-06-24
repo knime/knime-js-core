@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -53,19 +53,18 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel> implements
     WizardNodeFactoryExtension<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue> {
-    
-    private final GenericJSViewConfig m_config = new GenericJSViewConfig();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public GenericJSViewNodeModel createNodeModel() {
-        return new GenericJSViewNodeModel(m_config);
+        return new GenericJSViewNodeModel(new GenericJSViewConfig());
     }
 
     /**
@@ -97,18 +96,18 @@ public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new GenericJSViewNodeDialogPane(m_config);
+        return new GenericJSViewNodeDialogPane(new GenericJSViewConfig());
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    @Override
+    /*@Override
     public String getInteractiveViewName() {
         String name = m_config.getViewName();
         if (name == null || name.isEmpty()) {
             return super.getInteractiveViewName();
         }
         return name;
-    }
+    }*/
 }
