@@ -47,7 +47,6 @@
 package org.knime.js.core.layout;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -66,10 +65,7 @@ public class JSONGridSizing {
     private int m_minWidth;
     private int m_maxWidth;
 
-    private int m_paddingLeft;
-    private int m_paddingRight;
-    private int m_paddingTop;
-    private int m_paddingBottom;
+    private String m_padding;
 
     /**
      * @return the height
@@ -144,76 +140,15 @@ public class JSONGridSizing {
         m_maxWidth = maxWidth;
     }
     /**
-     * @return the paddingLeft
+     * @return the padding
      */
-    public int getPaddingLeft() {
-        return m_paddingLeft;
+    public String getPadding() {
+        return m_padding;
     }
     /**
-     * @param paddingLeft the paddingLeft to set
+     * @param padding the padding to set
      */
-    public void setPaddingLeft(final int paddingLeft) {
-        m_paddingLeft = paddingLeft;
-    }
-    /**
-     * @return the paddingRight
-     */
-    public int getPaddingRight() {
-        return m_paddingRight;
-    }
-    /**
-     * @param paddingRight the paddingRight to set
-     */
-    public void setPaddingRight(final int paddingRight) {
-        m_paddingRight = paddingRight;
-    }
-    /**
-     * @return the paddingTop
-     */
-    public int getPaddingTop() {
-        return m_paddingTop;
-    }
-    /**
-     * @param paddingTop the paddingTop to set
-     */
-    public void setPaddingTop(final int paddingTop) {
-        m_paddingTop = paddingTop;
-    }
-    /**
-     * @return the paddingBottom
-     */
-    public int getPaddingBottom() {
-        return m_paddingBottom;
-    }
-    /**
-     * @param paddingBottom the paddingBottom to set
-     */
-    public void setPaddingBottom(final int paddingBottom) {
-        m_paddingBottom = paddingBottom;
-    }
-
-    /**
-     * @param top the top padding
-     * @param right the right padding
-     * @param bottom the bottom padding
-     * @param left the left padding
-     */
-    @JsonIgnore
-    public void setPadding(final int top, final int right, final int bottom, final int left) {
-        m_paddingTop = top;
-        m_paddingRight = right;
-        m_paddingBottom = bottom;
-        m_paddingLeft = left;
-    }
-
-    /**
-     * @param padding the padding on all sides
-     */
-    @JsonIgnore
-    public void setPadding(final int padding) {
-        m_paddingTop = padding;
-        m_paddingRight = padding;
-        m_paddingBottom = padding;
-        m_paddingLeft = padding;
+    public void setPadding(final String padding) {
+        m_padding = padding;
     }
 }

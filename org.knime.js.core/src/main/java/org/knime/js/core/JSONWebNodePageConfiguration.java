@@ -62,6 +62,18 @@ public class JSONWebNodePageConfiguration {
     private JSONPageLayout m_layout;
     private JSONBlackBoard m_blackBoard;
 
+    /** Serialization constructor. Don't use. */
+    public JSONWebNodePageConfiguration() { }
+
+    /**
+     * @param layout the layout
+     * @param blackBoard the blackboard
+     */
+    public JSONWebNodePageConfiguration(final JSONPageLayout layout, final JSONBlackBoard blackBoard) {
+        m_layout = layout;
+        m_blackBoard = blackBoard;
+    }
+
     /**
      * @return the blackBoard
      */
