@@ -648,6 +648,7 @@
             javascriptComponentID="org_knime_js_base_node_quickform_input_string"
             name="String Input Quickform"
             namespace="org_knime_js_base_node_quickform_input_string"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
@@ -675,6 +676,7 @@
             javascriptComponentID="org_knime_js_base_node_quickform_input_integer"
             name="Integer Input Quickform"
             namespace="org_knime_js_base_node_quickform_input_integer"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
@@ -684,6 +686,7 @@
             javascriptComponentID="org_knime_js_base_node_quickform_input_dbl"
             name="Double Input Quickform"
             namespace="org_knime_js_base_node_quickform_input_dbl"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
@@ -709,6 +712,7 @@
             javascriptComponentID="org_knime_js_base_node_quickform_input_listbox"
             name="Listbox Input Quickform"
             namespace="org_knime_js_base_node_quickform_input_listbox"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
