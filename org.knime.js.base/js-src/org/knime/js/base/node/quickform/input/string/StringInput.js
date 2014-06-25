@@ -86,9 +86,9 @@ org_knime_js_base_node_quickform_input_string = function() {
 		if (regex != null && regex.length > 0) {
 			var valid = matchExact(regex, input.val());
 			if (!valid) {
-				setValidationErrorMessage(viewRepresentation.errormessage.replace(new RegExp('?', 'g'), input.val()));
+				stringInput.setValidationErrorMessage(viewRepresentation.errormessage.split('?').join(input.val()));
 			} else {
-				setValidationErrorMessage(null);
+				stringInput.setValidationErrorMessage(null);
 			}
 			return valid;
 		} else {

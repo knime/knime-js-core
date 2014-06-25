@@ -94,19 +94,19 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		var max = viewRepresentation.max;
 		var value = input.val();
 		if (!$.isNumeric(value)) {
-			setValidationErrorMessage('The set value is not a double');
+			doubleInput.setValidationErrorMessage('The set value is not a double');
 			return false;
 		}
 		value = parseFloat(value);
 		if (viewRepresentation.usemin && value<min) {
 			valid = false;
-			setValidationErrorMessage("The set double " + value + " is smaller than the allowed minimum of " + min);
+			doubleInput.setValidationErrorMessage("The set double " + value + " is smaller than the allowed minimum of " + min);
 		} else if (viewRepresentation.usemax && value>max) {
 			valid = false;
-			setValidationErrorMessage("The set double " + value + " is bigger than the allowed maximum of " + max);
+			doubleInput.setValidationErrorMessage("The set double " + value + " is bigger than the allowed maximum of " + max);
 		} else {
 			valid = true;
-			setValidationErrorMessage(null);
+			doubleInput.setValidationErrorMessage(null);
 		}
 		return valid;
 	};

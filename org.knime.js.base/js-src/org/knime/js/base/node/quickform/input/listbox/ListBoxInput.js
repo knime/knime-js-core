@@ -83,8 +83,6 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		errorMessages.css('font-style', 'italic');
 		errorMessages.css('font-size', '75%');
 		qfdiv.append(errorMessageLine1);
-		qfdiv.append($('<br>'));
-		qfdiv.append(errorMessageLine2);
 		if (representation.separator==null || representation.separator.length==0) {
 			separator = null;
 		} else {
@@ -123,10 +121,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 				}
 			}
 			if (!valid) {
-				errorMessageLine1.text(viewRepresentation.errormessage.replace(new RegExp('?', 'g'), values[i]));
-				errorMessageLine1.css('display', 'inline');
+				listboxInput.setValidationErrorMessage(viewRepresentation.errormessage.split('?').join(values[i]));
 			} else {
-				errorMessageLine1.css('display', 'none');
+				listboxInput.setValidationErrorMessage(null)
 			}
 			return valid;
 		} else {
