@@ -92,24 +92,31 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		var max = viewRepresentation.max;
 		var value = input.val();
 		if (!isInteger(value)) {
-			errorMessage.text('The set value is not an integer');
-			errorMessage.css('display', 'inline');
+			setValidationErrorMessage('The set value is not an integer');
 			return false;
 		}
 		value = parseInt(value);
 		if (viewRepresentation.usemin && value<min) {
 			valid = false;
-			errorMessage.text("The set integer " + value + " is smaller than the allowed minimum of " + min);
-			errorMessage.css('display', 'inline');
+			setValidationErrorMessage("The set integer " + value + " is smaller than the allowed minimum of " + min);
 		} else if (viewRepresentation.usemax && value>max) {
 			valid = false;
-			errorMessage.text("The set integer " + value + " is bigger than the allowed maximum of " + max);
-			errorMessage.css('display', 'inline');
+			setValidationErrorMessage("The set integer " + value + " is bigger than the allowed maximum of " + max);
 		} else {
 			valid = true;
-			errorMessage.css('display', 'none');
+			setValidationErrorMessage(null);
 		}
 		return valid;
+	};
+	
+	integerInput.setValidationErrorMessage = function(message) {
+		if (message != null) {
+			errorMessage.text(message);
+			errorMessage.css('display', 'inline');
+		} else {
+			errorMessage.text('');
+			errorMessage.css('display', 'none');
+		}
 	};
 
 	integerInput.value = function() {

@@ -53,8 +53,10 @@ org_knime_js_base_node_quickform_input_string = function() {
 	var viewValue;
 	var input;
 	var errorMessage;
+	var viewRepresentation;
 
 	stringInput.init = function(representation, value) {
+		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
@@ -68,7 +70,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		qfdiv.append(representation.label + " ");
 		qfdiv.append(input);
 		qfdiv.append($('<br>'));
-		errorMessage = $('<span>'+representation.errormessage+'</span>');
+		errorMessage = $('<span>');
 		errorMessage.css('display', 'none');
 		errorMessage.css('color', 'red');
 		errorMessage.css('font-style', 'italic');
@@ -84,15 +86,25 @@ org_knime_js_base_node_quickform_input_string = function() {
 		if (regex != null && regex.length > 0) {
 			var valid = matchExact(regex, input.val());
 			if (!valid) {
-				errorMessage.css('display', 'inline');
+				setValidationErrorMessage(viewRepresentation.errormessage);
 			} else {
-				errorMessage.css('display', 'none');
+				setValidationErrorMessage(null);
 			}
 			return valid;
 		} else {
 			return true;
 		}
 	};
+	
+	stringInput.setValidationErrorMessage = function(message) {
+		if (message != null) {
+			errorMessage.text(message);
+			errorMessage.css('display', 'inline');
+		} else {
+			errorMessage.text('');
+			errorMessage.css('display', 'none');
+		}
+	}
 
 	stringInput.value = function() {
 		viewValue.string = input.val();

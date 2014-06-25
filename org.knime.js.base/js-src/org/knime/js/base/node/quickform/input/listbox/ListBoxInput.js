@@ -134,6 +134,17 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		}
 	};
 
+	listboxInput.setValidationErrorMessage = function(message) {
+		if (message != null) {
+			errorMessageLine1.text(message);
+			errorMessageLine1.css('display', 'inline');
+		} else {
+			errorMessageLine1.text('');
+			errorMessageLine1.css('display', 'none');
+		}
+		errorMessageLine2.css('display', 'none');
+	};
+
 	listboxInput.value = function() {
 		viewValue.string = input.val();
 		return viewValue;
