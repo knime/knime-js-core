@@ -99,6 +99,8 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
         gbc.gridy++;
         panel.add(m_values.getComponent(), gbc);
         m_column.setSelectedItem(representation.getDefaultColumn());
+        List<String> possibleValues = representation.getPossibleValues().get(m_column.getSelectedItem());
+        m_values.setChoices(possibleValues.toArray(new String[possibleValues.size()]));
         m_values.setSelections(representation.getDefaultValues());
         addComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
