@@ -123,6 +123,6 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
     @JsonIgnore
     public void validateSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
-        // TODO Auto-generated method stub
+        settings.getString(CFG_STRING);
     }
 }
