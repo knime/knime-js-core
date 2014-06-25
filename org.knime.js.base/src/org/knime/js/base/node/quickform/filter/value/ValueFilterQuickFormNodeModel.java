@@ -104,7 +104,7 @@ public class ValueFilterQuickFormNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        getConfig().setFromSpec(((DataTableSpec)inSpecs[0]));
+        updateValues((DataTableSpec)inSpecs[0]);
         createAndPushFlowVariable();
         DataTableSpec inTable = (DataTableSpec)inSpecs[0];
         String column = getRelevantValue().getColumn();
@@ -151,6 +151,10 @@ public class ValueFilterQuickFormNodeModel
         container.close();
         updateViewValue();
         return new PortObject[]{container.getTable()};
+    }
+
+    private void updateValues(final DataTableSpec spec) {
+        getConfig().setFromSpec(spec);
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {

@@ -116,7 +116,7 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
     }
 
     private void updateValues(final DataTableSpec spec) {
-        getViewRepresentation().setFromSpec(spec);
+        getConfig().setFromSpec(spec);
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {

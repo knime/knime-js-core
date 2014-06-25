@@ -61,7 +61,11 @@ function listSingleSelection() {
 	};
 	this.setChoices = function(choices) {
 		select.empty();
-		select.attr('size', choices.length);
+		var size = choices.length;
+		if (size < 2) {
+			size = 2;
+		}
+		select.attr('size', size);
 		for ( var i in choices) {
 			var choice = choices[i];
 			var option = $('<option>' + choice + '</option>');

@@ -116,7 +116,7 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
     }
 
     private void updateColumns(final DataTableSpec spec) {
-        getViewRepresentation().setPossibleColumns(spec.getColumnNames());
+        getConfig().setPossibleColumns(spec.getColumnNames());
     }
 
     private void createAndPushFlowVariable() throws InvalidSettingsException {

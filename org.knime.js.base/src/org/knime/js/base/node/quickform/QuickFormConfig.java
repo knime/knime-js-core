@@ -63,7 +63,7 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
     private static final String CFG_DESCRIPTION = "description";
     private static final String CFG_HIDE_IN_WIZARD = "hideInWizard";
     private static final String CFG_HIDE_IN_DIALOG = "hideInDialog";
-    private static final String CFG_DEFAULT_VALUE = "defaultVale";
+    private static final String CFG_DEFAULT_VALUE = "defaultValue";
 
     private static final String DEFAULT_LABEL = "Label";
     private static final String DEFAULT_DESCRIPTION = "Enter Description";
