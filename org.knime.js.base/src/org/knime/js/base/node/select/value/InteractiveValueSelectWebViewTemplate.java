@@ -94,7 +94,16 @@ public class InteractiveValueSelectWebViewTemplate implements WebTemplate {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getValidateMethodName() {
         return "validate";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSetValidationErrorMethodName() {
+        return "setValidationErrorMethodName";
     }
 }

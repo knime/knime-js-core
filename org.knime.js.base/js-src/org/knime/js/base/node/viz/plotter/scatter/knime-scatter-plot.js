@@ -98,7 +98,8 @@ knime_scatter_plot = function() {
 
 		console.time("Building chart");
 		
-		var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
+		//var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
+		var chartHeight = "calc(100% - " + getControlHeight() + "px)";
 		d3.select("#"+layoutContainer).append("div")
 			.attr("id", containerID)
 			.style("width", "100%")
@@ -350,12 +351,16 @@ knime_scatter_plot = function() {
 	getControlHeight = function() {
 		var rows = 0;
 		var sizeFactor = 25;
-		var padding = 20;
-		if (_representation.enableTitleChange || _representation.enableSubtitleChange) rows++;
-		if (_representation.enableXColumnChange || _representation.enableYColumnChange) rows++;
-		if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) rows++;
-		if (_representation.enableDotSizeChange) rows++;
-		return rows * sizeFactor + padding;
+		var padding = 10;
+		if (_representation.enableViewConfiguration) {
+			if (_representation.enableTitleChange || _representation.enableSubtitleChange) rows++;
+			if (_representation.enableXColumnChange || _representation.enableYColumnChange) rows++;
+			if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) rows++;
+			if (_representation.enableDotSizeChange) rows++;
+		}
+		var height = rows * sizeFactor;
+		if (height > 0) height += padding;
+		return height;
 	};
 	
 	view.validate = function() {

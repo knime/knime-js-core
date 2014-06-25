@@ -48,7 +48,6 @@ package org.knime.js.core;
 
 import java.util.List;
 
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -66,6 +65,7 @@ public class JSONWebNode {
     private String m_namespace;
     private String m_initMethodName;
     private String m_validateMethodName;
+    private String m_setValidationErrorMethodName;
     private String m_getViewValueMethodName;
 
     private JSONViewContent m_viewRepresentation;
@@ -149,6 +149,22 @@ public class JSONWebNode {
     @JsonProperty("validateMethodName")
     public void setValidateMethodName(final String validateMethodName) {
         m_validateMethodName = validateMethodName;
+    }
+
+    /**
+     * @return the setValidationErrorMethodName
+     */
+    @JsonProperty("setValidationErrorMethodName")
+    public String getSetValidationErrorMethodName() {
+        return m_setValidationErrorMethodName;
+    }
+
+    /**
+     * @param setValidationErrorMethodName the setValidationErrorMethodName to set
+     */
+    @JsonProperty("setValidationErrorMethodName")
+    public void setSetValidationErrorMethodName(final String setValidationErrorMethodName) {
+        m_setValidationErrorMethodName = setValidationErrorMethodName;
     }
 
     /**

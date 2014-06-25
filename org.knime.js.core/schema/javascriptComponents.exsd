@@ -85,6 +85,13 @@ Good practice is to use the Java package name of the node using the resource, li
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="setValidationError-method-name" type="string" use="default" value="setValidationError">
+            <annotation>
+               <documentation>
+                  The method name to call when a validation error is supposed to be displayed.
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="getComponentValue-method-name" type="string" use="default" value="getComponentValue">
             <annotation>
                <documentation>
