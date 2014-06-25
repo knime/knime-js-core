@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Feb 28, 2014 ("Patrick Winter"): created
  */
@@ -62,22 +62,22 @@ import javax.swing.JTextField;
 import org.knime.core.node.util.StringHistoryPanel;
 
 /**
- * 
+ *
  * @author "Patrick Winter", University of Konstanz
  */
 @SuppressWarnings({"rawtypes", "unchecked" })
 public class RegexPanel {
 
     private StringHistoryPanel m_regex = new StringHistoryPanel("string_input_regex");
-    
+
     private JTextField m_errorMessage = new JTextField();
-    
+
     private JComboBox m_commonRegexes = new JComboBox();
-    
+
     private JPanel m_commonRegexesPanel = new JPanel();
-    
+
     /**
-     * 
+     *
      */
     public RegexPanel() {
         JButton assign = new JButton("Assign");
@@ -107,7 +107,7 @@ public class RegexPanel {
         m_commonRegexesPanel.add(assign, gbc);
         createCommonRegexes();
     }
-    
+
     /**
      * Commits the current regex to the history.
      */
@@ -115,108 +115,108 @@ public class RegexPanel {
         m_regex.commitSelectedToHistory();
         m_regex.updateHistory();
     }
-    
+
     /**
      * @return The regex
      */
     public String getRegex() {
         return m_regex.getSelectedString();
     }
-    
+
     /**
      * @param regex The regex to set
      */
     public void setRegex(final String regex) {
         m_regex.setSelectedString(regex);
     }
-    
+
     /**
      * @return The error message
      */
     public String getErrorMessage() {
         return m_errorMessage.getText();
     }
-    
+
     /**
      * @param errorMessage The error message to set
      */
     public void setErrorMessage(final String errorMessage) {
         m_errorMessage.setText(errorMessage);
     }
-    
+
     /**
      * @return The regex panel
      */
     public JComponent getRegexPanel() {
         return m_regex;
     }
-    
+
     /**
      * @return The error message panel
      */
     public JComponent getErrorMessagePanel() {
         return m_errorMessage;
     }
-    
+
     /**
      * @return The common regexes panel
      */
     public JComponent getCommonRegexesPanel() {
         return m_commonRegexesPanel;
     }
-    
+
     private void createCommonRegexes() {
         addRegex("", "", "");
         addRegex(
                 "Email address",
                 "^[0-9a-zA-Z]+([0-9a-zA-Z]*[-._+])*[0-9a-zA-Z]+@[0-9a-zA-Z]+([-.][0-9a-zA-Z]+)*([0-9a-zA-Z]*[.])[a-zA-Z]{2,6}$",
-                "The given input is not a valid email address");
+                "The given input '?' is not a valid email address");
         addRegex(
                 "URL",
                 "^(https:[/][/]|http:[/][/]|www.)[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\\-\\._\\?\\,\\'/\\\\\\+&amp;%\\$#\\=~])*$",
-                "The given input is not a valid URL");
+                "The given input '?' is not a valid URL");
         addRegex(
                 "IPv4",
                 "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
-                "The given input is not a valid IPv4 address");
+                "The given input '?' is not a valid IPv4 address");
         addRegex(
                 "Windows file path",
                 "^((\\\\\\\\[a-zA-Z0-9-]+\\\\[a-zA-Z0-9`~!@#$%^&(){}'._-]+([ ]+[a-zA-Z0-9`~!@#$%^&(){}'._-]+)*)|([a-zA-Z]:))(\\\\[^ \\\\/:*?\"\"<>|]+([ ]+[^ \\\\/:*?\"\"<>|]+)*)*\\\\?$",
-                "The given input is not a valid Windows path");
+                "The given input '?' is not a valid Windows path");
     }
-    
+
     private void addRegex(final String name, final String regex, final String errorMessage) {
         m_commonRegexes.addItem(new CommonRegex(name, regex, errorMessage));
     }
-    
+
     private static class CommonRegex {
-        
+
         private String m_name;
-        
+
         private String m_regex;
-        
+
         private String m_errorMessage;
-        
+
         public CommonRegex(final String name, final String regex, final String errorMessage) {
             m_name = name;
             m_regex = regex;
             m_errorMessage = errorMessage;
         }
-        
+
         /**
          * @return the regex
          */
         public String getRegex() {
             return m_regex;
         }
-        
+
         /**
          * @return the errorMessage
          */
         public String getErrorMessage() {
             return m_errorMessage;
         }
-        
+
         /**
          * {@inheritDoc}
          */
@@ -224,7 +224,7 @@ public class RegexPanel {
         public String toString() {
             return m_name;
         }
-        
+
     }
 
 }

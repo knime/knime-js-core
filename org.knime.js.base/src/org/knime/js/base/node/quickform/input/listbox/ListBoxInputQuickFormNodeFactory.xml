@@ -22,7 +22,7 @@
 			Regular expression defining valid values.
 		</option>
 		<option name="Validation error message">
-			Message that will be shown if one of the values is not valid.
+			Message that will be shown if one of the values is not valid. The character ? will be replaced by the invalid value.
 		</option>
 		<option name="Common Regular Expressions">
 			A set of regular expression templates for common inputs. With the assign button you assign the regular expression and the corresponding error message to be the current settings.

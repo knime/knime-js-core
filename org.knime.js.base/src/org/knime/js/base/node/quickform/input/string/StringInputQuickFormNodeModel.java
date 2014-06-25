@@ -75,7 +75,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         String regex = getConfig().getRegex();
         if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
             throw new InvalidSettingsException(getConfig()
-                    .getErrorMessage());
+                    .getErrorMessage().replaceAll("[?]", string));
         }
         pushFlowVariableString(getConfig().getFlowVariableName(), string);
     }
@@ -133,7 +133,7 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         String regex = getConfig().getRegex();
         if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
             return new ValidationError(getConfig()
-                    .getErrorMessage());
+                    .getErrorMessage().replaceAll("[?]", string));
         }
         return super.validateViewValue(viewContent);
     }

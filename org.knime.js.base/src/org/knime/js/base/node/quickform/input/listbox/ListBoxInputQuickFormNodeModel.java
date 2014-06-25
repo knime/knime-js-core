@@ -132,7 +132,7 @@ public class ListBoxInputQuickFormNodeModel
                 if (!values.get(i).matches(regex)) {
                     throw new InvalidSettingsException("Value " + (i + 1)
                             + " is not valid:\n"
-                            + getConfig().getErrorMessage());
+                            + getConfig().getErrorMessage().replaceAll("[?]", values.get(i)));
                 }
             }
         }
@@ -225,7 +225,7 @@ public class ListBoxInputQuickFormNodeModel
                 if (!values.get(i).matches(regex)) {
                     return new ValidationError("Value " + (i + 1)
                             + " is not valid:\n"
-                            + getConfig().getErrorMessage());
+                            + getConfig().getErrorMessage().replaceAll("[?]", values.get(i)));
                 }
             }
         }

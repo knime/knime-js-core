@@ -100,6 +100,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
+        loadSettingsFrom(m_config);
         m_defaultArea.setText(m_config.getDefaultValue().getMoleculeString());
         m_formatBox.setSelectedItem(m_config.getFormat());
     }

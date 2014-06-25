@@ -51,14 +51,15 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	};
 	listboxInput.name = "Listbox input";
 	var viewValue;
+	var viewRepresentation;
 	var input;
 	var errorMessageLine1;
-	var errorMessageLine2;
 	var separator;
 	var omitEmpty;
 
 	listboxInput.init = function(representation, value) {
 		viewValue = value;
+		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
@@ -76,8 +77,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		input.val(stringValue);
 		qfdiv.append($('<br>'));
 		errorMessageLine1 = $('<span>');
-		errorMessageLine2 = $('<span>'+representation.errormessage+'</span>');
-		errorMessages = errorMessageLine1.add(errorMessageLine2);
+		var errorMessages = errorMessageLine1;
 		errorMessages.css('display', 'none');
 		errorMessages.css('color', 'red');
 		errorMessages.css('font-style', 'italic');
@@ -123,10 +123,10 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 				}
 			}
 			if (!valid) {
-				errorMessageLine1.text('Value ' + index + ' is not valid:');
-				errorMessageLine1.add(errorMessageLine2).css('display', 'inline');
+				errorMessageLine1.text(viewRepresentation.errormessage.replace(new RegExp('?', 'g'), values[i]));
+				errorMessageLine1.css('display', 'inline');
 			} else {
-				errorMessageLine1.add(errorMessageLine2).css('display', 'none');
+				errorMessageLine1.css('display', 'none');
 			}
 			return valid;
 		} else {
@@ -142,7 +142,6 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 			errorMessageLine1.text('');
 			errorMessageLine1.css('display', 'none');
 		}
-		errorMessageLine2.css('display', 'none');
 	};
 
 	listboxInput.value = function() {
