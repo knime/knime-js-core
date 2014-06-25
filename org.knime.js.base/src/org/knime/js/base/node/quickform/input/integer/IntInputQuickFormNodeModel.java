@@ -45,6 +45,7 @@
 package org.knime.js.base.node.quickform.input.integer;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -123,6 +124,22 @@ public class IntInputQuickFormNodeModel
         representation.setUseMax(getConfig().getUseMax());
         representation.setUseMin(getConfig().getUseMin());
         return representation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final IntInputQuickFormValue viewContent) {
+        if (getConfig().getUseMin() && viewContent.getInteger() < getConfig().getMin()) {
+            return new ValidationError("The set integer " + viewContent.getInteger()
+                + " is smaller than the allowed minimum of " + getConfig().getMin());
+        }
+        if (getConfig().getUseMax() && viewContent.getInteger() < getConfig().getMax()) {
+            return new ValidationError("The set integer " + viewContent.getInteger()
+                + " is bigger than the allowed maximum of " + getConfig().getMax());
+        }
+        return super.validateViewValue(viewContent);
     }
 
 }

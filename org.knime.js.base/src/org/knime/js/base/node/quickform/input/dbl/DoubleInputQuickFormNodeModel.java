@@ -45,6 +45,7 @@
 package org.knime.js.base.node.quickform.input.dbl;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -123,6 +124,22 @@ public class DoubleInputQuickFormNodeModel
         representation.setUseMax(getConfig().getUseMax());
         representation.setUseMin(getConfig().getUseMin());
         return representation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final DoubleInputQuickFormValue viewContent) {
+        if (getConfig().getUseMin() && viewContent.getDouble() < getConfig().getMin()) {
+            return new ValidationError("The set double " + viewContent.getDouble()
+                + " is smaller than the allowed minimum of " + getConfig().getMin());
+        }
+        if (getConfig().getUseMax() && viewContent.getDouble() < getConfig().getMax()) {
+            return new ValidationError("The set double " + viewContent.getDouble()
+                + " is bigger than the allowed maximum of " + getConfig().getMax());
+        }
+        return super.validateViewValue(viewContent);
     }
 
 }

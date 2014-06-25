@@ -60,6 +60,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
@@ -195,6 +196,40 @@ public class ListBoxInputQuickFormNodeModel
         representation.setRegex(getConfig().getRegex());
         representation.setSeparator(getConfig().getSeparator());
         return representation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final ListBoxInputQuickFormValue viewContent) {
+        boolean omitEmpty = getConfig().getOmitEmpty();
+        final String value = viewContent.getString();
+        String separator = getConfig().getSeparator();
+        final ArrayList<String> values = new ArrayList<String>();
+        if (separator == null || separator.isEmpty()) {
+            if (!(omitEmpty && value.isEmpty())) {
+                values.add(value);
+            }
+        } else {
+            String[] splitValue = value.split(getConfig().getSeparatorRegex(), -1);
+            for (String val : splitValue) {
+                if (!(omitEmpty && val.isEmpty())) {
+                    values.add(val);
+                }
+            }
+        }
+        String regex = getConfig().getRegex();
+        if (regex != null && !regex.isEmpty()) {
+            for (int i = 0; i < values.size(); i++) {
+                if (!values.get(i).matches(regex)) {
+                    return new ValidationError("Value " + (i + 1)
+                            + " is not valid:\n"
+                            + getConfig().getErrorMessage());
+                }
+            }
+        }
+        return super.validateViewValue(viewContent);
     }
 
 }

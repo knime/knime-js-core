@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -142,6 +143,25 @@ public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
         representation.setUseMin(getConfig().getUseMin());
         representation.setWithTime(getConfig().getWithTime());
         return representation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final DateInputQuickFormValue viewContent) {
+        Date value = getRelevantValue().getDate();
+        Date min = getConfig().getMin();
+        Date max = getConfig().getMax();
+        if (getConfig().getUseMin() && value.before(min)) {
+            return new ValidationError("The set date " + value
+                    + " is before the earliest allowed date " + min);
+        }
+        if (getConfig().getUseMax() && value.after(max)) {
+            return new ValidationError("The set date " + value
+                    + " is after the latest allowed date " + max);
+        }
+        return super.validateViewValue(viewContent);
     }
 
 }

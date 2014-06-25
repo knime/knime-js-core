@@ -45,6 +45,7 @@
 package org.knime.js.base.node.quickform.input.string;
 
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
@@ -118,6 +119,23 @@ public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeMode
         representation.setErrorMessage(getConfig().getErrorMessage());
         representation.setRegex(getConfig().getRegex());
         return representation;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final StringInputQuickFormValue viewContent) {
+        String string = viewContent.getString();
+        if (string == null) {
+            string = "";
+        }
+        String regex = getConfig().getRegex();
+        if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
+            return new ValidationError(getConfig()
+                    .getErrorMessage());
+        }
+        return super.validateViewValue(viewContent);
     }
 
 }
