@@ -76,7 +76,7 @@ org_knime_js_base_node_quickform_selection_column = function() {
 			selector.setChoices(representation.possibleColumns);
 			var selection = value.column;
 			selector.setSelection(selection);
-			selector.addValueChangedListener(callUpdate());
+			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
 		callUpdate();

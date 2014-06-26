@@ -83,7 +83,7 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		errorMessage.css('font-style', 'italic');
 		errorMessage.css('font-size', '75%');
 		qfdiv.append(errorMessage);
-		input.blur(callUpdate());
+		input.blur(callUpdate);
 		resizeParent();
 		callUpdate();
 	};

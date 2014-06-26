@@ -65,7 +65,7 @@ org_knime_js_base_node_quickform_input_bool = function() {
 		input.attr("type", "checkbox");
 		var checked = value.boolean;
 		input.prop("checked", checked);
-		input.blur(callUpdate());
+		input.blur(callUpdate);
 		resizeParent();
 		callUpdate();
 	};

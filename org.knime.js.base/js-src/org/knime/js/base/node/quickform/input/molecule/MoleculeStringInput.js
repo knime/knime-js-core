@@ -65,7 +65,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		input.attr("type", "text");
 		var stringValue = value.moleculeString;
 		input.val(stringValue);
-		input.blur(callUpdate());
+		input.blur(callUpdate);
 		resizeParent();
 		callUpdate();
 	};

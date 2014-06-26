@@ -89,7 +89,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 			separator = new RegExp(representation.separatorregex);
 		}
 		omitEmpty = representation.omitempty;
-		input.blur(callUpdate());
+		input.blur(callUpdate);
 		resizeParent();
 		callUpdate();
 	};

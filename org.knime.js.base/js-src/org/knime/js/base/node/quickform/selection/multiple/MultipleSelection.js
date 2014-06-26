@@ -74,7 +74,7 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 			selector.setChoices(representation.possibleChoices);
 			var selections = value.value;
 			selector.setSelections(selections);
-			selector.addValueChangedListener(callUpdate());
+			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
 		callUpdate();

@@ -152,9 +152,9 @@ org_knime_js_base_node_quickform_input_date = function() {
 			dateInput.blur();
 			dateInput.datepicker("hide");
 		}, 0);
-		dateInput.blur(callUpdate());
-		hourInput.blur(callUpdate());
-		minInput.blur(callUpdate());
+		dateInput.blur(callUpdate);
+		hourInput.blur(callUpdate);
+		minInput.blur(callUpdate);
 		callUpdate();
 	};
 
