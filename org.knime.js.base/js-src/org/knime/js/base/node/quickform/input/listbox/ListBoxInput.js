@@ -65,7 +65,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		body.append(qfdiv);
 		input = $('<textarea>');
 		qfdiv.attr("title", representation.description);
-		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.css('white-space', 'pre');
 		input.css('overflow', 'auto');
@@ -139,6 +139,7 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 			errorMessageLine1.text('');
 			errorMessageLine1.css('display', 'none');
 		}
+		resizeParent();
 	};
 
 	listboxInput.value = function() {

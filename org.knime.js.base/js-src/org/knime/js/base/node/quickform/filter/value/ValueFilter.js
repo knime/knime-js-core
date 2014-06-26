@@ -60,7 +60,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
 		qfdiv.attr('title', representation.description);
-		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		viewValue = value;
 		viewRepresentation = representation;
 		if (representation.possibleValues == null) {
@@ -69,6 +69,8 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			var columnSelection = value.column;
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
+				colselection.addClass('dropdown');
+				colselection.css('margin', '5px');
 				qfdiv.append(colselection);
 				qfdiv.append($('<br>'));
 				for ( var key in representation.possibleValues) {

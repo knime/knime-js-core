@@ -248,13 +248,13 @@ function twinlist() {
 	span.append(remove);
 	span.append('<br>');
 	span.append(removeAll);
-	var excludesHeader = $('<span>Excludes</span>');
+	var excludesHeader = $('<div>Excludes</div>');
+	excludesHeader.css('padding', '5px');
 	excludesSpan.append(excludesHeader);
-	excludesSpan.append($('<br>'));
 	excludesSpan.append(excludes);
-	var includesHeader = $('<span>Includes</span>');
+	var includesHeader = $('<div>Includes</div>');
+	includesHeader.css('padding', '5px');
 	includesSpan.append(includesHeader);
-	includesSpan.append($('<br>'));
 	includesSpan.append(includes);
 
 	// Define which functions are callable from the outside

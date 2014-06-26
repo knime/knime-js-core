@@ -164,6 +164,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <!-- <webResourceBundle
             debug="true"
@@ -258,6 +261,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -277,6 +283,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
@@ -298,6 +307,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -317,6 +329,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
@@ -338,6 +353,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -357,6 +375,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <!-- <webResourceBundle
@@ -402,6 +423,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -421,6 +445,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
@@ -442,6 +469,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -461,6 +491,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
@@ -482,6 +515,9 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -501,6 +537,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.node.quickform.styles">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
@@ -610,6 +649,20 @@
          <webDependency
                webResourceBundleID="jsFreeChart_0.5">
          </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="QuickFormStyles_1.0_DEBUG"
+            version="1.0"
+            webResourceBundleID="org.knime.js.base.node.quickform.styles">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/quickform/"
+               relativePathTarget="org/knime/js/base/node/quickform/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/quickformStyles.css"
+               type="CSS">
+         </importResource>
       </webResourceBundle>
    </extension>
    <extension

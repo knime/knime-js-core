@@ -67,7 +67,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 		var stringValue = value.string;
 		input.val(stringValue);
 		qfdiv.attr("title", representation.description);
-		qfdiv.append(representation.label + " ");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');
@@ -104,6 +104,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 			errorMessage.text('');
 			errorMessage.css('display', 'none');
 		}
+		resizeParent();
 	}
 
 	stringInput.value = function() {

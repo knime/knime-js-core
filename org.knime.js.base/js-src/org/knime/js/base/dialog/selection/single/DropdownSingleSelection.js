@@ -82,4 +82,5 @@ function dropdownSingleSelection() {
 		});
 	};
 	select = $('<select>');
+	select.addClass('dropdown');
 }

@@ -60,7 +60,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		viewValue = value;
 		input = $('<input>');
 		qfdiv.attr('title', representation.description);
-		qfdiv.append(representation.label + " ");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.attr("type", "text");
 		var stringValue = value.moleculeString;

@@ -77,7 +77,7 @@ org_knime_js_base_node_quickform_input_date = function() {
 		dateElement.append('Date: ');
 		dateInput = $('<input>');
 		qfdiv.attr("title", representation.description);
-		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		dateElement.append(dateInput);
 		dateInput.datepicker({
 			showAnim : "",

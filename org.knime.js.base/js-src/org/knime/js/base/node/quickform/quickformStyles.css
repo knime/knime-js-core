@@ -1,0 +1,22 @@
+input,textarea,select {
+	padding: 5px;
+	font-size: 1.0em;
+	background-color: transparent;
+	border-radius: 5px;
+	border: 1px solid;
+	border-color: silver;
+}
+button {
+	margin: 5px;
+}
+.dropdown,.ui-datepicker-year {
+	padding: 0px;
+	border: none;
+}
+. ui-spinner {
+	background-color: silver;
+}
+.label {
+	font-weight: bold;
+	margin: 10px;
+}

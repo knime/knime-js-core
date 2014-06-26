@@ -58,7 +58,7 @@ org_knime_js_base_node_quickform_filter_column = function() {
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
 		qfdiv.attr('title', representation.description);
-		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		viewValue = value;
 		if (representation.possibleColumns == null) {
 			qfdiv.append("Error: No data available");

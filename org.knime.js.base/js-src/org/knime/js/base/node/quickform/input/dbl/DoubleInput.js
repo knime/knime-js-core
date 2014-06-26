@@ -63,7 +63,7 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		body.append(qfdiv);
 		input = $('<input>');
 		qfdiv.attr("title", representation.description);
-		qfdiv.append(representation.label + " ");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.spinner({
 			step: 0.01
@@ -119,6 +119,7 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 			errorMessage.text('');
 			errorMessage.css('display', 'none');
 		}
+		resizeParent();
 	};
 
 	doubleInput.value = function() {

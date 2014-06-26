@@ -58,7 +58,7 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
 		qfdiv.attr('title', representation.description);
-		qfdiv.append("<b>" + representation.label + "</b><br>");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		viewValue = value;
 		if (representation.possibleChoices.length > 0) {
 			if (representation.type == 'Check boxes (vertical)') {

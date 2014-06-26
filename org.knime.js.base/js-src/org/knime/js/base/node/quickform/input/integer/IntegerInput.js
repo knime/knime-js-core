@@ -63,7 +63,7 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		body.append(qfdiv);
 		input = $('<input>');
 		qfdiv.attr("title", representation.description);
-		qfdiv.append(representation.label + " ");
+		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.spinner();
 		if (viewRepresentation.usemin) {
@@ -117,6 +117,7 @@ org_knime_js_base_node_quickform_input_integer = function() {
 			errorMessage.text('');
 			errorMessage.css('display', 'none');
 		}
+		resizeParent();
 	};
 
 	integerInput.value = function() {
