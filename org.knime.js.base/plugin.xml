@@ -719,8 +719,7 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_input_molecule"
             name="Molecule Input Quickform"
-            namespace="org_knime_js_base_node_quickform_input_molecule"
-            validate-method-name="validate">
+            namespace="org_knime_js_base_node_quickform_input_molecule">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
