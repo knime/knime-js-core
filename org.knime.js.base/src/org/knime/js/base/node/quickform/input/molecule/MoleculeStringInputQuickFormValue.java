@@ -125,6 +125,15 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
         // TODO Auto-generated method stub
     }
 
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("moleculeString=");
+        sb.append(m_moleculeString);
+        return sb.toString();
+    }
 
 }

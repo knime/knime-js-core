@@ -268,4 +268,29 @@ public class ListBoxInputQuickFormRepresentation extends
         value.setString(getDefaultValue());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("regex=");
+        sb.append(m_regex);
+        sb.append(", ");
+        sb.append("errorMessage=");
+        sb.append(m_errorMessage);
+        sb.append(", ");
+        sb.append("separator=");
+        sb.append(m_separator);
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        sb.append(", ");
+        sb.append("omitEmpty=");
+        sb.append(m_omitEmpty);
+        return sb.toString();
+    }
+
 }

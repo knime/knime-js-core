@@ -183,4 +183,23 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
         value.setString(m_defaultValue);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("regex=");
+        sb.append(m_regex);
+        sb.append(", ");
+        sb.append("errorMessage=");
+        sb.append(m_errorMessage);
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        return sb.toString();
+    }
+
 }

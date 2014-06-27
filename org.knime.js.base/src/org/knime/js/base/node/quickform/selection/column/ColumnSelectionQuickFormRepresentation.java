@@ -57,24 +57,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ColumnSelectionQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ColumnSelectionQuickFormValue> {
-    
+
     private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-    
+
     private static final String DEFAULT_DEFAULT_COLUMN = "";
-    
+
     private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
-    
+
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-    
+
     private static final String[] DEFAULT_POSSIBLE_COLUMNS = new String[0];
-    
+
     private String[] m_possibleColumns = DEFAULT_POSSIBLE_COLUMNS;
 
     private static final String CFG_TYPE = "type";
@@ -82,7 +82,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
 
     private String m_type = DEFAULT_TYPE;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,7 +94,7 @@ public class ColumnSelectionQuickFormRepresentation extends
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         setType(settings.getString(CFG_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -106,7 +106,7 @@ public class ColumnSelectionQuickFormRepresentation extends
         setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,9 +152,9 @@ public class ColumnSelectionQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final ColumnSelectionQuickFormValue value) {
-        value.setColumn(m_defaultColumn);        
+        value.setColumn(m_defaultColumn);
     }
-    
+
     /**
      * @return the possibleColumns
      */
@@ -162,7 +162,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     public String[] getPossibleColumns() {
         return m_possibleColumns;
     }
-    
+
     /**
      * @param possibleColumns the possibleColumns to set
      */
@@ -185,6 +185,25 @@ public class ColumnSelectionQuickFormRepresentation extends
     @JsonProperty("type")
     public void setType(final String type) {
         m_type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("defaultColumn=");
+        sb.append(m_defaultColumn);
+        sb.append(", ");
+        sb.append("possibleColumns=");
+        sb.append(m_possibleColumns);
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
     }
 
 }

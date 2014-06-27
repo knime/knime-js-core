@@ -237,4 +237,29 @@ public class DoubleInputQuickFormRepresentation extends QuickFormFlowVariableRep
         m_max = max;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("useMin=");
+        sb.append(m_useMin);
+        sb.append(", ");
+        sb.append("useMax=");
+        sb.append(m_useMax);
+        sb.append(", ");
+        sb.append("min=");
+        sb.append(m_min);
+        sb.append(", ");
+        sb.append("max=");
+        sb.append(m_max);
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        return sb.toString();
+    }
+
 }

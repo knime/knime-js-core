@@ -125,4 +125,15 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("integer=");
+        sb.append(m_integer);
+        return sb.toString();
+    }
+
 }

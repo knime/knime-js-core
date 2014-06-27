@@ -135,4 +135,17 @@ public class BooleanInputQuickFormRepresentation extends
         value.setBoolean(getDefaultValue());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        return sb.toString();
+    }
+
 }

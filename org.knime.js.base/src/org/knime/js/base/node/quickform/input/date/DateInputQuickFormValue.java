@@ -151,4 +151,17 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("date=");
+        sb.append("{");
+        sb.append(m_date);
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

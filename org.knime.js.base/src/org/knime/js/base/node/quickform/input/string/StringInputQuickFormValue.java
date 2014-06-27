@@ -125,4 +125,16 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
             throws InvalidSettingsException {
         settings.getString(CFG_STRING);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("string");
+        sb.append(m_string);
+        return sb.toString();
+    }
+
 }

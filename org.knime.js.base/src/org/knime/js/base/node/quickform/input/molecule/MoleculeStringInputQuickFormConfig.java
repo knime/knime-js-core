@@ -97,4 +97,17 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
         return new MoleculeStringInputQuickFormValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("format=");
+        sb.append(m_format);
+        return sb.toString();
+    }
+
 }

@@ -65,7 +65,7 @@ public class SingleSelectionQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<SingleSelectionQuickFormValue> {
 
     private static final String CFG_DEFAULT_VALUE = "default_value";
-    
+
     private static final String DEFAULT_DEFAULT_VALUE = "";
 
     private String m_defaultValue = DEFAULT_DEFAULT_VALUE;
@@ -184,6 +184,25 @@ public class SingleSelectionQuickFormRepresentation extends
     @JsonProperty("type")
     public void setType(final String type) {
         m_type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        sb.append(", ");
+        sb.append("possibleChoices=");
+        sb.append(m_possibleChoices);
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
     }
 
 }

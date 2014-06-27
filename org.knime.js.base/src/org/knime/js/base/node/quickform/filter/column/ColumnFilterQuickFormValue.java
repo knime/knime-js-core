@@ -125,4 +125,16 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("columns=");
+        sb.append(m_columns);
+        return sb.toString();
+    }
+
 }

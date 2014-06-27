@@ -223,4 +223,28 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         return new ValueSelectionQuickFormValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("columnType=");
+        sb.append(m_columnType);
+        sb.append(", ");
+        sb.append("lockColumn=");
+        sb.append(m_lockColumn);
+        sb.append(", ");
+        sb.append("possibleValues=");
+        sb.append("{");
+        sb.append(m_possibleValues);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
+    }
+
 }

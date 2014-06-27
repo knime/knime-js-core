@@ -164,4 +164,20 @@ public class MoleculeStringInputQuickFormRepresentation extends
         value.setMoleculeString(getDefaultValue());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("format=");
+        sb.append(m_format);
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append(m_defaultValue);
+        return sb.toString();
+    }
+
 }

@@ -154,4 +154,19 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
         panel.setLabel(m_label);
         panel.setDescription(m_description);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("label=");
+        sb.append(m_label);
+        sb.append(", ");
+        sb.append("description=");
+        sb.append(m_description);
+        return sb.toString();
+    }
+
 }

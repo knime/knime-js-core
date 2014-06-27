@@ -125,4 +125,15 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("string=");
+        sb.append(m_string);
+        return sb.toString();
+    }
+
 }

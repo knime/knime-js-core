@@ -57,24 +57,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ColumnFilterQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<ColumnFilterQuickFormValue> {
-    
+
     private static final String CFG_DEFAULT_COLUMNS = "defaultColumns";
-    
+
     private static final String[] DEFAULT_DEFAULT_COLUMNS = new String[0];
-    
+
     private String[] m_defaultColumns = DEFAULT_DEFAULT_COLUMNS;
-    
+
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-    
+
     private static final String[] DEFAULT_POSSIBLE_COLUMNS = new String[0];
-    
+
     private String[] m_possibleColumns = DEFAULT_POSSIBLE_COLUMNS;
 
     private static final String CFG_TYPE = "type";
@@ -82,7 +82,7 @@ public class ColumnFilterQuickFormRepresentation extends
     private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
 
     private String m_type = DEFAULT_TYPE;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -94,7 +94,7 @@ public class ColumnFilterQuickFormRepresentation extends
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
         setType(settings.getString(CFG_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -106,7 +106,7 @@ public class ColumnFilterQuickFormRepresentation extends
         m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
         setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -152,9 +152,9 @@ public class ColumnFilterQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final ColumnFilterQuickFormValue value) {
-        value.setColumns(m_defaultColumns);        
+        value.setColumns(m_defaultColumns);
     }
-    
+
     /**
      * @return the possibleColumns
      */
@@ -162,7 +162,7 @@ public class ColumnFilterQuickFormRepresentation extends
     public String[] getPossibleColumns() {
         return m_possibleColumns;
     }
-    
+
     /**
      * @param possibleColumns the possibleColumns to set
      */
@@ -185,6 +185,25 @@ public class ColumnFilterQuickFormRepresentation extends
     @JsonProperty("type")
     public void setType(final String type) {
         m_type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("defaultColumns=");
+        sb.append(m_defaultColumns);
+        sb.append(", ");
+        sb.append("possibleColumns=");
+        sb.append(m_possibleColumns);
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
     }
 
 }

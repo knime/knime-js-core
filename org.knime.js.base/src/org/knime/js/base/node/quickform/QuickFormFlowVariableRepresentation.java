@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -54,7 +54,7 @@ import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.workflow.FlowVariable;
 
 /**
- * 
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
@@ -119,6 +119,19 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
         } catch (Exception e) {
             throw new InvalidSettingsException("Invalid variable name \"" + name + "\": " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("flowVariableName=");
+        sb.append(m_flowVariableName);
+        return sb.toString();
     }
 
 }

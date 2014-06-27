@@ -150,4 +150,19 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
             throws InvalidSettingsException {
         // TODO Auto-generated method stub
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("column=");
+        sb.append(m_column);
+        sb.append(", ");
+        sb.append("values=");
+        sb.append(m_values);
+        return sb.toString();
+    }
+
 }

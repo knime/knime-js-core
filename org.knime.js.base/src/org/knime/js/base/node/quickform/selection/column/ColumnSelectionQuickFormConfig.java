@@ -117,4 +117,20 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         return new ColumnSelectionQuickFormValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("possibleColumns=");
+        sb.append(m_possibleColumns);
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
+    }
+
 }

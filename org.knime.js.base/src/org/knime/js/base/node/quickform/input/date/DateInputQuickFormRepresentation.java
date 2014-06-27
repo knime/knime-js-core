@@ -59,50 +59,50 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class DateInputQuickFormRepresentation extends
         QuickFormFlowVariableRepresentation<DateInputQuickFormValue> {
-    
+
     private static final String CFG_USE_MIN = "use_min";
-    
+
     private static final boolean DEFAULT_USE_MIN = false;
-    
+
     private boolean m_useMin = DEFAULT_USE_MIN;
-    
+
     private static final String CFG_USE_MAX = "use_max";
-    
+
     private static final boolean DEFAULT_USE_MAX = false;
-    
+
     private boolean m_useMax = DEFAULT_USE_MAX;
-    
+
     private static final String CFG_MIN = "min";
-    
+
     private static final Date DEFAULT_MIN = DateInputQuickFormValue.DEFAULT_DATE;
-    
+
     private Date m_min = DEFAULT_MIN;
-    
+
     private static final String CFG_MAX = "max";
-    
+
     private static final Date DEFAULT_MAX = DateInputQuickFormValue.DEFAULT_DATE;
-    
+
     private Date m_max = DEFAULT_MAX;
 
     private static final String CFG_DEFAULT = "default";
-    
+
     private static final Date DEFAULT_DATE = DateInputQuickFormValue.DEFAULT_DATE;
-    
+
     private Date m_defaultValue = DEFAULT_DATE;
-    
+
     private static final String CFG_WITH_TIME = "with_time";
-    
+
     private static final boolean DEFAULT_WITH_TIME = true;
-    
+
     private boolean m_withTime = DEFAULT_WITH_TIME;
-    
+
     /**
      * {@inheritDoc}
      */
@@ -126,7 +126,7 @@ public class DateInputQuickFormRepresentation extends
             throw new InvalidSettingsException("Can't parse date: " + value, e);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -151,7 +151,7 @@ public class DateInputQuickFormRepresentation extends
             m_max = DEFAULT_MAX;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -167,7 +167,7 @@ public class DateInputQuickFormRepresentation extends
         settings.addString(CFG_MIN, sdf.format(m_min));
         settings.addString(CFG_MAX, sdf.format(m_max));
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -201,7 +201,7 @@ public class DateInputQuickFormRepresentation extends
     @Override
     @JsonIgnore
     public void resetNodeValueToDefault(final DateInputQuickFormValue value) {
-        value.setDate(getDefaultValue());        
+        value.setDate(getDefaultValue());
     }
 
     /**
@@ -267,7 +267,7 @@ public class DateInputQuickFormRepresentation extends
     public void setMax(final Date max) {
         m_max = max;
     }
-    
+
     /**
      * @return the withTime
      */
@@ -275,13 +275,47 @@ public class DateInputQuickFormRepresentation extends
     public boolean getWithTime() {
         return m_withTime;
     }
-    
+
     /**
      * @param withTime the withTime to set
      */
     @JsonProperty("withtime")
     public void setWithTime(final boolean withTime) {
         m_withTime = withTime;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("useMin=");
+        sb.append(m_useMin);
+        sb.append(", ");
+        sb.append("useMax=");
+        sb.append(m_useMax);
+        sb.append(", ");
+        sb.append("min=");
+        sb.append("{");
+        sb.append(m_min);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("max=");
+        sb.append("{");
+        sb.append(m_max);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append("{");
+        sb.append(m_defaultValue);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("withTime=");
+        sb.append(m_withTime);
+        return sb.toString();
     }
 
 }

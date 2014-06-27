@@ -117,4 +117,20 @@ public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfi
         return new MultipleSelectionQuickFormValue();
     };
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("possibleChoices=");
+        sb.append(m_possibleChoices);
+        sb.append(", ");
+        sb.append("type=");
+        sb.append(m_type);
+        return sb.toString();
+    }
+
 }

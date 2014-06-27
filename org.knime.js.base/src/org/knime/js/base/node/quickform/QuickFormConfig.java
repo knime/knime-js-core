@@ -148,4 +148,29 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
 
     protected abstract VAL createEmptyValue();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("label=");
+        sb.append(m_label);
+        sb.append(", ");
+        sb.append("description=");
+        sb.append(m_description);
+        sb.append(", ");
+        sb.append("hideInWizard=");
+        sb.append(m_hideInWizard);
+        sb.append(", ");
+        sb.append("hideInDialog=");
+        sb.append(m_hideInDialog);
+        sb.append(", ");
+        sb.append("defaultValue=");
+        sb.append("{");
+        sb.append(m_defaultValue);
+        sb.append("}");
+        return sb.toString();
+    }
+
 }

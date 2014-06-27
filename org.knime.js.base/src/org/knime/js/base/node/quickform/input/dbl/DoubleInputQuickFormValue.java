@@ -125,4 +125,15 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("double=");
+        sb.append(m_double);
+        return sb.toString();
+    }
+
 }

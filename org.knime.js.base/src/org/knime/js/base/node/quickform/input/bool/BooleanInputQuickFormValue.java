@@ -125,4 +125,15 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("boolean=");
+        sb.append(m_boolean);
+        return sb.toString();
+    }
+
 }

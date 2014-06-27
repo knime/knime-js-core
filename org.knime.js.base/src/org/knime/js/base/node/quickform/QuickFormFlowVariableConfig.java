@@ -100,4 +100,17 @@ public abstract class QuickFormFlowVariableConfig<VAL extends DialogNodeValue> e
         settings.addString(CFG_FLOW_VARIABLE_NAME, m_flowVariableName);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("flowVariableName=");
+        sb.append(m_flowVariableName);
+        return sb.toString();
+    }
+
 }

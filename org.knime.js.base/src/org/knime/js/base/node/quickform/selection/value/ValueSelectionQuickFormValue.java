@@ -152,4 +152,18 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
         m_value = value;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("column=");
+        sb.append(m_column);
+        sb.append(", ");
+        sb.append("value=");
+        sb.append(m_value);
+        return sb.toString();
+    }
+
 }

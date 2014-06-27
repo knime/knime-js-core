@@ -169,4 +169,33 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateIn
         return new DateInputQuickFormValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toString());
+        sb.append(", ");
+        sb.append("useMin=");
+        sb.append(m_useMin);
+        sb.append(", ");
+        sb.append("useMax=");
+        sb.append(m_useMax);
+        sb.append(", ");
+        sb.append("min=");
+        sb.append("{");
+        sb.append(m_min);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("max=");
+        sb.append("{");
+        sb.append(m_max);
+        sb.append("}");
+        sb.append(", ");
+        sb.append("withTime=");
+        sb.append(m_withTime);
+        return sb.toString();
+    }
+
 }
