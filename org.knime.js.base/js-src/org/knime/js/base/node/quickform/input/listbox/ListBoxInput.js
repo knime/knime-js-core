@@ -58,6 +58,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	var omitEmpty;
 
 	listboxInput.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
@@ -95,6 +98,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	};
 
 	listboxInput.validate = function() {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return true;
+		}
 		var index;
 		var value = input.val();
 		var regex = input.attr("pattern");
@@ -132,6 +138,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	};
 
 	listboxInput.setValidationErrorMessage = function(message) {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return;
+		}
 		if (message != null) {
 			errorMessageLine1.text(message);
 			errorMessageLine1.css('display', 'inline');
@@ -143,6 +152,9 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	};
 
 	listboxInput.value = function() {
+		if (!isValid(viewValue)) {
+			return null;
+		}
 		viewValue.string = input.val();
 		return viewValue;
 	};

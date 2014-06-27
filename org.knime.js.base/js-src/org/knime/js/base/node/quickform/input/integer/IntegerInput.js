@@ -56,6 +56,9 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	var errorMessage;
 
 	integerInput.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
@@ -87,6 +90,9 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	};
 	
 	integerInput.validate = function() {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return true;
+		}
 		var valid;
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
@@ -110,6 +116,9 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	};
 	
 	integerInput.setValidationErrorMessage = function(message) {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return;
+		}
 		if (message != null) {
 			errorMessage.text(message);
 			errorMessage.css('display', 'inline');
@@ -121,6 +130,9 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	};
 
 	integerInput.value = function() {
+		if (!isValid(viewValue)) {
+			return null;
+		}
 		viewValue.integer = parseInt(input.val());
 		return viewValue;
 	};

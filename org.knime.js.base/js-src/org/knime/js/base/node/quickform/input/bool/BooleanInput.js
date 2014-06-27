@@ -54,6 +54,9 @@ org_knime_js_base_node_quickform_input_bool = function() {
 	var input;
 
 	booleanInput.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		var body = $("body");
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
@@ -71,6 +74,9 @@ org_knime_js_base_node_quickform_input_bool = function() {
 	};
 
 	booleanInput.value = function() {
+		if (!isValid(viewValue)) {
+			return null;
+		}
 		viewValue.boolean = input.prop("checked");
 		return viewValue;
 	};

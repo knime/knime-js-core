@@ -20,3 +20,7 @@ button {
 	font-weight: bold;
 	margin: 10px;
 }
+.ui-widget {
+	font-family: inherit;
+	font-size: 1.0em;
+}

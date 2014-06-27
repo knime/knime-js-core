@@ -54,9 +54,17 @@ org_knime_js_base_node_quickform_selection_column = function() {
 	var selector
 
 	columnSelection.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
+		if (!isValid(representation) || !isValid(value)) {
+			qfdiv.append("Error: Data is missing, can not display view.");
+			resizeParent();
+			return;
+		}
 		qfdiv.attr('title', representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		viewValue = value;
@@ -83,6 +91,9 @@ org_knime_js_base_node_quickform_selection_column = function() {
 	};
 
 	columnSelection.value = function() {
+		if (!isValid(viewValue)) {
+			return null;
+		}
 		viewValue.column = selector.getSelection();
 		return viewValue;
 	};

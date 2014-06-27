@@ -56,6 +56,9 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	var errorMessage;
 
 	doubleInput.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
@@ -89,6 +92,9 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	};
 	
 	doubleInput.validate = function() {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return true;
+		}
 		var valid;
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
@@ -112,6 +118,9 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	};
 	
 	doubleInput.setValidationErrorMessage = function(message) {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return;
+		}
 		if (message != null) {
 			errorMessage.text(message);
 			errorMessage.css('display', 'inline');
@@ -123,6 +132,9 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	};
 
 	doubleInput.value = function() {
+		if (!isValid(viewValue)) {
+			return null;
+		}
 		viewValue.double = parseFloat(input.val());
 		return viewValue;
 	};

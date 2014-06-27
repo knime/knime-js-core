@@ -59,6 +59,25 @@ callUpdate = function() {
 	}
 };
 
-function injectCSS(rule) {
+injectCSS = function(rule) {
 	var div = $("<div />", {html: '<style>' + rule + '</style>'}).appendTo("head");    
+}
+
+isValid = function(object) {
+	return object != undefined && object != null;
+}
+
+checkMissingData = function(representation, value) {
+	if (isValid(representation) && isValid(value)) {
+		return false;
+	} else {
+		var body = $('body');
+		var qfdiv = $('<div class="quickformcontainer">');
+		body.append(qfdiv);
+		var error = $("<span>Error: Data is missing, can not display view.</span>");
+		error.css('color', 'red');
+		qfdiv.append(error);
+		resizeParent();
+		return true;
+	}
 }

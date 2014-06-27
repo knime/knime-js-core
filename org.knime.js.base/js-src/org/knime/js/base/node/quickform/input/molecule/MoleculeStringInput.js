@@ -54,6 +54,9 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 	var input;
 
 	moleculeInput.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
@@ -71,6 +74,9 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 	};
 
 	moleculeInput.value = function() {
+		if (!isValid((viewValue))) {
+			return null;
+		}
 		viewValue.moleculeString = input.val();
 		return viewValue;
 	};

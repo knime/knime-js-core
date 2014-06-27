@@ -56,6 +56,9 @@ org_knime_js_base_node_quickform_filter_value = function() {
 	var selector;
 
 	valueFilter.init = function(representation, value) {
+		if (checkMissingData(representation, value)) {
+			return;
+		}
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
@@ -108,6 +111,9 @@ org_knime_js_base_node_quickform_filter_value = function() {
 	};
 
 	valueFilter.value = function() {
+		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+			return null;
+		}
 		viewValue.values = selector.getSelections();
 		if (!viewRepresentation.lockColumn) {
 			viewValue.column = colselection.find(':selected').text();
