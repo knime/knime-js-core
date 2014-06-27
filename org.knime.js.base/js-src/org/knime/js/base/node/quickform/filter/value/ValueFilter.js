@@ -73,7 +73,7 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
 				colselection.addClass('dropdown');
-				colselection.css('margin', '5px');
+				colselection.css('margin', '0px 0px 5px 0px');
 				qfdiv.append(colselection);
 				qfdiv.append($('<br>'));
 				for ( var key in representation.possibleValues) {

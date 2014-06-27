@@ -139,8 +139,8 @@ org_knime_js_base_node_quickform_input_date = function() {
 		
 		var allInputs = $('input');
 		allInputs.height(20);
-		allInputs.width(40);
-		dateInput.width(100);
+		allInputs.width(20);
+		dateInput.width(108);
 		dateInput.css('border', '1px solid silver');
 		dateInput.css('margin-bottom', '10px');
 		allInputs.css('font-size', 'medium');

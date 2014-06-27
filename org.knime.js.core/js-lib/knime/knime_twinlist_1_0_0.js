@@ -224,6 +224,7 @@ function twinlist() {
 	var span = $('<span>');
 	span.css('float', 'left');
 	var buttonfiller = $('<div>');
+	buttonfiller.css('padding', '5px');
 	var add = $('<button type="button">&gt;</button>');
 	add.click(execAdd);
 	add.attr('title', 'Add selected to includes');

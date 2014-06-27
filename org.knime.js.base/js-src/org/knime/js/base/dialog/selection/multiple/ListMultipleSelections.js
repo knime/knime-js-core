@@ -67,6 +67,7 @@ function listMultipleSelections() {
 			option.appendTo(select);
 			option.blur(notifyListeners());
 		}
+		select.attr('size', choices.length);
 	};
 	this.getSelections = function() {
 		var selections = [];
