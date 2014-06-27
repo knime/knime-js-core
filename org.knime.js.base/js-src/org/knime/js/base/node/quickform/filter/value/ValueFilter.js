@@ -107,7 +107,6 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
-		callUpdate();
 	};
 
 	valueFilter.value = function() {

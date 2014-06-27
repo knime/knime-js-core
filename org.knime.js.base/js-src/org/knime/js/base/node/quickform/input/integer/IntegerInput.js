@@ -87,7 +87,6 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		qfdiv.append(errorMessage);
 		input.blur(callUpdate);
 		resizeParent();
-		callUpdate();
 	};
 	
 	integerInput.validate = function() {

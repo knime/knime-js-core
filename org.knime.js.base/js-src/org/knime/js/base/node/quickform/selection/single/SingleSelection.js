@@ -80,7 +80,6 @@ org_knime_js_base_node_quickform_selection_single = function() {
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
-		callUpdate();
 	};
 
 	singleSelection.value = function() {

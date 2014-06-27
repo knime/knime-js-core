@@ -82,7 +82,6 @@ org_knime_js_base_node_quickform_input_string = function() {
 		qfdiv.append(errorMessage);
 		input.blur(callUpdate);
 		resizeParent();
-		callUpdate();
 	};
 
 	stringInput.validate = function() {

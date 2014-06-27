@@ -95,7 +95,6 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		omitEmpty = representation.omitempty;
 		input.blur(callUpdate);
 		resizeParent();
-		callUpdate();
 	};
 
 	listboxInput.validate = function() {

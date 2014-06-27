@@ -87,7 +87,6 @@ org_knime_js_base_node_quickform_selection_column = function() {
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
-		callUpdate();
 	};
 
 	columnSelection.value = function() {
