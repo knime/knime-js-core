@@ -90,7 +90,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param regex the regex to set
      */
-    @JsonProperty("regex")
+    @JsonIgnore
     public void setRegex(final String regex) {
         m_regex = regex;
     }
@@ -106,7 +106,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param errorMessage the errorMessage to set
      */
-    @JsonProperty("errormessage")
+    @JsonIgnore
     public void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
@@ -161,7 +161,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -169,7 +169,7 @@ public class StringInputQuickFormRepresentation extends QuickFormFlowVariableRep
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }

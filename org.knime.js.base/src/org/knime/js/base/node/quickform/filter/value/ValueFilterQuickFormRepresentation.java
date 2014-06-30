@@ -189,7 +189,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @param lockColumn the lockColumn to set
      */
-    @JsonProperty("lockColumn")
+    @JsonIgnore
     public void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
     }
@@ -197,7 +197,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @return the defaultColumn
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public String getDefaultColumn() {
         return m_defaultColumn;
     }
@@ -205,7 +205,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @param defaultColumn the defaultColumn to set
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public void setDefaultColumn(final String defaultColumn) {
         m_defaultColumn = defaultColumn;
     }
@@ -213,7 +213,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @return the defaultValues
      */
-    @JsonProperty("defaultValues")
+    @JsonIgnore
     public String[] getDefaultValues() {
         return m_defaultValues;
     }
@@ -221,7 +221,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @param defaultValues the defaultValues to set
      */
-    @JsonProperty("defaultValues")
+    @JsonIgnore
     public void setDefaultValues(final String[] defaultValues) {
         m_defaultValues = defaultValues;
     }
@@ -242,7 +242,7 @@ public class ValueFilterQuickFormRepresentation extends
         return m_possibleValues;
     }
 
-    @JsonProperty("possibleValues")
+    @JsonIgnore
     public void setPossibleValues(final Map<String, List<String>> possibleValues) {
         m_possibleValues = possibleValues;
     }
@@ -285,7 +285,7 @@ public class ValueFilterQuickFormRepresentation extends
     /**
      * @param type the type to set
      */
-    @JsonProperty("type")
+    @JsonIgnore
     public void setType(final String type) {
         m_type = type;
     }
@@ -305,7 +305,7 @@ public class ValueFilterQuickFormRepresentation extends
         sb.append(m_defaultColumn);
         sb.append(", ");
         sb.append("defaultValues=");
-        sb.append(m_defaultValues);
+        sb.append(Arrays.toString(m_defaultValues));
         sb.append(", ");
         sb.append("possibleValues=");
         sb.append("{");

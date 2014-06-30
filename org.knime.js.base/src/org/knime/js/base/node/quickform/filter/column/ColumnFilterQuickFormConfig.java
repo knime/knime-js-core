@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.quickform.filter.column;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -126,7 +128,7 @@ public class ColumnFilterQuickFormConfig extends QuickFormFlowVariableConfig<Col
         sb.append(super.toString());
         sb.append(", ");
         sb.append("possibleColumns=");
-        sb.append(m_possibleColumns);
+        sb.append(Arrays.toString(m_possibleColumns));
         sb.append(", ");
         sb.append("type=");
         sb.append(m_type);

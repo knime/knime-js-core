@@ -201,7 +201,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @param columnType the columnType to set
      */
-    @JsonProperty("columnType")
+    @JsonIgnore
     public void setColumnType(final ColumnType columnType) {
         m_columnType = columnType;
     }
@@ -217,7 +217,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @param lockColumn the lockColumn to set
      */
-    @JsonProperty("lockColumn")
+    @JsonIgnore
     public void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
     }
@@ -225,7 +225,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @return the defaultColumn
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public String getDefaultColumn() {
         return m_defaultColumn;
     }
@@ -233,7 +233,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @param defaultColumn the defaultColumn to set
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public void setDefaultColumn(final String defaultColumn) {
         m_defaultColumn = defaultColumn;
     }
@@ -241,7 +241,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultValue")
+    @JsonIgnore
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -249,7 +249,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultValue")
+    @JsonIgnore
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -332,7 +332,7 @@ public class ValueSelectionQuickFormRepresentation extends
     /**
      * @param type the type to set
      */
-    @JsonProperty("type")
+    @JsonIgnore
     public void setType(final String type) {
         m_type = type;
     }

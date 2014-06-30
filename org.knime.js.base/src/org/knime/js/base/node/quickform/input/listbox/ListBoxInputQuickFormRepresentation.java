@@ -103,7 +103,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @param regex the regex to set
      */
-    @JsonProperty("regex")
+    @JsonIgnore
     public void setRegex(final String regex) {
         m_regex = regex;
     }
@@ -119,7 +119,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @param errorMessage the errorMessage to set
      */
-    @JsonProperty("errormessage")
+    @JsonIgnore
     public void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
@@ -135,7 +135,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @param separator the separator to set
      */
-    @JsonProperty("separator")
+    @JsonIgnore
     public void setSeparator(final String separator) {
         m_separator = separator;
     }
@@ -185,7 +185,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @param omitEmpty the omitEmpty to set
      */
-    @JsonProperty("omitempty")
+    @JsonIgnore
     public void setOmitEmpty(final boolean omitEmpty) {
         m_omitEmpty = omitEmpty;
     }
@@ -246,7 +246,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -254,7 +254,7 @@ public class ListBoxInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }

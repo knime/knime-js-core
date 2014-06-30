@@ -182,7 +182,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @return the default
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public Date getDefaultValue() {
         return m_defaultValue;
     }
@@ -190,7 +190,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param defaultValue the default to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final Date defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -215,7 +215,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param useMin the useMin to set
      */
-    @JsonProperty("usemin")
+    @JsonIgnore
     public void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
@@ -231,7 +231,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param useMax the useMax to set
      */
-    @JsonProperty("usemax")
+    @JsonIgnore
     public void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
@@ -247,7 +247,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param min the min to set
      */
-    @JsonProperty("min")
+    @JsonIgnore
     public void setMin(final Date min) {
         m_min = min;
     }
@@ -263,7 +263,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param max the max to set
      */
-    @JsonProperty("max")
+    @JsonIgnore
     public void setMax(final Date max) {
         m_max = max;
     }
@@ -279,7 +279,7 @@ public class DateInputQuickFormRepresentation extends
     /**
      * @param withTime the withTime to set
      */
-    @JsonProperty("withtime")
+    @JsonIgnore
     public void setWithTime(final boolean withTime) {
         m_withTime = withTime;
     }

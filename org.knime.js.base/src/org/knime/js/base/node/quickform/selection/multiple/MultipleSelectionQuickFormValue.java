@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.selection.multiple;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -130,7 +132,7 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("variableValue=");
-        sb.append(m_variableValue);
+        sb.append(Arrays.toString(m_variableValue));
         return sb.toString();
     }
 }

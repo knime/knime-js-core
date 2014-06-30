@@ -90,7 +90,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     /**
      * @param format the format to set
      */
-    @JsonProperty("format")
+    @JsonIgnore
     public void setFormat(final String format) {
         m_format = format;
     }
@@ -142,7 +142,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -150,7 +150,7 @@ public class MoleculeStringInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }

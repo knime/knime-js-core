@@ -52,7 +52,6 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -113,7 +112,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public boolean getDefaultValue() {
         return m_defaultValue;
     }
@@ -121,7 +120,7 @@ public class BooleanInputQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final boolean defaultValue) {
         m_defaultValue = defaultValue;
     }

@@ -44,6 +44,8 @@
  */
 package org.knime.js.base.node.quickform.selection.single;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -132,7 +134,7 @@ public class SingleSelectionQuickFormRepresentation extends
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public String getDefaultValue() {
         return m_defaultValue;
     }
@@ -140,7 +142,7 @@ public class SingleSelectionQuickFormRepresentation extends
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final String defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -165,7 +167,7 @@ public class SingleSelectionQuickFormRepresentation extends
     /**
      * @param possibleChoices the possibleChoices to set
      */
-    @JsonProperty("possibleChoices")
+    @JsonIgnore
     public void setPossibleChoices(final String[] possibleChoices) {
         m_possibleChoices = possibleChoices;
     }
@@ -181,7 +183,7 @@ public class SingleSelectionQuickFormRepresentation extends
     /**
      * @param type the type to set
      */
-    @JsonProperty("type")
+    @JsonIgnore
     public void setType(final String type) {
         m_type = type;
     }
@@ -198,7 +200,7 @@ public class SingleSelectionQuickFormRepresentation extends
         sb.append(m_defaultValue);
         sb.append(", ");
         sb.append("possibleChoices=");
-        sb.append(m_possibleChoices);
+        sb.append(Arrays.toString(m_possibleChoices));
         sb.append(", ");
         sb.append("type=");
         sb.append(m_type);

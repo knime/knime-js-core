@@ -44,6 +44,8 @@
  */
 package org.knime.js.base.node.quickform.selection.column;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -133,7 +135,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @return the defaultColumn
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public String getDefaultColumn() {
         return m_defaultColumn;
     }
@@ -141,7 +143,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param defaultColumn the defaultColumn to set
      */
-    @JsonProperty("defaultColumn")
+    @JsonIgnore
     public void setDefaultColumn(final String defaultColumn) {
         m_defaultColumn = defaultColumn;
     }
@@ -166,7 +168,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param possibleColumns the possibleColumns to set
      */
-    @JsonProperty("possibleColumns")
+    @JsonIgnore
     public void setPossibleColumns(final String[] possibleColumns) {
         m_possibleColumns = possibleColumns;
     }
@@ -182,7 +184,7 @@ public class ColumnSelectionQuickFormRepresentation extends
     /**
      * @param type the type to set
      */
-    @JsonProperty("type")
+    @JsonIgnore
     public void setType(final String type) {
         m_type = type;
     }
@@ -199,7 +201,7 @@ public class ColumnSelectionQuickFormRepresentation extends
         sb.append(m_defaultColumn);
         sb.append(", ");
         sb.append("possibleColumns=");
-        sb.append(m_possibleColumns);
+        sb.append(Arrays.toString(m_possibleColumns));
         sb.append(", ");
         sb.append("type=");
         sb.append(m_type);

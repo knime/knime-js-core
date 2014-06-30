@@ -150,7 +150,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @return the defaultValue
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public int getDefaultValue() {
         return m_defaultValue;
     }
@@ -158,7 +158,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param defaultValue the defaultValue to set
      */
-    @JsonProperty("defaultvalue")
+    @JsonIgnore
     public void setDefaultValue(final int defaultValue) {
         m_defaultValue = defaultValue;
     }
@@ -183,7 +183,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param useMin the useMin to set
      */
-    @JsonProperty("usemin")
+    @JsonIgnore
     public void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
@@ -199,7 +199,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param useMax the useMax to set
      */
-    @JsonProperty("usemax")
+    @JsonIgnore
     public void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
@@ -215,7 +215,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param min the min to set
      */
-    @JsonProperty("min")
+    @JsonIgnore
     public void setMin(final int min) {
         m_min = min;
     }
@@ -231,7 +231,7 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
     /**
      * @param max the max to set
      */
-    @JsonProperty("max")
+    @JsonIgnore
     public void setMax(final int max) {
         m_max = max;
     }

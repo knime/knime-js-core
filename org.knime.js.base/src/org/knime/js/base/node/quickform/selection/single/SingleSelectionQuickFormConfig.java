@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.quickform.selection.single;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -121,7 +123,7 @@ public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         sb.append(super.toString());
         sb.append(", ");
         sb.append("possibleChoices=");
-        sb.append(m_possibleChoices);
+        sb.append(Arrays.toString(m_possibleChoices));
         sb.append(", ");
         sb.append("type=");
         sb.append(m_type);

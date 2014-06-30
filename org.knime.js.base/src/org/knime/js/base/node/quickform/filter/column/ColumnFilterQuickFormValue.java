@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.filter.column;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -133,7 +135,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("columns=");
-        sb.append(m_columns);
+        sb.append(Arrays.toString(m_columns));
         return sb.toString();
     }
 

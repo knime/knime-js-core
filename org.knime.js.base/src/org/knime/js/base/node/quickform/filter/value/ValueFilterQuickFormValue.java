@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.filter.value;
 
+import java.util.Arrays;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -161,7 +163,7 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
         sb.append(m_column);
         sb.append(", ");
         sb.append("values=");
-        sb.append(m_values);
+        sb.append(Arrays.toString(m_values));
         return sb.toString();
     }
 
