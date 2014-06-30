@@ -63,6 +63,7 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
+ * Sub node dialog panel for the value filter quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */

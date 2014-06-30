@@ -58,8 +58,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the date input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateInputQuickFormValue> {
 
@@ -79,46 +80,79 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateIn
     private static final boolean DEFAULT_WITH_TIME = true;
     private boolean m_withTime = DEFAULT_WITH_TIME;
 
+    /**
+     * @return the useMin
+     */
     boolean getUseMin() {
         return m_useMin;
     }
 
+    /**
+     * @param useMin the useMin to set
+     */
     void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
 
+    /**
+     * @return the useMax
+     */
     boolean getUseMax() {
         return m_useMax;
     }
 
+    /**
+     * @param useMax the useMax to set
+     */
     void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
 
+    /**
+     * @return the min
+     */
     Date getMin() {
         return m_min;
     }
 
+    /**
+     * @param min the min to set
+     */
     void setMin(final Date min) {
         m_min = min;
     }
 
+    /**
+     * @return the max
+     */
     Date getMax() {
         return m_max;
     }
 
+    /**
+     * @param max the max to set
+     */
     void setMax(final Date max) {
         m_max = max;
     }
 
+    /**
+     * @return the withTime
+     */
     boolean getWithTime() {
         return m_withTime;
     }
 
+    /**
+     * @param withTime the withTime to set
+     */
     void setWithTime(final boolean withTime) {
         m_withTime = withTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -130,6 +164,9 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateIn
         settings.addBoolean(CFG_WITH_TIME, m_withTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -145,6 +182,9 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateIn
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

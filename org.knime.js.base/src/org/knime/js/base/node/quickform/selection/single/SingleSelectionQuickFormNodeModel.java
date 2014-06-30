@@ -48,11 +48,15 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
+ * The model for the single selection quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 public class SingleSelectionQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<SingleSelectionQuickFormRepresentation, SingleSelectionQuickFormValue, SingleSelectionQuickFormConfig> {
+    extends QuickFormFlowVariableNodeModel
+    <SingleSelectionQuickFormRepresentation,
+    SingleSelectionQuickFormValue,
+    SingleSelectionQuickFormConfig> {
 
     /**
      * {@inheritDoc}

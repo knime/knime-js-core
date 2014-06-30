@@ -68,8 +68,9 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the date input quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
@@ -187,6 +188,10 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
     }
 
+    /**
+     * Updates the format used to select time to either {@link DateInputQuickFormNodeModel.DATE_FORMAT} or
+     * {@link DateInputQuickFormNodeModel.DATE_TIME_FORMAT}, depending on the selected option.
+     */
     private void updateFormat() {
         String format =
                 m_dateAndTime.isSelected() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT

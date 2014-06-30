@@ -66,6 +66,8 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the single selection quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 @SuppressWarnings({"rawtypes", "unchecked" })

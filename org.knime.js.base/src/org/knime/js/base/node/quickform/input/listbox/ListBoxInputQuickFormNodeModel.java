@@ -64,12 +64,15 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the list box input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ListBoxInputQuickFormNodeModel
-        extends
-        QuickFormNodeModel<ListBoxInputQuickFormRepresentation, ListBoxInputQuickFormValue, ListBoxInputQuickFormConfig> {
+        extends QuickFormNodeModel
+        <ListBoxInputQuickFormRepresentation,
+        ListBoxInputQuickFormValue,
+        ListBoxInputQuickFormConfig> {
 
     /**
      * Creates a list box input node model.
@@ -78,6 +81,9 @@ public class ListBoxInputQuickFormNodeModel
         super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
     }
 
+    /**
+     * Pushes the current value as flow variable.
+     */
     private void createAndPushFlowVariable() {
         final String variableName = getConfig().getFlowVariableName();
         final String value = getRelevantValue().getString();
@@ -109,6 +115,10 @@ public class ListBoxInputQuickFormNodeModel
         return new PortObject[]{cont.getTable()};
     }
 
+    /**
+     * @return List of validated values
+     * @throws InvalidSettingsException If one of the values is invalid
+     */
     private List<String> getValidatedValues() throws InvalidSettingsException {
         boolean omitEmpty = getConfig().getOmitEmpty();
         final String value = getRelevantValue().getString();
@@ -139,6 +149,10 @@ public class ListBoxInputQuickFormNodeModel
         return values;
     }
 
+    /**
+     * @param variableName Name of the created column
+     * @return Output spec
+     */
     private DataTableSpec createSpec(final String variableName) {
         final DataColumnSpec cspec = new DataColumnSpecCreator(variableName, StringCell.TYPE).createSpec();
         return new DataTableSpec(cspec);

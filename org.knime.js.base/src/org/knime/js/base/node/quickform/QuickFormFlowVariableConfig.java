@@ -54,10 +54,14 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
+ * Configuration of a flow variable quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The value used for the default value
  */
-public abstract class QuickFormFlowVariableConfig<VAL extends DialogNodeValue> extends QuickFormConfig<VAL> {
+public abstract class QuickFormFlowVariableConfig
+        <VAL extends DialogNodeValue>
+        extends QuickFormConfig<VAL> {
 
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
@@ -65,10 +69,16 @@ public abstract class QuickFormFlowVariableConfig<VAL extends DialogNodeValue> e
 
     private String m_flowVariableName = DEFAULT_FLOW_VARIABLE_NAME;
 
+    /**
+     * @return the flowVariableName
+     */
     public String getFlowVariableName() {
         return m_flowVariableName;
     }
 
+    /**
+     * @param flowVariableName the flowVariableName to set
+     */
     public void setFlowVariableName(final String flowVariableName) {
         this.m_flowVariableName = flowVariableName;
     }

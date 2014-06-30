@@ -50,11 +50,15 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The factory for the double input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class DoubleInputQuickFormNodeFactory extends NodeFactory<DoubleInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<DoubleInputQuickFormNodeModel, DoubleInputQuickFormRepresentation,
+public class DoubleInputQuickFormNodeFactory
+        extends NodeFactory<DoubleInputQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <DoubleInputQuickFormNodeModel,
+        DoubleInputQuickFormRepresentation,
         DoubleInputQuickFormValue> {
 
     /**

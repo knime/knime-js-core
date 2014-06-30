@@ -54,8 +54,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the double input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig<DoubleInputQuickFormValue> {
 
@@ -72,38 +73,65 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig<Doub
     private static final double DEFAULT_MAX = 1.0;
     private double m_max = DEFAULT_MAX;
 
+    /**
+     * @return the useMin
+     */
     boolean getUseMin() {
         return m_useMin;
     }
 
+    /**
+     * @param useMin the useMin to set
+     */
     void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
 
+    /**
+     * @return the useMax
+     */
     boolean getUseMax() {
         return m_useMax;
     }
 
+    /**
+     * @param useMax the useMax to set
+     */
     void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
 
+    /**
+     * @return the min
+     */
     double getMin() {
         return m_min;
     }
 
+    /**
+     * @param min the min to set
+     */
     void setMin(final double min) {
         m_min = min;
     }
 
+    /**
+     * @return the max
+     */
     double getMax() {
         return m_max;
     }
 
+    /**
+     * @param max the max to set
+     */
     void setMax(final double max) {
         m_max = max;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -113,6 +141,9 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig<Doub
         settings.addDouble(CFG_MAX, m_max);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -122,6 +153,9 @@ public class DoubleInputQuickFormConfig extends QuickFormFlowVariableConfig<Doub
         m_max = settings.getDouble(CFG_MAX);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

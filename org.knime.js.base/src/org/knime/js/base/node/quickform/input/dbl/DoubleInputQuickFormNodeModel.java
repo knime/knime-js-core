@@ -49,12 +49,15 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the double input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class DoubleInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<DoubleInputQuickFormRepresentation, DoubleInputQuickFormValue, DoubleInputQuickFormConfig> {
+        extends QuickFormFlowVariableNodeModel
+        <DoubleInputQuickFormRepresentation,
+        DoubleInputQuickFormValue,
+        DoubleInputQuickFormConfig> {
 
     /**
      * {@inheritDoc}
@@ -99,6 +102,9 @@ public class DoubleInputQuickFormNodeModel
         pushFlowVariableDouble(getConfig().getFlowVariableName(), value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void copyValueToConfig() {
         getConfig().getDefaultValue().setDouble(getViewValue().getDouble());

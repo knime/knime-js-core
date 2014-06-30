@@ -57,8 +57,9 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the muliple selections quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<MultipleSelectionQuickFormValue> {
 
@@ -74,22 +75,37 @@ public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfi
 
     private String m_type = DEFAULT_TYPE;
 
+    /**
+     * @return the possibleChoices
+     */
     String[] getPossibleChoices() {
         return m_possibleChoices;
     }
 
+    /**
+     * @param possibleChoices the possibleChoices to set
+     */
     void setPossibleChoices(final String[] possibleChoices) {
         m_possibleChoices = possibleChoices;
     }
 
+    /**
+     * @return the type
+     */
     String getType() {
         return m_type;
     }
 
+    /**
+     * @param type the type to set
+     */
     void setType(final String type) {
         m_type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -97,6 +113,9 @@ public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfi
         settings.addString(CFG_TYPE, m_type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -104,6 +123,9 @@ public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfi
         m_type = settings.getString(CFG_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
@@ -117,7 +139,7 @@ public class MultipleSelectionQuickFormConfig extends QuickFormFlowVariableConfi
     @Override
     protected MultipleSelectionQuickFormValue createEmptyValue() {
         return new MultipleSelectionQuickFormValue();
-    };
+    }
 
     /**
      * {@inheritDoc}

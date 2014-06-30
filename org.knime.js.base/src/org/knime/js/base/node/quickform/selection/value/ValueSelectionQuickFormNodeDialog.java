@@ -78,9 +78,9 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the value selection quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings({"unchecked", "rawtypes" })
 public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
@@ -137,6 +137,9 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         createAndAddTab();
     }
 
+    /**
+     * Updates the columns that are available for selection.
+     */
     private void updateAvailableColumns() {
         List<DataColumnSpec> specs = new ArrayList<DataColumnSpec>();
         switch ((ColumnType)m_columnType.getSelectedItem()) {
@@ -179,6 +182,12 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         }
     }
 
+    /**
+     * Update the values that are available for selection based on the given column.
+     *
+     * @param column The column holding the values
+     * @param model Model of the Combo Box that gets updated
+     */
     private void updateValues(final String column, final DefaultComboBoxModel<String> model) {
         final DataTableSpec spec = m_defaultColumnField.getDataTableSpec();
         DataColumnSpec dcs = spec.getColumnSpec(column);

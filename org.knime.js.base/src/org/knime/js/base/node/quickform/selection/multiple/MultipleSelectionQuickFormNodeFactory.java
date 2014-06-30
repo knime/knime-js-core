@@ -50,10 +50,15 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
+ * The factory for the muliple selections quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
-public class MultipleSelectionQuickFormNodeFactory extends NodeFactory<MultipleSelectionQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<MultipleSelectionQuickFormNodeModel, MultipleSelectionQuickFormRepresentation,
+public class MultipleSelectionQuickFormNodeFactory
+        extends NodeFactory<MultipleSelectionQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <MultipleSelectionQuickFormNodeModel,
+        MultipleSelectionQuickFormRepresentation,
         MultipleSelectionQuickFormValue> {
 
     /**

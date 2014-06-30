@@ -60,11 +60,15 @@ import org.knime.core.node.port.PortType;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Model for the column filter quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFilterQuickFormRepresentation,
-        ColumnFilterQuickFormValue, ColumnFilterQuickFormConfig> {
+public class ColumnFilterQuickFormNodeModel
+        extends QuickFormNodeModel
+        <ColumnFilterQuickFormRepresentation,
+        ColumnFilterQuickFormValue,
+        ColumnFilterQuickFormConfig> {
 
     /** Creates a new value selection node model. */
     public ColumnFilterQuickFormNodeModel() {
@@ -107,6 +111,11 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
     }
 
+    /**
+     * @param inSpec The input spec
+     * @return The output spec for the given input spec and the current settings
+     * @throws InvalidSettingsException If the current settings can not be applied to the given input spec
+     */
     private DataTableSpec createSpec(final DataTableSpec inSpec) throws InvalidSettingsException {
         final String[] values = getRelevantValue().getColumns();
         final List<DataColumnSpec> cspecs = new ArrayList<DataColumnSpec>();
@@ -126,6 +135,11 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         return new DataTableSpec(cspecs.toArray(new DataColumnSpec[cspecs.size()]));
     }
 
+    /**
+     * Update the possible columns in the config.
+     *
+     * @param spec The input spec
+     */
     private void updateColumns(final DataTableSpec spec) {
         getConfig().setPossibleColumns(spec.getColumnNames());
     }
@@ -145,6 +159,9 @@ public class ColumnFilterQuickFormNodeModel extends QuickFormNodeModel<ColumnFil
         return new BufferedDataTable[]{outTable};
     }
 
+    /**
+     * Pushes the current value as flow variable.
+     */
     private void createAndPushFlowVariable() {
         final String[] values = getRelevantValue().getColumns();
         pushFlowVariableString(getConfig().getFlowVariableName(),

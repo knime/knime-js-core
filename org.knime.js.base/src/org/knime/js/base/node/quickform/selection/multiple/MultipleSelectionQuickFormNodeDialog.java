@@ -71,6 +71,8 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the muliple selections quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 @SuppressWarnings({"rawtypes", "unchecked", "deprecation" })
@@ -184,7 +186,8 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        m_config.getDefaultValue().setVariableValue((Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
+        m_config.getDefaultValue().setVariableValue(
+            (Arrays.asList(m_defaultField.getSelectedValues())).toArray(new String[0]));
         String possibleChoices = m_possibleChoicesField.getText();
         m_config.setPossibleChoices(possibleChoices.isEmpty() ? new String[0] : possibleChoices.split("\n"));
         m_config.setType((String)m_type.getItemAt(m_type.getSelectedIndex()));

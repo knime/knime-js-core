@@ -61,12 +61,16 @@ import org.knime.core.node.port.PortType;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Model for the value filter quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ValueFilterQuickFormNodeModel
         extends
-        QuickFormNodeModel<ValueFilterQuickFormRepresentation, ValueFilterQuickFormValue, ValueFilterQuickFormConfig> {
+        QuickFormNodeModel
+        <ValueFilterQuickFormRepresentation,
+        ValueFilterQuickFormValue,
+        ValueFilterQuickFormConfig> {
 
     /** Creates a new value selection node model. */
     public ValueFilterQuickFormNodeModel() {
@@ -153,10 +157,20 @@ public class ValueFilterQuickFormNodeModel
         return new PortObject[]{container.getTable()};
     }
 
+    /**
+     * Updates the possible values in the config.
+     *
+     * @param spec The input spec
+     */
     private void updateValues(final DataTableSpec spec) {
         getConfig().setFromSpec(spec);
     }
 
+    /**
+     * Push the current value as flow variable.
+     *
+     * @throws InvalidSettingsException If the current value is not among the possible values
+     */
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         checkSelectedValues();
         List<String> values = Arrays.asList(getRelevantValue().getValues());
@@ -164,6 +178,11 @@ public class ValueFilterQuickFormNodeModel
                 StringUtils.join(values, ","));
     }
 
+    /**
+     * Checks if the currently selected value is among the possible values and throws an exception if not.
+     *
+     * @throws InvalidSettingsException If the value is not among the possible values
+     */
     private void checkSelectedValues() throws InvalidSettingsException {
         String column = getRelevantValue().getColumn();
         List<String> values = Arrays.asList(getRelevantValue().getValues());

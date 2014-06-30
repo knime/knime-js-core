@@ -55,6 +55,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The sub node dialog panel for the list box input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -64,7 +65,7 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
     private JTextArea m_component = new JTextArea(5, QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
     /**
-     *
+     * @param representation The dialog representation
      */
     public ListBoxInputQuickFormDialogPanel(final ListBoxInputQuickFormRepresentation representation) {
         m_component.setText(representation.getDefaultValue());

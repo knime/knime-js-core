@@ -57,8 +57,9 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the single selection quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<SingleSelectionQuickFormValue> {
 
@@ -69,22 +70,37 @@ public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
     private String m_type = DEFAULT_TYPE;
 
+    /**
+     * @return the possibleChoices
+     */
     String[] getPossibleChoices() {
         return m_possibleChoices;
     }
 
+    /**
+     * @param possibleChoices the possibleChoices to set
+     */
     void setPossibleChoices(final String[] possibleChoices) {
         m_possibleChoices = possibleChoices;
     }
 
+    /**
+     * @return the type
+     */
     String getType() {
         return m_type;
     }
 
+    /**
+     * @param type the type to set
+     */
     void setType(final String type) {
         m_type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -92,6 +108,9 @@ public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         settings.addString(CFG_TYPE, m_type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -99,6 +118,9 @@ public class SingleSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         m_type = settings.getString(CFG_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

@@ -67,8 +67,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * Representation for the value filter quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
@@ -242,6 +243,9 @@ public class ValueFilterQuickFormRepresentation extends
         return m_possibleValues;
     }
 
+    /**
+     * @param possibleValues the possibleValues to set
+     */
     @JsonIgnore
     public void setPossibleValues(final Map<String, List<String>> possibleValues) {
         m_possibleValues = possibleValues;

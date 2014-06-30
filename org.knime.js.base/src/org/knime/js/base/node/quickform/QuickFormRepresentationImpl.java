@@ -61,14 +61,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * Implementation of {@link QuickFormRepresentation}.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
-        extends JSONViewContent implements QuickFormRepresentation<VAL> {
+public abstract class QuickFormRepresentationImpl
+        <VAL extends DialogNodeValue>
+        extends JSONViewContent
+        implements QuickFormRepresentation<VAL> {
 
     private static final String CFG_LABEL = "label";
 
@@ -147,7 +150,7 @@ public abstract class QuickFormRepresentationImpl<VAL extends DialogNodeValue>
     }
 
     /**
-     * @param panel The panel to fill
+     * @param panel The panel to fill with the information contained in this representation
      */
     @JsonIgnore
     protected void fillDialogPanel(final QuickFormDialogPanel<VAL> panel) {

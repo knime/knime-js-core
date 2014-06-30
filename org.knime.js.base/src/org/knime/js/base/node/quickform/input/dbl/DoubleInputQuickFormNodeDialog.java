@@ -65,9 +65,9 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the double input quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
 
@@ -88,9 +88,9 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config = new DoubleInputQuickFormConfig();
         m_useMin = new JCheckBox();
         m_useMax = new JCheckBox();
-        m_min = new JSpinner(getSpinnerModel());
-        m_max = new JSpinner(getSpinnerModel());
-        m_defaultSpinner = new JSpinner(getSpinnerModel());
+        m_min = new JSpinner(createSpinnerModel());
+        m_max = new JSpinner(createSpinnerModel());
+        m_defaultSpinner = new JSpinner(createSpinnerModel());
         m_useMin.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
@@ -126,7 +126,10 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         createAndAddTab();
     }
 
-    private SpinnerNumberModel getSpinnerModel() {
+    /**
+     * @return A new spinner model
+     */
+    private SpinnerNumberModel createSpinnerModel() {
         return new SpinnerNumberModel(0.0, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 0.01);
     }
 

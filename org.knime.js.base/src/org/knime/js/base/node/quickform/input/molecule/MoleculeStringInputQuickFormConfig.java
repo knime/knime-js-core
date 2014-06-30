@@ -54,8 +54,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the molecule string input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableConfig<MoleculeStringInputQuickFormValue> {
 
@@ -63,26 +64,41 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     private static final String DEFAULT_FORMAT = MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS[0];
     private String m_format = DEFAULT_FORMAT;
 
+    /**
+     * @return the format
+     */
     String getFormat() {
         return m_format;
     }
 
+    /**
+     * @param format the format to set
+     */
     void setFormat(final String format) {
         m_format = format;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
         settings.addString(CFG_FORMAT, m_format);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
         m_format = settings.getString(CFG_FORMAT);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

@@ -48,12 +48,15 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the boolean input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class BooleanInputQuickFormNodeModel
-    extends
-    QuickFormFlowVariableNodeModel<BooleanInputQuickFormRepresentation, BooleanInputQuickFormValue, BooleanInputQuickFormConfig> {
+    extends QuickFormFlowVariableNodeModel
+    <BooleanInputQuickFormRepresentation,
+    BooleanInputQuickFormValue,
+    BooleanInputQuickFormConfig> {
 
     /**
      * {@inheritDoc}
@@ -88,6 +91,9 @@ public class BooleanInputQuickFormNodeModel
         pushFlowVariableInt(getConfig().getFlowVariableName(), value ? 1 : 0);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected BooleanInputQuickFormRepresentation getRepresentation() {
         BooleanInputQuickFormRepresentation representation = super.getRepresentation();
@@ -95,6 +101,9 @@ public class BooleanInputQuickFormNodeModel
         return representation;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void copyValueToConfig() {
         getConfig().getDefaultValue().setBoolean(getViewValue().getBoolean());

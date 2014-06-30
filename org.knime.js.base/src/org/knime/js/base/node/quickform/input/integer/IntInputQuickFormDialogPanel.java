@@ -54,6 +54,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
+ * The sub node dialog panel for the integer input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -63,7 +64,7 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
     private JSpinner m_component = new JSpinner(new SpinnerNumberModel(0, Integer.MIN_VALUE, Integer.MAX_VALUE, 1));
 
     /**
-     *
+     * @param representation The dialog representation
      */
     public IntInputQuickFormDialogPanel(final IntInputQuickFormRepresentation representation) {
         m_component.setValue(representation.getDefaultValue());

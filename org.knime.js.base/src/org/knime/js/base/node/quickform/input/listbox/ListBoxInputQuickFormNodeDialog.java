@@ -61,9 +61,9 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 import org.knime.js.base.node.quickform.input.string.RegexPanel;
 
 /**
+ * The dialog for the list box input quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
 

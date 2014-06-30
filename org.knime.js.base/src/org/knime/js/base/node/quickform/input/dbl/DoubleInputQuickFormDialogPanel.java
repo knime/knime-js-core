@@ -56,6 +56,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The sub node dialog panel for the double input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -66,7 +67,7 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
             Double.POSITIVE_INFINITY, 0.01));
 
     /**
-     *
+     * @param representation The dialog representation
      */
     public DoubleInputQuickFormDialogPanel(final DoubleInputQuickFormRepresentation representation) {
         m_component.setPreferredSize(new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH).getPreferredSize());

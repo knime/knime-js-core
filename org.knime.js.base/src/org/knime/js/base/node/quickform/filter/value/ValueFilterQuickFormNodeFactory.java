@@ -50,11 +50,15 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Factory for the value filter quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class ValueFilterQuickFormNodeFactory extends NodeFactory<ValueFilterQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<ValueFilterQuickFormNodeModel, ValueFilterQuickFormRepresentation,
+public class ValueFilterQuickFormNodeFactory
+        extends NodeFactory<ValueFilterQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <ValueFilterQuickFormNodeModel,
+        ValueFilterQuickFormRepresentation,
         ValueFilterQuickFormValue> {
 
     /**

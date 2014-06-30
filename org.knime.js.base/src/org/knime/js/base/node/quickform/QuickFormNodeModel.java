@@ -65,14 +65,22 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 
 /**
+ * Model of a quick form node.
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP> The configuration content of the quickform node.
- * @param <VAL> The node value implementation of the quickform node.
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <REP> The representation implementation of the quick form node.
+ * @param <VAL> The value implementation of the quick form node.
+ * @param <CONF> The configuration implementation of the quick form node.
  *
  */
-public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl<VAL>,
-        VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig<VAL>>
-        extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
+public abstract class QuickFormNodeModel
+        <REP extends QuickFormRepresentationImpl<VAL>,
+        VAL extends DialogNodeValue & WebViewContent,
+        CONF extends QuickFormConfig<VAL>>
+        extends NodeModel
+        implements DialogNode<REP, VAL>,
+        WizardNode<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(QuickFormNodeModel.class);
 
@@ -81,7 +89,7 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     private VAL m_viewValue = null;
 
     /**
-     * Creates a new quickform model with the given number (and types!) of input
+     * Creates a new quick form model with the given number (and types!) of input
      * and output types.
      *
      * @param inPortTypes an array of non-null in-port types
@@ -91,6 +99,9 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         super(inPortTypes, outPortTypes);
     }
 
+    /**
+     * @return The config of this node.
+     */
     protected CONF getConfig() {
         return m_config;
     }
@@ -126,7 +137,10 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         valSettings.saveToXML(new FileOutputStream(valFile));
     }
 
-    abstract public CONF createEmptyConfig();
+    /**
+     * @return Empty instance of the config.
+     */
+    public abstract CONF createEmptyConfig();
 
     /**
      * {@inheritDoc}
@@ -152,6 +166,9 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         return getRepresentation();
     }
 
+    /**
+     * @return Representation based on the current config.
+     */
     protected REP getRepresentation() {
         REP representation = createEmptyViewRepresentation();
         representation.setLabel(getConfig().getLabel());
@@ -178,6 +195,9 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void reset() {
         m_viewValue = null;
@@ -207,20 +227,30 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         //
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ValidationError validateViewValue(final VAL viewContent) {
         return null;
     }
 
-    abstract protected void copyValueToConfig();
+    /**
+     * Sets the view value as default value of the config.
+     */
+    protected abstract void copyValueToConfig();
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setDialogValue(final VAL value) {
         m_dialogValue = value;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public VAL getDialogValue() {
         return m_dialogValue;
@@ -242,6 +272,18 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         return m_config.getHideInWizard();
     }
 
+    /**
+     * Returns the value that should currently be used.
+     *
+     * The priority of values is as follows:
+     * <ol>
+     * <li>View value</li>
+     * <li>Dialog value</li>
+     * <li>Default value of config</li>
+     * </ol>
+     *
+     * @return The value with the highest priority which is valid.
+     */
     protected VAL getRelevantValue() {
         if (m_viewValue != null) {
             return m_viewValue;
@@ -252,6 +294,9 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         }
     }
 
+    /**
+     * Sets {@link #getRelevantValue()} as the view value.
+     */
     protected void updateViewValue() {
         m_viewValue = getRelevantValue();
     }

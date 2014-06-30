@@ -62,8 +62,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * The value for the date input quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
@@ -84,7 +85,8 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        String dateString = m_date != null ? new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(m_date) : null;
+        String dateString =
+            m_date != null ? new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(m_date) : null;
         settings.addString(CFG_DATE, dateString);
     }
 

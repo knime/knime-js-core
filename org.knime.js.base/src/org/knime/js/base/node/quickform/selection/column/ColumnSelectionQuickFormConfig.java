@@ -57,8 +57,9 @@ import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the column selection quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<ColumnSelectionQuickFormValue> {
 
@@ -74,22 +75,37 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
 
     private String m_type = DEFAULT_TYPE;
 
+    /**
+     * @return the possibleColumns
+     */
     String[] getPossibleColumns() {
         return m_possibleColumns;
     }
 
+    /**
+     * @param possibleColumns the possibleColumns to set
+     */
     void setPossibleColumns(final String[] possibleColumns) {
         m_possibleColumns = possibleColumns;
     }
 
+    /**
+     * @return the type
+     */
     String getType() {
         return m_type;
     }
 
+    /**
+     * @param type the type to set
+     */
     void setType(final String type) {
         m_type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -97,6 +113,9 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         settings.addString(CFG_TYPE, m_type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -104,6 +123,9 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         m_type = settings.getString(CFG_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

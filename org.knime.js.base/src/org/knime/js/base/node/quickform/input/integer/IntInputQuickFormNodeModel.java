@@ -49,12 +49,15 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the integer input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class IntInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<IntInputQuickFormRepresentation, IntInputQuickFormValue, IntInputQuickFormConfig> {
+        extends QuickFormFlowVariableNodeModel
+        <IntInputQuickFormRepresentation,
+        IntInputQuickFormValue,
+        IntInputQuickFormConfig> {
 
     /**
      * {@inheritDoc}
@@ -99,6 +102,9 @@ public class IntInputQuickFormNodeModel
         pushFlowVariableInt(getConfig().getFlowVariableName(), value);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void copyValueToConfig() {
         getConfig().getDefaultValue().setInteger(getViewValue().getInteger());

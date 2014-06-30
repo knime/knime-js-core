@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -56,17 +56,20 @@ import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
- * 
+ * The panel of a node that is displayed in the sub node's dialog.
+ *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The type of value that is handled by this dialog
  */
 @SuppressWarnings("serial")
-public abstract class QuickFormDialogPanel<VAL extends DialogNodeValue> extends DialogNodePanel<VAL> {
+public abstract class QuickFormDialogPanel
+        <VAL extends DialogNodeValue>
+        extends DialogNodePanel<VAL> {
 
     private JLabel m_label = new JLabel();
 
     /**
-     * 
+     * Creates a {@link QuickFormDialogPanel}.
      */
     public QuickFormDialogPanel() {
         setLayout(new FlowLayout(FlowLayout.LEFT));

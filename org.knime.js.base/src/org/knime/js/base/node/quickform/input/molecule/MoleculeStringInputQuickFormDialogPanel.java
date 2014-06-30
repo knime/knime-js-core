@@ -54,6 +54,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The sub node dialog panel for the molecule string input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -63,7 +64,7 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
     private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
     /**
-     *
+     * @param representation The dialog representation
      */
     public MoleculeStringInputQuickFormDialogPanel(final MoleculeStringInputQuickFormRepresentation representation) {
         m_component.setText(representation.getDefaultValue());

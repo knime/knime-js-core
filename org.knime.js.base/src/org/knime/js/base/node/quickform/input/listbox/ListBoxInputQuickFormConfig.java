@@ -54,8 +54,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the list box input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<ListBoxInputQuickFormValue> {
 
@@ -72,34 +73,58 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<Lis
     private static final boolean DEFAULT_OMIT_EMPTY = true;
     private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
 
+    /**
+     * @return the regex
+     */
     String getRegex() {
         return m_regex;
     }
 
+    /**
+     * @param regex the regex to set
+     */
     void setRegex(final String regex) {
         m_regex = regex;
     }
 
+    /**
+     * @return the errorMessage
+     */
     String getErrorMessage() {
         return m_errorMessage;
     }
 
+    /**
+     * @param errorMessage the errorMessage to set
+     */
     void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
 
+    /**
+     * @return the separator
+     */
     String getSeparator() {
         return m_separator;
     }
 
+    /**
+     * @param separator the separator to set
+     */
     void setSeparator(final String separator) {
         m_separator = separator;
     }
 
+    /**
+     * @return the omitEmpty
+     */
     boolean getOmitEmpty() {
         return m_omitEmpty;
     }
 
+    /**
+     * @param omitEmpty the omitEmpty to set
+     */
     void setOmitEmpty(final boolean omitEmpty) {
         m_omitEmpty = omitEmpty;
     }
@@ -137,6 +162,9 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<Lis
         return sepString.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -146,6 +174,9 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<Lis
         settings.addBoolean(CFG_OMIT_EMPTY, m_omitEmpty);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -155,6 +186,9 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<Lis
         m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

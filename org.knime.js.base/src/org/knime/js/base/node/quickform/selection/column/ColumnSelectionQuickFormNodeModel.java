@@ -59,11 +59,15 @@ import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the column selection quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<ColumnSelectionQuickFormRepresentation,
-        ColumnSelectionQuickFormValue, ColumnSelectionQuickFormConfig> {
+public class ColumnSelectionQuickFormNodeModel
+        extends QuickFormNodeModel
+        <ColumnSelectionQuickFormRepresentation,
+        ColumnSelectionQuickFormValue,
+        ColumnSelectionQuickFormConfig> {
 
     /** Creates a new value selection node model. */
     public ColumnSelectionQuickFormNodeModel() {
@@ -115,6 +119,11 @@ public class ColumnSelectionQuickFormNodeModel extends QuickFormNodeModel<Column
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
+    /**
+     * Update the possible columns in the config.
+     *
+     * @param spec The input spec
+     */
     private void updateColumns(final DataTableSpec spec) {
         getConfig().setPossibleColumns(spec.getColumnNames());
     }

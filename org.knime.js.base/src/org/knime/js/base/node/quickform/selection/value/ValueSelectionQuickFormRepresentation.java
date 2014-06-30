@@ -70,8 +70,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * The representation for the value selection quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
@@ -262,6 +263,9 @@ public class ValueSelectionQuickFormRepresentation extends
         return m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]);
     }
 
+    /**
+     * @param possibleValues the possibleValues to set
+     */
     @JsonIgnore
     public void setPossibleValues(final Map<String, List<String>> possibleValues) {
         m_possibleValues = possibleValues;

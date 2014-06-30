@@ -62,8 +62,9 @@ import javax.swing.JTextField;
 import org.knime.core.node.util.StringHistoryPanel;
 
 /**
+ * Panel for regex input with suggested regexes.
  *
- * @author "Patrick Winter", University of Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings({"rawtypes", "unchecked" })
 public class RegexPanel {
@@ -77,7 +78,7 @@ public class RegexPanel {
     private JPanel m_commonRegexesPanel = new JPanel();
 
     /**
-     *
+     * create regex panel.
      */
     public RegexPanel() {
         JButton assign = new JButton("Assign");

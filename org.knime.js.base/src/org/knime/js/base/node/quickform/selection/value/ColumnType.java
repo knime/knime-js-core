@@ -41,14 +41,15 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 14, 2014 ("Patrick Winter"): created
  */
 package org.knime.js.base.node.quickform.selection.value;
 
 /**
- * 
+ * The type of columns which are selectable.
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 enum ColumnType {

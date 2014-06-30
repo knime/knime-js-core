@@ -53,6 +53,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
+ * The sub node dialog panel for the boolean input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -61,13 +62,10 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
 
     private JCheckBox m_component = new JCheckBox();
 
-    private BooleanInputQuickFormRepresentation m_representation;
-
     /**
-     *
+     * @param representation The dialog representation
      */
     public BooleanInputQuickFormDialogPanel(final BooleanInputQuickFormRepresentation representation) {
-        m_representation = representation;
         m_component.setSelected(representation.getDefaultValue());
         addComponent(m_component);
     }

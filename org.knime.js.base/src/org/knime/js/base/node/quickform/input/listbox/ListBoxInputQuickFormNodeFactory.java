@@ -50,11 +50,15 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The factory for the list box input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class ListBoxInputQuickFormNodeFactory extends NodeFactory<ListBoxInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<ListBoxInputQuickFormNodeModel, ListBoxInputQuickFormRepresentation,
+public class ListBoxInputQuickFormNodeFactory
+        extends NodeFactory<ListBoxInputQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <ListBoxInputQuickFormNodeModel,
+        ListBoxInputQuickFormRepresentation,
         ListBoxInputQuickFormValue> {
 
     /**

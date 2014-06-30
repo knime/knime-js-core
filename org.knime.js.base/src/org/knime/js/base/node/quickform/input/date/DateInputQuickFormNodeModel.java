@@ -52,11 +52,15 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the date input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class DateInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel
-        <DateInputQuickFormRepresentation, DateInputQuickFormValue, DateInputQuickFormConfig> {
+public class DateInputQuickFormNodeModel
+        extends QuickFormFlowVariableNodeModel
+        <DateInputQuickFormRepresentation,
+        DateInputQuickFormValue,
+        DateInputQuickFormConfig> {
 
     /**
      * Format string for the date to string and string to date operations.

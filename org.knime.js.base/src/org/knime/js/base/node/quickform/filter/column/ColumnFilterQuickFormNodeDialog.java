@@ -62,9 +62,9 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * Dialog for the column filter quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
 

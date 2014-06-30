@@ -59,9 +59,9 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The dialog for the molecule string input quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("rawtypes")
 public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog {

@@ -51,8 +51,9 @@ package org.knime.js.base.node.quickform.input.bool;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the boolean input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class BooleanInputQuickFormConfig extends QuickFormFlowVariableConfig<BooleanInputQuickFormValue> {
 

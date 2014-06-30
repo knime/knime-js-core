@@ -59,6 +59,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * The value for the single selection quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 @JsonAutoDetect

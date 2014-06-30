@@ -74,9 +74,9 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * Dialog for the value filter quick form node.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of
- *         Konstanz
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 @SuppressWarnings("unchecked")
 public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
@@ -124,6 +124,12 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         createAndAddTab();
     }
 
+    /**
+     * Updates the available values in the given panel.
+     *
+     * @param column The column containing the available values
+     * @param panel The panel to update.
+     */
     private void updateValues(final String column, final StringFilterPanel panel) {
         DataColumnSpec dcs = m_spec.getColumnSpec(column);
         if (dcs == null) {

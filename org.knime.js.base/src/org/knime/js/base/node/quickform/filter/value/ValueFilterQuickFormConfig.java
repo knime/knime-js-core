@@ -67,8 +67,9 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
+ * Config for the value filter quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<ValueFilterQuickFormValue> {
 
@@ -88,30 +89,51 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<Valu
 
     private String m_type = DEFAULT_TYPE;
 
+    /**
+     * @return the lockColumn
+     */
     boolean getLockColumn() {
         return m_lockColumn;
     }
 
+    /**
+     * @param lockColumn the lockColumn to set
+     */
     void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
     }
 
+    /**
+     * @return the possibleValues
+     */
     Map<String, List<String>> getPossibleValues() {
         return m_possibleValues;
     }
 
+    /**
+     * @param possibleValues the possibleValues to set
+     */
     void setPossibleValues(final Map<String, List<String>> possibleValues) {
         m_possibleValues = possibleValues;
     }
 
+    /**
+     * @return the type
+     */
     String getType() {
         return m_type;
     }
 
+    /**
+     * @param type the type to set
+     */
     void setType(final String type) {
         m_type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -125,6 +147,9 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<Valu
         settings.addString(CFG_TYPE, m_type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -137,6 +162,9 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<Valu
         m_type = settings.getString(CFG_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

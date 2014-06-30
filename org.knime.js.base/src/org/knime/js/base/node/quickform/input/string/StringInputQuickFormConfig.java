@@ -54,8 +54,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the string input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<StringInputQuickFormValue> {
 
@@ -66,22 +67,37 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<Stri
     private static final String DEFAULT_ERROR_MESSAGE = "";
     private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
 
+    /**
+     * @return the regex
+     */
     String getRegex() {
         return m_regex;
     }
 
+    /**
+     * @param regex The regex to set
+     */
     void setRegex(final String regex) {
         m_regex = regex;
     }
 
+    /**
+     * @return the errorMessage
+     */
     String getErrorMessage() {
         return m_errorMessage;
     }
 
+    /**
+     * @param errorMessage the errorMessage to set
+     */
     void setErrorMessage(final String errorMessage) {
         m_errorMessage = errorMessage;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -89,6 +105,9 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<Stri
         settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -96,6 +115,9 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<Stri
         m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

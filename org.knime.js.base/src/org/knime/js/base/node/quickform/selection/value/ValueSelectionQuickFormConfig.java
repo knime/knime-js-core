@@ -70,8 +70,9 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
+ * The config for the value selection quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<ValueSelectionQuickFormValue> {
 
@@ -97,38 +98,65 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
 
     private String m_type = DEFAULT_TYPE;
 
+    /**
+     * @return the columnType
+     */
     ColumnType getColumnType() {
         return m_columnType;
     }
 
+    /**
+     * @param columnType The columnType to set
+     */
     void setColumnType(final ColumnType columnType) {
         m_columnType = columnType;
     }
 
+    /**
+     * @return the lockColumn
+     */
     boolean getLockColumn() {
         return m_lockColumn;
     }
 
+    /**
+     * @param lockColumn the lockColumn to set
+     */
     void setLockColumn(final boolean lockColumn) {
         m_lockColumn = lockColumn;
     }
 
+    /**
+     * @return the possibleValues
+     */
     Map<String, List<String>> getPossibleValues() {
         return m_possibleValues;
     }
 
+    /**
+     * @param possibleValues the possibleValues to set
+     */
     void setPossibleValues(final Map<String, List<String>> possibleValues) {
         m_possibleValues = possibleValues;
     }
 
+    /**
+     * @return the type
+     */
     String getType() {
         return m_type;
     }
 
+    /**
+     * @param type the type to set
+     */
     void setType(final String type) {
         m_type = type;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -143,6 +171,9 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         settings.addString(CFG_TYPE, m_type);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -156,6 +187,9 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         m_type = settings.getString(CFG_TYPE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

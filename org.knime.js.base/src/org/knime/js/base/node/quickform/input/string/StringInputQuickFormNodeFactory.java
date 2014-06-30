@@ -50,11 +50,15 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The factory for the string input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormNodeFactory extends NodeFactory<StringInputQuickFormNodeModel> implements
-        WizardNodeFactoryExtension<StringInputQuickFormNodeModel, StringInputQuickFormRepresentation,
+public class StringInputQuickFormNodeFactory
+        extends NodeFactory<StringInputQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <StringInputQuickFormNodeModel,
+        StringInputQuickFormRepresentation,
         StringInputQuickFormValue> {
 
     /**

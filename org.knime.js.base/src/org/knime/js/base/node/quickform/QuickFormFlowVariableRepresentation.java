@@ -54,12 +54,14 @@ import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.workflow.FlowVariable;
 
 /**
+ * {@link QuickFormRepresentationImpl} for nodes that output a flow variable.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
-public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNodeValue> extends
-        QuickFormRepresentationImpl<VAL> {
+public abstract class QuickFormFlowVariableRepresentation
+        <VAL extends DialogNodeValue>
+        extends QuickFormRepresentationImpl<VAL> {
 
     private static final String CFG_FLOW_VARIABLE_NAME = "flowvariablename";
 
@@ -109,13 +111,18 @@ public abstract class QuickFormFlowVariableRepresentation<VAL extends DialogNode
         settings.addString(CFG_FLOW_VARIABLE_NAME, m_flowVariableName);
     }
 
-    private static String verifyFlowVariableName(final String name) throws InvalidSettingsException {
+    /**
+     * Verifies that the given name is a valid flow variable name.
+     *
+     * @param name The variable name
+     * @throws InvalidSettingsException
+     */
+    private static void verifyFlowVariableName(final String name) throws InvalidSettingsException {
+        if (name == null) {
+            throw new InvalidSettingsException("Flow variable name is missing.");
+        }
         try {
-            if (name == null) {
-                throw new Exception();
-            }
             FlowVariable.Scope.Flow.verifyName(name);
-            return name;
         } catch (Exception e) {
             throw new InvalidSettingsException("Invalid variable name \"" + name + "\": " + e.getMessage(), e);
         }

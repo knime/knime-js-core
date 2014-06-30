@@ -59,11 +59,15 @@ import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the value selection quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSelectionQuickFormRepresentation,
-        ValueSelectionQuickFormValue, ValueSelectionQuickFormConfig> {
+public class ValueSelectionQuickFormNodeModel
+        extends QuickFormNodeModel
+        <ValueSelectionQuickFormRepresentation,
+        ValueSelectionQuickFormValue,
+        ValueSelectionQuickFormConfig> {
 
     /** Creates a new value selection node model. */
     public ValueSelectionQuickFormNodeModel() {
@@ -115,10 +119,20 @@ public class ValueSelectionQuickFormNodeModel extends QuickFormNodeModel<ValueSe
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
+    /**
+     * Updates the values in the config.
+     *
+     * @param spec The input specs
+     */
     private void updateValues(final DataTableSpec spec) {
         getConfig().setFromSpec(spec);
     }
 
+    /**
+     * Pushes the current values as flow variable.
+     *
+     * @throws InvalidSettingsException If the current values are not available in the input
+     */
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         String column = getRelevantValue().getColumn();
         String value = getRelevantValue().getValue();

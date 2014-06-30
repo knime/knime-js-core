@@ -48,13 +48,15 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the molecule string input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class MoleculeStringInputQuickFormNodeModel
-        extends
-        QuickFormFlowVariableNodeModel<MoleculeStringInputQuickFormRepresentation,
-        MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormConfig> {
+        extends QuickFormFlowVariableNodeModel
+        <MoleculeStringInputQuickFormRepresentation,
+        MoleculeStringInputQuickFormValue,
+        MoleculeStringInputQuickFormConfig> {
 
     /**
      * {@inheritDoc}

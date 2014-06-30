@@ -53,6 +53,8 @@ import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFa
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
+ * The sub node dialog panel for the muliple selections quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 @SuppressWarnings("serial")

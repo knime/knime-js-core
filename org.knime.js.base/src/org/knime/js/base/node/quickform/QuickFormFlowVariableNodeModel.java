@@ -55,13 +55,18 @@ import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
 import org.knime.core.node.web.WebViewContent;
 
 /**
+ * Model of a quick form node with a flow variable output.
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP> The configuration content of the quickform node.
- * @param <VAL> The node value implementation of the quickform node.
+ * @param <REP> The representation implementation of the quick form node.
+ * @param <VAL> The value implementation of the quick form node.
+ * @param <CONF> The configuration implementation of the quick form node.
  *
  */
-public abstract class QuickFormFlowVariableNodeModel<
-        REP extends QuickFormFlowVariableRepresentation<VAL>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormFlowVariableConfig<VAL>>
+public abstract class QuickFormFlowVariableNodeModel
+        <REP extends QuickFormFlowVariableRepresentation<VAL>,
+        VAL extends DialogNodeValue & WebViewContent,
+        CONF extends QuickFormFlowVariableConfig<VAL>>
         extends QuickFormNodeModel<REP, VAL, CONF> {
 
     /** Creates a new node model with no inports and one flow variable outport. */

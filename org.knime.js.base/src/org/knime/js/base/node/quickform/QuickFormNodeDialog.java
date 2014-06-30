@@ -65,6 +65,7 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
@@ -72,7 +73,8 @@ import org.knime.core.node.port.PortObjectSpec;
  *
  * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
  */
-public abstract class QuickFormNodeDialog extends NodeDialogPane {
+public abstract class QuickFormNodeDialog
+        extends NodeDialogPane {
 
     /** Default width (#columns) of text field elements. */
     public static final int DEF_TEXTFIELD_WIDTH = 20;
@@ -211,18 +213,30 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         return m_variableNameField.getText();
     }
 
+    /**
+     * @return true if this node should be hidden in the wizard, false otherwise
+     */
     protected boolean getHideInWizard() {
         return m_hideInWizard.isSelected();
     }
 
+    /**
+     * @param hideInWizard If true this node will be hidden in the wizard.
+     */
     protected void setHideInWizard(final boolean hideInWizard) {
         m_hideInWizard.setSelected(hideInWizard);
     }
 
+    /**
+     * @return true if this node should be hidden in the sub node dialog, false otherwise
+     */
     protected boolean getHideInDialog() {
         return m_hideInDialog.isSelected();
     }
 
+    /**
+     * @param hideInDialog If true this node will be hidden in the sub node dialog.
+     */
     protected void setHideInDialog(final boolean hideInDialog) {
         m_hideInDialog.setSelected(hideInDialog);
     }
@@ -234,8 +248,11 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
         m_variableNameField.setText(flowVariableName);
     }
 
+    /**
+     * @param config The {@link QuickFormFlowVariableConfig} to load from
+     */
     protected void loadSettingsFrom(
-            final QuickFormFlowVariableConfig config) {
+            final QuickFormFlowVariableConfig<? extends DialogNodeValue> config) {
         setLabel(config.getLabel());
         setDescription(config.getDescription());
         setFlowVariableName(config.getFlowVariableName());
@@ -244,10 +261,9 @@ public abstract class QuickFormNodeDialog extends NodeDialogPane {
     }
 
     /**
-     * @param representation The representation to put the content of the
-     *            components into
+     * @param config The {@link QuickFormFlowVariableConfig} to save to
      */
-    protected void saveSettingsTo(final QuickFormFlowVariableConfig config) {
+    protected void saveSettingsTo(final QuickFormFlowVariableConfig<? extends DialogNodeValue> config) {
         config.setLabel(getLabel());
         config.setDescription(getDescription());
         config.setFlowVariableName(getFlowVariableName());

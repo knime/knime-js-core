@@ -54,10 +54,13 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 
 /**
+ * Configuration of a quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
+ * @param <VAL> The value implementation of the quick form node.
  */
-public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
+public abstract class QuickFormConfig
+        <VAL extends DialogNodeValue> {
 
     private static final String CFG_LABEL = "label";
     private static final String CFG_DESCRIPTION = "description";
@@ -76,38 +79,65 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
     private boolean m_hideInDialog = DEFAULT_HIDE_IN_DIALOG;
     private VAL m_defaultValue = createEmptyValue();
 
+    /**
+     * @return the label
+     */
     public String getLabel() {
         return m_label;
     }
 
+    /**
+     * @param label the label to set
+     */
     public void setLabel(final String label) {
         this.m_label = label;
     }
 
+    /**
+     * @return the description
+     */
     public String getDescription() {
         return m_description;
     }
 
+    /**
+     * @param description the description to set
+     */
     public void setDescription(final String description) {
         this.m_description = description;
     }
 
+    /**
+     * @return the hideInWizard
+     */
     public boolean getHideInWizard() {
         return m_hideInWizard;
     }
 
+    /**
+     * @param hideInWizard the hideInWizard to set
+     */
     public void setHideInWizard(final boolean hideInWizard) {
         m_hideInWizard = hideInWizard;
     }
 
+    /**
+     * @return the hideInDialog
+     */
     public boolean getHideInDialog() {
         return m_hideInDialog;
     }
 
+    /**
+     * @param hideInDialog the hideInDialog to set
+     */
     public void setHideInDialog(final boolean hideInDialog) {
         m_hideInDialog = hideInDialog;
     }
 
+    /**
+     * @param settings The settings to save to
+     */
     public void saveSettings(final NodeSettingsWO settings) {
         NodeSettingsWO defaultValueSettings = settings.addNodeSettings(CFG_DEFAULT_VALUE);
         m_defaultValue.saveToNodeSettings(defaultValueSettings);
@@ -117,6 +147,10 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
         settings.addBoolean(CFG_HIDE_IN_DIALOG, m_hideInDialog);
     }
 
+    /**
+     * @param settings The settings to load from
+     * @throws InvalidSettingsException If the settings are not valid
+     */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         NodeSettingsRO defaultValueSettings = settings.getNodeSettings(CFG_DEFAULT_VALUE);
         m_defaultValue = createEmptyValue();
@@ -127,6 +161,9 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG);
     }
 
+    /**
+     * @param settings The settings to load from
+     */
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         m_defaultValue = createEmptyValue();
         NodeSettingsRO defaultValueSettings;
@@ -142,10 +179,18 @@ public abstract class QuickFormConfig<VAL extends DialogNodeValue> {
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG, DEFAULT_HIDE_IN_DIALOG);
     }
 
+    /**
+     * @return the default value
+     */
     public VAL getDefaultValue() {
         return m_defaultValue;
     }
 
+    /**
+     * Creates an instance of a value used for the default value of this config.
+     *
+     * @return Create a value instance
+     */
     protected abstract VAL createEmptyValue();
 
     /**

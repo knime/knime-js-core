@@ -54,8 +54,9 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 
 /**
+ * The config for the integer input quick form node.
  *
- * @author winter
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
 public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig<IntInputQuickFormValue> {
 
@@ -72,38 +73,65 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig<IntInpu
     private static final int DEFAULT_MAX = 100;
     private int m_max = DEFAULT_MAX;
 
+    /**
+     * @return the useMin
+     */
     boolean getUseMin() {
         return m_useMin;
     }
 
+    /**
+     * @param useMin the useMin to set
+     */
     void setUseMin(final boolean useMin) {
         m_useMin = useMin;
     }
 
+    /**
+     * @return the useMax
+     */
     boolean getUseMax() {
         return m_useMax;
     }
 
+    /**
+     * @param useMax the useMax to set
+     */
     void setUseMax(final boolean useMax) {
         m_useMax = useMax;
     }
 
+    /**
+     * @return the min
+     */
     int getMin() {
         return m_min;
     }
 
+    /**
+     * @param min the min to set
+     */
     void setMin(final int min) {
         m_min = min;
     }
 
+    /**
+     * @return the max
+     */
     int getMax() {
         return m_max;
     }
 
+    /**
+     * @param max the max to set
+     */
     void setMax(final int max) {
         m_max = max;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
@@ -113,6 +141,9 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig<IntInpu
         settings.addInt(CFG_MAX, m_max);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
@@ -122,6 +153,9 @@ public class IntInputQuickFormConfig extends QuickFormFlowVariableConfig<IntInpu
         m_max = settings.getInt(CFG_MAX);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);

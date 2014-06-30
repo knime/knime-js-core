@@ -49,11 +49,15 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The model for the string input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class StringInputQuickFormNodeModel extends QuickFormFlowVariableNodeModel<StringInputQuickFormRepresentation,
-        StringInputQuickFormValue, StringInputQuickFormConfig> {
+public class StringInputQuickFormNodeModel
+        extends QuickFormFlowVariableNodeModel
+        <StringInputQuickFormRepresentation,
+        StringInputQuickFormValue,
+        StringInputQuickFormConfig> {
 
     /**
      * {@inheritDoc}

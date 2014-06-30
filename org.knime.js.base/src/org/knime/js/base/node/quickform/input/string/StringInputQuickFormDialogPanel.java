@@ -54,6 +54,7 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
+ * The sub node dialog panel for the string input quick form node.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
@@ -63,6 +64,7 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
     private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
 
     /**
+     * @param representation The dialog representation
      *
      */
     public StringInputQuickFormDialogPanel(final StringInputQuickFormRepresentation representation) {

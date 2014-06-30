@@ -63,14 +63,18 @@ import org.knime.core.node.port.PortType;
 import org.knime.js.base.node.quickform.QuickFormNodeModel;
 
 /**
+ * The model for the muliple selections quick form node.
+ *
  * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
 public class MultipleSelectionQuickFormNodeModel
-        extends
-        QuickFormNodeModel<MultipleSelectionQuickFormRepresentation, MultipleSelectionQuickFormValue, MultipleSelectionQuickFormConfig> {
+        extends QuickFormNodeModel
+        <MultipleSelectionQuickFormRepresentation,
+        MultipleSelectionQuickFormValue,
+        MultipleSelectionQuickFormConfig> {
 
     /**
-     *
+     * Creates the node model.
      */
     public MultipleSelectionQuickFormNodeModel() {
         super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});

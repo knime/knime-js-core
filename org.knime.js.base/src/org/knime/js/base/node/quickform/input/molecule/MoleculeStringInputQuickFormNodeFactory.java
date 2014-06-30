@@ -50,13 +50,16 @@ import org.knime.core.node.NodeView;
 import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * The factory for the molecule string input quick form node.
  *
+ * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  */
-public class MoleculeStringInputQuickFormNodeFactory extends NodeFactory<MoleculeStringInputQuickFormNodeModel>
-        implements
-        WizardNodeFactoryExtension<MoleculeStringInputQuickFormNodeModel,
-        MoleculeStringInputQuickFormRepresentation, MoleculeStringInputQuickFormValue> {
+public class MoleculeStringInputQuickFormNodeFactory
+        extends NodeFactory<MoleculeStringInputQuickFormNodeModel>
+        implements WizardNodeFactoryExtension
+        <MoleculeStringInputQuickFormNodeModel,
+        MoleculeStringInputQuickFormRepresentation,
+        MoleculeStringInputQuickFormValue> {
 
     /**
      * {@inheritDoc}
