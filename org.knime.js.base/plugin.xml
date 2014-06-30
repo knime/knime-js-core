@@ -592,34 +592,21 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="QuickForm Styles"
-            version="1.0"
-            webResourceBundleID="QuickFormStyles_1.0_DEBUG">
-         <webResource
-               relativePathSource="js-src/org/knime/js/base/node/quickform/style/"
-               relativePathTarget="org/knime/js/base/node/quickform/style/">
-         </webResource>
-         <importResource
-               relativePath="org/knime/js/base/node/quickform/style/quickformStyles.css"
-               type="CSS">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="true"
             name="KNIME Quickform Utils"
             version="1.0.0"
             webResourceBundleID="KnimeQuickformUtils_1.0.0">
          <webResource
-               relativePathSource="js-src/org/knime/js/base/util/quickform/knime_quickform_utils_1_0_0.js"
-               relativePathTarget="js-src/org/knime/js/base/util/quickform/knime_quickform_utils_1_0_0.js">
+               relativePathSource="js-src/org/knime/js/base/util/quickform/"
+               relativePathTarget="org/knime/js/base/util/quickform/">
          </webResource>
          <importResource
-               relativePath="js-src/org/knime/js/base/util/quickform/knime_quickform_utils_1_0_0.js"
+               relativePath="org/knime/js/base/util/quickform/knime_quickform_utils_1_0_0.js"
                type="JAVASCRIPT">
          </importResource>
-         <webDependency
-               webResourceBundleID="QuickFormStyles_1.0_DEBUG">
-         </webDependency>
+         <importResource
+               relativePath="org/knime/js/base/util/quickform/quickformStyles.css"
+               type="CSS">
+         </importResource>
          <webDependency
                webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
@@ -671,6 +658,7 @@
             javascriptComponentID="knime_table_viewer"
             name="Table Viewer"
             namespace="knime_table_viewer"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
@@ -679,7 +667,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_input_molecule"
             name="Molecule Input Quickform"
-            namespace="org_knime_js_base_node_quickform_input_molecule">
+            namespace="org_knime_js_base_node_quickform_input_molecule"
+            setValidationError-method-name="setValidationErrorMessage">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -707,7 +696,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_input_bool"
             name="Boolean Input Quickform"
-            namespace="org_knime_js_base_node_quickform_input_bool">
+            namespace="org_knime_js_base_node_quickform_input_bool"
+            validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -715,7 +705,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_input_date"
             name="Date Input Quickform"
-            namespace="org_knime_js_base_node_quickform_input_date">
+            namespace="org_knime_js_base_node_quickform_input_date"
+            validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -757,7 +748,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_filter_value"
             name="Filter Value Quickform"
-            namespace="org_knime_js_base_node_quickform_filter_value">
+            namespace="org_knime_js_base_node_quickform_filter_value"
+            setValidationError-method-name="setValidationErrorMessage">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -765,7 +757,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_selection_column"
             name="Column Selection Quickform"
-            namespace="org_knime_js_base_node_quickform_selection_column">
+            namespace="org_knime_js_base_node_quickform_selection_column"
+            setValidationError-method-name="setValidationErrorMessage">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="value"
@@ -773,7 +766,8 @@
             init-method-name="init"
             javascriptComponentID="org_knime_js_base_node_quickform_filter_column"
             name="Column Filter Quickform"
-            namespace="org_knime_js_base_node_quickform_filter_column">
+            namespace="org_knime_js_base_node_quickform_filter_column"
+            setValidationError-method-name="setValidationErrorMessage">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"

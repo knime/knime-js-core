@@ -1,6 +1,9 @@
+.quickformcontainer {
+	font-family: Calibri,sans-serif;
+	font-size: 13px;
+}
 input,textarea,select {
 	padding: 5px;
-	font-size: 1.0em;
 	background-color: transparent;
 	border-radius: 5px;
 	border: 1px solid;
@@ -18,7 +21,7 @@ button {
 }
 .label {
 	font-weight: bold;
-	margin: 10px;
+	margin: 10px 0;
 }
 .ui-widget {
 	font-family: inherit;
