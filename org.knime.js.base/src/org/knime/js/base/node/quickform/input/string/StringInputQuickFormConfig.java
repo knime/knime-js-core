@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.quickform.input.string;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -147,6 +149,38 @@ public class StringInputQuickFormConfig extends QuickFormFlowVariableConfig<Stri
         sb.append("errorMessage=");
         sb.append(m_errorMessage);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_regex)
+                .append(m_errorMessage)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        StringInputQuickFormConfig other = (StringInputQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_regex, other.m_regex)
+                .append(m_errorMessage, other.m_errorMessage)
+                .isEquals();
     }
 
 }

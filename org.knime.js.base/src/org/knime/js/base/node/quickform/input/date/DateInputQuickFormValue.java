@@ -50,6 +50,8 @@ package org.knime.js.base.node.quickform.input.date;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -164,6 +166,36 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
         sb.append(m_date);
         sb.append("}");
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_date)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        DateInputQuickFormValue other = (DateInputQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_date, other.m_date)
+                .isEquals();
     }
 
 }

@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.input.integer;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -135,6 +137,36 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
         sb.append("integer=");
         sb.append(m_integer);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_integer)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        IntInputQuickFormValue other = (IntInputQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_integer, other.m_integer)
+                .isEquals();
     }
 
 }

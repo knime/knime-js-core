@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.selection.column;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -136,6 +138,36 @@ public class ColumnSelectionQuickFormValue extends JSONViewContent implements Di
         sb.append("column=");
         sb.append(m_column);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_column)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ColumnSelectionQuickFormValue other = (ColumnSelectionQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_column, other.m_column)
+                .isEquals();
     }
 
 }

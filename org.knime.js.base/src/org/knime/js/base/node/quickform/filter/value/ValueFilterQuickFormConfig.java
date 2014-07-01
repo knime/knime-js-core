@@ -55,6 +55,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
@@ -231,6 +233,40 @@ public class ValueFilterQuickFormConfig extends QuickFormFlowVariableConfig<Valu
         sb.append("type=");
         sb.append(m_type);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_lockColumn)
+                .append(m_possibleValues)
+                .append(m_type)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ValueFilterQuickFormConfig other = (ValueFilterQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_lockColumn, other.m_lockColumn)
+                .append(m_possibleValues, other.m_possibleValues)
+                .append(m_type, other.m_type)
+                .isEquals();
     }
 
 }

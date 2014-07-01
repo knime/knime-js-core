@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.input.dbl;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -135,6 +137,36 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
         sb.append("double=");
         sb.append(m_double);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_double)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        DoubleInputQuickFormValue other = (DoubleInputQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_double, other.m_double)
+                .isEquals();
     }
 
 }

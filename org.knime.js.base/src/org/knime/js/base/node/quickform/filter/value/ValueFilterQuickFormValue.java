@@ -49,6 +49,8 @@ package org.knime.js.base.node.quickform.filter.value;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -166,6 +168,38 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
         sb.append("values=");
         sb.append(Arrays.toString(m_values));
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_column)
+                .append(m_values)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ValueFilterQuickFormValue other = (ValueFilterQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_column, other.m_column)
+                .append(m_values, other.m_values)
+                .isEquals();
     }
 
 }

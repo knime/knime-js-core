@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -139,6 +141,37 @@ public abstract class QuickFormFlowVariableRepresentation
         sb.append("flowVariableName=");
         sb.append(m_flowVariableName);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_flowVariableName)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        QuickFormFlowVariableRepresentation<VAL> other = (QuickFormFlowVariableRepresentation<VAL>)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_flowVariableName, other.m_flowVariableName)
+                .isEquals();
     }
 
 }

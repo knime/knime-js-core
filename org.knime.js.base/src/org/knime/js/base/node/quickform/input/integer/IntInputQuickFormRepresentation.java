@@ -44,6 +44,8 @@
  */
 package org.knime.js.base.node.quickform.input.integer;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -260,6 +262,44 @@ public class IntInputQuickFormRepresentation extends QuickFormFlowVariableRepres
         sb.append("defaultValue=");
         sb.append(m_defaultValue);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_useMin)
+                .append(m_useMax)
+                .append(m_min)
+                .append(m_max)
+                .append(m_defaultValue)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        IntInputQuickFormRepresentation other = (IntInputQuickFormRepresentation)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_useMin, other.m_useMin)
+                .append(m_useMax, other.m_useMax)
+                .append(m_min, other.m_min)
+                .append(m_max, other.m_max)
+                .append(m_defaultValue, other.m_defaultValue)
+                .isEquals();
     }
 
 }

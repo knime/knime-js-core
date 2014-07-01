@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.input.listbox;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -135,6 +137,36 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
         sb.append("string=");
         sb.append(m_string);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_string)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ListBoxInputQuickFormValue other = (ListBoxInputQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_string, other.m_string)
+                .isEquals();
     }
 
 }

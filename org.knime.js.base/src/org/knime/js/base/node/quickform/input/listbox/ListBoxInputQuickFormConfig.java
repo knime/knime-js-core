@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.quickform.input.listbox;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -226,6 +228,42 @@ public class ListBoxInputQuickFormConfig extends QuickFormFlowVariableConfig<Lis
         sb.append("omitEmpty=");
         sb.append(m_omitEmpty);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_regex)
+                .append(m_errorMessage)
+                .append(m_separator)
+                .append(m_omitEmpty)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ListBoxInputQuickFormConfig other = (ListBoxInputQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_regex, other.m_regex)
+                .append(m_errorMessage, other.m_errorMessage)
+                .append(m_separator, other.m_separator)
+                .append(m_omitEmpty, other.m_omitEmpty)
+                .isEquals();
     }
 
 }

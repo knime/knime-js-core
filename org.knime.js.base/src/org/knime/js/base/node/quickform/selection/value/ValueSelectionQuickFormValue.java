@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.quickform.selection.value;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -165,6 +167,38 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
         sb.append("value=");
         sb.append(m_value);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_column)
+                .append(m_value)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ValueSelectionQuickFormValue other = (ValueSelectionQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_column, other.m_column)
+                .append(m_value, other.m_value)
+                .isEquals();
     }
 
 }

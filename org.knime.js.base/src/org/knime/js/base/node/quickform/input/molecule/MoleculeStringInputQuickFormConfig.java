@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.quickform.input.molecule;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -124,6 +126,36 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
         sb.append("format=");
         sb.append(m_format);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_format)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        MoleculeStringInputQuickFormConfig other = (MoleculeStringInputQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_format, other.m_format)
+                .isEquals();
     }
 
 }

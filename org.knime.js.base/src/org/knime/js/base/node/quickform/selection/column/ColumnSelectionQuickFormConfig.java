@@ -50,6 +50,8 @@ package org.knime.js.base.node.quickform.selection.column;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -155,6 +157,38 @@ public class ColumnSelectionQuickFormConfig extends QuickFormFlowVariableConfig<
         sb.append("type=");
         sb.append(m_type);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_possibleColumns)
+                .append(m_type)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ColumnSelectionQuickFormConfig other = (ColumnSelectionQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_possibleColumns, other.m_possibleColumns)
+                .append(m_type, other.m_type)
+                .isEquals();
     }
 
 }

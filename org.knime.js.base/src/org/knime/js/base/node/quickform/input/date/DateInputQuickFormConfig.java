@@ -52,6 +52,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -236,6 +238,44 @@ public class DateInputQuickFormConfig extends QuickFormFlowVariableConfig<DateIn
         sb.append("withTime=");
         sb.append(m_withTime);
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_useMin)
+                .append(m_useMax)
+                .append(m_min)
+                .append(m_max)
+                .append(m_withTime)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        DateInputQuickFormConfig other = (DateInputQuickFormConfig)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_useMin, other.m_useMin)
+                .append(m_useMax, other.m_useMax)
+                .append(m_min, other.m_min)
+                .append(m_max, other.m_max)
+                .append(m_withTime, other.m_withTime)
+                .isEquals();
     }
 
 }

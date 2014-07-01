@@ -49,6 +49,8 @@ package org.knime.js.base.node.quickform.filter.column;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -138,6 +140,36 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
         sb.append("columns=");
         sb.append(Arrays.toString(m_columns));
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_columns)
+                .toHashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ColumnFilterQuickFormValue other = (ColumnFilterQuickFormValue)obj;
+        return new EqualsBuilder()
+                .append(m_columns, other.m_columns)
+                .isEquals();
     }
 
 }
