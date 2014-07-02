@@ -7,8 +7,10 @@ knime_generic_view = function() {
 			document.body.innerHTML = 'Error: No script available.';
 		} else {
 			// Define KNIME table and set data
-			var knimeDataTable = new kt();
-			knimeDataTable.setDataTable(representation.table);
+			if (representation.table) {
+				var knimeDataTable = new kt();
+				knimeDataTable.setDataTable(representation.table);
+			}
 			
 			// Import style dependencies
 			var head = document.getElementsByTagName('head')[0];
@@ -26,7 +28,14 @@ knime_generic_view = function() {
 			head.appendChild(styleElement);
 			
 			// Import JS dependencies and call JS code after loading
-			require(representation.jsDependencies, function() {
+			var libs = representation.jsDependencies;
+			if (parent != undefined && parent.KnimePageLoader != undefined) {
+				for (var i = 0; i < libs.length; i++) {
+					libs[i] = "./VAADIN/src-js/" + libs[i];
+				}
+			}
+			
+			require(libs, function() {
 				try {
 				    eval(representation.jsCode); 
 				} catch (e) {

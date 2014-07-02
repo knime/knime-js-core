@@ -69,6 +69,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
@@ -89,7 +90,7 @@ public class GenericJSViewNodeModel extends NodeModel implements
      * @param config
      */
     protected GenericJSViewNodeModel(final GenericJSViewConfig config) {
-        super(1, 0);
+        super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, null);
         m_config = config;
         m_representation = createEmptyViewRepresentation();
     }
@@ -111,12 +112,14 @@ public class GenericJSViewNodeModel extends NodeModel implements
         throws Exception {
 
         synchronized (m_lock) {
-            //create JSON table
-            JSONDataTable table = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
+            //create JSON table if data available
+            if (inData[0] != null) {
+                JSONDataTable table = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
+                m_representation.setTable(table);
+            }
 
             m_representation.setJsCode(parseTextAndReplaceVariables());
             m_representation.setCssCode(m_config.getCssCode());
-            m_representation.setTable(table);
             setPathsFromLibNames(m_config.getDependencies());
         }
         return null;

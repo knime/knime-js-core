@@ -563,7 +563,7 @@
                relativePathTarget="org/knime/js/base/node/viz/generic/">
          </webResource>
          <importResource
-               relativePath="org/knime/js/base/node/viz/generic/template.js"
+               relativePath="org/knime/js/base/node/viz/generic/knime-generic-view.js"
                type="JAVASCRIPT">
          </importResource>
          <webDependency
