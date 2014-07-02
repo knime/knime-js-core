@@ -50,7 +50,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.js.base.node.quickform.QuickFormFlowVariableRepresentation;
+import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -65,7 +65,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ListBoxInputQuickFormRepresentation extends
-        QuickFormFlowVariableRepresentation<ListBoxInputQuickFormValue> {
+        QuickFormRepresentationImpl<ListBoxInputQuickFormValue> {
 
     private static final String CFG_REGEX = "regex";
 

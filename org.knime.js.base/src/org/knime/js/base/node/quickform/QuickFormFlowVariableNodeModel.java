@@ -64,7 +64,7 @@ import org.knime.core.node.web.WebViewContent;
  *
  */
 public abstract class QuickFormFlowVariableNodeModel
-        <REP extends QuickFormFlowVariableRepresentation<VAL>,
+        <REP extends QuickFormRepresentationImpl<VAL>,
         VAL extends DialogNodeValue & WebViewContent,
         CONF extends QuickFormFlowVariableConfig<VAL>>
         extends QuickFormNodeModel<REP, VAL, CONF> {

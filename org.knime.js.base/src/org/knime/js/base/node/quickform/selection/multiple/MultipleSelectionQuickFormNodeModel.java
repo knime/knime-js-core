@@ -84,7 +84,7 @@ public class MultipleSelectionQuickFormNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
+        pushFlowVariableString(getConfig().getFlowVariableName(),
                 StringUtils.join(getRelevantValue().getVariableValue(), ","));
         return new PortObjectSpec[]{createSpec()};
     }
@@ -93,7 +93,7 @@ public class MultipleSelectionQuickFormNodeModel
     @Override
     protected PortObject[] execute(final PortObject[] inObjects,
             final ExecutionContext exec) throws Exception {
-        pushFlowVariableString(getDialogRepresentation().getFlowVariableName(),
+        pushFlowVariableString(getConfig().getFlowVariableName(),
                 StringUtils.join(getRelevantValue().getVariableValue(), ","));
         final DataTableSpec outSpec = createSpec();
         BufferedDataContainer container = exec.createDataContainer(outSpec, false);
@@ -118,7 +118,7 @@ public class MultipleSelectionQuickFormNodeModel
     }
 
     private DataTableSpec createSpec() throws InvalidSettingsException {
-        String strColumnName = getDialogRepresentation().getFlowVariableName();
+        String strColumnName = getConfig().getFlowVariableName();
         if (strColumnName != null) {
             DataColumnSpecCreator creator = new DataColumnSpecCreator(strColumnName, StringCell.TYPE);
             return new DataTableSpec(creator.createSpec());
