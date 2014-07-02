@@ -194,4 +194,14 @@ public class MultipleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return StringUtils.join(value.getVariableValue(), ", ");
+    }
+
 }

@@ -197,4 +197,14 @@ public class IntInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        IntInputQuickFormValue value = new IntInputQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return "" + value.getInteger();
+    }
+
 }

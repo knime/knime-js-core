@@ -132,4 +132,14 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return value.getString();
+    }
+
 }

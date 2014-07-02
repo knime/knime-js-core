@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -40,56 +41,31 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *   23.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   Jul 2, 2014 (Patrick Winter, KNIME.com, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.table;
-
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.port.PortType;
-import org.knime.js.base.util.table.WebTableNodeModel;
-import org.knime.js.base.util.table.WebTableViewRepresentation;
-import org.knime.js.base.util.table.WebTableViewValue;
+package org.knime.js.base.node.quickform;
 
 /**
+ * Describes if the value is overwritten by the sub node or wizard.
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Patrick Winter, KNIME.com, Zurich, Switzerland
  */
-public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue> {
+public enum ValueOverwriteMode {
 
     /**
+     * The default value is used.
      */
-    protected WebTableViewNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[0]);
-    }
-
+    NONE,
     /**
-     * {@inheritDoc}
+     * The value from the sub node dialog is used.
      */
-    @Override
-    public String getJavascriptObjectID() {
-        return "knime_table_viewer";
-    }
-
+    DIALOG,
     /**
-     * {@inheritDoc}
+     * The value from the wizard execution is used.
      */
-    @Override
-    public boolean isHideInWizard() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveCurrentValue(final NodeSettingsWO content) {
-        // TODO Auto-generated method stub
-
-    }
+    WIZARD
 
 }

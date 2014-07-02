@@ -243,4 +243,13 @@ public class WebScatterPlotterNodeModel extends DefaultVisualizationNodeModel im
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

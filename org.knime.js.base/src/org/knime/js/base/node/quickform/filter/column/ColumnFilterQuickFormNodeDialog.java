@@ -51,6 +51,7 @@ import java.util.Set;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -118,6 +119,16 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.setType((String)m_type.getSelectedItem());
         m_config.setPossibleColumns(m_possibleColumns);
         m_config.saveSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        ColumnFilterQuickFormValue value = new ColumnFilterQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return StringUtils.join(value.getColumns(), ", ");
     }
 
 }

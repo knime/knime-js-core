@@ -46,11 +46,15 @@
  */
 package org.knime.js.base.node.quickform;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -59,13 +63,17 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.BevelBorder;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NodeView;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.dialog.ValueControlledDialogPane;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
@@ -74,7 +82,7 @@ import org.knime.core.node.port.PortObjectSpec;
  * @author Bernd Wiswedel, KNIME.com, Zurich, Switzerland
  */
 public abstract class QuickFormNodeDialog
-        extends NodeDialogPane {
+        extends NodeDialogPane implements ValueControlledDialogPane {
 
     /** Default width (#columns) of text field elements. */
     public static final int DEF_TEXTFIELD_WIDTH = 20;
@@ -90,6 +98,8 @@ public abstract class QuickFormNodeDialog
     private final JCheckBox m_hideInDialog;
 
     private final JCheckBox m_required;
+
+    private final JLabel m_statusBarLabel;
 
     /**
      * Inits fields, sub-classes should call the {@link #createAndAddTab()}
@@ -109,6 +119,13 @@ public abstract class QuickFormNodeDialog
         m_required = new JCheckBox((Icon)null, false);
         m_required
             .setToolTipText("If selected, filling this QuickForm element is required, otherwise it can be left empty.");
+        m_statusBarLabel = new JLabel("", NodeView.WARNING_ICON, SwingConstants.LEFT);
+        Font font = m_statusBarLabel.getFont().deriveFont(Font.BOLD);
+        m_statusBarLabel.setFont(font);
+        m_statusBarLabel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        m_statusBarLabel.setBackground(Color.WHITE);
+        m_statusBarLabel.setOpaque(true);
+        m_statusBarLabel.setVisible(false);
     }
 
     /**
@@ -147,7 +164,11 @@ public abstract class QuickFormNodeDialog
 
         fillPanel(panel, gbc);
 
-        addTab("Control", panel);
+        JPanel borderPanel = new JPanel(new BorderLayout());
+        borderPanel.add(panel, BorderLayout.CENTER);
+        borderPanel.add(m_statusBarLabel, BorderLayout.SOUTH);
+
+        addTab("Control", borderPanel);
     }
 
     /**
@@ -303,5 +324,44 @@ public abstract class QuickFormNodeDialog
     /** {@inheritDoc} */
     @Override
     protected abstract void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadCurrentValue(final NodeSettingsRO value) throws InvalidSettingsException {
+        ValueOverwriteMode mode = ValueOverwriteMode.valueOf(value.getString(QuickFormNodeModel.CFG_OVERWRITE_MODE));
+        NodeSettingsRO valueSettings = value.getNodeSettings(QuickFormNodeModel.CFG_CURRENT_VALUE);
+        if (mode == ValueOverwriteMode.NONE) {
+            m_statusBarLabel.setVisible(false);
+        } else {
+            String overwrittenBy = "";
+            switch (mode) {
+                case DIALOG:
+                    overwrittenBy = "dialog";
+                    break;
+                case WIZARD:
+                    overwrittenBy = "wizard";
+                    break;
+                default:
+                    overwrittenBy = "unknown";
+            }
+            String fullText =
+                "Value overwritten by " + overwrittenBy + ", current value:\n" + getValueString(valueSettings);
+            m_statusBarLabel.setText("<html>" + fullText.replace("\n", "<br>") + "</html>");
+            m_statusBarLabel.setVisible(true);
+        }
+    }
+
+    /**
+     * Loads a value with the current setting and creates a string displaying the contained values.
+     *
+     * Is used for the overwrite label.
+     *
+     * @param settings Object containing the settings of the value
+     * @return String representing the value
+     * @throws InvalidSettingsException If the settings are invalid
+     */
+    protected abstract String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException;
 
 }

@@ -51,6 +51,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.ButtonGroup;
@@ -91,6 +92,8 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
     private final JRadioButton m_dateAndTime;
 
     private DateInputQuickFormConfig m_config;
+
+    private String m_format = DateInputQuickFormNodeModel.DATE_TIME_FORMAT;
 
     /** Constructors, inits fields calls layout routines. */
     DateInputQuickFormNodeDialog() {
@@ -193,12 +196,12 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
      * {@link DateInputQuickFormNodeModel.DATE_TIME_FORMAT}, depending on the selected option.
      */
     private void updateFormat() {
-        String format =
+        m_format =
                 m_dateAndTime.isSelected() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
                         : DateInputQuickFormNodeModel.DATE_FORMAT;
-        m_min.setEditor(new JSpinner.DateEditor(m_min, format));
-        m_max.setEditor(new JSpinner.DateEditor(m_max, format));
-        m_defaultField.setEditor(new JSpinner.DateEditor(m_defaultField, format));
+        m_min.setEditor(new JSpinner.DateEditor(m_min, m_format));
+        m_max.setEditor(new JSpinner.DateEditor(m_max, m_format));
+        m_defaultField.setEditor(new JSpinner.DateEditor(m_defaultField, m_format));
     }
 
     /**
@@ -237,6 +240,16 @@ public class DateInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.setMax((Date)m_max.getValue());
         m_config.setWithTime(m_dateAndTime.isSelected());
         m_config.saveSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        DateInputQuickFormValue value = new DateInputQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return new SimpleDateFormat(m_format).format(value.getDate());
     }
 
 }

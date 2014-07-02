@@ -270,4 +270,13 @@ public class InteractiveValueSelectNodeModel extends NodeModel implements Wizard
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

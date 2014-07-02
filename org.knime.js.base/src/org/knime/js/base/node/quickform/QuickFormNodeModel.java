@@ -82,6 +82,15 @@ public abstract class QuickFormNodeModel
         implements DialogNode<REP, VAL>,
         WizardNode<REP, VAL> {
 
+    /**
+     * Config key for the overwrite mode. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
+     */
+    public static final String CFG_OVERWRITE_MODE = "overwriteMode";
+    /**
+     * Config key for the value. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
+     */
+    public static final String CFG_CURRENT_VALUE = "currentValue";
+
     private static final NodeLogger LOGGER = NodeLogger.getLogger(QuickFormNodeModel.class);
 
     private CONF m_config = createEmptyConfig();
@@ -285,12 +294,13 @@ public abstract class QuickFormNodeModel
      * @return The value with the highest priority which is valid.
      */
     protected VAL getRelevantValue() {
-        if (m_viewValue != null) {
-            return m_viewValue;
-        } else if (m_dialogValue != null) {
-            return m_dialogValue;
-        } else {
-            return m_config.getDefaultValue();
+        switch (getOverwriteMode()) {
+            case WIZARD:
+                return m_viewValue;
+            case DIALOG:
+                return m_dialogValue;
+            default:
+                return m_config.getDefaultValue();
         }
     }
 
@@ -299,6 +309,29 @@ public abstract class QuickFormNodeModel
      */
     protected void updateViewValue() {
         m_viewValue = getRelevantValue();
+    }
+
+    /**
+     * @return The mode in which the value is overwritten
+     */
+    protected ValueOverwriteMode getOverwriteMode() {
+        if (m_viewValue != null) {
+            return ValueOverwriteMode.WIZARD;
+        } else if (m_dialogValue != null) {
+            return ValueOverwriteMode.DIALOG;
+        } else {
+            return ValueOverwriteMode.NONE;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        content.addString(CFG_OVERWRITE_MODE, getOverwriteMode().name());
+        NodeSettingsWO settings = content.addNodeSettings(CFG_CURRENT_VALUE);
+        getRelevantValue().saveToNodeSettings(settings);
     }
 
 }

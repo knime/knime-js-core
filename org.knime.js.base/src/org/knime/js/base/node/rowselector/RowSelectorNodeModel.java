@@ -236,4 +236,13 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -175,4 +175,14 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return value.getVariableValue();
+    }
+
 }

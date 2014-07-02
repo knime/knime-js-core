@@ -197,4 +197,14 @@ public class DoubleInputQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        DoubleInputQuickFormValue value = new DoubleInputQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return "" + value.getDouble();
+    }
+
 }

@@ -116,4 +116,14 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         m_config.saveSettings(settings);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        MoleculeStringInputQuickFormValue value = new MoleculeStringInputQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return value.getMoleculeString();
+    }
+
 }

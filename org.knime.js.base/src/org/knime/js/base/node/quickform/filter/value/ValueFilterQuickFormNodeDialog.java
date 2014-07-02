@@ -59,6 +59,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
@@ -215,6 +216,16 @@ public class ValueFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         m_config.setFromSpec(m_spec);
         m_config.setType((String)m_type.getSelectedItem());
         m_config.saveSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getValueString(final NodeSettingsRO settings) throws InvalidSettingsException {
+        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
+        value.loadFromNodeSettings(settings);
+        return "Column: " + value.getColumn() + "\nValues: " + StringUtils.join(value.getValues());
     }
 
 }
