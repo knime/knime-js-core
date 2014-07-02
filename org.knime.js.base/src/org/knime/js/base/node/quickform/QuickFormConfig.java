@@ -69,17 +69,20 @@ public abstract class QuickFormConfig
     private static final String CFG_HIDE_IN_WIZARD = "hideInWizard";
     private static final String CFG_HIDE_IN_DIALOG = "hideInDialog";
     private static final String CFG_DEFAULT_VALUE = "defaultValue";
+    private static final String CFG_REQUIRED = "required";
 
     private static final String DEFAULT_LABEL = "Label";
     private static final String DEFAULT_DESCRIPTION = "Enter Description";
     private static final boolean DEFAULT_HIDE_IN_WIZARD = false;
     private static final boolean DEFAULT_HIDE_IN_DIALOG = false;
+    private static final boolean DEFAULT_REQUIRED = true;
 
     private String m_label = DEFAULT_LABEL;
     private String m_description = DEFAULT_DESCRIPTION;
     private boolean m_hideInWizard = DEFAULT_HIDE_IN_WIZARD;
     private boolean m_hideInDialog = DEFAULT_HIDE_IN_DIALOG;
     private VAL m_defaultValue = createEmptyValue();
+    private boolean m_required = DEFAULT_REQUIRED;
 
     /**
      * @return the label
@@ -138,6 +141,20 @@ public abstract class QuickFormConfig
     }
 
     /**
+     * @return the required
+     */
+    public boolean getRequired() {
+        return m_required;
+    }
+
+    /**
+     * @param required the required to set
+     */
+    public void setRequired(final boolean required) {
+        m_required = required;
+    }
+
+    /**
      * @param settings The settings to save to
      */
     public void saveSettings(final NodeSettingsWO settings) {
@@ -147,6 +164,7 @@ public abstract class QuickFormConfig
         settings.addString(CFG_DESCRIPTION, m_description);
         settings.addBoolean(CFG_HIDE_IN_WIZARD, m_hideInWizard);
         settings.addBoolean(CFG_HIDE_IN_DIALOG, m_hideInDialog);
+        settings.addBoolean(CFG_REQUIRED, m_required);
     }
 
     /**
@@ -161,6 +179,7 @@ public abstract class QuickFormConfig
         m_description = settings.getString(CFG_DESCRIPTION);
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD);
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG);
+        m_required = settings.getBoolean(CFG_REQUIRED);
     }
 
     /**
@@ -179,6 +198,7 @@ public abstract class QuickFormConfig
         m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD, DEFAULT_HIDE_IN_WIZARD);
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG, DEFAULT_HIDE_IN_DIALOG);
+        m_required = settings.getBoolean(CFG_REQUIRED, DEFAULT_REQUIRED);
     }
 
     /**
@@ -217,6 +237,9 @@ public abstract class QuickFormConfig
         sb.append("{");
         sb.append(m_defaultValue);
         sb.append("}");
+        sb.append(", ");
+        sb.append("required=");
+        sb.append(m_required);
         return sb.toString();
     }
 
@@ -231,6 +254,7 @@ public abstract class QuickFormConfig
                 .append(m_hideInWizard)
                 .append(m_hideInDialog)
                 .append(m_defaultValue)
+                .append(m_required)
                 .toHashCode();
     }
 
@@ -256,6 +280,7 @@ public abstract class QuickFormConfig
                 .append(m_hideInWizard, other.m_hideInWizard)
                 .append(m_hideInDialog, other.m_hideInDialog)
                 .append(m_defaultValue, other.m_defaultValue)
+                .append(m_required, other.m_required)
                 .isEquals();
     }
 

@@ -89,6 +89,8 @@ public abstract class QuickFormNodeDialog
 
     private final JCheckBox m_hideInDialog;
 
+    private final JCheckBox m_required;
+
     /**
      * Inits fields, sub-classes should call the {@link #createAndAddTab()}
      * method when they are done initializing their fields.
@@ -104,6 +106,9 @@ public abstract class QuickFormNodeDialog
         m_hideInWizard.setToolTipText("If selected, this QuickForm elements is not visible in the wizard.");
         m_hideInDialog = new JCheckBox((Icon)null, false);
         m_hideInDialog.setToolTipText("If selected, this QuickForm elements is not visible in the dialog.");
+        m_required = new JCheckBox((Icon)null, false);
+        m_required
+            .setToolTipText("If selected, filling this QuickForm element is required, otherwise it can be left empty.");
     }
 
     /**
@@ -133,6 +138,9 @@ public abstract class QuickFormNodeDialog
         addPairToPanel("Hide in Wizard: ", m_hideInWizard, panel, gbc);
 
         addPairToPanel("Hide in Dialog: ", m_hideInDialog, panel, gbc);
+
+        // TODO enable once functionality is in
+        // addPairToPanel("Required: ", m_required, panel, gbc);
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         addPairToPanel("Variable Name: ", m_variableNameField, panel, gbc);
@@ -242,6 +250,20 @@ public abstract class QuickFormNodeDialog
     }
 
     /**
+     * @return true if this node is required to be configured from the sub node and wizard, false otherwise
+     */
+    protected boolean getRequired() {
+        return m_required.isSelected();
+    }
+
+    /**
+     * @param required If true this node will be required to be configured from the sub node and wizard.
+     */
+    protected void setRequired(final boolean required) {
+        m_required.setSelected(required);
+    }
+
+    /**
      * @param flowVariableName The flow variable name
      */
     protected void setFlowVariableName(final String flowVariableName) {
@@ -258,6 +280,7 @@ public abstract class QuickFormNodeDialog
         setFlowVariableName(config.getFlowVariableName());
         setHideInWizard(config.getHideInWizard());
         setHideInDialog(config.getHideInDialog());
+        setRequired(config.getRequired());
     }
 
     /**
@@ -269,6 +292,7 @@ public abstract class QuickFormNodeDialog
         config.setFlowVariableName(getFlowVariableName());
         config.setHideInWizard(getHideInWizard());
         config.setHideInDialog(getHideInDialog());
+        config.setRequired(getRequired());
     }
 
     /** {@inheritDoc} */

@@ -55,12 +55,18 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.workflow.FlowVariable;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * {@link QuickFormRepresentationImpl} for nodes that output a flow variable.
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class QuickFormFlowVariableRepresentation
         <VAL extends DialogNodeValue>
         extends QuickFormRepresentationImpl<VAL> {
@@ -74,6 +80,7 @@ public abstract class QuickFormFlowVariableRepresentation
     /**
      * @return the flowVariableName
      */
+    @JsonIgnore
     public String getFlowVariableName() {
         return m_flowVariableName;
     }
@@ -81,6 +88,7 @@ public abstract class QuickFormFlowVariableRepresentation
     /**
      * @param flowVariableName the flowVariableName to set
      */
+    @JsonIgnore
     public void setFlowVariableName(final String flowVariableName) {
         m_flowVariableName = flowVariableName;
     }
@@ -89,6 +97,7 @@ public abstract class QuickFormFlowVariableRepresentation
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
         m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME);
@@ -99,6 +108,7 @@ public abstract class QuickFormFlowVariableRepresentation
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         super.loadFromNodeSettingsInDialog(settings);
         m_flowVariableName = settings.getString(CFG_FLOW_VARIABLE_NAME, DEFAULT_FLOW_VARIABLE_NAME);
@@ -108,6 +118,7 @@ public abstract class QuickFormFlowVariableRepresentation
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
         settings.addString(CFG_FLOW_VARIABLE_NAME, m_flowVariableName);

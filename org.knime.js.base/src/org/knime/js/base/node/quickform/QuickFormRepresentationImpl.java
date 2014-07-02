@@ -79,13 +79,19 @@ public abstract class QuickFormRepresentationImpl
 
     private static final String CFG_DESCRIPTION = "description";
 
+    private static final String CFG_REQUIRED = "required";
+
     private static final String DEFAULT_LABEL = "Label";
 
     private static final String DEFAULT_DESCRIPTION = "Enter Description";
 
+    private static final boolean DEFAULT_REQUIRED = true;
+
     private String m_label = DEFAULT_LABEL;
 
     private String m_description = DEFAULT_DESCRIPTION;
+
+    private boolean m_required = DEFAULT_REQUIRED;
 
     /**
      * @return the label
@@ -99,7 +105,7 @@ public abstract class QuickFormRepresentationImpl
     /**
      * @param label the label to set
      */
-    @JsonProperty("label")
+    @JsonIgnore
     public void setLabel(final String label) {
         m_label = label;
     }
@@ -116,9 +122,25 @@ public abstract class QuickFormRepresentationImpl
     /**
      * @param description the description to set
      */
-    @JsonProperty("description")
+    @JsonIgnore
     public void setDescription(final String description) {
         m_description = description;
+    }
+
+    /**
+     * @return the required
+     */
+    @JsonProperty("required")
+    public boolean getRequired() {
+        return m_required;
+    }
+
+    /**
+     * @param required the required to set
+     */
+    @JsonIgnore
+    public void setRequired(final boolean required) {
+        m_required = required;
     }
 
     /**
@@ -129,6 +151,7 @@ public abstract class QuickFormRepresentationImpl
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_LABEL, m_label);
         settings.addString(CFG_DESCRIPTION, m_description);
+        settings.addBoolean(CFG_REQUIRED, m_required);
     }
 
     /**
@@ -139,6 +162,7 @@ public abstract class QuickFormRepresentationImpl
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_label = settings.getString(CFG_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION);
+        m_required = settings.getBoolean(CFG_REQUIRED);
     }
 
     /**
@@ -149,6 +173,7 @@ public abstract class QuickFormRepresentationImpl
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
         m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
+        m_required = settings.getBoolean(CFG_REQUIRED, DEFAULT_REQUIRED);
     }
 
     /**
@@ -171,6 +196,9 @@ public abstract class QuickFormRepresentationImpl
         sb.append(", ");
         sb.append("description=");
         sb.append(m_description);
+        sb.append(", ");
+        sb.append("required=");
+        sb.append(m_required);
         return sb.toString();
     }
 
@@ -182,6 +210,7 @@ public abstract class QuickFormRepresentationImpl
         return new HashCodeBuilder()
                 .append(m_label)
                 .append(m_description)
+                .append(m_required)
                 .toHashCode();
     }
 
@@ -204,6 +233,7 @@ public abstract class QuickFormRepresentationImpl
         return new EqualsBuilder()
                 .append(m_label, other.m_label)
                 .append(m_description, other.m_description)
+                .append(m_required, other.m_required)
                 .isEquals();
     }
 
