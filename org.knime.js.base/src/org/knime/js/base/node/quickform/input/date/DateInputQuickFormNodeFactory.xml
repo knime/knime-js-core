@@ -13,6 +13,9 @@
         <option name="Hide in Wizard">
           If the setting should be hidden in the wizard execution.
         </option>
+        <option name="Hide in Dialog">
+          If the setting should be hidden in the sub node dialog.
+        </option>
 		<option name="Variable Name">Variable identifier.</option>
 		<option name="Selection">If a date or a date with time is selectable.</option>
 		<option name="Earliest">The earliest allowed date.</option>
@@ -20,7 +23,6 @@
         <option name="Default Value">
           The value that is selected by default.
         </option>
-		<option name="Date Value">The current date value.</option>
 	</fullDescription>
 	<interactiveView name="Date input">
     	Input a date.

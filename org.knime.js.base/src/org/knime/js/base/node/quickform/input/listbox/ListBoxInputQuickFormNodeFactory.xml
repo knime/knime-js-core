@@ -13,6 +13,9 @@
         <option name="Hide in Wizard">
           If the setting should be hidden in the wizard execution.
         </option>
+        <option name="Hide in Dialog">
+          If the setting should be hidden in the sub node dialog.
+        </option>
 		<option name="Variable Name">Variable identifier and column name.</option>
 		<option name="Separator">An undelimited list of char separators including \n and \t; back slashes and/or quotes are not supported.
 			All tokens are used as delimiters.</option>
@@ -30,7 +33,6 @@
         <option name="Default List">
           The value that is selected by default.
         </option>
-		<option name="String List">String values, separated.</option>
 	</fullDescription>
 	<interactiveView name="Listbox input">
     	Input a list of strings.

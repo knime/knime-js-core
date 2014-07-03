@@ -23,14 +23,17 @@
         <option name="Hide in Wizard">
           If the setting should be hidden in the wizard execution.
         </option>
+        <option name="Hide in Dialog">
+          If the setting should be hidden in the sub node dialog.
+        </option>
         <option name="Variable Name">
           Variable identifier.
         </option>
+        <option name="Selection type">
+          Type of the selection panel.
+        </option>
         <option name="Default column">
           The column that is selected by default.
-        </option>
-        <option name="Column Selection">
-          The currently selected column.
         </option>
     </fullDescription>
 	<interactiveView name="Column selection">

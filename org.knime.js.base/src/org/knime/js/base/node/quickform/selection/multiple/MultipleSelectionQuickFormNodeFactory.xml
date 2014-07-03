@@ -13,11 +13,13 @@
         <option name="Hide in Wizard">
           If the setting should be hidden in the wizard execution.
         </option>
+        <option name="Hide in Dialog">
+          If the setting should be hidden in the sub node dialog.
+        </option>
 		<option name="Variable Name">Variable identifier.</option>
 		<option name="Selection Type">The type of the selection element. This can be either check boxes with a vertical or horizontal layout, a list or a twinlist.</option>
 		<option name="Possible Choices">The possible choices, each line is one possible value.</option>
 		<option name="Default Variable Values">Values selected by default.</option>
-		<option name="Variable Values">The current values.</option>
 	</fullDescription>
 	<interactiveView name="Multiple selection">
     	Select multiple options.
