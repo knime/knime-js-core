@@ -48,19 +48,23 @@
 package org.knime.js.base.node.viz.generic;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -163,15 +167,8 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         };
         m_dependenciesTable = new JTable(tableModel);
         m_dependenciesTable.getColumnModel().getColumn(0).setMaxWidth(30);
-        /*m_dependenciesTable.setDefaultRenderer(String.class, new TableCellRenderer() {
-
-            @Override
-            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus,
-                final int row, final int column) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-        })*/
+        //m_dependenciesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        m_dependenciesTable.setTableHeader(null);
         addTab("JavaScript View", initLayout());
     }
 
@@ -180,19 +177,54 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
      */
     private JPanel initLayout() {
         JPanel p = new JPanel(new BorderLayout());
-        //p.add(m_viewName, BorderLayout.NORTH);
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-        JPanel leftPanel = new JPanel(new BorderLayout());
-        leftPanel.add(m_flowVarList, BorderLayout.NORTH);
+        Border noBorder = BorderFactory.createEmptyBorder();
+        Border paddingBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+        p.setBorder(paddingBorder);
+
+        JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+        leftPane.setBorder(noBorder);
+        leftPane.setDividerLocation(120);
+        JPanel topLeftPanel = new JPanel(new BorderLayout(2, 2));
+        topLeftPanel.setBorder(paddingBorder);
+        topLeftPanel.add(new JLabel("Flow Variables"), BorderLayout.NORTH);
+        JScrollPane flowVarScroller = new JScrollPane(m_flowVarList);
+        topLeftPanel.add(flowVarScroller, BorderLayout.CENTER);
+        topLeftPanel.setPreferredSize(new Dimension(400, 130));
+        JPanel bottomLeftPanel = new JPanel(new BorderLayout(2, 2));
+        bottomLeftPanel.setBorder(paddingBorder);
+        bottomLeftPanel.add(new JLabel("CSS"), BorderLayout.NORTH);
         JScrollPane cssScroller = new RTextScrollPane(m_cssTextArea);
-        leftPanel.add(cssScroller, BorderLayout.CENTER);
-        splitPane.setLeftComponent(leftPanel);
+        bottomLeftPanel.add(cssScroller, BorderLayout.CENTER);
+        bottomLeftPanel.setPreferredSize(new Dimension(400, 400));
+        leftPane.setTopComponent(topLeftPanel);
+        leftPane.setBottomComponent(bottomLeftPanel);
+
+        JSplitPane rightPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
+        rightPane.setBorder(noBorder);
+        rightPane.setDividerLocation(120);
+        JPanel topRightPanel = new JPanel(new BorderLayout(2, 2));
+        topRightPanel.setBorder(paddingBorder);
+        topRightPanel.add(new JLabel("Dependencies"), BorderLayout.NORTH);
+        JScrollPane dependenciesScroller = new JScrollPane(m_dependenciesTable);
+        topRightPanel.add(dependenciesScroller, BorderLayout.CENTER);
+        topRightPanel.setPreferredSize(new Dimension(400, 130));
+        JPanel bottomRightPanel = new JPanel(new BorderLayout(2, 2));
+        bottomRightPanel.setBorder(paddingBorder);
+        bottomRightPanel.add(new JLabel("JavaScript"), BorderLayout.NORTH);
         JScrollPane jsScroller = new RTextScrollPane(m_jsTextArea);
-        JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(m_dependenciesTable, BorderLayout.NORTH);
-        rightPanel.add(jsScroller, BorderLayout.CENTER);
-        splitPane.setRightComponent(rightPanel);
+        bottomRightPanel.add(jsScroller, BorderLayout.CENTER);
+        bottomRightPanel.setPreferredSize(new Dimension(400, 400));
+        rightPane.setTopComponent(topRightPanel);
+        rightPane.setBottomComponent(bottomRightPanel);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
+        splitPane.setBorder(noBorder);
+        splitPane.setDividerLocation(0.5);
+        splitPane.setLeftComponent(leftPane);
+        splitPane.setRightComponent(rightPane);
+
         p.add(splitPane, BorderLayout.CENTER);
+
         return p;
     }
 
