@@ -66,10 +66,11 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      * @param representation Representation containing the possible values
      */
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_column = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column.setChoices(representation.getPossibleColumns());
         m_column.setSelection(representation.getDefaultValue().getColumn());
-        addComponent(m_column.getComponent());
+        setComponent(m_column.getComponent());
     }
 
     /**
@@ -88,6 +89,23 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
         if (value != null) {
             m_column.setSelection(value.getColumn());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_column.setSelection(getDefaultValue().getColumn());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_column.setEnabled(enabled);
     }
 
 }

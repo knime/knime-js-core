@@ -68,8 +68,9 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
      * @param representation The dialog representation
      */
     public ListBoxInputQuickFormDialogPanel(final ListBoxInputQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_component.setText(representation.getDefaultValue().getString());
-        addComponent(new JScrollPane(m_component));
+        setComponent(new JScrollPane(m_component));
     }
 
     /**
@@ -88,6 +89,23 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
         if (value != null) {
             m_component.setText(value.getString());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_component.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_component.setText(getDefaultValue().getString());
     }
 
 }

@@ -70,9 +70,10 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      * @param representation The dialog representation
      */
     public DoubleInputQuickFormDialogPanel(final DoubleInputQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_component.setPreferredSize(new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH).getPreferredSize());
         m_component.setValue(representation.getDefaultValue().getDouble());
-        addComponent(m_component);
+        setComponent(m_component);
     }
 
     /**
@@ -91,6 +92,23 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
         if (value != null) {
             m_component.setValue(value.getDouble());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_component.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_component.setValue(getDefaultValue().getDouble());
     }
 
 }

@@ -69,13 +69,14 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
      * @param representation Representation to get the date format
      */
     public DateInputQuickFormDialogPanel(final DateInputQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         String format =
                 representation.getWithTime() ? DateInputQuickFormNodeModel.DATE_TIME_FORMAT
                         : DateInputQuickFormNodeModel.DATE_FORMAT;
         m_component = new JSpinner(new SpinnerDateModel());
         m_component.setEditor(new JSpinner.DateEditor(m_component, format));
         m_component.setValue(representation.getDefaultValue().getDate());
-        addComponent(m_component);
+        setComponent(m_component);
     }
 
     /**
@@ -94,6 +95,23 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
         if (value != null) {
             m_component.setValue(value.getDate());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_component.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_component.setValue(getDefaultValue().getDate());
     }
 
 }

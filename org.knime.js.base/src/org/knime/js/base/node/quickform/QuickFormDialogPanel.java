@@ -48,9 +48,16 @@
 package org.knime.js.base.node.quickform;
 
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
@@ -68,12 +75,48 @@ public abstract class QuickFormDialogPanel
 
     private JLabel m_label = new JLabel();
 
+    private JCheckBox m_checkBox = new JCheckBox("Use defaults");
+
+    private final JPanel m_contentPanel;
+
+    private VAL m_defaultValue;
+
     /**
      * Creates a {@link QuickFormDialogPanel}.
+     *
+     * @param defaultValue The default value
      */
-    public QuickFormDialogPanel() {
-        setLayout(new FlowLayout(FlowLayout.LEFT));
-        add(m_label);
+    public QuickFormDialogPanel(final VAL defaultValue) {
+        m_defaultValue = defaultValue;
+        m_checkBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(final ItemEvent e) {
+                setEnabled(!m_checkBox.isSelected());
+                if (m_checkBox.isSelected()) {
+                    resetToDefault();
+                }
+            }
+        });
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(m_label, gbc);
+
+        gbc.gridx += 1;
+        /** Enable to get "use default" checker
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        add(ViewUtils.getInFlowLayout(FlowLayout.RIGHT, 0, 0, m_checkBox), gbc);
+        gbc.gridy += 1;
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
+         */
+        m_contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        gbc.weightx = 1;
+        add(m_contentPanel, gbc);
     }
 
     /**
@@ -93,8 +136,21 @@ public abstract class QuickFormDialogPanel
     /**
      * @param component The component that will be added to this quick form
      */
-    protected void addComponent(final JComponent component) {
-        add(component);
+    protected void setComponent(final JComponent component) {
+        m_contentPanel.removeAll();
+        m_contentPanel.add(component);
     }
+
+    /**
+     * @return the defaultValue
+     */
+    protected VAL getDefaultValue() {
+        return m_defaultValue;
+    }
+
+    /**
+     * Resets the currently set value back to the default.
+     */
+    protected abstract void resetToDefault();
 
 }

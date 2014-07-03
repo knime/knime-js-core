@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -57,15 +57,15 @@ import javax.swing.JComponent;
 import org.knime.core.node.util.filter.StringFilterPanel;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class TwinlistComponent implements MultipleSelectionsComponent {
-    
+
     private StringFilterPanel m_filter;
-    
+
     private String[] m_choices;
-    
+
     /**
      * Create TwinlistComponent.
      */
@@ -73,7 +73,7 @@ public class TwinlistComponent implements MultipleSelectionsComponent {
         m_filter = new StringFilterPanel(true);
         m_choices = new String[0];
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -113,6 +113,22 @@ public class TwinlistComponent implements MultipleSelectionsComponent {
             }
         }
         m_filter.update(includes, excludes, m_choices);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_filter.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_filter.isEnabled();
     }
 
 }

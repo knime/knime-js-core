@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -50,7 +50,7 @@ package org.knime.js.base.dialog.selection.single;
 import javax.swing.JComponent;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public interface SingleSelectionComponent {
@@ -59,7 +59,7 @@ public interface SingleSelectionComponent {
      * @return The JComponent
      */
     public JComponent getComponent();
-    
+
     /**
      * @param choices The available choices
      */
@@ -74,5 +74,15 @@ public interface SingleSelectionComponent {
      * @param selection The item that will be selected
      */
     public void setSelection(final String selection);
+
+    /**
+     * @param enabled true if this component should be enabled, false otherwise
+     */
+    public void setEnabled(final boolean enabled);
+
+    /**
+     * @return true if this component is enabled, false otherwise
+     */
+    public boolean isEnabled();
 
 }

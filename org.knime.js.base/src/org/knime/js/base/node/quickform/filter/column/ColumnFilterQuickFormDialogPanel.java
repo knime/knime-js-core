@@ -66,10 +66,11 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      * @param representation Representation containing the possible values
      */
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_columns = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_columns.setChoices(representation.getPossibleColumns());
         m_columns.setSelections(representation.getDefaultValue().getColumns());
-        addComponent(m_columns.getComponent());
+        setComponent(m_columns.getComponent());
     }
 
     /**
@@ -88,6 +89,23 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
         if (value != null) {
             m_columns.setSelections(value.getColumns());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_columns.setSelections(getDefaultValue().getColumns());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_columns.setEnabled(enabled);
     }
 
 }

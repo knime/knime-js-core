@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -56,7 +56,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.EtchedBorder;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class ListComponent implements SingleSelectionComponent {
@@ -64,7 +64,7 @@ public class ListComponent implements SingleSelectionComponent {
     private static final int MIN_WIDTH = 200;
 
     private JList<String> m_list;
-    
+
     private DefaultListModel<String> m_listModel;
 
     /**
@@ -76,7 +76,7 @@ public class ListComponent implements SingleSelectionComponent {
         m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_list.setBorder(new EtchedBorder());
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -120,6 +120,22 @@ public class ListComponent implements SingleSelectionComponent {
     @Override
     public void setSelection(final String selection) {
         m_list.setSelectedValue(selection, true);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_list.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_list.isEnabled();
     }
 
 }

@@ -78,6 +78,7 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
      * @param representation Representation containing the possible values
      */
     public ValueFilterQuickFormDialogPanel(final ValueFilterQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_values = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_column = new JComboBox<String>(representation.getPossibleColumns());
         m_column.addActionListener(new ActionListener() {
@@ -103,7 +104,7 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
         List<String> possibleValues = representation.getPossibleValues().get(m_column.getSelectedItem());
         m_values.setChoices(possibleValues.toArray(new String[possibleValues.size()]));
         m_values.setSelections(representation.getDefaultValue().getValues());
-        addComponent(panel);
+        setComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
     }
 
@@ -125,6 +126,25 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
             m_column.setSelectedItem(value.getColumn());
             m_values.setSelections(value.getValues());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_column.setSelectedItem(getDefaultValue().getColumn());
+        m_values.setSelections(getDefaultValue().getValues());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_column.setEnabled(enabled);
+        m_values.setEnabled(enabled);
     }
 
 }

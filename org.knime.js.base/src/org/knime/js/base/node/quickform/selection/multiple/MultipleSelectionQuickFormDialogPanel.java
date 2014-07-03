@@ -66,12 +66,13 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      * @param representation The representation containing layout information
      */
     public MultipleSelectionQuickFormDialogPanel(final MultipleSelectionQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         String[] choices = representation.getPossibleChoices();
         m_selectionComponent =
                 MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_selectionComponent.setChoices(choices);
         m_selectionComponent.setSelections(representation.getDefaultValue().getVariableValue());
-        addComponent(m_selectionComponent.getComponent());
+        setComponent(m_selectionComponent.getComponent());
     }
 
     /**
@@ -90,6 +91,23 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
         if (value != null) {
             m_selectionComponent.setSelections(value.getVariableValue());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_selectionComponent.setSelections(getDefaultValue().getVariableValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_selectionComponent.setEnabled(enabled);
     }
 
 }

@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -57,13 +57,13 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class RadioButtonComponent implements SingleSelectionComponent {
 
     private final JPanel m_panel = new JPanel();
-    
+
     private final boolean m_vertical;
 
     private List<JRadioButton> m_buttons = new ArrayList<JRadioButton>();
@@ -74,7 +74,7 @@ public class RadioButtonComponent implements SingleSelectionComponent {
     RadioButtonComponent(final boolean vertical) {
         m_vertical = vertical;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -121,7 +121,7 @@ public class RadioButtonComponent implements SingleSelectionComponent {
 
     /**
      * {@inheritDoc}
-     */ 
+     */
     @Override
     public void setSelection(final String selection) {
         for (JRadioButton button : m_buttons) {
@@ -130,6 +130,25 @@ public class RadioButtonComponent implements SingleSelectionComponent {
                 break;
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_panel.setEnabled(enabled);
+        for (JRadioButton button : m_buttons) {
+            button.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_panel.isEnabled();
     }
 
 }

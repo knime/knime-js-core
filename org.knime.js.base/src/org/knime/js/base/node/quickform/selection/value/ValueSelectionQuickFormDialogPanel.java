@@ -78,6 +78,7 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
      * @param representation Representation containing the possible values
      */
     public ValueSelectionQuickFormDialogPanel(final ValueSelectionQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_value = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column = new JComboBox<String>(representation.getPossibleColumns());
         m_column.addActionListener(new ActionListener() {
@@ -111,7 +112,7 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
             m_value.setChoices(new String[0]);
         }
         m_value.setSelection(representation.getDefaultValue().getValue());
-        addComponent(panel);
+        setComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
     }
 
@@ -133,6 +134,25 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
             m_column.setSelectedItem(value.getColumn());
             m_value.setSelection(value.getValue());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_column.setSelectedItem(getDefaultValue().getColumn());
+        m_value.setSelection(getDefaultValue().getValue());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_column.setEnabled(enabled);
+        m_value.setEnabled(enabled);
     }
 
 }

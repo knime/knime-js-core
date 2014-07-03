@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -62,7 +62,7 @@ import javax.swing.border.EtchedBorder;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class ListComponent implements MultipleSelectionsComponent {
@@ -70,7 +70,7 @@ public class ListComponent implements MultipleSelectionsComponent {
     private static final int MIN_WIDTH = 200;
 
     private JList<String> m_list;
-    
+
     private DefaultListModel<String> m_listModel;
 
     /**
@@ -82,7 +82,7 @@ public class ListComponent implements MultipleSelectionsComponent {
         m_list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         m_list.setBorder(new EtchedBorder());
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -129,6 +129,22 @@ public class ListComponent implements MultipleSelectionsComponent {
             }
         }
         m_list.setSelectedIndices(ArrayUtils.toPrimitive(indices.toArray(new Integer[indices.size()])));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_list.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_list.isEnabled();
     }
 
 }

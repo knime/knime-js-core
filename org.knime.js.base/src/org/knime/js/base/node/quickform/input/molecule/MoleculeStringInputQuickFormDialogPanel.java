@@ -67,8 +67,9 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      * @param representation The dialog representation
      */
     public MoleculeStringInputQuickFormDialogPanel(final MoleculeStringInputQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_component.setText(representation.getDefaultValue().getMoleculeString());
-        addComponent(m_component);
+        setComponent(m_component);
     }
 
     /**
@@ -87,6 +88,23 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
         if (value != null) {
             m_component.setText(value.getMoleculeString());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_component.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_component.setText(getDefaultValue().getMoleculeString());
     }
 
 }

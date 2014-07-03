@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -52,13 +52,13 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class DropdownComponent implements SingleSelectionComponent {
 
     private JComboBox<String> m_comboBox;
-    
+
     private DefaultComboBoxModel<String> m_comboBoxModel;
 
     /**
@@ -68,7 +68,7 @@ public class DropdownComponent implements SingleSelectionComponent {
         m_comboBoxModel = new DefaultComboBoxModel<String>();
         m_comboBox = new JComboBox<String>(m_comboBoxModel);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -102,6 +102,22 @@ public class DropdownComponent implements SingleSelectionComponent {
     @Override
     public void setSelection(final String selection) {
         m_comboBox.setSelectedItem(selection);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_comboBox.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_comboBox.isEnabled();
     }
 
 }

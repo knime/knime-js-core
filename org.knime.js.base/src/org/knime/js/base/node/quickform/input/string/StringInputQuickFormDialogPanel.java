@@ -68,8 +68,9 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      *
      */
     public StringInputQuickFormDialogPanel(final StringInputQuickFormRepresentation representation) {
+        super(representation.getDefaultValue());
         m_component.setText(representation.getDefaultValue().getString());
-        addComponent(m_component);
+        setComponent(m_component);
     }
 
     /**
@@ -88,6 +89,23 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
         if (value != null) {
             m_component.setText(value.getString());
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        super.setEnabled(enabled);
+        m_component.setEnabled(enabled);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void resetToDefault() {
+        m_component.setText(getDefaultValue().getString());
     }
 
 }

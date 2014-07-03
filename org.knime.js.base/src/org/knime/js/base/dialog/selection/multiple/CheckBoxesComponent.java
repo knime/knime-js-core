@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 17, 2014 ("Patrick Winter"): created
  */
@@ -57,7 +57,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 /**
- * 
+ *
  * @author "Patrick Winter", KNIME.com, Zurich, Switzerland
  */
 public class CheckBoxesComponent implements MultipleSelectionsComponent {
@@ -65,7 +65,7 @@ public class CheckBoxesComponent implements MultipleSelectionsComponent {
     private final JPanel m_panel = new JPanel();
 
     private List<JCheckBox> m_boxes = new ArrayList<JCheckBox>();
-    
+
     private final boolean m_vertical;
 
     /**
@@ -74,7 +74,7 @@ public class CheckBoxesComponent implements MultipleSelectionsComponent {
     CheckBoxesComponent(final boolean vertical) {
         m_vertical = vertical;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -125,6 +125,25 @@ public class CheckBoxesComponent implements MultipleSelectionsComponent {
         for (JCheckBox box : m_boxes) {
             box.setSelected(selectionList.contains(box.getText()));
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setEnabled(final boolean enabled) {
+        m_panel.setEnabled(enabled);
+        for (JCheckBox box : m_boxes) {
+            box.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEnabled() {
+        return m_panel.isEnabled();
     }
 
 }
