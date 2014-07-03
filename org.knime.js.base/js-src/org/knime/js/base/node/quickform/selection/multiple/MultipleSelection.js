@@ -50,7 +50,7 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		version : "1.0.0"
 	};
 	multiSelection.name = "Multiple selections";
-	var selector;
+	var selector = null;
 	var viewValid = false;
 
 	multiSelection.init = function(representation) {
@@ -84,6 +84,9 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 
 	multiSelection.value = function() {
 		if (!viewValid) {
+			return null;
+		}
+		if (selector == null) {
 			return null;
 		}
 		var viewValid = new Object();

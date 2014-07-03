@@ -50,7 +50,7 @@ org_knime_js_base_node_quickform_selection_single = function() {
 		version : "1.0.0"
 	};
 	singleSelection.name = "Single selection";
-	var selector;
+	var selector = null;
 	var viewValid = false;
 
 	singleSelection.init = function(representation) {
@@ -84,6 +84,9 @@ org_knime_js_base_node_quickform_selection_single = function() {
 
 	singleSelection.value = function() {
 		if (!viewValid) {
+			return null;
+		}
+		if (selector == null) {
 			return null;
 		}
 		var viewValue = new Object();
