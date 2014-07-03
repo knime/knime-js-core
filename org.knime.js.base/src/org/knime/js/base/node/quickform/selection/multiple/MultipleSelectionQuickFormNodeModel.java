@@ -105,7 +105,6 @@ public class MultipleSelectionQuickFormNodeModel
             container.addRowToTable(new DefaultRow(RowKey.createRowKey(i), result));
         }
         container.close();
-        updateViewValue();
         return new PortObject[]{container.getTable()};
     }
 
@@ -125,14 +124,6 @@ public class MultipleSelectionQuickFormNodeModel
         } else {
             throw new InvalidSettingsException("Invalid column name specified for user selections.");
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public MultipleSelectionQuickFormRepresentation createEmptyViewRepresentation() {
-        return new MultipleSelectionQuickFormRepresentation();
     }
 
     /**
@@ -164,11 +155,7 @@ public class MultipleSelectionQuickFormNodeModel
      */
     @Override
     protected MultipleSelectionQuickFormRepresentation getRepresentation() {
-        MultipleSelectionQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getVariableValue());
-        representation.setPossibleChoices(getConfig().getPossibleChoices());
-        representation.setType(getConfig().getType());
-        return representation;
+        return new MultipleSelectionQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

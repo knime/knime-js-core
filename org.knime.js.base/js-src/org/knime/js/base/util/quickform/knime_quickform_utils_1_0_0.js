@@ -67,8 +67,8 @@ isValid = function(object) {
 	return object != undefined && object != null;
 }
 
-checkMissingData = function(representation, value) {
-	if (isValid(representation) && isValid(value)) {
+checkMissingData = function(representation) {
+	if (isValid(representation)) {
 		return false;
 	} else {
 		var body = $('body');

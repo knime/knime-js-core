@@ -67,7 +67,7 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
      * @param representation The dialog representation
      */
     public IntInputQuickFormDialogPanel(final IntInputQuickFormRepresentation representation) {
-        m_component.setValue(representation.getDefaultValue());
+        m_component.setValue(representation.getDefaultValue().getInteger());
         addComponent(m_component);
     }
 

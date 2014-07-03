@@ -88,14 +88,6 @@ public class StringInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public StringInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new StringInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public StringInputQuickFormValue createEmptyViewValue() {
         return new StringInputQuickFormValue();
     }
@@ -118,11 +110,7 @@ public class StringInputQuickFormNodeModel
      */
     @Override
     protected StringInputQuickFormRepresentation getRepresentation() {
-        StringInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getString());
-        representation.setErrorMessage(getConfig().getErrorMessage());
-        representation.setRegex(getConfig().getRegex());
-        return representation;
+        return new StringInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

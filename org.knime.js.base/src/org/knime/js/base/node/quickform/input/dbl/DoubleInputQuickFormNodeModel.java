@@ -63,14 +63,6 @@ public class DoubleInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public DoubleInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new DoubleInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public DoubleInputQuickFormValue createEmptyViewValue() {
         return new DoubleInputQuickFormValue();
     }
@@ -123,13 +115,7 @@ public class DoubleInputQuickFormNodeModel
      */
     @Override
     protected DoubleInputQuickFormRepresentation getRepresentation() {
-        DoubleInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getDouble());
-        representation.setMax(getConfig().getMax());
-        representation.setMin(getConfig().getMin());
-        representation.setUseMax(getConfig().getUseMax());
-        representation.setUseMin(getConfig().getUseMin());
-        return representation;
+        return new DoubleInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

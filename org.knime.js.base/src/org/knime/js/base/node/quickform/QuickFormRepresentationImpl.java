@@ -67,31 +67,36 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *
  * @author Patrick Winter, KNIME.com AG, Zurich, Switzerland
  * @param <VAL> The value class handled by this representation
+ * @param <CONF> The config class containing the values for this presentation
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class QuickFormRepresentationImpl
-        <VAL extends DialogNodeValue>
+        <VAL extends DialogNodeValue, CONF extends QuickFormConfig<VAL>>
         extends JSONViewContent
         implements QuickFormRepresentation<VAL> {
 
-    private static final String CFG_LABEL = "label";
+    private final String m_label;
 
-    private static final String CFG_DESCRIPTION = "description";
+    private final String m_description;
 
-    private static final String CFG_REQUIRED = "required";
+    private final boolean m_required;
 
-    private static final String DEFAULT_LABEL = "Label";
+    private final VAL m_defaultValue;
 
-    private static final String DEFAULT_DESCRIPTION = "Enter Description";
+    private final VAL m_currentValue;
 
-    private static final boolean DEFAULT_REQUIRED = true;
-
-    private String m_label = DEFAULT_LABEL;
-
-    private String m_description = DEFAULT_DESCRIPTION;
-
-    private boolean m_required = DEFAULT_REQUIRED;
+    /**
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
+     */
+    public QuickFormRepresentationImpl(final VAL currentValue, final CONF config) {
+        m_label = config.getLabel();
+        m_description = config.getDescription();
+        m_required = config.getRequired();
+        m_defaultValue = config.getDefaultValue();
+        m_currentValue = currentValue;
+    }
 
     /**
      * @return the label
@@ -100,14 +105,6 @@ public abstract class QuickFormRepresentationImpl
     @JsonProperty("label")
     public String getLabel() {
         return m_label;
-    }
-
-    /**
-     * @param label the label to set
-     */
-    @JsonIgnore
-    public void setLabel(final String label) {
-        m_label = label;
     }
 
     /**
@@ -120,14 +117,6 @@ public abstract class QuickFormRepresentationImpl
     }
 
     /**
-     * @param description the description to set
-     */
-    @JsonIgnore
-    public void setDescription(final String description) {
-        m_description = description;
-    }
-
-    /**
      * @return the required
      */
     @JsonProperty("required")
@@ -136,44 +125,19 @@ public abstract class QuickFormRepresentationImpl
     }
 
     /**
-     * @param required the required to set
+     * @return the defaultValue
      */
-    @JsonIgnore
-    public void setRequired(final boolean required) {
-        m_required = required;
+    @JsonProperty("defaultValue")
+    public VAL getDefaultValue() {
+        return m_defaultValue;
     }
 
     /**
-     * {@inheritDoc}
+     * @return the currentValue
      */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_LABEL, m_label);
-        settings.addString(CFG_DESCRIPTION, m_description);
-        settings.addBoolean(CFG_REQUIRED, m_required);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        m_label = settings.getString(CFG_LABEL);
-        m_description = settings.getString(CFG_DESCRIPTION);
-        m_required = settings.getBoolean(CFG_REQUIRED);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        m_label = settings.getString(CFG_LABEL, DEFAULT_LABEL);
-        m_description = settings.getString(CFG_DESCRIPTION, DEFAULT_DESCRIPTION);
-        m_required = settings.getBoolean(CFG_REQUIRED, DEFAULT_REQUIRED);
+    @JsonProperty("currentValue")
+    public VAL getCurrentValue() {
+        return m_currentValue;
     }
 
     /**
@@ -229,12 +193,45 @@ public abstract class QuickFormRepresentationImpl
         if (obj.getClass() != getClass()) {
             return false;
         }
-        QuickFormRepresentationImpl<VAL> other = (QuickFormRepresentationImpl<VAL>) obj;
+        QuickFormRepresentationImpl<VAL, CONF> other = (QuickFormRepresentationImpl<VAL, CONF>) obj;
         return new EqualsBuilder()
                 .append(m_label, other.m_label)
                 .append(m_description, other.m_description)
                 .append(m_required, other.m_required)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        // ignore
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        // ignore
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void resetNodeValueToDefault(final VAL value) {
+        // ignore
     }
 
 }

@@ -63,14 +63,6 @@ public class IntInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public IntInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new IntInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public IntInputQuickFormValue createEmptyViewValue() {
         return new IntInputQuickFormValue();
     }
@@ -123,13 +115,7 @@ public class IntInputQuickFormNodeModel
      */
     @Override
     protected IntInputQuickFormRepresentation getRepresentation() {
-        IntInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getInteger());
-        representation.setMax(getConfig().getMax());
-        representation.setMin(getConfig().getMin());
-        representation.setUseMax(getConfig().getUseMax());
-        representation.setUseMin(getConfig().getUseMin());
-        return representation;
+        return new IntInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

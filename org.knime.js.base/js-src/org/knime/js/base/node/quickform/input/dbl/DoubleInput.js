@@ -50,16 +50,15 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 			version: "1.0.0"
 	};
 	doubleInput.name = "Double input";
-	var viewValue;
 	var viewRepresentation;
 	var input;
 	var errorMessage;
+	var viewValid = false;
 
-	doubleInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	doubleInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
-		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
@@ -78,7 +77,7 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 			input.spinner('option', 'max', viewRepresentation.max);
 		}
 		input.width(100);
-		var doubleValue = value.double;
+		var doubleValue = representation.currentValue.double;
 		input.val(doubleValue);
 		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');
@@ -89,13 +88,13 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		qfdiv.append(errorMessage);
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 	
 	doubleInput.validate = function() {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
-			return true;
+		if (!viewValid) {
+			return false;
 		}
-		var valid;
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
 		var value = input.val();
@@ -105,20 +104,19 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 		}
 		value = parseFloat(value);
 		if (viewRepresentation.usemin && value<min) {
-			valid = false;
 			doubleInput.setValidationErrorMessage("The set double " + value + " is smaller than the allowed minimum of " + min);
+			return false;
 		} else if (viewRepresentation.usemax && value>max) {
-			valid = false;
 			doubleInput.setValidationErrorMessage("The set double " + value + " is bigger than the allowed maximum of " + max);
+			return false;
 		} else {
-			valid = true;
 			doubleInput.setValidationErrorMessage(null);
+			return true;
 		}
-		return valid;
 	};
 	
 	doubleInput.setValidationErrorMessage = function(message) {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+		if (!viewValid) {
 			return;
 		}
 		if (message != null) {
@@ -132,9 +130,10 @@ org_knime_js_base_node_quickform_input_dbl = function() {
 	};
 
 	doubleInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.double = parseFloat(input.val());
 		return viewValue;
 	};

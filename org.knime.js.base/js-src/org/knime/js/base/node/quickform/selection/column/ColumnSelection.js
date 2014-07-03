@@ -50,24 +50,18 @@ org_knime_js_base_node_quickform_selection_column = function() {
 			version: "1.0.0"
 	};
 	columnSelection.name = "Column selection";
-	var viewValue;
 	var selector
+	var viewValid = false;
 
-	columnSelection.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	columnSelection.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
-		if (!isValid(representation) || !isValid(value)) {
-			qfdiv.append("Error: Data is missing, can not display view.");
-			resizeParent();
-			return;
-		}
 		qfdiv.attr('title', representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
-		viewValue = value;
 		if (representation.possibleColumns == null) {
 			qfdiv.append("Error: No data available");
 		} else {
@@ -82,17 +76,19 @@ org_knime_js_base_node_quickform_selection_column = function() {
 			}
 			qfdiv.append(selector.getComponent());
 			selector.setChoices(representation.possibleColumns);
-			var selection = value.column;
+			var selection = representation.currentValue.column;
 			selector.setSelection(selection);
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
+		viewValid = true;
 	};
 
 	columnSelection.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.column = selector.getSelection();
 		return viewValue;
 	};

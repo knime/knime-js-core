@@ -44,26 +44,12 @@
  */
 package org.knime.js.base.node.quickform.selection.value;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataColumnSpec;
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.data.DoubleValue;
-import org.knime.core.data.IntValue;
-import org.knime.core.data.StringValue;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -79,99 +65,28 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ValueSelectionQuickFormRepresentation extends
-        QuickFormRepresentationImpl<ValueSelectionQuickFormValue> {
-
-    private static final String CFG_COLUMN_TYPE = "columnType";
-
-    private static final ColumnType DEFAULT_COLUMN_TYPE = ColumnType.All;
-
-    private ColumnType m_columnType = DEFAULT_COLUMN_TYPE;
-
-    private static final String CFG_LOCK_COLUMN = "lockColumn";
-
-    private static final boolean DEFAULT_LOCK_COLUMN = false;
-
-    private boolean m_lockColumn = DEFAULT_LOCK_COLUMN;
-
-    private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-
-    private static final String DEFAULT_DEFAULT_COLUMN = "";
-
-    private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
-
-    private static final String CFG_DEFAULT_VALUE = "default";
-
-    private static final String DEFAULT_DEFAULT_VALUE = "";
-
-    private String m_defaultValue = DEFAULT_DEFAULT_VALUE;
-
-    private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-
-    private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
-
-    private static final String CFG_TYPE = "type";
-
-    private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
-
-    private String m_type = DEFAULT_TYPE;
+        QuickFormRepresentationImpl<ValueSelectionQuickFormValue, ValueSelectionQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE);
-        m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE));
-        m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN);
-        m_possibleValues = new TreeMap<String, List<String>>();
-        String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
-        for (String column : columns) {
-            m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column)));
-        }
-        setType(settings.getString(CFG_TYPE));
+    public ValueSelectionQuickFormRepresentation(final ValueSelectionQuickFormValue currentValue,
+        final ValueSelectionQuickFormConfig config) {
+        super(currentValue, config);
+        m_columnType = config.getColumnType();
+        m_lockColumn = config.getLockColumn();
+        m_possibleValues = config.getPossibleValues();
+        m_type = config.getType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_defaultValue = settings.getString(CFG_DEFAULT_VALUE, DEFAULT_DEFAULT_VALUE);
-        m_columnType = ColumnType.valueOf(settings.getString(CFG_COLUMN_TYPE, DEFAULT_COLUMN_TYPE.name()));
-        m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN, DEFAULT_LOCK_COLUMN);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN, DEFAULT_DEFAULT_COLUMN);
-        m_possibleValues = new TreeMap<String, List<String>>();
-        String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, new String[0]);
-        for (String column : columns) {
-            m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column, new String[0])));
-        }
-        setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
-    }
+    private final ColumnType m_columnType;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addString(CFG_DEFAULT_VALUE, m_defaultValue);
-        settings.addString(CFG_COLUMN_TYPE, m_columnType.name());
-        settings.addBoolean(CFG_LOCK_COLUMN, m_lockColumn);
-        settings.addStringArray(CFG_POSSIBLE_COLUMNS,
-                m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]));
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
-        for (String key : m_possibleValues.keySet()) {
-            List<String> values = m_possibleValues.get(key);
-            settings.addStringArray(key, values.toArray(new String[values.size()]));
-        }
-        settings.addString(CFG_TYPE, m_type);
-    }
+    private final boolean m_lockColumn;
+
+    private final Map<String, List<String>> m_possibleValues;
+
+    private final String m_type;
 
     /**
      * {@inheritDoc}
@@ -185,28 +100,11 @@ public class ValueSelectionQuickFormRepresentation extends
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final ValueSelectionQuickFormValue value) {
-        value.setValue(m_defaultValue);
-    }
-
-    /**
      * @return the columnType
      */
     @JsonProperty("columnType")
     public ColumnType getColumnType() {
         return m_columnType;
-    }
-
-    /**
-     * @param columnType the columnType to set
-     */
-    @JsonIgnore
-    public void setColumnType(final ColumnType columnType) {
-        m_columnType = columnType;
     }
 
     /**
@@ -218,59 +116,11 @@ public class ValueSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @param lockColumn the lockColumn to set
-     */
-    @JsonIgnore
-    public void setLockColumn(final boolean lockColumn) {
-        m_lockColumn = lockColumn;
-    }
-
-    /**
-     * @return the defaultColumn
-     */
-    @JsonIgnore
-    public String getDefaultColumn() {
-        return m_defaultColumn;
-    }
-
-    /**
-     * @param defaultColumn the defaultColumn to set
-     */
-    @JsonIgnore
-    public void setDefaultColumn(final String defaultColumn) {
-        m_defaultColumn = defaultColumn;
-    }
-
-    /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
      * @return the possibleColumns
      */
     @JsonProperty("possibleColumns")
     public String[] getPossibleColumns() {
         return m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]);
-    }
-
-    /**
-     * @param possibleValues the possibleValues to set
-     */
-    @JsonIgnore
-    public void setPossibleValues(final Map<String, List<String>> possibleValues) {
-        m_possibleValues = possibleValues;
     }
 
     /**
@@ -282,65 +132,11 @@ public class ValueSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @param spec the spec to set
-     */
-    @JsonIgnore
-    public void setFromSpec(final DataTableSpec spec) {
-        // Only add column specs for columns that have values and are of the selected type
-        List<DataColumnSpec> specs = new ArrayList<DataColumnSpec>();
-        for (DataColumnSpec cspec : spec) {
-            if (cspec.getDomain().hasValues()) {
-                switch (m_columnType) {
-                case String:
-                    if (cspec.getType().isCompatible(StringValue.class)) {
-                        specs.add(cspec);
-                    }
-                    break;
-                case Integer:
-                    if (cspec.getType().isCompatible(IntValue.class)) {
-                        specs.add(cspec);
-                    }
-                    break;
-                case Double:
-                    if (cspec.getType().isCompatible(DoubleValue.class)) {
-                        specs.add(cspec);
-                    }
-                    break;
-                case All:
-                    specs.add(cspec);
-                    break;
-                }
-            }
-        }
-        DataTableSpec filteredSpec = new DataTableSpec(specs.toArray(new DataColumnSpec[specs.size()]));
-        Map<String, List<String>> values = new TreeMap<String, List<String>>();
-        for (DataColumnSpec colSpec : filteredSpec) {
-            final Set<DataCell> vals = colSpec.getDomain().getValues();
-            if (vals != null) {
-                List<String> v = new ArrayList<String>();
-                for (final DataCell cell : vals) {
-                    v.add(cell.toString());
-                }
-                values.put(colSpec.getName(), v);
-            }
-        }
-        m_possibleValues = values;
-    }
-
-    /**
      * @return the type
      */
     @JsonProperty("type")
     public String getType() {
         return m_type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    @JsonIgnore
-    public void setType(final String type) {
-        m_type = type;
     }
 
     /**
@@ -356,12 +152,6 @@ public class ValueSelectionQuickFormRepresentation extends
         sb.append(", ");
         sb.append("lockColumn=");
         sb.append(m_lockColumn);
-        sb.append(", ");
-        sb.append("defaultColumn=");
-        sb.append(m_defaultColumn);
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
         sb.append(", ");
         sb.append("possibleValues=");
         sb.append("{");
@@ -381,8 +171,6 @@ public class ValueSelectionQuickFormRepresentation extends
         return new HashCodeBuilder().appendSuper(super.hashCode())
                 .append(m_columnType)
                 .append(m_lockColumn)
-                .append(m_defaultColumn)
-                .append(m_defaultValue)
                 .append(m_possibleValues)
                 .append(m_type)
                 .toHashCode();
@@ -406,8 +194,6 @@ public class ValueSelectionQuickFormRepresentation extends
         return new EqualsBuilder().appendSuper(super.equals(obj))
                 .append(m_columnType, other.m_columnType)
                 .append(m_lockColumn, other.m_lockColumn)
-                .append(m_defaultColumn, other.m_defaultColumn)
-                .append(m_defaultValue, other.m_defaultValue)
                 .append(m_possibleValues, other.m_possibleValues)
                 .append(m_type, other.m_type)
                 .isEquals();

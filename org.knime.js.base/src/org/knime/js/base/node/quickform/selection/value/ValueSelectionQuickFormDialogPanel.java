@@ -103,14 +103,14 @@ public class ValueSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Val
         panel.add(m_column, gbc);
         gbc.gridy++;
         panel.add(m_value.getComponent(), gbc);
-        m_column.setSelectedItem(representation.getDefaultColumn());
+        m_column.setSelectedItem(representation.getDefaultValue().getColumn());
         List<String> possibleValues = representation.getPossibleValues().get(m_column.getSelectedItem());
         if (possibleValues != null) {
             m_value.setChoices(possibleValues.toArray(new String[possibleValues.size()]));
         } else {
             m_value.setChoices(new String[0]);
         }
-        m_value.setSelection(representation.getDefaultValue());
+        m_value.setSelection(representation.getDefaultValue().getValue());
         addComponent(panel);
         m_column.setVisible(!representation.getLockColumn());
     }

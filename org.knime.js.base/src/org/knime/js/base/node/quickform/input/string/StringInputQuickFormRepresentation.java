@@ -46,9 +46,6 @@ package org.knime.js.base.node.quickform.input.string;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -64,23 +61,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class StringInputQuickFormRepresentation extends QuickFormRepresentationImpl<StringInputQuickFormValue> {
+public class StringInputQuickFormRepresentation extends
+    QuickFormRepresentationImpl<StringInputQuickFormValue, StringInputQuickFormConfig> {
 
-    private static final String CFG_REGEX = "regex";
+    /**
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
+     */
+    public StringInputQuickFormRepresentation(final StringInputQuickFormValue currentValue,
+        final StringInputQuickFormConfig config) {
+        super(currentValue, config);
+        m_regex = config.getRegex();
+        m_errorMessage = config.getErrorMessage();
+    }
 
-    private static final String DEFAULT_REGEX = "";
+    private final String m_regex;
 
-    private String m_regex = DEFAULT_REGEX;
-
-    private static final String CFG_ERROR_MESSAGE = "error_message";
-
-    private static final String DEFAULT_ERROR_MESSAGE = "";
-
-    private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
-
-    private static final String CFG_DEFAULT = "default";
-
-    private String m_defaultValue = "";
+    private final String m_errorMessage;
 
     /**
      * @return the regex
@@ -88,14 +85,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
     @JsonProperty("regex")
     public String getRegex() {
         return m_regex;
-    }
-
-    /**
-     * @param regex the regex to set
-     */
-    @JsonIgnore
-    public void setRegex(final String regex) {
-        m_regex = regex;
     }
 
     /**
@@ -107,50 +96,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
     }
 
     /**
-     * @param errorMessage the errorMessage to set
-     */
-    @JsonIgnore
-    public void setErrorMessage(final String errorMessage) {
-        m_errorMessage = errorMessage;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_regex = settings.getString(CFG_REGEX);
-        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
-        m_defaultValue = settings.getString(CFG_DEFAULT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
-        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
-        m_defaultValue = settings.getString(CFG_DEFAULT, "");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addString(CFG_REGEX, m_regex);
-        settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
-        settings.addString(CFG_DEFAULT, m_defaultValue);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -159,31 +104,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
         StringInputQuickFormDialogPanel panel = new StringInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
-    }
-
-    /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final StringInputQuickFormValue value) {
-        value.setString(m_defaultValue);
     }
 
     /**
@@ -199,9 +119,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
         sb.append(", ");
         sb.append("errorMessage=");
         sb.append(m_errorMessage);
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
         return sb.toString();
     }
 
@@ -213,7 +130,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
         return new HashCodeBuilder().appendSuper(super.hashCode())
                 .append(m_regex)
                 .append(m_errorMessage)
-                .append(m_defaultValue)
                 .toHashCode();
     }
 
@@ -235,7 +151,6 @@ public class StringInputQuickFormRepresentation extends QuickFormRepresentationI
         return new EqualsBuilder().appendSuper(super.equals(obj))
                 .append(m_regex, other.m_regex)
                 .append(m_errorMessage, other.m_errorMessage)
-                .append(m_defaultValue, other.m_defaultValue)
                 .isEquals();
     }
 

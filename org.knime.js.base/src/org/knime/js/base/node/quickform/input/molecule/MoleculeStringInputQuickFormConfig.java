@@ -63,7 +63,7 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableConfig;
 public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableConfig<MoleculeStringInputQuickFormValue> {
 
     private static final String CFG_FORMAT = "format";
-    private static final String DEFAULT_FORMAT = MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS[0];
+    private static final String DEFAULT_FORMAT = MoleculeStringInputQuickFormNodeModel.DEFAULT_FORMATS[0];
     private String m_format = DEFAULT_FORMAT;
 
     /**

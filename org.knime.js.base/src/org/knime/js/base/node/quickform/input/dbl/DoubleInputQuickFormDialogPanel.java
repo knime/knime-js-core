@@ -71,7 +71,7 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      */
     public DoubleInputQuickFormDialogPanel(final DoubleInputQuickFormRepresentation representation) {
         m_component.setPreferredSize(new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH).getPreferredSize());
-        m_component.setValue(representation.getDefaultValue());
+        m_component.setValue(representation.getDefaultValue().getDouble());
         addComponent(m_component);
     }
 

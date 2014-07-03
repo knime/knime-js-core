@@ -50,25 +50,24 @@ org_knime_js_base_node_quickform_input_string = function() {
 			version: "1.0.0"
 	};
 	stringInput.name = "String input";
-	var viewValue;
 	var input;
 	var errorMessage;
 	var viewRepresentation;
+	var viewValid = false;
 
-	stringInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	stringInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
-		viewValue = value;
 		input = $('<input>');
 		input.attr("type", "text");
 		input.attr("pattern", representation.regex);
 		input.width(400);
-		var stringValue = value.string;
+		var stringValue = representation.currentValue.string;
 		input.val(stringValue);
 		qfdiv.attr("title", representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
@@ -82,11 +81,12 @@ org_knime_js_base_node_quickform_input_string = function() {
 		qfdiv.append(errorMessage);
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 
 	stringInput.validate = function() {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
-			return true;
+		if (!viewValid) {
+			return false;
 		}
 		var regex = input.attr("pattern");
 		if (regex != null && regex.length > 0) {
@@ -103,7 +103,7 @@ org_knime_js_base_node_quickform_input_string = function() {
 	};
 	
 	stringInput.setValidationErrorMessage = function(message) {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+		if (!viewValid) {
 			return;
 		}
 		if (message != null) {
@@ -117,9 +117,10 @@ org_knime_js_base_node_quickform_input_string = function() {
 	}
 
 	stringInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.string = input.val();
 		return viewValue;
 	};

@@ -50,11 +50,11 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		version : "1.0.0"
 	};
 	multiSelection.name = "Multiple selections";
-	var viewValue;
 	var selector;
+	var viewValid = false;
 
-	multiSelection.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	multiSelection.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		var body = $('body');
@@ -62,7 +62,6 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		body.append(qfdiv);
 		qfdiv.attr('title', representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
-		viewValue = value;
 		if (representation.possibleChoices.length > 0) {
 			if (representation.type == 'Check boxes (vertical)') {
 				selector = new checkBoxesMultipleSelections(true);
@@ -75,17 +74,19 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 			}
 			qfdiv.append(selector.getComponent());
 			selector.setChoices(representation.possibleChoices);
-			var selections = value.value;
+			var selections = representation.currentValue.value;
 			selector.setSelections(selections);
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
+		viewValid = true;
 	};
 
 	multiSelection.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValid = new Object();
 		viewValue.value = selector.getSelections();
 		return viewValue;
 	};

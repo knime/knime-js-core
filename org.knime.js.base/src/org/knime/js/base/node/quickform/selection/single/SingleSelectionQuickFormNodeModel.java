@@ -79,14 +79,6 @@ public class SingleSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public SingleSelectionQuickFormRepresentation createEmptyViewRepresentation() {
-        return new SingleSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public SingleSelectionQuickFormValue createEmptyViewValue() {
         return new SingleSelectionQuickFormValue();
     }
@@ -112,11 +104,7 @@ public class SingleSelectionQuickFormNodeModel
      */
     @Override
     protected SingleSelectionQuickFormRepresentation getRepresentation() {
-        SingleSelectionQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getVariableValue());
-        representation.setPossibleChoices(getConfig().getPossibleChoices());
-        representation.setType(getConfig().getType());
-        return representation;
+        return new SingleSelectionQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

@@ -66,7 +66,7 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
      * @param representation The dialog representation
      */
     public BooleanInputQuickFormDialogPanel(final BooleanInputQuickFormRepresentation representation) {
-        m_component.setSelected(representation.getDefaultValue());
+        m_component.setSelected(representation.getDefaultValue().getBoolean());
         addComponent(m_component);
     }
 

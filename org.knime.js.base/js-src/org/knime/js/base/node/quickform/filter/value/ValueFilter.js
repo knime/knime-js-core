@@ -50,13 +50,13 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			version: "1.0.0"
 	};
 	valueFilter.name = "Value filter";
-	var viewValue;
 	var viewRepresentation;
 	var colselection;
 	var selector;
+	var viewValid = false;
 
-	valueFilter.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	valueFilter.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		var body = $('body');
@@ -64,12 +64,11 @@ org_knime_js_base_node_quickform_filter_value = function() {
 		body.append(qfdiv);
 		qfdiv.attr('title', representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
-		viewValue = value;
 		viewRepresentation = representation;
 		if (representation.possibleValues == null) {
 			qfdiv.append("Error: No data available");
 		} else {
-			var columnSelection = value.column;
+			var columnSelection = representation.currentValue.column;
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
 				colselection.addClass('dropdown');
@@ -97,19 +96,23 @@ org_knime_js_base_node_quickform_filter_value = function() {
 			}
 			qfdiv.append(selector.getComponent());
 			selector.setChoices(viewRepresentation.possibleValues[columnSelection]);
-			selector.setSelections(value.values);
+			selector.setSelections(representation.currentValue.values);
 			selector.addValueChangedListener(callUpdate);
 		}
 		resizeParent();
+		viewValid = true;
 	};
 
 	valueFilter.value = function() {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.values = selector.getSelections();
 		if (!viewRepresentation.lockColumn) {
 			viewValue.column = colselection.find(':selected').text();
+		} else {
+			viewValue.column = viewRepresentation.currentValue.column;
 		}
 		return viewValue;
 	};

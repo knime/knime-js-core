@@ -48,11 +48,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.js.base.dialog.selection.single.SingleSelectionComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -68,61 +64,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ColumnSelectionQuickFormRepresentation extends
-        QuickFormRepresentationImpl<ColumnSelectionQuickFormValue> {
-
-    private static final String CFG_DEFAULT_COLUMN = "defaultColumn";
-
-    private static final String DEFAULT_DEFAULT_COLUMN = "";
-
-    private String m_defaultColumn = DEFAULT_DEFAULT_COLUMN;
-
-    private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-
-    private static final String[] DEFAULT_POSSIBLE_COLUMNS = new String[0];
-
-    private String[] m_possibleColumns = DEFAULT_POSSIBLE_COLUMNS;
-
-    private static final String CFG_TYPE = "type";
-
-    private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
-
-    private String m_type = DEFAULT_TYPE;
+        QuickFormRepresentationImpl<ColumnSelectionQuickFormValue, ColumnSelectionQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN);
-        m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
-        setType(settings.getString(CFG_TYPE));
+    public ColumnSelectionQuickFormRepresentation(final ColumnSelectionQuickFormValue currentValue,
+        final ColumnSelectionQuickFormConfig config) {
+        super(currentValue, config);
+        m_possibleColumns = config.getPossibleColumns();
+        m_type = config.getType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_defaultColumn = settings.getString(CFG_DEFAULT_COLUMN, DEFAULT_DEFAULT_COLUMN);
-        setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
-        m_possibleColumns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, DEFAULT_POSSIBLE_COLUMNS);
-    }
+    private final String[] m_possibleColumns;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addString(CFG_DEFAULT_COLUMN, m_defaultColumn);
-        settings.addString(CFG_TYPE, m_type);
-        settings.addStringArray(CFG_POSSIBLE_COLUMNS, m_possibleColumns);
-    }
+    private final String m_type;
 
     /**
      * {@inheritDoc}
@@ -136,44 +93,11 @@ public class ColumnSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @return the defaultColumn
-     */
-    @JsonIgnore
-    public String getDefaultColumn() {
-        return m_defaultColumn;
-    }
-
-    /**
-     * @param defaultColumn the defaultColumn to set
-     */
-    @JsonIgnore
-    public void setDefaultColumn(final String defaultColumn) {
-        m_defaultColumn = defaultColumn;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final ColumnSelectionQuickFormValue value) {
-        value.setColumn(m_defaultColumn);
-    }
-
-    /**
      * @return the possibleColumns
      */
     @JsonProperty("possibleColumns")
     public String[] getPossibleColumns() {
         return m_possibleColumns;
-    }
-
-    /**
-     * @param possibleColumns the possibleColumns to set
-     */
-    @JsonIgnore
-    public void setPossibleColumns(final String[] possibleColumns) {
-        m_possibleColumns = possibleColumns;
     }
 
     /**
@@ -185,23 +109,12 @@ public class ColumnSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @param type the type to set
-     */
-    @JsonIgnore
-    public void setType(final String type) {
-        m_type = type;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append(", ");
-        sb.append("defaultColumn=");
-        sb.append(m_defaultColumn);
         sb.append(", ");
         sb.append("possibleColumns=");
         sb.append(Arrays.toString(m_possibleColumns));
@@ -217,7 +130,6 @@ public class ColumnSelectionQuickFormRepresentation extends
     @Override
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
-                .append(m_defaultColumn)
                 .append(m_possibleColumns)
                 .append(m_type)
                 .toHashCode();
@@ -239,7 +151,6 @@ public class ColumnSelectionQuickFormRepresentation extends
         }
         ColumnSelectionQuickFormRepresentation other = (ColumnSelectionQuickFormRepresentation)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
-                .append(m_defaultColumn, other.m_defaultColumn)
                 .append(m_possibleColumns, other.m_possibleColumns)
                 .append(m_type, other.m_type)
                 .isEquals();

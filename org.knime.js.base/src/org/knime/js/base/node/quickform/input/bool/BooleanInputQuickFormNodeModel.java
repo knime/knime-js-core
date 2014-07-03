@@ -62,14 +62,6 @@ public class BooleanInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public BooleanInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new BooleanInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public BooleanInputQuickFormValue createEmptyViewValue() {
         return new BooleanInputQuickFormValue();
     }
@@ -96,9 +88,7 @@ public class BooleanInputQuickFormNodeModel
      */
     @Override
     protected BooleanInputQuickFormRepresentation getRepresentation() {
-        BooleanInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getBoolean());
-        return representation;
+        return new BooleanInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

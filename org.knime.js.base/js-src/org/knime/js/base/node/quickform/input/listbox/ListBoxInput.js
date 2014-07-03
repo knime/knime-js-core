@@ -50,18 +50,17 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 			version: "1.0.0"
 	};
 	listboxInput.name = "Listbox input";
-	var viewValue;
 	var viewRepresentation;
 	var input;
-	var errorMessageLine1;
+	var errorMessageLine;
 	var separator;
 	var omitEmpty;
+	var viewValid = false;
 
-	listboxInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	listboxInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
-		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
@@ -77,16 +76,16 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		input.attr('cols', '20');
 		input.attr("pattern", representation.regex);
 		input.width(400);
-		var stringValue = value.string;
+		var stringValue = representation.currentValue.string;
 		input.val(stringValue);
 		qfdiv.append($('<br>'));
-		errorMessageLine1 = $('<span>');
-		var errorMessages = errorMessageLine1;
+		errorMessageLine = $('<span>');
+		var errorMessages = errorMessageLine;
 		errorMessages.css('display', 'none');
 		errorMessages.css('color', 'red');
 		errorMessages.css('font-style', 'italic');
 		errorMessages.css('font-size', '75%');
-		qfdiv.append(errorMessageLine1);
+		qfdiv.append(errorMessageLine);
 		if (representation.separator==null || representation.separator.length==0) {
 			separator = null;
 		} else {
@@ -95,11 +94,12 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 		omitEmpty = representation.omitempty;
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 
 	listboxInput.validate = function() {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
-			return true;
+		if (!viewValid) {
+			return false;
 		}
 		var index;
 		var value = input.val();
@@ -138,23 +138,24 @@ org_knime_js_base_node_quickform_input_listbox = function() {
 	};
 
 	listboxInput.setValidationErrorMessage = function(message) {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+		if (!viewValid) {
 			return;
 		}
 		if (message != null) {
-			errorMessageLine1.text(message);
-			errorMessageLine1.css('display', 'inline');
+			errorMessageLine.text(message);
+			errorMessageLine.css('display', 'inline');
 		} else {
-			errorMessageLine1.text('');
-			errorMessageLine1.css('display', 'none');
+			errorMessageLine.text('');
+			errorMessageLine.css('display', 'none');
 		}
 		resizeParent();
 	};
 
 	listboxInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.string = input.val();
 		return viewValue;
 	};

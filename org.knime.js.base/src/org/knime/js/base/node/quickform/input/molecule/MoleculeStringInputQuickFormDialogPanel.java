@@ -67,7 +67,7 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      * @param representation The dialog representation
      */
     public MoleculeStringInputQuickFormDialogPanel(final MoleculeStringInputQuickFormRepresentation representation) {
-        m_component.setText(representation.getDefaultValue());
+        m_component.setText(representation.getDefaultValue().getMoleculeString());
         addComponent(m_component);
     }
 

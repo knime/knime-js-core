@@ -87,14 +87,6 @@ public class ValueSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ValueSelectionQuickFormRepresentation createEmptyViewRepresentation() {
-        return new ValueSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ValueSelectionQuickFormValue createEmptyViewValue() {
         return new ValueSelectionQuickFormValue();
     }
@@ -115,7 +107,6 @@ public class ValueSelectionQuickFormNodeModel
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateValues(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
@@ -179,14 +170,7 @@ public class ValueSelectionQuickFormNodeModel
      */
     @Override
     protected ValueSelectionQuickFormRepresentation getRepresentation() {
-        ValueSelectionQuickFormRepresentation representation = super.getRepresentation();
-        representation.setColumnType(getConfig().getColumnType());
-        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
-        representation.setDefaultValue(getConfig().getDefaultValue().getValue());
-        representation.setLockColumn(getConfig().getLockColumn());
-        representation.setType(getConfig().getType());
-        representation.setPossibleValues(getConfig().getPossibleValues());
-        return representation;
+        return new ValueSelectionQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

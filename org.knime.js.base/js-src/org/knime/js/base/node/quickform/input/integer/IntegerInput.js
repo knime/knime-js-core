@@ -50,16 +50,15 @@ org_knime_js_base_node_quickform_input_integer = function() {
 			version: "1.0.0"
 	};
 	integerInput.name = "Integer input";
-	var viewValue;
 	var viewRepresentation;
 	var input;
 	var errorMessage;
+	var viewValid = false;
 
-	integerInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	integerInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
-		viewValue = value;
 		viewRepresentation = representation;
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
@@ -76,7 +75,7 @@ org_knime_js_base_node_quickform_input_integer = function() {
 			input.spinner('option', 'max', viewRepresentation.max);
 		}
 		input.width(100);
-		var integerValue = value.integer;
+		var integerValue = representation.currentValue.integer;
 		input.val(integerValue);
 		qfdiv.append($('<br>'));
 		errorMessage = $('<span>');
@@ -87,13 +86,13 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		qfdiv.append(errorMessage);
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 	
 	integerInput.validate = function() {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
-			return true;
+		if (!viewValid) {
+			return false;
 		}
-		var valid;
 		var min = viewRepresentation.min;
 		var max = viewRepresentation.max;
 		var value = input.val();
@@ -103,20 +102,19 @@ org_knime_js_base_node_quickform_input_integer = function() {
 		}
 		value = parseInt(value);
 		if (viewRepresentation.usemin && value<min) {
-			valid = false;
 			integerInput.setValidationErrorMessage("The set integer " + value + " is smaller than the allowed minimum of " + min);
+			return false;
 		} else if (viewRepresentation.usemax && value>max) {
-			valid = false;
 			integerInput.setValidationErrorMessage("The set integer " + value + " is bigger than the allowed maximum of " + max);
+			return false;
 		} else {
-			valid = true;
 			integerInput.setValidationErrorMessage(null);
+			return true;
 		}
-		return valid;
 	};
 	
 	integerInput.setValidationErrorMessage = function(message) {
-		if (!isValid(viewValue) || !isValid(viewRepresentation)) {
+		if (!viewValid) {
 			return;
 		}
 		if (message != null) {
@@ -130,9 +128,10 @@ org_knime_js_base_node_quickform_input_integer = function() {
 	};
 
 	integerInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.integer = parseInt(input.val());
 		return viewValue;
 	};

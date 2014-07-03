@@ -88,14 +88,6 @@ public class ColumnFilterQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ColumnFilterQuickFormRepresentation createEmptyViewRepresentation() {
-        return new ColumnFilterQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ColumnFilterQuickFormValue createEmptyViewValue() {
         return new ColumnFilterQuickFormValue();
     }
@@ -155,7 +147,6 @@ public class ColumnFilterQuickFormNodeModel
         rearranger.keepOnly(outSpec.getColumnNames());
         BufferedDataTable outTable = exec.createColumnRearrangeTable((BufferedDataTable)inObjects[0],
                 rearranger, exec);
-        updateViewValue();
         return new BufferedDataTable[]{outTable};
     }
 
@@ -189,11 +180,7 @@ public class ColumnFilterQuickFormNodeModel
      */
     @Override
     protected ColumnFilterQuickFormRepresentation getRepresentation() {
-        ColumnFilterQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultColumns(getConfig().getDefaultValue().getColumns());
-        representation.setPossibleColumns(getConfig().getPossibleColumns());
-        representation.setType(getConfig().getType());
-        return representation;
+        return new ColumnFilterQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

@@ -68,7 +68,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
         m_columns = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
         m_columns.setChoices(representation.getPossibleColumns());
-        m_columns.setSelections(representation.getDefaultColumns());
+        m_columns.setSelections(representation.getDefaultValue().getColumns());
         addComponent(m_columns.getComponent());
     }
 

@@ -68,7 +68,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
     public ColumnSelectionQuickFormDialogPanel(final ColumnSelectionQuickFormRepresentation representation) {
         m_column = SingleSelectionComponentFactory.createSingleSelectionComponent(representation.getType());
         m_column.setChoices(representation.getPossibleColumns());
-        m_column.setSelection(representation.getDefaultColumn());
+        m_column.setSelection(representation.getDefaultValue().getColumn());
         addComponent(m_column.getComponent());
     }
 

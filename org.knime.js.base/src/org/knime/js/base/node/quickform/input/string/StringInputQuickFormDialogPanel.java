@@ -68,7 +68,7 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      *
      */
     public StringInputQuickFormDialogPanel(final StringInputQuickFormRepresentation representation) {
-        m_component.setText(representation.getDefaultValue());
+        m_component.setText(representation.getDefaultValue().getString());
         addComponent(m_component);
     }
 

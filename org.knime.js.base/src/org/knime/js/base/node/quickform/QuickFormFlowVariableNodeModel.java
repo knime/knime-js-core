@@ -64,7 +64,7 @@ import org.knime.core.node.web.WebViewContent;
  *
  */
 public abstract class QuickFormFlowVariableNodeModel
-        <REP extends QuickFormRepresentationImpl<VAL>,
+        <REP extends QuickFormRepresentationImpl<VAL, CONF>,
         VAL extends DialogNodeValue & WebViewContent,
         CONF extends QuickFormFlowVariableConfig<VAL>>
         extends QuickFormNodeModel<REP, VAL, CONF> {
@@ -85,7 +85,6 @@ public abstract class QuickFormFlowVariableNodeModel
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         createAndPushFlowVariable();
-        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 

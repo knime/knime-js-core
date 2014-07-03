@@ -90,14 +90,6 @@ public class ValueFilterQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ValueFilterQuickFormRepresentation createEmptyViewRepresentation() {
-        return new ValueFilterQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ValueFilterQuickFormValue createEmptyViewValue() {
         return new ValueFilterQuickFormValue();
     }
@@ -153,7 +145,6 @@ public class ValueFilterQuickFormNodeModel
             }
         }
         container.close();
-        updateViewValue();
         return new PortObject[]{container.getTable()};
     }
 
@@ -219,13 +210,7 @@ public class ValueFilterQuickFormNodeModel
      */
     @Override
     protected ValueFilterQuickFormRepresentation getRepresentation() {
-        ValueFilterQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
-        representation.setDefaultValues(getConfig().getDefaultValue().getValues());
-        representation.setLockColumn(getConfig().getLockColumn());
-        representation.setPossibleValues(getConfig().getPossibleValues());
-        representation.setType(getConfig().getType());
-        return representation;
+        return new ValueFilterQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

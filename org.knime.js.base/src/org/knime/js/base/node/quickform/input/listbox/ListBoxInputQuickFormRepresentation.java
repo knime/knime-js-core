@@ -46,9 +46,6 @@ package org.knime.js.base.node.quickform.input.listbox;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -65,35 +62,28 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ListBoxInputQuickFormRepresentation extends
-        QuickFormRepresentationImpl<ListBoxInputQuickFormValue> {
+        QuickFormRepresentationImpl<ListBoxInputQuickFormValue, ListBoxInputQuickFormConfig> {
 
-    private static final String CFG_REGEX = "regex";
+    /**
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
+     */
+    public ListBoxInputQuickFormRepresentation(final ListBoxInputQuickFormValue currentValue,
+        final ListBoxInputQuickFormConfig config) {
+        super(currentValue, config);
+        m_regex = config.getRegex();
+        m_errorMessage = config.getErrorMessage();
+        m_separator = config.getSeparator();
+        m_omitEmpty = config.getOmitEmpty();
+    }
 
-    private static final String DEFAULT_REGEX = "";
+    private final String m_regex;
 
-    private String m_regex = DEFAULT_REGEX;
+    private final String m_errorMessage;
 
-    private static final String CFG_ERROR_MESSAGE = "error_message";
+    private final String m_separator;
 
-    private static final String DEFAULT_ERROR_MESSAGE = "";
-
-    private String m_errorMessage = DEFAULT_ERROR_MESSAGE;
-
-    private static final String CFG_SEPARATOR = "separator";
-
-    private static final String DEFAULT_SEPARATOR = "\\n";
-
-    private String m_separator = DEFAULT_SEPARATOR;
-
-    private static final String CFG_DEFAULT = "default";
-
-    private String m_defaultValue = "";
-
-    private static final String CFG_OMIT_EMPTY = "omit_empty";
-
-    private static final boolean DEFAULT_OMIT_EMPTY = true;
-
-    private boolean m_omitEmpty = DEFAULT_OMIT_EMPTY;
+    private final boolean m_omitEmpty;
 
     /**
      * @return the regex
@@ -101,14 +91,6 @@ public class ListBoxInputQuickFormRepresentation extends
     @JsonProperty("regex")
     public String getRegex() {
         return m_regex;
-    }
-
-    /**
-     * @param regex the regex to set
-     */
-    @JsonIgnore
-    public void setRegex(final String regex) {
-        m_regex = regex;
     }
 
     /**
@@ -120,27 +102,11 @@ public class ListBoxInputQuickFormRepresentation extends
     }
 
     /**
-     * @param errorMessage the errorMessage to set
-     */
-    @JsonIgnore
-    public void setErrorMessage(final String errorMessage) {
-        m_errorMessage = errorMessage;
-    }
-
-    /**
      * @return the separator
      */
     @JsonProperty("separator")
     public String getSeparator() {
         return m_separator;
-    }
-
-    /**
-     * @param separator the separator to set
-     */
-    @JsonIgnore
-    public void setSeparator(final String separator) {
-        m_separator = separator;
     }
 
     /**
@@ -186,56 +152,6 @@ public class ListBoxInputQuickFormRepresentation extends
     }
 
     /**
-     * @param omitEmpty the omitEmpty to set
-     */
-    @JsonIgnore
-    public void setOmitEmpty(final boolean omitEmpty) {
-        m_omitEmpty = omitEmpty;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_regex = settings.getString(CFG_REGEX);
-        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE);
-        m_separator = settings.getString(CFG_SEPARATOR);
-        m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY);
-        setDefaultValue(settings.getString(CFG_DEFAULT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_regex = settings.getString(CFG_REGEX, DEFAULT_REGEX);
-        m_errorMessage = settings.getString(CFG_ERROR_MESSAGE, DEFAULT_ERROR_MESSAGE);
-        m_separator = settings.getString(CFG_SEPARATOR, DEFAULT_SEPARATOR);
-        m_omitEmpty = settings.getBoolean(CFG_OMIT_EMPTY, DEFAULT_OMIT_EMPTY);
-        setDefaultValue(settings.getString(CFG_DEFAULT, ""));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addString(CFG_REGEX, m_regex);
-        settings.addString(CFG_ERROR_MESSAGE, m_errorMessage);
-        settings.addString(CFG_SEPARATOR, m_separator);
-        settings.addBoolean(CFG_OMIT_EMPTY, m_omitEmpty);
-        settings.addString(CFG_DEFAULT, getDefaultValue());
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -244,31 +160,6 @@ public class ListBoxInputQuickFormRepresentation extends
         ListBoxInputQuickFormDialogPanel panel = new ListBoxInputQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
-    }
-
-    /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final ListBoxInputQuickFormValue value) {
-        value.setString(getDefaultValue());
     }
 
     /**
@@ -288,9 +179,6 @@ public class ListBoxInputQuickFormRepresentation extends
         sb.append("separator=");
         sb.append(m_separator);
         sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
-        sb.append(", ");
         sb.append("omitEmpty=");
         sb.append(m_omitEmpty);
         return sb.toString();
@@ -305,7 +193,6 @@ public class ListBoxInputQuickFormRepresentation extends
                 .append(m_regex)
                 .append(m_errorMessage)
                 .append(m_separator)
-                .append(m_defaultValue)
                 .append(m_omitEmpty)
                 .toHashCode();
     }
@@ -329,7 +216,6 @@ public class ListBoxInputQuickFormRepresentation extends
                 .append(m_regex, other.m_regex)
                 .append(m_errorMessage, other.m_errorMessage)
                 .append(m_separator, other.m_separator)
-                .append(m_defaultValue, other.m_defaultValue)
                 .append(m_omitEmpty, other.m_omitEmpty)
                 .isEquals();
     }

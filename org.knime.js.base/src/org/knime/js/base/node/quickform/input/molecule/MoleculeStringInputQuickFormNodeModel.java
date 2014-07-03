@@ -59,12 +59,9 @@ public class MoleculeStringInputQuickFormNodeModel
         MoleculeStringInputQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * The default formats shown in the molecule quickform input.
      */
-    @Override
-    public MoleculeStringInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new MoleculeStringInputQuickFormRepresentation();
-    }
+    static final String[] DEFAULT_FORMATS = {"SDF", "SMILES", "MOL", "SMARTS", "RXN"};
 
     /**
      * {@inheritDoc}
@@ -116,10 +113,7 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     protected MoleculeStringInputQuickFormRepresentation getRepresentation() {
-        MoleculeStringInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getMoleculeString());
-        representation.setFormat(getConfig().getFormat());
-        return representation;
+        return new MoleculeStringInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

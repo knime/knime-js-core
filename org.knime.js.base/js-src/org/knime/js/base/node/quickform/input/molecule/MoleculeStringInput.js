@@ -50,33 +50,34 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 			version: "1.0.0"
 	};
 	moleculeInput.name = "Molecule input";
-	var viewValue;
 	var input;
+	var viewValid = false;
 
-	moleculeInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	moleculeInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		var body = $('body');
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
-		viewValue = value;
 		input = $('<input>');
 		qfdiv.attr('title', representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.attr("type", "text");
 		input.width(400);
-		var stringValue = value.moleculeString;
+		var stringValue = representation.currentValue.moleculeString;
 		input.val(stringValue);
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 
 	moleculeInput.value = function() {
-		if (!isValid((viewValue))) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.moleculeString = input.val();
 		return viewValue;
 	};

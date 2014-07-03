@@ -46,9 +46,6 @@ package org.knime.js.base.node.quickform.input.bool;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -64,41 +61,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class BooleanInputQuickFormRepresentation extends
-        QuickFormRepresentationImpl<BooleanInputQuickFormValue> {
-
-    private static final String CFG_DEFAULT = "default";
-
-    private boolean m_defaultValue = false;
+        QuickFormRepresentationImpl<BooleanInputQuickFormValue, BooleanInputQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        setDefaultValue(settings.getBoolean(CFG_DEFAULT));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        setDefaultValue(settings.getBoolean(CFG_DEFAULT, false));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addBoolean(CFG_DEFAULT, getDefaultValue());
+    public BooleanInputQuickFormRepresentation(final BooleanInputQuickFormValue currentValue,
+        final BooleanInputQuickFormConfig config) {
+        super(currentValue, config);
     }
 
     /**
@@ -113,40 +84,12 @@ public class BooleanInputQuickFormRepresentation extends
     }
 
     /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public boolean getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final boolean defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final BooleanInputQuickFormValue value) {
-        value.setBoolean(getDefaultValue());
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
         return sb.toString();
     }
 
@@ -156,7 +99,6 @@ public class BooleanInputQuickFormRepresentation extends
     @Override
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
-                .append(m_defaultValue)
                 .toHashCode();
     }
 
@@ -174,9 +116,7 @@ public class BooleanInputQuickFormRepresentation extends
         if (obj.getClass() != getClass()) {
             return false;
         }
-        BooleanInputQuickFormRepresentation other = (BooleanInputQuickFormRepresentation)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
-                .append(m_defaultValue, other.m_defaultValue)
                 .isEquals();
     }
 

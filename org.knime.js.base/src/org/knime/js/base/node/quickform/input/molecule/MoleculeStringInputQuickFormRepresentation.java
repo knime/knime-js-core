@@ -46,9 +46,6 @@ package org.knime.js.base.node.quickform.input.molecule;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -65,22 +62,19 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class MoleculeStringInputQuickFormRepresentation extends
-        QuickFormRepresentationImpl<MoleculeStringInputQuickFormValue> {
+        QuickFormRepresentationImpl<MoleculeStringInputQuickFormValue, MoleculeStringInputQuickFormConfig> {
 
     /**
-     * The default formats shown in the molecule quickform input.
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    static final String[] DEFAULT_FORMATS = {"SDF", "SMILES", "MOL", "SMARTS", "RXN"};
+    public MoleculeStringInputQuickFormRepresentation(final MoleculeStringInputQuickFormValue currentValue,
+        final MoleculeStringInputQuickFormConfig config) {
+        super(currentValue, config);
+        m_format = config.getFormat();
+    }
 
-    private static final String CFG_FORMAT = "format";
-
-    private static final String DEFAULT_FORMAT = DEFAULT_FORMATS[0];
-
-    private String m_format = DEFAULT_FORMAT;
-
-    private static final String CFG_DEFAULT = "default";
-
-    private String m_defaultValue = "";
+    private final String m_format;
 
     /**
      * @return the format
@@ -88,47 +82,6 @@ public class MoleculeStringInputQuickFormRepresentation extends
     @JsonProperty("format")
     public String getFormat() {
         return m_format;
-    }
-
-    /**
-     * @param format the format to set
-     */
-    @JsonIgnore
-    public void setFormat(final String format) {
-        m_format = format;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_format = settings.getString(CFG_FORMAT);
-        m_defaultValue = settings.getString(CFG_DEFAULT);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_format = settings.getString(CFG_FORMAT, DEFAULT_FORMAT);
-        m_defaultValue = settings.getString(CFG_DEFAULT, "");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addString(CFG_FORMAT, m_format);
-        settings.addString(CFG_DEFAULT, getDefaultValue());
     }
 
     /**
@@ -143,31 +96,6 @@ public class MoleculeStringInputQuickFormRepresentation extends
     }
 
     /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public String getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final String defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final MoleculeStringInputQuickFormValue value) {
-        value.setMoleculeString(getDefaultValue());
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -177,9 +105,6 @@ public class MoleculeStringInputQuickFormRepresentation extends
         sb.append(", ");
         sb.append("format=");
         sb.append(m_format);
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
         return sb.toString();
     }
 
@@ -190,7 +115,6 @@ public class MoleculeStringInputQuickFormRepresentation extends
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
                 .append(m_format)
-                .append(m_defaultValue)
                 .toHashCode();
     }
 
@@ -211,7 +135,6 @@ public class MoleculeStringInputQuickFormRepresentation extends
         MoleculeStringInputQuickFormRepresentation other = (MoleculeStringInputQuickFormRepresentation)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
                 .append(m_format, other.m_format)
-                .append(m_defaultValue, other.m_defaultValue)
                 .isEquals();
     }
 

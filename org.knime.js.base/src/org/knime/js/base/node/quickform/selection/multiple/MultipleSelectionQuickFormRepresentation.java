@@ -48,11 +48,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -68,61 +64,22 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class MultipleSelectionQuickFormRepresentation extends
-        QuickFormRepresentationImpl<MultipleSelectionQuickFormValue> {
-
-    private static final String CFG_DEFAULT_VALUE = "default_value";
-
-    private static final String[] DEFAULT_DEFAULT_VALUE = new String[0];
-
-    private String[] m_defaultValue = DEFAULT_DEFAULT_VALUE;
-
-    private static final String CFG_POSSIBLE_CHOICES = "possible_choices";
-
-    private static final String[] DEFAULT_POSSIBLE_CHOICES = new String[0];
-
-    private String[] m_possibleChoices = DEFAULT_POSSIBLE_CHOICES;
-
-    private static final String CFG_TYPE = "type";
-
-    private static final String DEFAULT_TYPE = MultipleSelectionsComponentFactory.TWINLIST;
-
-    private String m_type = DEFAULT_TYPE;
+        QuickFormRepresentationImpl<MultipleSelectionQuickFormValue, MultipleSelectionQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        setPossibleChoices(settings.getStringArray(CFG_POSSIBLE_CHOICES));
-        m_defaultValue = settings.getStringArray(CFG_DEFAULT_VALUE);
-        setType(settings.getString(CFG_TYPE));
+    public MultipleSelectionQuickFormRepresentation(final MultipleSelectionQuickFormValue currentValue,
+        final MultipleSelectionQuickFormConfig config) {
+        super(currentValue, config);
+        m_possibleChoices = config.getPossibleChoices();
+        m_type = config.getType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        setPossibleChoices(settings.getStringArray(CFG_POSSIBLE_CHOICES, DEFAULT_POSSIBLE_CHOICES));
-        m_defaultValue = settings.getStringArray(CFG_DEFAULT_VALUE, DEFAULT_DEFAULT_VALUE);
-        setType(settings.getString(CFG_TYPE, DEFAULT_TYPE));
-    }
+    private final String[] m_possibleChoices;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addStringArray(CFG_POSSIBLE_CHOICES, m_possibleChoices);
-        settings.addStringArray(CFG_DEFAULT_VALUE, m_defaultValue);
-        settings.addString(CFG_TYPE, m_type);
-    }
+    private final String m_type;
 
     /**
      * {@inheritDoc}
@@ -136,44 +93,11 @@ public class MultipleSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public String[] getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final String[] defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final MultipleSelectionQuickFormValue value) {
-        value.setVariableValue(m_defaultValue);
-    }
-
-    /**
      * @return the possibleChoices
      */
     @JsonProperty("possibleChoices")
     public String[] getPossibleChoices() {
         return m_possibleChoices;
-    }
-
-    /**
-     * @param possibleChoices the possibleChoices to set
-     */
-    @JsonIgnore
-    public void setPossibleChoices(final String[] possibleChoices) {
-        m_possibleChoices = possibleChoices;
     }
 
     /**
@@ -185,23 +109,12 @@ public class MultipleSelectionQuickFormRepresentation extends
     }
 
     /**
-     * @param type the type to set
-     */
-    @JsonIgnore
-    public void setType(final String type) {
-        m_type = type;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(Arrays.toString(m_defaultValue));
         sb.append(", ");
         sb.append("possibleChoices=");
         sb.append(Arrays.toString(m_possibleChoices));
@@ -217,7 +130,6 @@ public class MultipleSelectionQuickFormRepresentation extends
     @Override
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
-                .append(m_defaultValue)
                 .append(m_possibleChoices)
                 .append(m_type)
                 .toHashCode();
@@ -239,7 +151,6 @@ public class MultipleSelectionQuickFormRepresentation extends
         }
         MultipleSelectionQuickFormRepresentation other = (MultipleSelectionQuickFormRepresentation)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
-                .append(m_defaultValue, other.m_defaultValue)
                 .append(m_possibleChoices, other.m_possibleChoices)
                 .append(m_type, other.m_type)
                 .isEquals();

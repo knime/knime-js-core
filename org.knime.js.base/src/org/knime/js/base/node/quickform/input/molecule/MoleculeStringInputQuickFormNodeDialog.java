@@ -78,7 +78,7 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     @SuppressWarnings("unchecked")
     MoleculeStringInputQuickFormNodeDialog() {
         m_config = new MoleculeStringInputQuickFormConfig();
-        m_formatBox = new JComboBox(MoleculeStringInputQuickFormRepresentation.DEFAULT_FORMATS);
+        m_formatBox = new JComboBox(MoleculeStringInputQuickFormNodeModel.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
         createAndAddTab();

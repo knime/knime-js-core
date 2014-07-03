@@ -111,7 +111,6 @@ public class ListBoxInputQuickFormNodeModel
         }
         cont.close();
         createAndPushFlowVariable();
-        updateViewValue();
         return new PortObject[]{cont.getTable()};
     }
 
@@ -162,14 +161,6 @@ public class ListBoxInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ListBoxInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new ListBoxInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ListBoxInputQuickFormValue createEmptyViewValue() {
         return new ListBoxInputQuickFormValue();
     }
@@ -203,13 +194,7 @@ public class ListBoxInputQuickFormNodeModel
      */
     @Override
     protected ListBoxInputQuickFormRepresentation getRepresentation() {
-        ListBoxInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getString());
-        representation.setErrorMessage(getConfig().getErrorMessage());
-        representation.setOmitEmpty(getConfig().getOmitEmpty());
-        representation.setRegex(getConfig().getRegex());
-        representation.setSeparator(getConfig().getSeparator());
-        return representation;
+        return new ListBoxInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

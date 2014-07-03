@@ -52,7 +52,6 @@ import java.io.IOException;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
@@ -75,7 +74,7 @@ import org.knime.core.node.wizard.WizardNode;
  *
  */
 public abstract class QuickFormNodeModel
-        <REP extends QuickFormRepresentationImpl<VAL>,
+        <REP extends QuickFormRepresentationImpl<VAL, CONF>,
         VAL extends DialogNodeValue & WebViewContent,
         CONF extends QuickFormConfig<VAL>>
         extends NodeModel
@@ -90,8 +89,6 @@ public abstract class QuickFormNodeModel
      * Config key for the value. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
      */
     public static final String CFG_CURRENT_VALUE = "currentValue";
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(QuickFormNodeModel.class);
 
     private CONF m_config = createEmptyConfig();
     private VAL m_dialogValue = null;
@@ -127,8 +124,7 @@ public abstract class QuickFormNodeModel
         try {
             m_viewValue.loadFromNodeSettings(valSettings);
         } catch (InvalidSettingsException e) {
-            // what to do?
-            LOGGER.error("Error loading internals: ", e);
+            m_viewValue = null;
         }
     }
 
@@ -176,14 +172,9 @@ public abstract class QuickFormNodeModel
     }
 
     /**
-     * @return Representation based on the current config.
+     * @return The representation of this node.
      */
-    protected REP getRepresentation() {
-        REP representation = createEmptyViewRepresentation();
-        representation.setLabel(getConfig().getLabel());
-        representation.setDescription(getConfig().getDescription());
-        return representation;
-    }
+    protected abstract REP getRepresentation();
 
     /**
      * {@inheritDoc}
@@ -305,13 +296,6 @@ public abstract class QuickFormNodeModel
     }
 
     /**
-     * Sets {@link #getRelevantValue()} as the view value.
-     */
-    protected void updateViewValue() {
-        m_viewValue = getRelevantValue();
-    }
-
-    /**
      * @return The mode in which the value is overwritten
      */
     protected ValueOverwriteMode getOverwriteMode() {
@@ -332,6 +316,15 @@ public abstract class QuickFormNodeModel
         content.addString(CFG_OVERWRITE_MODE, getOverwriteMode().name());
         NodeSettingsWO settings = content.addNodeSettings(CFG_CURRENT_VALUE);
         getRelevantValue().saveToNodeSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public REP createEmptyViewRepresentation() {
+        // ignore
+        return null;
     }
 
 }

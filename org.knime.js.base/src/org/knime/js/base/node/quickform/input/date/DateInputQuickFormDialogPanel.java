@@ -74,7 +74,7 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
                         : DateInputQuickFormNodeModel.DATE_FORMAT;
         m_component = new JSpinner(new SpinnerDateModel());
         m_component.setEditor(new JSpinner.DateEditor(m_component, format));
-        m_component.setValue(representation.getDefaultValue());
+        m_component.setValue(representation.getDefaultValue().getDate());
         addComponent(m_component);
     }
 

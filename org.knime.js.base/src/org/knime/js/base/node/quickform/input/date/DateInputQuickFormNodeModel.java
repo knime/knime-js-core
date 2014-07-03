@@ -76,14 +76,6 @@ public class DateInputQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public DateInputQuickFormRepresentation createEmptyViewRepresentation() {
-        return new DateInputQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public DateInputQuickFormValue createEmptyViewValue() {
         return new DateInputQuickFormValue();
     }
@@ -139,14 +131,7 @@ public class DateInputQuickFormNodeModel
      */
     @Override
     protected DateInputQuickFormRepresentation getRepresentation() {
-        DateInputQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultValue(getConfig().getDefaultValue().getDate());
-        representation.setMax(getConfig().getMax());
-        representation.setMin(getConfig().getMin());
-        representation.setUseMax(getConfig().getUseMax());
-        representation.setUseMin(getConfig().getUseMin());
-        representation.setWithTime(getConfig().getWithTime());
-        return representation;
+        return new DateInputQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
     /**

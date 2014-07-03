@@ -87,14 +87,6 @@ public class ColumnSelectionQuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    public ColumnSelectionQuickFormRepresentation createEmptyViewRepresentation() {
-        return new ColumnSelectionQuickFormRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public ColumnSelectionQuickFormValue createEmptyViewValue() {
         return new ColumnSelectionQuickFormValue();
     }
@@ -115,7 +107,6 @@ public class ColumnSelectionQuickFormNodeModel
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         updateColumns(((DataTable)inObjects[0]).getDataTableSpec());
         createAndPushFlowVariable();
-        updateViewValue();
         return new PortObject[]{FlowVariablePortObject.INSTANCE};
     }
 
@@ -158,11 +149,7 @@ public class ColumnSelectionQuickFormNodeModel
      */
     @Override
     protected ColumnSelectionQuickFormRepresentation getRepresentation() {
-        ColumnSelectionQuickFormRepresentation representation = super.getRepresentation();
-        representation.setDefaultColumn(getConfig().getDefaultValue().getColumn());
-        representation.setPossibleColumns(getConfig().getPossibleColumns());
-        representation.setType(getConfig().getType());
-        return representation;
+        return new ColumnSelectionQuickFormRepresentation(getRelevantValue(), getConfig());
     }
 
 }

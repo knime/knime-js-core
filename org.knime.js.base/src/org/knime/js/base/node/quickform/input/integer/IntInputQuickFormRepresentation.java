@@ -46,9 +46,6 @@ package org.knime.js.base.node.quickform.input.integer;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -64,80 +61,29 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl<IntInputQuickFormValue> {
-
-    private static final String CFG_USE_MIN = "use_min";
-
-    private static final boolean DEFAULT_USE_MIN = false;
-
-    private boolean m_useMin = DEFAULT_USE_MIN;
-
-    private static final String CFG_USE_MAX = "use_max";
-
-    private static final boolean DEFAULT_USE_MAX = false;
-
-    private boolean m_useMax = DEFAULT_USE_MAX;
-
-    private static final String CFG_MIN = "min";
-
-    private static final int DEFAULT_MIN = 0;
-
-    private int m_min = DEFAULT_MIN;
-
-    private static final String CFG_MAX = "max";
-
-    private static final int DEFAULT_MAX = 100;
-
-    private int m_max = DEFAULT_MAX;
-
-    private static final String CFG_DEFAULT = "default";
-
-    private static final int DEFAULT_INTEGER = 0;
-
-    private int m_defaultValue = DEFAULT_INTEGER;
+public class IntInputQuickFormRepresentation extends
+    QuickFormRepresentationImpl<IntInputQuickFormValue, IntInputQuickFormConfig> {
 
     /**
-     * {@inheritDoc}
+     * @param currentValue The value currently used by the node
+     * @param config The config of the node
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        super.loadFromNodeSettings(settings);
-        m_defaultValue = settings.getInt(CFG_DEFAULT);
-        m_useMin = settings.getBoolean(CFG_USE_MIN);
-        m_useMax = settings.getBoolean(CFG_USE_MAX);
-        m_min = settings.getInt(CFG_MIN);
-        m_max = settings.getInt(CFG_MAX);
+    public IntInputQuickFormRepresentation(final IntInputQuickFormValue currentValue,
+        final IntInputQuickFormConfig config) {
+        super(currentValue, config);
+        m_useMin = config.getUseMin();
+        m_useMax = config.getUseMax();
+        m_min = config.getMin();
+        m_max = config.getMax();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        super.loadFromNodeSettingsInDialog(settings);
-        m_defaultValue = settings.getInt(CFG_DEFAULT, DEFAULT_INTEGER);
-        m_useMin = settings.getBoolean(CFG_USE_MIN, DEFAULT_USE_MIN);
-        m_useMax = settings.getBoolean(CFG_USE_MAX, DEFAULT_USE_MAX);
-        m_min = settings.getInt(CFG_MIN, DEFAULT_MIN);
-        m_max = settings.getInt(CFG_MAX, DEFAULT_MAX);
-    }
+    private final boolean m_useMin;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        super.saveToNodeSettings(settings);
-        settings.addInt(CFG_DEFAULT, m_defaultValue);
-        settings.addBoolean(CFG_USE_MIN, m_useMin);
-        settings.addBoolean(CFG_USE_MAX, m_useMax);
-        settings.addInt(CFG_MIN, m_min);
-        settings.addInt(CFG_MAX, m_max);
-    }
+    private final boolean m_useMax;
+
+    private final int m_min;
+
+    private final int m_max;
 
     /**
      * {@inheritDoc}
@@ -151,44 +97,11 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
     }
 
     /**
-     * @return the defaultValue
-     */
-    @JsonIgnore
-    public int getDefaultValue() {
-        return m_defaultValue;
-    }
-
-    /**
-     * @param defaultValue the defaultValue to set
-     */
-    @JsonIgnore
-    public void setDefaultValue(final int defaultValue) {
-        m_defaultValue = defaultValue;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void resetNodeValueToDefault(final IntInputQuickFormValue value) {
-        value.setInteger(m_defaultValue);
-    }
-
-    /**
      * @return the useMin
      */
     @JsonProperty("usemin")
     public boolean getUseMin() {
         return m_useMin;
-    }
-
-    /**
-     * @param useMin the useMin to set
-     */
-    @JsonIgnore
-    public void setUseMin(final boolean useMin) {
-        m_useMin = useMin;
     }
 
     /**
@@ -200,14 +113,6 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
     }
 
     /**
-     * @param useMax the useMax to set
-     */
-    @JsonIgnore
-    public void setUseMax(final boolean useMax) {
-        m_useMax = useMax;
-    }
-
-    /**
      * @return the min
      */
     @JsonProperty("min")
@@ -216,27 +121,11 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
     }
 
     /**
-     * @param min the min to set
-     */
-    @JsonIgnore
-    public void setMin(final int min) {
-        m_min = min;
-    }
-
-    /**
      * @return the max
      */
     @JsonProperty("max")
     public int getMax() {
         return m_max;
-    }
-
-    /**
-     * @param max the max to set
-     */
-    @JsonIgnore
-    public void setMax(final int max) {
-        m_max = max;
     }
 
     /**
@@ -258,9 +147,6 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
         sb.append(", ");
         sb.append("max=");
         sb.append(m_max);
-        sb.append(", ");
-        sb.append("defaultValue=");
-        sb.append(m_defaultValue);
         return sb.toString();
     }
 
@@ -274,7 +160,6 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
                 .append(m_useMax)
                 .append(m_min)
                 .append(m_max)
-                .append(m_defaultValue)
                 .toHashCode();
     }
 
@@ -298,7 +183,6 @@ public class IntInputQuickFormRepresentation extends QuickFormRepresentationImpl
                 .append(m_useMax, other.m_useMax)
                 .append(m_min, other.m_min)
                 .append(m_max, other.m_max)
-                .append(m_defaultValue, other.m_defaultValue)
                 .isEquals();
     }
 

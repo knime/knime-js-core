@@ -50,7 +50,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 			version: "1.0.0"
 	};
 	dateInput.name = "Date input";
-	var viewValue;
 	var viewRepresentation;
 	var dateInput;
 	var hourInput;
@@ -59,14 +58,14 @@ org_knime_js_base_node_quickform_input_date = function() {
 	var date;
 	var minDate;
 	var maxDate;
+	var viewValid = false;
 
-	dateInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	dateInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
-		viewValue = value;
 		viewRepresentation = representation;
-		var dateValue = value.date;
+		var dateValue = representation.currentValue.date;
 		date = new Date(dateValue);
 		minDate = viewRepresentation.usemin ? new Date(viewRepresentation.min) : null;
 		maxDate = viewRepresentation.usemax ? new Date(viewRepresentation.max) : null;
@@ -157,12 +156,14 @@ org_knime_js_base_node_quickform_input_date = function() {
 		dateInput.blur(callUpdate);
 		hourInput.blur(callUpdate);
 		minInput.blur(callUpdate);
+		viewValid = true;
 	};
 
 	dateInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.date = date.getTime();
 		return viewValue;
 	};

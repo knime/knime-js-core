@@ -50,32 +50,33 @@ org_knime_js_base_node_quickform_input_bool = function() {
 			version: "1.0.0"
 	};
 	booleanInput.name = "Boolean input";
-	var viewValue;
 	var input;
+	var viewValid = false;
 
-	booleanInput.init = function(representation, value) {
-		if (checkMissingData(representation, value)) {
+	booleanInput.init = function(representation) {
+		if (checkMissingData(representation)) {
 			return;
 		}
 		var body = $("body");
 		var qfdiv = $('<div class="quickformcontainer">');
 		body.append(qfdiv);
-		viewValue = value;
 		input = $('<input>');
 		qfdiv.attr("title", representation.description);
 		qfdiv.append('<div class="label">' + representation.label + '</div>');
 		qfdiv.append(input);
 		input.attr("type", "checkbox");
-		var checked = value.boolean;
+		var checked = representation.currentValue.boolean;
 		input.prop("checked", checked);
 		input.blur(callUpdate);
 		resizeParent();
+		viewValid = true;
 	};
 
 	booleanInput.value = function() {
-		if (!isValid(viewValue)) {
+		if (!viewValid) {
 			return null;
 		}
+		var viewValue = new Object();
 		viewValue.boolean = input.prop("checked");
 		return viewValue;
 	};
