@@ -77,8 +77,10 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final StringInputQuickFormValue value) throws InvalidSettingsException {
+    public StringInputQuickFormValue createNodeValue() throws InvalidSettingsException {
+        StringInputQuickFormValue value = new StringInputQuickFormValue();
         value.setString(m_component.getText());
+        return value;
     }
 
     /**

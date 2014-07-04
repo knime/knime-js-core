@@ -59,6 +59,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
 
@@ -152,5 +153,23 @@ public abstract class QuickFormDialogPanel
      * Resets the currently set value back to the default.
      */
     protected abstract void resetToDefault();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VAL getNodeValue() throws InvalidSettingsException {
+        if (m_checkBox.isSelected()) {
+            return null;
+        } else {
+            return createNodeValue();
+        }
+    }
+
+    /**
+     * @return Value containing the current settings
+     * @throws InvalidSettingsException If the current settings are invalid
+     */
+    protected abstract VAL createNodeValue() throws InvalidSettingsException;
 
 }

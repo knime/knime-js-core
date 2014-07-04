@@ -112,9 +112,11 @@ public class ValueFilterQuickFormDialogPanel extends QuickFormDialogPanel<ValueF
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final ValueFilterQuickFormValue value) throws InvalidSettingsException {
+    public ValueFilterQuickFormValue createNodeValue() throws InvalidSettingsException {
+        ValueFilterQuickFormValue value = new ValueFilterQuickFormValue();
         value.setValues(m_values.getSelections());
         value.setColumn((String)m_column.getSelectedItem());
+        return value;
     }
 
     /**

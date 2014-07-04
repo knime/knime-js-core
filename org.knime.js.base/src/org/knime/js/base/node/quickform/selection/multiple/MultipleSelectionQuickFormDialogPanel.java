@@ -79,8 +79,10 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final MultipleSelectionQuickFormValue value) throws InvalidSettingsException {
+    public MultipleSelectionQuickFormValue createNodeValue() throws InvalidSettingsException {
+        MultipleSelectionQuickFormValue value = new MultipleSelectionQuickFormValue();
         value.setVariableValue(m_selectionComponent.getSelections());
+        return value;
     }
 
     /**

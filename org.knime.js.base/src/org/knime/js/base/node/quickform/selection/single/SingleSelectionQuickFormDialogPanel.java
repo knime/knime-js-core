@@ -79,8 +79,10 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final SingleSelectionQuickFormValue value) throws InvalidSettingsException {
+    public SingleSelectionQuickFormValue createNodeValue() throws InvalidSettingsException {
+        SingleSelectionQuickFormValue value = new SingleSelectionQuickFormValue();
         value.setVariableValue(m_selectionComponent.getSelection());
+        return value;
     }
 
     /**

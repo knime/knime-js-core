@@ -205,14 +205,6 @@ public abstract class QuickFormRepresentationImpl
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // ignore
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // ignore
     }
@@ -221,16 +213,7 @@ public abstract class QuickFormRepresentationImpl
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        // ignore
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void resetNodeValueToDefault(final VAL value) {
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
         // ignore
     }
 

@@ -77,8 +77,10 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final ColumnFilterQuickFormValue value) throws InvalidSettingsException {
+    public ColumnFilterQuickFormValue createNodeValue() throws InvalidSettingsException {
+        ColumnFilterQuickFormValue value = new ColumnFilterQuickFormValue();
         value.setColumns(m_columns.getSelections());
+        return value;
     }
 
     /**

@@ -83,8 +83,10 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final DateInputQuickFormValue value) throws InvalidSettingsException {
+    protected DateInputQuickFormValue createNodeValue() throws InvalidSettingsException {
+        DateInputQuickFormValue value = new DateInputQuickFormValue();
         value.setDate((Date)m_component.getValue());
+        return value;
     }
 
     /**

@@ -77,8 +77,10 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final ListBoxInputQuickFormValue value) throws InvalidSettingsException {
+    public ListBoxInputQuickFormValue createNodeValue() throws InvalidSettingsException {
+        ListBoxInputQuickFormValue value = new ListBoxInputQuickFormValue();
         value.setString(m_component.getText());
+        return value;
     }
 
     /**

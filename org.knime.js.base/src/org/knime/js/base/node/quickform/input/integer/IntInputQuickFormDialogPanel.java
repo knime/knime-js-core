@@ -76,8 +76,10 @@ public class IntInputQuickFormDialogPanel extends QuickFormDialogPanel<IntInputQ
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final IntInputQuickFormValue value) throws InvalidSettingsException {
+    public IntInputQuickFormValue createNodeValue() throws InvalidSettingsException {
+        IntInputQuickFormValue value = new IntInputQuickFormValue();
         value.setInteger((Integer)m_component.getValue());
+        return value;
     }
 
     /**

@@ -75,8 +75,10 @@ public class BooleanInputQuickFormDialogPanel extends QuickFormDialogPanel<Boole
      * {@inheritDoc}
      */
     @Override
-    public void saveNodeValue(final BooleanInputQuickFormValue value) throws InvalidSettingsException {
+    protected BooleanInputQuickFormValue createNodeValue() throws InvalidSettingsException {
+        BooleanInputQuickFormValue value = new BooleanInputQuickFormValue();
         value.setBoolean(m_component.isSelected());
+        return value;
     }
 
     /**
