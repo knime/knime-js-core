@@ -50,6 +50,9 @@ package org.knime.js.base.util.table;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Objects;
 
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
@@ -61,7 +64,9 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -80,6 +85,14 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
 
     /** Config key for the last displayed row. */
     public static final String CFG_END = "end";
+    /** Config key if number formatter used. */
+    public static final String CFG_USE_NUMBER_FORMATTER = "useNumberFormatter";
+    /** Config key for the number of decimal places. */
+    public static final String CFG_DECIMAL_PLACES = "decimalPlaces";
+    /** Config key for the decimal separator sign. */
+    public static final String CFG_DECIMAL_SEPARATOR = "decimalSeparator";
+    /** Config key for the thousands separator sign. */
+    public static final String CFG_THOUSANDS_SEPARATOR = "thousandsSeparator";
     /** Default end row for table creation. */
     public static final int END = 2500;
 
@@ -90,8 +103,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private REP m_viewRepresentation;
     private VAL m_viewValue;
 
-    private final SettingsModelIntegerBounded m_maxRows
-        = createLastDisplayedRowModel(END);
+    private final SettingsModelIntegerBounded m_maxRows = createLastDisplayedRowModel(END);
+    private final SettingsModelBoolean m_useNumberFormatter = createUseNumberFormatterModel();
+    private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel();
+    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
+    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
+
 
     /**
      * Creates a new model with the given number (and types!) of input and
@@ -114,6 +131,34 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 CFG_END, end, 1, Integer.MAX_VALUE);
     }
 
+    /** @return settings model for the use number formatter property. */
+    static SettingsModelBoolean createUseNumberFormatterModel() {
+        return new SettingsModelBoolean(CFG_USE_NUMBER_FORMATTER, false);
+    }
+
+    /** @return settings model for the decimal places property. */
+    static SettingsModelIntegerBounded createDecimalPlacesModel() {
+        return new SettingsModelIntegerBounded(CFG_DECIMAL_PLACES, 2, 0, Integer.MAX_VALUE);
+    }
+
+    /** @return settings model for the decimal separator property. */
+    static SettingsModelString createDecimalSeparatorModel() {
+        @SuppressWarnings("static-access")
+        DecimalFormat format = (DecimalFormat)DecimalFormat.getInstance();
+        DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
+        char sep = symbols.getDecimalSeparator();
+        return new SettingsModelString(CFG_DECIMAL_SEPARATOR, String.valueOf(sep));
+    }
+
+    /** @return settings model for the thousands separator property. */
+    static SettingsModelString createThousandsSeparatorModel() {
+        @SuppressWarnings("static-access")
+        DecimalFormat format = (DecimalFormat)DecimalFormat.getInstance();
+        DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
+        char sep = symbols.getGroupingSeparator();
+        return new SettingsModelString(CFG_THOUSANDS_SEPARATOR, String.valueOf(sep));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -131,6 +176,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_table = (BufferedDataTable)inObjects[0];
         createJSONTableFromBufferedDataTable(exec);
         m_viewRepresentation.setTable(m_jsonTable);
+        setNumberFormatter();
         return new PortObject[0];
     }
 
@@ -139,6 +185,17 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         if (m_maxRows.getIntValue() < m_table.getRowCount()) {
             setWarningMessage("Only the first "
                     + m_maxRows.getIntValue() + " rows are displayed.");
+        }
+    }
+
+    private void setNumberFormatter() {
+        if (m_useNumberFormatter.getBooleanValue()) {
+            int decimalPlaces = m_decimalPlaces.getIntValue();
+            String decimalSeparator = m_decimalSeparator.getStringValue();
+            String thousandsSeparator = m_thousandsSeparator.getStringValue();
+            JSONNumberFormatter formatter =
+                new JSONNumberFormatter(decimalPlaces, decimalSeparator, thousandsSeparator);
+            m_viewRepresentation.setNumberFormatter(formatter);
         }
     }
 
@@ -223,6 +280,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
+        // Don't save table automatically. Lazy init on first use.
         /*NodeSettings settings = new NodeSettings("table");
         m_jsonTable.saveJSONToNodeSettings(settings);
         File f = new File(nodeInternDir, "jsonTable.xml");
@@ -235,10 +293,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
         CanceledExecutionException {
+        // Don't load table automatically. Lazy init on first use.
         /*File f = new File(nodeInternDir, "jsonTable.xml");
         NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(f));
         m_jsonTable = JSONDataTable.loadFromNodeSettings(settings);
         m_viewRepresentation.setTable(m_jsonTable);*/
+        setNumberFormatter();
     }
 
     /**
@@ -247,6 +307,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_maxRows.saveSettingsTo(settings);
+        m_useNumberFormatter.saveSettingsTo(settings);
+        m_decimalPlaces.saveSettingsTo(settings);
+        m_decimalSeparator.saveSettingsTo(settings);
+        m_thousandsSeparator.saveSettingsTo(settings);
     }
 
     /**
@@ -255,6 +319,16 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_maxRows.validateSettings(settings);
+        m_useNumberFormatter.validateSettings(settings);
+        m_decimalPlaces.validateSettings(settings);
+        SettingsModelString tempDecimalSeparator =
+            (SettingsModelString)m_decimalSeparator.createCloneWithValidatedValue(settings);
+        SettingsModelString tempThousandSeparator =
+            (SettingsModelString)m_thousandsSeparator.createCloneWithValidatedValue(settings);
+        if (Objects.equals(tempDecimalSeparator.getStringValue(), tempThousandSeparator.getStringValue())) {
+            throw new InvalidSettingsException(
+                "Decimal separator and thousands separator cannot be assigned to the same string.");
+        }
     }
 
     /**
@@ -263,6 +337,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_maxRows.loadSettingsFrom(settings);
+        m_useNumberFormatter.loadSettingsFrom(settings);
+        m_decimalPlaces.loadSettingsFrom(settings);
+        m_decimalSeparator.loadSettingsFrom(settings);
+        m_thousandsSeparator.loadSettingsFrom(settings);
     }
 
     /**

@@ -18,7 +18,7 @@ knime_table_view = function(table, containerElement) {
 	
 	var drawingStartTime = 0;
 	
-	var formatterForType = {};
+	var formatterForType = [];
 	
 	var additionalDrawFunctions = [];
 	

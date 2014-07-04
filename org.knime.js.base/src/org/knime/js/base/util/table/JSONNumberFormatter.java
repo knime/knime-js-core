@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -40,94 +41,77 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *   14.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   04.07.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.base.util.table;
 
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.core.JSONDataTable;
-import org.knime.js.core.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class WebTableViewRepresentation extends JSONViewContent {
+public class JSONNumberFormatter {
 
-    private JSONDataTable m_table;
-
-    private JSONNumberFormatter m_numberFormatter;
+    private int m_decimalPlaces;
+    private String m_decimalSeparator;
+    private String m_thousandsSeparator;
 
     /** Serialization constructor. Don't use. */
-    public WebTableViewRepresentation() { }
+    public JSONNumberFormatter() { }
 
     /**
-     * @param table
+     * @param decimalPlaces
+     * @param decimalSeparator
+     * @param thousandsSeparator
      */
-    public WebTableViewRepresentation(final JSONDataTable table) {
-        setTable(table);
+    public JSONNumberFormatter(final int decimalPlaces, final String decimalSeparator, final String thousandsSeparator){
+        m_decimalPlaces = decimalPlaces;
+        m_decimalSeparator = decimalSeparator;
+        m_thousandsSeparator = thousandsSeparator;
     }
 
     /**
-     * @return The JSON data table.
+     * @return the decimalPlaces
      */
-    @JsonProperty("table")
-    public JSONDataTable getTable() {
-        return m_table;
+    public int getDecimalPlaces() {
+        return m_decimalPlaces;
     }
 
     /**
-     * @param table The table to set.
+     * @param decimalPlaces the decimalPlaces to set
      */
-    @JsonProperty("table")
-    public void setTable(final JSONDataTable table) {
-        m_table = table;
+    public void setDecimalPlaces(final int decimalPlaces) {
+        m_decimalPlaces = decimalPlaces;
     }
 
     /**
-     * @return the numberFormatter
+     * @return the decimalSeparator
      */
-    @JsonProperty("numberFormatter")
-    public JSONNumberFormatter getNumberFormatter() {
-        return m_numberFormatter;
+    public String getDecimalSeparator() {
+        return m_decimalSeparator;
     }
 
     /**
-     * @param numberFormatter the numberFormatter to set
+     * @param decimalSeparator the decimalSeparator to set
      */
-    @JsonProperty("numberFormatter")
-    public void setNumberFormatter(final JSONNumberFormatter numberFormatter) {
-        m_numberFormatter = numberFormatter;
+    public void setDecimalSeparator(final String decimalSeparator) {
+        m_decimalSeparator = decimalSeparator;
     }
 
     /**
-     * {@inheritDoc}
+     * @return the thousandsSeparator
      */
-    @Override
-    @JsonIgnore
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO save table?
+    public String getThousandsSeparator() {
+        return m_thousandsSeparator;
     }
 
     /**
-     * {@inheritDoc}
+     * @param thousandsSeparator the thousandsSeparator to set
      */
-    @Override
-    @JsonIgnore
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO load table?
+    public void setThousandsSeparator(final String thousandsSeparator) {
+        m_thousandsSeparator = thousandsSeparator;
     }
 
 }

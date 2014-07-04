@@ -48,9 +48,16 @@
  */
 package org.knime.js.base.util.table;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  *
@@ -65,5 +72,26 @@ public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
         super();
         addDialogComponent(new DialogComponentNumber(new SettingsModelIntegerBounded(
             WebTableNodeModel.CFG_END, WebTableNodeModel.END, 1, Integer.MAX_VALUE), "No. of rows to display:", 10));
+
+        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
+            WebTableNodeModel.CFG_USE_NUMBER_FORMATTER, false), "Enable Number Formatter"));
+
+        addDialogComponent(new DialogComponentNumber(new SettingsModelIntegerBounded(
+            WebTableNodeModel.CFG_DECIMAL_PLACES, 2, 0, Integer.MAX_VALUE), "Decimal Places", 1));
+
+        // get standard signs according to current locale
+        @SuppressWarnings("static-access")
+        DecimalFormat format = (DecimalFormat)DecimalFormat.getInstance();
+        DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
+        char decSep = symbols.getDecimalSeparator();
+        char grSep = symbols.getGroupingSeparator();
+
+        addDialogComponent(new DialogComponentString(new SettingsModelString(
+            WebTableNodeModel.CFG_DECIMAL_SEPARATOR, String.valueOf(decSep)), "Decimal Separator", true, 2));
+
+        addDialogComponent(new DialogComponentString(new SettingsModelString(
+            WebTableNodeModel.CFG_THOUSANDS_SEPARATOR, String.valueOf(grSep)), "Thousands Separator", false, 2));
+
     }
+
 }
