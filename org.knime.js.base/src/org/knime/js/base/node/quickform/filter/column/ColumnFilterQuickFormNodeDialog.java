@@ -90,8 +90,8 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
-        addPairToPanel("Default Columns: ", m_defaultField, panelWithGBLayout, gbc);
+        addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
+        addPairToPanel("Default Values: ", m_defaultField, panelWithGBLayout, gbc);
     }
 
     /**

@@ -32,13 +32,13 @@
 		<option name="Variable Name">
 			Variable identifier.
 		</option>
-        <option name="Selection type">
+        <option name="Selection Type">
           Type of the selection panel.
         </option>
-        <option name="Lock column">
+        <option name="Lock Column">
           If selected the column is locked and can not be selected from the sub node dialog or wizard.
         </option>
-		<option name="Default column selection">
+		<option name="Default Column">
 			The column containing the values.
 		</option>
         <option name="Default Values">

@@ -83,7 +83,7 @@ public class StringInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
-        addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
+        addPairToPanel("Validation Error Message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
         addPairToPanel("Common Regular Expressions: ",
                 m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);

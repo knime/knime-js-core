@@ -92,8 +92,8 @@ public class ColumnSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        addPairToPanel("Selection type: ", m_type, panelWithGBLayout, gbc);
-        addPairToPanel("Default column: ", m_defaultField, panelWithGBLayout, gbc);
+        addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
+        addPairToPanel("Default Value: ", m_defaultField, panelWithGBLayout, gbc);
     }
 
     /**

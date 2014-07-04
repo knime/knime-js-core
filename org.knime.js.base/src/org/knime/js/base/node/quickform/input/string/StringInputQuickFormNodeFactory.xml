@@ -17,10 +17,10 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
-		<option name="Regular expression">
+		<option name="Regular Expression">
 			Regular expression defining valid values.
 		</option>
-		<option name="Validation error message">
+		<option name="Validation Error Message">
 			Message that will be shown if one of the values is not valid. The character ? will be replaced by the invalid value.
 		</option>
 		<option name="Common Regular Expressions">

@@ -29,10 +29,10 @@
         <option name="Variable Name">
           Variable identifier.
         </option>
-        <option name="Selection type">
+        <option name="Selection Type">
           Type of the selection panel.
         </option>
-        <option name="Default column">
+        <option name="Default Value">
           The column that is selected by default.
         </option>
     </fullDescription>

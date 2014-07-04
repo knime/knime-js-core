@@ -122,7 +122,7 @@ public class SingleSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         addPairToPanel("Possible Choices: ", choicesPane, panelWithGBLayout, gbc2);
         JScrollPane defaultPane = new JScrollPane(m_defaultField);
         defaultPane.setPreferredSize(prefSize);
-        addPairToPanel("Default Variable Value: ", defaultPane, panelWithGBLayout, gbc2);
+        addPairToPanel("Default Value: ", defaultPane, panelWithGBLayout, gbc2);
     }
 
 

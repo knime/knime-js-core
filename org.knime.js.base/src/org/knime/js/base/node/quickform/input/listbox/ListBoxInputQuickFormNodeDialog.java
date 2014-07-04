@@ -95,12 +95,12 @@ public class ListBoxInputQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Separator: ", m_separatorField, panelWithGBLayout, gbc);
-        addPairToPanel("Omit empty values: ", m_omitEmptyField, panelWithGBLayout, gbc);
+        addPairToPanel("Omit Empty Values: ", m_omitEmptyField, panelWithGBLayout, gbc);
         addPairToPanel("Regular Expression: ", m_regexField.getRegexPanel(), panelWithGBLayout, gbc);
-        addPairToPanel("Validation error message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
+        addPairToPanel("Validation Error Message: ", m_regexField.getErrorMessagePanel(), panelWithGBLayout, gbc);
         addPairToPanel("Common Regular Expressions: ",
                 m_regexField.getCommonRegexesPanel(), panelWithGBLayout, gbc);
-        addPairToPanel("Default List: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
+        addPairToPanel("Default Value: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
     }
 
     /**

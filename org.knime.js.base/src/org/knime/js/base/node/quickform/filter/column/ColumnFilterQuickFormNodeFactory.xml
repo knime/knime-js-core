@@ -33,10 +33,10 @@
         <option name="Variable Name">
           Variable identifier.
         </option>
-        <option name="Selection type">
+        <option name="Selection Type">
           Type of the selection panel.
         </option>
-        <option name="Default Columns">
+        <option name="Default Values">
           The columns that are selected by default.
         </option>
     </fullDescription>
