@@ -81,7 +81,7 @@ public abstract class JSONViewContent implements WebViewContent {
      */
     @Override
     @JsonIgnore
-    public final void loadFromStream(final InputStream viewContentStream) throws JsonProcessingException, IOException {
+    public final void loadFromStream(final InputStream viewContentStream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         ObjectReader reader = mapper.readerForUpdating(this);
@@ -104,7 +104,7 @@ public abstract class JSONViewContent implements WebViewContent {
      */
     @Override
     @JsonIgnore
-    public final OutputStream saveToStream() throws JsonGenerationException, JsonMappingException, IOException {
+    public final OutputStream saveToStream() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         String viewContentString = mapper.writeValueAsString(this);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
