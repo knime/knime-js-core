@@ -72,6 +72,15 @@ public class SingleSelectionQuickFormNodeModel
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
         String value = getRelevantValue().getVariableValue();
+        int index = -1;
+        String[] possibleChoices = getConfig().getPossibleChoices();
+        for (int i = 0; i < possibleChoices.length; i++) {
+            if (possibleChoices[i].equals(value)) {
+                index = i;
+                break;
+            }
+        }
+        pushFlowVariableInt(getConfig().getFlowVariableName() + " (index)", index);
         pushFlowVariableString(getConfig().getFlowVariableName(), value);
     }
 
