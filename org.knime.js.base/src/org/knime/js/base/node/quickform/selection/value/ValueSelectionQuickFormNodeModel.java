@@ -135,6 +135,7 @@ public class ValueSelectionQuickFormNodeModel
                     + column + "'");
         }
         String variableName = getConfig().getFlowVariableName();
+        pushFlowVariableString(variableName + " (column)", getRelevantValue().getColumn());
         switch (getConfig().getColumnType()) {
         case Integer:
             pushFlowVariableInt(variableName, Integer.parseInt(value));

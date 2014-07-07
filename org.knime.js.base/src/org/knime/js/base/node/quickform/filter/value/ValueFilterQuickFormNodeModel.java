@@ -165,6 +165,8 @@ public class ValueFilterQuickFormNodeModel
     private void createAndPushFlowVariable() throws InvalidSettingsException {
         checkSelectedValues();
         List<String> values = Arrays.asList(getRelevantValue().getValues());
+        pushFlowVariableString(getConfig().getFlowVariableName() + " (column)",
+            getRelevantValue().getColumn());
         pushFlowVariableString(getConfig().getFlowVariableName(),
                 StringUtils.join(values, ","));
     }
