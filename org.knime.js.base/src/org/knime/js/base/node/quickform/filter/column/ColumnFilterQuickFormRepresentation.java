@@ -48,6 +48,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.js.base.node.quickform.QuickFormRepresentationImpl;
 
@@ -69,17 +70,21 @@ public class ColumnFilterQuickFormRepresentation extends
     /**
      * @param currentValue The value currently used by the node
      * @param config The config of the node
+     * @param spec The current table spec
      */
     public ColumnFilterQuickFormRepresentation(final ColumnFilterQuickFormValue currentValue,
-        final ColumnFilterQuickFormConfig config) {
+        final ColumnFilterQuickFormConfig config, final DataTableSpec spec) {
         super(currentValue, config);
         m_possibleColumns = config.getPossibleColumns();
         m_type = config.getType();
+        m_spec = spec;
     }
 
     private final String[] m_possibleColumns;
 
     private final String m_type;
+
+    private final DataTableSpec m_spec;
 
     /**
      * {@inheritDoc}
@@ -90,6 +95,14 @@ public class ColumnFilterQuickFormRepresentation extends
         ColumnFilterQuickFormDialogPanel panel = new ColumnFilterQuickFormDialogPanel(this);
         fillDialogPanel(panel);
         return panel;
+    }
+
+    /**
+     * @return Last known table spec
+     */
+    @JsonIgnore
+    public DataTableSpec getSpec() {
+        return m_spec;
     }
 
     /**

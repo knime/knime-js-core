@@ -51,10 +51,13 @@ import java.util.Arrays;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
 import org.knime.js.core.JSONViewContent;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -77,6 +80,8 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
 
     private String[] m_columns = DEFAULT_COLUMNS;
 
+    private NodeSettings m_settings = null;
+
     /**
      * {@inheritDoc}
      */
@@ -84,6 +89,9 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addStringArray(CFG_COLUMNS, getColumns());
+        if (m_settings != null) {
+            settings.addNodeSettings(m_settings);
+        }
     }
 
     /**
@@ -94,6 +102,11 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     public void loadFromNodeSettings(final NodeSettingsRO settings)
             throws InvalidSettingsException {
         setColumns(settings.getStringArray(CFG_COLUMNS));
+        try {
+            m_settings = (NodeSettings) settings.getNodeSettings("columnFilter");
+        } catch (InvalidSettingsException e) {
+            m_settings = null;
+        }
     }
 
     /**
@@ -103,6 +116,40 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         setColumns(settings.getStringArray(CFG_COLUMNS, DEFAULT_COLUMNS));
+        try {
+            m_settings = (NodeSettings) settings.getNodeSettings("columnFilter");
+        } catch (InvalidSettingsException e) {
+            m_settings = null;
+        }
+    }
+
+    /**
+     * @return the settings
+     */
+    @JsonIgnore
+    public NodeSettings getSettings() {
+        return m_settings;
+    }
+
+    /**
+     * @param settings the settings to set
+     */
+    @JsonIgnore
+    public void setsettings(final NodeSettings settings) {
+        m_settings = settings;
+    }
+
+    /**
+     * Updates the selection based on the settings and the given spec.
+     * 
+     * @param spec The current table spec
+     */
+    public void updateFromSpec(final DataTableSpec spec) {
+        if (m_settings != null) {
+            DataColumnSpecFilterConfiguration config = new DataColumnSpecFilterConfiguration("columnFilter");
+            config.loadConfigurationInDialog(m_settings, spec);
+            setColumns(config.applyTo(spec).getIncludes());
+        }
     }
 
     /**

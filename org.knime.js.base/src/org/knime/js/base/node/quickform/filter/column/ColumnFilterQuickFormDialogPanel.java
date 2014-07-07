@@ -48,8 +48,9 @@
 package org.knime.js.base.node.quickform.filter.column;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponent;
-import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
+import org.knime.core.node.NodeSettings;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 
 /**
@@ -60,17 +61,19 @@ import org.knime.js.base.node.quickform.QuickFormDialogPanel;
 @SuppressWarnings("serial")
 public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<ColumnFilterQuickFormValue> {
 
-    private MultipleSelectionsComponent m_columns;
+    private DataColumnSpecFilterPanel m_columns;
+
+    private ColumnFilterQuickFormRepresentation m_representation;
 
     /**
      * @param representation Representation containing the possible values
      */
     public ColumnFilterQuickFormDialogPanel(final ColumnFilterQuickFormRepresentation representation) {
         super(representation.getDefaultValue());
-        m_columns = MultipleSelectionsComponentFactory.createMultipleSelectionsComponent(representation.getType());
-        m_columns.setChoices(representation.getPossibleColumns());
-        m_columns.setSelections(representation.getDefaultValue().getColumns());
-        setComponent(m_columns.getComponent());
+        m_representation = representation;
+        m_columns = new DataColumnSpecFilterPanel();
+        resetToDefault();
+        setComponent(m_columns);
     }
 
     /**
@@ -79,7 +82,12 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
     @Override
     public ColumnFilterQuickFormValue createNodeValue() throws InvalidSettingsException {
         ColumnFilterQuickFormValue value = new ColumnFilterQuickFormValue();
-        value.setColumns(m_columns.getSelections());
+        DataColumnSpecFilterConfiguration config = new DataColumnSpecFilterConfiguration("columnFilter");
+        m_columns.saveConfiguration(config);
+        NodeSettings settings = new NodeSettings("columnFilter");
+        config.saveConfiguration(settings);
+        value.setsettings(settings);
+        value.updateFromSpec(m_representation.getSpec());
         return value;
     }
 
@@ -89,7 +97,9 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
     @Override
     public void loadNodeValue(final ColumnFilterQuickFormValue value) {
         if (value != null) {
-            m_columns.setSelections(value.getColumns());
+            DataColumnSpecFilterConfiguration config = new DataColumnSpecFilterConfiguration("columnFilter");
+            config.loadConfigurationInDialog(value.getSettings(), m_representation.getSpec());
+            m_columns.loadConfiguration(config, m_representation.getSpec());
         }
     }
 
@@ -98,7 +108,9 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     protected void resetToDefault() {
-        m_columns.setSelections(getDefaultValue().getColumns());
+        DataColumnSpecFilterConfiguration config = new DataColumnSpecFilterConfiguration("columnFilter");
+        config.loadConfigurationInDialog(m_representation.getDefaultValue().getSettings(), m_representation.getSpec());
+        m_columns.loadConfiguration(config, m_representation.getSpec());
     }
 
     /**

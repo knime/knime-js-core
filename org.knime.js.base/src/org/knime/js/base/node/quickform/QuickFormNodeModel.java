@@ -116,7 +116,7 @@ public abstract class QuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected final void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
         File valFile = new File(nodeInternDir, "viewvalue.xml");
         NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
@@ -132,7 +132,7 @@ public abstract class QuickFormNodeModel
      * {@inheritDoc}
      */
     @Override
-    protected final void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
             CanceledExecutionException {
         NodeSettings valSettings = new NodeSettings("viewvalue");
         if (m_viewValue != null) {

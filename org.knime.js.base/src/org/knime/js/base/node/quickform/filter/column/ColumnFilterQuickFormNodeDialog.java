@@ -45,8 +45,6 @@
 package org.knime.js.base.node.quickform.filter.column;
 
 import java.awt.GridBagConstraints;
-import java.util.Arrays;
-import java.util.Set;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -54,11 +52,13 @@ import javax.swing.JPanel;
 import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.util.ColumnFilterPanel;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
 import org.knime.js.base.dialog.selection.multiple.MultipleSelectionsComponentFactory;
 import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
@@ -69,7 +69,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
  */
 public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
 
-    private final ColumnFilterPanel m_defaultField;
+    private final DataColumnSpecFilterPanel m_defaultField;
 
     private final JComboBox<String> m_type;
 
@@ -81,7 +81,7 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     ColumnFilterQuickFormNodeDialog() {
         m_config = new ColumnFilterQuickFormConfig();
         m_type = new JComboBox<String>(MultipleSelectionsComponentFactory.listMultipleSelectionsComponents());
-        m_defaultField = new ColumnFilterPanel(true);
+        m_defaultField = new DataColumnSpecFilterPanel(false);
         createAndAddTab();
     }
 
@@ -104,7 +104,13 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         loadSettingsFrom(m_config);
         DataTableSpec spec = (DataTableSpec) specs[0];
         m_possibleColumns = spec.getColumnNames();
-        m_defaultField.update(spec, false, Arrays.asList(m_config.getDefaultValue().getColumns()));
+        NodeSettings filterSettings = m_config.getDefaultValue().getSettings();
+        if (filterSettings == null) {
+            filterSettings = new NodeSettings("columnFilter");
+        }
+        DataColumnSpecFilterConfiguration filterConfig = new DataColumnSpecFilterConfiguration("columnFilter");
+        filterConfig.loadConfigurationInDialog(filterSettings, (DataTableSpec)specs[0]);
+        m_defaultField.loadConfiguration(filterConfig, (DataTableSpec)specs[0]);
         m_type.setSelectedItem(m_config.getType());
     }
 
@@ -114,8 +120,11 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
-        Set<String> defaultIncludes = m_defaultField.getIncludedColumnSet();
-        m_config.getDefaultValue().setColumns(defaultIncludes.toArray(new String[defaultIncludes.size()]));
+        DataColumnSpecFilterConfiguration filterConfig = new DataColumnSpecFilterConfiguration("columnFilter");
+        m_defaultField.saveConfiguration(filterConfig);
+        NodeSettings filterSettings = new NodeSettings("columnFilter");
+        filterConfig.saveConfiguration(filterSettings);
+        m_config.getDefaultValue().setsettings(filterSettings);
         m_config.setType((String)m_type.getSelectedItem());
         m_config.setPossibleColumns(m_possibleColumns);
         m_config.saveSettings(settings);

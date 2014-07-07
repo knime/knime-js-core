@@ -44,6 +44,10 @@
  */
 package org.knime.js.base.node.quickform.filter.column;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,8 +56,12 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettings;
+import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -69,6 +77,8 @@ public class ColumnFilterQuickFormNodeModel
         <ColumnFilterQuickFormRepresentation,
         ColumnFilterQuickFormValue,
         ColumnFilterQuickFormConfig> {
+
+    private DataTableSpec m_spec = new DataTableSpec();
 
     /** Creates a new value selection node model. */
     public ColumnFilterQuickFormNodeModel() {
@@ -98,9 +108,18 @@ public class ColumnFilterQuickFormNodeModel
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs)
             throws InvalidSettingsException {
+        m_spec = (DataTableSpec) inSpecs[0];
+        updateValuesFromSpec((DataTableSpec) inSpecs[0]);
         updateColumns((DataTableSpec) inSpecs[0]);
         createAndPushFlowVariable();
         return new DataTableSpec[]{createSpec((DataTableSpec) inSpecs[0])};
+    }
+
+    private void updateValuesFromSpec(final DataTableSpec spec) {
+        getConfig().getDefaultValue().updateFromSpec(spec);
+        if (getDialogValue() != null) {
+            getDialogValue().updateFromSpec(spec);
+        }
     }
 
     /**
@@ -180,7 +199,36 @@ public class ColumnFilterQuickFormNodeModel
      */
     @Override
     protected ColumnFilterQuickFormRepresentation getRepresentation() {
-        return new ColumnFilterQuickFormRepresentation(getRelevantValue(), getConfig());
+        return new ColumnFilterQuickFormRepresentation(getRelevantValue(), getConfig(), m_spec);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        super.loadInternals(nodeInternDir, exec);
+        File file = new File(nodeInternDir, "spec.xml");
+        NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(file));
+        try {
+            m_spec = DataTableSpec.load(settings.getConfig("spec"));
+        } catch (InvalidSettingsException e) {
+            m_spec = new DataTableSpec();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
+        CanceledExecutionException {
+        super.saveInternals(nodeInternDir, exec);
+        NodeSettings settings = new NodeSettings("spec");
+        m_spec.save(settings.addConfig("spec"));
+        File file = new File(nodeInternDir, "spec.xml");
+        settings.saveToXML(new FileOutputStream(file));
     }
 
 }
