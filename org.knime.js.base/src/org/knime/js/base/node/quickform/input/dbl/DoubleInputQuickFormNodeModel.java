@@ -127,7 +127,7 @@ public class DoubleInputQuickFormNodeModel
             return new ValidationError("The set double " + viewContent.getDouble()
                 + " is smaller than the allowed minimum of " + getConfig().getMin());
         }
-        if (getConfig().getUseMax() && viewContent.getDouble() < getConfig().getMax()) {
+        if (getConfig().getUseMax() && viewContent.getDouble() > getConfig().getMax()) {
             return new ValidationError("The set double " + viewContent.getDouble()
                 + " is bigger than the allowed maximum of " + getConfig().getMax());
         }

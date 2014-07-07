@@ -127,7 +127,7 @@ public class IntInputQuickFormNodeModel
             return new ValidationError("The set integer " + viewContent.getInteger()
                 + " is smaller than the allowed minimum of " + getConfig().getMin());
         }
-        if (getConfig().getUseMax() && viewContent.getInteger() < getConfig().getMax()) {
+        if (getConfig().getUseMax() && viewContent.getInteger() > getConfig().getMax()) {
             return new ValidationError("The set integer " + viewContent.getInteger()
                 + " is bigger than the allowed maximum of " + getConfig().getMax());
         }
