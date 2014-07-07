@@ -54,12 +54,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
@@ -80,6 +82,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
+import org.knime.js.core.JSONDataTableSpec;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 
@@ -138,7 +141,8 @@ public class ScatterPlotNodeModel extends NodeModel implements
             throws Exception {
         synchronized (m_lock) {
             m_table = inData[0];
-            if (m_representation.getKeyedDataset() == null || m_viewValue.getxColumn() == null) {
+            final String xColumn = m_viewValue.getxColumn();
+            if (m_representation.getKeyedDataset() == null || xColumn == null) {
                 ColumnRearranger c = createNumericColumnRearranger(inData[0].getDataTableSpec());
                 BufferedDataTable filteredTable =
                     exec.createColumnRearrangeTable(inData[0], c, exec.createSubProgress(0.1));
@@ -147,13 +151,14 @@ public class ScatterPlotNodeModel extends NodeModel implements
                 if (m_config.getMaxRows() < filteredTable.getRowCount()) {
                     setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
                 }
-                JSONDataTable table =
+                final JSONDataTable table =
                     new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.8));
                 exec.setProgress(0.9);
                 ExecutionMonitor datasetExecutionMonitor = exec.createSubProgress(0.1);
-                int numColumns = table.getSpec().getNumColumns();
-                String[] rowKeys = new String[table.getSpec().getNumRows()];
-                JSONKeyedValuesRow[] rowValues = new JSONKeyedValuesRow[table.getSpec().getNumRows()];
+                final JSONDataTableSpec tableSpec = table.getSpec();
+                int numColumns = tableSpec.getNumColumns();
+                String[] rowKeys = new String[tableSpec.getNumRows()];
+                JSONKeyedValuesRow[] rowValues = new JSONKeyedValuesRow[tableSpec.getNumRows()];
                 JSONDataTableRow[] tableRows = table.getRows();
                 for (int rowID = 0; rowID < rowValues.length; rowID++) {
                     JSONDataTableRow currentRow = tableRows[rowID];
@@ -168,26 +173,27 @@ public class ScatterPlotNodeModel extends NodeModel implements
                         }
                     }
                     rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
-                    rowValues[rowID].setColor(table.getSpec().getRowColorValues()[rowID]);
+                    rowValues[rowID].setColor(tableSpec.getRowColorValues()[rowID]);
                     datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length,
                         "Creating dataset, processing row " + rowID + " of " + rowValues.length + ".");
                 }
 
                 JSONKeyedValues2DDataset dataset =
-                    new JSONKeyedValues2DDataset(table.getSpec().getColNames(), rowValues);
-                for (int col = 0; col < table.getSpec().getNumColumns(); col++) {
-                    if (table.getSpec().getColTypes()[col] == "string"
-                        && table.getSpec().getPossibleValues().get(col) != null) {
-                        dataset.setSymbol(getSymbolMap(table.getSpec().getPossibleValues().get(col)), col);
+                    new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
+                for (int col = 0; col < tableSpec.getNumColumns(); col++) {
+                    if (tableSpec.getColTypes()[col] == "string"
+                        && tableSpec.getPossibleValues().get(col) != null) {
+                        dataset.setSymbol(getSymbolMap(tableSpec.getPossibleValues().get(col)), col);
                     }
                 }
                 m_representation.setKeyedDataset(dataset);
                 copyConfigToView();
-                if (m_viewValue.getxColumn() == null || m_viewValue.getxColumn().trim().isEmpty()) {
-                    m_viewValue.setxColumn(table.getSpec().getColNames()[0]);
+                if (StringUtils.isEmpty(xColumn) || !Arrays.asList(tableSpec.getColNames()).contains(xColumn)) {
+                    m_viewValue.setxColumn(tableSpec.getColNames()[0]);
                 }
-                if (m_viewValue.getyColumn() == null || m_viewValue.getyColumn().trim().isEmpty()) {
-                    m_viewValue.setyColumn(table.getSpec().getColNames()[table.getSpec().getNumColumns()>1 ? 1 : 0]);
+                final String yColumn = m_viewValue.getyColumn();
+                if (StringUtils.isEmpty(yColumn) || !Arrays.asList(tableSpec.getColNames()).contains(yColumn)) {
+                    m_viewValue.setyColumn(tableSpec.getColNames()[tableSpec.getNumColumns() > 1 ? 1 : 0]);
                 }
             }
         }
