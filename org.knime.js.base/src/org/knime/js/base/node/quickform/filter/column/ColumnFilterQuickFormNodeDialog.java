@@ -90,7 +90,9 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
+        // This option is hidden because we can not easily implement it in the sub node dialog
+        // e.g. if the regex filter from the DataColumnSpecFilterPanel is used we have no equivalent with check boxes
+        // addPairToPanel("Selection Type: ", m_type, panelWithGBLayout, gbc);
         addPairToPanel("Default Values: ", m_defaultField, panelWithGBLayout, gbc);
     }
 
