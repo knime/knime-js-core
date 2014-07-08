@@ -89,7 +89,7 @@ org_knime_js_base_node_quickform_selection_multiple = function() {
 		if (selector == null) {
 			return null;
 		}
-		var viewValid = new Object();
+		var viewValue = new Object();
 		viewValue.value = selector.getSelections();
 		return viewValue;
 	};
