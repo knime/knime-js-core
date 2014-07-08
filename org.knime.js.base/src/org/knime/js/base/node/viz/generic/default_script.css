@@ -1,0 +1,16 @@
+body {
+    font-family: sans-serif;
+}
+h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+.success {
+    color: #006633;
+    font-weight: bold;
+}
+
+.failure {
+    color: #990000;
+    font-weight: bold;
+}

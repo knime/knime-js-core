@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -78,7 +79,7 @@ import org.knime.js.core.JSONDataTable;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class GenericJSViewNodeModel extends NodeModel implements
+final class GenericJSViewNodeModel extends NodeModel implements
     WizardNode<GenericJSViewRepresentation, GenericJSViewValue>, FlowVariableProvider {
 
     private final Object m_lock = new Object();
@@ -87,11 +88,10 @@ public class GenericJSViewNodeModel extends NodeModel implements
     private GenericJSViewRepresentation m_representation;
 
     /**
-     * @param config
      */
-    protected GenericJSViewNodeModel(final GenericJSViewConfig config) {
+    GenericJSViewNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, null);
-        m_config = config;
+        m_config = new GenericJSViewConfig();
         m_representation = createEmptyViewRepresentation();
     }
 
@@ -100,7 +100,9 @@ public class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
-        //nothing to do?
+        if (StringUtils.isEmpty(m_config.getJsCode())) {
+            throw new InvalidSettingsException("No script defined");
+        }
         return null;
     }
 

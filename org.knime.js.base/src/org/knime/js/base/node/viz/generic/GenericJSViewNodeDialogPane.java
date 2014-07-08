@@ -95,7 +95,7 @@ import com.google.common.collect.HashBiMap;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class GenericJSViewNodeDialogPane extends NodeDialogPane {
+final class GenericJSViewNodeDialogPane extends NodeDialogPane {
 
     private static final String ID_WEB_RES = "org.knime.js.core.webResources";
     private static final String ATTR_RES_BUNDLE_ID = "webResourceBundleID";
@@ -104,7 +104,6 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private static final String ATTR_RES_BUNDLE_DEBUG = "debug";
     private static final String ATTR_RES_BUNDLE_DESCRIPTION = "description";
 
-    private final GenericJSViewConfig m_config;
     private BiMap<String, String> m_availableLibraries;
 
     //private final JTextField m_viewName;
@@ -116,8 +115,7 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
     /**
      * Initializes new dialog pane.
      */
-    public GenericJSViewNodeDialogPane(final GenericJSViewConfig config) {
-        m_config = config;
+    GenericJSViewNodeDialogPane() {
         //m_viewName = new JTextField(20);
         m_flowVarList = new JList(new DefaultListModel());
         m_flowVarList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -248,8 +246,9 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
         for(String lib : libNameList) {
             tableModel.addRow(new Object[]{false, lib});
         }
-        m_config.loadSettingsForDialog(settings);
-        String[] activeLibs = m_config.getDependencies();
+        GenericJSViewConfig config = new GenericJSViewConfig();
+        config.loadSettingsForDialog(settings);
+        String[] activeLibs = config.getDependencies();
         for (String lib: activeLibs) {
             String displayLib = m_availableLibraries.get(lib);
             for(int i = 0; i < tableModel.getRowCount(); i++) {
@@ -260,8 +259,8 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
             }
         }
         //m_viewName.setText(m_config.getViewName());
-        m_jsTextArea.setText(m_config.getJsCode());
-        m_cssTextArea.setText(m_config.getCssCode());
+        m_jsTextArea.setText(config.getJsCode());
+        m_cssTextArea.setText(config.getCssCode());
     }
 
     private BiMap<String, String> getAvailableLibraries() {
@@ -317,11 +316,12 @@ public class GenericJSViewNodeDialogPane extends NodeDialogPane {
                 dependencies.add(m_availableLibraries.inverse().get(libDisplay));
             }
         }
+        final GenericJSViewConfig config = new GenericJSViewConfig();
         //m_config.setViewName(m_viewName.getText());
-        m_config.setJsCode(m_jsTextArea.getText());
-        m_config.setCssCode(m_cssTextArea.getText());
-        m_config.setDependencies(dependencies.toArray(new String[0]));
-        m_config.saveSettings(settings);
+        config.setJsCode(m_jsTextArea.getText());
+        config.setCssCode(m_cssTextArea.getText());
+        config.setDependencies(dependencies.toArray(new String[0]));
+        config.saveSettings(settings);
     }
 
     /*public static class JSLibrary {

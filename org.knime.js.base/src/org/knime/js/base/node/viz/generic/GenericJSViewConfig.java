@@ -47,7 +47,12 @@
  */
 package org.knime.js.base.node.viz.generic;
 
+import java.io.IOException;
+
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
@@ -55,7 +60,15 @@ import org.knime.core.node.NodeSettingsWO;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class GenericJSViewConfig {
+final class GenericJSViewConfig {
+
+    /** File containing default script. */
+    private static final String DEFAULT_SCRIPT_CSS = "default_script.css";
+
+    /** File containing default CSS. */
+    private static final String DEFAULT_SCRIPT_JS = "default_script.js";
+
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(GenericJSViewConfig.class);
 
     private static final String JS_CODE = "jsCode";
     private static final String CSS_CODE = "cssCode";
@@ -155,8 +168,24 @@ public class GenericJSViewConfig {
      * @param settings To load from.
      */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
-        m_jsCode = settings.getString(JS_CODE, "");
-        m_cssCode = settings.getString(CSS_CODE, "");
+        m_jsCode = settings.getString(JS_CODE, null);
+        if (m_jsCode == null) {
+            try {
+                m_jsCode = IOUtils.toString(GenericJSViewConfig.class.getResource(DEFAULT_SCRIPT_JS), Charsets.UTF_8);
+            } catch (IOException e) {
+                LOGGER.error(String.format("Could not read default javascript from file \"%s\"", DEFAULT_SCRIPT_JS), e);
+                m_jsCode = "";
+            }
+        }
+        m_cssCode = settings.getString(CSS_CODE, null);
+        if (m_cssCode == null) {
+            try {
+                m_cssCode = IOUtils.toString(GenericJSViewConfig.class.getResource(DEFAULT_SCRIPT_CSS), Charsets.UTF_8);
+            } catch (IOException e) {
+                LOGGER.error(String.format("Could not read default css from file \"%s\"", DEFAULT_SCRIPT_CSS), e);
+                m_cssCode = "";
+            }
+        }
         m_dependencies = settings.getStringArray(DEPENDENCIES, new String[0]);
         //m_viewName = settings.getString(VIEW_NAME, "");
     }

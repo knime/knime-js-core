@@ -56,7 +56,7 @@ import org.knime.core.node.wizard.WizardNodeFactoryExtension;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel> implements
+public final class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel> implements
     WizardNodeFactoryExtension<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue> {
 
     /**
@@ -64,7 +64,7 @@ public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel
      */
     @Override
     public GenericJSViewNodeModel createNodeModel() {
-        return new GenericJSViewNodeModel(new GenericJSViewConfig());
+        return new GenericJSViewNodeModel();
     }
 
     /**
@@ -96,7 +96,7 @@ public class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNodeModel
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new GenericJSViewNodeDialogPane(new GenericJSViewConfig());
+        return new GenericJSViewNodeDialogPane();
     }
 
     /**

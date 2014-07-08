@@ -3,13 +3,18 @@
 	<name>Generic JavaScript View</name>
 	
 	<shortDescription>
-	    Nice view
+	    Executes JavaScript code to generate a view.
 	</shortDescription>
 	
 	<fullDescription>
 		<intro>		
-    	    <p>Creates a nice view.
+    	    <p>Executes JavaScript code to generate a view. The code in the script editor is executed when displayed
+            in the view (right-click -&gt; Interactive View) or in the KNIME server web portal. 
 	       	</p>
+            <p>Within the java script code block you have access to the input table and can use a set of predefined
+            libraries to generate the view.</p>
+            <p>Note, this node is currently under development. Future versions of the node will have more functionality,
+            including the ability to define and use templates and to generate a static view/image output.</p>            
 		</intro>
 		<option name="Library Dependencies">Choose from the list of available libraries.</option>
 		<option name="JavaScript Code">
