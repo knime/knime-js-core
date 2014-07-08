@@ -44,10 +44,6 @@
  */
 package org.knime.js.base.node.quickform.filter.column;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,12 +52,9 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeSettings;
-import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -76,9 +69,12 @@ public class ColumnFilterQuickFormNodeModel
         extends QuickFormNodeModel
         <ColumnFilterQuickFormRepresentation,
         ColumnFilterQuickFormValue,
-        ColumnFilterQuickFormConfig> {
+        ColumnFilterQuickFormConfig>
+        implements BufferedDataTableHolder {
 
     private DataTableSpec m_spec = new DataTableSpec();
+
+    private BufferedDataTable m_inTable = null;
 
     /** Creates a new value selection node model. */
     public ColumnFilterQuickFormNodeModel() {
@@ -158,6 +154,7 @@ public class ColumnFilterQuickFormNodeModel
     /** {@inheritDoc} */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        m_inTable = (BufferedDataTable) inObjects[0];
         DataTableSpec inSpec = (DataTableSpec) inObjects[0].getSpec();
         updateColumns(inSpec);
         createAndPushFlowVariable();
@@ -199,36 +196,41 @@ public class ColumnFilterQuickFormNodeModel
      */
     @Override
     protected ColumnFilterQuickFormRepresentation getRepresentation() {
-        return new ColumnFilterQuickFormRepresentation(getRelevantValue(), getConfig(), m_spec);
+        return new ColumnFilterQuickFormRepresentation(getRelevantValue(), getConfig(), getSpec());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        super.loadInternals(nodeInternDir, exec);
-        File file = new File(nodeInternDir, "spec.xml");
-        NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(file));
-        try {
-            m_spec = DataTableSpec.load(settings.getConfig("spec"));
-        } catch (InvalidSettingsException e) {
-            m_spec = new DataTableSpec();
+    protected void reset() {
+        super.reset();
+        m_inTable = null;
+    }
+
+    /**
+     * @return The spec of the input table
+     */
+    private DataTableSpec getSpec() {
+        return m_inTable != null ? m_inTable.getDataTableSpec() : m_spec;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BufferedDataTable[] getInternalTables() {
+        return m_inTable != null ? new BufferedDataTable[]{m_inTable} : new BufferedDataTable[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInternalTables(final BufferedDataTable[] tables) {
+        if (tables.length > 0) {
+            m_inTable = tables[0];
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        super.saveInternals(nodeInternDir, exec);
-        NodeSettings settings = new NodeSettings("spec");
-        m_spec.save(settings.addConfig("spec"));
-        File file = new File(nodeInternDir, "spec.xml");
-        settings.saveToXML(new FileOutputStream(file));
     }
 
 }
