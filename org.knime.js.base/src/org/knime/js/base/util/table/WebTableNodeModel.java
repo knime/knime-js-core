@@ -52,7 +52,9 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Objects;
+
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
@@ -105,9 +107,9 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
 
     private final SettingsModelIntegerBounded m_maxRows = createLastDisplayedRowModel(END);
     private final SettingsModelBoolean m_useNumberFormatter = createUseNumberFormatterModel();
-    private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel();
-    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
-    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
+    private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
+//    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
+//    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
 
 
     /**
@@ -136,9 +138,19 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         return new SettingsModelBoolean(CFG_USE_NUMBER_FORMATTER, false);
     }
 
-    /** @return settings model for the decimal places property. */
-    static SettingsModelIntegerBounded createDecimalPlacesModel() {
-        return new SettingsModelIntegerBounded(CFG_DECIMAL_PLACES, 2, 0, Integer.MAX_VALUE);
+    /** @param useNumberFormatter for enable/disablement
+     * @return settings model for the decimal places property. */
+    static SettingsModelIntegerBounded createDecimalPlacesModel(final SettingsModelBoolean useNumberFormatter) {
+        final SettingsModelIntegerBounded result =
+                new SettingsModelIntegerBounded(CFG_DECIMAL_PLACES, 2, 0, Integer.MAX_VALUE);
+        useNumberFormatter.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                result.setEnabled(useNumberFormatter.getBooleanValue());
+            }
+        });
+        result.setEnabled(useNumberFormatter.getBooleanValue());
+        return result;
     }
 
     /** @return settings model for the decimal separator property. */
@@ -191,10 +203,11 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private void setNumberFormatter() {
         if (m_useNumberFormatter.getBooleanValue()) {
             int decimalPlaces = m_decimalPlaces.getIntValue();
-            String decimalSeparator = m_decimalSeparator.getStringValue();
-            String thousandsSeparator = m_thousandsSeparator.getStringValue();
-            JSONNumberFormatter formatter =
-                new JSONNumberFormatter(decimalPlaces, decimalSeparator, thousandsSeparator);
+//            String decimalSeparator = m_decimalSeparator.getStringValue();
+//            String thousandsSeparator = m_thousandsSeparator.getStringValue();
+//            JSONNumberFormatter formatter =
+//                new JSONNumberFormatter(decimalPlaces, decimalSeparator, thousandsSeparator);
+            JSONNumberFormatter formatter = new JSONNumberFormatter(decimalPlaces, ".", ",");
             m_viewRepresentation.setNumberFormatter(formatter);
         }
     }
@@ -309,8 +322,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.saveSettingsTo(settings);
         m_useNumberFormatter.saveSettingsTo(settings);
         m_decimalPlaces.saveSettingsTo(settings);
-        m_decimalSeparator.saveSettingsTo(settings);
-        m_thousandsSeparator.saveSettingsTo(settings);
+//        m_decimalSeparator.saveSettingsTo(settings);
+//        m_thousandsSeparator.saveSettingsTo(settings);
     }
 
     /**
@@ -321,14 +334,14 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.validateSettings(settings);
         m_useNumberFormatter.validateSettings(settings);
         m_decimalPlaces.validateSettings(settings);
-        SettingsModelString tempDecimalSeparator =
-            (SettingsModelString)m_decimalSeparator.createCloneWithValidatedValue(settings);
-        SettingsModelString tempThousandSeparator =
-            (SettingsModelString)m_thousandsSeparator.createCloneWithValidatedValue(settings);
-        if (Objects.equals(tempDecimalSeparator.getStringValue(), tempThousandSeparator.getStringValue())) {
-            throw new InvalidSettingsException(
-                "Decimal separator and thousands separator cannot be assigned to the same string.");
-        }
+//        SettingsModelString tempDecimalSeparator =
+//            (SettingsModelString)m_decimalSeparator.createCloneWithValidatedValue(settings);
+//        SettingsModelString tempThousandSeparator =
+//            (SettingsModelString)m_thousandsSeparator.createCloneWithValidatedValue(settings);
+//        if (Objects.equals(tempDecimalSeparator.getStringValue(), tempThousandSeparator.getStringValue())) {
+//            throw new InvalidSettingsException(
+//                "Decimal separator and thousands separator cannot be assigned to the same string.");
+//        }
     }
 
     /**
@@ -339,8 +352,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.loadSettingsFrom(settings);
         m_useNumberFormatter.loadSettingsFrom(settings);
         m_decimalPlaces.loadSettingsFrom(settings);
-        m_decimalSeparator.loadSettingsFrom(settings);
-        m_thousandsSeparator.loadSettingsFrom(settings);
+//        m_decimalSeparator.loadSettingsFrom(settings);
+//        m_thousandsSeparator.loadSettingsFrom(settings);
     }
 
     /**
