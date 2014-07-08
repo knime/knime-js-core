@@ -141,7 +141,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
 
     /**
      * Updates the selection based on the settings and the given spec.
-     * 
+     *
      * @param spec The current table spec
      */
     public void updateFromSpec(final DataTableSpec spec) {
@@ -186,6 +186,11 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
         StringBuilder sb = new StringBuilder();
         sb.append("columns=");
         sb.append(Arrays.toString(m_columns));
+        sb.append(", ");
+        sb.append("settings=");
+        sb.append("{");
+        sb.append(m_settings);
+        sb.append("}");
         return sb.toString();
     }
 
@@ -196,6 +201,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(m_columns)
+                .append(m_settings)
                 .toHashCode();
     }
 
@@ -216,6 +222,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
         ColumnFilterQuickFormValue other = (ColumnFilterQuickFormValue)obj;
         return new EqualsBuilder()
                 .append(m_columns, other.m_columns)
+                .append(m_settings, other.m_settings)
                 .isEquals();
     }
 
