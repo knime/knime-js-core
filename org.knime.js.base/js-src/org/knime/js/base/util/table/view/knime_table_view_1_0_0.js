@@ -111,20 +111,24 @@ knime_table_view = function(table, containerElement) {
 				var cellContent = knimeTable.getRows()[i].data[j];
 				var tableData = $('<td>');
 				tableData.attr('class', 'knimeTableCell ' + columnType);
-				if (columnType === "boolean" || columnType === "number" || columnType === "string") {
-					var formatter = tableView.getFormatterForType(columnType);
-					var textContent = cellContent;
-					if (formatter) {
-						textContent = formatter.format(cellContent);
+				if (cellContent != undefined) {
+					if (columnType === "boolean" || columnType === "number" || columnType === "string") {
+						var formatter = tableView.getFormatterForType(columnType);
+						var textContent = cellContent;
+						if (formatter) {
+							textContent = formatter.format(cellContent);
+						}
+						tableData.text(textContent);
+					} else if (columnType === "svg") {
+						tableData.append($.parseHTML(cellContent));
 					}
-					tableData.text(textContent);
-				} else if (columnType === "svg") {
-					tableData.append($.parseHTML(cellContent));
-				}
-				else if (columnType === "png") {
-					var image = $('<img>');
-					tableData.append(image);
-					image.attr('src', 'data:image/png;base64,' + cellContent);
+					else if (columnType === "png") {
+						var image = $('<img>');
+						tableData.append(image);
+						image.attr('src', 'data:image/png;base64,' + cellContent);
+					}
+				} else {
+					tableData.text('?');
 				}
 				tableRow.append(tableData);
 			}
