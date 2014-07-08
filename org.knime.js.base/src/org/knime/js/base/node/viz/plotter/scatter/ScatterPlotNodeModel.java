@@ -90,7 +90,7 @@ import org.knime.js.core.datasets.JSONKeyedValuesRow;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class ScatterPlotNodeModel extends NodeModel implements
+final class ScatterPlotNodeModel extends NodeModel implements
     WizardNode<ScatterPlotViewRepresentation, ScatterPlotViewValue> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ScatterPlotNodeModel.class);
@@ -101,12 +101,9 @@ public class ScatterPlotNodeModel extends NodeModel implements
     private ScatterPlotViewRepresentation m_representation;
     private ScatterPlotViewValue m_viewValue;
 
-    /**
-     * @param config
-     */
-    protected ScatterPlotNodeModel(final ScatterPlotViewConfig config) {
+    ScatterPlotNodeModel() {
         super(1, 0);
-        m_config = config;
+        m_config = new ScatterPlotViewConfig();
         m_representation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
     }
@@ -397,8 +394,7 @@ public class ScatterPlotNodeModel extends NodeModel implements
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        new ScatterPlotViewConfig().loadSettings(settings);
     }
 
     /**

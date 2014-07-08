@@ -78,11 +78,9 @@ import org.knime.core.node.util.ColumnSelectionPanel;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class ScatterPlotNodeDialogPane extends NodeDialogPane {
+final class ScatterPlotNodeDialogPane extends NodeDialogPane {
 
     private final static int TEXT_FIELD_SIZE = 20;
-
-    private final ScatterPlotViewConfig m_config;
 
     private final JCheckBox m_enableViewConfigCheckBox;
     private final JCheckBox m_enableTitleChangeCheckBox;
@@ -105,11 +103,9 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JSpinner m_dotSize;
 
     /**
-     * @param config The config to read/write from.
      *
      */
-    public ScatterPlotNodeDialogPane(final ScatterPlotViewConfig config) {
-        m_config = config;
+    ScatterPlotNodeDialogPane() {
         m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
         m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
         m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
@@ -240,36 +236,37 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
             throws NotConfigurableException {
-        m_config.loadSettingsForDialog(settings);
-        m_enableViewConfigCheckBox.setSelected(m_config.getEnableViewConfiguration());
-        m_enableTitleChangeCheckBox.setSelected(m_config.getEnableTitleChange());
-        m_enableSubtitleChangeCheckBox.setSelected(m_config.getEnableSubtitleChange());
-        m_enableXColumnChangeCheckBox.setSelected(m_config.getEnableXColumnChange());
-        m_enableYColumnChangeCheckBox.setSelected(m_config.getEnableYColumnChange());
-        m_enableXAxisLabelEditCheckBox.setSelected(m_config.getEnableXAxisLabelEdit());
-        m_enableYAxisLabelEditCheckBox.setSelected(m_config.getEnableYAxisLabelEdit());
-        m_enableDotSizeChangeCheckBox.setSelected(m_config.getEnableDotSizeChange());
-        m_allowZoomingCheckBox.setSelected(m_config.getEnableZooming());
-        m_allowPanningCheckBox.setSelected(m_config.getEnablePanning());
+        ScatterPlotViewConfig config = new ScatterPlotViewConfig();
+        config.loadSettingsForDialog(settings);
+        m_enableViewConfigCheckBox.setSelected(config.getEnableViewConfiguration());
+        m_enableTitleChangeCheckBox.setSelected(config.getEnableTitleChange());
+        m_enableSubtitleChangeCheckBox.setSelected(config.getEnableSubtitleChange());
+        m_enableXColumnChangeCheckBox.setSelected(config.getEnableXColumnChange());
+        m_enableYColumnChangeCheckBox.setSelected(config.getEnableYColumnChange());
+        m_enableXAxisLabelEditCheckBox.setSelected(config.getEnableXAxisLabelEdit());
+        m_enableYAxisLabelEditCheckBox.setSelected(config.getEnableYAxisLabelEdit());
+        m_enableDotSizeChangeCheckBox.setSelected(config.getEnableDotSizeChange());
+        m_allowZoomingCheckBox.setSelected(config.getEnableZooming());
+        m_allowPanningCheckBox.setSelected(config.getEnablePanning());
 
-        m_chartTitleTextField.setText(m_config.getChartTitle());
-        m_chartSubtitleTextField.setText(m_config.getChartSubtitle());
-        String xCol = m_config.getxColumn();
+        m_chartTitleTextField.setText(config.getChartTitle());
+        m_chartSubtitleTextField.setText(config.getChartSubtitle());
+        String xCol = config.getxColumn();
         if (xCol == null || xCol.isEmpty()) {
             xCol = specs[0].getColumnNames()[0];
         }
 
-        String yCol = m_config.getyColumn();
+        String yCol = config.getyColumn();
         if (yCol == null || yCol.isEmpty()) {
             yCol = specs[0].getColumnNames()[specs[0].getNumColumns() > 1 ? 1 : 0];
         }
 
         m_xColComboBox.update(specs[0], xCol);
         m_yColComboBox.update(specs[0], yCol);
-        m_xAxisLabelField.setText(m_config.getxAxisLabel());
-        m_yAxisLabelField.setText(m_config.getyAxisLabel());
-        m_dotSize.setValue(m_config.getDotSize());
-        m_maxRowsSpinner.setValue(m_config.getMaxRows());
+        m_xAxisLabelField.setText(config.getxAxisLabel());
+        m_yAxisLabelField.setText(config.getyAxisLabel());
+        m_dotSize.setValue(config.getDotSize());
+        m_maxRowsSpinner.setValue(config.getMaxRows());
         enableViewControls();
     }
 
@@ -278,26 +275,27 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        m_config.setEnableViewConfiguration(m_enableViewConfigCheckBox.isSelected());
-        m_config.setEnableTitleChange(m_enableTitleChangeCheckBox.isSelected());
-        m_config.setEnableSubtitleChange(m_enableSubtitleChangeCheckBox.isSelected());
-        m_config.setEnableXColumnChange(m_enableXColumnChangeCheckBox.isSelected());
-        m_config.setEnableYColumnChange(m_enableYColumnChangeCheckBox.isSelected());
-        m_config.setEnableXAxisLabelEdit(m_enableXAxisLabelEditCheckBox.isSelected());
-        m_config.setEnableYAxisLabelEdit(m_enableYAxisLabelEditCheckBox.isSelected());
-        m_config.setEnableDotSizeChange(m_enableDotSizeChangeCheckBox.isSelected());
-        m_config.setEnableZooming(m_allowZoomingCheckBox.isSelected());
-        m_config.setEnablePanning(m_allowPanningCheckBox.isSelected());
+        ScatterPlotViewConfig config = new ScatterPlotViewConfig();
+        config.setEnableViewConfiguration(m_enableViewConfigCheckBox.isSelected());
+        config.setEnableTitleChange(m_enableTitleChangeCheckBox.isSelected());
+        config.setEnableSubtitleChange(m_enableSubtitleChangeCheckBox.isSelected());
+        config.setEnableXColumnChange(m_enableXColumnChangeCheckBox.isSelected());
+        config.setEnableYColumnChange(m_enableYColumnChangeCheckBox.isSelected());
+        config.setEnableXAxisLabelEdit(m_enableXAxisLabelEditCheckBox.isSelected());
+        config.setEnableYAxisLabelEdit(m_enableYAxisLabelEditCheckBox.isSelected());
+        config.setEnableDotSizeChange(m_enableDotSizeChangeCheckBox.isSelected());
+        config.setEnableZooming(m_allowZoomingCheckBox.isSelected());
+        config.setEnablePanning(m_allowPanningCheckBox.isSelected());
 
-        m_config.setChartTitle(m_chartTitleTextField.getText());
-        m_config.setChartSubtitle(m_chartSubtitleTextField.getText());
-        m_config.setxColumn(m_xColComboBox.getSelectedColumn());
-        m_config.setyColumn(m_yColComboBox.getSelectedColumn());
-        m_config.setxAxisLabel(m_xAxisLabelField.getText());
-        m_config.setyAxisLabel(m_yAxisLabelField.getText());
-        m_config.setDotSize((Integer)m_dotSize.getValue());
-        m_config.setMaxRows((Integer)m_maxRowsSpinner.getValue());
-        m_config.saveSettings(settings);
+        config.setChartTitle(m_chartTitleTextField.getText());
+        config.setChartSubtitle(m_chartSubtitleTextField.getText());
+        config.setxColumn(m_xColComboBox.getSelectedColumn());
+        config.setyColumn(m_yColComboBox.getSelectedColumn());
+        config.setxAxisLabel(m_xAxisLabelField.getText());
+        config.setyAxisLabel(m_yAxisLabelField.getText());
+        config.setDotSize((Integer)m_dotSize.getValue());
+        config.setMaxRows((Integer)m_maxRowsSpinner.getValue());
+        config.saveSettings(settings);
     }
 
 }

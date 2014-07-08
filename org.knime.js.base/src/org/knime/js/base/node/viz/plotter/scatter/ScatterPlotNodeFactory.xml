@@ -8,9 +8,18 @@
 	
 	<fullDescription>
 		<intro>		
-    	    <p>A scatter plot using a JavaScript based charting library. The node is currently under development and should
-        not be used in production workflows.
+    	    <p>A scatter plot using a JavaScript based charting library. The view can be accessed either via
+            the "interactive view" action on the executed node or in KNIME Server web portal page. 
 	       	</p>
+            <p>The configuration of the node lets you choose the size of a sample to display and to enable certain 
+            controls, which are then available in the view. This includes the ability to choose different columns
+            for x and y or the possibility to set a title. Enabling or disabling these controls via the configuration
+            dialog might not seem useful at first glance but has benefits when used in a web portal/wizard execution 
+            where the end user has no access to the workflow itself.
+            </p>
+            <p>
+            The node is currently under development and should  be used in production workflows.
+            </p>
 		</intro>
 		
 	</fullDescription>

@@ -67,7 +67,7 @@ public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> im
      */
     @Override
     public ScatterPlotNodeModel createNodeModel() {
-        return new ScatterPlotNodeModel(new ScatterPlotViewConfig());
+        return new ScatterPlotNodeModel();
     }
 
     /**
@@ -99,7 +99,7 @@ public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> im
      */
     @Override
     protected NodeDialogPane createNodeDialogPane() {
-        return new ScatterPlotNodeDialogPane(new ScatterPlotViewConfig());
+        return new ScatterPlotNodeDialogPane();
     }
 
 }

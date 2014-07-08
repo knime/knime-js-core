@@ -58,7 +58,7 @@ import org.knime.core.node.NodeSettingsWO;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class ScatterPlotViewConfig {
+final class ScatterPlotViewConfig {
 
     static final String ENABLE_CONFIG = "enableViewConfiguration";
     static final String ENABLE_TTILE_CHANGE = "enableTitleChange";
