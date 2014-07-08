@@ -13,7 +13,7 @@ knime_scatter_plot = function() {
 	var defaultFontSize = 12;
 	
 	view.init = function(representation, value) {
-		if (!representation.keyedDataset) {
+		if ((!representation.keyedDataset) || representation.keyedDataset.rows.length < 1) {
 			d3.select("body").text("Error: No data available");
 			return;
 		}
