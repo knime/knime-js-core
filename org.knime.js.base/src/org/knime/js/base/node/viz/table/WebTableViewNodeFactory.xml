@@ -3,12 +3,18 @@
     <name>JavaScript Table View</name>
     <shortDescription>Displays data in a table view.</shortDescription>
     <fullDescription>
-        <intro> Displays data in a table view. If the number of rows is 
-        unknown, the view counts the number of rows when opened. Furthermore, 
-        rows can be selected and hilited.</intro>
+        <intro>
+            <p>Displays data in an HTML table view.</p>
+            <p>Note, this node is currently under development. Future versions of the node will have more functionality.</p> 
+        </intro>
+        <option name="No. of rows to display">
+            Use this numerical value to restrict the number of rows used for this visualization.
+        </option>
+        <option name="Enable Number Formatter">If checked the options beneath will be applied to all columns of type <i>Number</i>.</option>
+        <option name="Decimal Places">If number formatter is enabled use this value to restrict the display of decimal places in the table view.</option>
     </fullDescription>
     <interactiveView name="JavaScript Table View">
-        Displays the data in a table view.
+        Displays the data in a table view. The HTML table is drawn in chunks to free up processing time and allow for quick initial display of the data. 
     </interactiveView>
     <ports>
         <inPort index="0" name="Input to display">
