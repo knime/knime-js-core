@@ -72,14 +72,13 @@ public class StringInputQuickFormNodeModel
      */
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
+        ValidationError error = validateViewValue(getRelevantValue());
+        if (error != null) {
+            throw new InvalidSettingsException(error.getError());
+        }
         String string = getRelevantValue().getString();
         if (string == null) {
             string = "";
-        }
-        String regex = getConfig().getRegex();
-        if (regex != null && !regex.isEmpty() && !string.matches(regex)) {
-            throw new InvalidSettingsException(getConfig()
-                    .getErrorMessage().replaceAll("[?]", string));
         }
         pushFlowVariableString(getConfig().getFlowVariableName(), string);
     }

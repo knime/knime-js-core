@@ -94,21 +94,9 @@ public class DateInputQuickFormNodeModel
     @Override
     protected void createAndPushFlowVariable() throws InvalidSettingsException {
         Date value = getRelevantValue().getDate();
-        Date min = getConfig().getMin();
-        Date max = getConfig().getMax();
-        if (!getConfig().getWithTime()) {
-            // Set time to midnight for value, min and max
-            value = new Date(value.getYear(), value.getMonth(), value.getDate());
-            min = new Date(min.getYear(), min.getMonth(), min.getDate());
-            max = new Date(max.getYear(), max.getMonth(), max.getDate());
-        }
-        if (getConfig().getUseMin() && value.before(min)) {
-            throw new InvalidSettingsException("The set date " + value
-                    + " is before the earliest allowed date " + min);
-        }
-        if (getConfig().getUseMax() && value.after(max)) {
-            throw new InvalidSettingsException("The set date " + value
-                    + " is after the latest allowed date " + max);
+        ValidationError error = validateViewValue(getRelevantValue());
+        if (error != null) {
+            throw new InvalidSettingsException(error.getError());
         }
         SimpleDateFormat sdf =
                 new SimpleDateFormat(getConfig().getWithTime() ? DATE_TIME_FORMAT : DATE_FORMAT);

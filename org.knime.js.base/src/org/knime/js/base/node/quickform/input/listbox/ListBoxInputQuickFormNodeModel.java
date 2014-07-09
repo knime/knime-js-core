@@ -135,15 +135,9 @@ public class ListBoxInputQuickFormNodeModel
                 }
             }
         }
-        String regex = getConfig().getRegex();
-        if (regex != null && !regex.isEmpty()) {
-            for (int i = 0; i < values.size(); i++) {
-                if (!values.get(i).matches(regex)) {
-                    throw new InvalidSettingsException("Value " + (i + 1)
-                            + " is not valid:\n"
-                            + getConfig().getErrorMessage().replaceAll("[?]", values.get(i)));
-                }
-            }
+        ValidationError error = validateViewValue(getRelevantValue());
+        if (error != null) {
+            throw new InvalidSettingsException(error.getError());
         }
         return values;
     }
