@@ -20,8 +20,8 @@ knime_scatter_plot = function() {
 		_representation = representation;
 		_value = value;
 		try {
-			console.time("Parse and build 2DDataset");
-			console.time("Total init time");
+			//console.time("Parse and build 2DDataset");
+			//console.time("Total init time");
 			_keyedDataset = new jsfc.KeyedValues2DDataset();
 			//_keyedDataset.load(_representation.keyedDataset);
 			//var seriesKey = _representation.keyedDataset.series[0].seriesKey;
@@ -49,7 +49,7 @@ knime_scatter_plot = function() {
 					_keyedDataset.setColumnProperty(columnKey, "symbols", symbols);
 				}
 			}
-			console.timeEnd("Parse and build 2DDataset");
+			//console.timeEnd("Parse and build 2DDataset");
 
 			d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
 			d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
@@ -59,10 +59,10 @@ knime_scatter_plot = function() {
 				.style("min-width", minWidth + "px").style("min-height", (minHeight + getControlHeight()) + "px");
 			
 			drawChart(layoutContainer);
-			if (_representation.enableViewConfiguration) {
+			if (_representation.enableViewConfiguration || _representation.showZoomResetButton) {
 				drawControls(layoutContainer);
 			}
-			console.timeEnd("Total init time");
+			//console.timeEnd("Total init time");
 		} catch(err) {
 			if (err.stack) {
 				alert(err.stack);
@@ -76,9 +76,9 @@ knime_scatter_plot = function() {
 	};
 	
 	buildXYDataset = function() {
-		console.time("Building XYDataset");
+		//console.time("Building XYDataset");
 		var xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
-		console.timeEnd("Building XYDataset");
+		//console.timeEnd("Building XYDataset");
 		return xyDataset;
 	};
 	
@@ -96,7 +96,7 @@ knime_scatter_plot = function() {
 		
 		var dataset = buildXYDataset();
 
-		console.time("Building chart");
+		//console.time("Building chart");
 		
 		//var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
 		var chartHeight = "calc(100% - " + getControlHeight() + "px)";
@@ -131,13 +131,24 @@ knime_scatter_plot = function() {
 		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
         var svg = document.getElementById("chart_svg");
         var zoomEnabled = _representation.enableZooming;
+        var dragZoomEnabled = _representation.enableDragZooming;
         var panEnabled = _representation.enablePanning;
-        chartManager = new jsfc.ChartManager(svg, chart, false, zoomEnabled, panEnabled);
+        chartManager = new jsfc.ChartManager(svg, chart, dragZoomEnabled, zoomEnabled, false);
+        
+        if (panEnabled) {
+        	var panModifier = new jsfc.Modifier(false, false, false, false);
+        	if (dragZoomEnabled) {
+        		panModifier = new jsfc.Modifier(true, false, false, false);
+        	}
+            var panHandler = new jsfc.PanHandler(chartManager, panModifier);
+            chartManager.addLiveHandler(panHandler);
+        }
+        
         setChartDimensions();
-        console.timeEnd("Building chart");
-        console.time("Refreshing Display");
+        //console.timeEnd("Building chart");
+        //console.time("Refreshing Display");
         chartManager.refreshDisplay();
-        console.timeEnd("Refreshing Display");
+        //console.timeEnd("Refreshing Display");
         var win = document.defaultView || document.parentWindow;
         win.onresize = resize;
 	};
@@ -203,6 +214,17 @@ knime_scatter_plot = function() {
 	    	.style("font-size", defaultFontSize+"px")
 	    	.style("border-spacing", 0)
 	    	.style("border-collapse", "collapse");
+	    
+	    if (_representation.showZoomResetButton) {
+	    	var resetButtonContainer = controlContainer.append("tr").append("td").attr("colspan", "4").style("text-align", "center");
+	    	resetButtonContainer.append("button").text("Reset Zoom").on("click", function() {
+	    		var plot = chartManager.getChart().getPlot();
+	    		plot.getXAxis().setAutoRange(true);
+	    		plot.getYAxis().setAutoRange(true);
+	    	});
+	    }
+	    
+	    if (!_representation.enableViewConfiguration) return;
 	    
 	    if (_representation.enableTitleChange || _representation.enableSubtitleChange) {
 	    	var titleEditContainer = controlContainer.append("tr");
@@ -352,6 +374,7 @@ knime_scatter_plot = function() {
 		var rows = 0;
 		var sizeFactor = 25;
 		var padding = 10;
+		if (_representation.showZoomResetButton) rows++;
 		if (_representation.enableViewConfiguration) {
 			if (_representation.enableTitleChange || _representation.enableSubtitleChange) rows++;
 			if (_representation.enableXColumnChange || _representation.enableYColumnChange) rows++;

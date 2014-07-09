@@ -78,9 +78,9 @@ import org.knime.core.node.util.ColumnSelectionPanel;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-final class ScatterPlotNodeDialogPane extends NodeDialogPane {
+public class ScatterPlotNodeDialogPane extends NodeDialogPane {
 
-    private final static int TEXT_FIELD_SIZE = 20;
+    private static final int TEXT_FIELD_SIZE = 20;
 
     private final JCheckBox m_enableViewConfigCheckBox;
     private final JCheckBox m_enableTitleChangeCheckBox;
@@ -90,7 +90,9 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JCheckBox m_enableXAxisLabelEditCheckBox;
     private final JCheckBox m_enableYAxisLabelEditCheckBox;
     private final JCheckBox m_allowZoomingCheckBox;
+    private final JCheckBox m_allowDragZoomingCheckBox;
     private final JCheckBox m_allowPanningCheckBox;
+    private final JCheckBox m_showZoomResetCheckBox;
     private final JCheckBox m_enableDotSizeChangeCheckBox;
 
     private final JSpinner m_maxRowsSpinner;
@@ -103,9 +105,10 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JSpinner m_dotSize;
 
     /**
+     * @param config The config to read/write from.
      *
      */
-    ScatterPlotNodeDialogPane() {
+    public ScatterPlotNodeDialogPane() {
         m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
         m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
         m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
@@ -114,8 +117,10 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_enableXAxisLabelEditCheckBox = new JCheckBox("Enable label edit for x-axis");
         m_enableYAxisLabelEditCheckBox = new JCheckBox("Enable label edit for y-axis");
         m_enableDotSizeChangeCheckBox = new JCheckBox("Enable dot size edit");
-        m_allowZoomingCheckBox = new JCheckBox("Enable zooming");
+        m_allowZoomingCheckBox = new JCheckBox("Enable mouse wheel zooming");
+        m_allowDragZoomingCheckBox = new JCheckBox("Enable drag zooming");
         m_allowPanningCheckBox = new JCheckBox("Enable panning");
+        m_showZoomResetCheckBox = new JCheckBox("Show zoom reset button");
 
         m_maxRowsSpinner = new JSpinner();
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
@@ -212,9 +217,13 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
         panel.add(m_enableDotSizeChangeCheckBox, c);*/
         c.gridx = 0;
         c.gridy++;
-        panel.add(m_allowZoomingCheckBox, c);
-        c.gridx += 2;
         panel.add(m_allowPanningCheckBox, c);
+        c.gridx++;
+        panel.add(m_allowZoomingCheckBox, c);
+        c.gridx++;
+        panel.add(m_allowDragZoomingCheckBox, c);
+        c.gridx++;
+        panel.add(m_showZoomResetCheckBox, c);
 
         return panel;
     }
@@ -247,7 +256,9 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_enableYAxisLabelEditCheckBox.setSelected(config.getEnableYAxisLabelEdit());
         m_enableDotSizeChangeCheckBox.setSelected(config.getEnableDotSizeChange());
         m_allowZoomingCheckBox.setSelected(config.getEnableZooming());
+        m_allowDragZoomingCheckBox.setSelected(config.getEnableDragZooming());
         m_allowPanningCheckBox.setSelected(config.getEnablePanning());
+        m_showZoomResetCheckBox.setSelected(config.getShowZoomResetButton());
 
         m_chartTitleTextField.setText(config.getChartTitle());
         m_chartSubtitleTextField.setText(config.getChartSubtitle());
@@ -285,7 +296,9 @@ final class ScatterPlotNodeDialogPane extends NodeDialogPane {
         config.setEnableYAxisLabelEdit(m_enableYAxisLabelEditCheckBox.isSelected());
         config.setEnableDotSizeChange(m_enableDotSizeChangeCheckBox.isSelected());
         config.setEnableZooming(m_allowZoomingCheckBox.isSelected());
+        config.setEnableDragZooming(m_allowDragZoomingCheckBox.isSelected());
         config.setEnablePanning(m_allowPanningCheckBox.isSelected());
+        config.setShowZoomResetButton(m_showZoomResetCheckBox.isSelected());
 
         config.setChartTitle(m_chartTitleTextField.getText());
         config.setChartSubtitle(m_chartSubtitleTextField.getText());

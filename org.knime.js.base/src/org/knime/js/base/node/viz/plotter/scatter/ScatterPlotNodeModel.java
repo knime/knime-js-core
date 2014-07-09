@@ -287,7 +287,9 @@ final class ScatterPlotNodeModel extends NodeModel implements
         m_representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
         m_representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
         m_representation.setEnableZooming(m_config.getEnableZooming());
+        m_representation.setEnableDragZooming(m_config.getEnableDragZooming());
         m_representation.setEnablePanning(m_config.getEnablePanning());
+        m_representation.setShowZoomResetButton(m_config.getShowZoomResetButton());
 
         m_viewValue.setChartTitle(m_config.getChartTitle());
         m_viewValue.setChartSubtitle(m_config.getChartSubtitle());

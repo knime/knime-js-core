@@ -77,7 +77,9 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     private boolean m_enableYAxisLabelEdit;
     private boolean m_enableDotSizeChange;
     private boolean m_enableZooming;
+    private boolean m_enableDragZooming;
     private boolean m_enablePanning;
+    private boolean m_showZoomResetButton;
 
 
     /**
@@ -221,6 +223,20 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     }
 
     /**
+     * @return the enableDragZooming
+     */
+    public boolean getEnableDragZooming() {
+        return m_enableDragZooming;
+    }
+
+    /**
+     * @param enableDragZooming the enableDragZooming to set
+     */
+    public void setEnableDragZooming(final boolean enableDragZooming) {
+        m_enableDragZooming = enableDragZooming;
+    }
+
+    /**
      * @return the allowPanning
      */
     public boolean getEnablePanning() {
@@ -232,6 +248,20 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     public void setEnablePanning(final boolean enablePanning) {
         m_enablePanning = enablePanning;
+    }
+
+    /**
+     * @return the showZoomResetButton
+     */
+    public boolean getShowZoomResetButton() {
+        return m_showZoomResetButton;
+    }
+
+    /**
+     * @param showZoomResetButton the showZoomResetButton to set
+     */
+    public void setShowZoomResetButton(final boolean showZoomResetButton) {
+        m_showZoomResetButton = showZoomResetButton;
     }
 
     /**
@@ -248,7 +278,9 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT, getEnableYAxisLabelEdit());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE, getEnableDotSizeChange());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING, getEnableZooming());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_DRAG_ZOOMING, getEnableDragZooming());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_PANNING, getEnablePanning());
+        settings.addBoolean(ScatterPlotViewConfig.SHOW_ZOOM_RESET_BUTTON, getShowZoomResetButton());
         settings.addBoolean("hasDataset", m_keyedDataset != null);
         if (m_keyedDataset != null) {
             NodeSettingsWO datasetSettings = settings.addNodeSettings("dataset");
@@ -270,7 +302,9 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         setEnableYAxisLabelEdit(settings.getBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT));
         setEnableDotSizeChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE));
         setEnableZooming(settings.getBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING));
+        setEnableDragZooming(settings.getBoolean(ScatterPlotViewConfig.ENABLE_DRAG_ZOOMING));
         setEnablePanning(settings.getBoolean(ScatterPlotViewConfig.ENABLE_PANNING));
+        setShowZoomResetButton(settings.getBoolean(ScatterPlotViewConfig.SHOW_ZOOM_RESET_BUTTON));
         m_keyedDataset = null;
         boolean hasDataset = settings.getBoolean("hasDataset");
         if (hasDataset) {

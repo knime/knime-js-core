@@ -69,7 +69,9 @@ final class ScatterPlotViewConfig {
     static final String ENABLE_Y_LABEL_EDIT = "enableYAxisLabelEdit";
     static final String ENABLE_DOT_SIZE_CHANGE = "enableDotSizeChange";
     static final String ENABLE_ZOOMING = "enableZooming";
+    static final String ENABLE_DRAG_ZOOMING = "enableDragZooming";
     static final String ENABLE_PANNING = "enablePanning";
+    static final String SHOW_ZOOM_RESET_BUTTON = "showZoomResetButton";
     static final String CHART_TITLE = "chartTitle";
     static final String CHART_SUBTITLE = "chartSubtitle";
     static final String X_COL = "xCol";
@@ -94,6 +96,8 @@ final class ScatterPlotViewConfig {
     private boolean m_enableDotSizeChange = false;
     private boolean m_enableZooming = true;
     private boolean m_enablePanning = true;
+    private boolean m_enableDragZooming = false;
+    private boolean m_showZoomResetButton = false;
     private int m_maxRows = 2500;
     private String m_chartTitle;
     private String m_chartSubtitle;
@@ -402,6 +406,34 @@ final class ScatterPlotViewConfig {
     }
 
     /**
+     * @return the enableDragZooming
+     */
+    public boolean getEnableDragZooming() {
+        return m_enableDragZooming;
+    }
+
+    /**
+     * @param enableDragZooming the enableDragZooming to set
+     */
+    public void setEnableDragZooming(final boolean enableDragZooming) {
+        m_enableDragZooming = enableDragZooming;
+    }
+
+    /**
+     * @return the showZoomResetButton
+     */
+    public boolean getShowZoomResetButton() {
+        return m_showZoomResetButton;
+    }
+
+    /**
+     * @param showZoomResetButton the showZoomResetButton to set
+     */
+    public void setShowZoomResetButton(final boolean showZoomResetButton) {
+        m_showZoomResetButton = showZoomResetButton;
+    }
+
+    /**
      * @return the dotSize
      */
     public Integer getDotSize() {
@@ -428,7 +460,9 @@ final class ScatterPlotViewConfig {
         settings.addBoolean(ENABLE_Y_LABEL_EDIT, getEnableYAxisLabelEdit());
         settings.addBoolean(ENABLE_DOT_SIZE_CHANGE, getEnableDotSizeChange());
         settings.addBoolean(ENABLE_ZOOMING, getEnableZooming());
+        settings.addBoolean(ENABLE_DRAG_ZOOMING, getEnableDragZooming());
         settings.addBoolean(ENABLE_PANNING, getEnablePanning());
+        settings.addBoolean(SHOW_ZOOM_RESET_BUTTON, getShowZoomResetButton());
         settings.addString(CHART_TITLE, getChartTitle());
         settings.addString(CHART_SUBTITLE, getChartSubtitle());
         settings.addString(X_COL, getxColumn());
@@ -457,7 +491,9 @@ final class ScatterPlotViewConfig {
         setEnableYAxisLabelEdit(settings.getBoolean(ENABLE_Y_LABEL_EDIT));
         setEnableDotSizeChange(settings.getBoolean(ENABLE_DOT_SIZE_CHANGE));
         setEnableZooming(settings.getBoolean(ENABLE_ZOOMING));
+        setEnableDragZooming(settings.getBoolean(ENABLE_DRAG_ZOOMING));
         setEnablePanning(settings.getBoolean(ENABLE_PANNING));
+        setShowZoomResetButton(settings.getBoolean(SHOW_ZOOM_RESET_BUTTON));
         setChartTitle(settings.getString(CHART_TITLE));
         setChartSubtitle(settings.getString(CHART_SUBTITLE));
         setxColumn(settings.getString(X_COL));
@@ -490,7 +526,9 @@ final class ScatterPlotViewConfig {
         setEnableYAxisLabelEdit(settings.getBoolean(ENABLE_Y_LABEL_EDIT, false));
         setEnableDotSizeChange(settings.getBoolean(ENABLE_DOT_SIZE_CHANGE, false));
         setEnableZooming(settings.getBoolean(ENABLE_ZOOMING, true));
+        setEnableDragZooming(settings.getBoolean(ENABLE_DRAG_ZOOMING, false));
         setEnablePanning(settings.getBoolean(ENABLE_PANNING, true));
+        setShowZoomResetButton(settings.getBoolean(SHOW_ZOOM_RESET_BUTTON, false));
         setChartTitle(settings.getString(CHART_TITLE, null));
         setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
