@@ -138,7 +138,7 @@ knime_scatter_plot = function() {
         if (panEnabled) {
         	var panModifier = new jsfc.Modifier(false, false, false, false);
         	if (dragZoomEnabled) {
-        		panModifier = new jsfc.Modifier(true, false, false, false);
+        		panModifier = new jsfc.Modifier(false, true, false, false);
         	}
             var panHandler = new jsfc.PanHandler(chartManager, panModifier);
             chartManager.addLiveHandler(panHandler);
