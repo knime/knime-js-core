@@ -138,7 +138,7 @@ final class ScatterPlotNodeModel extends NodeModel implements
             throws Exception {
         synchronized (m_lock) {
             m_table = inData[0];
-            final String xColumn = m_viewValue.getxColumn();
+            String xColumn = m_viewValue.getxColumn();
             if (m_representation.getKeyedDataset() == null || xColumn == null) {
                 ColumnRearranger c = createNumericColumnRearranger(inData[0].getDataTableSpec());
                 BufferedDataTable filteredTable =
@@ -185,6 +185,7 @@ final class ScatterPlotNodeModel extends NodeModel implements
                 }
                 m_representation.setKeyedDataset(dataset);
                 copyConfigToView();
+                xColumn = m_viewValue.getxColumn();
                 if (StringUtils.isEmpty(xColumn) || !Arrays.asList(tableSpec.getColNames()).contains(xColumn)) {
                     m_viewValue.setxColumn(tableSpec.getColNames()[0]);
                 }
