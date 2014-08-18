@@ -128,7 +128,7 @@ knime_scatter_plot = function() {
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
         chart.setLegendBuilder(null);
-		d3.select("#"+containerID).append("svg").attr("id", "chart_svg");
+		d3.select("#"+containerID).append("svg").attr("id", "chart_svg").style("width", "100%").style("height", "100%");
         var svg = document.getElementById("chart_svg");
         var zoomEnabled = _representation.enableZooming;
         var dragZoomEnabled = _representation.enableDragZooming;
