@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<knimeNode icon="../../js.png" type="Visualizer" deprecated="true" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+<knimeNode icon="../../js.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
 	<name>JavaScript Scatter Plot</name>
 	
 	<shortDescription>
 	    A scatter plot using a JavaScript based charting library.
 	</shortDescription>
-	
+		
 	<fullDescription>
 		<intro>		
     	    <p>A scatter plot using a JavaScript based charting library. The view can be accessed either via
@@ -49,5 +49,6 @@
 	</interactiveView>
 	<ports>
 		<inPort index="0" name="Display data">Data table with data to display.</inPort>
+		<outPort index="0" name="Input data and view selection">Data table containing the input data appended with a column, that represents the selection made in the scatter plot view.</outPort>
 	</ports>	
 </knimeNode>

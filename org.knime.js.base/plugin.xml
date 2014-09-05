@@ -87,8 +87,8 @@
             after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
-            factory-class="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
-            id="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory">
+            factory-class="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory">
       </node>
       <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
@@ -102,7 +102,7 @@
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
-            after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
+            after="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
@@ -611,6 +611,23 @@
                webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Scatter Plot Selection Appender"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/scatterSelectionAppender/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/scatterSelectionAppender/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/plotter/scatterSelectionAppender/knime-scatter-plot.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jsFreeChart_0.5">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -783,6 +800,15 @@
             javascriptComponentID="org_knime_js_base_node_viz_plotter_scatter"
             name="Scatter Chart"
             namespace="knime_scatter_plot"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender"
+            name="Scatter Chart Selection Appender"
+            namespace="knime_scatter_plot_selection_appender"
             validate-method-name="validate">
       </javascriptComponent>
    </extension>
