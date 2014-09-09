@@ -44,7 +44,7 @@
  *
  * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.line;
+package org.knime.js.base.node.viz.plotter.line_dep;
 
 import java.io.File;
 import java.io.IOException;

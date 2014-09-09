@@ -42,61 +42,65 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 09.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.scatter_own;
+package org.knime.js.base.node.viz.plotter.line_dep;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
-import org.knime.core.node.wizard.WizardNodeFactoryExtension;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JSONViewContent;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class WebScatterPlotterNodeFactory extends NodeFactory<WebScatterPlotterNodeModel> implements
-    WizardNodeFactoryExtension<WebScatterPlotterNodeModel, WebScatterPlotterViewRepresentation, WebScatterPlotterViewValue> {
+public class WebLinePlotterViewContent extends JSONViewContent {
+
+    private JSONDataTable m_table;
+
+    /** Default constructor for bean initialization. */
+    public WebLinePlotterViewContent() {
+        // do nothing
+    }
 
     /**
-     * {@inheritDoc}
+     * @param table The table used to construct the view.
      */
-    @Override
-    public WebScatterPlotterNodeModel createNodeModel() {
-        return new WebScatterPlotterNodeModel();
+    public WebLinePlotterViewContent(final JSONDataTable table) {
+        setTable(table);
+    }
+
+    /**
+     * @return The JSON data table.
+     */
+    public JSONDataTable getTable() {
+        return m_table;
+    }
+
+    /**
+     * @param table The table to set.
+     */
+    public void setTable(final JSONDataTable table) {
+        m_table = table;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected int getNrNodeViews() {
-        return 0;
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        // TODO Auto-generated method stub
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<WebScatterPlotterNodeModel> createNodeView(final int viewIndex,
-        final WebScatterPlotterNodeModel nodeModel) {
-        return null;
-    }
+    public void loadFromNodeSettings(final NodeSettingsRO settings) {
+        // TODO Auto-generated method stub
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new WebScatterPlotterNodeDialog();
     }
 
 }

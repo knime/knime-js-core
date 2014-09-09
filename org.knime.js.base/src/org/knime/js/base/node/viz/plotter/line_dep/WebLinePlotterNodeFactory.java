@@ -41,17 +41,77 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * Created on 09.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.line;
+package org.knime.js.base.node.viz.plotter.line_dep;
 
-import org.knime.base.node.viz.plotter.node.DefaultVisualizationNodeDialog;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
+import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.WizardNodeFactoryExtension;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class WebLinePlotterNodeDialog extends DefaultVisualizationNodeDialog {
-//
+public class WebLinePlotterNodeFactory extends NodeFactory<WebLinePlotterNodeModel> implements
+    WizardNodeFactoryExtension<WebLinePlotterNodeModel, WebLinePlotterViewContent, WebViewContent> {
+
+    /**
+     * {@inheritDoc}
+     */
+    /*@Override
+    public WebTemplate getWebTemplate() {
+        String pkg = "org.knime.base";
+        String jsLocation = "js-lib/node/web/viz/plotter/line/";
+        WebResourceLocator jsFile = new WebResourceLocator(pkg, jsLocation + "web-template.js",
+            WebResourceType.JAVASCRIPT);
+        WebResourceLocator cssFile = new WebResourceLocator(pkg, jsLocation + "styles.css", WebResourceType.CSS);
+        WebDependency[] dependencies = new WebDependency[] {WebDependency.D3_3_2_8, WebDependency.KNIME_JS_TABLE_1_0_0};
+        return new DefaultWebTemplate(new WebResourceLocator[]{jsFile, cssFile}, dependencies, "knime_line_plotter");
+    }*/
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebLinePlotterNodeModel createNodeModel() {
+        return new WebLinePlotterNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<WebLinePlotterNodeModel> createNodeView(final int viewIndex,
+        final WebLinePlotterNodeModel nodeModel) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new WebLinePlotterNodeDialog();
+    }
+
 }

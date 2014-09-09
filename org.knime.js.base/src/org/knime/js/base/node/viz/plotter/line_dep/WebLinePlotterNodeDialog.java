@@ -41,71 +41,17 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- *
- * Created on 08.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * 
+ * Created on 09.08.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.base.node.viz.plotter.scatter_own;
+package org.knime.js.base.node.viz.plotter.line_dep;
 
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.core.JSONDataTable;
-import org.knime.js.core.JSONViewContent;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.knime.base.node.viz.plotter.node.DefaultVisualizationNodeDialog;
 
 /**
- *
+ * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class WebScatterPlotterViewRepresentation extends JSONViewContent {
-
-    private JSONDataTable m_table;
-
-    /** Default constructor for bean initialization. */
-    public WebScatterPlotterViewRepresentation() {
-        // do nothing
-    }
-
-    /**
-     * @param table The table used to construct the view.
-     */
-    public WebScatterPlotterViewRepresentation(final JSONDataTable table) {
-        setTable(table);
-    }
-
-    /**
-     * @return The JSON data table.
-     */
-    public JSONDataTable getTable() {
-        return m_table;
-    }
-
-    /**
-     * @param table The table to set.
-     */
-    public void setTable(final JSONDataTable table) {
-        m_table = table;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) {
-        // TODO Auto-generated method stub
-
-    }
-
+public class WebLinePlotterNodeDialog extends DefaultVisualizationNodeDialog {
+//
 }
