@@ -49,6 +49,15 @@ knime_scatter_plot_selection_appender = function() {
 					_keyedDataset.setColumnProperty(columnKey, "symbols", symbols);
 				}
 			}
+			
+			if (_value.selection) {
+				for (var selection = 0; selection < _value.selection.length; selection++) {
+					for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
+						// Select all cols of selected row
+						_keyedDataset.select("selection", _value.selection[selection],  _representation.keyedDataset.columnKeys[col]);
+					}
+				}
+			}
 			//console.timeEnd("Parse and build 2DDataset");
 
 			d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
@@ -128,8 +137,9 @@ knime_scatter_plot_selection_appender = function() {
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
         chart.setLegendBuilder(null);
-		d3.select("#"+containerID).append("svg").attr("id", "chart_svg").style("width", "100%").style("height", "100%");
-        var svg = document.getElementById("chart_svg");
+		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		document.getElementById(containerID).appendChild(svg);
+		d3.select(svg).attr("id", "chart_svg").style("width", "100%").style("height", "100%");
         var zoomEnabled = _representation.enableZooming;
         var dragZoomEnabled = _representation.enableDragZooming;
         var panEnabled = _representation.enablePanning;
@@ -141,13 +151,13 @@ knime_scatter_plot_selection_appender = function() {
         		panModifier = new jsfc.Modifier(false, true, false, false);
         	}
             var panHandler = new jsfc.PanHandler(chartManager, panModifier);
-            //chartManager.addLiveHandler(panHandler);
+            chartManager.addLiveHandler(panHandler);
         }
         
         var selectionHandler = new jsfc.ClickSelectionHandler(chartManager);
-        //chartManager.addLiveHandler(selectionHandler);
+        chartManager.addLiveHandler(selectionHandler);
         
-        var polygonSelectionModifier = new jsfc.Modifier(false, true, false, false);
+        var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
         var polygonSelectionHandler = new jsfc.PolygonSelectionHandler(chartManager, polygonSelectionModifier);
         chartManager.addLiveHandler(polygonSelectionHandler);
         
@@ -156,6 +166,7 @@ knime_scatter_plot_selection_appender = function() {
         //console.time("Refreshing Display");
         chartManager.refreshDisplay();
         //console.timeEnd("Refreshing Display");
+        //console.debug(svg.outerHTML);
         var win = document.defaultView || document.parentWindow;
         win.onresize = resize;
 	};
@@ -413,8 +424,17 @@ knime_scatter_plot_selection_appender = function() {
 		return true;
 	};
 	
+	view.getSVG = function() {
+		var svg = chartManager.getElement();
+		d3.select(svg).selectAll("circle").each(function() {
+			this.removeAttributeNS("http://www.jfree.org", "ref");
+		});
+		return (new XMLSerializer()).serializeToString(svg);
+	};
+	
 	view.getComponentValue = function() {
 		_value.selection = getSelection();
+		_value.image = view.getSVG();
 		return _value;
 	};
 	

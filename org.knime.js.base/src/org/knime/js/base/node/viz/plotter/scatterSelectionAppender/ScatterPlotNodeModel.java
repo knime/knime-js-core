@@ -50,10 +50,12 @@
  */
 package org.knime.js.base.node.viz.plotter.scatterSelectionAppender;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -63,6 +65,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.knime.base.data.xml.SvgCell;
+import org.knime.base.data.xml.SvgImageContent;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -87,6 +91,11 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.image.ImagePortObject;
+import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
@@ -114,7 +123,7 @@ final class ScatterPlotNodeModel extends NodeModel implements
      * Creates a new model instance.
      */
     ScatterPlotNodeModel() {
-        super(1, 1);
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
         m_config = new ScatterPlotViewConfig();
         m_representation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
@@ -124,36 +133,40 @@ final class ScatterPlotNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected DataTableSpec[] configure(final DataTableSpec[] inSpecs) throws InvalidSettingsException {
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         List<String> allAllowedCols = new LinkedList<String>();
 
-        for (DataColumnSpec colspec : inSpecs[0]) {
+        DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
+
+        for (DataColumnSpec colspec : tableSpec) {
             if (colspec.getType().isCompatible(DoubleValue.class)
                     || colspec.getType().isCompatible(StringValue.class)) {
                 allAllowedCols.add(colspec.getName());
             }
         }
 
-        if (inSpecs[0].getNumColumns() < 1
+        if (tableSpec.getNumColumns() < 1
                 || allAllowedCols.size() < 1) {
             throw new InvalidSettingsException("Data table must have"
                     + " at least one numerical or categorical column.");
         }
 
-        ColumnRearranger rearranger = createColumnAppender(inSpecs[0], null);
+        ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
         DataTableSpec out = rearranger.createSpec();
-        return new DataTableSpec[]{out};
+
+        ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        return new PortObjectSpec[]{imageSpec, out};
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
             throws Exception {
         List<RowKey> selectionList = null;
         synchronized (m_lock) {
-            m_table = inData[0];
+            m_table = (BufferedDataTable)inData[0];
             String xColumn = m_viewValue.getxColumn();
             if (m_representation.getKeyedDataset() == null || xColumn == null) {
                 // create dataset for view
@@ -178,10 +191,22 @@ final class ScatterPlotNodeModel extends NodeModel implements
             }
         }
         ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-        BufferedDataTable out = exec.createColumnRearrangeTable(inData[0], rearranger, exec);
+        BufferedDataTable out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
         exec.setProgress(1);
-        return new BufferedDataTable[]{out};
+
+        String svgPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
+        String svg = m_viewValue.getImage();
+        if (svg == null || svg.isEmpty()) {
+            svg = "<svg width=\"1px\" height=\"1px\"></svg>";
+        }
+        svg = svgPrimer + svg;
+        InputStream is = new ByteArrayInputStream(svg.getBytes());
+        ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        PortObject imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
+        return new PortObject[]{imagePort, out};
     }
+
+
 
     private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
         String newColName = "Selected (Scatter Plot)";
