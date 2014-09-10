@@ -1251,7 +1251,7 @@ jsfc.Context2D.prototype.fillRect = function(x, y, width, height) {
 };
 
 /**
- * Draws a circle.
+ * Draws a circle with radius r at a location (cx, cy).
  * 
  * @param {!number} cx  the x-coordinate for the center point.
  * @param {!number} cy  the y-coordinate for the center point.
@@ -1428,6 +1428,14 @@ jsfc.Context2D.prototype.save = function() {
 };
 
 jsfc.Context2D.prototype.restore = function() {
+};
+
+/**
+ * Clears the content of the target element.
+ * 
+ * @returns {undefined}
+ */
+jsfc.Context2D.prototype.clear = function() {
 };
 
 "use strict";
@@ -2214,8 +2222,6 @@ jsfc.SVGContext2D = function(svg) {
         this._hiddenGroup = document.createElementNS("http://www.w3.org/2000/svg", 
                 "g");
         this._hiddenGroup.setAttribute("id", "hiddenGroup");
-        this._hiddenGroup.setAttribute("width", 60);
-        this._hiddenGroup.setAttribute("height", 60);
         this._hiddenGroup.setAttribute("visibility", "hidden");
         this.svg.appendChild(this._hiddenGroup);
     }
@@ -2225,7 +2231,12 @@ jsfc.SVGContext2D = function(svg) {
 jsfc.SVGContext2D.prototype = new jsfc.BaseContext2D();
 
 /**
- * Sets a rendering hint.
+ * Sets a rendering hint.  The hints recognised by this context include:
+ * 
+ * - "size" : expects a value of jsfc.Dimension.  When this hint is received it
+ *   is used to immediately update the width and height of the SVG element.
+ * - "layer" : expects a string that identifies a layer and switches to 
+ *   (or creates) that layer.
  * 
  * @param {!string} key  the hint key.
  * @param {*} value  the hint value.
@@ -2239,6 +2250,11 @@ jsfc.SVGContext2D.prototype.setHint = function(key, value) {
             this._addLayer(layer);
         } 
         this._currentLayer = layer;
+        return;
+    }
+    if (key === "size") {
+        this.svg.setAttribute("width", value.width() + "px");
+        this.svg.setAttribute("height", value.height() + "px");
         return;
     }
     this._hints[key] = value;  
@@ -2357,7 +2373,8 @@ jsfc.SVGContext2D.prototype.beginGroup = function(classStr) {
     var glass = this.getHint("glass");
     if (glass) {
         var rect = this._createRectElement(clip);
-        rect.setAttribute("fill", "rgba(0, 0, 0, 0)");
+        rect.setAttribute("fill", "rgb(0, 0, 0)");
+        rect.setAttribute("fill-opacity", "0");
         g.appendChild(rect);
     }
     this.append(g);
@@ -2378,7 +2395,7 @@ jsfc.SVGContext2D.prototype.endGroup = function() {
 };
 
 /**
- * Clears all the content of the SVG element.
+ * Clears all the content of the current layer in the SVG element.
  * 
  * @returns {undefined}
  */
@@ -2398,7 +2415,7 @@ jsfc.SVGContext2D.prototype.clear = function() {
  */
 jsfc.SVGContext2D.prototype.drawLine = function(x0, y0, x1, y1) {
     var t = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-    t.setAttribute("stroke", this._lineColor.rgbaStr());
+    this._applyStrokeColor(t, this._lineColor);
     //t.setAttribute("stroke-width", this._stroke.lineWidth);
     t.setAttribute("x1", this._geomDP(x0));
     t.setAttribute("y1", this._geomDP(y0));
@@ -2425,7 +2442,7 @@ jsfc.SVGContext2D.prototype.fillRect = function(x, y, width, height) {
     rect.setAttribute("y", y);
     rect.setAttribute("width", width);
     rect.setAttribute("height", height);
-    rect.setAttribute("fill", this._fillColor.rgbaStr());
+    this._applyFillColor(rect, this._fillColor);
     this.append(rect);
 };
 
@@ -2440,8 +2457,8 @@ jsfc.SVGContext2D.prototype.fillRect = function(x, y, width, height) {
  */
 jsfc.SVGContext2D.prototype.drawRect = function(x, y, w, h) {
     var t = document.createElementNS("http://www.w3.org/2000/svg", 'rect');
-    t.setAttribute("stroke", this._lineColor.rgbaStr());
-    t.setAttribute("fill", this._fillColor.rgbaStr());
+    this._applyStrokeColor(t, this._lineColor);
+    this._applyFillColor(t, this._fillColor);
     t.setAttribute("x", this._geomDP(x));
     t.setAttribute("y", this._geomDP(y));
     t.setAttribute("width", this._geomDP(w));
@@ -2451,8 +2468,24 @@ jsfc.SVGContext2D.prototype.drawRect = function(x, y, w, h) {
     this.append(t);    
 };
 
+jsfc.SVGContext2D.prototype._applyStrokeColor = function(element, color) {
+    element.setAttribute("stroke", color.rgbStr());
+    if (color.getAlpha() < 255) {
+        element.setAttribute("stroke-opacity", 
+                this._geomDP(color.getAlpha() / 255));
+    }
+};
+
+jsfc.SVGContext2D.prototype._applyFillColor = function(element, color) {
+    element.setAttribute("fill", color.rgbStr());
+    if (color.getAlpha() < 255) {
+        element.setAttribute("fill-opacity", 
+                this._geomDP(color.getAlpha() / 255));
+    }
+};
+
 /**
- * Draws a circle.
+ * Draws a circle with radius r at a location (cx, cy).
  * 
  * @param {!number} cx  the x-coordinate for the center point.
  * @param {!number} cy  the y-coordinate for the center point.
@@ -2461,15 +2494,15 @@ jsfc.SVGContext2D.prototype.drawRect = function(x, y, w, h) {
  */
 jsfc.SVGContext2D.prototype.drawCircle = function(cx, cy, r) {
     var t = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
-    t.setAttribute("stroke", this._lineColor.rgbaStr());
+    this._applyStrokeColor(t, this._lineColor);
     t.setAttribute("stroke-width", this._stroke.lineWidth);
-    t.setAttribute("fill", this._fillColor.rgbaStr());
+    this._applyFillColor(t, this._fillColor);
     t.setAttribute("cx", cx);
     t.setAttribute("cy", cy);
     t.setAttribute("r", r);
     var ref = this.getHint("ref");
     if (ref) {
-        t.setAttribute("jfree:ref", JSON.stringify(ref));
+        t.setAttributeNS("http://www.jfree.org", "ref", JSON.stringify(ref));
         this.setHint("ref", null);
     }
     this.append(t);        
@@ -2519,7 +2552,7 @@ jsfc.SVGContext2D.prototype.drawAlignedString = function(text, x, y, anchor) {
     var t = document.createElementNS("http://www.w3.org/2000/svg", 'text');
     t.setAttribute("x", this._geomDP(x));
     t.setAttribute("style", this._font.styleStr());
-    t.setAttribute("fill", this._fillColor.rgbaStr());
+    this._applyFillColor(t, this._fillColor);
     t.setAttribute("transform", this._svgTransformStr());
     t.textContent = text;
 
@@ -2659,7 +2692,7 @@ jsfc.SVGContext2D.prototype.stroke = function() {
     var path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
     path.setAttribute("style", this._stroke.getStyleStr());
     path.setAttribute("fill", "none");
-    path.setAttribute("stroke", this._lineColor.rgbaStr());
+    this._applyStrokeColor(path, this._lineColor)
     path.setAttribute("d", this._pathStr);
     this.append(path);
 };
@@ -8482,7 +8515,8 @@ jsfc.XYDatasetUtils.itemCount = function(dataset) {
 
 /**
  * Returns [ymin, ymax] where ymin is the smallest value appearing in the 
- * dataset and ymax is the largest value.
+ * dataset and ymax is the largest value.  If the dataset doesn't contain any
+ * data, this method will return [POSITIVE_INFINITY, NEGATIVE_INFINITY].
  * 
  * @param {jsfc.XYDataset} dataset  the source dataset.
  * @param {number} [baseline]  the baseline value.
@@ -9765,6 +9799,7 @@ jsfc.ChartManager.prototype.removeAuxiliaryHandler = function(handler) {
 jsfc.ChartManager.prototype.refreshDisplay = function() {
     var size = this._chart.getSize();
     var bounds = new jsfc.Rectangle(0, 0, size.width(), size.height());
+    this._ctx.setHint("size", size);
     this._ctx.clear();
     this._chart.draw(this._ctx, bounds);
 };
@@ -12301,8 +12336,11 @@ jsfc.LinearAxis.prototype.configureAsYAxis = function(plot) {
     var dataset = plot.getDataset();
     if (this._autoRange && dataset) {
         var range = plot.getRenderer().calcYRange(dataset);
-        if (range.length() >= 0) {
+        if (range) {
             this._applyAutoRange(range.lowerBound(), range.upperBound());
+        } else {
+            this._applyAutoRange(this._defaultRange.lowerBound(), 
+                    this._defaultRange.upperBound());
         }
     }
     // auto-detect symbols in dataset
@@ -13239,9 +13277,20 @@ jsfc.BaseXYRenderer.prototype.passCount = function() {
     return 1;
 };
 
+/**
+ * Returns the range required on the y-axis in order for this renderer to 
+ * fully display all the data items in the dataset.
+ * 
+ * @param {jsfc.StandardXYDataset} dataset  the dataset.
+ * @returns {jsfc.Range} The range (can be undefined if the dataset has no data
+ *         values).
+ */
 jsfc.BaseXYRenderer.prototype.calcYRange = function(dataset) {
     var bounds = jsfc.XYDatasetUtils.ybounds(dataset);
-    return new jsfc.Range(bounds[0], bounds[1]);
+    if (bounds[1] >= bounds[0]) {
+        return new jsfc.Range(bounds[0], bounds[1]);
+    }
+    return;
 };
 
 /**
