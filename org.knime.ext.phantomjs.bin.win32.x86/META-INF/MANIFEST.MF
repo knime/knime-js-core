@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PhantomJS binaries for Windows32
+Bundle-SymbolicName: org.knime.ext.phantomjs.bin.win32.x86;singleton:=true
+Bundle-Version: 1.9.7.qualifier
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
+Fragment-Host: org.knime.ext.phantomjs;bundle-version="1.1.0"
+Eclipse-PlatformFilter: (osgi.os=win32)
