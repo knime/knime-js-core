@@ -7,7 +7,7 @@ Bundle-ClassPath: js-base.jar
 Bundle-Vendor: KNIME.com, Zurich, Switzerland
 Require-Bundle: org.knime.base;bundle-version="[2.9.0,3.0.0)",
  org.knime.js.core;bundle-version="[2.9.0,3.0.0)",
- org.fife.rsyntaxtextarea;bundle-version="[2.0.4,2.1.0)",
+ org.fife.rsyntaxtextarea;bundle-version="[2.5.0,2.6.0)",
  com.fasterxml.jackson;bundle-version="[2.2.2,3.0.0)",
  org.apache.commons.lang;bundle-version="[2.6.0,3.0.0)",
  com.google.guava;bundle-version="[12.0.0,14.0.0)",
