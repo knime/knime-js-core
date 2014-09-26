@@ -147,15 +147,10 @@ org_knime_js_base_node_quickform_input_date = function() {
 		allInputs.css('background-color', 'white');
 		
 		refreshTime();
-		dateInput.datepicker("show");
-		setTimeout(function() {
-			resizeParent();
-			dateInput.blur();
-			dateInput.datepicker("hide");
-		}, 0);
 		dateInput.blur(callUpdate);
 		hourInput.blur(callUpdate);
 		minInput.blur(callUpdate);
+		resizeParent();
 		viewValid = true;
 	};
 
@@ -181,6 +176,12 @@ org_knime_js_base_node_quickform_input_date = function() {
 		hourInput.val(date.getHours());
 		minInput.val(date.getMinutes());
 	}
+	
+	function resizeParent() {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.autoResize(window.frameElement.id, 350, 300);
+		}
+	};
 	
 	return dateInput;
 	
