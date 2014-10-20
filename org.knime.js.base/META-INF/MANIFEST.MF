@@ -8,9 +8,11 @@ Bundle-Vendor: KNIME.com, Zurich, Switzerland
 Require-Bundle: org.knime.base;bundle-version="[2.9.0,3.0.0)",
  org.knime.js.core;bundle-version="[2.9.0,3.0.0)",
  org.fife.rsyntaxtextarea;bundle-version="[2.5.0,2.6.0)",
- com.fasterxml.jackson;bundle-version="[2.2.2,3.0.0)",
  org.apache.commons.lang;bundle-version="[2.6.0,3.0.0)",
  com.google.guava;bundle-version="[16.0.0,17.0.0)",
- org.knime.ext.svg;bundle-version="[2.11.0,3.0.0)"
+ org.knime.ext.svg;bundle-version="[2.11.0,3.0.0)",
+ com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.4.3,3.0.0)",
+ com.fasterxml.jackson.core.jackson-core;bundle-version="[2.4.3,3.0.0)",
+ com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.4.3,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
