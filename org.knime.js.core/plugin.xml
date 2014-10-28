@@ -208,5 +208,14 @@
          </webDependency>
       </webResourceBundle>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.knime.workbench.ui.preferences"
+            class="org.knime.js.core.preferences.WizardNodeViewPreferencePage"
+            id="org.knime.workbench.editor.js"
+            name="JavaScript Views">
+      </page>
+   </extension>
 
 </plugin>

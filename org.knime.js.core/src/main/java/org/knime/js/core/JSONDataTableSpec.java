@@ -57,6 +57,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.image.png.PNGImageValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -83,6 +84,8 @@ public class JSONDataTableSpec {
         PNG("png"),
         /** @since 2.10 */
         SVG("svg"),
+        /** @since 2.11 */
+        DATE_TIME("dateTime"),
         UNDEFINED("undefined");
 
         private String name;
@@ -119,6 +122,8 @@ public class JSONDataTableSpec {
             type = JSTypes.PNG;
         } else if (colType.isCompatible(BooleanValue.class)) {
             type = JSTypes.BOOLEAN;
+        } else if (colType.isCompatible(DateAndTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
         } else if (colType.isCompatible(DoubleValue.class)) {
             type = JSTypes.NUMBER;
         } else if (colType.isCompatible(StringValue.class)) {

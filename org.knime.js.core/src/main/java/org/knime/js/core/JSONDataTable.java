@@ -64,6 +64,7 @@ import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.image.png.PNGImageValue;
 import org.knime.core.data.property.ColorAttr;
 import org.knime.core.node.CanceledExecutionException;
@@ -253,6 +254,8 @@ public class JSONDataTable {
         switch (jsType) {
             case BOOLEAN:
                 return ((BooleanValue)cell).getBooleanValue();
+            case DATE_TIME:
+                return ((DateAndTimeValue)cell).getUTCTimeInMillis();
             case NUMBER:
                 return ((DoubleValue)cell).getDoubleValue();
             case STRING:

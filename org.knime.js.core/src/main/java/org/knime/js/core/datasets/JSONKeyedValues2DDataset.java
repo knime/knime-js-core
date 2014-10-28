@@ -68,6 +68,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class JSONKeyedValues2DDataset implements JSONDataset {
 
     private String[] m_columnKeys;
+    private String[] m_columnColors;
     private Map<String, String>[] m_symbols;
     private JSONKeyedValuesRow[] m_rows;
 
@@ -82,6 +83,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
         m_columnKeys = columnKeys;
         m_rows = rows;
         m_symbols = new Map[m_columnKeys.length];
+        m_columnColors = new String[m_columnKeys.length];
     }
 
     /**
@@ -119,6 +121,30 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     @JsonIgnore
     public void setSymbol(final Map<String, String> symbols, final int index) {
         m_symbols[index] = symbols;
+    }
+
+    /**
+     * @return the columnColors
+     */
+    public String[] getColumnColors() {
+        return m_columnColors;
+    }
+
+    /**
+     * @param columnColors the columnColors to set
+     */
+    public void setColumnColors(final String[] columnColors) {
+        m_columnColors = columnColors;
+    }
+
+    /**
+     * @param color
+     * @param index
+     *
+     */
+    @JsonIgnore
+    public void setColumnColor(final String color, final int index) {
+        m_columnColors[index] = color;
     }
 
     /**
