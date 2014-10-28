@@ -75,6 +75,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  *
@@ -108,6 +109,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private final SettingsModelIntegerBounded m_maxRows = createLastDisplayedRowModel(END);
     private final SettingsModelBoolean m_useNumberFormatter = createUseNumberFormatterModel();
     private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
+    private String m_viewPath;
 //    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
 //    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
 
@@ -389,5 +391,35 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public void setInternalTables(final BufferedDataTable[] tables) {
         m_table = tables[0];
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue>, WebTableViewRepresentation, WebTableViewValue> viewCreator =
+            new JavaScriptViewCreator<WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue>, WebTableViewRepresentation, WebTableViewValue>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
 
 }
