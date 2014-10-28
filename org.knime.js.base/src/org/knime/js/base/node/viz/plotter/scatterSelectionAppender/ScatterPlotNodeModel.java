@@ -101,6 +101,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 
@@ -108,7 +109,7 @@ import org.knime.js.core.datasets.JSONKeyedValuesRow;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-final class ScatterPlotNodeModel extends NodeModel implements
+public class ScatterPlotNodeModel extends NodeModel implements
     WizardNode<ScatterPlotViewRepresentation, ScatterPlotViewValue> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ScatterPlotNodeModel.class);
@@ -118,11 +119,12 @@ final class ScatterPlotNodeModel extends NodeModel implements
     private BufferedDataTable m_table;
     private ScatterPlotViewRepresentation m_representation;
     private ScatterPlotViewValue m_viewValue;
+    private String m_viewPath;
 
     /**
      * Creates a new model instance.
      */
-    ScatterPlotNodeModel() {
+    protected ScatterPlotNodeModel() {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
         m_config = new ScatterPlotViewConfig();
         m_representation = createEmptyViewRepresentation();
@@ -194,8 +196,15 @@ final class ScatterPlotNodeModel extends NodeModel implements
         BufferedDataTable out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
         exec.setProgress(1);
 
-        String svgPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?><!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
-        String svg = m_viewValue.getImage();
+        String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+        String svgPrimer = xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
+                + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
+        //String svg = m_viewValue.getImage();
+        m_viewPath = null;
+        m_viewPath = getViewHTMLPath();
+        PhantomJSImageGenerator generator = new PhantomJSImageGenerator(m_viewPath);
+        Object imageData = generator.getImage("knime_scatter_plot_selection_appender.getSVG();");
+        String svg = (String)imageData;
         if (svg == null || svg.isEmpty()) {
             svg = "<svg width=\"1px\" height=\"1px\"></svg>";
         }
@@ -501,6 +510,7 @@ final class ScatterPlotNodeModel extends NodeModel implements
         synchronized (m_lock) {
             m_representation = createEmptyViewRepresentation();
             m_viewValue = createEmptyViewValue();
+            m_viewPath = null;
         }
     }
 
@@ -520,6 +530,35 @@ final class ScatterPlotNodeModel extends NodeModel implements
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue> viewCreator =
+            new JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

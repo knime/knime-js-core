@@ -105,8 +105,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JSpinner m_dotSize;
 
     /**
-     * @param config The config to read/write from.
-     *
+     * Creates a new dialog pane
      */
     public ScatterPlotNodeDialogPane() {
         m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
