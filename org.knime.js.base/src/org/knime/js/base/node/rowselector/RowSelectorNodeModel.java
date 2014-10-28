@@ -67,6 +67,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  *
@@ -79,6 +80,8 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
     private final RowSelectorRepresentation m_representation = createEmptyViewRepresentation();
 
     private RowSelectorValue m_value = createEmptyViewValue();
+
+    private String m_viewPath;
 
     /**
      *
@@ -243,6 +246,35 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<RowSelectorNodeModel, RowSelectorRepresentation, RowSelectorValue> viewCreator =
+            new JavaScriptViewCreator<RowSelectorNodeModel, RowSelectorRepresentation, RowSelectorValue>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

@@ -70,6 +70,7 @@ import org.knime.core.node.defaultnodesettings.SettingsModelStringArray;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  *
@@ -94,6 +95,7 @@ public class InteractiveValueSelectNodeModel extends NodeModel implements Wizard
     private SettingsModelString column = createColumnSelection();
 
     private DataColumnSpec colSpec = new DataColumnSpecCreator("Selected Values", StringCell.TYPE).createSpec();
+    private String m_viewPath;
 
     /**
      *
@@ -276,7 +278,35 @@ public class InteractiveValueSelectNodeModel extends NodeModel implements Wizard
     @Override
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent, InteractiveValueSelectViewContent> viewCreator =
+            new JavaScriptViewCreator<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent, InteractiveValueSelectViewContent>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

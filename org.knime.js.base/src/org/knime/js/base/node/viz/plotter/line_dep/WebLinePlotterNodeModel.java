@@ -64,6 +64,7 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTableSpec.JSTypes;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  *
@@ -73,6 +74,7 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     WizardNode<WebLinePlotterViewContent, WebViewContent> {
 
     private JSONDataTable m_input;
+    private String m_viewPath;
 
     /**
      * {@inheritDoc}
@@ -219,5 +221,34 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<WebLinePlotterNodeModel, WebLinePlotterViewContent, WebViewContent> viewCreator =
+            new JavaScriptViewCreator<WebLinePlotterNodeModel, WebLinePlotterViewContent, WebViewContent>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

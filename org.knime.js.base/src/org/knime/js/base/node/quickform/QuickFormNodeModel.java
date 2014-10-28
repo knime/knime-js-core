@@ -62,6 +62,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  * Model of a quick form node.
@@ -93,6 +94,7 @@ public abstract class QuickFormNodeModel
     private CONF m_config = createEmptyConfig();
     private VAL m_dialogValue = null;
     private VAL m_viewValue = null;
+    private String m_viewPath;
 
     /**
      * Creates a new quick form model with the given number (and types!) of input
@@ -325,6 +327,34 @@ public abstract class QuickFormNodeModel
     public REP createEmptyViewRepresentation() {
         // ignore
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private String createViewPath() {
+        JavaScriptViewCreator viewCreator = new JavaScriptViewCreator(getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("Quickform View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }

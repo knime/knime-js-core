@@ -83,6 +83,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 
@@ -100,6 +101,8 @@ final class ScatterPlotNodeModel extends NodeModel implements
     private BufferedDataTable m_table;
     private ScatterPlotViewRepresentation m_representation;
     private ScatterPlotViewValue m_viewValue;
+
+    private String m_viewPath;
 
     ScatterPlotNodeModel() {
         super(1, 0);
@@ -435,6 +438,35 @@ final class ScatterPlotNodeModel extends NodeModel implements
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue> viewCreator =
+            new JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }
