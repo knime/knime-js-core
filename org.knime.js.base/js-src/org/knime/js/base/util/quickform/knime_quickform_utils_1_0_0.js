@@ -47,9 +47,9 @@
  *   Oct 14, 2013 (Patrick Winter, KNIME.com AG, Zurich, Switzerland): created
  */
 
-resizeParent = function() {
+resizeParent = function(width, height) {
 	if (parent != undefined && parent.KnimePageLoader != undefined) {
-		parent.KnimePageLoader.autoResize(window.frameElement.id);
+		parent.KnimePageLoader.autoResize(window.frameElement.id, width, height);
 	}
 };
 
@@ -61,11 +61,11 @@ callUpdate = function() {
 
 injectCSS = function(rule) {
 	var div = $("<div />", {html: '<style>' + rule + '</style>'}).appendTo("head");    
-}
+};
 
 isValid = function(object) {
 	return object != undefined && object != null;
-}
+};
 
 checkMissingData = function(representation) {
 	if (isValid(representation)) {
@@ -80,4 +80,49 @@ checkMissingData = function(representation) {
 		resizeParent();
 		return true;
 	}
-}
+};
+
+// Method to create label and representation and move a native component
+insertNativeComponent = function(representation, messageNotFound, messageNotStandalone) {
+	var body = document.getElementsByTagName("body")[0];
+	var div = document.createElement("div");
+	//set correct class attributes to be used by JS and native component's css
+	div.setAttribute("class", "v-app knime quickformcontainer");
+	body.appendChild(div);
+	var label = document.createElement("div");
+	label.setAttribute("class", "label");
+	label.appendChild(document.createTextNode(representation.label));
+	div.appendChild(label);
+	div.setAttribute("title", representation.description);
+	var placeHolder = null;
+	// check if parent frame present
+	if (parent && window.frameElement) {
+		//set correct class attributes on body element
+		var bodyClass = parent.document.getElementsByTagName("body")[0].getAttribute("class");
+		body.setAttribute("class", bodyClass);
+		// find corresponding native component 
+		var component = parent.document.getElementById("element_for_" + window.frameElement.id);
+		if (component) {
+			// reallocate native component
+			div.appendChild(component);
+		} else {
+			// component was not found, but expected, show error message
+			placeHolder = createPlaceHolder(messageNotFound);
+		}
+	} else {
+		// native components cannot be present in standalone mode, show message
+		placeHolder = createPlaceHolder(messageNotStandalone);
+	}
+	if (placeHolder) {
+		div.appendChild(placeHolder);
+	}
+};
+
+createPlaceHolder = function(message) {
+	var element = null;
+	if (message) {
+		element = document.createElement("div");
+		element.appendChild(document.createTextNode(message));
+	}
+	return element;
+};
