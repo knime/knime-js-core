@@ -13,7 +13,7 @@ knime_scatter_plot_selection_appender = function() {
 	var defaultFontSize = 12;
 	
 	view.init = function(representation, value) {
-		if ((!representation.keyedDataset) || representation.keyedDataset.rows.length < 1) {
+		if (!representation.keyedDataset) {
 			d3.select("body").text("Error: No data available");
 			return;
 		}
@@ -154,13 +154,14 @@ knime_scatter_plot_selection_appender = function() {
             chartManager.addLiveHandler(panHandler);
         }
         
-        var selectionHandler = new jsfc.ClickSelectionHandler(chartManager);
-        chartManager.addLiveHandler(selectionHandler);
-        
         var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
-        var polygonSelectionHandler = new jsfc.PolygonSelectionHandler(chartManager, polygonSelectionModifier);
+        var polygonSelectionHandler = new jsfc.RectangleSelectionHandler(chartManager, polygonSelectionModifier);
         chartManager.addLiveHandler(polygonSelectionHandler);
         
+        var selectionModifier = new jsfc.Modifier(true, true, false, false);
+        var selectionHandler = new jsfc.PolygonSelectionHandler(chartManager, selectionModifier);
+        chartManager.addLiveHandler(selectionHandler);
+                
         setChartDimensions();
         //console.timeEnd("Building chart");
         //console.time("Refreshing Display");
