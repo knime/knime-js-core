@@ -84,7 +84,6 @@
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/> -->
       <node
-            after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
@@ -102,11 +101,36 @@
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
-            after="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
             category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
             id="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory">
+      </node>
+      <node
+            category-path="/labs/quickform/view"
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory">
+      </node>
+      <node
+            category-path="/labs/quickform/input"
+            factory-class="org.knime.js.base.node.quickform.input.fileupload.FileUploadQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.fileupload.FileUploadQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/labs/quickform/output"
+            factory-class="org.knime.js.base.node.output.filedownload.FileDownloadNodeFactory"
+            id="org.knime.js.base.node.output.filedownload.FileDownloadNodeFactory">
+      </node>
+      <node
+            category-path="/labs/quickform/output"
+            factory-class="org.knime.js.base.node.output.image.ImageOutputNodeFactory"
+            id="org.knime.js.base.node.output.image.ImageOutputNodeFactory">
+      </node>
+      <node
+            category-path="/labs/quickform/output"
+            factory-class="org.knime.js.base.node.output.text.TextOutputNodeFactory"
+            id="org.knime.js.base.node.output.image.TextOutputNodeFactory">
       </node>
    </extension>
    <extension
@@ -141,6 +165,12 @@
             locked="true"
             name="Views &amp; Interactive Nodes"
             path="/labs/quickform">
+      </category>
+      <category
+            icon="icons/missing.gif"
+            level-id="output"
+            name="Output"
+            path="labs/quickform">
       </category>
    </extension>
    <extension
@@ -575,7 +605,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="Scatter Plot"
+            name="Scatter Plot (Deprecated)"
             version="1.0.0"
             webResourceBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle">
          <webResource
@@ -613,7 +643,24 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="Scatter Plot Selection Appender"
+            name="Line Plot"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.line.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/line/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/line/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/plotter/line/knime-line-plot.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jsFreeChart_0.5">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Scatter Plot"
             version="1.0.0"
             webResourceBundleID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.bundle">
          <webResource
@@ -626,6 +673,74 @@
          </importResource>
          <webDependency
                webResourceBundleID="jsFreeChart_0.5">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="File Upload Quickform"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.quickform.input.fileupload.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/fileupload/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/fileupload/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/fileupload/FileUpload.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="File Download"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.output.filedownload.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/output/filedownload/"
+               relativePathTarget="org/knime/js/base/node/output/filedownload/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/output/filedownload/FileDownload.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Image Output"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.output.image.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/output/image/"
+               relativePathTarget="org/knime/js/base/node/output/image/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/output/image/ImageOutput.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Text Output"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.output.text.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/output/text/"
+               relativePathTarget="org/knime/js/base/node/output/text/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/output/text/TextOutput.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
       </webResourceBundle>
    </extension>
@@ -795,20 +910,70 @@
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"
-            implementationBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.bundle"
             init-method-name="init"
-            javascriptComponentID="org_knime_js_base_node_viz_plotter_scatter"
+            javascriptComponentID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender"
             name="Scatter Chart"
-            namespace="knime_scatter_plot"
+            namespace="knime_scatter_plot_selection_appender"
             validate-method-name="validate">
       </javascriptComponent>
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"
-            implementationBundleID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.bundle"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.line.bundle"
             init-method-name="init"
-            javascriptComponentID="org.knime.js.base.node.viz.plotter.scatterSelectionAppender"
-            name="Scatter Chart Selection Appender"
-            namespace="knime_scatter_plot_selection_appender"
+            javascriptComponentID="org.knime.js.base.node.viz.plotter.line"
+            name="Line Chart"
+            namespace="knime_line_plot"
+            setValidationError-method-name="setValidationError"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.fileupload.bundle"
+            init-method-name="init"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_fileupload"
+            name="File Upload Quickform"
+            namespace="org_knime_js_base_node_quickform_input_fileupload"
+            setValidationError-method-name="setValidationErrorMessage"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.scatter.bundle"
+            init-method-name="init"
+            javascriptComponentID="org_knime_js_base_node_viz_plotter_scatter"
+            name="Scatter Chart (Deprecated)"
+            namespace="knime_scatter_plot"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.output.filedownload.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.output.filedownload"
+            name="File Download"
+            namespace="org_knime_js_base_node_output_filedownload"
+            setValidationError-method-name="setValidationErrorMessage"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.output.image.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.output.image"
+            name="Image Output"
+            namespace="org_knime_js_base_node_output_image"
+            setValidationError-method-name="setValidationErrorMessage"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.output.text.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.output.text"
+            name="Text Output"
+            namespace="org_knime_js_base_node_output_text"
+            setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
    </extension>
