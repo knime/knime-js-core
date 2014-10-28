@@ -74,6 +74,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  *
@@ -84,8 +85,8 @@ final class GenericJSViewNodeModel extends NodeModel implements
 
     private final Object m_lock = new Object();
     private final GenericJSViewConfig m_config;
-
     private GenericJSViewRepresentation m_representation;
+    private String m_viewPath;
 
     /**
      */
@@ -149,7 +150,6 @@ final class GenericJSViewNodeModel extends NodeModel implements
 
     private static final String ATTR_TYPE = "type";
 
-    // change to display only a select number of dependencies
     private void setPathsFromLibNames(final String[] libNames) {
         ArrayList<String> jsPaths = new ArrayList<String>();
         ArrayList<String> cssPaths = new ArrayList<String>();
@@ -327,6 +327,35 @@ final class GenericJSViewNodeModel extends NodeModel implements
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getViewHTMLPath() {
+        if (m_viewPath == null || m_viewPath.isEmpty()) {
+            // view is not created
+            m_viewPath = createViewPath();
+        } else {
+            // check if file still exists, create otherwise
+            File viewFile = new File(m_viewPath);
+            if (!viewFile.exists()) {
+                m_viewPath = createViewPath();
+            }
+        }
+        return m_viewPath;
+    }
+
+    private String createViewPath() {
+        JavaScriptViewCreator<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue> viewCreator =
+            new JavaScriptViewCreator<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue>(
+                getJavascriptObjectID());
+        try {
+            return viewCreator.createWebResources("View", m_representation, null);
+        } catch (IOException e) {
+            return null;
+        }
     }
 
 }
