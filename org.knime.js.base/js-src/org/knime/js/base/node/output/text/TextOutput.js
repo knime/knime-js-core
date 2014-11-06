@@ -58,19 +58,32 @@ org_knime_js_base_node_output_text = function() {
 		
 		if (representation.text && representation.textFormat) {
 			var body = document.getElementsByTagName("body")[0];
+			
+			var div = document.createElement("div");
+			div.setAttribute("class", "quickformcontainer");
+			body.appendChild(div);
+			if (representation.label) {
+				var label = document.createElement("div");
+				label.setAttribute("class", "label");
+				label.appendChild(document.createTextNode(representation.label));
+				div.appendChild(label);
+			}
+			if (representation.description) {
+				div.setAttribute("title", representation.description);
+			}
 				
 			if (representation.textFormat == "Text") {
 				var p = document.createElement("p");
 				p.appendChild(document.createTextNode(representation.text));
-				body.appendChild(p);
+				div.appendChild(p);
 			} else if (representation.textFormat == "Preformatted") {
 				var pre = document.createElement("pre");
 				pre.appendChild(document.createTextNode(representation.text));
-				body.appendChild(pre);
+				div.appendChild(pre);
 			} else if (representation.textFormat == "Html") {
-				var div = document.createElement("div");
-				div.innerHTML = representation.text;
-				body.appendChild(div);
+				var textContainer = document.createElement("div");
+				textContainer.innerHTML = representation.text;
+				div.appendChild(textContainer);
 			}
 			
 			resizeParent();

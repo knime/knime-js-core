@@ -57,18 +57,32 @@ org_knime_js_base_node_output_image = function() {
 		}
 		
 		var body = document.getElementsByTagName("body")[0];
+		
+		var div = document.createElement("div");
+		div.setAttribute("class", "quickformcontainer");
+		body.appendChild(div);
+		if (representation.label) {
+			var label = document.createElement("div");
+			label.setAttribute("class", "label");
+			label.appendChild(document.createTextNode(representation.label));
+			div.appendChild(label);
+		}
+		if (representation.description) {
+			div.setAttribute("title", representation.description);
+		}
+		
 		var element = null;
 		if (representation.imageFormat == "PNG") {
 			var img = document.createElement("img");
 			img.setAttribute("src", "data:image/png;base64," + representation.imageData);
-			body.appendChild(img);
+			div.appendChild(img);
 			element = img;
 		} else if (representation.imageFormat == "SVG") {
-			body.innerHTML = representation.imageData;
+			div.innerHTML = representation.imageData;
 			element = body.getElementsByTagName("svg")[0];
 		} else {
 			var errorText = "Image format not supported: " + representation.imageFormat;
-			body.appendChild(document.createTextNode(errorText));
+			div.appendChild(document.createTextNode(errorText));
 		}
 		
 		if (element) {
