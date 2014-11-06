@@ -63,6 +63,8 @@ org_knime_js_base_node_quickform_input_fileupload = function() {
 		insertNativeComponent(representation, messageNotFound, messageNotStandalone);
 		
 		resizeParent();
+		// Automatically resize component, since events of native component are not noticed
+		setInterval(resizeParent, 500);
 		viewValid = true;
 		m_value = value;
 	};

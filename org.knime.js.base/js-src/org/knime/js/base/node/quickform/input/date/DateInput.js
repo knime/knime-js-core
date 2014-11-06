@@ -151,6 +151,8 @@ org_knime_js_base_node_quickform_input_date = function() {
 		hourInput.blur(callUpdate);
 		minInput.blur(callUpdate);
 		resizeParent();
+		// Automatically resize component on interval
+		setInterval(resizeParent, 500);
 		viewValid = true;
 	};
 
@@ -176,12 +178,6 @@ org_knime_js_base_node_quickform_input_date = function() {
 		hourInput.val(date.getHours());
 		minInput.val(date.getMinutes());
 	}
-	
-	function resizeParent() {
-		if (parent != undefined && parent.KnimePageLoader != undefined) {
-			parent.KnimePageLoader.autoResize(window.frameElement.id, 350, 300);
-		}
-	};
 	
 	return dateInput;
 	

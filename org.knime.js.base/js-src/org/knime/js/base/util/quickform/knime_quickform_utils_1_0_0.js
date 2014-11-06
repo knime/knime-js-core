@@ -105,6 +105,7 @@ insertNativeComponent = function(representation, messageNotFound, messageNotStan
 		if (component) {
 			// reallocate native component
 			div.appendChild(component);
+			component.className = component.className.replace(/\bhidden\b/,'');
 		} else {
 			// component was not found, but expected, show error message
 			placeHolder = createPlaceHolder(messageNotFound);
