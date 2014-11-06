@@ -33,6 +33,7 @@
           is uploaded by means of the, e.g. KNIME WebPortal.
         </option>
 	</fullDescription>
+	<interactiveView name="File Upload">View containing the file upload component.</interactiveView>
 	<ports>
 		<outPort index="0" name="Flow Variable Output">
           Variable output the file path represented as variable.
