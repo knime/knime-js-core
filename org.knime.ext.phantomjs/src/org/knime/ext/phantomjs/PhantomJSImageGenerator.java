@@ -69,27 +69,34 @@ public class PhantomJSImageGenerator {
     private final WebDriver m_driver;
     
     /**
+     * Creates a new image generator object.<br>
+     * The PhantomJS process is started if not present and the view is loaded and initialized.
+     * 
+     * @param viewHTML The view to load.
      * 
      */
     public PhantomJSImageGenerator(final String viewHTML) {
-        /*m_driver = null;
-        try {
-            m_driver = new RemoteWebDriver(new URL("http://localhost:9515"), DesiredCapabilities.chrome());
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-        }*/
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
+        //TODO make size editable
         m_driver.manage().window().setPosition(new Point(20, 20));
         m_driver.manage().window().setSize(new Dimension(800, 600));
         File viewFile = new File(viewHTML);
         m_driver.navigate().to(viewFile.toURI().toString());
         WebDriverWait wait = new WebDriverWait(m_driver, 10);
+        //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
     }
     
-    public Object getImage(final String jsMethodCall, final Object... args) {
+    /**
+     * Executes a given JavaScript and returns the result, if available.<br>
+     * See {@link JavascriptExecutor#executeScript(String, Object...) executeScript}.
+     * @param script The JavaScript to execute
+     * @param args The arguments to the script. May be empty
+     * @return One of Boolean, Long, String, List or WebElement. Or null if script has no return value.
+     */
+    public Object executeScript(final String script, final Object... args) {
         if (m_driver instanceof JavascriptExecutor) {
-            return ((JavascriptExecutor)m_driver).executeScript("return " + jsMethodCall, args);
+            return ((JavascriptExecutor)m_driver).executeScript("return " + script, args);
         }
         return null;
     }
