@@ -58,7 +58,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONDatasetSelection {
 
-    private String m_seriesKey;
+    private int m_seriesIndex;
 
     private int m_itemIndex;
 
@@ -66,26 +66,26 @@ public class JSONDatasetSelection {
     public JSONDatasetSelection() { }
 
     /**
-     * @param seriesKey
+     * @param seriesIndex
      * @param itemIndex
      */
-    public JSONDatasetSelection(final String seriesKey, final int itemIndex) {
-        m_seriesKey = seriesKey;
+    public JSONDatasetSelection(final int seriesIndex, final int itemIndex) {
+        m_seriesIndex = seriesIndex;
         m_itemIndex = itemIndex;
     }
 
     /**
      * @return the seriesKey
      */
-    public String getSeriesKey() {
-        return m_seriesKey;
+    public int getSeriesIndex() {
+        return m_seriesIndex;
     }
 
     /**
-     * @param seriesKey the seriesKey to set
+     * @param seriesIndex the seriesIndex to set
      */
-    public void setSeriesKey(final String seriesKey) {
-        m_seriesKey = seriesKey;
+    public void setSeriesIndex(final int seriesIndex) {
+        m_seriesIndex = seriesIndex;
     }
 
     /**

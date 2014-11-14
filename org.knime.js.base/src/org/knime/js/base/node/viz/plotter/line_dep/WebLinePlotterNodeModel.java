@@ -242,8 +242,8 @@ public class WebLinePlotterNodeModel extends DefaultVisualizationNodeModel imple
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<WebLinePlotterNodeModel, WebLinePlotterViewContent, WebViewContent> viewCreator =
-            new JavaScriptViewCreator<WebLinePlotterNodeModel, WebLinePlotterViewContent, WebViewContent>(
+        JavaScriptViewCreator<WebLinePlotterViewContent, WebViewContent> viewCreator =
+            new JavaScriptViewCreator<WebLinePlotterViewContent, WebViewContent>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

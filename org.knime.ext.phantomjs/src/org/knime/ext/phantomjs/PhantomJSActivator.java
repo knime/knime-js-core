@@ -96,6 +96,10 @@ public class PhantomJSActivator extends Plugin {
             m_phantomJSPath = url.getFile();
         }
         
+        createPhantomJSDriver();
+    }
+
+    private static void createPhantomJSDriver() {
         if (m_phantomJSPath != null) {
             DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, m_phantomJSPath);
@@ -131,6 +135,9 @@ public class PhantomJSActivator extends Plugin {
      * executable could not be found
      */
     public static PhantomJSDriver getConfiguredPhantomJSDriver() {
+        if (m_driver == null) {
+            createPhantomJSDriver();
+        }
         return m_driver;
     }
 }

@@ -267,8 +267,8 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<RowSelectorNodeModel, RowSelectorRepresentation, RowSelectorValue> viewCreator =
-            new JavaScriptViewCreator<RowSelectorNodeModel, RowSelectorRepresentation, RowSelectorValue>(
+        JavaScriptViewCreator<RowSelectorRepresentation, RowSelectorValue> viewCreator =
+            new JavaScriptViewCreator<RowSelectorRepresentation, RowSelectorValue>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

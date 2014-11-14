@@ -122,7 +122,7 @@ knime_scatter_plot_selection_appender = function() {
 		//chart.build(container);
 				
 		var plot = new jsfc.XYPlot(dataset);
-		plot.setStaggerRendering(true);
+		plot.setStaggerRendering(_representation.enableStaggeredRendering);
         plot.getXAxis().setLabel(xAxisLabel);
         plot.getXAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //plot.getXAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));

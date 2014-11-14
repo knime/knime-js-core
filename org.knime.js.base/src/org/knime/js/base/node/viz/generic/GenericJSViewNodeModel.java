@@ -348,8 +348,8 @@ final class GenericJSViewNodeModel extends NodeModel implements
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue> viewCreator =
-            new JavaScriptViewCreator<GenericJSViewNodeModel, GenericJSViewRepresentation, GenericJSViewValue>(
+        JavaScriptViewCreator<GenericJSViewRepresentation, GenericJSViewValue> viewCreator =
+            new JavaScriptViewCreator<GenericJSViewRepresentation, GenericJSViewValue>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", m_representation, null);

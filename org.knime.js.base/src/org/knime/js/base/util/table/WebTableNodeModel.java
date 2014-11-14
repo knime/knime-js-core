@@ -411,8 +411,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue>, WebTableViewRepresentation, WebTableViewValue> viewCreator =
-            new JavaScriptViewCreator<WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue>, WebTableViewRepresentation, WebTableViewValue>(
+        JavaScriptViewCreator<WebTableViewRepresentation, WebTableViewValue> viewCreator =
+            new JavaScriptViewCreator<WebTableViewRepresentation, WebTableViewValue>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

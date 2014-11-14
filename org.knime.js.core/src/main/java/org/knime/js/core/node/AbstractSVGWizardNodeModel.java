@@ -92,7 +92,6 @@ public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL
      */
     @Override
     protected final PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        resetViewHTML();
         exec.setProgress(0.0, "Creating view model...");
         performExecuteCreateView(inObjects, createThirdsExecutionContext(exec));
         exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
@@ -146,6 +145,11 @@ public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL
     }
 
     /**
+     * @return true if the SVG image is supposed to be rendered and retrieved, false otherwise
+     */
+    protected abstract boolean generateImage();
+
+    /**
      * Renders the view with PhantomJS and retrieves the created SVG image.
      * @return A {@link PortObject} containing the SVG created by the view.
      * @throws IOException if an I/O error occurs
@@ -154,22 +158,24 @@ public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL
         String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
         String svgPrimer = xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
-        //String svg = m_viewValue.getImage();
-        resetViewHTML();
-        String viewPath = getViewHTMLPath();
-        PhantomJSImageGenerator generator = new PhantomJSImageGenerator(viewPath);
+        String svg = null;
+        if (generateImage()) {
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
 
-        exec.setProgress(0.75, "Retrieving generated image...");
-        String namespace = getViewNamespace();
-        String methodCall = "";
-        if (namespace != null && !namespace.isEmpty()) {
-            methodCall += namespace + ".";
+            exec.setProgress(0.75, "Retrieving generated image...");
+            String namespace = getViewNamespace();
+            String methodCall = "";
+            if (namespace != null && !namespace.isEmpty()) {
+                methodCall += namespace + ".";
+            }
+            methodCall += getExtractSVGMethodName() + "();";
+            Object imageData = generator.executeScript(methodCall);
+            if (imageData instanceof String) {
+                svg = (String)imageData;
+            }
         }
-        methodCall += getExtractSVGMethodName() + "();";
-        Object imageData = generator.executeScript(methodCall);
-
         exec.setProgress(0.9, "Creating image output...");
-        String svg = (String)imageData;
         if (svg == null || svg.isEmpty()) {
             svg = "<svg width=\"1px\" height=\"1px\"></svg>";
         }

@@ -113,7 +113,6 @@ public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL ex
      */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        resetViewHTML();
         PortObject[] portObjects = performExecute(inObjects, exec);
         return portObjects;
     }

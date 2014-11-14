@@ -299,8 +299,8 @@ public class InteractiveValueSelectNodeModel extends NodeModel implements Wizard
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent, InteractiveValueSelectViewContent> viewCreator =
-            new JavaScriptViewCreator<InteractiveValueSelectNodeModel, InteractiveValueSelectViewContent, InteractiveValueSelectViewContent>(
+        JavaScriptViewCreator<InteractiveValueSelectViewContent, InteractiveValueSelectViewContent> viewCreator =
+            new JavaScriptViewCreator<InteractiveValueSelectViewContent, InteractiveValueSelectViewContent>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

@@ -568,8 +568,8 @@ final class LinePlotNodeModel extends NodeModel implements
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<LinePlotNodeModel, LinePlotViewRepresentation, LinePlotViewValue> viewCreator =
-            new JavaScriptViewCreator<LinePlotNodeModel, LinePlotViewRepresentation, LinePlotViewValue>(
+        JavaScriptViewCreator<LinePlotViewRepresentation, LinePlotViewValue> viewCreator =
+            new JavaScriptViewCreator<LinePlotViewRepresentation, LinePlotViewValue>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

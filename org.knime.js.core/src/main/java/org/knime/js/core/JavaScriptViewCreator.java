@@ -73,23 +73,19 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
-import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.util.FileUtil;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <T>
  * @param <REP>
  * @param <VAL>
  */
-public class JavaScriptViewCreator<T extends NodeModel & WizardNode<REP, VAL>,
-        REP extends WebViewContent, VAL extends WebViewContent> {
+public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebViewContent> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JavaScriptViewCreator.class);
 
@@ -170,7 +166,7 @@ public class JavaScriptViewCreator<T extends NodeModel & WizardNode<REP, VAL>,
                 return "null";
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("No view representation available!");
+            throw new IllegalArgumentException("No view representation available!", e);
         }
 
     }
@@ -183,7 +179,7 @@ public class JavaScriptViewCreator<T extends NodeModel & WizardNode<REP, VAL>,
                 return "null";
             }
         } catch (Exception e) {
-            throw new IllegalArgumentException("No view value available!");
+            throw new IllegalArgumentException("No view value available!", e);
         }
     }
 
@@ -241,10 +237,11 @@ public class JavaScriptViewCreator<T extends NodeModel & WizardNode<REP, VAL>,
                     LOGGER.error("Unrecognized resource type " + resFile.getType());
             }
         }
-        String loadScript = "function loadWizardNodeView(){%s};";
+        // Uncomment following lines to inline init call
+        /*String loadScript = "function loadWizardNodeView(){%s};";
         loadScript = String.format(loadScript, wrapInTryCatch(initJSView(jsonViewRepresentation, jsonViewValue)));
-        pageBuilder.append(String.format(inlineScript, loadScript));
-        pageBuilder.append("</head><body onload=\"loadWizardNodeView();\">");
+        pageBuilder.append(String.format(inlineScript, loadScript));*/
+        pageBuilder.append("</head><body" /* + " onload=\"loadWizardNodeView();\"" */ + ">");
         pageBuilder.append(bodyText);
         pageBuilder.append("</body></html>");
         return pageBuilder.toString();

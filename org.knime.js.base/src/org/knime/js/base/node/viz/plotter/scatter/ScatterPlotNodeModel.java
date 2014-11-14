@@ -459,8 +459,8 @@ final class ScatterPlotNodeModel extends NodeModel implements
     }
 
     private String createViewPath() {
-        JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue> viewCreator =
-            new JavaScriptViewCreator<ScatterPlotNodeModel, ScatterPlotViewRepresentation, ScatterPlotViewValue>(
+        JavaScriptViewCreator<ScatterPlotViewRepresentation, ScatterPlotViewValue> viewCreator =
+            new JavaScriptViewCreator<ScatterPlotViewRepresentation, ScatterPlotViewValue>(
                 getJavascriptObjectID());
         try {
             return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());

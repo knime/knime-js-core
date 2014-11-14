@@ -60,6 +60,8 @@ import org.knime.core.node.NodeSettingsWO;
  */
 final class ScatterPlotViewConfig {
 
+    static final String HIDE_IN_WIZARD = "hideInWizard";
+    static final String GENERATE_IMAGE = "generateImage";
     static final String ENABLE_CONFIG = "enableViewConfiguration";
     static final String ENABLE_TTILE_CHANGE = "enableTitleChange";
     static final String ENABLE_SUBTTILE_CHANGE = "enableSubtitleChange";
@@ -85,7 +87,8 @@ final class ScatterPlotViewConfig {
     static final String Y_AXIS_MAX = "yAxisMax";
     static final String DOT_SIZE = "dot_size";
 
-
+    private boolean m_hideInWizard = false;
+    private boolean m_generateImage = true;
     private boolean m_enableViewConfiguration = false;
     private boolean m_enableTitleChange = false;
     private boolean m_enableSubtitleChange = false;
@@ -110,6 +113,35 @@ final class ScatterPlotViewConfig {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize = 3;
+
+
+    /**
+     * @return the hideInWizard
+     */
+    public boolean getHideInWizard() {
+        return m_hideInWizard;
+    }
+
+    /**
+     * @param hideInWizard the hideInWizard to set
+     */
+    public void setHideInWizard(final boolean hideInWizard) {
+        m_hideInWizard = hideInWizard;
+    }
+
+    /**
+     * @return the generateImage
+     */
+    public boolean getGenerateImage() {
+        return m_generateImage;
+    }
+
+    /**
+     * @param generateImage the generateImage to set
+     */
+    public void setGenerateImage(final boolean generateImage) {
+        m_generateImage = generateImage;
+    }
 
     /**
      * @return the chartTitle
@@ -451,6 +483,8 @@ final class ScatterPlotViewConfig {
      * @param settings To save to.
      */
     public void saveSettings(final NodeSettingsWO settings) {
+        settings.addBoolean(HIDE_IN_WIZARD, getHideInWizard());
+        settings.addBoolean(GENERATE_IMAGE, getGenerateImage());
         settings.addBoolean(ENABLE_CONFIG, getEnableViewConfiguration());
         settings.addBoolean(ENABLE_TTILE_CHANGE, getEnableTitleChange());
         settings.addBoolean(ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
@@ -482,6 +516,8 @@ final class ScatterPlotViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
+        setGenerateImage(settings.getBoolean(GENERATE_IMAGE));
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE));
@@ -517,6 +553,8 @@ final class ScatterPlotViewConfig {
      * @param settings To load from.
      */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
+        setGenerateImage(settings.getBoolean(GENERATE_IMAGE, true));
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG, false));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE, false));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE, false));

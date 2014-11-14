@@ -50,41 +50,43 @@
  */
 package org.knime.ext.phantomjs;
 
-import java.io.File;
-
+import org.knime.core.node.NodeModel;
+import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.AbstractWizardNodeView;
+import org.knime.core.node.wizard.WizardNode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * 
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @param <T> 
+ * @param <REP> 
+ * @param <VAL> 
  */
-public class PhantomJSImageGenerator {
+public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> 
+    extends AbstractWizardNodeView<T, REP, VAL>{
+    
+    private static final long DEFAULT_TIMEOUT = 10;
     
     private final WebDriver m_driver;
     
     /**
      * Creates a new image generator object.<br>
      * The PhantomJS process is started if not present and the view is loaded and initialized.
-     * 
-     * @param viewHTML The view to load.
+     * @param nodeModel 
      * 
      */
-    public PhantomJSImageGenerator(final String viewHTML) {
+    public PhantomJSImageGenerator(final T nodeModel) {
+        super(nodeModel);
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
-        //TODO make size editable
-        m_driver.manage().window().setPosition(new Point(20, 20));
-        m_driver.manage().window().setSize(new Dimension(800, 600));
-        File viewFile = new File(viewHTML);
-        m_driver.navigate().to(viewFile.toURI().toString());
-        WebDriverWait wait = new WebDriverWait(m_driver, 10);
-        //TODO wait until what?
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+        callOpenView(null);
     }
     
     /**
@@ -100,5 +102,61 @@ public class PhantomJSImageGenerator {
         }
         return null;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void closeView() {
+        // do nothing        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void modelChanged() {
+        // do nothing        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void callOpenView(final String title) {
+        //TODO make size editable
+        m_driver.manage().window().setPosition(new Point(20, 20));
+        m_driver.manage().window().setSize(new Dimension(800, 600));
+        m_driver.navigate().to(getViewSource().toURI().toString());
+        waitForDocumentReady();
+        ((JavascriptExecutor)m_driver).executeScript(createInitJSViewMethodCall());
+        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
+        //TODO wait until what?
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+    }
+    
+    private void waitForDocumentReady()
+    {
+        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
+        if (!(m_driver instanceof JavascriptExecutor)) {
+            throw new IllegalArgumentException("Driver must support javascript execution");
+        }
+        wait.until(documentReady());
+    }
+        private ExpectedCondition<Boolean> documentReady() {
+          return new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(final WebDriver driver) {
+                String readyState = ((JavascriptExecutor)m_driver).executeScript(
+                        "if (document.readyState) return document.readyState;").toString();
+                return "complete".equalsIgnoreCase(readyState);
+            }
+
+            @Override
+            public String toString() {
+              return "document ready state";
+            }
+          };
+        }
 
 }
