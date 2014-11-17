@@ -60,6 +60,9 @@ import org.knime.core.node.NodeSettingsWO;
  */
 final class ScatterPlotViewConfig {
 
+    static final int DEFAULT_MAX_ROWS = 2500;
+    static final String DEFAULT_SELECTION_COLUMN_NAME = "Selected (Scatter Plot)";
+
     static final String HIDE_IN_WIZARD = "hideInWizard";
     static final String GENERATE_IMAGE = "generateImage";
     static final String ENABLE_CONFIG = "enableViewConfiguration";
@@ -79,6 +82,7 @@ final class ScatterPlotViewConfig {
     static final String X_COL = "xCol";
     static final String Y_COL = "yCol";
     static final String MAX_ROWS = "maxRows";
+    static final String SELECTION_COLUMN_NAME = "selectionColumnName";
     static final String X_AXIS_LABEL = "xAxisLabel";
     static final String Y_AXIS_LABEL = "yAxisLabel";
     static final String X_AXIS_MIN = "xAxisMin";
@@ -101,7 +105,8 @@ final class ScatterPlotViewConfig {
     private boolean m_enablePanning = true;
     private boolean m_enableDragZooming = false;
     private boolean m_showZoomResetButton = false;
-    private int m_maxRows = 2500;
+    private int m_maxRows = DEFAULT_MAX_ROWS;
+    private String m_selectionColumnName = DEFAULT_SELECTION_COLUMN_NAME;
     private String m_chartTitle;
     private String m_chartSubtitle;
     private String m_xColumn;
@@ -211,6 +216,20 @@ final class ScatterPlotViewConfig {
      */
     public void setMaxRows(final int maxRows) {
         m_maxRows = maxRows;
+    }
+
+    /**
+     * @return the selectionColumnName
+     */
+    public String getSelectionColumnName() {
+        return m_selectionColumnName;
+    }
+
+    /**
+     * @param selectionColumnName the selectionColumnName to set
+     */
+    public void setSelectionColumnName(final String selectionColumnName) {
+        m_selectionColumnName = selectionColumnName;
     }
 
     /**
@@ -502,6 +521,7 @@ final class ScatterPlotViewConfig {
         settings.addString(X_COL, getxColumn());
         settings.addString(Y_COL, getyColumn());
         settings.addInt(MAX_ROWS, getMaxRows());
+        settings.addString(SELECTION_COLUMN_NAME, getSelectionColumnName());
         settings.addString(X_AXIS_LABEL, getxAxisLabel());
         settings.addString(Y_AXIS_LABEL, getyAxisLabel());
         settings.addString(X_AXIS_MIN, getxAxisMin() == null ? null : getxAxisMin().toString());
@@ -535,6 +555,7 @@ final class ScatterPlotViewConfig {
         setxColumn(settings.getString(X_COL));
         setyColumn(settings.getString(Y_COL));
         setMaxRows(settings.getInt(MAX_ROWS));
+        setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL));
         setyAxisLabel(settings.getString(Y_AXIS_LABEL));
         String xMin = settings.getString(X_AXIS_MIN);
@@ -571,7 +592,8 @@ final class ScatterPlotViewConfig {
         setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
         setyColumn(settings.getString(Y_COL, null));
-        setMaxRows(settings.getInt(MAX_ROWS, 2500));
+        setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
+        setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL, null));
         setyAxisLabel(settings.getString(Y_AXIS_LABEL, null));
         String xMin = settings.getString(X_AXIS_MIN, null);

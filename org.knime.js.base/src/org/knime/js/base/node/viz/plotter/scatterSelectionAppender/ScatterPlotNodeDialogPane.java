@@ -98,6 +98,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JCheckBox m_enableDotSizeChangeCheckBox;
 
     private final JSpinner m_maxRowsSpinner;
+    private final JTextField m_appendedColumnName;
     private final JTextField m_chartTitleTextField;
     private final JTextField m_chartSubtitleTextField;
     private final ColumnSelectionPanel m_xColComboBox;
@@ -126,6 +127,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_showZoomResetCheckBox = new JCheckBox("Show zoom reset button");
 
         m_maxRowsSpinner = new JSpinner();
+        m_appendedColumnName = new JTextField(TEXT_FIELD_SIZE);
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
         // Change to include string columns when JS library supports it
@@ -169,6 +171,9 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         c.gridx = 0;
         c.gridy++;
         c.gridwidth = 2;
+        panel.add(m_appendedColumnName, c);
+        c.gridx = 0;
+        c.gridy++;
         panel.add(m_enableViewConfigCheckBox, c);
         c.gridx = 0;
         c.gridy++;
@@ -258,6 +263,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         config.loadSettingsForDialog(settings);
         m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
         m_generateImageCheckBox.setSelected(config.getGenerateImage());
+        m_appendedColumnName.setText(config.getSelectionColumnName());
         m_enableViewConfigCheckBox.setSelected(config.getEnableViewConfiguration());
         m_enableTitleChangeCheckBox.setSelected(config.getEnableTitleChange());
         m_enableSubtitleChangeCheckBox.setSelected(config.getEnableSubtitleChange());
@@ -300,6 +306,7 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         ScatterPlotViewConfig config = new ScatterPlotViewConfig();
         config.setHideInWizard(m_hideInWizardCheckBox.isSelected());
         config.setGenerateImage(m_generateImageCheckBox.isSelected());
+        config.setSelectionColumnName(m_appendedColumnName.getText());
         config.setEnableViewConfiguration(m_enableViewConfigCheckBox.isSelected());
         config.setEnableTitleChange(m_enableTitleChangeCheckBox.isSelected());
         config.setEnableSubtitleChange(m_enableSubtitleChangeCheckBox.isSelected());

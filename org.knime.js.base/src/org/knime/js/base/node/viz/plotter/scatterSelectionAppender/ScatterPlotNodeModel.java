@@ -143,8 +143,11 @@ public class ScatterPlotNodeModel extends
     }
 
     private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
-        // TODO make editable
-        String newColName = "Selected (Scatter Plot)";
+        String newColName = m_config.getSelectionColumnName();
+        if (newColName == null || newColName.trim().isEmpty()) {
+            newColName = ScatterPlotViewConfig.DEFAULT_SELECTION_COLUMN_NAME;
+        }
+        newColName = DataTableSpec.getUniqueColumnName(spec, newColName);
         DataColumnSpec outColumnSpec =
                 new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
@@ -368,7 +371,7 @@ public class ScatterPlotNodeModel extends
      */
     @Override
     protected void performReset() {
-        // nothing to do
+        m_table = null;
     }
 
     /**
