@@ -83,6 +83,9 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
 
     private static final int TEXT_FIELD_SIZE = 20;
 
+
+    private final JCheckBox m_hideInWizardCheckBox;
+    private final JCheckBox m_generateImageCheckBox;
     private final JCheckBox m_enableViewConfigCheckBox;
     private final JCheckBox m_enableTitleChangeCheckBox;
     private final JCheckBox m_enableSubtitleChangeCheckBox;
@@ -97,6 +100,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     private final JCheckBox m_enableDotSizeChangeCheckBox;
 
     private final JSpinner m_maxRowsSpinner;
+    private final JTextField m_appendedColumnName;
     private final JTextField m_chartTitleTextField;
     private final JTextField m_chartSubtitleTextField;
     private final ColumnSelectionPanel m_xColComboBox;
@@ -106,10 +110,12 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     private final JSpinner m_dotSize;
 
     /**
-     * @param config The config to read/write from.
+     * Creates a new dialog pane.
      *
      */
     public LinePlotNodeDialogPane() {
+        m_hideInWizardCheckBox = new JCheckBox("Hide in wizard");
+        m_generateImageCheckBox = new JCheckBox("Create image at outport");
         m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
         m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
         m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
@@ -124,6 +130,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         m_showZoomResetCheckBox = new JCheckBox("Show zoom reset button");
 
         m_maxRowsSpinner = new JSpinner();
+        m_appendedColumnName = new JTextField(TEXT_FIELD_SIZE);
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_xColComboBox = new ColumnSelectionPanel("Choose column for x axis", DoubleValue.class, StringValue.class);
@@ -150,14 +157,26 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
         c.gridx = 0;
         c.gridy = 0;
+        c.gridwidth = 2;
+        panel.add(m_hideInWizardCheckBox, c);
+        c.gridx += 2;
+        panel.add(m_generateImageCheckBox, c);
+        c.gridx = 0;
+        c.gridy++;
         c.gridwidth = 1;
-        c.anchor = GridBagConstraints.NORTHWEST;
         panel.add(new JLabel("Maximum number of rows: "), c);
         c.gridx += 1;
         m_maxRowsSpinner.setPreferredSize(new Dimension(100, TEXT_FIELD_SIZE));
         panel.add(m_maxRowsSpinner, c);
+        c.gridx = 0;
+        c.gridy++;
+        c.gridwidth = 1;
+        panel.add(new JLabel("Selection Column Name: "), c);
+        c.gridx++;
+        panel.add(m_appendedColumnName, c);
         c.gridx = 0;
         c.gridy++;
         c.gridwidth = 2;
@@ -251,6 +270,9 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
             throws NotConfigurableException {
         LinePlotViewConfig config = new LinePlotViewConfig();
         config.loadSettingsForDialog(settings);
+        m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
+        m_generateImageCheckBox.setSelected(config.getGenerateImage());
+        m_appendedColumnName.setText(config.getSelectionColumnName());
         m_enableViewConfigCheckBox.setSelected(config.getEnableViewConfiguration());
         m_enableTitleChangeCheckBox.setSelected(config.getEnableTitleChange());
         m_enableSubtitleChangeCheckBox.setSelected(config.getEnableSubtitleChange());
@@ -291,6 +313,9 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         LinePlotViewConfig config = new LinePlotViewConfig();
+        config.setHideInWizard(m_hideInWizardCheckBox.isSelected());
+        config.setGenerateImage(m_generateImageCheckBox.isSelected());
+        config.setSelectionColumnName(m_appendedColumnName.getText());
         config.setEnableViewConfiguration(m_enableViewConfigCheckBox.isSelected());
         config.setEnableTitleChange(m_enableTitleChangeCheckBox.isSelected());
         config.setEnableSubtitleChange(m_enableSubtitleChangeCheckBox.isSelected());

@@ -60,6 +60,11 @@ import org.knime.core.node.NodeSettingsWO;
  */
 final class LinePlotViewConfig {
 
+    static final int DEFAULT_MAX_ROWS = 2500;
+    static final String DEFAULT_SELECTION_COLUMN_NAME = "Selected (Line Plot)";
+
+    static final String HIDE_IN_WIZARD = "hideInWizard";
+    static final String GENERATE_IMAGE = "generateImage";
     static final String ENABLE_CONFIG = "enableViewConfiguration";
     static final String ENABLE_TTILE_CHANGE = "enableTitleChange";
     static final String ENABLE_SUBTTILE_CHANGE = "enableSubtitleChange";
@@ -77,6 +82,7 @@ final class LinePlotViewConfig {
     static final String X_COL = "xCol";
     static final String Y_COLS = "yCols";
     static final String MAX_ROWS = "maxRows";
+    static final String SELECTION_COLUMN_NAME = "selectionColumnName";
     static final String X_AXIS_LABEL = "xAxisLabel";
     static final String Y_AXIS_LABEL = "yAxisLabel";
     static final String X_AXIS_MIN = "xAxisMin";
@@ -85,7 +91,8 @@ final class LinePlotViewConfig {
     static final String Y_AXIS_MAX = "yAxisMax";
     static final String DOT_SIZE = "dot_size";
 
-
+    private boolean m_hideInWizard = false;
+    private boolean m_generateImage = true;
     private boolean m_enableViewConfiguration = false;
     private boolean m_enableTitleChange = false;
     private boolean m_enableSubtitleChange = false;
@@ -98,7 +105,8 @@ final class LinePlotViewConfig {
     private boolean m_enablePanning = true;
     private boolean m_enableDragZooming = false;
     private boolean m_showZoomResetButton = false;
-    private int m_maxRows = 2500;
+    private int m_maxRows = DEFAULT_MAX_ROWS;
+    private String m_selectionColumnName = DEFAULT_SELECTION_COLUMN_NAME;
     private String m_chartTitle;
     private String m_chartSubtitle;
     private String m_xColumn;
@@ -110,6 +118,34 @@ final class LinePlotViewConfig {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize = 3;
+
+    /**
+     * @return the hideInWizard
+     */
+    public boolean getHideInWizard() {
+        return m_hideInWizard;
+    }
+
+    /**
+     * @param hideInWizard the hideInWizard to set
+     */
+    public void setHideInWizard(final boolean hideInWizard) {
+        m_hideInWizard = hideInWizard;
+    }
+
+    /**
+     * @return the generateImage
+     */
+    public boolean getGenerateImage() {
+        return m_generateImage;
+    }
+
+    /**
+     * @param generateImage the generateImage to set
+     */
+    public void setGenerateImage(final boolean generateImage) {
+        m_generateImage = generateImage;
+    }
 
     /**
      * @return the chartTitle
@@ -179,6 +215,20 @@ final class LinePlotViewConfig {
      */
     public void setMaxRows(final int maxRows) {
         m_maxRows = maxRows;
+    }
+
+    /**
+     * @return the selectionColumnName
+     */
+    public String getSelectionColumnName() {
+        return m_selectionColumnName;
+    }
+
+    /**
+     * @param selectionColumnName the selectionColumnName to set
+     */
+    public void setSelectionColumnName(final String selectionColumnName) {
+        m_selectionColumnName = selectionColumnName;
     }
 
     /**
@@ -451,6 +501,8 @@ final class LinePlotViewConfig {
      * @param settings To save to.
      */
     public void saveSettings(final NodeSettingsWO settings) {
+        settings.addBoolean(HIDE_IN_WIZARD, getHideInWizard());
+        settings.addBoolean(GENERATE_IMAGE, getGenerateImage());
         settings.addBoolean(ENABLE_CONFIG, getEnableViewConfiguration());
         settings.addBoolean(ENABLE_TTILE_CHANGE, getEnableTitleChange());
         settings.addBoolean(ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
@@ -468,6 +520,7 @@ final class LinePlotViewConfig {
         settings.addString(X_COL, getxColumn());
         settings.addStringArray(Y_COLS, getyColumns());
         settings.addInt(MAX_ROWS, getMaxRows());
+        settings.addString(SELECTION_COLUMN_NAME, getSelectionColumnName());
         settings.addString(X_AXIS_LABEL, getxAxisLabel());
         settings.addString(Y_AXIS_LABEL, getyAxisLabel());
         settings.addString(X_AXIS_MIN, getxAxisMin() == null ? null : getxAxisMin().toString());
@@ -482,6 +535,8 @@ final class LinePlotViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
+        setGenerateImage(settings.getBoolean(GENERATE_IMAGE));
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE));
@@ -499,6 +554,7 @@ final class LinePlotViewConfig {
         setxColumn(settings.getString(X_COL));
         setyColumns(settings.getStringArray(Y_COLS));
         setMaxRows(settings.getInt(MAX_ROWS));
+        setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL));
         setyAxisLabel(settings.getString(Y_AXIS_LABEL));
         String xMin = settings.getString(X_AXIS_MIN);
@@ -517,6 +573,8 @@ final class LinePlotViewConfig {
      * @param settings To load from.
      */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
+        setGenerateImage(settings.getBoolean(GENERATE_IMAGE, true));
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG, false));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE, false));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE, false));
@@ -533,7 +591,8 @@ final class LinePlotViewConfig {
         setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
         setyColumns(settings.getStringArray(Y_COLS, new String[0]));
-        setMaxRows(settings.getInt(MAX_ROWS, 2500));
+        setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
+        setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL, null));
         setyAxisLabel(settings.getString(Y_AXIS_LABEL, null));
         String xMin = settings.getString(X_AXIS_MIN, null);

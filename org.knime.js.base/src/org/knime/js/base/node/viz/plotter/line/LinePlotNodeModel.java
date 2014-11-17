@@ -50,12 +50,6 @@
  */
 package org.knime.js.base.node.viz.plotter.line;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -66,7 +60,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.knime.base.data.xml.SvgCell;
-import org.knime.base.data.xml.SvgImageContent;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
@@ -87,8 +80,6 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
@@ -97,29 +88,24 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
-import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
+import org.knime.js.core.node.AbstractSVGWizardNodeModel;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-final class LinePlotNodeModel extends NodeModel implements
-    WizardNode<LinePlotViewRepresentation, LinePlotViewValue> {
+final class LinePlotNodeModel extends
+    AbstractSVGWizardNodeModel<LinePlotViewRepresentation, LinePlotViewValue> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(LinePlotNodeModel.class);
 
-    private final Object m_lock = new Object();
     private final LinePlotViewConfig m_config;
-    private LinePlotViewRepresentation m_representation;
-    private LinePlotViewValue m_viewValue;
-
-    private String m_viewPath;
+    private BufferedDataTable m_table;
 
     /**
      * Creates a new model instance.
@@ -128,8 +114,6 @@ final class LinePlotNodeModel extends NodeModel implements
         super(new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE_OPTIONAL},
             new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
         m_config = new LinePlotViewConfig();
-        m_representation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
     }
 
     /**
@@ -161,59 +145,13 @@ final class LinePlotNodeModel extends NodeModel implements
         return new PortObjectSpec[]{imageSpec, out};
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected PortObject[] execute(final PortObject[] inData, final ExecutionContext exec)
-            throws Exception {
-        List<RowKey> selectionList = null;
-        BufferedDataTable inTable = (BufferedDataTable)inData[0];
-        BufferedDataTable colorTable = (BufferedDataTable)inData[1];
-        synchronized (m_lock) {
-            String xColumn = m_viewValue.getxColumn();
-            if (m_representation.getKeyedDataset() == null || xColumn == null) {
-                // create dataset for view
-                copyConfigToView();
-                m_representation.setKeyedDataset(createKeyedDataset(inTable, colorTable, exec));
-            }
-            if (m_viewValue.getSelection() != null && m_viewValue.getSelection().length > 0) {
-                // handle view selection
-                List<String> selections = Arrays.asList(m_viewValue.getSelection());
-                selectionList = new ArrayList<RowKey>();
-                CloseableRowIterator iterator = inTable.iterator();
-                try {
-                    while (iterator.hasNext()) {
-                        DataRow row = iterator.next();
-                        if (selections.contains(row.getKey().getString())) {
-                            selectionList.add(row.getKey());
-                        }
-                    }
-                } finally {
-                    iterator.close();
-                }
-            }
-        }
-        ColumnRearranger rearranger = createColumnAppender(inTable.getDataTableSpec(), selectionList);
-        BufferedDataTable out = exec.createColumnRearrangeTable(inTable, rearranger, exec);
-        exec.setProgress(1);
-
-        String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-        String svgPrimer = xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
-                + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
-        String svg = m_viewValue.getImage();
-        if (svg == null || svg.isEmpty()) {
-            svg = "<svg width=\"1px\" height=\"1px\"></svg>";
-        }
-        svg = svgPrimer + svg;
-        InputStream is = new ByteArrayInputStream(svg.getBytes());
-        ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
-        PortObject imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
-        return new PortObject[]{imagePort, out};
-    }
-
     private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
-        String newColName = "Selected (Line Plot)";
+        String newColName = m_config.getSelectionColumnName();
+        if (newColName == null || newColName.trim().isEmpty()) {
+            newColName = LinePlotViewConfig.DEFAULT_SELECTION_COLUMN_NAME;
+        }
+        newColName = DataTableSpec.getUniqueColumnName(spec, newColName);
+
         DataColumnSpec outColumnSpec =
                 new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
@@ -231,11 +169,121 @@ final class LinePlotNodeModel extends NodeModel implements
         return rearranger;
     }
 
-    private JSONKeyedValues2DDataset createKeyedDataset(final BufferedDataTable inTable,
-            final BufferedDataTable colorTable, final ExecutionContext exec) throws CanceledExecutionException {
-        ColumnRearranger c = createNumericColumnRearranger(inTable.getDataTableSpec());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LinePlotViewRepresentation createEmptyViewRepresentation() {
+        return new LinePlotViewRepresentation();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LinePlotViewValue createEmptyViewValue() {
+        return new LinePlotViewValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getJavascriptObjectID() {
+        return "org.knime.js.base.node.viz.plotter.line";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        return m_config.getHideInWizard();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ValidationError validateViewValue(final LinePlotViewValue viewContent) {
+        synchronized (getLock()) {
+            // validate value, nothing to do atm
+        }
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        // do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void performExecuteCreateView(final PortObject[] inData, final ExecutionContext exec)
+        throws Exception {
+        synchronized (getLock()) {
+            m_table = (BufferedDataTable)inData[0];
+            BufferedDataTable colorTable = (BufferedDataTable)inData[1];
+            LinePlotViewRepresentation representation = getViewRepresentation();
+            String xColumn = getViewValue().getxColumn();
+            if (representation.getKeyedDataset() == null || xColumn == null) {
+                // create dataset for view
+                copyConfigToView();
+                representation.setKeyedDataset(createKeyedDataset(colorTable, exec));
+                // don't use staggered rendering for image creation
+                representation.setEnableStaggeredRendering(false);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected PortObject[] performExecuteCreatePortObjects(final ImagePortObject svgImageFromView,
+        final ExecutionContext exec) throws Exception {
+        List<RowKey> selectionList = null;
+        synchronized (getLock()) {
+            // enable staggered rendering for interactive view
+            getViewRepresentation().setEnableStaggeredRendering(true);
+
+            LinePlotViewValue viewValue = getViewValue();
+            if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
+                // handle view selection
+                List<String> selections = Arrays.asList(viewValue.getSelection());
+                selectionList = new ArrayList<RowKey>();
+                CloseableRowIterator iterator = m_table.iterator();
+                try {
+                    while (iterator.hasNext()) {
+                        DataRow row = iterator.next();
+                        if (selections.contains(row.getKey().getString())) {
+                            selectionList.add(row.getKey());
+                        }
+                    }
+                } finally {
+                    iterator.close();
+                }
+            }
+        }
+        exec.setProgress(0.5);
+        ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+        BufferedDataTable out =
+            exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
+        exec.setProgress(1);
+        return new PortObject[]{svgImageFromView, out};
+    }
+
+    private JSONKeyedValues2DDataset createKeyedDataset(final BufferedDataTable colorTable, final ExecutionContext exec)
+            throws CanceledExecutionException {
+
+        ColumnRearranger c = createNumericColumnRearranger(m_table.getDataTableSpec());
         BufferedDataTable filteredTable =
-            exec.createColumnRearrangeTable(inTable, c, exec.createSubProgress(0.1));
+            exec.createColumnRearrangeTable(m_table, c, exec.createSubProgress(0.1));
         exec.setProgress(0.1);
         //construct dataset
         if (m_config.getMaxRows() < filteredTable.getRowCount()) {
@@ -288,13 +336,14 @@ final class LinePlotNodeModel extends NodeModel implements
             }
         }
 
-        final String xColumn = m_viewValue.getxColumn();
+        LinePlotViewValue viewValue = getViewValue();
+        final String xColumn = viewValue.getxColumn();
         if (StringUtils.isEmpty(xColumn) || !Arrays.asList(tableSpec.getColNames()).contains(xColumn)) {
-            m_viewValue.setxColumn(tableSpec.getColNames()[0]);
+            viewValue.setxColumn(tableSpec.getColNames()[0]);
         }
-        final String[] yColumns = m_viewValue.getyColumns();
+        final String[] yColumns = viewValue.getyColumns();
         if (yColumns == null || !Arrays.asList(tableSpec.getColNames()).containsAll(Arrays.asList(yColumns))) {
-            m_viewValue.setyColumns(new String[]{tableSpec.getColNames()[tableSpec.getNumColumns() > 1 ? 1 : 0]});
+            viewValue.setyColumns(new String[]{tableSpec.getColNames()[tableSpec.getNumColumns() > 1 ? 1 : 0]});
         }
 
         return dataset;
@@ -350,150 +399,16 @@ final class LinePlotNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public ValidationError validateViewValue(final LinePlotViewValue viewContent) {
-        synchronized (m_lock) {
-            // validate value
-        }
-        return null;
+    protected void performReset() {
+        m_table = null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final LinePlotViewValue viewValue, final boolean useAsDefault) {
-        synchronized (m_lock) {
-            m_viewValue = viewValue;
-            if (useAsDefault) {
-                copyValueToConfig();
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LinePlotViewRepresentation getViewRepresentation() {
-        synchronized (m_lock) {
-            return m_representation;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LinePlotViewValue getViewValue() {
-        synchronized (m_lock) {
-            return m_viewValue;
-        }
-    }
-
-    private void copyConfigToView() {
-        m_representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
-        m_representation.setEnableTitleChange(m_config.getEnableTitleChange());
-        m_representation.setEnableSubtitleChange(m_config.getEnableSubtitleChange());
-        m_representation.setEnableXColumnChange(m_config.getEnableXColumnChange());
-        m_representation.setEnableYColumnChange(m_config.getEnableYColumnChange());
-        m_representation.setEnableXAxisLabelEdit(m_config.getEnableXAxisLabelEdit());
-        m_representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
-        m_representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
-        m_representation.setEnableZooming(m_config.getEnableZooming());
-        m_representation.setEnableDragZooming(m_config.getEnableDragZooming());
-        m_representation.setEnablePanning(m_config.getEnablePanning());
-        m_representation.setShowZoomResetButton(m_config.getShowZoomResetButton());
-
-        m_viewValue.setChartTitle(m_config.getChartTitle());
-        m_viewValue.setChartSubtitle(m_config.getChartSubtitle());
-        m_viewValue.setxColumn(m_config.getxColumn());
-        m_viewValue.setyColumns(m_config.getyColumns());
-        m_viewValue.setxAxisLabel(m_config.getxAxisLabel());
-        m_viewValue.setyAxisLabel(m_config.getyAxisLabel());
-        m_viewValue.setxAxisMin(m_config.getxAxisMin());
-        m_viewValue.setxAxisMax(m_config.getxAxisMax());
-        m_viewValue.setyAxisMin(m_config.getyAxisMin());
-        m_viewValue.setyAxisMax(m_config.getyAxisMax());
-        m_viewValue.setDotSize(m_config.getDotSize());
-    }
-
-    private void copyValueToConfig() {
-        m_config.setChartTitle(m_viewValue.getChartTitle());
-        m_config.setChartSubtitle(m_viewValue.getChartSubtitle());
-        m_config.setxColumn(m_viewValue.getxColumn());
-        m_config.setyColumns(m_viewValue.getyColumns());
-        m_config.setxAxisLabel(m_viewValue.getxAxisLabel());
-        m_config.setyAxisLabel(m_viewValue.getyAxisLabel());
-        m_config.setxAxisMin(m_viewValue.getxAxisMin());
-        m_config.setxAxisMax(m_viewValue.getxAxisMax());
-        m_config.setyAxisMin(m_viewValue.getyAxisMin());
-        m_config.setyAxisMax(m_viewValue.getyAxisMax());
-        m_config.setDotSize(m_viewValue.getDotSize());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LinePlotViewRepresentation createEmptyViewRepresentation() {
-        return new LinePlotViewRepresentation();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LinePlotViewValue createEmptyViewValue() {
-        return new LinePlotViewValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getJavascriptObjectID() {
-        return "org.knime.js.base.node.viz.plotter.line";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        File repFile = new File(nodeInternDir, "representation.xml");
-        File valFile = new File(nodeInternDir, "value.xml");
-        NodeSettingsRO repSettings = NodeSettings.loadFromXML(new FileInputStream(repFile));
-        NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
-        m_representation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
-        try {
-            m_representation.loadFromNodeSettings(repSettings);
-            m_viewValue.loadFromNodeSettings(valSettings);
-        } catch (InvalidSettingsException e) {
-            // what to do?
-            LOGGER.error("Error loading internals: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        NodeSettings repSettings = new NodeSettings("scatterPlotViewRepresentation");
-        NodeSettings valSettings = new NodeSettings("scatterPlotViewValue");
-        if (m_representation != null) {
-            m_representation.saveToNodeSettings(repSettings);
-        }
-        if (m_viewValue != null) {
-            m_viewValue.saveToNodeSettings(valSettings);
-        }
-        File repFile = new File(nodeInternDir, "representation.xml");
-        File valFile = new File(nodeInternDir, "value.xml");
-        repSettings.saveToXML(new FileOutputStream(repFile));
-        valSettings.saveToXML(new FileOutputStream(valFile));
+    protected String getInteractiveViewName() {
+        return (new LinePlotNodeFactory()).getInteractiveViewName();
     }
 
     /**
@@ -524,10 +439,9 @@ final class LinePlotNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        synchronized (m_lock) {
-            m_representation = createEmptyViewRepresentation();
-            m_viewValue = createEmptyViewValue();
+    protected void useCurrentValueAsDefault() {
+        synchronized (getLock()) {
+            copyValueToConfig();
         }
     }
 
@@ -535,47 +449,53 @@ final class LinePlotNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public boolean isHideInWizard() {
-        // TODO Auto-generated method stub
-        return false;
+    protected boolean generateImage() {
+        return m_config.getGenerateImage();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void saveCurrentValue(final NodeSettingsWO content) {
-        // TODO Auto-generated method stub
+    private void copyConfigToView() {
+        LinePlotViewRepresentation representation = getViewRepresentation();
+        representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
+        representation.setEnableTitleChange(m_config.getEnableTitleChange());
+        representation.setEnableSubtitleChange(m_config.getEnableSubtitleChange());
+        representation.setEnableXColumnChange(m_config.getEnableXColumnChange());
+        representation.setEnableYColumnChange(m_config.getEnableYColumnChange());
+        representation.setEnableXAxisLabelEdit(m_config.getEnableXAxisLabelEdit());
+        representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
+        representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
+        representation.setEnableZooming(m_config.getEnableZooming());
+        representation.setEnableDragZooming(m_config.getEnableDragZooming());
+        representation.setEnablePanning(m_config.getEnablePanning());
+        representation.setShowZoomResetButton(m_config.getShowZoomResetButton());
 
+        LinePlotViewValue viewValue = getViewValue();
+        viewValue.setChartTitle(m_config.getChartTitle());
+        viewValue.setChartSubtitle(m_config.getChartSubtitle());
+        viewValue.setxColumn(m_config.getxColumn());
+        viewValue.setyColumns(m_config.getyColumns());
+        viewValue.setxAxisLabel(m_config.getxAxisLabel());
+        viewValue.setyAxisLabel(m_config.getyAxisLabel());
+        viewValue.setxAxisMin(m_config.getxAxisMin());
+        viewValue.setxAxisMax(m_config.getxAxisMax());
+        viewValue.setyAxisMin(m_config.getyAxisMin());
+        viewValue.setyAxisMax(m_config.getyAxisMax());
+        viewValue.setDotSize(m_config.getDotSize());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getViewHTMLPath() {
-        if (m_viewPath == null || m_viewPath.isEmpty()) {
-            // view is not created
-            m_viewPath = createViewPath();
-        } else {
-            // check if file still exists, create otherwise
-            File viewFile = new File(m_viewPath);
-            if (!viewFile.exists()) {
-                m_viewPath = createViewPath();
-            }
-        }
-        return m_viewPath;
+    private void copyValueToConfig() {
+        LinePlotViewValue viewValue = getViewValue();
+        m_config.setChartTitle(viewValue.getChartTitle());
+        m_config.setChartSubtitle(viewValue.getChartSubtitle());
+        m_config.setxColumn(viewValue.getxColumn());
+        m_config.setyColumns(viewValue.getyColumns());
+        m_config.setxAxisLabel(viewValue.getxAxisLabel());
+        m_config.setyAxisLabel(viewValue.getyAxisLabel());
+        m_config.setxAxisMin(viewValue.getxAxisMin());
+        m_config.setxAxisMax(viewValue.getxAxisMax());
+        m_config.setyAxisMin(viewValue.getyAxisMin());
+        m_config.setyAxisMax(viewValue.getyAxisMax());
+        m_config.setDotSize(viewValue.getDotSize());
     }
 
-    private String createViewPath() {
-        JavaScriptViewCreator<LinePlotViewRepresentation, LinePlotViewValue> viewCreator =
-            new JavaScriptViewCreator<LinePlotViewRepresentation, LinePlotViewValue>(
-                getJavascriptObjectID());
-        try {
-            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
-        } catch (IOException e) {
-            return null;
-        }
-    }
 
 }

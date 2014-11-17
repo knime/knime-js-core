@@ -81,6 +81,7 @@ public class LinePlotViewRepresentation extends JSONViewContent {
     private boolean m_enablePanning;
     private boolean m_showZoomResetButton;
 
+    private boolean m_enableStaggeredRendering = true;
 
     /**
      * @return the keyedDataset
@@ -262,6 +263,20 @@ public class LinePlotViewRepresentation extends JSONViewContent {
      */
     public void setShowZoomResetButton(final boolean showZoomResetButton) {
         m_showZoomResetButton = showZoomResetButton;
+    }
+
+    /**
+     * @return the enableStaggeredRendering
+     */
+    public boolean getEnableStaggeredRendering() {
+        return m_enableStaggeredRendering;
+    }
+
+    /**
+     * @param enableStaggeredRendering the enableStaggeredRendering to set
+     */
+    public void setEnableStaggeredRendering(final boolean enableStaggeredRendering) {
+        m_enableStaggeredRendering = enableStaggeredRendering;
     }
 
     /**
