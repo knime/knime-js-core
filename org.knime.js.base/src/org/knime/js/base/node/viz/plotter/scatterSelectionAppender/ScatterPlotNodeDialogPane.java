@@ -170,10 +170,13 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         panel.add(m_maxRowsSpinner, c);
         c.gridx = 0;
         c.gridy++;
-        c.gridwidth = 2;
+        c.gridwidth = 1;
+        panel.add(new JLabel("Selection Column Name: "), c);
+        c.gridx++;
         panel.add(m_appendedColumnName, c);
         c.gridx = 0;
         c.gridy++;
+        c.gridwidth = 2;
         panel.add(m_enableViewConfigCheckBox, c);
         c.gridx = 0;
         c.gridy++;
