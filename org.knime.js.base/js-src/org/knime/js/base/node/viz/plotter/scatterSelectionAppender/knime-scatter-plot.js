@@ -435,7 +435,6 @@ knime_scatter_plot_selection_appender = function() {
 	
 	view.getComponentValue = function() {
 		_value.selection = getSelection();
-		_value.image = view.getSVG();
 		return _value;
 	};
 	

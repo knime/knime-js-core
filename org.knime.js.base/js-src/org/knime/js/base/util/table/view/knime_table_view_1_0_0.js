@@ -15,6 +15,10 @@ knime_table_view = function(table, containerElement) {
 	var sortable = false;
 	var sortColumn = null;
 	var sortAscending = true;
+	var enableSelection = true;
+	var selectAllCheckbox;
+	
+	var initialSelections = [];
 	
 	var drawingStartTime = 0;
 	
@@ -33,17 +37,28 @@ knime_table_view = function(table, containerElement) {
 			var headerRow = $('<tr>');
 			headerRow.attr('class', 'knimeTableRow knimeTableHeaderRow');
 			table.append(headerRow);
-			for ( var i = -1; i < knimeTable.getColumnNames().length; i++) {
+			if (enableSelection) {
 				var tableHeader = $('<th>');
-				if(i >= 0) {
-					showColumnHeader && tableHeader.text(knimeTable.getColumnNames()[i]);
-					tableHeader.attr('class', 'knimeTableCell knimeTableHeaderCell');
-					headerRow.append(tableHeader);
-				} else if (showRowKeys) {
-					showColumnHeader && tableHeader.text("Row ID");
-					tableHeader.attr('class', 'knimeTableCell knimeTableHeaderCell knimeTableRowKeyHeaderCell');
-					headerRow.append(tableHeader);
-				}
+				selectAllCheckbox = $('<input type="checkbox">');
+				selectAllCheckbox.change(function() {
+					$('td.knimeTableSelectCell input').prop('checked', selectAllCheckbox.get(0).checked);
+				});
+				selectAllCheckbox.prop('disabled', true);
+				tableHeader.attr('class', 'knimeTableCell knimeTableHeaderCell knimeTableSelectAll');
+				showColumnHeader && tableHeader.append(selectAllCheckbox);
+				headerRow.append(tableHeader);
+			}
+			if (showRowKeys) {
+				var tableHeader = $('<th>');
+				showColumnHeader && tableHeader.text("Row ID");
+				tableHeader.attr('class', 'knimeTableCell knimeTableHeaderCell knimeTableRowKeyHeaderCell');
+				headerRow.append(tableHeader);
+			}
+			for ( var i = 0; i < knimeTable.getColumnNames().length; i++) {
+				var tableHeader = $('<th>');
+				showColumnHeader && tableHeader.text(knimeTable.getColumnNames()[i]);
+				tableHeader.attr('class', 'knimeTableCell knimeTableHeaderCell');
+				headerRow.append(tableHeader);
 			}
 		}
 		var initialChunkSize = 20;
@@ -77,6 +92,7 @@ knime_table_view = function(table, containerElement) {
 				};
 			})(table, startIndex + chunkSize, newChunkSize), chunkDuration);
 		} else {
+			selectAllCheckbox.prop('disabled', false);
 			//var totalDrawDuration = new Date().getTime() - drawingStartTime;
 			//console.log("Total layout time " + totalDrawDuration + "ms.");
 		}
@@ -87,6 +103,18 @@ knime_table_view = function(table, containerElement) {
 			var tableRow = $('<tr>');
 			tableRow.attr('id', 'row' + i);
 			tableRow.attr('class', 'knimeTableRow');
+			var rowKey = knimeTable.getRows()[i].rowKey;
+			
+			if (enableSelection) {
+				var selectCell = $('<td>');
+				selectCell.attr('class', 'knimeTableCell knimeTableSelectCell');
+				var selectCheckbox = $('<input type="checkbox">');
+				selectCheckbox.addClass(rowKey);
+				var selected = $.inArray(rowKey, initialSelections) >= 0;
+				selectCheckbox.prop('checked', selected);
+				selectCell.append(selectCheckbox);
+				tableRow.append(selectCell); 
+			}
 			
 			if (showRowKeys) {
 				var rowKeyCell = $('<td>');
@@ -136,6 +164,18 @@ knime_table_view = function(table, containerElement) {
 		}
 	};
 	
+	tableView.setSelection = function(selections) {
+		initialSelections = selections;
+	};
+	
+	tableView.getSelectedRowKeys = function() {
+		var selected = [];
+		$('td.knimeTableSelectCell input').each(function() {
+			$(this).prop('checked') && selected.push($(this).attr('class'));
+		});
+		return selected;
+	};
+	
 	tableView.redraw = function() {
 		if (tableDrawn) {
 			container.empty();
@@ -144,6 +184,13 @@ knime_table_view = function(table, containerElement) {
 			tableView.draw();
 		}
 	};
+	
+	tableView.setEnableSelection = function(enable) {
+		enableSelection = enable;
+	}
+	tableView.isEnableSelection = function() {
+		return enableSelection;
+	}
 	
 	tableView.setShowColumnHeader = function(show, redraw) {
 		showColumnHeader = show;

@@ -226,12 +226,13 @@ public class ScatterPlotNodeModel extends
             m_table = (BufferedDataTable)inData[0];
             ScatterPlotViewRepresentation representation = getViewRepresentation();
             String xColumn = getViewValue().getxColumn();
+            // don't use staggered rendering for image creation
+            representation.setEnableStaggeredRendering(false);
+            // Test if re-execute, dataset generation not necessary
             if (representation.getKeyedDataset() == null || xColumn == null) {
                 // create dataset for view
                 copyConfigToView();
                 representation.setKeyedDataset(createKeyedDataset(exec));
-                // don't use staggered rendering for image creation
-                representation.setEnableStaggeredRendering(false);
             }
         }
     }

@@ -63,7 +63,7 @@ public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewReprese
     /**
      */
     protected WebTableViewNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[0]);
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
     }
 
     /**

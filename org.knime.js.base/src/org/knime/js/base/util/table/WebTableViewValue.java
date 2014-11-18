@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   14.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
@@ -57,23 +57,38 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class WebTableViewValue extends JSONViewContent {
 
-    
-    
+    static final String SELECTED_KEYS = "selectedKeys";
+
+    private String[] m_selection;
+
+    /**
+     * @return the selection
+     */
+    public String[] getSelection() {
+        return m_selection;
+    }
+
+    /**
+     * @param selection the selection to set
+     */
+    public void setSelection(final String[] selection) {
+        m_selection = selection;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO Auto-generated method stub
-
+        settings.addStringArray(SELECTED_KEYS, getSelection());
     }
 
     /**
@@ -82,8 +97,7 @@ public class WebTableViewValue extends JSONViewContent {
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        setSelection(settings.getStringArray(SELECTED_KEYS));
     }
 
 }

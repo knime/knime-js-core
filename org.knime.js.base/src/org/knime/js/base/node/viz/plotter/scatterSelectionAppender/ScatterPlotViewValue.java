@@ -67,7 +67,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class ScatterPlotViewValue extends JSONViewContent {
 
     static final String SELECTED_KEYS = "selectedKeys";
-    static final String IMAGE = "image";
 
     private String m_chartTitle;
     private String m_chartSubtitle;
@@ -81,7 +80,6 @@ public class ScatterPlotViewValue extends JSONViewContent {
     private Double m_yAxisMax;
     private Integer m_dotSize;
     private String[] m_selection;
-    private String m_image;
 
     /**
      * @return the chartTitle
@@ -252,20 +250,6 @@ public class ScatterPlotViewValue extends JSONViewContent {
     }
 
     /**
-     * @return the image
-     */
-    public String getImage() {
-        return m_image;
-    }
-
-    /**
-     * @param image the image to set
-     */
-    public void setImage(final String image) {
-        m_image = image;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -282,7 +266,6 @@ public class ScatterPlotViewValue extends JSONViewContent {
         settings.addString(ScatterPlotViewConfig.Y_AXIS_MAX, getyAxisMax() == null ? null : getyAxisMax().toString());
         settings.addString(ScatterPlotViewConfig.DOT_SIZE, getDotSize() == null ? null : getDotSize().toString());
         settings.addStringArray(ScatterPlotViewValue.SELECTED_KEYS, m_selection);
-        settings.addString(ScatterPlotViewValue.IMAGE, getImage());
     }
 
     /**
@@ -307,7 +290,6 @@ public class ScatterPlotViewValue extends JSONViewContent {
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
         setSelection(settings.getStringArray(ScatterPlotViewValue.SELECTED_KEYS));
-        setImage(settings.getString(ScatterPlotViewValue.IMAGE));
     }
 
 }

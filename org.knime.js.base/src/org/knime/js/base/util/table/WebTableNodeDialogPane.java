@@ -51,7 +51,9 @@ package org.knime.js.base.util.table;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
+import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  *
@@ -73,6 +75,12 @@ public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
 
         addDialogComponent(new DialogComponentNumber(WebTableNodeModel.createDecimalPlacesModel(numberFormatterModel),
             "Decimal Places", 1));
+
+        final SettingsModelBoolean selectionEnabledModel = WebTableNodeModel.createEnableSelectionModel();
+        addDialogComponent(new DialogComponentBoolean(selectionEnabledModel, "Enable Selection"));
+
+        final SettingsModelString selectionColumnNameModel = WebTableNodeModel.createSelectionColumnNameModel();
+        addDialogComponent(new DialogComponentString(selectionColumnNameModel, "Selection Column Name"));
 
         // get standard signs according to current locale
 //        @SuppressWarnings("static-access")

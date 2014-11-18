@@ -52,10 +52,25 @@ import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
+import org.knime.core.data.DataRow;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
+import org.knime.core.data.RowKey;
+import org.knime.core.data.container.CellFactory;
+import org.knime.core.data.container.CloseableRowIterator;
+import org.knime.core.data.container.ColumnRearranger;
+import org.knime.core.data.container.SingleCellFactory;
+import org.knime.core.data.def.BooleanCell;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.CanceledExecutionException;
@@ -90,6 +105,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public static final String CFG_END = "end";
     /** Config key if number formatter used. */
     public static final String CFG_USE_NUMBER_FORMATTER = "useNumberFormatter";
+    /** Config key if selection is enabled. */
+    public static final String CFG_ENABLE_SELECTION = "enableSelection";
+    /** Config key for selection column name. */
+    public static final String CFG_SELECTION_COLUMN_NAME = "selectionColumnName";
     /** Config key for the number of decimal places. */
     public static final String CFG_DECIMAL_PLACES = "decimalPlaces";
     /** Config key for the decimal separator sign. */
@@ -98,6 +117,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public static final String CFG_THOUSANDS_SEPARATOR = "thousandsSeparator";
     /** Default end row for table creation. */
     public static final int END = 2500;
+    public static final String DEFAULT_SELECTION_COLUMN_NAME = "Selected (Table View)";
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(WebTableNodeModel.class);
 
@@ -109,6 +129,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private final SettingsModelIntegerBounded m_maxRows = createLastDisplayedRowModel(END);
     private final SettingsModelBoolean m_useNumberFormatter = createUseNumberFormatterModel();
     private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
+    private final SettingsModelBoolean m_enableSelection = createEnableSelectionModel();
+    private final SettingsModelString m_selectionColumnName = createSelectionColumnNameModel();
     private String m_viewPath;
 //    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
 //    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
@@ -127,7 +149,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     }
 
     /** @param end The last row index to display.
-     * @return settings model for the max row count property.
+     * @return Settings model for the max row count property.
      * */
     static SettingsModelIntegerBounded createLastDisplayedRowModel(
             final int end) {
@@ -135,9 +157,18 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 CFG_END, end, 1, Integer.MAX_VALUE);
     }
 
-    /** @return settings model for the use number formatter property. */
+    /** @return Settings model for the use number formatter property. */
     static SettingsModelBoolean createUseNumberFormatterModel() {
         return new SettingsModelBoolean(CFG_USE_NUMBER_FORMATTER, false);
+    }
+
+    /** @return Settings model for the selection enabled property. */
+    static SettingsModelBoolean createEnableSelectionModel() {
+        return new SettingsModelBoolean(CFG_ENABLE_SELECTION, true);
+    }
+
+    static SettingsModelString createSelectionColumnNameModel() {
+        return new SettingsModelString(CFG_SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME);
     }
 
     /** @param useNumberFormatter for enable/disablement
@@ -178,8 +209,35 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-        return new PortObjectSpec[0];
+
+        DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
+        ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
+        DataTableSpec out = rearranger.createSpec();
+
+        return new PortObjectSpec[]{out};
+    }
+
+    private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
+        String newColName = m_selectionColumnName.getStringValue();
+        if (newColName == null || newColName.trim().isEmpty()) {
+            newColName = DEFAULT_SELECTION_COLUMN_NAME;
+        }
+        newColName = DataTableSpec.getUniqueColumnName(spec, newColName);
+        DataColumnSpec outColumnSpec =
+                new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
+        ColumnRearranger rearranger = new ColumnRearranger(spec);
+        CellFactory fac = new SingleCellFactory(outColumnSpec) {
+            @Override
+            public DataCell getCell(final DataRow row) {
+                if (selectionList != null && selectionList.contains(row.getKey())) {
+                    return BooleanCell.TRUE;
+                } else {
+                    return BooleanCell.FALSE;
+                }
+            }
+        };
+        rearranger.append(fac);
+        return rearranger;
     }
 
     /**
@@ -187,11 +245,35 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        m_table = (BufferedDataTable)inObjects[0];
-        createJSONTableFromBufferedDataTable(exec);
-        m_viewRepresentation.setTable(m_jsonTable);
-        setNumberFormatter();
-        return new PortObject[0];
+        if (m_viewRepresentation.getTable() == null) {
+            m_table = (BufferedDataTable)inObjects[0];
+            createJSONTableFromBufferedDataTable(exec.createSubExecutionContext(0.5));
+            m_viewRepresentation.setTable(m_jsonTable);
+            setNumberFormatter();
+            m_viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+        }
+        List<RowKey> selectionList = null;
+        if (m_viewValue.getSelection() != null && m_viewValue.getSelection().length > 0) {
+            // handle view selection
+            List<String> selections = Arrays.asList(m_viewValue.getSelection());
+            selectionList = new ArrayList<RowKey>();
+            CloseableRowIterator iterator = m_table.iterator();
+            try {
+                while (iterator.hasNext()) {
+                    DataRow row = iterator.next();
+                    if (selections.contains(row.getKey().getString())) {
+                        selectionList.add(row.getKey());
+                    }
+                }
+            } finally {
+                iterator.close();
+            }
+        }
+        ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+        BufferedDataTable out =
+            exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
+        exec.setProgress(1);
+        return new PortObject[]{out};
     }
 
     private void createJSONTableFromBufferedDataTable(final ExecutionContext exec) throws CanceledExecutionException {
@@ -314,6 +396,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_jsonTable = JSONDataTable.loadFromNodeSettings(settings);
         m_viewRepresentation.setTable(m_jsonTable);*/
         setNumberFormatter();
+        m_viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
     }
 
     /**
@@ -324,6 +407,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.saveSettingsTo(settings);
         m_useNumberFormatter.saveSettingsTo(settings);
         m_decimalPlaces.saveSettingsTo(settings);
+        m_enableSelection.saveSettingsTo(settings);
+        m_selectionColumnName.saveSettingsTo(settings);
 //        m_decimalSeparator.saveSettingsTo(settings);
 //        m_thousandsSeparator.saveSettingsTo(settings);
     }
@@ -336,6 +421,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.validateSettings(settings);
         m_useNumberFormatter.validateSettings(settings);
         m_decimalPlaces.validateSettings(settings);
+        m_enableSelection.validateSettings(settings);
+        m_selectionColumnName.validateSettings(settings);
 //        SettingsModelString tempDecimalSeparator =
 //            (SettingsModelString)m_decimalSeparator.createCloneWithValidatedValue(settings);
 //        SettingsModelString tempThousandSeparator =
@@ -354,6 +441,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_maxRows.loadSettingsFrom(settings);
         m_useNumberFormatter.loadSettingsFrom(settings);
         m_decimalPlaces.loadSettingsFrom(settings);
+        m_enableSelection.loadSettingsFrom(settings);
+        m_selectionColumnName.loadSettingsFrom(settings);
 //        m_decimalSeparator.loadSettingsFrom(settings);
 //        m_thousandsSeparator.loadSettingsFrom(settings);
     }
@@ -367,6 +456,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_jsonTable = null;
         m_viewRepresentation = createEmptyViewRepresentation();
         m_viewValue = createEmptyViewValue();
+        m_viewPath = null;
     }
 
     /**

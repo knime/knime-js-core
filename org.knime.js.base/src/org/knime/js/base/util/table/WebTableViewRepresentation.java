@@ -67,8 +67,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class WebTableViewRepresentation extends JSONViewContent {
 
     private JSONDataTable m_table;
-
     private JSONNumberFormatter m_numberFormatter;
+    private boolean m_enableSelection;
 
     /** Serialization constructor. Don't use. */
     public WebTableViewRepresentation() { }
@@ -113,12 +113,27 @@ public class WebTableViewRepresentation extends JSONViewContent {
     }
 
     /**
+     * @return the enableSelection
+     */
+    public boolean getEnableSelection() {
+        return m_enableSelection;
+    }
+
+    /**
+     * @param enableSelection the enableSelection to set
+     */
+    public void setEnableSelection(final boolean enableSelection) {
+        m_enableSelection = enableSelection;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         // TODO save table?
+
     }
 
     /**
