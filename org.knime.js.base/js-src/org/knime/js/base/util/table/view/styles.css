@@ -48,3 +48,15 @@ table.knimeTableView .knimeTableRowKeyText {
 	display: inline-block;
 	vertical-align: middle;
 }
+
+table.knimeTableView .knimeTableSelectCell, table.knimeTableView .knimeTableSelectAll {
+	text-align: center;
+	vertical-align: middle;
+	padding: 0;
+}
+
+input[type='checkbox'] {
+	margin: 1px 2px;
+	padding: 0;
+	display: block;
+}

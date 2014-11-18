@@ -78,18 +78,17 @@ public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewReprese
      * {@inheritDoc}
      */
     @Override
-    public boolean isHideInWizard() {
+    public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
-        return false;
+
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveCurrentValue(final NodeSettingsWO content) {
-        // TODO Auto-generated method stub
-
+    protected String getInteractiveViewName() {
+        return (new WebTableViewNodeFactory()).getInteractiveViewName();
     }
 
 }

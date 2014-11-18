@@ -132,8 +132,7 @@ public class WebTableViewRepresentation extends JSONViewContent {
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        // TODO save table?
-
+        // save nothing?
     }
 
     /**
@@ -142,7 +141,7 @@ public class WebTableViewRepresentation extends JSONViewContent {
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO load table?
+        // load nothing?
     }
 
 }

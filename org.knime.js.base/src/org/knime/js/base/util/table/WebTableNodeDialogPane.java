@@ -66,21 +66,25 @@ public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
      */
     public WebTableNodeDialogPane() {
         super();
+
+        final SettingsModelBoolean hideInWizardModel = WebTableNodeModel.createHideInWizardModel();
+        addDialogComponent(new DialogComponentBoolean(hideInWizardModel, "Hide in wizard"));
+
         addDialogComponent(new DialogComponentNumber(
             WebTableNodeModel.createLastDisplayedRowModel(WebTableNodeModel.END),
             "No. of rows to display:", 10));
 
         final SettingsModelBoolean numberFormatterModel = WebTableNodeModel.createUseNumberFormatterModel();
-        addDialogComponent(new DialogComponentBoolean(numberFormatterModel, "Enable Number Formatter"));
+        addDialogComponent(new DialogComponentBoolean(numberFormatterModel, "Enable number formatter"));
 
         addDialogComponent(new DialogComponentNumber(WebTableNodeModel.createDecimalPlacesModel(numberFormatterModel),
-            "Decimal Places", 1));
+            "Decimal places", 1));
 
         final SettingsModelBoolean selectionEnabledModel = WebTableNodeModel.createEnableSelectionModel();
-        addDialogComponent(new DialogComponentBoolean(selectionEnabledModel, "Enable Selection"));
+        addDialogComponent(new DialogComponentBoolean(selectionEnabledModel, "Enable selection"));
 
         final SettingsModelString selectionColumnNameModel = WebTableNodeModel.createSelectionColumnNameModel();
-        addDialogComponent(new DialogComponentString(selectionColumnNameModel, "Selection Column Name"));
+        addDialogComponent(new DialogComponentString(selectionColumnNameModel, "Selection column name"));
 
         // get standard signs according to current locale
 //        @SuppressWarnings("static-access")

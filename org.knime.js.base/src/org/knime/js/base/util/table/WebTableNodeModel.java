@@ -47,8 +47,6 @@
  */
 package org.knime.js.base.util.table;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -75,10 +73,8 @@ import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.BufferedDataTableHolder;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
@@ -88,9 +84,8 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
-import org.knime.js.core.JavaScriptViewCreator;
+import org.knime.js.core.node.AbstractWizardNodeModel;
 
 /**
  *
@@ -99,8 +94,10 @@ import org.knime.js.core.JavaScriptViewCreator;
  * @param <VAL>
  */
 public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, VAL extends WebTableViewValue>
-        extends NodeModel implements WizardNode<REP, VAL>, BufferedDataTableHolder {
+        extends AbstractWizardNodeModel<REP, VAL> implements BufferedDataTableHolder {
 
+    /** Config key for hide in wizard. */
+    public static final String CFG_HIDE_IN_WIZARD = "hideInWizard";
     /** Config key for the last displayed row. */
     public static final String CFG_END = "end";
     /** Config key if number formatter used. */
@@ -117,21 +114,20 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public static final String CFG_THOUSANDS_SEPARATOR = "thousandsSeparator";
     /** Default end row for table creation. */
     public static final int END = 2500;
+    /** Default selection column name. */
     public static final String DEFAULT_SELECTION_COLUMN_NAME = "Selected (Table View)";
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(WebTableNodeModel.class);
 
     private BufferedDataTable m_table;
     private JSONDataTable m_jsonTable;
-    private REP m_viewRepresentation;
-    private VAL m_viewValue;
 
+    private final SettingsModelBoolean m_hideInWizard = createHideInWizardModel();
     private final SettingsModelIntegerBounded m_maxRows = createLastDisplayedRowModel(END);
     private final SettingsModelBoolean m_useNumberFormatter = createUseNumberFormatterModel();
     private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
     private final SettingsModelBoolean m_enableSelection = createEnableSelectionModel();
     private final SettingsModelString m_selectionColumnName = createSelectionColumnNameModel();
-    private String m_viewPath;
 //    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
 //    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
 
@@ -144,8 +140,11 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     protected WebTableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
-        m_viewRepresentation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
+    }
+
+    /** @return Settings model for the hide in wizard property. */
+    static SettingsModelBoolean createHideInWizardModel() {
+        return new SettingsModelBoolean(CFG_HIDE_IN_WIZARD, false);
     }
 
     /** @param end The last row index to display.
@@ -211,10 +210,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-        ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
-        DataTableSpec out = rearranger.createSpec();
+        if (m_enableSelection.getBooleanValue()) {
+            ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
+            tableSpec = rearranger.createSpec();
+        }
 
-        return new PortObjectSpec[]{out};
+        return new PortObjectSpec[]{tableSpec};
     }
 
     private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
@@ -227,8 +228,14 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         CellFactory fac = new SingleCellFactory(outColumnSpec) {
+
+            private int m_rowIndex = 0;
+
             @Override
             public DataCell getCell(final DataRow row) {
+                if (++m_rowIndex > m_maxRows.getIntValue()) {
+                    return DataType.getMissingCell();
+                }
                 if (selectionList != null && selectionList.contains(row.getKey())) {
                     return BooleanCell.TRUE;
                 } else {
@@ -244,34 +251,38 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        if (m_viewRepresentation.getTable() == null) {
+    protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        REP viewRepresentation = getViewRepresentation();
+        if (viewRepresentation.getTable() == null) {
             m_table = (BufferedDataTable)inObjects[0];
             createJSONTableFromBufferedDataTable(exec.createSubExecutionContext(0.5));
-            m_viewRepresentation.setTable(m_jsonTable);
+            viewRepresentation.setTable(m_jsonTable);
             setNumberFormatter();
-            m_viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+            viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
         }
-        List<RowKey> selectionList = null;
-        if (m_viewValue.getSelection() != null && m_viewValue.getSelection().length > 0) {
-            // handle view selection
-            List<String> selections = Arrays.asList(m_viewValue.getSelection());
-            selectionList = new ArrayList<RowKey>();
-            CloseableRowIterator iterator = m_table.iterator();
-            try {
-                while (iterator.hasNext()) {
-                    DataRow row = iterator.next();
-                    if (selections.contains(row.getKey().getString())) {
-                        selectionList.add(row.getKey());
+        BufferedDataTable out = m_table;
+        if (m_enableSelection.getBooleanValue()) {
+            List<RowKey> selectionList = null;
+            VAL viewValue = getViewValue();
+            if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
+                // handle view selection
+                List<String> selections = Arrays.asList(viewValue.getSelection());
+                selectionList = new ArrayList<RowKey>();
+                CloseableRowIterator iterator = m_table.iterator();
+                try {
+                    while (iterator.hasNext()) {
+                        DataRow row = iterator.next();
+                        if (selections.contains(row.getKey().getString())) {
+                            selectionList.add(row.getKey());
+                        }
                     }
+                } finally {
+                    iterator.close();
                 }
-            } finally {
-                iterator.close();
             }
+            ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+            out = exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
         }
-        ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-        BufferedDataTable out =
-            exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
         exec.setProgress(1);
         return new PortObject[]{out};
     }
@@ -292,7 +303,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
 //            JSONNumberFormatter formatter =
 //                new JSONNumberFormatter(decimalPlaces, decimalSeparator, thousandsSeparator);
             JSONNumberFormatter formatter = new JSONNumberFormatter(decimalPlaces, ".", ",");
-            m_viewRepresentation.setNumberFormatter(formatter);
+            getViewRepresentation().setNumberFormatter(formatter);
         }
     }
 
@@ -301,29 +312,19 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     public REP getViewRepresentation() {
-        if (m_viewRepresentation == null) {
-            m_viewRepresentation = createEmptyViewRepresentation();
-        }
+        REP viewRepresentation = super.getViewRepresentation();
+        // set internal table
         if (m_table != null && m_jsonTable == null) {
             try {
                 createJSONTableFromBufferedDataTable(null);
-                m_viewRepresentation.setTable(m_jsonTable);
+                viewRepresentation.setTable(m_jsonTable);
+                setNumberFormatter();
+                viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
             } catch (Exception e) {
                 LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
             }
         }
-        return m_viewRepresentation;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public VAL getViewValue() {
-        if (m_viewValue == null) {
-            m_viewValue = createEmptyViewValue();
-        }
-        return m_viewValue;
+        return viewRepresentation;
     }
 
     /**
@@ -331,7 +332,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     public ValidationError validateViewValue(final WebTableViewValue viewContent) {
-        // TODO Auto-generated method stub
+        // nothing to do?
         return null;
     }
 
@@ -339,8 +340,16 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      * {@inheritDoc}
      */
     @Override
-    public void loadViewValue(final VAL viewContent, final boolean useAsDefault) {
-        m_viewValue = viewContent;
+    protected void useCurrentValueAsDefault() {
+        // do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isHideInWizard() {
+        return m_hideInWizard.getBooleanValue();
     }
 
     /**
@@ -375,35 +384,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      * {@inheritDoc}
      */
     @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        // Don't save table automatically. Lazy init on first use.
-        /*NodeSettings settings = new NodeSettings("table");
-        m_jsonTable.saveJSONToNodeSettings(settings);
-        File f = new File(nodeInternDir, "jsonTable.xml");
-        settings.saveToXML(new FileOutputStream(f));*/
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        // Don't load table automatically. Lazy init on first use.
-        /*File f = new File(nodeInternDir, "jsonTable.xml");
-        NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(f));
-        m_jsonTable = JSONDataTable.loadFromNodeSettings(settings);
-        m_viewRepresentation.setTable(m_jsonTable);*/
-        setNumberFormatter();
-        m_viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
+        m_hideInWizard.saveSettingsTo(settings);
         m_maxRows.saveSettingsTo(settings);
         m_useNumberFormatter.saveSettingsTo(settings);
         m_decimalPlaces.saveSettingsTo(settings);
@@ -418,6 +400,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_hideInWizard.validateSettings(settings);
         m_maxRows.validateSettings(settings);
         m_useNumberFormatter.validateSettings(settings);
         m_decimalPlaces.validateSettings(settings);
@@ -438,6 +421,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_hideInWizard.loadSettingsFrom(settings);
         m_maxRows.loadSettingsFrom(settings);
         m_useNumberFormatter.loadSettingsFrom(settings);
         m_decimalPlaces.loadSettingsFrom(settings);
@@ -451,12 +435,9 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
+    protected void performReset() {
         m_table = null;
         m_jsonTable = null;
-        m_viewRepresentation = createEmptyViewRepresentation();
-        m_viewValue = createEmptyViewValue();
-        m_viewPath = null;
     }
 
     /**
@@ -481,35 +462,5 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public void setInternalTables(final BufferedDataTable[] tables) {
         m_table = tables[0];
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getViewHTMLPath() {
-        if (m_viewPath == null || m_viewPath.isEmpty()) {
-            // view is not created
-            m_viewPath = createViewPath();
-        } else {
-            // check if file still exists, create otherwise
-            File viewFile = new File(m_viewPath);
-            if (!viewFile.exists()) {
-                m_viewPath = createViewPath();
-            }
-        }
-        return m_viewPath;
-    }
-
-    private String createViewPath() {
-        JavaScriptViewCreator<WebTableViewRepresentation, WebTableViewValue> viewCreator =
-            new JavaScriptViewCreator<WebTableViewRepresentation, WebTableViewValue>(
-                getJavascriptObjectID());
-        try {
-            return viewCreator.createWebResources("View", getViewRepresentation(), getViewValue());
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
 
 }
