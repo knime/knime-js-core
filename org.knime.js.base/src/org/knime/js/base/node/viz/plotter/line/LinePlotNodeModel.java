@@ -156,8 +156,12 @@ final class LinePlotNodeModel extends
                 new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         CellFactory fac = new SingleCellFactory(outColumnSpec) {
+            private int m_rowIndex = 0;
             @Override
             public DataCell getCell(final DataRow row) {
+                if (++m_rowIndex > m_config.getMaxRows()) {
+                    return DataType.getMissingCell();
+                }
                 if (selectionList != null && selectionList.contains(row.getKey())) {
                     return BooleanCell.TRUE;
                 } else {
