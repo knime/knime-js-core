@@ -62,6 +62,9 @@ import org.knime.core.node.NodeSettingsWO;
  */
 final class GenericJSViewConfig {
 
+    /** Default row maximum. */
+    static final int DEFAULT_MAX_ROWS = 2500;
+
     /** File containing default script. */
     private static final String DEFAULT_SCRIPT_CSS = "default_script.css";
 
@@ -70,11 +73,15 @@ final class GenericJSViewConfig {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(GenericJSViewConfig.class);
 
+    private static final String HIDE_IN_WIZARD = "hideInWizard";
+    private static final String MAX_ROWS = "maxRows";
     private static final String JS_CODE = "jsCode";
     private static final String CSS_CODE = "cssCode";
     private static final String DEPENDENCIES = "dependencies";
     //private static final String VIEW_NAME = "viewName";
 
+    private boolean m_hideInWizard = false;
+    private int m_maxRows = DEFAULT_MAX_ROWS;
     private String m_jsCode;
     private String m_cssCode;
     private String[] m_dependencies;
@@ -85,6 +92,34 @@ final class GenericJSViewConfig {
      */
     public GenericJSViewConfig() {
         m_dependencies = new String[0];
+    }
+
+    /**
+     * @return the hideInWizard
+     */
+    public boolean getHideInWizard() {
+        return m_hideInWizard;
+    }
+
+    /**
+     * @param hideInWizard the hideInWizard to set
+     */
+    public void setHideInWizard(final boolean hideInWizard) {
+        m_hideInWizard = hideInWizard;
+    }
+
+    /**
+     * @return the maxRows
+     */
+    public int getMaxRows() {
+        return m_maxRows;
+    }
+
+    /**
+     * @param maxRows the maxRows to set
+     */
+    public void setMaxRows(final int maxRows) {
+        m_maxRows = maxRows;
     }
 
     /**
@@ -147,6 +182,8 @@ final class GenericJSViewConfig {
      * @param settings To save to.
      */
     public void saveSettings(final NodeSettingsWO settings) {
+        settings.addBoolean(HIDE_IN_WIZARD, getHideInWizard());
+        settings.addInt(MAX_ROWS, getMaxRows());
         settings.addString(JS_CODE, m_jsCode);
         settings.addString(CSS_CODE, m_cssCode);
         settings.addStringArray(DEPENDENCIES, m_dependencies);
@@ -158,6 +195,8 @@ final class GenericJSViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
+        setMaxRows(settings.getInt(MAX_ROWS));
         m_jsCode = settings.getString(JS_CODE);
         m_cssCode = settings.getString(CSS_CODE);
         m_dependencies = settings.getStringArray(DEPENDENCIES);
@@ -168,6 +207,8 @@ final class GenericJSViewConfig {
      * @param settings To load from.
      */
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
+        setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
         m_jsCode = settings.getString(JS_CODE, null);
         if (m_jsCode == null) {
             try {

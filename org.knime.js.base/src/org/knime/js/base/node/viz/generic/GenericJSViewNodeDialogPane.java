@@ -48,6 +48,7 @@
 package org.knime.js.base.node.viz.generic;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -56,11 +57,15 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -107,6 +112,8 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private BiMap<String, String> m_availableLibraries;
 
     //private final JTextField m_viewName;
+    private final JCheckBox m_hideInWizardCheckBox;
+    private final JSpinner m_maxRowsSpinner;
     private final JList m_flowVarList;
     private final JTable m_dependenciesTable;
     private final JSSnippetTextArea m_jsTextArea;
@@ -117,6 +124,8 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
      */
     GenericJSViewNodeDialogPane() {
         //m_viewName = new JTextField(20);
+        m_hideInWizardCheckBox = new JCheckBox("Hide in wizard");
+        m_maxRowsSpinner = new JSpinner();
         m_flowVarList = new JList(new DefaultListModel());
         m_flowVarList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_flowVarList.setCellRenderer(new FlowVariableListCellRenderer());
@@ -174,10 +183,28 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
      * @return
      */
     private JPanel initLayout() {
-        JPanel p = new JPanel(new BorderLayout());
         Border noBorder = BorderFactory.createEmptyBorder();
         Border paddingBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
-        p.setBorder(paddingBorder);
+        Border lineBorder = BorderFactory.createLineBorder(new Color(200, 200, 200), 1);
+
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.setBorder(paddingBorder);
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.setBorder(lineBorder);
+        topPanel.add(Box.createHorizontalStrut(10));
+        topPanel.add(m_hideInWizardCheckBox);
+        topPanel.add(Box.createHorizontalGlue());
+        topPanel.add(new JLabel("Maximum number of rows: "));
+        m_maxRowsSpinner.setMaximumSize(new Dimension(100, 20));
+        m_maxRowsSpinner.setMinimumSize(new Dimension(100, 20));
+        m_maxRowsSpinner.setPreferredSize(new Dimension(100, 20));
+        topPanel.add(m_maxRowsSpinner);
+        topPanel.add(Box.createHorizontalStrut(10));
+
+        wrapperPanel.add(topPanel, BorderLayout.NORTH);
+
+        JPanel p = new JPanel(new BorderLayout());
 
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
         leftPane.setBorder(noBorder);
@@ -222,8 +249,9 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         splitPane.setRightComponent(rightPane);
 
         p.add(splitPane, BorderLayout.CENTER);
+        wrapperPanel.add(p, BorderLayout.CENTER);
 
-        return p;
+        return wrapperPanel;
     }
 
     /**
@@ -240,10 +268,9 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         DefaultTableModel tableModel = (DefaultTableModel)m_dependenciesTable.getModel();
         tableModel.setRowCount(0);
         m_availableLibraries = getAvailableLibraries();
-        System.out.println(m_availableLibraries);
         List<String> libNameList = new ArrayList<String>(m_availableLibraries.values());
         Collections.sort(libNameList);
-        for(String lib : libNameList) {
+        for (String lib : libNameList) {
             tableModel.addRow(new Object[]{false, lib});
         }
         GenericJSViewConfig config = new GenericJSViewConfig();
@@ -251,7 +278,7 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         String[] activeLibs = config.getDependencies();
         for (String lib: activeLibs) {
             String displayLib = m_availableLibraries.get(lib);
-            for(int i = 0; i < tableModel.getRowCount(); i++) {
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
                 if (tableModel.getValueAt(i, 1).equals(displayLib)) {
                     tableModel.setValueAt(true, i, 0);
                     break;
@@ -259,6 +286,8 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
             }
         }
         //m_viewName.setText(m_config.getViewName());
+        m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
+        m_maxRowsSpinner.setValue(config.getMaxRows());
         m_jsTextArea.setText(config.getJsCode());
         m_cssTextArea.setText(config.getCssCode());
     }
@@ -318,6 +347,8 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         }
         final GenericJSViewConfig config = new GenericJSViewConfig();
         //m_config.setViewName(m_viewName.getText());
+        config.setHideInWizard(m_hideInWizardCheckBox.isSelected());
+        config.setMaxRows((Integer)m_maxRowsSpinner.getValue());
         config.setJsCode(m_jsTextArea.getText());
         config.setCssCode(m_cssTextArea.getText());
         config.setDependencies(dependencies.toArray(new String[0]));

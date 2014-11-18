@@ -117,7 +117,11 @@ final class GenericJSViewNodeModel extends NodeModel implements
         synchronized (m_lock) {
             //create JSON table if data available
             if (inData[0] != null) {
-                JSONDataTable table = new JSONDataTable(inData[0], 1, inData[0].getRowCount(), exec);
+              //construct dataset
+                if (m_config.getMaxRows() < inData[0].getRowCount()) {
+                    setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
+                }
+                JSONDataTable table = new JSONDataTable(inData[0], 1, m_config.getMaxRows(), exec);
                 m_representation.setTable(table);
             }
 
@@ -316,8 +320,7 @@ final class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     public boolean isHideInWizard() {
-        // TODO Auto-generated method stub
-        return false;
+        return m_config.getHideInWizard();
     }
 
     /**
