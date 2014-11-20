@@ -5,7 +5,7 @@ knime_line_plot = function() {
 	var _value = null;
 	var _keyedDataset = null;
 	var chartManager = null;
-	var containerID = "scatterContainer";
+	var containerID = "lineContainer";
 	
 	var minWidth = 400;
 	var minHeight = 300;
@@ -39,9 +39,9 @@ knime_line_plot = function() {
 			}
 			
 			for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
+				var columnKey = _representation.keyedDataset.columnKeys[col];
 				var symbolProp = _representation.keyedDataset.symbols[col];
 				if (symbolProp) {
-					var columnKey = _representation.keyedDataset.columnKeys[col];
 					var symbols = [];
 					for (var symbolKey in symbolProp) {
 						symbols.push({"symbol": symbolProp[symbolKey], "value": symbolKey});
@@ -50,8 +50,11 @@ knime_line_plot = function() {
 				}
 				var columnColor = _representation.keyedDataset.columnColors[col];
 				if (columnColor) {
-					var columnKey = _representation.keyedDataset.columnKeys[col];
 					_keyedDataset.setColumnProperty(columnKey, "color", columnColor);
+				}
+				var dateTimeFormat = _representation.keyedDataset.dateTimeFormats[col];
+				if (dateTimeFormat) {
+					_keyedDataset.setColumnProperty(columnKey, "date", dateTimeFormat);
 				}
 			}
 			
@@ -91,17 +94,12 @@ knime_line_plot = function() {
 	
 	buildXYDataset = function() {
 		//console.time("Building XYDataset");
-		//var xyDataset = new jsfc.TableXYDataset(_keyedDataset, _value.xColumn, _value.yColumns);
-		var xyDataset = new jsfc.TableXYDataset(_keyedDataset, null, _value.yColumns);
+		var xyDataset = new jsfc.TableXYDataset(_keyedDataset, _value.xColumn, _value.yColumns);
 		//console.timeEnd("Building XYDataset");
 		return xyDataset;
 	};
 	
 	drawChart = function(layoutContainer) {
-		if (!_value.xColumn) {
-			alert("No column set for x axis!");
-			return;
-		}
 		if (!_value.yColumns) {
 			alert("No columns set for y axis!");
 			return;
@@ -128,7 +126,7 @@ knime_line_plot = function() {
 		//chart.build(container);
 				
 		var plot = new jsfc.XYPlot(dataset);
-		plot.setStaggerRendering(false);
+		plot.setStaggerRendering(_representation.enableStaggeredRendering);
         plot.getXAxis().setLabel(xAxisLabel);
         plot.getXAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //plot.getXAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
@@ -136,13 +134,22 @@ knime_line_plot = function() {
         plot.getYAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //plot.getYAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
         
+		if (_value.xColumn) {
+			var dateProp = dataset.getSeriesProperty(_value.xColumn, "date");
+			if (dateProp) {
+				plot.getXAxis().setTickLabelFormatOverride(new jsfc.DateFormat(dateProp));
+			} else {
+				plot.getXAxis().setTickLabelFormatOverride(null);
+			}
+		}
+        
         plot.setRenderer(new jsfc.XYLineRenderer(plot));
         var chart = new jsfc.Chart(plot);
         chart.setTitleAnchor(new jsfc.Anchor2D(jsfc.RefPt2D.TOP_LEFT));
         var chartTitle = _value.chartTitle ? _value.chartTitle : "";
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
-        chart.setLegendBuilder(null);
+        //chart.setLegendBuilder(null);
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		document.getElementById(containerID).appendChild(svg);
 		d3.select(svg).attr("id", "chart_svg").style("width", "100%").style("height", "100%");
@@ -192,6 +199,14 @@ knime_line_plot = function() {
 	updateChart = function() {
 		var plot = chartManager.getChart().getPlot();
 		plot.setDataset(buildXYDataset());
+		if (_value.xColumn) {
+			var dateProp = plot.getDataset().getSeriesProperty(_value.xColumn, "date");
+			if (dateProp) {
+				plot.getXAxis().setTickLabelFormatOverride(new jsfc.DateFormat(dateProp));
+			} else {
+				plot.getXAxis().setTickLabelFormatOverride(null);
+			}
+		}
 		plot.getXAxis().setAutoRange(true);
 		plot.getYAxis().setAutoRange(true);
 		//chartManager.refreshDisplay();
@@ -303,12 +318,17 @@ knime_line_plot = function() {
 	    			.style("font-family", defaultFont)
 	    			.style("font-size", defaultFontSize+"px");
 	    		var columnKeys = _keyedDataset.columnKeys();
+	    		xSelect.append("option").attr("value", "<RowID>").text("<RowID>");
 	    		for (var colID = 0; colID < columnKeys.length; colID++) {
 	    			xSelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
 	    		}
 	    		document.getElementById("xColumnSelect").value = _value.xColumn;
 	    		xSelect.on("change", function() {
-	    			_value.xColumn = document.getElementById("xColumnSelect").value;
+	    			var newXCol = document.getElementById("xColumnSelect").value;
+	    			if (newXCol == "<RowID>") {
+	    				newXCol = null;
+	    			}
+	    			_value.xColumn = newXCol;
 	    			if (!_value.xAxisLabel) {
 	    				chartManager.getChart().getPlot().getXAxis().setLabel(_value.xColumn, false);
 	    			}
@@ -332,9 +352,9 @@ knime_line_plot = function() {
 	    		document.getElementById("yColumnSelect").value = _value.yColumn;
 	    		ySelect.on("change", function() {
 	    			_value.yColumn = document.getElementById("yColumnSelect").value;
-	    			if (!_value.yAxisLabel) {
+	    			/*if (!_value.yAxisLabel) {
 	    				chartManager.getChart().getPlot().getYAxis().setLabel(_value.yColumn, false);
-	    			}
+	    			}*/
 	    			updateChart();
 	    		});
 	    	}

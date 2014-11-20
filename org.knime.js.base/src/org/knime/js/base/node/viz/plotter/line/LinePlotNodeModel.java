@@ -90,6 +90,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
+import org.knime.js.core.JSONDataTableSpec.JSTypes;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
@@ -333,9 +334,12 @@ final class LinePlotNodeModel extends
             if (colColor != null) {
                 dataset.setColumnColor(colColor, col);
             }
-            if (tableSpec.getColTypes()[col] == "string"
+            if (tableSpec.getColTypes()[col].equals(JSTypes.STRING.getName())
                 && tableSpec.getPossibleValues().get(col) != null) {
                 dataset.setSymbol(getSymbolMap(tableSpec.getPossibleValues().get(col)), col);
+            }
+            if (tableSpec.getColTypes()[col].equals(JSTypes.DATE_TIME.getName())) {
+                dataset.setDateTimeFormat("mmm-yyyy", col);
             }
         }
 

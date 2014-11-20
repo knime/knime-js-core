@@ -70,6 +70,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     private String[] m_columnKeys;
     private String[] m_columnColors;
     private Map<String, String>[] m_symbols;
+    private String[] m_dateTimeFormats;
     private JSONKeyedValuesRow[] m_rows;
 
     /** Serialization constructor. Don't use. */
@@ -84,6 +85,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
         m_rows = rows;
         m_symbols = new Map[m_columnKeys.length];
         m_columnColors = new String[m_columnKeys.length];
+        m_dateTimeFormats = new String[m_columnKeys.length];
     }
 
     /**
@@ -138,13 +140,36 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     }
 
     /**
-     * @param color
-     * @param index
+     * @param color the color to set
+     * @param index the column index
      *
      */
     @JsonIgnore
     public void setColumnColor(final String color, final int index) {
         m_columnColors[index] = color;
+    }
+
+    /**
+     * @return the dateTimeFormats
+     */
+    public String[] getDateTimeFormats() {
+        return m_dateTimeFormats;
+    }
+
+    /**
+     * @param dateTimeFormats the dateTimeFormats to set
+     */
+    public void setDateTimeFormats(final String[] dateTimeFormats) {
+        m_dateTimeFormats = dateTimeFormats;
+    }
+
+    /**
+     * @param dateTimeFormat the dateTimeFormats to set
+     * @param index the column index
+     */
+    @JsonIgnore
+    public void setDateTimeFormat(final String dateTimeFormat, final int index) {
+        m_dateTimeFormats[index] = dateTimeFormat;
     }
 
     /**
@@ -184,6 +209,8 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
                 }
             }
         }
+        settings.addStringArray("columnColors", getColumnColors());
+        settings.addStringArray("dateTimeFormats", getDateTimeFormats());
         settings.addInt("colPropsSize", propSize);
         settings.addInt("numRows", m_rows.length);
         for (int rowID = 0; rowID < m_rows.length; rowID++) {
@@ -213,6 +240,8 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
             }
             m_symbols[index] = curPropertyMap;
         }
+        m_columnColors = settings.getStringArray("columnColors");
+        m_dateTimeFormats = settings.getStringArray("dateTimeFormats");
         int numRows = settings.getInt("numRows");
         m_rows = new JSONKeyedValuesRow[numRows];
         for (int rowID = 0; rowID < m_rows.length; rowID++) {
