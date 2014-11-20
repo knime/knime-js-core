@@ -91,7 +91,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL
      * {@inheritDoc}
      */
     @Override
-    protected final PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+    protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
+            throws Exception {
         exec.setProgress(0.0, "Creating view model...");
         performExecuteCreateView(inObjects, createThirdsExecutionContext(exec));
         exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
@@ -132,17 +133,6 @@ public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL
      */
     protected abstract PortObject[] performExecuteCreatePortObjects(ImagePortObject svgImageFromView,
         final ExecutionContext exec) throws Exception;
-
-    /**
-     * Empty implementation. Should not be called by subclasses.
-     * <br><br>
-     * {@inheritDoc}
-     */
-    @Override
-    protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
-            throws Exception {
-        return null;
-    }
 
     /**
      * @return true if the SVG image is supposed to be rendered and retrieved, false otherwise
