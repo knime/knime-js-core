@@ -56,11 +56,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -74,6 +76,7 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.util.ColumnFilterPanel;
 import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.core.node.util.DataValueColumnFilter;
 
 /**
  *
@@ -133,9 +136,10 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         m_appendedColumnName = new JTextField(TEXT_FIELD_SIZE);
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
-        m_xColComboBox = new ColumnSelectionPanel("Choose column for x axis", DoubleValue.class, StringValue.class);
-        m_yColFilter = new ColumnFilterPanel(false, DoubleValue.class, StringValue.class);
-        //new ColumnSelectionPanel("Choose column for y axis", DoubleValue.class, StringValue.class);
+        Border xColBoxBorder = BorderFactory.createTitledBorder("Choose column for x axis");
+        DataValueColumnFilter xColFilter = new DataValueColumnFilter(DoubleValue.class, StringValue.class);
+        m_xColComboBox = new ColumnSelectionPanel(xColBoxBorder, xColFilter, false, true);
+        m_yColFilter = new ColumnFilterPanel(true, DoubleValue.class, StringValue.class);
         m_xAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_yAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_dotSize = new JSpinner();
@@ -289,16 +293,13 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         m_chartTitleTextField.setText(config.getChartTitle());
         m_chartSubtitleTextField.setText(config.getChartSubtitle());
         String xCol = config.getxColumn();
-        if (xCol == null || xCol.isEmpty()) {
-            xCol = specs[0].getColumnNames()[0];
-        }
 
         String[] yCols = config.getyColumns();
         if (yCols == null || yCols.length < 1) {
             yCols = new String[]{specs[0].getColumnNames()[specs[0].getNumColumns() > 1 ? 1 : 0]};
         }
 
-        m_xColComboBox.update(specs[0], xCol);
+        m_xColComboBox.update(specs[0], xCol, true);
         m_yColFilter.update(specs[0], false, yCols);
         m_xAxisLabelField.setText(config.getxAxisLabel());
         m_yAxisLabelField.setText(config.getyAxisLabel());

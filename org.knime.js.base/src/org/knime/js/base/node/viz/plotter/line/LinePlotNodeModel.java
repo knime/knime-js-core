@@ -58,7 +58,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.knime.base.data.xml.SvgCell;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
@@ -341,10 +340,7 @@ final class LinePlotNodeModel extends
         }
 
         LinePlotViewValue viewValue = getViewValue();
-        final String xColumn = viewValue.getxColumn();
-        if (StringUtils.isEmpty(xColumn) || !Arrays.asList(tableSpec.getColNames()).contains(xColumn)) {
-            viewValue.setxColumn(tableSpec.getColNames()[0]);
-        }
+
         final String[] yColumns = viewValue.getyColumns();
         if (yColumns == null || !Arrays.asList(tableSpec.getColNames()).containsAll(Arrays.asList(yColumns))) {
             viewValue.setyColumns(new String[]{tableSpec.getColNames()[tableSpec.getNumColumns() > 1 ? 1 : 0]});
