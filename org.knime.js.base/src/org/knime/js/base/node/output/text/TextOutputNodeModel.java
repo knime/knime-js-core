@@ -48,20 +48,12 @@
  */
 package org.knime.js.base.node.output.text;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.knime.base.util.flowvariable.FlowVariableProvider;
 import org.knime.base.util.flowvariable.FlowVariableResolver;
-import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
@@ -69,19 +61,16 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.flowvariable.FlowVariablePortObject;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.wizard.WizardNode;
-import org.knime.js.core.JavaScriptViewCreator;
+import org.knime.js.core.node.AbstractWizardNodeModel;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class TextOutputNodeModel extends NodeModel implements
-    WizardNode<TextOutputRepresentation, TextOutputValue>, FlowVariableProvider {
+public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepresentation, TextOutputValue>
+        implements FlowVariableProvider {
 
     private TextOutputConfig m_config = new TextOutputConfig();
-    private TextOutputRepresentation m_representation;
-    private String m_viewPath;
 
     /**
      * Creates a new file download node model.
@@ -102,18 +91,19 @@ public class TextOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        if (m_representation == null) {
-            m_representation = createEmptyViewRepresentation();
+    protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        TextOutputRepresentation representation = getViewRepresentation();
+        if (representation == null) {
+            representation = createEmptyViewRepresentation();
         }
-        m_representation.setTextFormat(m_config.getTextFormat().toString());
+        representation.setTextFormat(m_config.getTextFormat().toString());
         String flowVarCorrectedText;
         try {
             flowVarCorrectedText = FlowVariableResolver.parse(m_config.getText(), this);
         } catch (NoSuchElementException nse) {
             throw new InvalidSettingsException(nse.getMessage(), nse);
         }
-        m_representation.setText(flowVarCorrectedText);
+        representation.setText(flowVarCorrectedText);
         return new PortObject[0];
     }
 
@@ -123,30 +113,6 @@ public class TextOutputNodeModel extends NodeModel implements
     @Override
     public ValidationError validateViewValue(final TextOutputValue viewContent) {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(final TextOutputValue viewContent, final boolean useAsDefault) {
-        // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TextOutputRepresentation getViewRepresentation() {
-        return m_representation;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public TextOutputValue getViewValue() {
-        return new TextOutputValue();
     }
 
     /**
@@ -185,37 +151,6 @@ public class TextOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        File valFile = new File(nodeInternDir, "representation.xml");
-        NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
-        m_representation = createEmptyViewRepresentation();
-        m_representation.setTextFormat(m_config.getTextFormat().toString());
-        try {
-            m_representation.loadFromNodeSettings(valSettings);
-        } catch (InvalidSettingsException e) {
-            m_representation = null;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        NodeSettings valSettings = new NodeSettings("representation");
-        if (m_representation != null) {
-            m_representation.saveToNodeSettings(valSettings);
-        }
-        File valFile = new File(nodeInternDir, "representation.xml");
-        valSettings.saveToXML(new FileOutputStream(valFile));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_config.saveSettings(settings);
     }
@@ -240,8 +175,8 @@ public class TextOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        m_viewPath = null;
+    protected void performReset() {
+        // do nothing
     }
 
     /**
@@ -256,28 +191,16 @@ public class TextOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public String getViewHTMLPath() {
-        if (m_viewPath == null || m_viewPath.isEmpty()) {
-            // view is not created
-            m_viewPath = createViewPath();
-        } else {
-            // check if file still exists, create otherwise
-            File viewFile = new File(m_viewPath);
-            if (!viewFile.exists()) {
-                m_viewPath = createViewPath();
-            }
-        }
-        return m_viewPath;
+    protected String getInteractiveViewName() {
+        return (new TextOutputNodeFactory()).getInteractiveViewName();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private String createViewPath() {
-        JavaScriptViewCreator viewCreator = new JavaScriptViewCreator(getJavascriptObjectID());
-        try {
-            return viewCreator.createWebResources("Image Output", getViewRepresentation(), getViewValue());
-        } catch (IOException e) {
-            return null;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void useCurrentValueAsDefault() {
+        // do nothing
     }
 
 }

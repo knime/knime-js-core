@@ -80,6 +80,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
@@ -467,6 +468,14 @@ final class ScatterPlotNodeModel extends NodeModel implements
         } catch (IOException e) {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WizardViewCreator<ScatterPlotViewRepresentation, ScatterPlotViewValue> getViewCreator() {
+        return new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
 }

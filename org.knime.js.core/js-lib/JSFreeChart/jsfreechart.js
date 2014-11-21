@@ -302,7 +302,8 @@ jsfc.LogFormat.prototype.format = function(n) {
 };
 
 /**
- * Creates a new number formatter.
+ * Creates a new number formatter.  By default, a comma is used for the
+ * decimal separator.
  * 
  * @constructor
  * @implements {jsfc.Format}
@@ -316,6 +317,7 @@ jsfc.NumberFormat = function(dp, exponential) {
         throw new Error("Use 'new' for construction.");
     }    
     this._dp = dp;
+    this.separator = ",";
     this._exponential = exponential || false;
 };
 
@@ -331,10 +333,23 @@ jsfc.NumberFormat.prototype.format = function(n) {
     if (this._exponential) {
         return n.toExponential(this._dp);
     }
+    var str;
     if (this._dp === Number.POSITIVE_INFINITY) {
-        return n.toString();
+        str = n.toString();
+    } else {
+        str = n.toFixed(this._dp); 
     }
-    return n.toFixed(this._dp);  
+    var i = str.indexOf(".");
+    if (i >= 0) {
+        var pre = str.slice(0, i);
+        var post = str.slice(i);
+        // http://blog.tompawlak.org/number-currency-formatting-javascript
+        if (this.separator) {
+            pre = pre.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1" + this.separator);
+        }
+        str = pre + post;
+    }
+    return str;
 };
 
 /**
@@ -12118,6 +12133,7 @@ if (Object.freeze) {
 }
 /**
  * Creates a new NumberTickSelector instance.
+ * @param {boolean} percentage  show values as percentages?
  * @returns {jsfc.NumberTickSelector}
  * @constructor
  * @classdesc 
@@ -12129,11 +12145,10 @@ jsfc.NumberTickSelector = function(percentage) {
     this._power = 0;
     this._factor = 1;
     this._percentage = percentage;
-    this._f0 = new jsfc.NumberFormat(0);
-    this._f1 = new jsfc.NumberFormat(1);
-    this._f2 = new jsfc.NumberFormat(2);
-    this._f3 = new jsfc.NumberFormat(3);
-    this._f4 = new jsfc.NumberFormat(4);
+    this._formats = [];
+    for (var i = 0; i < 16; i++) {
+        this._formats[i] = new jsfc.NumberFormat(i);
+    }
 };
 
 /**
@@ -12166,25 +12181,16 @@ jsfc.NumberTickSelector.prototype.currentTickSize = function() {
  * @returns {jsfc.NumberFormat}
  */
 jsfc.NumberTickSelector.prototype.currentTickFormat = function() {
-    if (this._power === -4) {
-        return this._f4;
+    if (this._power < 0 && this._power > -16) {
+        return this._formats[Math.abs(this._power)];
     }
-    if (this._power === -3) {
-        return this._f3;
-    }
-    if (this._power === -2) {
-        return this._f2;
-    }
-    if (this._power === -1) {
-        return this._f1;
-    }
-    if (this._power < -4) {
+    if (this._power < -15) {
         return new jsfc.NumberFormat(Number.POSITIVE_INFINITY);
     }
-    if (this._power > 6) {
+    if (this._power > 8) {
         return new jsfc.NumberFormat(1, true);
     }
-    return this._f0;
+    return this._formats[0];
 };
 
 /**

@@ -65,19 +65,20 @@ import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortType;
-import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JavaScriptViewCreator;
 
 /**
  * Abstract implementation of {@link WizardNode}, which manages HTML view creation.
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP> The concrete class of the {@link WebViewContent} acting as representation of the view.
- * @param <VAL> The concrete class of the {@link WebViewContent} acting as value of the view.
+ * @param <REP> The concrete class of the {@link JSONViewContent} acting as representation of the view.
+ * @param <VAL> The concrete class of the {@link JSONViewContent} acting as value of the view.
  * @since 2.11
  */
-public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL extends WebViewContent> extends NodeModel
+public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends NodeModel
     implements WizardNode<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractWizardNodeModel.class);
@@ -87,6 +88,7 @@ public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL ex
     private String m_viewPath;
     private REP m_representation;
     private VAL m_value;
+    private final JavaScriptViewCreator<REP, VAL> m_viewCreator;
 
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and
@@ -98,6 +100,7 @@ public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL ex
         super(inPortTypes, outPortTypes);
         m_representation = createEmptyViewRepresentation();
         m_value = createEmptyViewValue();
+        m_viewCreator = new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
     /**
@@ -115,6 +118,15 @@ public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL ex
     protected final PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         PortObject[] portObjects = performExecute(inObjects, exec);
         return portObjects;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected final BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+            throws Exception {
+        return super.execute(inData, exec);
     }
 
     /**
@@ -192,6 +204,14 @@ public abstract class AbstractWizardNodeModel<REP extends WebViewContent, VAL ex
             } catch (Exception e) { /* do nothing */ }
         }
         m_viewPath = null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WizardViewCreator<REP, VAL> getViewCreator() {
+        return m_viewCreator;
     }
 
     /**

@@ -62,6 +62,7 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.JavaScriptViewCreator;
 
 /**
@@ -96,6 +97,8 @@ public abstract class QuickFormNodeModel
     private VAL m_viewValue = null;
     private String m_viewPath;
 
+    private final JavaScriptViewCreator<REP, VAL> m_viewCreator;
+
     /**
      * Creates a new quick form model with the given number (and types!) of input
      * and output types.
@@ -105,6 +108,7 @@ public abstract class QuickFormNodeModel
      */
     protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
+        m_viewCreator = new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
     /**
@@ -327,6 +331,14 @@ public abstract class QuickFormNodeModel
     public REP createEmptyViewRepresentation() {
         // ignore
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WizardViewCreator<REP, VAL> getViewCreator() {
+        return m_viewCreator;
     }
 
     /**

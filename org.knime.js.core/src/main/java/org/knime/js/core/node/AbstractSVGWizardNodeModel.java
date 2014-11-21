@@ -62,19 +62,19 @@ import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
 import org.knime.core.node.web.WebTemplate;
-import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.ext.phantomjs.PhantomJSImageGenerator;
+import org.knime.js.core.JSONViewContent;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP> The concrete class of the {@link WebViewContent} acting as representation of the view.
- * @param <VAL> The concrete class of the {@link WebViewContent} acting as value of the view.
+ * @param <REP> The concrete class of the {@link JSONViewContent} acting as representation of the view.
+ * @param <VAL> The concrete class of the {@link JSONViewContent} acting as value of the view.
  * @since 2.11
  */
-public abstract class AbstractSVGWizardNodeModel<REP extends WebViewContent, VAL extends WebViewContent> extends
+public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends
     AbstractWizardNodeModel<REP, VAL> {
 
     /**

@@ -47,10 +47,6 @@
  */
 package org.knime.js.base.node.viz.generic;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -62,38 +58,30 @@ import org.knime.base.util.flowvariable.FlowVariableProvider;
 import org.knime.base.util.flowvariable.FlowVariableResolver;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.core.JSONDataTable;
-import org.knime.js.core.JavaScriptViewCreator;
+import org.knime.js.core.node.AbstractWizardNodeModel;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-final class GenericJSViewNodeModel extends NodeModel implements
-    WizardNode<GenericJSViewRepresentation, GenericJSViewValue>, FlowVariableProvider {
+final class GenericJSViewNodeModel extends AbstractWizardNodeModel<GenericJSViewRepresentation, GenericJSViewValue>
+        implements FlowVariableProvider {
 
-    private final Object m_lock = new Object();
     private final GenericJSViewConfig m_config;
-    private GenericJSViewRepresentation m_representation;
-    private String m_viewPath;
 
     /**
      */
     GenericJSViewNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, null);
+        super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, new PortType[0]);
         m_config = new GenericJSViewConfig();
-        m_representation = createEmptyViewRepresentation();
     }
 
     /**
@@ -111,25 +99,27 @@ final class GenericJSViewNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
+    protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
 
-        synchronized (m_lock) {
+        synchronized (getLock()) {
+            GenericJSViewRepresentation representation = getViewRepresentation();
             //create JSON table if data available
-            if (inData[0] != null) {
+            if (inObjects[0] != null) {
               //construct dataset
-                if (m_config.getMaxRows() < inData[0].getRowCount()) {
+                BufferedDataTable table = (BufferedDataTable)inObjects[0];
+                if (m_config.getMaxRows() < table.getRowCount()) {
                     setWarningMessage("Only the first " + m_config.getMaxRows() + " rows are displayed.");
                 }
-                JSONDataTable table = new JSONDataTable(inData[0], 1, m_config.getMaxRows(), exec);
-                m_representation.setTable(table);
+                JSONDataTable jsonTable = new JSONDataTable(table, 1, m_config.getMaxRows(), exec);
+                representation.setTable(jsonTable);
             }
 
-            m_representation.setJsCode(parseTextAndReplaceVariables());
-            m_representation.setCssCode(m_config.getCssCode());
+            representation.setJsCode(parseTextAndReplaceVariables());
+            representation.setCssCode(m_config.getCssCode());
             setPathsFromLibNames(m_config.getDependencies());
         }
-        return null;
+        return new PortObject[0];
     }
 
     private String parseTextAndReplaceVariables() throws InvalidSettingsException {
@@ -177,8 +167,9 @@ final class GenericJSViewNodeModel extends NodeModel implements
                 setWarningMessage("Required library is not registered: " + lib);
             }
         }
-        m_representation.setJsDependencies(jsPaths.toArray(new String[0]));
-        m_representation.setCssDependencies(cssPaths.toArray(new String[0]));
+        GenericJSViewRepresentation representation = getViewRepresentation();
+        representation.setJsDependencies(jsPaths.toArray(new String[0]));
+        representation.setCssDependencies(cssPaths.toArray(new String[0]));
     }
 
     private IConfigurationElement getConfigurationFromWebResID(final String id) {
@@ -197,32 +188,6 @@ final class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     public ValidationError validateViewValue(final GenericJSViewValue viewContent) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(final GenericJSViewValue viewContent, final boolean useAsDefault) {
-        // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GenericJSViewRepresentation getViewRepresentation() {
-        synchronized (m_lock) {
-            return m_representation;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GenericJSViewValue getViewValue() {
         return null;
     }
 
@@ -254,36 +219,6 @@ final class GenericJSViewNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        File f = new File(nodeInternDir, "representation.xml");
-        NodeSettingsRO settings = NodeSettings.loadFromXML(new FileInputStream(f));
-        m_representation = createEmptyViewRepresentation();
-        try {
-            m_representation.loadFromNodeSettings(settings);
-        } catch (InvalidSettingsException e) { /* do nothing */
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        NodeSettings settings = new NodeSettings("genericViewRepresentation");
-        if (m_representation != null) {
-            m_representation.saveToNodeSettings(settings);
-        }
-        File f = new File(nodeInternDir, "representation.xml");
-        settings.saveToXML(new FileOutputStream(f));
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_config.saveSettings(settings);
     }
@@ -293,8 +228,7 @@ final class GenericJSViewNodeModel extends NodeModel implements
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
+        // nothing to do
     }
 
     /**
@@ -309,10 +243,8 @@ final class GenericJSViewNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        synchronized (m_lock) {
-            m_representation = createEmptyViewRepresentation();
-        }
+    protected void performReset() {
+        // do nothing
     }
 
     /**
@@ -336,29 +268,16 @@ final class GenericJSViewNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public String getViewHTMLPath() {
-        if (m_viewPath == null || m_viewPath.isEmpty()) {
-            // view is not created
-            m_viewPath = createViewPath();
-        } else {
-            // check if file still exists, create otherwise
-            File viewFile = new File(m_viewPath);
-            if (!viewFile.exists()) {
-                m_viewPath = createViewPath();
-            }
-        }
-        return m_viewPath;
+    protected String getInteractiveViewName() {
+        return (new GenericJSViewNodeFactory()).getInteractiveViewName();
     }
 
-    private String createViewPath() {
-        JavaScriptViewCreator<GenericJSViewRepresentation, GenericJSViewValue> viewCreator =
-            new JavaScriptViewCreator<GenericJSViewRepresentation, GenericJSViewValue>(
-                getJavascriptObjectID());
-        try {
-            return viewCreator.createWebResources("View", m_representation, null);
-        } catch (IOException e) {
-            return null;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void useCurrentValueAsDefault() {
+        // nothing to do
     }
 
 }

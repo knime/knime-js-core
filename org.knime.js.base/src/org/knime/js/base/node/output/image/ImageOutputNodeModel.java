@@ -48,11 +48,6 @@
  */
 package org.knime.js.base.node.output.image;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.base.data.xml.SvgValue;
@@ -60,12 +55,8 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.image.ImageContent;
 import org.knime.core.data.image.ImageValue;
 import org.knime.core.data.image.png.PNGImageContent;
-import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.NodeSettings;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.port.PortObject;
@@ -73,21 +64,15 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.web.ValidationError;
-import org.knime.core.node.wizard.WizardNode;
-import org.knime.js.core.JavaScriptViewCreator;
+import org.knime.js.core.node.AbstractWizardNodeModel;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class ImageOutputNodeModel extends NodeModel implements
-    WizardNode<ImageOutputRepresentation, ImageOutputValue> {
+public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRepresentation, ImageOutputValue> {
 
     private ImageOutputConfig m_config = new ImageOutputConfig();
-
-    private ImageOutputRepresentation m_representation;
-
-    private String m_viewPath;
 
     /**
      * Creates a new file download node model.
@@ -108,11 +93,12 @@ public class ImageOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        if (m_representation == null) {
-            m_representation = createEmptyViewRepresentation();
-            m_representation.setMaxWidth(m_config.getMaxWidth());
-            m_representation.setMaxHeight(m_config.getMaxHeight());
+    protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        ImageOutputRepresentation representation = getViewRepresentation();
+        if (representation == null) {
+            representation = createEmptyViewRepresentation();
+            representation.setMaxWidth(m_config.getMaxWidth());
+            representation.setMaxHeight(m_config.getMaxHeight());
         }
 
         ImagePortObject img = (ImagePortObject)inObjects[0];
@@ -125,11 +111,11 @@ public class ImageOutputNodeModel extends NodeModel implements
 
         if (imageCnt instanceof PNGImageContent) {
             byte[] byteCnt = ((PNGImageContent)imageCnt).getByteArray();
-            m_representation.setImageFormat("PNG");
-            m_representation.setImageData(new String(Base64.encodeBase64(byteCnt)));
+            representation.setImageFormat("PNG");
+            representation.setImageData(new String(Base64.encodeBase64(byteCnt)));
         } else if (imageCnt instanceof SvgImageContent) {
-            m_representation.setImageFormat("SVG");
-            m_representation.setImageData(((SvgValue)imgValue).toString());
+            representation.setImageFormat("SVG");
+            representation.setImageData(((SvgValue)imgValue).toString());
         } else {
             throw new InvalidSettingsException("Unsupported image type: "
                     + imageCnt.getClass().getName() + " (expected PNG or SVG)");
@@ -144,30 +130,6 @@ public class ImageOutputNodeModel extends NodeModel implements
     @Override
     public ValidationError validateViewValue(final ImageOutputValue viewContent) {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void loadViewValue(final ImageOutputValue viewContent, final boolean useAsDefault) {
-        // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageOutputRepresentation getViewRepresentation() {
-        return m_representation;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ImageOutputValue getViewValue() {
-        return new ImageOutputValue();
     }
 
     /**
@@ -206,39 +168,6 @@ public class ImageOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        File valFile = new File(nodeInternDir, "representation.xml");
-        NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
-        m_representation =
-            new ImageOutputRepresentation(m_config.getLabel(), m_config.getDescription());
-        m_representation.setMaxWidth(m_config.getMaxWidth());
-        m_representation.setMaxHeight(m_config.getMaxHeight());
-        try {
-            m_representation.loadFromNodeSettings(valSettings);
-        } catch (InvalidSettingsException e) {
-            m_representation = null;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-        CanceledExecutionException {
-        NodeSettings valSettings = new NodeSettings("representation");
-        if (m_representation != null) {
-            m_representation.saveToNodeSettings(valSettings);
-        }
-        File valFile = new File(nodeInternDir, "representation.xml");
-        valSettings.saveToXML(new FileOutputStream(valFile));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_config.saveSettings(settings);
     }
@@ -263,9 +192,8 @@ public class ImageOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    protected void reset() {
-        m_representation = null;
-        m_viewPath = null;
+    protected void performReset() {
+        // do nothing
     }
 
     /**
@@ -280,28 +208,16 @@ public class ImageOutputNodeModel extends NodeModel implements
      * {@inheritDoc}
      */
     @Override
-    public String getViewHTMLPath() {
-        if (m_viewPath == null || m_viewPath.isEmpty()) {
-            // view is not created
-            m_viewPath = createViewPath();
-        } else {
-            // check if file still exists, create otherwise
-            File viewFile = new File(m_viewPath);
-            if (!viewFile.exists()) {
-                m_viewPath = createViewPath();
-            }
-        }
-        return m_viewPath;
+    protected String getInteractiveViewName() {
+        return (new ImageOutputNodeFactory()).getInteractiveViewName();
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private String createViewPath() {
-        JavaScriptViewCreator viewCreator = new JavaScriptViewCreator(getJavascriptObjectID());
-        try {
-            return viewCreator.createWebResources("Image Output", getViewRepresentation(), getViewValue());
-        } catch (IOException e) {
-            return null;
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void useCurrentValueAsDefault() {
+        // do nothing
     }
 
 }

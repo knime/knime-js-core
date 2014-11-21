@@ -66,6 +66,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JavaScriptViewCreator;
 
@@ -275,6 +276,14 @@ public class RowSelectorNodeModel extends NodeModel implements WizardNode<RowSel
         } catch (IOException e) {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WizardViewCreator<RowSelectorRepresentation, RowSelectorValue> getViewCreator() {
+        return new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
 }

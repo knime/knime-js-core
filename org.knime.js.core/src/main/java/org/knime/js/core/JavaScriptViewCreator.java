@@ -76,16 +76,18 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.util.FileUtil;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- * @param <REP>
- * @param <VAL>
+ * @param <REP> the {@link WebViewContent} implementation used as view representation
+ * @param <VAL> the {@link WebViewContent} implementation used as view value
  */
-public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebViewContent> {
+public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebViewContent> implements
+        WizardViewCreator<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JavaScriptViewCreator.class);
 
@@ -108,16 +110,23 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return false;
     }
 
+    private boolean viewTempDirExists() {
+        return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
+    }
+
     /**
-     * Creates a new view creator for a given implementation ID.
-     * @param javascriptObjectID the JavaScript ID
+     * @param javascriptObjectID The id of the JavaScriptComponent defined in extension point.
      */
     public JavaScriptViewCreator(final String javascriptObjectID) {
         m_template = WizardExecutionController.getWebTemplateFromJSObjectID(javascriptObjectID);
     }
 
-    private boolean viewTempDirExists() {
-        return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WebTemplate getWebTemplate() {
+        return m_template;
     }
 
     /**
@@ -129,8 +138,9 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      * @return the path to the view HTML
      * @throws IOException on IO error
      */
-    public String createWebResources(final String viewTitle, final REP viewRepresentation, final VAL viewValue)
-        throws IOException {
+    @Override
+    public String createWebResources(final String viewTitle,
+            final REP viewRepresentation, final VAL viewValue) throws IOException {
         m_title = viewTitle == null ? "KNIME view" : viewTitle;
         if (!viewTempDirExists()) {
             File tempDir = null;
@@ -200,8 +210,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";
         String inlineScript = "<script type=\"text/javascript\" charset=\"UTF-8\">%s</script>";
-        //String debugScript = "<script type=\"text/javascript\" "
-        //        + "src=\"https://getfirebug.com/firebug-lite.js#startOpened=true\"></script>";
+        /* String debugScript = "<script type=\"text/javascript\" "
+                + "src=\"https://getfirebug.com/firebug-lite.js#startOpened=true\"></script>"; */
         String scriptString = "<script type=\"text/javascript\" src=\"%s\" charset=\"UTF-8\"></script>";
         String cssString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">";
 
@@ -247,7 +257,14 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return pageBuilder.toString();
     }
 
-    private String wrapInTryCatch(final String jsCode) {
+    /**
+     * Wraps a JavaScript code block in a try/catch block.
+     * In the catch block an alert with the error message and stack trace is shown.
+     * @param jsCode The code block to wrap.
+     * @return The resulting JavaScript as string.
+     */
+    @Override
+    public String wrapInTryCatch(final String jsCode) {
         StringBuilder builder = new StringBuilder();
         builder.append("try {");
         builder.append(jsCode);
@@ -255,7 +272,18 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return builder.toString();
     }
 
-    private String initJSView(final String jsonViewRepresentation, final String jsonViewValue) {
+    /**
+     * Creates the JavaScript code to initialize the view implementation with the respective
+     * view representation and value objects.
+     *
+     * @param viewRepresentation The view representation.
+     * @param viewValue The view value.
+     * @return The JavaScript code to initialize the view.
+     */
+    @Override
+    public String createInitJSViewMethodCall(final REP viewRepresentation, final VAL viewValue) {
+        String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
+        String jsonViewValue = getViewValueJSONString(viewValue);
         StringBuilder builder = new StringBuilder();
         String escapedRepresentation = jsonViewRepresentation.replace("\\", "\\\\").replace("'", "\\'");
         String escapedValue = jsonViewValue.replace("\\", "\\\\").replace("'", "\\'");
@@ -269,7 +297,11 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return builder.toString();
     }
 
-    private String getNamespacePrefix() {
+    /**
+     * @return The namespace prefix for all method calls of the respective view implementation.
+     */
+    @Override
+    public String getNamespacePrefix() {
         String namespace = m_template.getNamespace();
         if (namespace != null && !namespace.isEmpty()) {
             namespace += ".";
@@ -277,6 +309,27 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             namespace = "";
         }
         return namespace;
+    }
+
+    /**
+     * Creates a minimal HTML string to display a message.
+     * @param message The message to display.
+     * @return The created HTML string
+     */
+    @Override
+    public String createMessageHTML(final String message) {
+        String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";
+
+        StringBuilder pageBuilder = new StringBuilder();
+        pageBuilder.append("<!doctype html><html><head>");
+        pageBuilder.append(setIEVersion);
+        pageBuilder.append("</head><body>");
+        // content
+        pageBuilder.append(message);
+        // content end
+        pageBuilder.append("</body></html>");
+
+        return pageBuilder.toString();
     }
 
     private ArrayList<WebResourceLocator> getResourceFileList() {

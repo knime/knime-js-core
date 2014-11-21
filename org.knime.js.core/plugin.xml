@@ -207,8 +207,22 @@
                webResourceBundleID="jQuery_1.11.0">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="Firebug Lite"
+            version="1.4.0"
+            webResourceBundleID="firebug-lite_1.4.0">
+         <webResource
+               relativePathSource="js-lib/firebug-lite/"
+               relativePathTarget="js-lib/firebug-lite/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/firebug-lite/firebug-lite.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
-   <extension
+   <!-- <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.knime.workbench.ui.preferences"
@@ -216,6 +230,6 @@
             id="org.knime.workbench.editor.js"
             name="JavaScript Views">
       </page>
-   </extension>
+   </extension> -->
 
 </plugin>
