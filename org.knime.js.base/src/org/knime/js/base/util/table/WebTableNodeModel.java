@@ -252,32 +252,35 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        REP viewRepresentation = getViewRepresentation();
-        if (viewRepresentation.getTable() == null) {
-            m_table = (BufferedDataTable)inObjects[0];
-            createJSONTableFromBufferedDataTable(exec.createSubExecutionContext(0.5));
-            viewRepresentation.setTable(m_jsonTable);
-            setNumberFormatter();
-            viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
-        }
         BufferedDataTable out = m_table;
-        if (m_enableSelection.getBooleanValue()) {
-            List<RowKey> selectionList = null;
-            VAL viewValue = getViewValue();
-            if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
-                // handle view selection
-                List<String> selections = Arrays.asList(viewValue.getSelection());
-                selectionList = new ArrayList<RowKey>();
-                CloseableRowIterator iterator = m_table.iterator();
-                try {
-                    while (iterator.hasNext()) {
-                        DataRow row = iterator.next();
-                        if (selections.contains(row.getKey().getString())) {
-                            selectionList.add(row.getKey());
+        List<RowKey> selectionList = null;
+        synchronized (getLock()) {
+            REP viewRepresentation = getViewRepresentation();
+            if (viewRepresentation.getTable() == null) {
+                m_table = (BufferedDataTable)inObjects[0];
+                createJSONTableFromBufferedDataTable(exec.createSubExecutionContext(0.5));
+                viewRepresentation.setTable(m_jsonTable);
+                setNumberFormatter();
+                viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+            }
+
+            if (m_enableSelection.getBooleanValue()) {
+                VAL viewValue = getViewValue();
+                if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
+                    // handle view selection
+                    List<String> selections = Arrays.asList(viewValue.getSelection());
+                    selectionList = new ArrayList<RowKey>();
+                    CloseableRowIterator iterator = m_table.iterator();
+                    try {
+                        while (iterator.hasNext()) {
+                            DataRow row = iterator.next();
+                            if (selections.contains(row.getKey().getString())) {
+                                selectionList.add(row.getKey());
+                            }
                         }
+                    } finally {
+                        iterator.close();
                     }
-                } finally {
-                    iterator.close();
                 }
             }
             ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
@@ -313,15 +316,17 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     @Override
     public REP getViewRepresentation() {
         REP viewRepresentation = super.getViewRepresentation();
-        // set internal table
-        if (m_table != null && m_jsonTable == null) {
-            try {
-                createJSONTableFromBufferedDataTable(null);
-                viewRepresentation.setTable(m_jsonTable);
-                setNumberFormatter();
-                viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
-            } catch (Exception e) {
-                LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
+        synchronized (getLock()) {
+            // set internal table
+            if (m_table != null && m_jsonTable == null) {
+                try {
+                    createJSONTableFromBufferedDataTable(null);
+                    viewRepresentation.setTable(m_jsonTable);
+                    setNumberFormatter();
+                    viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+                } catch (Exception e) {
+                    LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
+                }
             }
         }
         return viewRepresentation;
