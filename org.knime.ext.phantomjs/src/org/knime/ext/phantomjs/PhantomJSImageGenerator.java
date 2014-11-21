@@ -50,15 +50,17 @@
  */
 package org.knime.ext.phantomjs;
 
+import java.io.File;
+
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
-import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -70,12 +72,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  * @param <REP> 
  * @param <VAL> 
  */
-public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> 
-    extends AbstractWizardNodeView<T, REP, VAL>{
+public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
     
     private static final long DEFAULT_TIMEOUT = 10;
     
     private final WebDriver m_driver;
+    private final T m_nodeModel;
     
     /**
      * Creates a new image generator object.<br>
@@ -84,9 +86,9 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * 
      */
     public PhantomJSImageGenerator(final T nodeModel) {
-        super(nodeModel);
+        m_nodeModel = nodeModel;
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
-        callOpenView(null);
+        generateView();
     }
     
     /**
@@ -103,33 +105,18 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void closeView() {
-        // do nothing        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void modelChanged() {
-        // do nothing        
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void callOpenView(final String title) {
+    private void generateView() {
         //TODO make size editable
-        m_driver.manage().window().setPosition(new Point(20, 20));
-        m_driver.manage().window().setSize(new Dimension(800, 600));
-        m_driver.navigate().to(getViewSource().toURI().toString());
+        Window window = m_driver.manage().window();
+        window.setPosition(new Point(20, 20));
+        window.setSize(new Dimension(800, 600));
+        String viewPath = m_nodeModel.getViewHTMLPath();
+        m_driver.navigate().to(new File(viewPath).toURI().toString());
         waitForDocumentReady();
-        ((JavascriptExecutor)m_driver).executeScript(createInitJSViewMethodCall());
+        REP viewRepresentation = m_nodeModel.getViewRepresentation();
+        VAL viewValue = m_nodeModel.getViewValue();
+        String initCall = m_nodeModel.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
+        ((JavascriptExecutor)m_driver).executeScript(initCall);
         WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
