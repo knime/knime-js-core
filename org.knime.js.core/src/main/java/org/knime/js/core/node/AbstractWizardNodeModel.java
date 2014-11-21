@@ -78,8 +78,8 @@ import org.knime.js.core.JavaScriptViewCreator;
  * @param <VAL> The concrete class of the {@link JSONViewContent} acting as value of the view.
  * @since 2.11
  */
-public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends NodeModel
-    implements WizardNode<REP, VAL> {
+public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent>
+        extends NodeModel implements WizardNode<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractWizardNodeModel.class);
 

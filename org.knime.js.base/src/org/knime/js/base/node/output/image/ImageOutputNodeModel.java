@@ -94,31 +94,33 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
      */
     @Override
     protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        ImageOutputRepresentation representation = getViewRepresentation();
-        if (representation == null) {
-            representation = createEmptyViewRepresentation();
-            representation.setMaxWidth(m_config.getMaxWidth());
-            representation.setMaxHeight(m_config.getMaxHeight());
-        }
+        synchronized (getLock()) {
+            ImageOutputRepresentation representation = getViewRepresentation();
+            if (representation == null) {
+                representation = createEmptyViewRepresentation();
+                representation.setMaxWidth(m_config.getMaxWidth());
+                representation.setMaxHeight(m_config.getMaxHeight());
+            }
 
-        ImagePortObject img = (ImagePortObject)inObjects[0];
-        DataCell dataCell = img.toDataCell();
-        if (!(dataCell instanceof ImageValue)) {
-            throw new IllegalStateException("Expected image but got " + dataCell);
-        }
-        ImageValue imgValue = (ImageValue)dataCell;
-        ImageContent imageCnt = imgValue.getImageContent();
+            ImagePortObject img = (ImagePortObject)inObjects[0];
+            DataCell dataCell = img.toDataCell();
+            if (!(dataCell instanceof ImageValue)) {
+                throw new IllegalStateException("Expected image but got " + dataCell);
+            }
+            ImageValue imgValue = (ImageValue)dataCell;
+            ImageContent imageCnt = imgValue.getImageContent();
 
-        if (imageCnt instanceof PNGImageContent) {
-            byte[] byteCnt = ((PNGImageContent)imageCnt).getByteArray();
-            representation.setImageFormat("PNG");
-            representation.setImageData(new String(Base64.encodeBase64(byteCnt)));
-        } else if (imageCnt instanceof SvgImageContent) {
-            representation.setImageFormat("SVG");
-            representation.setImageData(((SvgValue)imgValue).toString());
-        } else {
-            throw new InvalidSettingsException("Unsupported image type: "
-                    + imageCnt.getClass().getName() + " (expected PNG or SVG)");
+            if (imageCnt instanceof PNGImageContent) {
+                byte[] byteCnt = ((PNGImageContent)imageCnt).getByteArray();
+                representation.setImageFormat("PNG");
+                representation.setImageData(new String(Base64.encodeBase64(byteCnt)));
+            } else if (imageCnt instanceof SvgImageContent) {
+                representation.setImageFormat("SVG");
+                representation.setImageData(((SvgValue)imgValue).toString());
+            } else {
+                throw new InvalidSettingsException("Unsupported image type: " + imageCnt.getClass().getName()
+                    + " (expected PNG or SVG)");
+            }
         }
 
         return new PortObject[0];

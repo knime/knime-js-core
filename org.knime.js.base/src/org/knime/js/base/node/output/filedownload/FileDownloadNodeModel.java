@@ -91,11 +91,13 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
      */
     @Override
     protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        FileDownloadRepresentation representation = getViewRepresentation();
-        if (representation == null) {
-            representation = createEmptyViewRepresentation();
+        synchronized (getLock()) {
+            FileDownloadRepresentation representation = getViewRepresentation();
+            if (representation == null) {
+                representation = createEmptyViewRepresentation();
+            }
+            representation.setPath(getPathFromVariable());
         }
-        representation.setPath(getPathFromVariable());
         return new PortObject[0];
     }
 

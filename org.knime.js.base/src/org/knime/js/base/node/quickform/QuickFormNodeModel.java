@@ -75,33 +75,33 @@ import org.knime.js.core.JavaScriptViewCreator;
  * @param <CONF> The configuration implementation of the quick form node.
  *
  */
-public abstract class QuickFormNodeModel
-        <REP extends QuickFormRepresentationImpl<VAL, CONF>,
-        VAL extends DialogNodeValue & WebViewContent,
-        CONF extends QuickFormConfig<VAL>>
-        extends NodeModel
-        implements DialogNode<REP, VAL>,
-        WizardNode<REP, VAL> {
+public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl<VAL, CONF>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig<VAL>>
+    extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
 
     /**
      * Config key for the overwrite mode. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
      */
     public static final String CFG_OVERWRITE_MODE = "overwriteMode";
+
     /**
      * Config key for the value. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
      */
     public static final String CFG_CURRENT_VALUE = "currentValue";
 
+    private final Object m_lock = new Object();
+
     private CONF m_config = createEmptyConfig();
+
     private VAL m_dialogValue = null;
+
     private VAL m_viewValue = null;
+
     private String m_viewPath;
 
     private final JavaScriptViewCreator<REP, VAL> m_viewCreator;
 
     /**
-     * Creates a new quick form model with the given number (and types!) of input
-     * and output types.
+     * Creates a new quick form model with the given number (and types!) of input and output types.
      *
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
@@ -123,7 +123,7 @@ public abstract class QuickFormNodeModel
      */
     @Override
     protected void loadInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+        CanceledExecutionException {
         File valFile = new File(nodeInternDir, "viewvalue.xml");
         NodeSettingsRO valSettings = NodeSettings.loadFromXML(new FileInputStream(valFile));
         m_viewValue = createEmptyViewValue();
@@ -139,7 +139,7 @@ public abstract class QuickFormNodeModel
      */
     @Override
     protected void saveInternals(final File nodeInternDir, final ExecutionMonitor exec) throws IOException,
-            CanceledExecutionException {
+        CanceledExecutionException {
         NodeSettings valSettings = new NodeSettings("viewvalue");
         if (m_viewValue != null) {
             m_viewValue.saveToNodeSettings(valSettings);
@@ -174,7 +174,9 @@ public abstract class QuickFormNodeModel
      */
     @Override
     public REP getViewRepresentation() {
-        return getRepresentation();
+        synchronized (m_lock) {
+            return getRepresentation();
+        }
     }
 
     /**
@@ -187,7 +189,9 @@ public abstract class QuickFormNodeModel
      */
     @Override
     public VAL getViewValue() {
-        return m_viewValue;
+        synchronized (m_lock) {
+            return m_viewValue;
+        }
     }
 
     /**
@@ -195,9 +199,11 @@ public abstract class QuickFormNodeModel
      */
     @Override
     public void loadViewValue(final VAL viewContent, final boolean useAsDefault) {
-        m_viewValue = viewContent;
-        if (useAsDefault) {
-            copyValueToConfig();
+        synchronized (m_lock) {
+            m_viewValue = viewContent;
+            if (useAsDefault) {
+                copyValueToConfig();
+            }
         }
     }
 
@@ -206,7 +212,9 @@ public abstract class QuickFormNodeModel
      */
     @Override
     protected void reset() {
-        m_viewValue = null;
+        synchronized (m_lock) {
+            m_viewValue = null;
+        }
     }
 
     /**
@@ -251,7 +259,9 @@ public abstract class QuickFormNodeModel
      */
     @Override
     public void setDialogValue(final VAL value) {
-        m_dialogValue = value;
+        synchronized (m_lock) {
+            m_dialogValue = value;
+        }
     }
 
     /**
@@ -259,7 +269,9 @@ public abstract class QuickFormNodeModel
      */
     @Override
     public VAL getDialogValue() {
-        return m_dialogValue;
+        synchronized (m_lock) {
+            return m_dialogValue;
+        }
     }
 
     /**
@@ -291,13 +303,15 @@ public abstract class QuickFormNodeModel
      * @return The value with the highest priority which is valid.
      */
     protected VAL getRelevantValue() {
-        switch (getOverwriteMode()) {
-            case WIZARD:
-                return m_viewValue;
-            case DIALOG:
-                return m_dialogValue;
-            default:
-                return m_config.getDefaultValue();
+        synchronized (m_lock) {
+            switch (getOverwriteMode()) {
+                case WIZARD:
+                    return m_viewValue;
+                case DIALOG:
+                    return m_dialogValue;
+                default:
+                    return m_config.getDefaultValue();
+            }
         }
     }
 
@@ -305,12 +319,14 @@ public abstract class QuickFormNodeModel
      * @return The mode in which the value is overwritten
      */
     protected ValueOverwriteMode getOverwriteMode() {
-        if (m_viewValue != null) {
-            return ValueOverwriteMode.WIZARD;
-        } else if (m_dialogValue != null) {
-            return ValueOverwriteMode.DIALOG;
-        } else {
-            return ValueOverwriteMode.NONE;
+        synchronized (m_lock) {
+            if (m_viewValue != null) {
+                return ValueOverwriteMode.WIZARD;
+            } else if (m_dialogValue != null) {
+                return ValueOverwriteMode.DIALOG;
+            } else {
+                return ValueOverwriteMode.NONE;
+            }
         }
     }
 

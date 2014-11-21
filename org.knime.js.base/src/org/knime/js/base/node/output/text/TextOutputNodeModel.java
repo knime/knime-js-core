@@ -67,8 +67,8 @@ import org.knime.js.core.node.AbstractWizardNodeModel;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepresentation, TextOutputValue>
-        implements FlowVariableProvider {
+public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepresentation, TextOutputValue> implements
+    FlowVariableProvider {
 
     private TextOutputConfig m_config = new TextOutputConfig();
 
@@ -92,18 +92,20 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
      */
     @Override
     protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        TextOutputRepresentation representation = getViewRepresentation();
-        if (representation == null) {
-            representation = createEmptyViewRepresentation();
+        synchronized (getLock()) {
+            TextOutputRepresentation representation = getViewRepresentation();
+            if (representation == null) {
+                representation = createEmptyViewRepresentation();
+            }
+            representation.setTextFormat(m_config.getTextFormat().toString());
+            String flowVarCorrectedText;
+            try {
+                flowVarCorrectedText = FlowVariableResolver.parse(m_config.getText(), this);
+            } catch (NoSuchElementException nse) {
+                throw new InvalidSettingsException(nse.getMessage(), nse);
+            }
+            representation.setText(flowVarCorrectedText);
         }
-        representation.setTextFormat(m_config.getTextFormat().toString());
-        String flowVarCorrectedText;
-        try {
-            flowVarCorrectedText = FlowVariableResolver.parse(m_config.getText(), this);
-        } catch (NoSuchElementException nse) {
-            throw new InvalidSettingsException(nse.getMessage(), nse);
-        }
-        representation.setText(flowVarCorrectedText);
         return new PortObject[0];
     }
 
