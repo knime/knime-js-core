@@ -57,6 +57,8 @@ org_knime_js_base_node_output_image = function() {
 		}
 		
 		var body = document.getElementsByTagName("body")[0];
+		var width = representation.maxWidth;
+		var height = representation.maxHeight;
 		
 		var div = document.createElement("div");
 		div.setAttribute("class", "quickformcontainer");
@@ -76,28 +78,50 @@ org_knime_js_base_node_output_image = function() {
 			var img = document.createElement("img");
 			img.setAttribute("src", "data:image/png;base64," + representation.imageData);
 			div.appendChild(img);
-			element = img;
+			if (width >= 0) {
+				img.style.maxWidth = width + "px";
+			}
+			if (height >= 0) {
+				img.style.maxHeight = height + "px";
+			}
 		} else if (representation.imageFormat == "SVG") {
 			div.innerHTML = representation.imageData;
 			element = body.getElementsByTagName("svg")[0];
+			var originalWidth = parseInt(element.getAttribute("width"));
+			var originalHeight = parseInt(element.getAttribute("height"));
+			var svgWidth = originalWidth;
+			var svgHeight = originalHeight;
+			var svgAspect = svgWidth / svgHeight;
+			if (width >= 0 && svgWidth > width) {
+				svgWidth = width;
+				svgHeight = svgWidth / svgAspect;
+				createViewbox(element, svgWidth, svgHeight, originalWidth, originalHeight);
+				div.style.maxWidth = width + "px";
+				div.style.overflow = "hidden";
+			}
+			if (height >= 0 && svgHeight > height) {
+				svgHeight = height;
+				svgWidth = svgHeight * svgAspect;
+				createViewbox(element, svgWidth, svgHeight, originalWidth, originalHeight);
+				div.style.maxHeight = height + "px";
+				div.style.overflow = "hidden";
+			}
 		} else {
 			var errorText = "Image format not supported: " + representation.imageFormat;
 			div.appendChild(document.createTextNode(errorText));
 		}
 		
-		if (element) {
-			var width = representation.maxWidth;
-			var height = representation.maxHeight;
-			if (width >= 0) {
-				element.style.maxWidth = width + "px";
-			}
-			if (height >= 0) {
-				element.style.maxHeight = height + "px";
-			}
-		}
-		
 		resizeParent();
 	};
+	
+	createViewbox = function(element, width, height, oldWidth, oldHeight) {
+		element.setAttribute("viewBox", "0 0 " + oldWidth + " " + oldHeight);
+		element.setAttribute("preserveAspectRatio", "xMinYMin meet");
+		element.setAttribute("width", Math.round(width));
+		element.setAttribute("height", Math.round(height));
+		element.style.width = Math.round(width) + "px";
+		element.style.height = Math.round(height) + "px";
+	}
 	
 	imageOutput.validate = function() {
 		return true;
