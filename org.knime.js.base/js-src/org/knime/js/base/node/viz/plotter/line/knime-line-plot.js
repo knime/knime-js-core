@@ -127,12 +127,21 @@ knime_line_plot = function() {
 				
 		var plot = new jsfc.XYPlot(dataset);
 		plot.setStaggerRendering(_representation.enableStaggeredRendering);
-        plot.getXAxis().setLabel(xAxisLabel);
-        plot.getXAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
-        //plot.getXAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
-        plot.getYAxis().setLabel(yAxisLabel);
-        plot.getYAxis().setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
-        //plot.getYAxis().setTickLabelFont(new jsfc.Font("sans-serif", 10));
+		var xAxis = plot.getXAxis();
+        xAxis.setLabel(xAxisLabel);
+        xAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
+        //xAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        if (_value.xAxisMin && _value.xAxisMax) {
+        	xAxis.setBounds(_value.xAxisMin, _value.xAxisMax, false, false);
+        }
+        
+        var yAxis = plot.getYAxis();
+        yAxis.setLabel(yAxisLabel);
+        yAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
+        //yAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        if (_value.yAxisMin && _value.yAxisMax) {
+        	yAxis.setBounds(_value.yAxisMin, _value.yAxisMax, true, false);
+        }
         
 		if (_value.xColumn) {
 			var dateProp = dataset.getSeriesProperty(_value.xColumn, "date");
@@ -461,9 +470,19 @@ knime_line_plot = function() {
 	};
 	
 	view.getComponentValue = function() {
+		setAxisBoundsToValue();
 		_value.selection = getSelection();
-		_value.image = view.getSVG();
 		return _value;
+	};
+	
+	setAxisBoundsToValue = function() {
+		var plot = chartManager.getChart().getPlot();
+		var xAxis = plot.getXAxis();
+		var yAxis = plot.getYAxis();
+		_value.xAxisMin = xAxis.getLowerBound();
+		_value.xAxisMax = xAxis.getUpperBound();
+		_value.yAxisMin = yAxis.getLowerBound();
+		_value.yAxisMax = yAxis.getUpperBound();
 	};
 	
 	return view;
