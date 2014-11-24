@@ -97,6 +97,8 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
             if (representation == null) {
                 representation = createEmptyViewRepresentation();
             }
+            representation.setLabel(m_config.getLabel());
+            representation.setDescription(m_config.getDescription());
             representation.setTextFormat(m_config.getTextFormat().toString());
             String flowVarCorrectedText;
             try {
@@ -122,7 +124,7 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
      */
     @Override
     public TextOutputRepresentation createEmptyViewRepresentation() {
-        return new TextOutputRepresentation(m_config.getLabel(), m_config.getDescription());
+        return new TextOutputRepresentation();
     }
 
     /**
@@ -162,7 +164,7 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // do nothing
+        new TextOutputConfig().loadSettings(settings);
     }
 
     /**

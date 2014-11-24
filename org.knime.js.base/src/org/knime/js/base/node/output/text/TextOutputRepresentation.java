@@ -67,22 +67,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class TextOutputRepresentation extends JSONViewContent {
 
-    private final String m_label;
-    private final String m_description;
+    private String m_label;
+    private String m_description;
 
     private String m_textFormat;
 
     private static final String CFG_TEXT = "text";
     private String m_text;
-
-    /**
-     * @param label the label to display
-     * @param description the description to display
-     */
-    public TextOutputRepresentation(final String label, final String description) {
-        m_label = label;
-        m_description = description;
-    }
 
     /**
      * @return the label
@@ -93,11 +84,25 @@ public class TextOutputRepresentation extends JSONViewContent {
     }
 
     /**
+     * @param label the label to set
+     */
+    public void setLabel(final String label) {
+        m_label = label;
+    }
+
+    /**
      * @return the description
      */
     @JsonProperty("description")
     public String getDescription() {
         return m_description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(final String description) {
+        m_description = description;
     }
 
     /**
