@@ -204,7 +204,7 @@ final class GenericJSViewNodeModel extends AbstractWizardNodeModel<GenericJSView
      */
     @Override
     public GenericJSViewValue createEmptyViewValue() {
-        return null;
+        return new GenericJSViewValue();
     }
 
     /**
@@ -228,7 +228,7 @@ final class GenericJSViewNodeModel extends AbstractWizardNodeModel<GenericJSView
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // nothing to do
+        new GenericJSViewConfig().loadSettings(settings);
     }
 
     /**
