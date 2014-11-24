@@ -238,7 +238,7 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        //
+        createEmptyConfig().loadSettings(settings);
     }
 
     /**
