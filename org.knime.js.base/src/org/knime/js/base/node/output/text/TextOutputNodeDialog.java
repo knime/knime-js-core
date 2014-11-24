@@ -79,7 +79,6 @@ import org.knime.js.base.util.LabeledViewNodeDialog;
  */
 public class TextOutputNodeDialog extends LabeledViewNodeDialog {
 
-    private final TextOutputConfig m_config;
     private final JList m_flowVarList;
     private final JComboBox m_textFormatBox;
     private final JTextArea m_textArea;
@@ -89,7 +88,6 @@ public class TextOutputNodeDialog extends LabeledViewNodeDialog {
      */
     @SuppressWarnings({"unchecked", "rawtypes" })
     public TextOutputNodeDialog() {
-        m_config = new TextOutputConfig();
         m_textFormatBox = new JComboBox(OutputTextFormat.values());
         m_textArea = new JTextArea(10, DEF_TEXTFIELD_WIDTH);
         m_flowVarList = new JList(new DefaultListModel());
@@ -139,8 +137,9 @@ public class TextOutputNodeDialog extends LabeledViewNodeDialog {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
-        m_config.loadSettingsInDialog(settings);
-        String s = m_config.getText();
+        TextOutputConfig config = new TextOutputConfig();
+        config.loadSettingsInDialog(settings);
+        String s = config.getText();
         if (s == null) {
             s = "";
         }
@@ -150,8 +149,8 @@ public class TextOutputNodeDialog extends LabeledViewNodeDialog {
             listModel.addElement(e);
         }
         m_textArea.setText(s);
-        m_textFormatBox.setSelectedItem(m_config.getTextFormat());
-        loadSettingsFrom(m_config);
+        m_textFormatBox.setSelectedItem(config.getTextFormat());
+        loadSettingsFrom(config);
     }
 
     /**
@@ -159,10 +158,11 @@ public class TextOutputNodeDialog extends LabeledViewNodeDialog {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        saveSettingsTo(m_config);
+        TextOutputConfig config = new TextOutputConfig();
+        saveSettingsTo(config);
         String s = m_textArea.getText();
-        m_config.setText(s);
-        m_config.setTextFormat((OutputTextFormat)m_textFormatBox.getSelectedItem());
-        m_config.saveSettings(settings);
+        config.setText(s);
+        config.setTextFormat((OutputTextFormat)m_textFormatBox.getSelectedItem());
+        config.saveSettings(settings);
     }
 }
