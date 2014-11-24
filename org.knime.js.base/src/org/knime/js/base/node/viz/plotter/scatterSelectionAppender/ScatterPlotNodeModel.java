@@ -48,7 +48,6 @@
  */
 package org.knime.js.base.node.viz.plotter.scatterSelectionAppender;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -65,10 +64,8 @@ import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
-import org.knime.core.data.RowKey;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.container.CellFactory;
-import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.data.def.BooleanCell;
@@ -142,7 +139,7 @@ public class ScatterPlotNodeModel extends
         return new PortObjectSpec[]{imageSpec, out};
     }
 
-    private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
+    private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<String> selectionList) {
         String newColName = m_config.getSelectionColumnName();
         if (newColName == null || newColName.trim().isEmpty()) {
             newColName = ScatterPlotViewConfig.DEFAULT_SELECTION_COLUMN_NAME;
@@ -159,11 +156,12 @@ public class ScatterPlotNodeModel extends
                 if (++m_rowIndex > m_config.getMaxRows()) {
                     return DataType.getMissingCell();
                 }
-                if (selectionList != null && selectionList.contains(row.getKey())) {
-                    return BooleanCell.TRUE;
-                } else {
-                    return BooleanCell.FALSE;
+                if (selectionList != null) {
+                    if (selectionList.contains(row.getKey().toString())) {
+                            return BooleanCell.TRUE;
+                    }
                 }
+                return BooleanCell.FALSE;
             }
         };
         rearranger.append(fac);
@@ -248,33 +246,19 @@ public class ScatterPlotNodeModel extends
     @Override
     protected PortObject[] performExecuteCreatePortObjects(final ImagePortObject svgImageFromView,
         final ExecutionContext exec) throws Exception {
-        List<RowKey> selectionList = null;
+        BufferedDataTable out = m_table;
         synchronized (getLock()) {
             // enable staggered rendering for interactive view
             getViewRepresentation().setEnableStaggeredRendering(true);
 
             ScatterPlotViewValue viewValue = getViewValue();
-            if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
-                // handle view selection
-                List<String> selections = Arrays.asList(viewValue.getSelection());
-                selectionList = new ArrayList<RowKey>();
-                CloseableRowIterator iterator = m_table.iterator();
-                try {
-                    while (iterator.hasNext()) {
-                        DataRow row = iterator.next();
-                        if (selections.contains(row.getKey().getString())) {
-                            selectionList.add(row.getKey());
-                        }
-                    }
-                } finally {
-                    iterator.close();
-                }
+            List<String> selectionList = null;
+            if (viewValue != null && viewValue.getSelection() != null) {
+                selectionList = Arrays.asList(viewValue.getSelection());
             }
+            ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+            out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
         }
-        exec.setProgress(0.5);
-        ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-        BufferedDataTable out =
-            exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
         exec.setProgress(1);
         return new PortObject[]{svgImageFromView, out};
     }
