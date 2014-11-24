@@ -50,7 +50,6 @@ package org.knime.js.base.util.table;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,9 +62,7 @@ import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
-import org.knime.core.data.RowKey;
 import org.knime.core.data.container.CellFactory;
-import org.knime.core.data.container.CloseableRowIterator;
 import org.knime.core.data.container.ColumnRearranger;
 import org.knime.core.data.container.SingleCellFactory;
 import org.knime.core.data.def.BooleanCell;
@@ -218,7 +215,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         return new PortObjectSpec[]{tableSpec};
     }
 
-    private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<RowKey> selectionList) {
+    private ColumnRearranger createColumnAppender(final DataTableSpec spec, final List<String> selectionList) {
         String newColName = m_selectionColumnName.getStringValue();
         if (newColName == null || newColName.trim().isEmpty()) {
             newColName = DEFAULT_SELECTION_COLUMN_NAME;
@@ -236,11 +233,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 if (++m_rowIndex > m_maxRows.getIntValue()) {
                     return DataType.getMissingCell();
                 }
-                if (selectionList != null && selectionList.contains(row.getKey())) {
-                    return BooleanCell.TRUE;
-                } else {
-                    return BooleanCell.FALSE;
+                if (selectionList != null) {
+                    if (selectionList.contains(row.getKey().toString())) {
+                            return BooleanCell.TRUE;
+                    }
                 }
+                return BooleanCell.FALSE;
             }
         };
         rearranger.append(fac);
@@ -252,8 +250,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      */
     @Override
     protected PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
-        BufferedDataTable out = m_table;
-        List<RowKey> selectionList = null;
+        BufferedDataTable out = (BufferedDataTable)inObjects[0];
         synchronized (getLock()) {
             REP viewRepresentation = getViewRepresentation();
             if (viewRepresentation.getTable() == null) {
@@ -266,25 +263,13 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
 
             if (m_enableSelection.getBooleanValue()) {
                 VAL viewValue = getViewValue();
-                if (viewValue.getSelection() != null && viewValue.getSelection().length > 0) {
-                    // handle view selection
-                    List<String> selections = Arrays.asList(viewValue.getSelection());
-                    selectionList = new ArrayList<RowKey>();
-                    CloseableRowIterator iterator = m_table.iterator();
-                    try {
-                        while (iterator.hasNext()) {
-                            DataRow row = iterator.next();
-                            if (selections.contains(row.getKey().getString())) {
-                                selectionList.add(row.getKey());
-                            }
-                        }
-                    } finally {
-                        iterator.close();
-                    }
+                List<String> selectionList = null;
+                if (viewValue != null && viewValue.getSelection() != null) {
+                    selectionList = Arrays.asList(viewValue.getSelection());
                 }
+                ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+                out = exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
             }
-            ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-            out = exec.createColumnRearrangeTable(m_table, rearranger, exec.createSubExecutionContext(0.5));
         }
         exec.setProgress(1);
         return new PortObject[]{out};

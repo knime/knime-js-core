@@ -98,8 +98,6 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      */
     protected AbstractWizardNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
         super(inPortTypes, outPortTypes);
-        m_representation = createEmptyViewRepresentation();
-        m_value = createEmptyViewValue();
         m_viewCreator = new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
@@ -116,6 +114,14 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      */
     @Override
     protected final PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        synchronized (m_lock) {
+            if (m_representation == null) {
+                m_representation = createEmptyViewRepresentation();
+            }
+            if (m_value == null) {
+                m_value = createEmptyViewValue();
+            }
+        }
         PortObject[] portObjects = performExecute(inObjects, exec);
         return portObjects;
     }
