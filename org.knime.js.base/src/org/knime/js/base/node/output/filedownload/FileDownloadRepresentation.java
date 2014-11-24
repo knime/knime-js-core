@@ -67,24 +67,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class FileDownloadRepresentation extends JSONViewContent {
 
-    private final String m_label;
-    private final String m_description;
-    private final String m_linkTitle;
+    private String m_label;
+    private String m_description;
+    private String m_linkTitle;
 
     private static final String SETTINGS_PATH = "path";
     private static final String DEFAULT_PATH = "";
     private String m_path = DEFAULT_PATH;
-
-    /**
-     * @param label the label to display
-     * @param description the description to display
-     * @param linkTitle the link title
-     */
-    public FileDownloadRepresentation(final String label, final String description, final String linkTitle) {
-        m_label = label;
-        m_description = description;
-        m_linkTitle = linkTitle;
-    }
 
     /**
      * @return the label
@@ -92,6 +81,13 @@ public class FileDownloadRepresentation extends JSONViewContent {
     @JsonProperty("label")
     public String getLabel() {
         return m_label;
+    }
+
+    /**
+     * @param label the label to set
+     */
+    public void setLabel(final String label) {
+        m_label = label;
     }
 
     /**
@@ -103,11 +99,25 @@ public class FileDownloadRepresentation extends JSONViewContent {
     }
 
     /**
+     * @param description the description to set
+     */
+    public void setDescription(final String description) {
+        m_description = description;
+    }
+
+    /**
      * @return the linkTitle
      */
     @JsonProperty("linkTitle")
     public String getLinkTitle() {
         return m_linkTitle;
+    }
+
+    /**
+     * @param linkTitle the linkTitle to set
+     */
+    public void setLinkTitle(final String linkTitle) {
+        m_linkTitle = linkTitle;
     }
 
     /**

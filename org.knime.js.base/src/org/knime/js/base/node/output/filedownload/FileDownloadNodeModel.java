@@ -96,6 +96,9 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
             if (representation == null) {
                 representation = createEmptyViewRepresentation();
             }
+            representation.setLabel(m_config.getLabel());
+            representation.setDescription(m_config.getDescription());
+            representation.setLinkTitle(m_config.getLinkTitle());
             representation.setPath(getPathFromVariable());
         }
         return new PortObject[0];
@@ -134,7 +137,7 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
      */
     @Override
     public FileDownloadRepresentation createEmptyViewRepresentation() {
-        return new FileDownloadRepresentation(m_config.getLabel(), m_config.getDescription(), m_config.getLinkTitle());
+        return new FileDownloadRepresentation();
     }
 
     /**
@@ -174,7 +177,7 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        //new FileDownloadConfig().loadSettings(settings);
+        new FileDownloadConfig().loadSettings(settings);
     }
 
     /**

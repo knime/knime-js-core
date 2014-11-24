@@ -72,7 +72,7 @@ import org.knime.js.core.node.AbstractWizardNodeModel;
  */
 public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRepresentation, ImageOutputValue> {
 
-    private ImageOutputConfig m_config = new ImageOutputConfig();
+    private final ImageOutputConfig m_config = new ImageOutputConfig();
 
     /**
      * Creates a new file download node model.
@@ -98,9 +98,11 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
             ImageOutputRepresentation representation = getViewRepresentation();
             if (representation == null) {
                 representation = createEmptyViewRepresentation();
-                representation.setMaxWidth(m_config.getMaxWidth());
-                representation.setMaxHeight(m_config.getMaxHeight());
             }
+            representation.setLabel(m_config.getLabel());
+            representation.setDescription(m_config.getDescription());
+            representation.setMaxWidth(m_config.getMaxWidth());
+            representation.setMaxHeight(m_config.getMaxHeight());
 
             ImagePortObject img = (ImagePortObject)inObjects[0];
             DataCell dataCell = img.toDataCell();
@@ -139,7 +141,7 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
      */
     @Override
     public ImageOutputRepresentation createEmptyViewRepresentation() {
-        return new ImageOutputRepresentation(m_config.getLabel(), m_config.getDescription());
+        return new ImageOutputRepresentation();
     }
 
     /**
@@ -179,7 +181,7 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
      */
     @Override
     protected void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // do nothing
+        new ImageOutputConfig().loadSettings(settings);
     }
 
     /**

@@ -67,8 +67,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ImageOutputRepresentation extends JSONViewContent {
 
-    private final String m_label;
-    private final String m_description;
+    private String m_label;
+    private String m_description;
     private int m_maxWidth;
     private int m_maxHeight;
 
@@ -80,15 +80,6 @@ public class ImageOutputRepresentation extends JSONViewContent {
     private String m_imageData = EMPTY_STRING;
 
     /**
-     * @param label the label to display
-     * @param description the description to display
-     */
-    public ImageOutputRepresentation(final String label, final String description) {
-        m_label = label;
-        m_description = description;
-    }
-
-    /**
      * @return the label
      */
     @JsonProperty("label")
@@ -97,11 +88,25 @@ public class ImageOutputRepresentation extends JSONViewContent {
     }
 
     /**
+     * @param label the label to set
+     */
+    public void setLabel(final String label) {
+        m_label = label;
+    }
+
+    /**
      * @return the description
      */
     @JsonProperty("description")
     public String getDescription() {
         return m_description;
+    }
+
+    /**
+     * @param description the description to set
+     */
+    public void setDescription(final String description) {
+        m_description = description;
     }
 
     /**
