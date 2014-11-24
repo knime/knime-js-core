@@ -195,8 +195,10 @@ final class GenericJSViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
-        setMaxRows(settings.getInt(MAX_ROWS));
+        // added in 2.11
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
+        // added in 2.11
+        setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
         m_jsCode = settings.getString(JS_CODE);
         m_cssCode = settings.getString(CSS_CODE);
         m_dependencies = settings.getStringArray(DEPENDENCIES);
