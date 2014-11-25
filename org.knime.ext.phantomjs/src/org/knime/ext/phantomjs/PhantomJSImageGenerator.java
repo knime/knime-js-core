@@ -51,7 +51,9 @@
 package org.knime.ext.phantomjs;
 
 import java.io.File;
+import java.io.IOException;
 
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
@@ -61,9 +63,13 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Window;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * 
@@ -74,6 +80,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
     
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(PhantomJSImageGenerator.class); 
     private static final long DEFAULT_TIMEOUT = 10;
     
     private final WebDriver m_driver;
@@ -97,10 +104,28 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @param script The JavaScript to execute
      * @param args The arguments to the script. May be empty
      * @return One of Boolean, Long, String, List or WebElement. Or null if script has no return value.
+     * @throws IOException on script execution exception
      */
-    public Object executeScript(final String script, final Object... args) {
+    public Object executeScript(final String script, final Object... args) throws IOException{
         if (m_driver instanceof JavascriptExecutor) {
-            return ((JavascriptExecutor)m_driver).executeScript("return " + script, args);
+            try {
+                return ((JavascriptExecutor)m_driver).executeScript("return " + script, args);
+            } catch (Exception e) {
+                String errorMessage = e.getMessage();
+                if (e instanceof WebDriverException) {
+                    errorMessage = errorMessage.substring(0, errorMessage.indexOf('\n'));
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode root = mapper.readTree(errorMessage);
+                        JsonNode errorNode = root.findValue("errorMessage");
+                        if (errorNode != null) {
+                            errorMessage = errorNode.asText();
+                        }
+                    } catch (Exception e1) { /*do nothing*/ }
+                }
+                errorMessage = "Error executing JavaScript: " + errorMessage;
+                throw new IOException(errorMessage, e);
+            }
         }
         return null;
     }

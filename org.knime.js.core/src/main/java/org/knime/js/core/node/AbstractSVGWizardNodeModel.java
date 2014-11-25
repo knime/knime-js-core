@@ -161,6 +161,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             }
             methodCall += getExtractSVGMethodName() + "();";
             Object imageData = generator.executeScript(methodCall);
+
             if (imageData instanceof String) {
                 svg = (String)imageData;
             }
