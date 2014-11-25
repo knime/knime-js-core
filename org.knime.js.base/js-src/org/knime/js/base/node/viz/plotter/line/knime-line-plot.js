@@ -94,7 +94,12 @@ knime_line_plot = function() {
 	
 	buildXYDataset = function() {
 		//console.time("Building XYDataset");
-		var xyDataset = new jsfc.TableXYDataset(_keyedDataset, _value.xColumn, _value.yColumns);
+		var xyDataset;
+		if (_keyedDataset.rowCount() > 0) {
+			xyDataset = new jsfc.TableXYDataset(_keyedDataset, _value.xColumn, _value.yColumns);
+		} else {
+			xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumns[0]);
+		}
 		//console.timeEnd("Building XYDataset");
 		return xyDataset;
 	};
