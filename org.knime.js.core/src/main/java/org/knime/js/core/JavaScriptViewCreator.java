@@ -157,12 +157,9 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
                 throw e;
             }
         }
-        m_tempIndexFile = new File(tempFolder, "index_" + System.currentTimeMillis() + ".html");
-        m_tempIndexFile.createNewFile();
+        m_tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);
         BufferedWriter writer = new BufferedWriter(new FileWriter(m_tempIndexFile));
-        String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
-        String jsonViewValue = getViewValueJSONString(viewValue);
-        writer.write(buildHTMLResource(jsonViewRepresentation, jsonViewValue));
+        writer.write(buildHTMLResource(viewRepresentation, viewValue));
         writer.flush();
         writer.close();
         return m_tempIndexFile.getAbsolutePath();
@@ -205,7 +202,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         }
     }
 
-    private String buildHTMLResource(final String jsonViewRepresentation, final String jsonViewValue)
+    private String buildHTMLResource(final REP viewRepresentation, final VAL viewValue)
             throws IOException {
 
         String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";
@@ -247,11 +244,23 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
                     LOGGER.error("Unrecognized resource type " + resFile.getType());
             }
         }
-        // Uncomment following lines to inline init call
-        /*String loadScript = "function loadWizardNodeView(){%s};";
-        loadScript = String.format(loadScript, wrapInTryCatch(initJSView(jsonViewRepresentation, jsonViewValue)));
-        pageBuilder.append(String.format(inlineScript, loadScript));*/
-        pageBuilder.append("</head><body" /* + " onload=\"loadWizardNodeView();\"" */ + ">");
+        if (isDebug()) {
+            String loadScript = "function loadWizardNodeView(){%s};";
+            loadScript =
+                String.format(loadScript, wrapInTryCatch(createInitJSViewMethodCall(viewRepresentation, viewValue)));
+            StringBuilder debugBuilder = new StringBuilder(pageBuilder.toString());
+            debugBuilder.append(String.format(inlineScript, loadScript));
+            debugBuilder.append("</head><body" + " onload=\"loadWizardNodeView();\"" + ">");
+            debugBuilder.append(bodyText);
+            debugBuilder.append("</body></html>");
+            File debugFile = FileUtil.createTempFile("debug_" + System.currentTimeMillis(), ".html", tempFolder, true);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(debugFile));
+            writer.write(debugBuilder.toString());
+            writer.flush();
+            writer.close();
+            LOGGER.info("JavaScript view - " + m_title + " - created. Debug output at: " + debugFile.getAbsolutePath());
+        }
+        pageBuilder.append("</head><body>");
         pageBuilder.append(bodyText);
         pageBuilder.append("</body></html>");
         return pageBuilder.toString();
