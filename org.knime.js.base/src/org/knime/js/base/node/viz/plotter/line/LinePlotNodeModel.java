@@ -83,6 +83,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.util.filter.NameFilterConfiguration.EnforceOption;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
 import org.knime.js.core.JSONDataTable;
@@ -479,7 +480,7 @@ final class LinePlotNodeModel extends
         m_config.setChartTitle(viewValue.getChartTitle());
         m_config.setChartSubtitle(viewValue.getChartSubtitle());
         m_config.setxColumn(viewValue.getxColumn());
-        m_config.getyColumnsConfig().loadDefaults(viewValue.getyColumns(), true);
+        m_config.getyColumnsConfig().loadDefaults(viewValue.getyColumns(), null, EnforceOption.EnforceInclusion);
         m_config.setxAxisLabel(viewValue.getxAxisLabel());
         m_config.setyAxisLabel(viewValue.getyAxisLabel());
         m_config.setxAxisMin(viewValue.getxAxisMin());
