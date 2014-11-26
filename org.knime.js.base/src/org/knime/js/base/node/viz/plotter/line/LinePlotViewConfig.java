@@ -50,9 +50,16 @@
  */
 package org.knime.js.base.node.viz.plotter.line;
 
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
+import org.knime.core.data.DoubleValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.util.filter.InputFilter;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
 
 /**
  *
@@ -110,7 +117,7 @@ final class LinePlotViewConfig {
     private String m_chartTitle;
     private String m_chartSubtitle;
     private String m_xColumn;
-    private String[] m_yColumns;
+    private DataColumnSpecFilterConfiguration m_yConf;
     private String m_xAxisLabel;
     private String m_yAxisLabel;
     private Double m_xAxisMin;
@@ -189,18 +196,39 @@ final class LinePlotViewConfig {
         m_xColumn = xColumn;
     }
 
-    /**
-     * @return the yColumn
-     */
-    public String[] getyColumns() {
-        return m_yColumns;
+    public DataColumnSpecFilterConfiguration getyColumnsConfig() {
+        return getyColumnsConfig(false, null);
     }
 
     /**
-     * @param yColumn the yColumn to set
+     * @return the yColumn
      */
-    public void setyColumns(final String[] yColumns) {
-        m_yColumns = yColumns;
+    public DataColumnSpecFilterConfiguration getyColumnsConfig(final boolean loadDefaults, final DataTableSpec spec) {
+        if (m_yConf == null) {
+            m_yConf = createDCSFilterConfiguration();
+            if (loadDefaults) {
+                m_yConf.loadDefaults(spec, true);
+            }
+        }
+        return m_yConf;
+    }
+
+    /** A new configuration to store the settings. Also enables the type filter.
+     * @return ...
+     */
+    private DataColumnSpecFilterConfiguration createDCSFilterConfiguration() {
+        InputFilter<DataColumnSpec> filter = new InputFilter<DataColumnSpec>() {
+
+            @Override
+            public boolean include(final DataColumnSpec spec) {
+                DataType type = spec.getType();
+                if (type.isCompatible(DoubleValue.class) || type.isCompatible(StringValue.class)) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return new DataColumnSpecFilterConfiguration(Y_COLS, filter);
     }
 
     /**
@@ -518,7 +546,7 @@ final class LinePlotViewConfig {
         settings.addString(CHART_TITLE, getChartTitle());
         settings.addString(CHART_SUBTITLE, getChartSubtitle());
         settings.addString(X_COL, getxColumn());
-        settings.addStringArray(Y_COLS, getyColumns());
+        getyColumnsConfig().saveConfiguration(settings);
         settings.addInt(MAX_ROWS, getMaxRows());
         settings.addString(SELECTION_COLUMN_NAME, getSelectionColumnName());
         settings.addString(X_AXIS_LABEL, getxAxisLabel());
@@ -552,7 +580,7 @@ final class LinePlotViewConfig {
         setChartTitle(settings.getString(CHART_TITLE));
         setChartSubtitle(settings.getString(CHART_SUBTITLE));
         setxColumn(settings.getString(X_COL));
-        setyColumns(settings.getStringArray(Y_COLS));
+        getyColumnsConfig().loadConfigurationInModel(settings);
         setMaxRows(settings.getInt(MAX_ROWS));
         setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL));
@@ -572,7 +600,7 @@ final class LinePlotViewConfig {
     /** Loads parameters in Dialog.
      * @param settings To load from.
      */
-    public void loadSettingsForDialog(final NodeSettingsRO settings) {
+    public void loadSettingsForDialog(final NodeSettingsRO settings, final DataTableSpec spec) {
         setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
         setGenerateImage(settings.getBoolean(GENERATE_IMAGE, true));
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG, false));
@@ -590,7 +618,7 @@ final class LinePlotViewConfig {
         setChartTitle(settings.getString(CHART_TITLE, null));
         setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
-        setyColumns(settings.getStringArray(Y_COLS, new String[0]));
+        getyColumnsConfig().loadConfigurationInDialog(settings, spec);
         setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
         setSelectionColumnName(settings.getString(SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME));
         setxAxisLabel(settings.getString(X_AXIS_LABEL, null));

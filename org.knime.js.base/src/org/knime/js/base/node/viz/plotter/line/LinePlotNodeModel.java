@@ -83,6 +83,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
@@ -137,6 +138,8 @@ final class LinePlotNodeModel extends
 
         ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
         DataTableSpec out = rearranger.createSpec();
+
+        m_config.getyColumnsConfig(true, tableSpec);
 
         ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
         return new PortObjectSpec[]{imageSpec, out};
@@ -235,7 +238,7 @@ final class LinePlotNodeModel extends
             String xColumn = getViewValue().getxColumn();
             if (representation.getKeyedDataset() == null || xColumn == null) {
                 // create dataset for view
-                copyConfigToView();
+                copyConfigToView(m_table.getDataTableSpec());
                 representation.setKeyedDataset(createKeyedDataset(colorTable, exec));
                 // don't use staggered rendering for image creation
                 representation.setEnableStaggeredRendering(false);
@@ -441,7 +444,7 @@ final class LinePlotNodeModel extends
         return m_config.getGenerateImage();
     }
 
-    private void copyConfigToView() {
+    private void copyConfigToView(final DataTableSpec spec) {
         LinePlotViewRepresentation representation = getViewRepresentation();
         representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
         representation.setEnableTitleChange(m_config.getEnableTitleChange());
@@ -460,7 +463,8 @@ final class LinePlotNodeModel extends
         viewValue.setChartTitle(m_config.getChartTitle());
         viewValue.setChartSubtitle(m_config.getChartSubtitle());
         viewValue.setxColumn(m_config.getxColumn());
-        viewValue.setyColumns(m_config.getyColumns());
+        FilterResult filter = m_config.getyColumnsConfig().applyTo(spec);
+        viewValue.setyColumns(filter.getIncludes());
         viewValue.setxAxisLabel(m_config.getxAxisLabel());
         viewValue.setyAxisLabel(m_config.getyAxisLabel());
         viewValue.setxAxisMin(m_config.getxAxisMin());
@@ -475,7 +479,7 @@ final class LinePlotNodeModel extends
         m_config.setChartTitle(viewValue.getChartTitle());
         m_config.setChartSubtitle(viewValue.getChartSubtitle());
         m_config.setxColumn(viewValue.getxColumn());
-        m_config.setyColumns(viewValue.getyColumns());
+        m_config.getyColumnsConfig().loadDefaults(viewValue.getyColumns(), true);
         m_config.setxAxisLabel(viewValue.getxAxisLabel());
         m_config.setyAxisLabel(viewValue.getyAxisLabel());
         m_config.setxAxisMin(viewValue.getxAxisMin());

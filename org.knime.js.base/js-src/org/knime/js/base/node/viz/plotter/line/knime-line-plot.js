@@ -322,56 +322,46 @@ knime_line_plot = function() {
 	    	}
 	    }
 	    
-	    if (_representation.enableXColumnChange || _representation.enableYColumnChange) {
-	    	var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
-	    	if (_representation.enableXColumnChange) {
-	    		columnChangeContainer.append("td").append("label").attr("for", "xColumnSelect").text("X Column:").style("margin-right", "5px");
-	    		var xSelect = columnChangeContainer.append("td").append("select")
-	    			.attr("id", "xColumnSelect")
-	    			.attr("name", "xColumnSelect")
-	    			.style("font-family", defaultFont)
-	    			.style("font-size", defaultFontSize+"px");
-	    		var columnKeys = _keyedDataset.columnKeys();
-	    		xSelect.append("option").attr("value", "<RowID>").text("<RowID>");
-	    		for (var colID = 0; colID < columnKeys.length; colID++) {
-	    			xSelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
-	    		}
-	    		document.getElementById("xColumnSelect").value = _value.xColumn;
-	    		xSelect.on("change", function() {
-	    			var newXCol = document.getElementById("xColumnSelect").value;
-	    			if (newXCol == "<RowID>") {
-	    				newXCol = null;
-	    			}
-	    			_value.xColumn = newXCol;
-	    			if (!_value.xAxisLabel) {
-	    				chartManager.getChart().getPlot().getXAxis().setLabel(_value.xColumn, false);
-	    			}
-	    			updateChart();
-	    		});
-	    		if (_representation.enableYColumnChange) {
-	    			xSelect.style("margin-right", "10px");
-	    		}
-	    	}
-	    	if (_representation.enableYColumnChange) {
-	    		columnChangeContainer.append("td").append("label").attr("for", "yColumnSelect").text("Y Columns:").style("margin-right", "5px");
-	    		var ySelect = columnChangeContainer.append("td").append("select")
-	    			.attr("id", "yColumnSelect")
-	    			.attr("name", "yColumnSelect")
-	    			.style("font-family", defaultFont)
-	    			.style("font-size", defaultFontSize+"px");
-	    		var columnKeys = _keyedDataset.columnKeys();
-	    		for (var colID = 0; colID < columnKeys.length; colID++) {
-	    			ySelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
-	    		}
-	    		document.getElementById("yColumnSelect").value = _value.yColumn;
-	    		ySelect.on("change", function() {
-	    			_value.yColumn = document.getElementById("yColumnSelect").value;
-	    			/*if (!_value.yAxisLabel) {
-	    				chartManager.getChart().getPlot().getYAxis().setLabel(_value.yColumn, false);
-	    			}*/
-	    			updateChart();
-	    		});
-	    	}
+    	if (_representation.enableXColumnChange) {
+    		var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
+    		columnChangeContainer.append("td").append("label").attr("for", "xColumnSelect").text("X Column:").style("margin-right", "5px");
+    		var xSelect = columnChangeContainer.append("td").append("select")
+    			.attr("id", "xColumnSelect")
+    			.attr("name", "xColumnSelect")
+    			.style("font-family", defaultFont)
+    			.style("font-size", defaultFontSize+"px");
+    		var columnKeys = _keyedDataset.columnKeys();
+    		xSelect.append("option").attr("value", "<RowID>").text("<RowID>");
+    		for (var colID = 0; colID < columnKeys.length; colID++) {
+    			xSelect.append("option").attr("value", columnKeys[colID]).text(columnKeys[colID]);
+    		}
+    		document.getElementById("xColumnSelect").value = _value.xColumn;
+    		xSelect.on("change", function() {
+    			var newXCol = document.getElementById("xColumnSelect").value;
+    			if (newXCol == "<RowID>") {
+    				newXCol = null;
+    			}
+    			_value.xColumn = newXCol;
+    			if (!_value.xAxisLabel) {
+    				chartManager.getChart().getPlot().getXAxis().setLabel(_value.xColumn, false);
+    			}
+    			updateChart();
+    		});
+    		if (_representation.enableYColumnChange) {
+    			xSelect.style("margin-right", "10px");
+    		}
+    	}
+	    if (_representation.enableYColumnChange) {
+    		var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
+	    	columnChangeContainer.append("td").append("label").attr("for", "yColumnSelect").text("Y Columns:").style("margin-right", "5px");
+	    	var ySelect = new twinlistMultipleSelections();
+	    	columnChangeContainer.append("td").node().appendChild(ySelect.getComponent().get(0));
+	    	ySelect.setChoices(_keyedDataset.columnKeys());
+	    	ySelect.setSelections(_value.yColumns);
+	    	ySelect.addValueChangedListener(function() {
+	    		_value.yColumns = ySelect.getSelections();
+	    		updateChart();
+	    	});
 	    }
 	    if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) {
 	    	var axisLabelContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
@@ -435,11 +425,17 @@ knime_line_plot = function() {
 		if (_representation.showZoomResetButton) rows++;
 		if (_representation.enableViewConfiguration) {
 			if (_representation.enableTitleChange || _representation.enableSubtitleChange) rows++;
-			if (_representation.enableXColumnChange || _representation.enableYColumnChange) rows++;
+			if (_representation.enableXColumnChange) rows++;
 			if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) rows++;
 			if (_representation.enableDotSizeChange) rows++;
 		}
 		var height = rows * sizeFactor;
+		if (_representation.enableYColumnChange) {
+			//rows
+			height += _keyedDataset.columnKeys().length * 17;
+			//header
+			height += 25;
+		}
 		if (height > 0) height += padding;
 		return height;
 	};

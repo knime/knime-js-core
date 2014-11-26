@@ -74,9 +74,9 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
-import org.knime.core.node.util.ColumnFilterPanel;
 import org.knime.core.node.util.ColumnSelectionPanel;
 import org.knime.core.node.util.DataValueColumnFilter;
+import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
 
 /**
  *
@@ -107,7 +107,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     private final JTextField m_chartTitleTextField;
     private final JTextField m_chartSubtitleTextField;
     private final ColumnSelectionPanel m_xColComboBox;
-    private final ColumnFilterPanel m_yColFilter;
+    private final DataColumnSpecFilterPanel m_yColFilter;
     private final JTextField m_xAxisLabelField;
     private final JTextField m_yAxisLabelField;
     private final JSpinner m_dotSize;
@@ -139,7 +139,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         Border xColBoxBorder = BorderFactory.createTitledBorder("Choose column for x axis");
         DataValueColumnFilter xColFilter = new DataValueColumnFilter(DoubleValue.class, StringValue.class);
         m_xColComboBox = new ColumnSelectionPanel(xColBoxBorder, xColFilter, false, true);
-        m_yColFilter = new ColumnFilterPanel(true, DoubleValue.class, StringValue.class);
+        m_yColFilter = new DataColumnSpecFilterPanel();
         m_xAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_yAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_dotSize = new JSpinner();
@@ -273,7 +273,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
             throws NotConfigurableException {
         LinePlotViewConfig config = new LinePlotViewConfig();
-        config.loadSettingsForDialog(settings);
+        config.loadSettingsForDialog(settings, specs[0]);
         m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
         m_generateImageCheckBox.setSelected(config.getGenerateImage());
         m_appendedColumnName.setText(config.getSelectionColumnName());
@@ -293,14 +293,8 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         m_chartTitleTextField.setText(config.getChartTitle());
         m_chartSubtitleTextField.setText(config.getChartSubtitle());
         String xCol = config.getxColumn();
-
-        String[] yCols = config.getyColumns();
-        if (yCols == null || yCols.length < 1) {
-            yCols = new String[]{specs[0].getColumnNames()[specs[0].getNumColumns() > 1 ? 1 : 0]};
-        }
-
         m_xColComboBox.update(specs[0], xCol, true);
-        m_yColFilter.update(specs[0], false, yCols);
+        m_yColFilter.loadConfiguration(config.getyColumnsConfig(), specs[0]);
         m_xAxisLabelField.setText(config.getxAxisLabel());
         m_yAxisLabelField.setText(config.getyAxisLabel());
         m_dotSize.setValue(config.getDotSize());
@@ -333,7 +327,7 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         config.setChartTitle(m_chartTitleTextField.getText());
         config.setChartSubtitle(m_chartSubtitleTextField.getText());
         config.setxColumn(m_xColComboBox.getSelectedColumn());
-        config.setyColumns(m_yColFilter.getIncludedColumnSet().toArray(new String[0]));
+        m_yColFilter.saveConfiguration(config.getyColumnsConfig());
         config.setxAxisLabel(m_xAxisLabelField.getText());
         config.setyAxisLabel(m_yAxisLabelField.getText());
         config.setDotSize((Integer)m_dotSize.getValue());
