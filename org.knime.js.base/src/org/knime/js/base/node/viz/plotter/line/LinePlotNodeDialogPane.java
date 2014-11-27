@@ -55,6 +55,7 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.LinkedHashSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -74,8 +75,11 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ColumnSelectionPanel;
 import org.knime.core.node.util.DataValueColumnFilter;
+import org.knime.core.node.util.StringHistory;
 import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
 
 /**
@@ -84,8 +88,12 @@ import org.knime.core.node.util.filter.column.DataColumnSpecFilterPanel;
  */
 public class LinePlotNodeDialogPane extends NodeDialogPane {
 
-    private static final int TEXT_FIELD_SIZE = 20;
+    /**
+     * Key for the string history to re-use user entered date formats.
+     */
+    public static final String FORMAT_HISTORY_KEY = "javascript-date-formats";
 
+    private static final int TEXT_FIELD_SIZE = 20;
 
     private final JCheckBox m_hideInWizardCheckBox;
     private final JCheckBox m_generateImageCheckBox;
@@ -111,6 +119,10 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
     private final JTextField m_xAxisLabelField;
     private final JTextField m_yAxisLabelField;
     private final JSpinner m_dotSize;
+    private final DialogComponentStringSelection m_dateFormatChooser;
+
+    public static final LinkedHashSet<String> PREDEFINED_FORMATS
+        = createPredefinedFormats();
 
     /**
      * Creates a new dialog pane.
@@ -151,6 +163,10 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
                enableViewControls();
             }
         });
+        m_dateFormatChooser =
+            new DialogComponentStringSelection(new SettingsModelString(LinePlotViewConfig.DATE_FORMAT, null),
+                "Date Format: ", PREDEFINED_FORMATS, true);
+
         addTab("Options", initDialog());
     }
 
@@ -205,6 +221,8 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         c.gridy++;
         m_xColComboBox.setPreferredSize(new Dimension(260, 50));
         panel.add(m_xColComboBox, c);
+        c.gridx += 2;
+        panel.add(m_dateFormatChooser.getComponentPanel(), c);
         c.gridx = 0;
         c.gridy++;
         c.gridwidth = 4;
@@ -299,6 +317,8 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         m_yAxisLabelField.setText(config.getyAxisLabel());
         m_dotSize.setValue(config.getDotSize());
         m_maxRowsSpinner.setValue(config.getMaxRows());
+        m_dateFormatChooser.replaceListItems(createPredefinedFormats(), config.getDateFormat());
+
         enableViewControls();
     }
 
@@ -332,7 +352,32 @@ public class LinePlotNodeDialogPane extends NodeDialogPane {
         config.setyAxisLabel(m_yAxisLabelField.getText());
         config.setDotSize((Integer)m_dotSize.getValue());
         config.setMaxRows((Integer)m_maxRowsSpinner.getValue());
+        config.setDateFormat(((SettingsModelString)m_dateFormatChooser.getModel()).getStringValue());
         config.saveSettings(settings);
+    }
+
+    private static LinkedHashSet<String> createPredefinedFormats() {
+        // unique values
+        LinkedHashSet<String> formats = new LinkedHashSet<String>();
+
+        formats.add("ddd mmm dd yyyy HH:MM:ss");
+        formats.add("m/d/yy");
+        formats.add("mmm d, yyyy");
+        formats.add("mmmm d, yyyy");
+        formats.add("dddd, mmmm d, yyyy");
+        formats.add("yyyy-mm-dd");
+        formats.add("h:MM TT");
+        formats.add("h:MM:ss TT");
+        formats.add("h:MM:ss TT Z");
+        formats.add("HH:MM:ss");
+        formats.add("yyyy-mm-dd'T'HH:MM:ss");
+        // check also the StringHistory....
+        String[] userFormats = StringHistory.getInstance(FORMAT_HISTORY_KEY)
+            .getHistory();
+        for (String userFormat : userFormats) {
+            formats.add(userFormat);
+        }
+        return formats;
     }
 
 }

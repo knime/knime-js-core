@@ -327,7 +327,7 @@ final class LinePlotNodeModel extends
                 dataset.setSymbol(getSymbolMap(tableSpec.getPossibleValues().get(col)), col);
             }
             if (tableSpec.getColTypes()[col].equals(JSTypes.DATE_TIME.getName())) {
-                dataset.setDateTimeFormat("mmm-yyyy", col);
+                dataset.setDateTimeFormat(m_config.getDateFormat(), col);
             }
         }
 

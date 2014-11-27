@@ -151,7 +151,7 @@ knime_line_plot = function() {
 		if (_value.xColumn) {
 			var dateProp = dataset.getSeriesProperty(_value.xColumn, "date");
 			if (dateProp) {
-				plot.getXAxis().setTickLabelFormatOverride(new jsfc.DateFormat(dateProp));
+				plot.getXAxis().setTickLabelFormatOverride(new jsfc.UniversalDateFormat(dateProp));
 			} else {
 				plot.getXAxis().setTickLabelFormatOverride(null);
 			}
@@ -419,7 +419,7 @@ knime_line_plot = function() {
 	};
 	
 	getControlHeight = function() {
-		var rows = 0;
+		var height = rows = 0;
 		var sizeFactor = 25;
 		var padding = 10;
 		if (_representation.showZoomResetButton) rows++;
@@ -428,13 +428,13 @@ knime_line_plot = function() {
 			if (_representation.enableXColumnChange) rows++;
 			if (_representation.enableXAxisLabelEdit || _representation.enableYAxisLabelEdit) rows++;
 			if (_representation.enableDotSizeChange) rows++;
-		}
-		var height = rows * sizeFactor;
-		if (_representation.enableYColumnChange) {
-			//rows
-			height += _keyedDataset.columnKeys().length * 17;
-			//header
-			height += 25;
+			height = rows * sizeFactor;
+			if (_representation.enableYColumnChange) {
+				//rows
+				height += _keyedDataset.columnKeys().length * 17;
+				//header
+				height += 25;
+			}
 		}
 		if (height > 0) height += padding;
 		return height;

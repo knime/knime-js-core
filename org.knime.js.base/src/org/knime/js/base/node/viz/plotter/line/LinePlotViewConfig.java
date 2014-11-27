@@ -58,6 +58,7 @@ import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.util.StringHistory;
 import org.knime.core.node.util.filter.InputFilter;
 import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
 
@@ -97,6 +98,7 @@ final class LinePlotViewConfig {
     static final String Y_AXIS_MIN = "yAxisMin";
     static final String Y_AXIS_MAX = "yAxisMax";
     static final String DOT_SIZE = "dot_size";
+    static final String DATE_FORMAT = "date_format";
 
     private boolean m_hideInWizard = false;
     private boolean m_generateImage = true;
@@ -125,6 +127,7 @@ final class LinePlotViewConfig {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize = 3;
+    private String m_dateFormat;
 
     /**
      * @return the hideInWizard
@@ -525,6 +528,20 @@ final class LinePlotViewConfig {
         m_dotSize = dotSize;
     }
 
+    /**
+     * @return the dateFormat
+     */
+    public String getDateFormat() {
+        return m_dateFormat;
+    }
+
+    /**
+     * @param dateFormat the dateFormat to set
+     */
+    public void setDateFormat(final String dateFormat) {
+        m_dateFormat = dateFormat;
+    }
+
     /** Saves current parameters to settings object.
      * @param settings To save to.
      */
@@ -556,6 +573,7 @@ final class LinePlotViewConfig {
         settings.addString(Y_AXIS_MIN, getyAxisMin() == null ? null : getyAxisMin().toString());
         settings.addString(Y_AXIS_MAX, getyAxisMax() == null ? null : getyAxisMax().toString());
         settings.addString(DOT_SIZE, getDotSize() == null ? null : getDotSize().toString());
+        settings.addString(DATE_FORMAT, getDateFormat());
     }
 
     /** Loads parameters in NodeModel.
@@ -595,6 +613,8 @@ final class LinePlotViewConfig {
         setyAxisMin(yMin == null ? null : Double.parseDouble(yMin));
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
+        setDateFormat(settings.getString(DATE_FORMAT));
+        setDateFormat(getDateFormat());
     }
 
     /** Loads parameters in Dialog.
@@ -633,5 +653,14 @@ final class LinePlotViewConfig {
         setyAxisMin(yMin == null ? null : Double.parseDouble(yMin));
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
+        setDateFormat(settings.getString(DATE_FORMAT, LinePlotNodeDialogPane.PREDEFINED_FORMATS.iterator().next()));
+        setDateFormatHistory(getDateFormat());
+    }
+
+    private void setDateFormatHistory(final String format) {
+        // if it is not a predefined one -> store it
+        if (!LinePlotNodeDialogPane.PREDEFINED_FORMATS.contains(format)) {
+            StringHistory.getInstance(LinePlotNodeDialogPane.FORMAT_HISTORY_KEY).add(format);
+        }
     }
 }

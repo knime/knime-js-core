@@ -177,6 +177,20 @@
          point="org.knime.js.core.webResources">
       <webResourceBundle
             debug="true"
+            name="Universal Date Formatter"
+            version="1.2.3"
+            webResourceBundleID="org.knime.js.base.util.dateFormat.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/util/dateFormat/"
+               relativePathTarget="org/knime/js/base/util/dateFormat/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/util/dateFormat/date-format.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
             name="String Input Quickform"
             version="1.0.0"
             webResourceBundleID="org.knime.js.base.node.quickform.input.string.bundle">
@@ -659,6 +673,9 @@
          </webDependency>
          <webDependency
                webResourceBundleID="MultipleSelections">
+         </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.util.dateFormat.bundle">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
