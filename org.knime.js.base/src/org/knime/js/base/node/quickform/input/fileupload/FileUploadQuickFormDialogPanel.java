@@ -47,11 +47,9 @@
  */
 package org.knime.js.base.node.quickform.input.fileupload;
 
-import javax.swing.JTextField;
-
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.util.FilesHistoryPanel;
 import org.knime.js.base.node.quickform.QuickFormDialogPanel;
-import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 
 /**
  * The sub node dialog panel for the file upload quick form node.
@@ -61,7 +59,7 @@ import org.knime.js.base.node.quickform.QuickFormNodeDialog;
 @SuppressWarnings("serial")
 public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUploadQuickFormValue> {
 
-    private JTextField m_component = new JTextField(QuickFormNodeDialog.DEF_TEXTFIELD_WIDTH);
+    private final FilesHistoryPanel m_historyPanel;
 
     /**
      * @param representation The dialog representation
@@ -69,8 +67,14 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
      */
     public FileUploadQuickFormDialogPanel(final FileUploadQuickFormRepresentation representation) {
         super(representation.getDefaultValue());
-        m_component.setText(representation.getDefaultValue().getPath());
-        setComponent(m_component);
+        String[] extensions = representation.getFileTypes();
+        String historyID = "quickform_file_upload";
+        if (extensions != null && extensions.length > 0) {
+            String first = extensions[0];
+            historyID = historyID.concat("_" + first);
+        }
+        m_historyPanel = new FilesHistoryPanel(historyID, extensions);
+        setComponent(m_historyPanel);
     }
 
     /**
@@ -79,7 +83,9 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
     @Override
     public FileUploadQuickFormValue createNodeValue() throws InvalidSettingsException {
         FileUploadQuickFormValue value = new FileUploadQuickFormValue();
-        value.setPath(m_component.getText());
+        String sel = m_historyPanel.getSelectedFile();
+        value.setPath(sel);
+        m_historyPanel.addToHistory();
         return value;
     }
 
@@ -89,7 +95,7 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
     @Override
     public void loadNodeValue(final FileUploadQuickFormValue value) {
         if (value != null) {
-            m_component.setText(value.getPath());
+            setPath(value.getPath());
         }
     }
 
@@ -99,7 +105,7 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
-        m_component.setEnabled(enabled);
+        m_historyPanel.setEnabled(enabled);
     }
 
     /**
@@ -107,7 +113,12 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
      */
     @Override
     protected void resetToDefault() {
-        m_component.setText(getDefaultValue().getPath());
+        setPath(getDefaultValue().getPath());
+    }
+
+    private void setPath(final String path) {
+        m_historyPanel.updateHistory();
+        m_historyPanel.setSelectedFile(path);
     }
 
 }
