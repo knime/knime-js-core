@@ -236,13 +236,12 @@ final class LinePlotNodeModel extends
             m_table = (BufferedDataTable)inData[0];
             BufferedDataTable colorTable = (BufferedDataTable)inData[1];
             LinePlotViewRepresentation representation = getViewRepresentation();
-            String xColumn = getViewValue().getxColumn();
-            if (representation.getKeyedDataset() == null || xColumn == null) {
+            // don't use staggered rendering for image creation
+            representation.setEnableStaggeredRendering(false);
+            if (representation.getKeyedDataset() == null) {
                 // create dataset for view
                 copyConfigToView(m_table.getDataTableSpec());
                 representation.setKeyedDataset(createKeyedDataset(colorTable, exec));
-                // don't use staggered rendering for image creation
-                representation.setEnableStaggeredRendering(false);
             }
         }
     }
