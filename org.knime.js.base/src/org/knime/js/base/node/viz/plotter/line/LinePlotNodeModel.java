@@ -83,6 +83,7 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.port.inactive.InactiveBranchPortObjectSpec;
 import org.knime.core.node.util.filter.NameFilterConfiguration.EnforceOption;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
@@ -142,7 +143,12 @@ final class LinePlotNodeModel extends
 
         m_config.getyColumnsConfig(true, tableSpec);
 
-        ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        PortObjectSpec imageSpec;
+        if (generateImage()) {
+            imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        } else {
+            imageSpec = InactiveBranchPortObjectSpec.INSTANCE;
+        }
         return new PortObjectSpec[]{imageSpec, out};
     }
 
@@ -250,8 +256,8 @@ final class LinePlotNodeModel extends
      * {@inheritDoc}
      */
     @Override
-    protected PortObject[] performExecuteCreatePortObjects(final ImagePortObject svgImageFromView,
-        final ExecutionContext exec) throws Exception {
+    protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
+            final ExecutionContext exec) throws Exception {
         BufferedDataTable out = m_table;
         synchronized (getLock()) {
             // enable staggered rendering for interactive view

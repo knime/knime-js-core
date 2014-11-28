@@ -61,6 +61,7 @@ import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.port.inactive.InactiveBranchPortObject;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.WizardExecutionController;
@@ -78,8 +79,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     AbstractWizardNodeModel<REP, VAL> {
 
     /**
-     * Creates a new {@link WizardNode} model with the given number (and types!) of input and
-     * output types.
+     * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
+     *
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
      */
@@ -92,11 +93,11 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      */
     @Override
     protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
-            throws Exception {
+        throws Exception {
         exec.setProgress(0.0, "Creating view model...");
         performExecuteCreateView(inObjects, createThirdsExecutionContext(exec));
         exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
-        ImagePortObject svgPortObject = createSVGImagePortObjectFromView(createThirdsExecutionContext(exec));
+        PortObject svgPortObject = createSVGImagePortObjectFromView(createThirdsExecutionContext(exec));
         exec.setProgress(2.0 / 3.0, "Creating output...");
         PortObject[] output = performExecuteCreatePortObjects(svgPortObject, createThirdsExecutionContext(exec));
         exec.setProgress(1.0);
@@ -107,12 +108,12 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         return originalExec.createSubExecutionContext(1.0 / 3.0);
     }
 
-
     /**
-     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}.
-     * View representation and value are populated in this method.
-     * <br><br>
+     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}. View representation and value
+     * are populated in this method. <br>
+     * <br>
      * Called BEFORE image creation.
+     *
      * @param inObjects The input objects.
      * @param exec For {@link BufferedDataTable} creation and progress.
      * @throws Exception If the node execution fails for any reason.
@@ -121,17 +122,18 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         throws Exception;
 
     /**
-     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}.
-     * Populates the resulting {@link PortObject} array.
-     * The {@link ImagePortObject} containing the required SVG image is passed in as a parameter.
-     * <br><br>
+     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}. Populates the resulting
+     * {@link PortObject} array. The {@link ImagePortObject} containing the required SVG image is passed in as a
+     * parameter. <br>
+     * <br>
      * Called AFTER image creation.
-     * @param svgImageFromView The port object, containing the SVG created by the view.
+     *
+     * @param svgImageFromView The port object, containing the SVG created by the view, or inactive port object.
      * @param exec For {@link BufferedDataTable} creation and progress.
      * @return The output objects.
      * @throws Exception If the node execution fails for any reason.
      */
-    protected abstract PortObject[] performExecuteCreatePortObjects(ImagePortObject svgImageFromView,
+    protected abstract PortObject[] performExecuteCreatePortObjects(PortObject svgImageFromView,
         final ExecutionContext exec) throws Exception;
 
     /**
@@ -141,30 +143,33 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
 
     /**
      * Renders the view with PhantomJS and retrieves the created SVG image.
+     *
      * @return A {@link PortObject} containing the SVG created by the view.
      * @throws IOException if an I/O error occurs
      */
-    private final ImagePortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
+    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
+        if (!generateImage()) {
+            return InactiveBranchPortObject.INSTANCE;
+        }
         String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-        String svgPrimer = xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
+        String svgPrimer =
+            xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
         String svg = null;
-        if (generateImage()) {
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
 
-            exec.setProgress(0.75, "Retrieving generated image...");
-            String namespace = getViewNamespace();
-            String methodCall = "";
-            if (namespace != null && !namespace.isEmpty()) {
-                methodCall += namespace + ".";
-            }
-            methodCall += getExtractSVGMethodName() + "();";
-            Object imageData = generator.executeScript(methodCall);
+        exec.setProgress(0.75, "Retrieving generated image...");
+        String namespace = getViewNamespace();
+        String methodCall = "";
+        if (namespace != null && !namespace.isEmpty()) {
+            methodCall += namespace + ".";
+        }
+        methodCall += getExtractSVGMethodName() + "();";
+        Object imageData = generator.executeScript(methodCall);
 
-            if (imageData instanceof String) {
-                svg = (String)imageData;
-            }
+        if (imageData instanceof String) {
+            svg = (String)imageData;
         }
         exec.setProgress(0.9, "Creating image output...");
         if (svg == null || svg.isEmpty()) {
@@ -187,8 +192,9 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     }
 
     /**
-     * Override this method, if JavaScript implementation uses a different
-     * method name then getSVG() for returning the rendered SVG.
+     * Override this method, if JavaScript implementation uses a different method name then getSVG() for returning the
+     * rendered SVG.
+     *
      * @return The method name, used in the JavaScript view implementation, which returns the rendered SVG.
      */
     protected String getExtractSVGMethodName() {
