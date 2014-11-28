@@ -96,6 +96,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
      */
     @Override
     public void loadNodeValue(final ColumnFilterQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             DataColumnSpecFilterConfiguration config = new DataColumnSpecFilterConfiguration("columnFilter");
             config.loadConfigurationInDialog(value.getSettings(), m_representation.getSpec());

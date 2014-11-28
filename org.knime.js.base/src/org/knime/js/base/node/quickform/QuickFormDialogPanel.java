@@ -62,6 +62,7 @@ import javax.swing.JPanel;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.dialog.DialogNodePanel;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.util.ViewUtils;
 
 /**
  * The panel of a node that is displayed in the sub node's dialog.
@@ -76,7 +77,7 @@ public abstract class QuickFormDialogPanel
 
     private JLabel m_label = new JLabel();
 
-    private JCheckBox m_checkBox = new JCheckBox("Use defaults");
+    private JCheckBox m_checkBox = new JCheckBox("Change");
 
     private final JPanel m_contentPanel;
 
@@ -92,12 +93,13 @@ public abstract class QuickFormDialogPanel
         m_checkBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(final ItemEvent e) {
-                setEnabled(!m_checkBox.isSelected());
+                setEnabled(m_checkBox.isSelected());
                 if (m_checkBox.isSelected()) {
                     resetToDefault();
                 }
             }
         });
+        m_checkBox.setSelected(false);
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
@@ -108,13 +110,11 @@ public abstract class QuickFormDialogPanel
         add(m_label, gbc);
 
         gbc.gridx += 1;
-        /** Enable to get "use default" checker
         gbc.anchor = GridBagConstraints.NORTHEAST;
         add(ViewUtils.getInFlowLayout(FlowLayout.RIGHT, 0, 0, m_checkBox), gbc);
         gbc.gridy += 1;
         gbc.gridx = 0;
         gbc.gridwidth = 2;
-         */
         m_contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         gbc.weightx = 1;
         add(m_contentPanel, gbc);
@@ -140,6 +140,7 @@ public abstract class QuickFormDialogPanel
     protected void setComponent(final JComponent component) {
         m_contentPanel.removeAll();
         m_contentPanel.add(component);
+        setEnabled(m_checkBox.isSelected());
     }
 
     /**
@@ -158,11 +159,21 @@ public abstract class QuickFormDialogPanel
      * {@inheritDoc}
      */
     @Override
+    public void loadNodeValue(final VAL value) {
+        if (value != null) {
+            m_checkBox.setSelected(true);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public VAL getNodeValue() throws InvalidSettingsException {
         if (m_checkBox.isSelected()) {
-            return null;
-        } else {
             return createNodeValue();
+        } else {
+            return null;
         }
     }
 

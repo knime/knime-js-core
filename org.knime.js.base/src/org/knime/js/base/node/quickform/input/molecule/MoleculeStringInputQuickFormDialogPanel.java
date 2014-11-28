@@ -87,6 +87,7 @@ public class MoleculeStringInputQuickFormDialogPanel extends QuickFormDialogPane
      */
     @Override
     public void loadNodeValue(final MoleculeStringInputQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_component.setText(value.getMoleculeString());
         }

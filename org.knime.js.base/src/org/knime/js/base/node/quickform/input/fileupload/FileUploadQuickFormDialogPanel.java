@@ -94,6 +94,7 @@ public class FileUploadQuickFormDialogPanel extends QuickFormDialogPanel<FileUpl
      */
     @Override
     public void loadNodeValue(final FileUploadQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             setPath(value.getPath());
         }

@@ -94,6 +94,7 @@ public class DateInputQuickFormDialogPanel extends QuickFormDialogPanel<DateInpu
      */
     @Override
     public void loadNodeValue(final DateInputQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_component.setValue(value.getDate());
         }

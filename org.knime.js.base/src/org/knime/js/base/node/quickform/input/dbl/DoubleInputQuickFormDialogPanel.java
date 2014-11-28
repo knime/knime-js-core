@@ -91,6 +91,7 @@ public class DoubleInputQuickFormDialogPanel extends QuickFormDialogPanel<Double
      */
     @Override
     public void loadNodeValue(final DoubleInputQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_component.setValue(value.getDouble());
         }

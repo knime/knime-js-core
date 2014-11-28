@@ -90,6 +90,7 @@ public class SingleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Si
      */
     @Override
     public void loadNodeValue(final SingleSelectionQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_selectionComponent.setSelection(value.getVariableValue());
         }

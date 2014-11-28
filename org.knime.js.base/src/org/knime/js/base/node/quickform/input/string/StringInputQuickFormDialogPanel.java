@@ -88,6 +88,7 @@ public class StringInputQuickFormDialogPanel extends QuickFormDialogPanel<String
      */
     @Override
     public void loadNodeValue(final StringInputQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_component.setText(value.getString());
         }

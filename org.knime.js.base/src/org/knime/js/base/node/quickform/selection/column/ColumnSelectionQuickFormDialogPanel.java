@@ -88,6 +88,7 @@ public class ColumnSelectionQuickFormDialogPanel extends QuickFormDialogPanel<Co
      */
     @Override
     public void loadNodeValue(final ColumnSelectionQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_column.setSelection(value.getColumn());
         }

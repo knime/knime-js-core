@@ -90,6 +90,7 @@ public class MultipleSelectionQuickFormDialogPanel extends QuickFormDialogPanel<
      */
     @Override
     public void loadNodeValue(final MultipleSelectionQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_selectionComponent.setSelections(value.getVariableValue());
         }

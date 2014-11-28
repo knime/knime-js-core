@@ -88,6 +88,7 @@ public class ListBoxInputQuickFormDialogPanel extends QuickFormDialogPanel<ListB
      */
     @Override
     public void loadNodeValue(final ListBoxInputQuickFormValue value) {
+        super.loadNodeValue(value);
         if (value != null) {
             m_component.setText(value.getString());
         }
