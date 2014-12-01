@@ -59,7 +59,6 @@ org_knime_js_base_node_output_image = function() {
 		var body = document.getElementsByTagName("body")[0];
 		var width = representation.maxWidth;
 		var height = representation.maxHeight;
-		
 		var div = document.createElement("div");
 		div.setAttribute("class", "quickformcontainer");
 		body.appendChild(div);
@@ -85,8 +84,10 @@ org_knime_js_base_node_output_image = function() {
 				img.style.maxHeight = height + "px";
 			}
 		} else if (representation.imageFormat == "SVG") {
-			div.innerHTML = representation.imageData;
-			element = body.getElementsByTagName("svg")[0];
+			var tempContainer = document.createElement("div");
+			tempContainer.innerHTML = representation.imageData;
+			element = tempContainer.getElementsByTagName("svg")[0];
+			div.appendChild(element);
 			var originalWidth = parseInt(element.getAttribute("width"));
 			var originalHeight = parseInt(element.getAttribute("height"));
 			var svgWidth = originalWidth;
@@ -96,15 +97,13 @@ org_knime_js_base_node_output_image = function() {
 				svgWidth = width;
 				svgHeight = svgWidth / svgAspect;
 				createViewbox(element, svgWidth, svgHeight, originalWidth, originalHeight);
-				div.style.maxWidth = width + "px";
-				div.style.overflow = "hidden";
+				element.style.overflow = "hidden";
 			}
 			if (height >= 0 && svgHeight > height) {
 				svgHeight = height;
 				svgWidth = svgHeight * svgAspect;
 				createViewbox(element, svgWidth, svgHeight, originalWidth, originalHeight);
-				div.style.maxHeight = height + "px";
-				div.style.overflow = "hidden";
+				element.style.overflow = "hidden";
 			}
 		} else {
 			var errorText = "Image format not supported: " + representation.imageFormat;
