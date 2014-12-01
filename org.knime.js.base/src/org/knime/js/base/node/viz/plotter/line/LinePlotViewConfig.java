@@ -127,7 +127,7 @@ final class LinePlotViewConfig {
     private Double m_yAxisMin;
     private Double m_yAxisMax;
     private Integer m_dotSize = 3;
-    private String m_dateFormat;
+    private String m_dateFormat = LinePlotNodeDialogPane.PREDEFINED_FORMATS.iterator().next();
 
     /**
      * @return the hideInWizard
@@ -659,7 +659,7 @@ final class LinePlotViewConfig {
 
     private void setDateFormatHistory(final String format) {
         // if it is not a predefined one -> store it
-        if (!LinePlotNodeDialogPane.PREDEFINED_FORMATS.contains(format)) {
+        if (format != null && !LinePlotNodeDialogPane.PREDEFINED_FORMATS.contains(format)) {
             StringHistory.getInstance(LinePlotNodeDialogPane.FORMAT_HISTORY_KEY).add(format);
         }
     }
