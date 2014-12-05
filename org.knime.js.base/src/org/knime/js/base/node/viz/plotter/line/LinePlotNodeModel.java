@@ -519,6 +519,25 @@ final class LinePlotNodeModel extends
         } else {
             viewValue.setyAxisMax(m_config.getyAxisMax());
         }
+
+        // Check axes ranges
+        Double xMin = viewValue.getxAxisMin();
+        Double xMax = viewValue.getxAxisMax();
+        if (xMin != null && xMax != null && xMin >= xMax) {
+            LOGGER.info("Unsetting x-axis ranges. Minimum (" + xMin
+                + ") has to be smaller than maximum (" + xMax + ").");
+            viewValue.setxAxisMin(null);
+            viewValue.setxAxisMax(null);
+        }
+        Double yMin = viewValue.getyAxisMin();
+        Double yMax = viewValue.getyAxisMax();
+        if (yMin != null && yMax != null && yMin >= yMax) {
+            LOGGER.info("Unsetting y-axis ranges. Minimum (" + yMin
+                + ") has to be smaller than maximum (" + yMax + ").");
+            viewValue.setyAxisMin(null);
+            viewValue.setyAxisMax(null);
+        }
+
         viewValue.setDotSize(m_config.getDotSize());
     }
 
