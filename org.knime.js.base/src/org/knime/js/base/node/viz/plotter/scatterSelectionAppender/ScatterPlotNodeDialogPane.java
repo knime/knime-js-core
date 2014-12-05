@@ -56,11 +56,14 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -72,7 +75,13 @@ import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.defaultnodesettings.DialogComponentColorChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
+import org.knime.core.node.defaultnodesettings.SettingsModelColor;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.util.ColumnSelectionPanel;
+import org.knime.core.node.util.DataValueColumnFilter;
+import org.knime.js.base.node.viz.plotter.line.LinePlotNodeDialogPane;
 
 /**
  *
@@ -84,6 +93,13 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
 
     private final JCheckBox m_hideInWizardCheckBox;
     private final JCheckBox m_generateImageCheckBox;
+    private final JCheckBox m_showLegendCheckBox;
+    private final JCheckBox m_autoRangeAxisCheckBox;
+    private final JCheckBox m_useDomainInformationCheckBox;
+    private final JCheckBox m_showGridCheckBox;
+    private final JCheckBox m_showCrosshairCheckBox;
+    private final JCheckBox m_snapToPointsCheckBox;
+    private final JCheckBox m_resizeViewToWindow;
     private final JCheckBox m_enableViewConfigCheckBox;
     private final JCheckBox m_enableTitleChangeCheckBox;
     private final JCheckBox m_enableSubtitleChangeCheckBox;
@@ -91,11 +107,14 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JCheckBox m_enableYColumnChangeCheckBox;
     private final JCheckBox m_enableXAxisLabelEditCheckBox;
     private final JCheckBox m_enableYAxisLabelEditCheckBox;
-    private final JCheckBox m_allowZoomingCheckBox;
+    private final JCheckBox m_allowMouseWheelZoomingCheckBox;
     private final JCheckBox m_allowDragZoomingCheckBox;
     private final JCheckBox m_allowPanningCheckBox;
     private final JCheckBox m_showZoomResetCheckBox;
     private final JCheckBox m_enableDotSizeChangeCheckBox;
+    private final JCheckBox m_enableSelectionCheckBox;
+    private final JCheckBox m_allowRectangleSelectionCheckBox;
+    private final JCheckBox m_allowLassoSelectionCheckBox;
 
     private final JSpinner m_maxRowsSpinner;
     private final JTextField m_appendedColumnName;
@@ -106,6 +125,12 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     private final JTextField m_xAxisLabelField;
     private final JTextField m_yAxisLabelField;
     private final JSpinner m_dotSize;
+    private final DialogComponentStringSelection m_dateFormatChooser;
+    private final JSpinner m_imageWidthSpinner;
+    private final JSpinner m_imageHeightSpinner;
+    private final DialogComponentColorChooser m_gridColorChooser;
+    private final DialogComponentColorChooser m_dataAreaColorChooser;
+    private final DialogComponentColorChooser m_backgroundColorChooser;
 
     /**
      * Creates a new dialog pane.
@@ -113,6 +138,13 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
     public ScatterPlotNodeDialogPane() {
         m_hideInWizardCheckBox = new JCheckBox("Hide in wizard");
         m_generateImageCheckBox = new JCheckBox("Create image at outport");
+        m_showLegendCheckBox = new JCheckBox("Show color legend");
+        m_autoRangeAxisCheckBox = new JCheckBox("Auto range axes");
+        m_useDomainInformationCheckBox = new JCheckBox("Use domain information");
+        m_showGridCheckBox = new JCheckBox("Show grid");
+        m_showCrosshairCheckBox = new JCheckBox("Enable mouse crosshair");
+        m_snapToPointsCheckBox = new JCheckBox("Snap to data pionts");
+        m_resizeViewToWindow = new JCheckBox("Resize view to fill window");
         m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
         m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
         m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
@@ -121,21 +153,37 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_enableXAxisLabelEditCheckBox = new JCheckBox("Enable label edit for x-axis");
         m_enableYAxisLabelEditCheckBox = new JCheckBox("Enable label edit for y-axis");
         m_enableDotSizeChangeCheckBox = new JCheckBox("Enable dot size edit");
-        m_allowZoomingCheckBox = new JCheckBox("Enable mouse wheel zooming");
+        m_allowMouseWheelZoomingCheckBox = new JCheckBox("Enable mouse wheel zooming");
         m_allowDragZoomingCheckBox = new JCheckBox("Enable drag zooming");
         m_allowPanningCheckBox = new JCheckBox("Enable panning");
         m_showZoomResetCheckBox = new JCheckBox("Show zoom reset button");
+        m_enableSelectionCheckBox = new JCheckBox("Enable selection");
+        m_allowRectangleSelectionCheckBox = new JCheckBox("Enable rectangular selection");
+        m_allowLassoSelectionCheckBox = new JCheckBox("Enable lasso selection");
 
         m_maxRowsSpinner = new JSpinner();
         m_appendedColumnName = new JTextField(TEXT_FIELD_SIZE);
         m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
         m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
-        // Change to include string columns when JS library supports it
-        m_xColComboBox = new ColumnSelectionPanel("Choose column for x axis", DoubleValue.class, StringValue.class);
-        m_yColComboBox = new ColumnSelectionPanel("Choose column for y axis", DoubleValue.class, StringValue.class);
+        //TODO change to ColumnSelectionPanel
+        @SuppressWarnings("unchecked")
+        DataValueColumnFilter colFilter = new DataValueColumnFilter(DoubleValue.class, StringValue.class);
+        Border xColBoxBorder = BorderFactory.createTitledBorder("Choose column for x axis");
+        m_xColComboBox = new ColumnSelectionPanel(xColBoxBorder, colFilter, false, false);
+        Border yColBoxBorder = BorderFactory.createTitledBorder("Choose column for y axis");
+        m_yColComboBox = new ColumnSelectionPanel(yColBoxBorder, colFilter, false, false);
         m_xAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
         m_yAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
-        m_dotSize = new JSpinner();
+        m_dotSize = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+
+        m_imageWidthSpinner = new JSpinner(new SpinnerNumberModel(100, 100, Integer.MAX_VALUE, 1));
+        m_imageHeightSpinner = new JSpinner(new SpinnerNumberModel(100, 100, Integer.MAX_VALUE, 1));
+        m_gridColorChooser = new DialogComponentColorChooser(
+            new SettingsModelColor("gridColor", null), "Grid color: ", true);
+        m_dataAreaColorChooser = new DialogComponentColorChooser(
+            new SettingsModelColor("dataAreaColor", null), "Data area color: ", true);
+        m_backgroundColorChooser = new DialogComponentColorChooser(
+            new SettingsModelColor("backgroundColor", null), "Background color: ", true);
 
         m_enableViewConfigCheckBox.addChangeListener(new ChangeListener() {
 
@@ -144,22 +192,52 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
                enableViewControls();
             }
         });
-        addTab("Options", initDialog());
+        m_showCrosshairCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                enableCrosshairControls();
+            }
+        });
+        m_enableSelectionCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                enableSelectionControls();
+            }
+        });
+        m_showGridCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                m_gridColorChooser.getModel().setEnabled(m_showGridCheckBox.isSelected());
+
+            }
+        });
+
+        m_dateFormatChooser =
+            new DialogComponentStringSelection(new SettingsModelString(ScatterPlotViewConfig.DATE_FORMAT, null),
+                "Date format: ", LinePlotNodeDialogPane.PREDEFINED_FORMATS, true);
+
+        addTab("Options", initOptionsPanel());
+        addTab("Axis Configuration", initAxisPanel());
+        addTab("General Plot Options", initGeneralPanel());
+        addTab("View Controls", initControlsPanel());
     }
 
     /**
      * @return
      */
-    private Component initDialog() {
+    private Component initOptionsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.insets = new Insets(5, 5, 5, 5);
-        c.anchor = GridBagConstraints.NORTHWEST;
+        c.insets = new Insets(10, 5, 10, 5);
+        c.anchor = GridBagConstraints.CENTER;
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 2;
         panel.add(m_hideInWizardCheckBox, c);
-        c.gridx += 2;
+        c.gridy++;
         panel.add(m_generateImageCheckBox, c);
         c.gridx = 0;
         c.gridy++;
@@ -170,59 +248,146 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         panel.add(m_maxRowsSpinner, c);
         c.gridx = 0;
         c.gridy++;
-        c.gridwidth = 1;
-        panel.add(new JLabel("Selection Column Name: "), c);
+        panel.add(new JLabel("Selection column name: "), c);
         c.gridx++;
         panel.add(m_appendedColumnName, c);
-        c.gridx = 0;
-        c.gridy++;
         c.gridwidth = 2;
-        panel.add(m_enableViewConfigCheckBox, c);
-        c.gridx = 0;
-        c.gridy++;
-        c.gridwidth = 1;
-        panel.add(new JLabel("Chart Title: "), c);
-        c.gridx++;
-        panel.add(m_chartTitleTextField, c);
-        c.gridx++;
-        panel.add(new JLabel("Chart Subtitle: "), c);
-        c.gridx++;
-        panel.add(m_chartSubtitleTextField, c);
-        c.gridwidth = 2;
-        c.gridx = 0;
-        c.gridy++;
-        panel.add(m_enableTitleChangeCheckBox, c);
-        c.gridx += 2;
-        panel.add(m_enableSubtitleChangeCheckBox, c);
         c.gridx = 0;
         c.gridy++;
         m_xColComboBox.setPreferredSize(new Dimension(260, 50));
         panel.add(m_xColComboBox, c);
-        c.gridx += 2;
+        c.gridy++;
         m_yColComboBox.setPreferredSize(new Dimension(260, 50));
         panel.add(m_yColComboBox, c);
+
+        return panel;
+    }
+
+    private Component initAxisPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
         c.gridx = 0;
-        c.gridy++;
-        panel.add(m_enableXColumnChangeCheckBox, c);
-        c.gridx += 2;
-        panel.add(m_enableYColumnChangeCheckBox, c);
-        c.gridx = 0;
-        c.gridy++;
+        c.gridy = 0;
         c.gridwidth = 1;
-        panel.add(new JLabel("Label for x axis: "), c);
-        c.gridx++;
-        panel.add(m_xAxisLabelField, c);
-        c.gridx++;
-        panel.add(new JLabel("Label for y axis: "), c);
-        c.gridx++;
-        panel.add(m_yAxisLabelField, c);
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel labelsPanel = new JPanel(new GridBagLayout());
+        labelsPanel.setBorder(BorderFactory.createTitledBorder("Labels"));
+        panel.add(labelsPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        labelsPanel.add(new JLabel("Label for x axis: "), cc);
+        cc.gridx++;
+        labelsPanel.add(m_xAxisLabelField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        labelsPanel.add(new JLabel("Label for y axis: "), cc);
+        cc.gridx++;
+        labelsPanel.add(m_yAxisLabelField, cc);
         c.gridx = 0;
         c.gridy++;
-        c.gridwidth = 2;
-        panel.add(m_enableXAxisLabelEditCheckBox, c);
-        c.gridx += 2;
-        panel.add(m_enableYAxisLabelEditCheckBox, c);
+
+        JPanel formatPanel = new JPanel(new GridBagLayout());
+        formatPanel.setBorder(BorderFactory.createTitledBorder("Formatter"));
+        panel.add(formatPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        formatPanel.add(m_dateFormatChooser.getComponentPanel(), cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        //TODO: enable if sensible legend can be shown
+        /*JPanel legendPanel = new JPanel(new GridBagLayout());
+        legendPanel.setBorder(BorderFactory.createTitledBorder("Legends"));
+        panel.add(legendPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        legendPanel.add(m_showLegendCheckBox, cc);
+        c.gridx = 0;
+        c.gridy++;
+        */
+
+        JPanel rangePanel = new JPanel(new GridBagLayout());
+        rangePanel.setBorder(BorderFactory.createTitledBorder("Axes ranges"));
+        panel.add(rangePanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        rangePanel.add(m_autoRangeAxisCheckBox, cc);
+        cc.gridx++;
+        rangePanel.add(m_useDomainInformationCheckBox, cc);
+
+        return panel;
+    }
+
+    private Component initGeneralPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridx = 0;
+        c.gridy = 0;
         c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel titlesPanel = new JPanel(new GridBagLayout());
+        titlesPanel.setBorder(BorderFactory.createTitledBorder("Titles"));
+        panel.add(titlesPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        titlesPanel.add(new JLabel("Chart title: "), cc);
+        cc.gridx++;
+        titlesPanel.add(m_chartTitleTextField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        titlesPanel.add(new JLabel("Chart subtitle: "), cc);
+        cc.gridx++;
+        titlesPanel.add(m_chartSubtitleTextField, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        JPanel sizesPanel = new JPanel(new GridBagLayout());
+        sizesPanel.setBorder(BorderFactory.createTitledBorder("Sizes"));
+        panel.add(sizesPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        sizesPanel.add(new JLabel("Width of image (in px): "), cc);
+        cc.gridx++;
+        m_imageWidthSpinner.setPreferredSize(new Dimension(100, TEXT_FIELD_SIZE));
+        sizesPanel.add(m_imageWidthSpinner, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        sizesPanel.add(new JLabel("Height of image (in px): "), cc);
+        cc.gridx++;
+        m_imageHeightSpinner.setPreferredSize(new Dimension(100, TEXT_FIELD_SIZE));
+        sizesPanel.add(m_imageHeightSpinner, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        cc.anchor = GridBagConstraints.CENTER;
+        sizesPanel.add(m_resizeViewToWindow, cc);
+
+        c.gridx = 0;
+        c.gridy++;
+        JPanel backgroundPanel = new JPanel(new GridBagLayout());
+        backgroundPanel.setBorder(BorderFactory.createTitledBorder("Background"));
+        panel.add(backgroundPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        backgroundPanel.add(m_backgroundColorChooser.getComponentPanel(), cc);
+        cc.gridy++;
+        backgroundPanel.add(m_dataAreaColorChooser.getComponentPanel(), cc);
+        cc.gridy++;
+        backgroundPanel.add(m_showGridCheckBox, cc);
+        cc.gridy++;
+        backgroundPanel.add(m_gridColorChooser.getComponentPanel(), cc);
+
         /*c.gridx = 0;
         c.gridy++;
         panel.add(new JLabel("Dot size: "), c);
@@ -232,15 +397,87 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         c.gridx++;
         c.gridwidth = 2;
         panel.add(m_enableDotSizeChangeCheckBox, c);*/
+
+        return panel;
+    }
+
+    private Component initControlsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.ipadx = 20;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        JPanel viewControlsPanel = new JPanel(new GridBagLayout());
+        viewControlsPanel.setBorder(BorderFactory.createTitledBorder("View edit controls"));
+        panel.add(viewControlsPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        viewControlsPanel.add(m_enableViewConfigCheckBox, cc);
+        cc.gridy++;
+        viewControlsPanel.add(m_enableTitleChangeCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableSubtitleChangeCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableXColumnChangeCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableYColumnChangeCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableXAxisLabelEditCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableYAxisLabelEditCheckBox, cc);
+
         c.gridx = 0;
         c.gridy++;
-        panel.add(m_allowPanningCheckBox, c);
-        c.gridx++;
-        panel.add(m_allowZoomingCheckBox, c);
-        c.gridx++;
-        panel.add(m_allowDragZoomingCheckBox, c);
-        c.gridx++;
-        panel.add(m_showZoomResetCheckBox, c);
+        JPanel crosshairControlPanel = new JPanel(new GridBagLayout());
+        crosshairControlPanel.setBorder(BorderFactory.createTitledBorder("Crosshair"));
+        panel.add(crosshairControlPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        crosshairControlPanel.add(m_showCrosshairCheckBox, cc);
+        cc.gridx += 2;
+        crosshairControlPanel.add(m_snapToPointsCheckBox, cc);
+
+        c.gridx = 0;
+        c.gridy++;
+        JPanel selectionControlPanel = new JPanel(new GridBagLayout());
+        selectionControlPanel.setBorder(BorderFactory.createTitledBorder("Selection"));
+        panel.add(selectionControlPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        selectionControlPanel.add(m_enableSelectionCheckBox, cc);
+        cc.gridx++;
+        selectionControlPanel.add(m_allowRectangleSelectionCheckBox, cc);
+        cc.gridx += 2;
+        selectionControlPanel.add(m_allowLassoSelectionCheckBox, cc);
+
+        c.gridx = 0;
+        c.gridy++;
+        JPanel panControlPanel = new JPanel(new GridBagLayout());
+        panControlPanel.setBorder(BorderFactory.createTitledBorder("Panning"));
+        panel.add(panControlPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        panControlPanel.add(m_allowPanningCheckBox, cc);
+
+        c.gridy++;
+        JPanel zoomControlPanel = new JPanel(new GridBagLayout());
+        zoomControlPanel.setBorder(BorderFactory.createTitledBorder("Zoom"));
+        panel.add(zoomControlPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        zoomControlPanel.add(m_allowMouseWheelZoomingCheckBox, cc);
+        cc.gridx++;
+        zoomControlPanel.add(m_allowDragZoomingCheckBox, cc);
+        cc.gridx++;
+        zoomControlPanel.add(m_showZoomResetCheckBox, cc);
 
         return panel;
     }
@@ -256,6 +493,17 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_enableDotSizeChangeCheckBox.setEnabled(enable);
     }
 
+    private void enableSelectionControls() {
+        boolean enable = m_enableSelectionCheckBox.isSelected();
+        m_allowRectangleSelectionCheckBox.setEnabled(enable);
+        m_allowLassoSelectionCheckBox.setEnabled(enable);
+    }
+
+    private void enableCrosshairControls() {
+        boolean enable = m_showCrosshairCheckBox.isSelected();
+        m_snapToPointsCheckBox.setEnabled(enable);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -266,6 +514,15 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         config.loadSettingsForDialog(settings);
         m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
         m_generateImageCheckBox.setSelected(config.getGenerateImage());
+
+        m_showLegendCheckBox.setSelected(config.getShowLegend());
+        m_autoRangeAxisCheckBox.setSelected(config.getAutoRangeAxes());
+        m_useDomainInformationCheckBox.setSelected(config.getUseDomainInfo());
+        m_showGridCheckBox.setSelected(config.getShowGrid());
+        m_showCrosshairCheckBox.setSelected(config.getShowCrosshair());
+        m_snapToPointsCheckBox.setSelected(config.getSnapToPoints());
+        m_resizeViewToWindow.setSelected(config.getResizeToWindow());
+
         m_appendedColumnName.setText(config.getSelectionColumnName());
         m_enableViewConfigCheckBox.setSelected(config.getEnableViewConfiguration());
         m_enableTitleChangeCheckBox.setSelected(config.getEnableTitleChange());
@@ -275,20 +532,23 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_enableXAxisLabelEditCheckBox.setSelected(config.getEnableXAxisLabelEdit());
         m_enableYAxisLabelEditCheckBox.setSelected(config.getEnableYAxisLabelEdit());
         m_enableDotSizeChangeCheckBox.setSelected(config.getEnableDotSizeChange());
-        m_allowZoomingCheckBox.setSelected(config.getEnableZooming());
+        m_allowMouseWheelZoomingCheckBox.setSelected(config.getEnableZooming());
         m_allowDragZoomingCheckBox.setSelected(config.getEnableDragZooming());
         m_allowPanningCheckBox.setSelected(config.getEnablePanning());
         m_showZoomResetCheckBox.setSelected(config.getShowZoomResetButton());
+        m_enableSelectionCheckBox.setSelected(config.getEnableSelection());
+        m_allowRectangleSelectionCheckBox.setSelected(config.getEnableRectangleSelection());
+        m_allowLassoSelectionCheckBox.setSelected(config.getEnableLassoSelection());
 
         m_chartTitleTextField.setText(config.getChartTitle());
         m_chartSubtitleTextField.setText(config.getChartSubtitle());
         String xCol = config.getxColumn();
-        if (xCol == null || xCol.isEmpty()) {
+        if (((xCol == null) || xCol.isEmpty()) && (specs[0].getNumColumns() > 0)) {
             xCol = specs[0].getColumnNames()[0];
         }
 
         String yCol = config.getyColumn();
-        if (yCol == null || yCol.isEmpty()) {
+        if (((yCol == null) || yCol.isEmpty()) && (specs[0].getNumColumns() > 0)) {
             yCol = specs[0].getColumnNames()[specs[0].getNumColumns() > 1 ? 1 : 0];
         }
 
@@ -298,7 +558,19 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         m_yAxisLabelField.setText(config.getyAxisLabel());
         m_dotSize.setValue(config.getDotSize());
         m_maxRowsSpinner.setValue(config.getMaxRows());
+
+        m_dateFormatChooser.replaceListItems(LinePlotNodeDialogPane.createPredefinedFormats(),
+            config.getDateFormat());
+        m_imageWidthSpinner.setValue(config.getImageWidth());
+        m_imageHeightSpinner.setValue(config.getImageHeight());
+        m_backgroundColorChooser.setColor(config.getBackgroundColor());
+        m_dataAreaColorChooser.setColor(config.getDataAreaColor());
+        m_gridColorChooser.setColor(config.getGridColor());
+        m_gridColorChooser.getModel().setEnabled(m_showGridCheckBox.isSelected());
+
         enableViewControls();
+        enableCrosshairControls();
+        enableSelectionControls();
     }
 
     /**
@@ -309,6 +581,15 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         ScatterPlotViewConfig config = new ScatterPlotViewConfig();
         config.setHideInWizard(m_hideInWizardCheckBox.isSelected());
         config.setGenerateImage(m_generateImageCheckBox.isSelected());
+
+        config.setShowLegend(m_showLegendCheckBox.isSelected());
+        config.setAutoRangeAxes(m_autoRangeAxisCheckBox.isSelected());
+        config.setUseDomainInfo(m_useDomainInformationCheckBox.isSelected());
+        config.setShowGrid(m_showGridCheckBox.isSelected());
+        config.setShowCrosshair(m_showCrosshairCheckBox.isSelected());
+        config.setSnapToPoints(m_snapToPointsCheckBox.isSelected());
+        config.setResizeToWindow(m_resizeViewToWindow.isSelected());
+
         config.setSelectionColumnName(m_appendedColumnName.getText());
         config.setEnableViewConfiguration(m_enableViewConfigCheckBox.isSelected());
         config.setEnableTitleChange(m_enableTitleChangeCheckBox.isSelected());
@@ -318,10 +599,13 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         config.setEnableXAxisLabelEdit(m_enableXAxisLabelEditCheckBox.isSelected());
         config.setEnableYAxisLabelEdit(m_enableYAxisLabelEditCheckBox.isSelected());
         config.setEnableDotSizeChange(m_enableDotSizeChangeCheckBox.isSelected());
-        config.setEnableZooming(m_allowZoomingCheckBox.isSelected());
+        config.setEnableZooming(m_allowMouseWheelZoomingCheckBox.isSelected());
         config.setEnableDragZooming(m_allowDragZoomingCheckBox.isSelected());
         config.setEnablePanning(m_allowPanningCheckBox.isSelected());
         config.setShowZoomResetButton(m_showZoomResetCheckBox.isSelected());
+        config.setEnableSelection(m_enableSelectionCheckBox.isSelected());
+        config.setEnableRectangleSelection(m_allowRectangleSelectionCheckBox.isSelected());
+        config.setEnableLassoSelection(m_allowLassoSelectionCheckBox.isSelected());
 
         config.setChartTitle(m_chartTitleTextField.getText());
         config.setChartSubtitle(m_chartSubtitleTextField.getText());
@@ -331,6 +615,14 @@ public class ScatterPlotNodeDialogPane extends NodeDialogPane {
         config.setyAxisLabel(m_yAxisLabelField.getText());
         config.setDotSize((Integer)m_dotSize.getValue());
         config.setMaxRows((Integer)m_maxRowsSpinner.getValue());
+
+        config.setDateFormat(((SettingsModelString)m_dateFormatChooser.getModel()).getStringValue());
+        config.setImageWidth((Integer)m_imageWidthSpinner.getValue());
+        config.setImageHeight((Integer)m_imageHeightSpinner.getValue());
+        config.setBackgroundColor(m_backgroundColorChooser.getColor());
+        config.setDataAreaColor(m_dataAreaColorChooser.getColor());
+        config.setGridColor(m_gridColorChooser.getColor());
+
         config.saveSettings(settings);
     }
 

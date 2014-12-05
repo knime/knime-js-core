@@ -17,6 +17,10 @@ knime_scatter_plot_selection_appender = function() {
 			d3.select("body").text("Error: No data available");
 			return;
 		}
+		if (representation.keyedDataset.columnKeys.indexOf(value.xColumn) == -1) {
+			d3.select("body").text("Error: Selected column for x-axis: \"" + value.xColumn + "\" not available.");
+			return;
+		}
 		_representation = representation;
 		_value = value;
 		try {
@@ -39,14 +43,18 @@ knime_scatter_plot_selection_appender = function() {
 			}
 			
 			for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
+				var columnKey = _representation.keyedDataset.columnKeys[col];
 				var symbolProp = _representation.keyedDataset.symbols[col];
 				if (symbolProp) {
-					var columnKey = _representation.keyedDataset.columnKeys[col];
 					var symbols = [];
 					for (var symbolKey in symbolProp) {
 						symbols.push({"symbol": symbolProp[symbolKey], "value": symbolKey});
 					}
 					_keyedDataset.setColumnProperty(columnKey, "symbols", symbols);
+				}
+				var dateTimeFormat = _representation.keyedDataset.dateTimeFormats[col];
+				if (dateTimeFormat) {
+					_keyedDataset.setColumnProperty(columnKey, "date", dateTimeFormat);
 				}
 			}
 			
@@ -86,7 +94,14 @@ knime_scatter_plot_selection_appender = function() {
 	
 	buildXYDataset = function() {
 		//console.time("Building XYDataset");
-		var xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumn);
+		var yCol = null;
+		if (_value.yColumn) {
+			yCol = _value.yColumn;
+		}
+		if (!yCol) {
+			yCol = "[EMPTY]";
+		}
+		var xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, yCol);
 		//console.timeEnd("Building XYDataset");
 		return xyDataset;
 	};
@@ -107,11 +122,15 @@ knime_scatter_plot_selection_appender = function() {
 
 		//console.time("Building chart");
 		
-		//var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
-		var chartHeight = "calc(100% - " + getControlHeight() + "px)";
+		var chartWidth = _representation.imageWidth + "px;"
+		var chartHeight = _representation.imageHeight + "px";
+		if (_representation.resizeToWindow) {
+			chartWidth = "100%";
+			chartHeight = "calc(100% - " + getControlHeight() + "px)";
+		}
 		d3.select("#"+layoutContainer).append("div")
 			.attr("id", containerID)
-			.style("width", "100%")
+			.style("width", chartWidth)
 			.style("height", chartHeight)
 			.style("min-width", minWidth + "px")
 			.style("min-height", minHeight + "px")
@@ -127,6 +146,8 @@ knime_scatter_plot_selection_appender = function() {
         xAxis.setLabel(xAxisLabel);
         xAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //xAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        xAxis.setGridLinesVisible(_representation.showGrid, false);
+        xAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.xAxisMin && _value.xAxisMax) {
         	xAxis.setBounds(_value.xAxisMin, _value.xAxisMax, false, false);
         }
@@ -135,20 +156,47 @@ knime_scatter_plot_selection_appender = function() {
         yAxis.setLabel(yAxisLabel);
         yAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //yAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        yAxis.setGridLinesVisible(_representation.showGrid, false);
+        yAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.yAxisMin && _value.yAxisMax) {
         	yAxis.setBounds(_value.yAxisMin, _value.yAxisMax, true, false);
         }
+        if (_representation.gridColor) {
+        	var gColor = getJsfcColor(_representation.gridColor);
+        	xAxis.setGridLineColor(gColor, false);
+        	yAxis.setGridLineColor(gColor, false);
+        }
+        
+        if (_value.xColumn) {
+			var dateProp = _keyedDataset.getColumnProperty(_value.xColumn, "date");
+			if (dateProp) {
+				plot.getXAxis().setTickLabelFormatOverride(new jsfc.UniversalDateFormat(dateProp));
+			} else {
+				plot.getXAxis().setTickLabelFormatOverride(null);
+			}
+		}
         
         plot.renderer = new jsfc.ScatterRenderer(plot);
         var chart = new jsfc.Chart(plot);
+        if (_representation.backgroundColor) {
+        	chart.setBackgroundColor(getJsfcColor(_representation.backgroundColor), false);
+        }
+        if (_representation.dataAreaColor) {
+			plot.setDataBackgroundColor(getJsfcColor(_representation.dataAreaColor), false);
+		}
         chart.setTitleAnchor(new jsfc.Anchor2D(jsfc.RefPt2D.TOP_LEFT));
         var chartTitle = _value.chartTitle ? _value.chartTitle : "";
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
-        chart.setLegendBuilder(null);
+        if (!_representation.showLegend) {
+        	chart.setLegendBuilder(null);
+        }
 		var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		document.getElementById(containerID).appendChild(svg);
-		d3.select(svg).attr("id", "chart_svg").style("width", "100%").style("height", "100%");
+		if (_representation.resizeToWindow) {
+			chartHeight = "100%";
+		}
+		d3.select(svg).attr("id", "chart_svg").style("width", chartWidth).style("height", chartHeight);
         var zoomEnabled = _representation.enableZooming;
         var dragZoomEnabled = _representation.enableDragZooming;
         var panEnabled = _representation.enablePanning;
@@ -163,13 +211,28 @@ knime_scatter_plot_selection_appender = function() {
             chartManager.addLiveHandler(panHandler);
         }
         
-        var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
-        var polygonSelectionHandler = new jsfc.RectangleSelectionHandler(chartManager, polygonSelectionModifier);
-        chartManager.addLiveHandler(polygonSelectionHandler);
+        var selectionEnabled = _representation.enableSelection;
+        var recSelEnabled = _representation.enableRectangleSelection;
+        var lasSelEnabled = _representation.enableLassoSelection;
         
-        var selectionModifier = new jsfc.Modifier(true, true, false, false);
-        var selectionHandler = new jsfc.PolygonSelectionHandler(chartManager, selectionModifier);
-        chartManager.addLiveHandler(selectionHandler);
+        if (selectionEnabled) {
+        	if (recSelEnabled) {
+        		var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
+        		var polygonSelectionHandler = new jsfc.RectangleSelectionHandler(chartManager, polygonSelectionModifier);
+        		chartManager.addLiveHandler(polygonSelectionHandler);
+        	}
+        	if (lasSelEnabled) {
+        		var selectionModifier = new jsfc.Modifier(true, true, false, false);
+        		var selectionHandler = new jsfc.PolygonSelectionHandler(chartManager, selectionModifier);
+        		chartManager.addLiveHandler(selectionHandler);
+        	}
+        }
+        
+        if (_representation.showCrosshair) {
+        	var crosshairHandler = new jsfc.XYCrosshairHandler(chartManager);
+        	crosshairHandler.setSnapToItem(_representation.snapToPoints);
+        	chartManager.addAuxiliaryHandler(crosshairHandler);
+        }
                 
         setChartDimensions();
         //console.timeEnd("Building chart");
@@ -181,6 +244,12 @@ knime_scatter_plot_selection_appender = function() {
         win.onresize = resize;
 	};
 	
+	getJsfcColor = function(colorString) {
+		var colC = colorString.slice(5,-1).split(",");
+		var color = new jsfc.Color(parseInt(colC[0]), parseInt(colC[1]), parseInt(colC[2]), parseInt(colC[3])*255);
+		return color;
+	};
+	
 	resize = function(event) {
 		setChartDimensions();
         chartManager.refreshDisplay();
@@ -188,16 +257,30 @@ knime_scatter_plot_selection_appender = function() {
 	
 	setChartDimensions = function() {
 		var container = document.getElementById(containerID);
-		var w = Math.max(minWidth, container.clientWidth);
-        var h = Math.max(minHeight, container.clientHeight);
+		var w = _representation.imageWidth;
+		var h = _representation.imageHeight;
+		if (_representation.resizeToWindow) {
+			w = Math.max(minWidth, container.clientWidth);
+			h = Math.max(minHeight, container.clientHeight);
+		}
         chartManager.getChart().setSize(w, h);
 	};
 	
 	updateChart = function() {
 		var plot = chartManager.getChart().getPlot();
 		plot.setDataset(buildXYDataset());
-		plot.getXAxis().setAutoRange(true);
-		plot.getYAxis().setAutoRange(true);
+		if (_value.xColumn) {
+			var dateProp = plot.getDataset().getSeriesProperty(_value.xColumn, "date");
+			if (dateProp) {
+				plot.getXAxis().setTickLabelFormatOverride(new jsfc.DateFormat(dateProp));
+			} else {
+				plot.getXAxis().setTickLabelFormatOverride(null);
+			}
+		}
+		if (_representation.autoRangeAxes) {
+			plot.getXAxis().setAutoRange(true);
+			plot.getYAxis().setAutoRange(true);
+		}
 		//chartManager.refreshDisplay();
 		//plot.update(chart);
 	};
@@ -435,6 +518,9 @@ knime_scatter_plot_selection_appender = function() {
 	};
 	
 	view.getSVG = function() {
+		if (!chartManager || !chartManager.getElement()) {
+			return null;
+		}
 		var svg = chartManager.getElement();
 		d3.select(svg).selectAll("circle").each(function() {
 			this.removeAttributeNS("http://www.jfree.org", "ref");

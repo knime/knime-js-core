@@ -58,11 +58,8 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriver.Window;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -132,9 +129,9 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
 
     private void generateView() {
         //TODO make size editable
-        Window window = m_driver.manage().window();
+        /*Window window = m_driver.manage().window();
         window.setPosition(new Point(20, 20));
-        window.setSize(new Dimension(800, 600));
+        window.setSize(new Dimension(800, 600));*/
         String viewPath = m_nodeModel.getViewHTMLPath();
         m_driver.navigate().to(new File(viewPath).toURI().toString());
         waitForDocumentReady();
@@ -144,7 +141,8 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         ((JavascriptExecutor)m_driver).executeScript(initCall);
         WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+        //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
     }
     
     private void waitForDocumentReady()

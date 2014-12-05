@@ -87,6 +87,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.JSONDataTable.JSONDataTableRow;
 import org.knime.js.core.JSONDataTableSpec;
+import org.knime.js.core.JSONDataTableSpec.JSTypes;
 import org.knime.js.core.datasets.JSONKeyedValues2DDataset;
 import org.knime.js.core.datasets.JSONKeyedValuesRow;
 import org.knime.js.core.node.AbstractSVGWizardNodeModel;
@@ -133,8 +134,11 @@ public class ScatterPlotNodeModel extends
                     + " at least one numerical or categorical column.");
         }
 
-        ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
-        DataTableSpec out = rearranger.createSpec();
+        DataTableSpec out = tableSpec;
+        if (m_config.getEnableSelection()) {
+            ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
+            out = rearranger.createSpec();
+        }
 
         PortObjectSpec imageSpec;
         if (generateImage()) {
@@ -234,13 +238,13 @@ public class ScatterPlotNodeModel extends
         synchronized (getLock()) {
             m_table = (BufferedDataTable)inData[0];
             ScatterPlotViewRepresentation representation = getViewRepresentation();
-            String xColumn = getViewValue().getxColumn();
-            // don't use staggered rendering for image creation
+            // don't use staggered rendering and resizing for image creation
             representation.setEnableStaggeredRendering(false);
+            representation.setResizeToWindow(false);
             // Test if re-execute, dataset generation not necessary
-            if (representation.getKeyedDataset() == null || xColumn == null) {
+            if (representation.getKeyedDataset() == null) {
                 // create dataset for view
-                copyConfigToView();
+                copyConfigToView(m_table.getDataTableSpec());
                 representation.setKeyedDataset(createKeyedDataset(exec));
             }
         }
@@ -254,16 +258,20 @@ public class ScatterPlotNodeModel extends
         final ExecutionContext exec) throws Exception {
         BufferedDataTable out = m_table;
         synchronized (getLock()) {
-            // enable staggered rendering for interactive view
-            getViewRepresentation().setEnableStaggeredRendering(true);
+            ScatterPlotViewRepresentation representation = getViewRepresentation();
+            // enable staggered rendering and resizing for interactive view
+            representation.setEnableStaggeredRendering(true);
+            representation.setResizeToWindow(m_config.getResizeToWindow());
 
             ScatterPlotViewValue viewValue = getViewValue();
-            List<String> selectionList = null;
-            if (viewValue != null && viewValue.getSelection() != null) {
-                selectionList = Arrays.asList(viewValue.getSelection());
+            if (m_config.getEnableSelection()) {
+                List<String> selectionList = null;
+                if (viewValue != null && viewValue.getSelection() != null) {
+                    selectionList = Arrays.asList(viewValue.getSelection());
+                }
+                ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+                out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
             }
-            ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-            out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
         }
         exec.setProgress(1);
         return new PortObject[]{svgImageFromView, out};
@@ -295,6 +303,8 @@ public class ScatterPlotNodeModel extends
             for (int colID = 0; colID < numColumns; colID++) {
                 if (tableData[colID] instanceof Double) {
                     rowData[colID] = (double)tableData[colID];
+                } else if (tableData[colID] instanceof Long) {
+                    rowData[colID] = (long)tableData[colID];
                 } else if (tableData[colID] instanceof String) {
                     rowData[colID] = getOrdinalFromStringValue((String)tableData[colID], table, colID);
                 }
@@ -308,9 +318,12 @@ public class ScatterPlotNodeModel extends
         JSONKeyedValues2DDataset dataset =
             new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
         for (int col = 0; col < tableSpec.getNumColumns(); col++) {
-            if (tableSpec.getColTypes()[col] == "string"
+            if (tableSpec.getColTypes()[col].equals(JSTypes.STRING.getName())
                 && tableSpec.getPossibleValues().get(col) != null) {
                 dataset.setSymbol(getSymbolMap(tableSpec.getPossibleValues().get(col)), col);
+            }
+            if (tableSpec.getColTypes()[col].equals(JSTypes.DATE_TIME.getName())) {
+                dataset.setDateTimeFormat(m_config.getDateFormat(), col);
             }
         }
 
@@ -412,8 +425,15 @@ public class ScatterPlotNodeModel extends
         }
     }
 
-    private void copyConfigToView() {
+    private void copyConfigToView(final DataTableSpec spec) {
         ScatterPlotViewRepresentation representation = getViewRepresentation();
+        representation.setShowLegend(m_config.getShowLegend());
+        representation.setAutoRangeAxes(m_config.getAutoRangeAxes());
+        representation.setUseDomainInformation(m_config.getUseDomainInfo());
+        representation.setShowGrid(m_config.getShowGrid());
+        representation.setShowCrosshair(m_config.getShowCrosshair());
+        representation.setSnapToPoints(m_config.getSnapToPoints());
+
         representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
         representation.setEnableTitleChange(m_config.getEnableTitleChange());
         representation.setEnableSubtitleChange(m_config.getEnableSubtitleChange());
@@ -422,10 +442,21 @@ public class ScatterPlotNodeModel extends
         representation.setEnableXAxisLabelEdit(m_config.getEnableXAxisLabelEdit());
         representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
         representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
+
+        representation.setEnablePanning(m_config.getEnablePanning());
         representation.setEnableZooming(m_config.getEnableZooming());
         representation.setEnableDragZooming(m_config.getEnableDragZooming());
-        representation.setEnablePanning(m_config.getEnablePanning());
         representation.setShowZoomResetButton(m_config.getShowZoomResetButton());
+        representation.setEnableSelection(m_config.getEnableSelection());
+        representation.setEnableRectangleSelection(m_config.getEnableRectangleSelection());
+        representation.setEnableLassoSelection(m_config.getEnableLassoSelection());
+
+        representation.setImageWidth(m_config.getImageWidth());
+        representation.setImageHeight(m_config.getImageHeight());
+        representation.setDateTimeFormat(m_config.getDateFormat());
+        representation.setBackgroundColor(m_config.getBackgroundColorString());
+        representation.setDataAreaColor(m_config.getDataAreaColorString());
+        representation.setGridColor(m_config.getGridColorString());
 
         ScatterPlotViewValue viewValue = getViewValue();
         viewValue.setChartTitle(m_config.getChartTitle());
@@ -434,10 +465,26 @@ public class ScatterPlotNodeModel extends
         viewValue.setyColumn(m_config.getyColumn());
         viewValue.setxAxisLabel(m_config.getxAxisLabel());
         viewValue.setyAxisLabel(m_config.getyAxisLabel());
-        viewValue.setxAxisMin(m_config.getxAxisMin());
-        viewValue.setxAxisMax(m_config.getxAxisMax());
-        viewValue.setyAxisMin(m_config.getyAxisMin());
-        viewValue.setyAxisMax(m_config.getyAxisMax());
+        if (m_config.getxAxisMin() == null && m_config.getUseDomainInfo()) {
+            viewValue.setxAxisMin(getMinimumFromColumn(spec, m_config.getxColumn()));
+        } else {
+            viewValue.setxAxisMin(m_config.getxAxisMin());
+        }
+        if (m_config.getxAxisMax() == null && m_config.getUseDomainInfo()) {
+            viewValue.setxAxisMax(getMaximumFromColumn(spec, m_config.getxColumn()));
+        } else {
+            viewValue.setxAxisMax(m_config.getxAxisMax());
+        }
+        if (m_config.getyAxisMin() == null && m_config.getUseDomainInfo()) {
+            viewValue.setyAxisMin(getMinimumFromColumn(spec, m_config.getyColumn()));
+        } else {
+            viewValue.setyAxisMin(m_config.getyAxisMin());
+        }
+        if (m_config.getyAxisMax() == null && m_config.getUseDomainInfo()) {
+            viewValue.setyAxisMax(getMaximumFromColumn(spec, m_config.getyColumn()));
+        } else {
+            viewValue.setyAxisMax(m_config.getyAxisMax());
+        }
         viewValue.setDotSize(m_config.getDotSize());
     }
 
@@ -464,4 +511,19 @@ public class ScatterPlotNodeModel extends
         return m_config.getGenerateImage();
     }
 
+    private Double getMinimumFromColumn(final DataTableSpec spec, final String columnName) {
+        DataCell lowerCell = spec.getColumnSpec(columnName).getDomain().getLowerBound();
+        if (lowerCell.getType().isCompatible(DoubleValue.class)) {
+            return ((DoubleValue)lowerCell).getDoubleValue();
+        }
+        return null;
+    }
+
+    private Double getMaximumFromColumn(final DataTableSpec spec, final String columnName) {
+        DataCell upperCell = spec.getColumnSpec(columnName).getDomain().getUpperBound();
+        if (upperCell.getType().isCompatible(DoubleValue.class)) {
+            return ((DoubleValue)upperCell).getDoubleValue();
+        }
+        return null;
+    }
 }

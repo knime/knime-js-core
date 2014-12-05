@@ -17,6 +17,10 @@ knime_line_plot = function() {
 			d3.select("body").text("Error: No data available");
 			return;
 		}
+		if (value.xColumn && representation.keyedDataset.columnKeys.indexOf(value.xColumn) == -1) {
+			d3.select("body").text("Error: Selected column for x-axis: \"" + value.xColumn + "\" not available.");
+			return;
+		}
 		_representation = representation;
 		_value = value;
 		try {
@@ -95,10 +99,17 @@ knime_line_plot = function() {
 	buildXYDataset = function() {
 		//console.time("Building XYDataset");
 		var xyDataset;
-		if (_keyedDataset.rowCount() > 0) {
+		if (_keyedDataset.rowCount() > 0 && _value.yColumns.length > 0) {
 			xyDataset = new jsfc.TableXYDataset(_keyedDataset, _value.xColumn, _value.yColumns);
 		} else {
-			xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, _value.yColumns[0]);
+			var yCol = null;
+			if (_value.yColumns) {
+				yCol = _value.yColumns[0];
+			}
+			if (!yCol) {
+				yCol = "[EMPTY]";
+			} 
+			xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, yCol);
 		}
 		//console.timeEnd("Building XYDataset");
 		return xyDataset;
@@ -116,11 +127,15 @@ knime_line_plot = function() {
 
 		//console.time("Building chart");
 		
-		//var chartHeight = _representation.enableViewConfiguration ? "80%" : "100%";
-		var chartHeight = "calc(100% - " + getControlHeight() + "px)";
+		var chartWidth = _representation.imageWidth + "px;"
+		var chartHeight = _representation.imageHeight + "px";
+		if (_representation.resizeToWindow) {
+			chartWidth = "100%";
+			chartHeight = "calc(100% - " + getControlHeight() + "px)";
+		}
 		d3.select("#"+layoutContainer).append("div")
 			.attr("id", containerID)
-			.style("width", "100%")
+			.style("width", chartWidth)
 			.style("height", chartHeight)
 			.style("min-width", minWidth + "px")
 			.style("min-height", minHeight + "px")
@@ -128,14 +143,14 @@ knime_line_plot = function() {
 			.style("overflow", "hidden")
 			.style("margin", "0");
 		
-		//chart.build(container);
-				
 		var plot = new jsfc.XYPlot(dataset);
 		plot.setStaggerRendering(_representation.enableStaggeredRendering);
 		var xAxis = plot.getXAxis();
         xAxis.setLabel(xAxisLabel);
         xAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //xAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        xAxis.setGridLinesVisible(_representation.showGrid, false);
+        xAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.xAxisMin && _value.xAxisMax) {
         	xAxis.setBounds(_value.xAxisMin, _value.xAxisMax, false, false);
         }
@@ -144,8 +159,15 @@ knime_line_plot = function() {
         yAxis.setLabel(yAxisLabel);
         yAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
         //yAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        yAxis.setGridLinesVisible(_representation.showGrid, false);
+        yAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.yAxisMin && _value.yAxisMax) {
         	yAxis.setBounds(_value.yAxisMin, _value.yAxisMax, true, false);
+        }
+        if (_representation.gridColor) {
+        	var gColor = getJsfcColor(_representation.gridColor);
+        	xAxis.setGridLineColor(gColor, false);
+        	yAxis.setGridLineColor(gColor, false);
         }
         
 		if (_value.xColumn) {
@@ -159,14 +181,25 @@ knime_line_plot = function() {
         
         plot.setRenderer(new jsfc.XYLineRenderer(plot));
         var chart = new jsfc.Chart(plot);
+        if (_representation.backgroundColor) {
+        	chart.setBackgroundColor(getJsfcColor(_representation.backgroundColor), false);
+        }
+        if (_representation.dataAreaColor) {
+			plot.setDataBackgroundColor(getJsfcColor(_representation.dataAreaColor), false);
+		}
         chart.setTitleAnchor(new jsfc.Anchor2D(jsfc.RefPt2D.TOP_LEFT));
         var chartTitle = _value.chartTitle ? _value.chartTitle : "";
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
-        //chart.setLegendBuilder(null);
+        if (!_representation.showLegend) {
+        	chart.setLegendBuilder(null);
+        }
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 		document.getElementById(containerID).appendChild(svg);
-		d3.select(svg).attr("id", "chart_svg").style("width", "100%").style("height", "100%");
+		if (_representation.resizeToWindow) {
+			chartHeight = "100%";
+		}
+		d3.select(svg).attr("id", "chart_svg").style("width", chartWidth).style("height", chartHeight);
         var zoomEnabled = _representation.enableZooming;
         var dragZoomEnabled = _representation.enableDragZooming;
         var panEnabled = _representation.enablePanning;
@@ -181,12 +214,28 @@ knime_line_plot = function() {
             chartManager.addLiveHandler(panHandler);
         }
         
-        var selectionHandler = new jsfc.ClickSelectionHandler(chartManager);
-        chartManager.addLiveHandler(selectionHandler);
+        //TODO: enable selection when data points can be rendered
+        var selectionEnabled = false;
+        var recSelEnabled = _representation.enableRectangleSelection;
+        var lasSelEnabled = _representation.enableLassoSelection;
         
-        var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
-        var polygonSelectionHandler = new jsfc.PolygonSelectionHandler(chartManager, polygonSelectionModifier);
-        chartManager.addLiveHandler(polygonSelectionHandler);
+        if (selectionEnabled) {
+        	var selectionHandler = new jsfc.ClickSelectionHandler(chartManager);
+        	chartManager.addLiveHandler(selectionHandler);
+        
+        	if (lasSelEnabled) {
+        		var polygonSelectionModifier = new jsfc.Modifier(true, false, false, false);
+        		var polygonSelectionHandler = new jsfc.PolygonSelectionHandler(chartManager, polygonSelectionModifier);
+        		chartManager.addLiveHandler(polygonSelectionHandler);
+        	}
+        }
+        
+        if (_representation.showCrosshair) {
+        	var crosshairHandler = new jsfc.XYCrosshairHandler(chartManager);
+        	//TODO: evaluate snap to points
+        	crosshairHandler.setSnapToItem(false);
+        	chartManager.addAuxiliaryHandler(crosshairHandler);
+        }
         
         setChartDimensions();
         //console.timeEnd("Building chart");
@@ -194,8 +243,16 @@ knime_line_plot = function() {
         chartManager.refreshDisplay();
         //console.timeEnd("Refreshing Display");
         //console.debug(svg.outerHTML);
-        var win = document.defaultView || document.parentWindow;
-        win.onresize = resize;
+        if (_representation.resizeToWindow) {
+        	var win = document.defaultView || document.parentWindow;
+        	win.onresize = resize;
+        }
+	};
+	
+	getJsfcColor = function(colorString) {
+		var colC = colorString.slice(5,-1).split(",");
+		var color = new jsfc.Color(parseInt(colC[0]), parseInt(colC[1]), parseInt(colC[2]), parseInt(colC[3])*255);
+		return color;
 	};
 	
 	resize = function(event) {
@@ -205,8 +262,12 @@ knime_line_plot = function() {
 	
 	setChartDimensions = function() {
 		var container = document.getElementById(containerID);
-		var w = Math.max(minWidth, container.clientWidth);
-        var h = Math.max(minHeight, container.clientHeight);
+		var w = _representation.imageWidth;
+		var h = _representation.imageHeight;
+		if (_representation.resizeToWindow) {
+			w = Math.max(minWidth, container.clientWidth);
+			h = Math.max(minHeight, container.clientHeight);
+		}
         chartManager.getChart().setSize(w, h);
 	};
 	
@@ -221,8 +282,10 @@ knime_line_plot = function() {
 				plot.getXAxis().setTickLabelFormatOverride(null);
 			}
 		}
-		plot.getXAxis().setAutoRange(true);
-		plot.getYAxis().setAutoRange(true);
+		if (_representation.autoRangeAxes) {
+			plot.getXAxis().setAutoRange(true);
+			plot.getYAxis().setAutoRange(true);
+		}
 		//chartManager.refreshDisplay();
 		//plot.update(chart);
 	};
@@ -355,7 +418,7 @@ knime_line_plot = function() {
     		var columnChangeContainer = controlContainer.append("tr")/*.style("margin", "5px auto").style("display", "table")*/;
 	    	columnChangeContainer.append("td").append("label").attr("for", "yColumnSelect").text("Y Columns:").style("margin-right", "5px");
 	    	var ySelect = new twinlistMultipleSelections();
-	    	columnChangeContainer.append("td").node().appendChild(ySelect.getComponent().get(0));
+	    	columnChangeContainer.append("td").attr("colspan", "3").node().appendChild(ySelect.getComponent().get(0));
 	    	ySelect.setChoices(_keyedDataset.columnKeys());
 	    	ySelect.setSelections(_value.yColumns);
 	    	ySelect.addValueChangedListener(function() {
@@ -463,6 +526,9 @@ knime_line_plot = function() {
 	};
 	
 	view.getSVG = function() {
+		if (!chartManager || !chartManager.getElement()) {
+			return null;
+		}
 		var svg = chartManager.getElement();
 		d3.select(svg).selectAll("circle").each(function() {
 			this.removeAttributeNS("http://www.jfree.org", "ref");
