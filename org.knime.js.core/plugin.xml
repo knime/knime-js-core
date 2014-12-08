@@ -158,7 +158,7 @@
                relativePathTarget="js-lib/JSFreeChart/">
          </webResource>
          <importResource
-               relativePath="js-lib/JSFreeChart/jsfreechart.js"
+               relativePath="js-lib/JSFreeChart/jsfreechart.min.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource

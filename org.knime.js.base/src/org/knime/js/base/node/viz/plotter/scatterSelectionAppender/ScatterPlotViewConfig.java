@@ -50,9 +50,13 @@
  */
 package org.knime.js.base.node.viz.plotter.scatterSelectionAppender;
 
+import java.awt.Color;
+
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.base.node.viz.plotter.line.LinePlotNodeDialogPane;
+import org.knime.js.base.node.viz.plotter.line.LinePlotViewConfig;
 
 /**
  *
@@ -62,9 +66,23 @@ final class ScatterPlotViewConfig {
 
     static final int DEFAULT_MAX_ROWS = 2500;
     static final String DEFAULT_SELECTION_COLUMN_NAME = "Selected (Scatter Plot)";
+    static final int DEFAULT_WIDTH = 800;
+    static final int DEFAULT_HEIGHT = 600;
+    static final int DEFAULT_DOT_SIZE = 3;
+    static final String COLOR_STRING_PREFIX = "rgba(";
+    static final Color DEFAULT_BACKGROUND_COLOR = new Color(255, 255, 255);
+    static final Color DEFAULT_DATA_AREA_COLOR = new Color(230, 230, 230);
+    static final Color DEFAULT_GRID_COLOR = new Color(255, 255, 255);
 
     static final String HIDE_IN_WIZARD = "hideInWizard";
     static final String GENERATE_IMAGE = "generateImage";
+    static final String SHOW_LEGEND = "showLegend";
+    static final String AUTO_RANGE_AXES = "autoRange";
+    static final String USE_DOMAIN_INFO = "useDomainInformation";
+    static final String SHOW_GRID = "showGrid";
+    static final String SHOW_CROSSHAIR = "showCrosshair";
+    static final String SNAP_TO_POINTS = "snapToPoints";
+    static final String RESIZE_TO_WINDOW = "resizeToWindow";
     static final String ENABLE_CONFIG = "enableViewConfiguration";
     static final String ENABLE_TTILE_CHANGE = "enableTitleChange";
     static final String ENABLE_SUBTTILE_CHANGE = "enableSubtitleChange";
@@ -77,6 +95,9 @@ final class ScatterPlotViewConfig {
     static final String ENABLE_DRAG_ZOOMING = "enableDragZooming";
     static final String ENABLE_PANNING = "enablePanning";
     static final String SHOW_ZOOM_RESET_BUTTON = "showZoomResetButton";
+    static final String ENABLE_SELECTION = "enableSelection";
+    static final String ENABLE_RECTANGLE_SELECTION = "enableRectangleSelection";
+    static final String ENABLE_LASSO_SELECTION = "enableLassoSelection";
     static final String CHART_TITLE = "chartTitle";
     static final String CHART_SUBTITLE = "chartSubtitle";
     static final String X_COL = "xCol";
@@ -90,9 +111,22 @@ final class ScatterPlotViewConfig {
     static final String Y_AXIS_MIN = "yAxisMin";
     static final String Y_AXIS_MAX = "yAxisMax";
     static final String DOT_SIZE = "dot_size";
+    static final String DATE_FORMAT = "date_format";
+    static final String IMAGE_WIDTH = "imageWidth";
+    static final String IMAGE_HEIGHT = "imageHeight";
+    static final String BACKGROUND_COLOR = "backgroundColor";
+    static final String DATA_AREA_COLOR = "dataAreaColor";
+    static final String GRID_COLOR = "gridColor";
 
     private boolean m_hideInWizard = false;
     private boolean m_generateImage = true;
+    private boolean m_showLegend = false;
+    private boolean m_autoRangeAxes = true;
+    private boolean m_useDomainInfo = false;
+    private boolean m_showGrid = true;
+    private boolean m_showCrosshair = false;
+    private boolean m_snapToPoints = false;
+    private boolean m_resizeToWindow = true;
     private boolean m_enableViewConfiguration = false;
     private boolean m_enableTitleChange = false;
     private boolean m_enableSubtitleChange = false;
@@ -105,6 +139,9 @@ final class ScatterPlotViewConfig {
     private boolean m_enablePanning = true;
     private boolean m_enableDragZooming = false;
     private boolean m_showZoomResetButton = false;
+    private boolean m_enableSelection = true;
+    private boolean m_enableRectangleSelection = false;
+    private boolean m_enableLassoSelection = false;
     private int m_maxRows = DEFAULT_MAX_ROWS;
     private String m_selectionColumnName = DEFAULT_SELECTION_COLUMN_NAME;
     private String m_chartTitle;
@@ -117,8 +154,13 @@ final class ScatterPlotViewConfig {
     private Double m_xAxisMax;
     private Double m_yAxisMin;
     private Double m_yAxisMax;
-    private Integer m_dotSize = 3;
-
+    private Integer m_dotSize = DEFAULT_DOT_SIZE;
+    private String m_dateFormat = LinePlotNodeDialogPane.PREDEFINED_FORMATS.iterator().next();
+    private int m_imageWidth = DEFAULT_WIDTH;
+    private int m_imageHeight = DEFAULT_HEIGHT;
+    private Color m_backgroundColor = DEFAULT_BACKGROUND_COLOR;
+    private Color m_dataAreaColor = DEFAULT_DATA_AREA_COLOR;
+    private Color m_gridColor = DEFAULT_GRID_COLOR;
 
     /**
      * @return the hideInWizard
@@ -146,6 +188,237 @@ final class ScatterPlotViewConfig {
      */
     public void setGenerateImage(final boolean generateImage) {
         m_generateImage = generateImage;
+    }
+
+    /**
+     * @return the showLegend
+     */
+    public boolean getShowLegend() {
+        return m_showLegend;
+    }
+
+    /**
+     * @param showLegend the showLegend to set
+     */
+    public void setShowLegend(final boolean showLegend) {
+        m_showLegend = showLegend;
+    }
+
+    /**
+     * @return the autoRangeAxes
+     */
+    public boolean getAutoRangeAxes() {
+        return m_autoRangeAxes;
+    }
+
+    /**
+     * @param autoRangeAxes the autoRangeAxes to set
+     */
+    public void setAutoRangeAxes(final boolean autoRangeAxes) {
+        m_autoRangeAxes = autoRangeAxes;
+    }
+
+    /**
+     * @return the useDomainInfo
+     */
+    public boolean getUseDomainInfo() {
+        return m_useDomainInfo;
+    }
+
+    /**
+     * @param useDomainInfo the useDomainInfo to set
+     */
+    public void setUseDomainInfo(final boolean useDomainInfo) {
+        m_useDomainInfo = useDomainInfo;
+    }
+
+    /**
+     * @return the showGrid
+     */
+    public boolean getShowGrid() {
+        return m_showGrid;
+    }
+
+    /**
+     * @param showGrid the showGrid to set
+     */
+    public void setShowGrid(final boolean showGrid) {
+        m_showGrid = showGrid;
+    }
+
+    /**
+     * @return the showCrosshair
+     */
+    public boolean getShowCrosshair() {
+        return m_showCrosshair;
+    }
+
+    /**
+     * @param showCrosshair the showCrosshair to set
+     */
+    public void setShowCrosshair(final boolean showCrosshair) {
+        m_showCrosshair = showCrosshair;
+    }
+
+    /**
+     * @return the snapToPoints
+     */
+    public boolean getSnapToPoints() {
+        return m_snapToPoints;
+    }
+
+    /**
+     * @param snapToPoints the snapToPoints to set
+     */
+    public void setSnapToPoints(final boolean snapToPoints) {
+        m_snapToPoints = snapToPoints;
+    }
+
+    /**
+     * @return the enableSelection
+     */
+    public boolean getEnableSelection() {
+        return m_enableSelection;
+    }
+
+    /**
+     * @param enableSelection the enableSelection to set
+     */
+    public void setEnableSelection(final boolean enableSelection) {
+        m_enableSelection = enableSelection;
+    }
+
+    /**
+     * @return the enableRectangleSelection
+     */
+    public boolean getEnableRectangleSelection() {
+        return m_enableRectangleSelection;
+    }
+
+    /**
+     * @param enableRectangleSelection the enableRectangleSelection to set
+     */
+    public void setEnableRectangleSelection(final boolean enableRectangleSelection) {
+        m_enableRectangleSelection = enableRectangleSelection;
+    }
+
+    /**
+     * @return the enableLassoSelection
+     */
+    public boolean getEnableLassoSelection() {
+        return m_enableLassoSelection;
+    }
+
+    /**
+     * @param enableLassoSelection the enableLassoSelection to set
+     */
+    public void setEnableLassoSelection(final boolean enableLassoSelection) {
+        m_enableLassoSelection = enableLassoSelection;
+    }
+
+    /**
+     * @return the imageWidth
+     */
+    public int getImageWidth() {
+        return m_imageWidth;
+    }
+
+    /**
+     * @param imageWidth the imageWidth to set
+     */
+    public void setImageWidth(final int imageWidth) {
+        m_imageWidth = imageWidth;
+    }
+
+    /**
+     * @return the imageHeight
+     */
+    public int getImageHeight() {
+        return m_imageHeight;
+    }
+
+    /**
+     * @param imageHeight the imageHeight to set
+     */
+    public void setImageHeight(final int imageHeight) {
+        m_imageHeight = imageHeight;
+    }
+
+    /**
+     * @return the resizeToWindow
+     */
+    public boolean getResizeToWindow() {
+        return m_resizeToWindow;
+    }
+
+    /**
+     * @param resizeToWindow the resizeToWindow to set
+     */
+    public void setResizeToWindow(final boolean resizeToWindow) {
+        m_resizeToWindow = resizeToWindow;
+    }
+
+    /**
+     * @return the backgroundColor
+     */
+    public Color getBackgroundColor() {
+        return m_backgroundColor;
+    }
+
+    /**
+     * @return the backgroundColor as rgba string
+     */
+    public String getBackgroundColorString() {
+        return LinePlotViewConfig.getRGBAStringFromColor(m_backgroundColor);
+    }
+
+    /**
+     * @param backgroundColor the backgroundColor to set
+     */
+    public void setBackgroundColor(final Color backgroundColor) {
+        m_backgroundColor = backgroundColor;
+    }
+
+    /**
+     * @return the dataAreaColor
+     */
+    public Color getDataAreaColor() {
+        return m_dataAreaColor;
+    }
+
+    /**
+     * @return the data area color as rgba string
+     */
+    public String getDataAreaColorString() {
+        return LinePlotViewConfig.getRGBAStringFromColor(m_dataAreaColor);
+    }
+
+    /**
+     * @param dataAreaColor the dataAreaColor to set
+     */
+    public void setDataAreaColor(final Color dataAreaColor) {
+        m_dataAreaColor = dataAreaColor;
+    }
+
+    /**
+     * @return the gridColor
+     */
+    public Color getGridColor() {
+        return m_gridColor;
+    }
+
+    /**
+     * @return the grid color as rgba string
+     */
+    public String getGridColorString() {
+        return LinePlotViewConfig.getRGBAStringFromColor(m_gridColor);
+    }
+
+    /**
+     * @param gridColor the gridColor to set
+     */
+    public void setGridColor(final Color gridColor) {
+        m_gridColor = gridColor;
     }
 
     /**
@@ -498,12 +771,35 @@ final class ScatterPlotViewConfig {
         m_dotSize = dotSize;
     }
 
+    /**
+     * @return the dateFormat
+     */
+    public String getDateFormat() {
+        return m_dateFormat;
+    }
+
+    /**
+     * @param dateFormat the dateFormat to set
+     */
+    public void setDateFormat(final String dateFormat) {
+        m_dateFormat = dateFormat;
+    }
+
     /** Saves current parameters to settings object.
      * @param settings To save to.
      */
     public void saveSettings(final NodeSettingsWO settings) {
         settings.addBoolean(HIDE_IN_WIZARD, getHideInWizard());
         settings.addBoolean(GENERATE_IMAGE, getGenerateImage());
+
+        settings.addBoolean(SHOW_LEGEND, getShowLegend());
+        settings.addBoolean(AUTO_RANGE_AXES, getAutoRangeAxes());
+        settings.addBoolean(USE_DOMAIN_INFO, getUseDomainInfo());
+        settings.addBoolean(SHOW_GRID, getShowGrid());
+        settings.addBoolean(SHOW_CROSSHAIR, getShowCrosshair());
+        settings.addBoolean(SNAP_TO_POINTS, getSnapToPoints());
+        settings.addBoolean(RESIZE_TO_WINDOW, getResizeToWindow());
+
         settings.addBoolean(ENABLE_CONFIG, getEnableViewConfiguration());
         settings.addBoolean(ENABLE_TTILE_CHANGE, getEnableTitleChange());
         settings.addBoolean(ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
@@ -516,6 +812,10 @@ final class ScatterPlotViewConfig {
         settings.addBoolean(ENABLE_DRAG_ZOOMING, getEnableDragZooming());
         settings.addBoolean(ENABLE_PANNING, getEnablePanning());
         settings.addBoolean(SHOW_ZOOM_RESET_BUTTON, getShowZoomResetButton());
+        settings.addBoolean(ENABLE_SELECTION, getEnableSelection());
+        settings.addBoolean(ENABLE_RECTANGLE_SELECTION, getEnableRectangleSelection());
+        settings.addBoolean(ENABLE_LASSO_SELECTION, getEnableLassoSelection());
+
         settings.addString(CHART_TITLE, getChartTitle());
         settings.addString(CHART_SUBTITLE, getChartSubtitle());
         settings.addString(X_COL, getxColumn());
@@ -529,6 +829,13 @@ final class ScatterPlotViewConfig {
         settings.addString(Y_AXIS_MIN, getyAxisMin() == null ? null : getyAxisMin().toString());
         settings.addString(Y_AXIS_MAX, getyAxisMax() == null ? null : getyAxisMax().toString());
         settings.addString(DOT_SIZE, getDotSize() == null ? null : getDotSize().toString());
+
+        settings.addString(DATE_FORMAT, getDateFormat());
+        settings.addInt(IMAGE_WIDTH, getImageWidth());
+        settings.addInt(IMAGE_HEIGHT, getImageHeight());
+        settings.addString(BACKGROUND_COLOR, getBackgroundColorString());
+        settings.addString(DATA_AREA_COLOR, getDataAreaColorString());
+        settings.addString(GRID_COLOR, getGridColorString());
     }
 
     /** Loads parameters in NodeModel.
@@ -538,6 +845,15 @@ final class ScatterPlotViewConfig {
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
         setGenerateImage(settings.getBoolean(GENERATE_IMAGE));
+
+        setShowLegend(settings.getBoolean(SHOW_LEGEND));
+        setAutoRangeAxes(settings.getBoolean(AUTO_RANGE_AXES));
+        setUseDomainInfo(settings.getBoolean(USE_DOMAIN_INFO));
+        setShowGrid(settings.getBoolean(SHOW_GRID));
+        setShowCrosshair(settings.getBoolean(SHOW_CROSSHAIR));
+        setSnapToPoints(settings.getBoolean(SNAP_TO_POINTS));
+        setResizeToWindow(settings.getBoolean(RESIZE_TO_WINDOW));
+
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE));
@@ -550,6 +866,10 @@ final class ScatterPlotViewConfig {
         setEnableDragZooming(settings.getBoolean(ENABLE_DRAG_ZOOMING));
         setEnablePanning(settings.getBoolean(ENABLE_PANNING));
         setShowZoomResetButton(settings.getBoolean(SHOW_ZOOM_RESET_BUTTON));
+        setEnableSelection(settings.getBoolean(ENABLE_SELECTION));
+        setEnableRectangleSelection(settings.getBoolean(ENABLE_RECTANGLE_SELECTION));
+        setEnableLassoSelection(settings.getBoolean(ENABLE_LASSO_SELECTION));
+
         setChartTitle(settings.getString(CHART_TITLE));
         setChartSubtitle(settings.getString(CHART_SUBTITLE));
         setxColumn(settings.getString(X_COL));
@@ -568,6 +888,17 @@ final class ScatterPlotViewConfig {
         setyAxisMin(yMin == null ? null : Double.parseDouble(yMin));
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
+
+        setDateFormat(settings.getString(DATE_FORMAT));
+        setDateFormat(getDateFormat());
+        setImageWidth(settings.getInt(IMAGE_WIDTH));
+        setImageHeight(settings.getInt(IMAGE_HEIGHT));
+        String bgColorString = settings.getString(BACKGROUND_COLOR);
+        setBackgroundColor(LinePlotViewConfig.getColorFromString(bgColorString));
+        String dataColorString = settings.getString(DATA_AREA_COLOR);
+        setDataAreaColor(LinePlotViewConfig.getColorFromString(dataColorString));
+        String gridColorString = settings.getString(GRID_COLOR);
+        setGridColor(LinePlotViewConfig.getColorFromString(gridColorString));
     }
 
     /** Loads parameters in Dialog.
@@ -576,6 +907,15 @@ final class ScatterPlotViewConfig {
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
         setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
         setGenerateImage(settings.getBoolean(GENERATE_IMAGE, true));
+
+        setShowLegend(settings.getBoolean(SHOW_LEGEND, false));
+        setAutoRangeAxes(settings.getBoolean(AUTO_RANGE_AXES, true));
+        setUseDomainInfo(settings.getBoolean(USE_DOMAIN_INFO, false));
+        setShowGrid(settings.getBoolean(SHOW_GRID, true));
+        setShowCrosshair(settings.getBoolean(SHOW_CROSSHAIR, false));
+        setSnapToPoints(settings.getBoolean(SNAP_TO_POINTS, false));
+        setResizeToWindow(settings.getBoolean(RESIZE_TO_WINDOW, true));
+
         setEnableViewConfiguration(settings.getBoolean(ENABLE_CONFIG, false));
         setEnableTitleChange(settings.getBoolean(ENABLE_TTILE_CHANGE, false));
         setEnableSubtitleChange(settings.getBoolean(ENABLE_SUBTTILE_CHANGE, false));
@@ -588,6 +928,10 @@ final class ScatterPlotViewConfig {
         setEnableDragZooming(settings.getBoolean(ENABLE_DRAG_ZOOMING, false));
         setEnablePanning(settings.getBoolean(ENABLE_PANNING, true));
         setShowZoomResetButton(settings.getBoolean(SHOW_ZOOM_RESET_BUTTON, false));
+        setEnableSelection(settings.getBoolean(ENABLE_SELECTION, true));
+        setEnableRectangleSelection(settings.getBoolean(ENABLE_RECTANGLE_SELECTION, false));
+        setEnableLassoSelection(settings.getBoolean(ENABLE_LASSO_SELECTION, false));
+
         setChartTitle(settings.getString(CHART_TITLE, null));
         setChartSubtitle(settings.getString(CHART_SUBTITLE, null));
         setxColumn(settings.getString(X_COL, null));
@@ -606,5 +950,29 @@ final class ScatterPlotViewConfig {
         setyAxisMin(yMin == null ? null : Double.parseDouble(yMin));
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
+
+        setDateFormat(settings.getString(DATE_FORMAT, LinePlotNodeDialogPane.PREDEFINED_FORMATS.iterator().next()));
+        LinePlotViewConfig.setDateFormatHistory(getDateFormat());
+        setImageWidth(settings.getInt(IMAGE_WIDTH, DEFAULT_WIDTH));
+        setImageHeight(settings.getInt(IMAGE_HEIGHT, DEFAULT_HEIGHT));
+
+        String bgColorString = settings.getString(BACKGROUND_COLOR, null);
+        Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
+        try {
+            backgroundColor = LinePlotViewConfig.getColorFromString(bgColorString);
+        } catch (InvalidSettingsException e) { /* do nothing */ }
+        setBackgroundColor(backgroundColor);
+        String dataColorString = settings.getString(DATA_AREA_COLOR, null);
+        Color dataAreaColor = DEFAULT_DATA_AREA_COLOR;
+        try {
+            dataAreaColor = LinePlotViewConfig.getColorFromString(dataColorString);
+        } catch (InvalidSettingsException e) { /* do nothing */ }
+        setDataAreaColor(dataAreaColor);
+        String gridColorString = settings.getString(GRID_COLOR, null);
+        Color gridColor = DEFAULT_GRID_COLOR;
+        try {
+            gridColor = LinePlotViewConfig.getColorFromString(gridColorString);
+        } catch (InvalidSettingsException e) { /* do nothing */ }
+        setGridColor(gridColor);
     }
 }

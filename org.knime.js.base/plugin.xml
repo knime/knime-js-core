@@ -694,6 +694,9 @@
          <webDependency
                webResourceBundleID="jsFreeChart_0.5">
          </webDependency>
+         <webDependency
+               webResourceBundleID="org.knime.js.base.util.dateFormat.bundle">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"

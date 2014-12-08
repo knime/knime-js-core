@@ -68,6 +68,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class ScatterPlotViewRepresentation extends JSONViewContent {
 
     private JSONKeyedValues2DDataset m_keyedDataset;
+
+    private boolean m_showLegend;
+    private boolean m_autoRangeAxes;
+    private boolean m_useDomainInformation;
+    private boolean m_showGrid;
+    private boolean m_showCrosshair;
+    private boolean m_snapToPoints;
+    private boolean m_resizeToWindow;
+
     private boolean m_enableViewConfiguration;
     private boolean m_enableTitleChange;
     private boolean m_enableSubtitleChange;
@@ -80,6 +89,17 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     private boolean m_enableDragZooming;
     private boolean m_enablePanning;
     private boolean m_showZoomResetButton;
+
+    private boolean m_enableSelection;
+    private boolean m_enableRectangleSelection;
+    private boolean m_enableLassoSelection;
+
+    private int m_imageWidth;
+    private int m_imageHeight;
+    private String m_dateTimeFormat;
+    private String m_backgroundColor;
+    private String m_dataAreaColor;
+    private String m_gridColor;
 
     private boolean m_enableStaggeredRendering = true;
 
@@ -96,6 +116,104 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     public void setKeyedDataset(final JSONKeyedValues2DDataset keyedDataset) {
         m_keyedDataset = keyedDataset;
+    }
+
+    /**
+     * @return the showLegend
+     */
+    public boolean getShowLegend() {
+        return m_showLegend;
+    }
+
+    /**
+     * @param showLegend the showLegend to set
+     */
+    public void setShowLegend(final boolean showLegend) {
+        m_showLegend = showLegend;
+    }
+
+    /**
+     * @return the autoRange
+     */
+    public boolean getAutoRangeAxes() {
+        return m_autoRangeAxes;
+    }
+
+    /**
+     * @param autoRangeAxes the autoRange to set
+     */
+    public void setAutoRangeAxes(final boolean autoRangeAxes) {
+        m_autoRangeAxes = autoRangeAxes;
+    }
+
+    /**
+     * @return the useDomainInformation
+     */
+    public boolean getUseDomainInformation() {
+        return m_useDomainInformation;
+    }
+
+    /**
+     * @param useDomainInformation the useDomainInformation to set
+     */
+    public void setUseDomainInformation(final boolean useDomainInformation) {
+        m_useDomainInformation = useDomainInformation;
+    }
+
+    /**
+     * @return the showGrid
+     */
+    public boolean getShowGrid() {
+        return m_showGrid;
+    }
+
+    /**
+     * @param showGrid the showGrid to set
+     */
+    public void setShowGrid(final boolean showGrid) {
+        m_showGrid = showGrid;
+    }
+
+    /**
+     * @return the showCrosshair
+     */
+    public boolean getShowCrosshair() {
+        return m_showCrosshair;
+    }
+
+    /**
+     * @param showCrosshair the showCrosshair to set
+     */
+    public void setShowCrosshair(final boolean showCrosshair) {
+        m_showCrosshair = showCrosshair;
+    }
+
+    /**
+     * @return the snapToPoints
+     */
+    public boolean getSnapToPoints() {
+        return m_snapToPoints;
+    }
+
+    /**
+     * @param snapToPoints the snapToPoints to set
+     */
+    public void setSnapToPoints(final boolean snapToPoints) {
+        m_snapToPoints = snapToPoints;
+    }
+
+    /**
+     * @return the resizeToWindow
+     */
+    public boolean getResizeToWindow() {
+        return m_resizeToWindow;
+    }
+
+    /**
+     * @param resizeToWindow the resizeToWindow to set
+     */
+    public void setResizeToWindow(final boolean resizeToWindow) {
+        m_resizeToWindow = resizeToWindow;
     }
 
     /**
@@ -267,6 +385,132 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
     }
 
     /**
+     * @return the enableSelection
+     */
+    public boolean getEnableSelection() {
+        return m_enableSelection;
+    }
+
+    /**
+     * @param enableSelection the enableSelection to set
+     */
+    public void setEnableSelection(final boolean enableSelection) {
+        m_enableSelection = enableSelection;
+    }
+
+    /**
+     * @return the enableRectangleSelection
+     */
+    public boolean getEnableRectangleSelection() {
+        return m_enableRectangleSelection;
+    }
+
+    /**
+     * @param enableRectangleSelection the enableRectangleSelection to set
+     */
+    public void setEnableRectangleSelection(final boolean enableRectangleSelection) {
+        m_enableRectangleSelection = enableRectangleSelection;
+    }
+
+    /**
+     * @return the enableLassoSelection
+     */
+    public boolean getEnableLassoSelection() {
+        return m_enableLassoSelection;
+    }
+
+    /**
+     * @param enableLassoSelection the enableLassoSelection to set
+     */
+    public void setEnableLassoSelection(final boolean enableLassoSelection) {
+        m_enableLassoSelection = enableLassoSelection;
+    }
+
+    /**
+     * @return the imageWidth
+     */
+    public int getImageWidth() {
+        return m_imageWidth;
+    }
+
+    /**
+     * @param imageWidth the imageWidth to set
+     */
+    public void setImageWidth(final int imageWidth) {
+        m_imageWidth = imageWidth;
+    }
+
+    /**
+     * @return the imageHeight
+     */
+    public int getImageHeight() {
+        return m_imageHeight;
+    }
+
+    /**
+     * @param imageHeight the imageHeight to set
+     */
+    public void setImageHeight(final int imageHeight) {
+        m_imageHeight = imageHeight;
+    }
+
+    /**
+     * @return the dateTimeFormat
+     */
+    public String getDateTimeFormat() {
+        return m_dateTimeFormat;
+    }
+
+    /**
+     * @param dateTimeFormat the dateTimeFormat to set
+     */
+    public void setDateTimeFormat(final String dateTimeFormat) {
+        m_dateTimeFormat = dateTimeFormat;
+    }
+
+    /**
+     * @return the backgroundColor
+     */
+    public String getBackgroundColor() {
+        return m_backgroundColor;
+    }
+
+    /**
+     * @param backgroundColor the backgroundColor to set
+     */
+    public void setBackgroundColor(final String backgroundColor) {
+        m_backgroundColor = backgroundColor;
+    }
+
+    /**
+     * @return the dataAreaColor
+     */
+    public String getDataAreaColor() {
+        return m_dataAreaColor;
+    }
+
+    /**
+     * @param dataAreaColor the dataAreaColor to set
+     */
+    public void setDataAreaColor(final String dataAreaColor) {
+        m_dataAreaColor = dataAreaColor;
+    }
+
+    /**
+     * @return the gridColor
+     */
+    public String getGridColor() {
+        return m_gridColor;
+    }
+
+    /**
+     * @param gridColor the gridColor to set
+     */
+    public void setGridColor(final String gridColor) {
+        m_gridColor = gridColor;
+    }
+
+    /**
      * @return the enableStaggeredRendering
      */
     public boolean getEnableStaggeredRendering() {
@@ -285,6 +529,14 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addBoolean(ScatterPlotViewConfig.SHOW_LEGEND, getShowLegend());
+        settings.addBoolean(ScatterPlotViewConfig.AUTO_RANGE_AXES, getAutoRangeAxes());
+        settings.addBoolean(ScatterPlotViewConfig.USE_DOMAIN_INFO, getUseDomainInformation());
+        settings.addBoolean(ScatterPlotViewConfig.SHOW_GRID, getShowGrid());
+        settings.addBoolean(ScatterPlotViewConfig.SHOW_CROSSHAIR, getShowCrosshair());
+        settings.addBoolean(ScatterPlotViewConfig.SNAP_TO_POINTS, getSnapToPoints());
+        settings.addBoolean(ScatterPlotViewConfig.RESIZE_TO_WINDOW, getResizeToWindow());
+
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_CONFIG, getEnableViewConfiguration());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_TTILE_CHANGE, getEnableTitleChange());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_SUBTTILE_CHANGE, getEnableSubtitleChange());
@@ -293,10 +545,23 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_X_LABEL_EDIT, getEnableXAxisLabelEdit());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT, getEnableYAxisLabelEdit());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE, getEnableDotSizeChange());
+
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_PANNING, getEnablePanning());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING, getEnableZooming());
         settings.addBoolean(ScatterPlotViewConfig.ENABLE_DRAG_ZOOMING, getEnableDragZooming());
-        settings.addBoolean(ScatterPlotViewConfig.ENABLE_PANNING, getEnablePanning());
         settings.addBoolean(ScatterPlotViewConfig.SHOW_ZOOM_RESET_BUTTON, getShowZoomResetButton());
+
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_SELECTION, getEnableSelection());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_RECTANGLE_SELECTION, getEnableRectangleSelection());
+        settings.addBoolean(ScatterPlotViewConfig.ENABLE_LASSO_SELECTION, getEnableLassoSelection());
+
+        settings.addInt(ScatterPlotViewConfig.IMAGE_WIDTH, getImageWidth());
+        settings.addInt(ScatterPlotViewConfig.IMAGE_HEIGHT, getImageHeight());
+        settings.addString(ScatterPlotViewConfig.DATE_FORMAT, getDateTimeFormat());
+        settings.addString(ScatterPlotViewConfig.BACKGROUND_COLOR, getBackgroundColor());
+        settings.addString(ScatterPlotViewConfig.DATA_AREA_COLOR, getDataAreaColor());
+        settings.addString(ScatterPlotViewConfig.GRID_COLOR, getGridColor());
+
         settings.addBoolean("hasDataset", m_keyedDataset != null);
         if (m_keyedDataset != null) {
             NodeSettingsWO datasetSettings = settings.addNodeSettings("dataset");
@@ -309,6 +574,14 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        setShowLegend(settings.getBoolean(ScatterPlotViewConfig.SHOW_LEGEND));
+        setAutoRangeAxes(settings.getBoolean(ScatterPlotViewConfig.AUTO_RANGE_AXES));
+        setUseDomainInformation(settings.getBoolean(ScatterPlotViewConfig.USE_DOMAIN_INFO));
+        setShowGrid(settings.getBoolean(ScatterPlotViewConfig.SHOW_GRID));
+        setShowCrosshair(settings.getBoolean(ScatterPlotViewConfig.SHOW_CROSSHAIR));
+        setSnapToPoints(settings.getBoolean(ScatterPlotViewConfig.SNAP_TO_POINTS));
+        setResizeToWindow(settings.getBoolean(ScatterPlotViewConfig.RESIZE_TO_WINDOW));
+
         setEnableViewConfiguration(settings.getBoolean(ScatterPlotViewConfig.ENABLE_CONFIG));
         setEnableTitleChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_TTILE_CHANGE));
         setEnableSubtitleChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_SUBTTILE_CHANGE));
@@ -317,10 +590,23 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
         setEnableXAxisLabelEdit(settings.getBoolean(ScatterPlotViewConfig.ENABLE_X_LABEL_EDIT));
         setEnableYAxisLabelEdit(settings.getBoolean(ScatterPlotViewConfig.ENABLE_Y_LABEL_EDIT));
         setEnableDotSizeChange(settings.getBoolean(ScatterPlotViewConfig.ENABLE_DOT_SIZE_CHANGE));
+
+        setEnablePanning(settings.getBoolean(ScatterPlotViewConfig.ENABLE_PANNING));
         setEnableZooming(settings.getBoolean(ScatterPlotViewConfig.ENABLE_ZOOMING));
         setEnableDragZooming(settings.getBoolean(ScatterPlotViewConfig.ENABLE_DRAG_ZOOMING));
-        setEnablePanning(settings.getBoolean(ScatterPlotViewConfig.ENABLE_PANNING));
         setShowZoomResetButton(settings.getBoolean(ScatterPlotViewConfig.SHOW_ZOOM_RESET_BUTTON));
+
+        setEnableSelection(settings.getBoolean(ScatterPlotViewConfig.ENABLE_SELECTION));
+        setEnableRectangleSelection(settings.getBoolean(ScatterPlotViewConfig.ENABLE_RECTANGLE_SELECTION));
+        setEnableLassoSelection(settings.getBoolean(ScatterPlotViewConfig.ENABLE_LASSO_SELECTION));
+
+        setImageWidth(settings.getInt(ScatterPlotViewConfig.IMAGE_WIDTH));
+        setImageHeight(settings.getInt(ScatterPlotViewConfig.IMAGE_HEIGHT));
+        setDateTimeFormat(settings.getString(ScatterPlotViewConfig.DATE_FORMAT));
+        setBackgroundColor(settings.getString(ScatterPlotViewConfig.BACKGROUND_COLOR));
+        setDataAreaColor(settings.getString(ScatterPlotViewConfig.DATA_AREA_COLOR));
+        setGridColor(settings.getString(ScatterPlotViewConfig.GRID_COLOR));
+
         m_keyedDataset = null;
         boolean hasDataset = settings.getBoolean("hasDataset");
         if (hasDataset) {

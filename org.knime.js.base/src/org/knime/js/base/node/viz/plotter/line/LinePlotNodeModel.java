@@ -99,20 +99,20 @@ import org.knime.js.core.node.AbstractSVGWizardNodeModel;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-final class LinePlotNodeModel extends
-    AbstractSVGWizardNodeModel<LinePlotViewRepresentation, LinePlotViewValue> {
+final class LinePlotNodeModel extends AbstractSVGWizardNodeModel<LinePlotViewRepresentation, LinePlotViewValue> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(LinePlotNodeModel.class);
 
     private final LinePlotViewConfig m_config;
+
     private BufferedDataTable m_table;
 
     /**
      * Creates a new model instance.
      */
     LinePlotNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE_OPTIONAL},
-            new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
+        super(new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE_OPTIONAL}, new PortType[]{
+            ImagePortObject.TYPE, BufferedDataTable.TYPE});
         m_config = new LinePlotViewConfig();
     }
 
@@ -126,20 +126,21 @@ final class LinePlotNodeModel extends
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
         for (DataColumnSpec colspec : tableSpec) {
-            if (colspec.getType().isCompatible(DoubleValue.class)
-                    || colspec.getType().isCompatible(StringValue.class)) {
+            if (colspec.getType().isCompatible(DoubleValue.class) || colspec.getType().isCompatible(StringValue.class)) {
                 allAllowedCols.add(colspec.getName());
             }
         }
 
-        if (tableSpec.getNumColumns() < 1
-                || allAllowedCols.size() < 1) {
+        if (tableSpec.getNumColumns() < 1 || allAllowedCols.size() < 1) {
             throw new InvalidSettingsException("Data table must have"
-                    + " at least one numerical or categorical column.");
+                + " at least one numerical or categorical column.");
         }
 
-        ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
-        DataTableSpec out = rearranger.createSpec();
+        DataTableSpec out = tableSpec;
+        if (m_config.getEnableSelection()) {
+            ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
+            out = rearranger.createSpec();
+        }
 
         m_config.getyColumnsConfig(true, tableSpec);
 
@@ -160,10 +161,11 @@ final class LinePlotNodeModel extends
         newColName = DataTableSpec.getUniqueColumnName(spec, newColName);
 
         DataColumnSpec outColumnSpec =
-                new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
+            new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         CellFactory fac = new SingleCellFactory(outColumnSpec) {
             private int m_rowIndex = 0;
+
             @Override
             public DataCell getCell(final DataRow row) {
                 if (++m_rowIndex > m_config.getMaxRows()) {
@@ -171,7 +173,7 @@ final class LinePlotNodeModel extends
                 }
                 if (selectionList != null) {
                     if (selectionList.contains(row.getKey().toString())) {
-                            return BooleanCell.TRUE;
+                        return BooleanCell.TRUE;
                     }
                 }
                 return BooleanCell.FALSE;
@@ -236,14 +238,14 @@ final class LinePlotNodeModel extends
      * {@inheritDoc}
      */
     @Override
-    protected void performExecuteCreateView(final PortObject[] inData, final ExecutionContext exec)
-        throws Exception {
+    protected void performExecuteCreateView(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         synchronized (getLock()) {
             m_table = (BufferedDataTable)inData[0];
             BufferedDataTable colorTable = (BufferedDataTable)inData[1];
             LinePlotViewRepresentation representation = getViewRepresentation();
-            // don't use staggered rendering for image creation
+            // don't use staggered rendering and resizing for image creation
             representation.setEnableStaggeredRendering(false);
+            representation.setResizeToWindow(false);
             if (representation.getKeyedDataset() == null) {
                 // create dataset for view
                 copyConfigToView(m_table.getDataTableSpec());
@@ -257,30 +259,34 @@ final class LinePlotNodeModel extends
      */
     @Override
     protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
-            final ExecutionContext exec) throws Exception {
+        final ExecutionContext exec) throws Exception {
         BufferedDataTable out = m_table;
         synchronized (getLock()) {
-            // enable staggered rendering for interactive view
-            getViewRepresentation().setEnableStaggeredRendering(true);
+            LinePlotViewRepresentation representation = getViewRepresentation();
+            // enable staggered rendering and resizing for interactive view
+            representation.setEnableStaggeredRendering(true);
+            representation.setResizeToWindow(m_config.getResizeToWindow());
 
             LinePlotViewValue viewValue = getViewValue();
-            List<String> selectionList = null;
-            if (viewValue != null && viewValue.getSelection() != null) {
-                selectionList = Arrays.asList(viewValue.getSelection());
+            if (m_config.getEnableSelection()) {
+                List<String> selectionList = null;
+                if (viewValue != null && viewValue.getSelection() != null) {
+                    selectionList = Arrays.asList(viewValue.getSelection());
+                }
+                ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
+                out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
             }
-            ColumnRearranger rearranger = createColumnAppender(m_table.getDataTableSpec(), selectionList);
-            out = exec.createColumnRearrangeTable(m_table, rearranger, exec);
         }
         exec.setProgress(1);
         return new PortObject[]{svgImageFromView, out};
     }
 
-    private JSONKeyedValues2DDataset createKeyedDataset(final BufferedDataTable colorTable, final ExecutionContext exec)
+    private JSONKeyedValues2DDataset
+        createKeyedDataset(final BufferedDataTable colorTable, final ExecutionContext exec)
             throws CanceledExecutionException {
 
         ColumnRearranger c = createNumericColumnRearranger(m_table.getDataTableSpec());
-        BufferedDataTable filteredTable =
-            exec.createColumnRearrangeTable(m_table, c, exec.createSubProgress(0.1));
+        BufferedDataTable filteredTable = exec.createColumnRearrangeTable(m_table, c, exec.createSubProgress(0.1));
         exec.setProgress(0.1);
         //construct dataset
         if (m_config.getMaxRows() < filteredTable.getRowCount()) {
@@ -290,8 +296,8 @@ final class LinePlotNodeModel extends
             new JSONDataTable(filteredTable, 1, m_config.getMaxRows(), exec.createSubProgress(0.79));
         JSONDataTable jsonColorTable = null;
         if (colorTable != null) {
-            jsonColorTable = new JSONDataTable(colorTable, 1, colorTable.getRowCount(),
-                exec.createSilentSubProgress(0.01));
+            jsonColorTable =
+                new JSONDataTable(colorTable, 1, colorTable.getRowCount(), exec.createSilentSubProgress(0.01));
         }
         exec.setProgress(0.9);
         ExecutionMonitor datasetExecutionMonitor = exec.createSubProgress(0.1);
@@ -316,12 +322,11 @@ final class LinePlotNodeModel extends
             }
             rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
             rowValues[rowID].setColor(tableSpec.getRowColorValues()[rowID]);
-            datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length,
-                "Creating dataset, processing row " + rowID + " of " + rowValues.length + ".");
+            datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length, "Creating dataset, processing row "
+                + rowID + " of " + rowValues.length + ".");
         }
 
-        JSONKeyedValues2DDataset dataset =
-            new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
+        JSONKeyedValues2DDataset dataset = new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
         for (int col = 0; col < tableSpec.getNumColumns(); col++) {
             String colColor = getColorForColumn(tableSpec.getColNames()[col], jsonColorTable);
             if (colColor != null) {
@@ -374,7 +379,7 @@ final class LinePlotNodeModel extends
     private Map<String, String> getSymbolMap(final LinkedHashSet<Object> linkedHashSet) {
         Map<String, String> symbolMap = new HashMap<String, String>();
         Integer ordinal = 0;
-        for (Object value: linkedHashSet) {
+        for (Object value : linkedHashSet) {
             symbolMap.put(ordinal.toString(), value.toString());
             ordinal++;
         }
@@ -452,6 +457,13 @@ final class LinePlotNodeModel extends
 
     private void copyConfigToView(final DataTableSpec spec) {
         LinePlotViewRepresentation representation = getViewRepresentation();
+        representation.setShowLegend(m_config.getShowLegend());
+        representation.setAutoRangeAxes(m_config.getAutoRangeAxes());
+        representation.setUseDomainInformation(m_config.getUseDomainInfo());
+        representation.setShowGrid(m_config.getShowGrid());
+        representation.setShowCrosshair(m_config.getShowCrosshair());
+        representation.setSnapToPoints(m_config.getSnapToPoints());
+
         representation.setEnableViewConfiguration(m_config.getEnableViewConfiguration());
         representation.setEnableTitleChange(m_config.getEnableTitleChange());
         representation.setEnableSubtitleChange(m_config.getEnableSubtitleChange());
@@ -460,10 +472,21 @@ final class LinePlotNodeModel extends
         representation.setEnableXAxisLabelEdit(m_config.getEnableXAxisLabelEdit());
         representation.setEnableYAxisLabelEdit(m_config.getEnableYAxisLabelEdit());
         representation.setEnableDotSizeChange(m_config.getEnableDotSizeChange());
+
+        representation.setEnablePanning(m_config.getEnablePanning());
         representation.setEnableZooming(m_config.getEnableZooming());
         representation.setEnableDragZooming(m_config.getEnableDragZooming());
-        representation.setEnablePanning(m_config.getEnablePanning());
         representation.setShowZoomResetButton(m_config.getShowZoomResetButton());
+        representation.setEnableSelection(m_config.getEnableSelection());
+        representation.setEnableRectangleSelection(m_config.getEnableRectangleSelection());
+        representation.setEnableLassoSelection(m_config.getEnableLassoSelection());
+
+        representation.setImageWidth(m_config.getImageWidth());
+        representation.setImageHeight(m_config.getImageHeight());
+        representation.setDateTimeFormat(m_config.getDateFormat());
+        representation.setBackgroundColor(m_config.getBackgroundColorString());
+        representation.setDataAreaColor(m_config.getDataAreaColorString());
+        representation.setGridColor(m_config.getGridColorString());
 
         LinePlotViewValue viewValue = getViewValue();
         viewValue.setChartTitle(m_config.getChartTitle());
@@ -473,10 +496,45 @@ final class LinePlotNodeModel extends
         viewValue.setyColumns(filter.getIncludes());
         viewValue.setxAxisLabel(m_config.getxAxisLabel());
         viewValue.setyAxisLabel(m_config.getyAxisLabel());
-        viewValue.setxAxisMin(m_config.getxAxisMin());
-        viewValue.setxAxisMax(m_config.getxAxisMax());
-        viewValue.setyAxisMin(m_config.getyAxisMin());
-        viewValue.setyAxisMax(m_config.getyAxisMax());
+        if ((m_config.getxAxisMin() == null) && m_config.getUseDomainInfo() && (m_config.getxColumn() != null)) {
+            viewValue.setxAxisMin(getMinimumFromColumns(spec, m_config.getxColumn()));
+        } else {
+            viewValue.setxAxisMin(m_config.getxAxisMin());
+        }
+        if ((m_config.getxAxisMax() == null) && m_config.getUseDomainInfo() && (m_config.getxColumn() != null)) {
+            viewValue.setxAxisMax(getMaximumFromColumns(spec, m_config.getxColumn()));
+        } else {
+            viewValue.setxAxisMax(m_config.getxAxisMax());
+        }
+        if (m_config.getyAxisMin() == null && m_config.getUseDomainInfo()) {
+            viewValue.setyAxisMin(getMinimumFromColumns(spec, filter.getIncludes()));
+        } else {
+            viewValue.setyAxisMin(m_config.getyAxisMin());
+        }
+        if (m_config.getyAxisMax() == null && m_config.getUseDomainInfo()) {
+            viewValue.setyAxisMax(getMaximumFromColumns(spec, filter.getIncludes()));
+        } else {
+            viewValue.setyAxisMax(m_config.getyAxisMax());
+        }
+
+        // Check axes ranges
+        Double xMin = viewValue.getxAxisMin();
+        Double xMax = viewValue.getxAxisMax();
+        if (xMin != null && xMax != null && xMin >= xMax) {
+            LOGGER.info("Unsetting x-axis ranges. Minimum (" + xMin + ") has to be smaller than maximum (" + xMax
+                + ").");
+            viewValue.setxAxisMin(null);
+            viewValue.setxAxisMax(null);
+        }
+        Double yMin = viewValue.getyAxisMin();
+        Double yMax = viewValue.getyAxisMax();
+        if (yMin != null && yMax != null && yMin >= yMax) {
+            LOGGER.info("Unsetting y-axis ranges. Minimum (" + yMin + ") has to be smaller than maximum (" + yMax
+                + ").");
+            viewValue.setyAxisMin(null);
+            viewValue.setyAxisMax(null);
+        }
+
         viewValue.setDotSize(m_config.getDotSize());
     }
 
@@ -495,5 +553,38 @@ final class LinePlotNodeModel extends
         m_config.setDotSize(viewValue.getDotSize());
     }
 
+    private Double getMinimumFromColumns(final DataTableSpec spec, final String... columnNames) {
+        double minimum = Double.MAX_VALUE;
+        for (String column : columnNames) {
+            DataColumnSpec colSpec = spec.getColumnSpec(column);
+            if (colSpec != null) {
+                DataCell lowerCell = colSpec.getDomain().getLowerBound();
+                if ((lowerCell != null) && lowerCell.getType().isCompatible(DoubleValue.class)) {
+                    minimum = Math.min(minimum, ((DoubleValue)lowerCell).getDoubleValue());
+                }
+            }
+        }
+        if (minimum < Double.MAX_VALUE) {
+            return minimum;
+        }
+        return null;
+    }
+
+    private Double getMaximumFromColumns(final DataTableSpec spec, final String... columnNames) {
+        double maximum = Double.MIN_VALUE;
+        for (String column : columnNames) {
+            DataColumnSpec colSpec = spec.getColumnSpec(column);
+            if (colSpec != null) {
+                DataCell upperCell = colSpec.getDomain().getUpperBound();
+                if ((upperCell != null) && upperCell.getType().isCompatible(DoubleValue.class)) {
+                    maximum = Math.max(maximum, ((DoubleValue)upperCell).getDoubleValue());
+                }
+            }
+        }
+        if (maximum > Double.MIN_VALUE) {
+            return maximum;
+        }
+        return null;
+    }
 
 }
