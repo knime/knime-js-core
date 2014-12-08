@@ -102,6 +102,7 @@ public class ScatterPlotNodeModel extends
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ScatterPlotNodeModel.class);
 
     private final ScatterPlotViewConfig m_config;
+
     private BufferedDataTable m_table;
 
     /**
@@ -122,16 +123,14 @@ public class ScatterPlotNodeModel extends
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
         for (DataColumnSpec colspec : tableSpec) {
-            if (colspec.getType().isCompatible(DoubleValue.class)
-                    || colspec.getType().isCompatible(StringValue.class)) {
+            if (colspec.getType().isCompatible(DoubleValue.class) || colspec.getType().isCompatible(StringValue.class)) {
                 allAllowedCols.add(colspec.getName());
             }
         }
 
-        if (tableSpec.getNumColumns() < 1
-                || allAllowedCols.size() < 1) {
+        if (tableSpec.getNumColumns() < 1 || allAllowedCols.size() < 1) {
             throw new InvalidSettingsException("Data table must have"
-                    + " at least one numerical or categorical column.");
+                + " at least one numerical or categorical column.");
         }
 
         DataTableSpec out = tableSpec;
@@ -156,11 +155,12 @@ public class ScatterPlotNodeModel extends
         }
         newColName = DataTableSpec.getUniqueColumnName(spec, newColName);
         DataColumnSpec outColumnSpec =
-                new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
+            new DataColumnSpecCreator(newColName, DataType.getType(BooleanCell.class)).createSpec();
         ColumnRearranger rearranger = new ColumnRearranger(spec);
         CellFactory fac = new SingleCellFactory(outColumnSpec) {
 
             private int m_rowIndex = 0;
+
             @Override
             public DataCell getCell(final DataRow row) {
                 if (++m_rowIndex > m_config.getMaxRows()) {
@@ -168,7 +168,7 @@ public class ScatterPlotNodeModel extends
                 }
                 if (selectionList != null) {
                     if (selectionList.contains(row.getKey().toString())) {
-                            return BooleanCell.TRUE;
+                        return BooleanCell.TRUE;
                     }
                 }
                 return BooleanCell.FALSE;
@@ -233,8 +233,7 @@ public class ScatterPlotNodeModel extends
      * {@inheritDoc}
      */
     @Override
-    protected void performExecuteCreateView(final PortObject[] inData, final ExecutionContext exec)
-        throws Exception {
+    protected void performExecuteCreateView(final PortObject[] inData, final ExecutionContext exec) throws Exception {
         synchronized (getLock()) {
             m_table = (BufferedDataTable)inData[0];
             ScatterPlotViewRepresentation representation = getViewRepresentation();
@@ -279,8 +278,7 @@ public class ScatterPlotNodeModel extends
 
     private JSONKeyedValues2DDataset createKeyedDataset(final ExecutionContext exec) throws CanceledExecutionException {
         ColumnRearranger c = createNumericColumnRearranger(m_table.getDataTableSpec());
-        BufferedDataTable filteredTable =
-            exec.createColumnRearrangeTable(m_table, c, exec.createSubProgress(0.1));
+        BufferedDataTable filteredTable = exec.createColumnRearrangeTable(m_table, c, exec.createSubProgress(0.1));
         exec.setProgress(0.1);
         //construct dataset
         if (m_config.getMaxRows() < filteredTable.getRowCount()) {
@@ -311,12 +309,11 @@ public class ScatterPlotNodeModel extends
             }
             rowValues[rowID] = new JSONKeyedValuesRow(currentRow.getRowKey(), rowData);
             rowValues[rowID].setColor(tableSpec.getRowColorValues()[rowID]);
-            datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length,
-                "Creating dataset, processing row " + rowID + " of " + rowValues.length + ".");
+            datasetExecutionMonitor.setProgress(((double)rowID) / rowValues.length, "Creating dataset, processing row "
+                + rowID + " of " + rowValues.length + ".");
         }
 
-        JSONKeyedValues2DDataset dataset =
-            new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
+        JSONKeyedValues2DDataset dataset = new JSONKeyedValues2DDataset(tableSpec.getColNames(), rowValues);
         for (int col = 0; col < tableSpec.getNumColumns(); col++) {
             if (tableSpec.getColTypes()[col].equals(JSTypes.STRING.getName())
                 && tableSpec.getPossibleValues().get(col) != null) {
@@ -368,7 +365,7 @@ public class ScatterPlotNodeModel extends
     private Map<String, String> getSymbolMap(final LinkedHashSet<Object> linkedHashSet) {
         Map<String, String> symbolMap = new HashMap<String, String>();
         Integer ordinal = 0;
-        for (Object value: linkedHashSet) {
+        for (Object value : linkedHashSet) {
             symbolMap.put(ordinal.toString(), value.toString());
             ordinal++;
         }
@@ -490,16 +487,16 @@ public class ScatterPlotNodeModel extends
         Double xMin = viewValue.getxAxisMin();
         Double xMax = viewValue.getxAxisMax();
         if (xMin != null && xMax != null && xMin >= xMax) {
-            LOGGER.info("Unsetting x-axis ranges. Minimum (" + xMin
-                + ") has to be smaller than maximum (" + xMax + ").");
+            LOGGER.info("Unsetting x-axis ranges. Minimum (" + xMin + ") has to be smaller than maximum (" + xMax
+                + ").");
             viewValue.setxAxisMin(null);
             viewValue.setxAxisMax(null);
         }
         Double yMin = viewValue.getyAxisMin();
         Double yMax = viewValue.getyAxisMax();
         if (yMin != null && yMax != null && yMin >= yMax) {
-            LOGGER.info("Unsetting y-axis ranges. Minimum (" + yMin
-                + ") has to be smaller than maximum (" + yMax + ").");
+            LOGGER.info("Unsetting y-axis ranges. Minimum (" + yMin + ") has to be smaller than maximum (" + yMax
+                + ").");
             viewValue.setyAxisMin(null);
             viewValue.setyAxisMax(null);
         }
@@ -531,17 +528,23 @@ public class ScatterPlotNodeModel extends
     }
 
     private Double getMinimumFromColumn(final DataTableSpec spec, final String columnName) {
-        DataCell lowerCell = spec.getColumnSpec(columnName).getDomain().getLowerBound();
-        if ((lowerCell != null) && lowerCell.getType().isCompatible(DoubleValue.class)) {
-            return ((DoubleValue)lowerCell).getDoubleValue();
+        DataColumnSpec colSpec = spec.getColumnSpec(columnName);
+        if (colSpec != null) {
+            DataCell lowerCell = colSpec.getDomain().getLowerBound();
+            if ((lowerCell != null) && lowerCell.getType().isCompatible(DoubleValue.class)) {
+                return ((DoubleValue)lowerCell).getDoubleValue();
+            }
         }
         return null;
     }
 
     private Double getMaximumFromColumn(final DataTableSpec spec, final String columnName) {
-        DataCell upperCell = spec.getColumnSpec(columnName).getDomain().getUpperBound();
-        if ((upperCell != null) && upperCell.getType().isCompatible(DoubleValue.class)) {
-            return ((DoubleValue)upperCell).getDoubleValue();
+        DataColumnSpec colSpec = spec.getColumnSpec(columnName);
+        if (colSpec != null) {
+            DataCell upperCell = colSpec.getDomain().getUpperBound();
+            if ((upperCell != null) && upperCell.getType().isCompatible(DoubleValue.class)) {
+                return ((DoubleValue)upperCell).getDoubleValue();
+            }
         }
         return null;
     }

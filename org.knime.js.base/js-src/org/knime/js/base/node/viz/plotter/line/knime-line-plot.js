@@ -108,8 +108,9 @@ knime_line_plot = function() {
 			}
 			if (!yCol) {
 				yCol = "[EMPTY]";
-			} 
+			}
 			xyDataset = jsfc.DatasetUtils.extractXYDatasetFromColumns2D(_keyedDataset, _value.xColumn, yCol);
+			xyDataset.data.series = [];
 		}
 		//console.timeEnd("Building XYDataset");
 		return xyDataset;
