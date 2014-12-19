@@ -50,35 +50,96 @@ org_knime_js_base_node_quickform_input_fileupload = function() {
 			version: "1.0.0"
 	};
 	fileUpload.name = "File upload";
+	var m_representation = null;
 	var m_value = null;
-	var viewValid = false;
+	var m_viewValid = false;
+	var m_component = null;
+	var m_errorDiv = null;
 
 	fileUpload.init = function(representation, value) {
 		if (checkMissingData(representation)) {
 			return;
 		}
 		
-		var messageNotFound = "File upload not available. Native component not found.";
-		var messageNotStandalone = "File upload not available in standalone mode.";
-		insertNativeComponent(representation, messageNotFound, messageNotStandalone);
+		//add native component
+		var messageNotFound = 'File upload not available. Native component not found.';
+		var messageNotStandalone = 'File upload not available in standalone mode.';
+		m_component = insertNativeComponent(representation, messageNotFound, messageNotStandalone);
+		
+		//add error field
+		m_errorDiv = document.createElement('div');
+		m_errorDiv.style.display = 'none';
+		m_errorDiv.style.color = 'red';
+		m_errorDiv.style.fontStyle = 'italic';
+		m_errorDiv.style.fontSize = '75%';
+		m_errorDiv.style.marginTop = '1em';
+		m_errorDiv.appendChild(document.createTextNode(''));
+		document.getElementsByTagName('body')[0].appendChild(m_errorDiv);
+
+		//set listener on label
+		if (m_component) {
+			var uLabel = m_component.getElementsByClassName('knime-upload-label')[0];
+			if (uLabel) {
+				//use mutation event instead of observer, since IE only supports it as of version 11 
+				try {
+					uLabel.addEventListener('DOMSubtreeModified', function() {
+						if (m_viewValid && m_errorDiv.textContent) {
+							fileUpload.validate();
+						}
+					}, false);
+				} catch (exception) { /*do nothing*/ }
+			}
+		}
 		
 		resizeParent();
+		
 		// Automatically resize component, since events of native component are not noticed
-		setInterval(resizeParent, 500);
-		viewValid = true;
+		if (m_component) {
+			setInterval(resizeParent, 500);
+		}
+		m_viewValid = true;
+		m_representation = representation;
 		m_value = value;
 	};
 	
 	fileUpload.validate = function() {
-		return true;
+		if (!m_viewValid) {
+			return false;
+		}
+		if (m_component) {
+			// get label component to check if uploaded file exists
+			var uLabel = m_component.getElementsByClassName('knime-upload-label')[0];
+			if (uLabel && uLabel.textContent.indexOf('Uploaded file') == 0) {
+				fileUpload.setValidationErrorMessage(null);
+				return true;
+			}
+		}
+		var errorMessage = 'No file selected';
+		if (m_representation.label) {
+			errorMessage += ' for ' + m_representation.label;
+		}
+		fileUpload.setValidationErrorMessage(errorMessage + '.');
+		return false;
 	};
 	
 	fileUpload.setValidationErrorMessage = function(message) {
-		//TODO display message
+		if (!m_viewValid) {
+			return;
+		}
+		if (message != null) {
+			m_errorDiv.textContent = message;
+			m_errorDiv.style.display = 'block';
+		} else {
+			m_errorDiv.textContent = '';
+			m_errorDiv.style.display = 'none';
+		}
+		if (!m_component) {
+			resizeParent();
+		}
 	};
 
 	fileUpload.value = function() {
-		if (!viewValid) {
+		if (!m_viewValid) {
 			return null;
 		}
 		return m_value;
