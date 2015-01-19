@@ -123,16 +123,6 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        settings.getString(CFG_STRING);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("string=");

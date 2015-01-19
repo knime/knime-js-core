@@ -113,17 +113,6 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
      * @return the column
      */
     @JsonProperty("column")

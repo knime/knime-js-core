@@ -123,16 +123,6 @@ public class ColumnSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings)
-            throws InvalidSettingsException {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("column=");

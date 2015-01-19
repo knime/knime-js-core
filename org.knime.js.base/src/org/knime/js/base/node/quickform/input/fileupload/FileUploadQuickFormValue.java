@@ -122,15 +122,6 @@ public class FileUploadQuickFormValue extends JSONViewContent implements DialogN
      * {@inheritDoc}
      */
     @Override
-    @JsonIgnore
-    public void validateSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        settings.getString(CFG_PATH);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("path=");

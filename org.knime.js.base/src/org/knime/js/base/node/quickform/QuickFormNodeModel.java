@@ -241,9 +241,7 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         createEmptyConfig().loadSettings(settings);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public ValidationError validateViewValue(final VAL viewContent) {
         return null;
@@ -271,6 +269,15 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     public VAL getDialogValue() {
         synchronized (m_lock) {
             return m_dialogValue;
+        }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void validateDialogValue(final VAL value) throws InvalidSettingsException {
+        ValidationError validateError = validateViewValue(value);
+        if (validateError != null) {
+            throw new InvalidSettingsException(validateError.getError());
         }
     }
 
