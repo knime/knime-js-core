@@ -2,9 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PhantomJS Driver for Selenium
 Bundle-SymbolicName: org.knime.ext.phantomjs;singleton:=true
-Bundle-Version: 1.1.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Version: 2.12.0.qualifier
 Bundle-ClassPath: .
+Bundle-Activator: org.knime.ext.phantomjs.PhantomJSActivator
+Bundle-Vendor: KNIME GmbH, Konstanz, Germany
+Export-Package: org.knime.ext.phantomjs
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
  com.google.guava;bundle-version="[15.0.0,17.0.0)",
  org.openqa.selenium;bundle-version="[2.43.0,3.0.0)",
@@ -12,7 +14,5 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
  com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.4.3,3.0.0)",
  com.fasterxml.jackson.core.jackson-core;bundle-version="[2.4.3,3.0.0)",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.4.3,3.0.0)"
-Bundle-Vendor: KNIME GmbH, Konstanz, Germany
-Bundle-Activator: org.knime.ext.phantomjs.PhantomJSActivator
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Export-Package: org.knime.ext.phantomjs
