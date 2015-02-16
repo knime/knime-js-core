@@ -49,6 +49,15 @@ package org.knime.js.base.node.quickform.filter.value;
 
 import java.util.Arrays;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -190,6 +199,69 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
                 .append(m_column, other.m_column)
                 .append(m_values, other.m_values)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException("Parameterization of ValueFilter not supported!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_COLUMN);
+            if (JsonValue.NULL.equals(val)) {
+                m_column = null;
+            } else {
+                m_column = json.getString(CFG_COLUMN);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected string value for key '" + CFG_COLUMN + ".", e);
+        }
+
+        try {
+            JsonValue val = json.get(CFG_VALUES);
+            if (JsonValue.NULL.equals(val)) {
+                m_values = null;
+            } else {
+                JsonArray array = json.getJsonArray(CFG_VALUES);
+                m_values = new String[array.size()];
+                for (int i = 0; i < array.size(); i++) {
+                    m_values [i] = array.getString(i);
+                }
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected valid string array for key '" + CFG_VALUES + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_column == null) {
+            builder.addNull(CFG_COLUMN);
+        } else {
+            builder.add(CFG_COLUMN, m_column);
+        }
+        if (m_values == null) {
+            builder.addNull(CFG_VALUES);
+        } else {
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (String value : m_values) {
+                arrayBuilder.add(value);
+            }
+            builder.add(CFG_VALUES, arrayBuilder);
+        }
+        return builder.build();
     }
 
 }

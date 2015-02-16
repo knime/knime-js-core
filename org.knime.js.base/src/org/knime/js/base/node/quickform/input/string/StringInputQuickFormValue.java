@@ -47,6 +47,13 @@
  */
 package org.knime.js.base.node.quickform.input.string;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -158,6 +165,45 @@ public class StringInputQuickFormValue extends JSONViewContent implements Dialog
         return new EqualsBuilder()
                 .append(m_string, other.m_string)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setString(fromCmdLine);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_STRING);
+            if (JsonValue.NULL.equals(val)) {
+                m_string = null;
+            } else {
+                m_string = json.getString(CFG_STRING);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected string value for key '" + CFG_STRING + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_string == null) {
+            builder.addNull(CFG_STRING);
+        } else {
+            builder.add(CFG_STRING, m_string);
+        }
+        return builder.build();
     }
 
 }

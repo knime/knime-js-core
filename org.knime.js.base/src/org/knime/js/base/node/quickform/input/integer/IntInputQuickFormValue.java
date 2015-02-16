@@ -47,6 +47,11 @@
  */
 package org.knime.js.base.node.quickform.input.integer;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +162,43 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
         return new EqualsBuilder()
                 .append(m_integer, other.m_integer)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        Integer number = null;
+        try {
+            number = Integer.parseInt(fromCmdLine);
+        } catch (Exception e) {
+            throw new OperationNotSupportedException("Could not parse '" + fromCmdLine + "' as integer type.");
+        }
+        setInteger(number);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            m_integer = json.getInt(CFG_INTEGER);
+        } catch (Exception e) {
+            throw new JsonException("Expected integer value for key '" + CFG_INTEGER + "'."  , e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObject value = Json.createObjectBuilder()
+                .add(CFG_INTEGER, m_integer)
+                .build();
+        return value;
     }
 
 }

@@ -93,6 +93,8 @@ public abstract class QuickFormNodeDialog
 
     private final JTextField m_variableNameField;
 
+    private final JTextField m_parameterNameField;
+
     private final JCheckBox m_hideInWizard;
 
     private final JCheckBox m_hideInDialog;
@@ -112,6 +114,7 @@ public abstract class QuickFormNodeDialog
         m_descriptionArea.setPreferredSize(new Dimension(100, 50));
         m_descriptionArea.setMinimumSize(new Dimension(100, 30));
         m_variableNameField = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_parameterNameField = new JTextField(DEF_TEXTFIELD_WIDTH);
         m_hideInWizard = new JCheckBox((Icon)null, false);
         m_hideInWizard.setToolTipText("If selected, this QuickForm elements is not visible in the wizard.");
         m_hideInDialog = new JCheckBox((Icon)null, false);
@@ -161,6 +164,8 @@ public abstract class QuickFormNodeDialog
 
         gbc.fill = GridBagConstraints.HORIZONTAL;
         addPairToPanel("Variable Name: ", m_variableNameField, panel, gbc);
+
+        addPairToPanel("Parameter Name: ", m_parameterNameField, panel, gbc);
 
         fillPanel(panel, gbc);
 
@@ -243,6 +248,13 @@ public abstract class QuickFormNodeDialog
     }
 
     /**
+     * @return The parameter name
+     */
+    protected String getParameterName() {
+        return m_parameterNameField.getText();
+    }
+
+    /**
      * @return true if this node should be hidden in the wizard, false otherwise
      */
     protected boolean getHideInWizard() {
@@ -292,6 +304,13 @@ public abstract class QuickFormNodeDialog
     }
 
     /**
+     * @param parameterName The parameter name to set
+     */
+    protected void setParameterName(final String parameterName) {
+        m_parameterNameField.setText(parameterName);
+    }
+
+    /**
      * @param config The {@link QuickFormFlowVariableConfig} to load from
      */
     protected void loadSettingsFrom(
@@ -299,6 +318,7 @@ public abstract class QuickFormNodeDialog
         setLabel(config.getLabel());
         setDescription(config.getDescription());
         setFlowVariableName(config.getFlowVariableName());
+        setParameterName(config.getParameterName());
         setHideInWizard(config.getHideInWizard());
         setHideInDialog(config.getHideInDialog());
         setRequired(config.getRequired());
@@ -311,6 +331,7 @@ public abstract class QuickFormNodeDialog
         config.setLabel(getLabel());
         config.setDescription(getDescription());
         config.setFlowVariableName(getFlowVariableName());
+        config.setParameterName(getParameterName());
         config.setHideInWizard(getHideInWizard());
         config.setHideInDialog(getHideInDialog());
         config.setRequired(getRequired());

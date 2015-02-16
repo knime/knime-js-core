@@ -48,6 +48,13 @@
  */
 package org.knime.js.base.node.quickform.input.fileupload;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +164,45 @@ public class FileUploadQuickFormValue extends JSONViewContent implements DialogN
         return new EqualsBuilder()
                 .append(m_path, other.m_path)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setPath(fromCmdLine);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_PATH);
+            if (JsonValue.NULL.equals(val)) {
+                m_path = null;
+            } else {
+                m_path = json.getString(CFG_PATH);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected path value for key '" + CFG_PATH + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_path == null) {
+            builder.addNull(CFG_PATH);
+        } else {
+            builder.add(CFG_PATH, m_path);
+        }
+        return builder.build();
     }
 
 }

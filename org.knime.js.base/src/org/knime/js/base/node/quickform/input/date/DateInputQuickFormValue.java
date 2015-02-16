@@ -50,6 +50,13 @@ package org.knime.js.base.node.quickform.input.date;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -81,6 +88,8 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
 
     private Date m_date = DEFAULT_DATE;
 
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT);
+
     /**
      * {@inheritDoc}
      */
@@ -88,7 +97,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         String dateString =
-            m_date != null ? new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(m_date) : null;
+            m_date != null ? dateFormat.format(m_date) : null;
         settings.addString(CFG_DATE, dateString);
     }
 
@@ -103,7 +112,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
             m_date = null;
         } else {
             try {
-                setDate(new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).parse(value));
+                setDate(dateFormat.parse(value));
             } catch (Exception e) {
                 throw new InvalidSettingsException("Can't parse date: " + value, e);
             }
@@ -116,13 +125,12 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
-        SimpleDateFormat sdf = new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT);
-        String value = settings.getString(CFG_DATE, sdf.format(DEFAULT_DATE));
+        String value = settings.getString(CFG_DATE, new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).format(DEFAULT_DATE));
         if (value == null) {
             m_date = null;
         } else {
             try {
-                setDate(sdf.parse(value));
+                setDate(new SimpleDateFormat(DateInputQuickFormNodeModel.DATE_TIME_FORMAT).parse(value));
             } catch (Exception e) {
                 m_date = DEFAULT_DATE;
             }
@@ -186,6 +194,59 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
         return new EqualsBuilder()
                 .append(m_date, other.m_date)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        try {
+            if (fromCmdLine == null || fromCmdLine.isEmpty()) {
+                m_date = null;
+            } else {
+                m_date = dateFormat.parse(fromCmdLine);
+            }
+        } catch (Exception e) {
+            throw new OperationNotSupportedException("Could not parse '" + fromCmdLine + "' as dateTime in format '"
+                + DateInputQuickFormNodeModel.DATE_TIME_FORMAT + "'.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_DATE);
+            if (JsonValue.NULL.equals(val)) {
+                m_date = null;
+            }
+            String dateVal = json.getString(CFG_DATE);
+            if (dateVal == null || dateVal.trim().isEmpty()) {
+                m_date = null;
+            } else {
+                m_date = dateFormat.parse(dateVal);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected string value for key '" + CFG_DATE + "' in format '"
+                + DateInputQuickFormNodeModel.DATE_TIME_FORMAT + "'.", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_date == null) {
+            builder.addNull(CFG_DATE);
+        } else {
+            builder.add(CFG_DATE, dateFormat.format(m_date));
+        }
+        return builder.build();
     }
 
 }

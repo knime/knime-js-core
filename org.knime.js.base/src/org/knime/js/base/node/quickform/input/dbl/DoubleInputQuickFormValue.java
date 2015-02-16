@@ -47,6 +47,11 @@
  */
 package org.knime.js.base.node.quickform.input.dbl;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +162,43 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
         return new EqualsBuilder()
                 .append(m_double, other.m_double)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        Double number = null;
+        try {
+            number = Double.parseDouble(fromCmdLine);
+        } catch (Exception e) {
+            throw new OperationNotSupportedException("Could not parse '" + fromCmdLine + "' as double type.");
+        }
+        setDouble(number);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            m_double = json.getJsonNumber(CFG_DOUBLE).doubleValue();
+        } catch (Exception e) {
+            throw new JsonException("Expected double value for key '" + CFG_DOUBLE + "'."  , e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObject value = Json.createObjectBuilder()
+                .add(CFG_DOUBLE, m_double)
+                .build();
+        return value;
     }
 
 }

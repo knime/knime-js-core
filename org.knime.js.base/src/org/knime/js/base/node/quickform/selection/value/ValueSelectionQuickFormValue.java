@@ -47,6 +47,13 @@
  */
 package org.knime.js.base.node.quickform.selection.value;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -188,6 +195,61 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
                 .append(m_column, other.m_column)
                 .append(m_value, other.m_value)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException("Parameterization of ValueSelection not supported!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_COLUMN);
+            if (JsonValue.NULL.equals(val)) {
+                m_column = null;
+            } else {
+                m_column = json.getString(CFG_COLUMN);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected column name for key '" + CFG_COLUMN + ".", e);
+        }
+
+        try {
+            JsonValue val = json.get(CFG_VALUE);
+            if (JsonValue.NULL.equals(val)) {
+                m_value = null;
+            } else {
+                m_value = json.getString(CFG_VALUE);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected string value for key '" + CFG_VALUE + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_column == null) {
+            builder.addNull(CFG_COLUMN);
+        } else {
+            builder.add(CFG_COLUMN, m_column);
+        }
+        if (m_value == null) {
+            builder.addNull(CFG_VALUE);
+        } else {
+            builder.add(CFG_VALUE, m_value);
+        }
+        return builder.build();
     }
 
 }

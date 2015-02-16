@@ -47,6 +47,13 @@
  */
 package org.knime.js.base.node.quickform.selection.column;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -158,6 +165,45 @@ public class ColumnSelectionQuickFormValue extends JSONViewContent implements Di
         return new EqualsBuilder()
                 .append(m_column, other.m_column)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setColumn(fromCmdLine);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_COLUMN);
+            if (JsonValue.NULL.equals(val)) {
+                m_column = null;
+            } else {
+                m_column = json.getString(CFG_COLUMN);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected column name for key '" + CFG_COLUMN + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_column == null) {
+            builder.addNull(CFG_COLUMN);
+        } else {
+            builder.add(CFG_COLUMN, m_column);
+        }
+        return builder.build();
     }
 
 }

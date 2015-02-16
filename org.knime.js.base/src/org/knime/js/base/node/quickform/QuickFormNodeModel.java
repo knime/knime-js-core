@@ -63,6 +63,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.js.core.JavaScriptViewCreator;
 
 /**
@@ -169,6 +170,17 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         return createEmptyViewValue();
     }
 
+    /** {@inheritDoc} */
+    @Override
+    public String getParameterName() {
+        String name = m_config.getParameterName();
+        if (name == null || name.trim().isEmpty()) {
+            return SubNodeContainer.getDialogNodeParameterNameDefault(getClass());
+        } else {
+            return name;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -259,6 +271,16 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     public void setDialogValue(final VAL value) {
         synchronized (m_lock) {
             m_dialogValue = value;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public VAL getDefaultValue() {
+        synchronized (m_lock) {
+            return m_config.getDefaultValue();
         }
     }
 

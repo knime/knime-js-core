@@ -47,6 +47,13 @@
  */
 package org.knime.js.base.node.quickform.input.molecule;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +164,45 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
         return new EqualsBuilder()
                 .append(m_moleculeString, other.m_moleculeString)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setMoleculeString(fromCmdLine);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_STRING);
+            if (JsonValue.NULL.equals(val)) {
+                m_moleculeString = null;
+            } else {
+                m_moleculeString = json.getString(CFG_STRING);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected molecule string value for key '" + CFG_STRING + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_moleculeString == null) {
+            builder.addNull(CFG_STRING);
+        } else {
+            builder.add(CFG_STRING, m_moleculeString);
+        }
+        return builder.build();
     }
 
 }

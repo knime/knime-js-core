@@ -49,6 +49,15 @@ package org.knime.js.base.node.quickform.filter.column;
 
 import java.util.Arrays;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.data.DataTableSpec;
@@ -214,6 +223,53 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
                 .append(m_columns, other.m_columns)
                 .append(m_settings, other.m_settings)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException("Parameterization of ColumnFilter not supported!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_COLUMNS);
+            if (JsonValue.NULL.equals(val)) {
+                m_columns = null;
+            } else {
+                JsonArray array = json.getJsonArray(CFG_COLUMNS);
+                m_columns = new String[array.size()];
+                for (int i = 0; i < array.size(); i++) {
+                    m_columns [i] = array.getString(i);
+                }
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected valid string array for key '" + CFG_COLUMNS + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_columns == null) {
+            builder.addNull(CFG_COLUMNS);
+        } else {
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (String col : m_columns) {
+                arrayBuilder.add(col);
+            }
+            builder.add(CFG_COLUMNS, arrayBuilder);
+        }
+        return builder.build();
     }
 
 }

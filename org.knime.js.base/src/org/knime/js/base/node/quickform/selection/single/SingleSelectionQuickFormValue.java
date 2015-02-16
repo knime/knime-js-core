@@ -47,6 +47,13 @@
  */
 package org.knime.js.base.node.quickform.selection.single;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +164,45 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
         return new EqualsBuilder()
                 .append(m_variableValue, other.m_variableValue)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setVariableValue(fromCmdLine);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_VARIABLE_VALUE);
+            if (JsonValue.NULL.equals(val)) {
+                m_variableValue = null;
+            } else {
+                m_variableValue = json.getString(CFG_VARIABLE_VALUE);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected string value for key '" + CFG_VARIABLE_VALUE + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_variableValue == null) {
+            builder.addNull(CFG_VARIABLE_VALUE);
+        } else {
+            builder.add(CFG_VARIABLE_VALUE, m_variableValue);
+        }
+        return builder.build();
     }
 
 }

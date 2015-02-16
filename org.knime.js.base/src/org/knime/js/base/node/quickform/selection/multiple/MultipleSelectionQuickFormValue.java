@@ -49,6 +49,15 @@ package org.knime.js.base.node.quickform.selection.multiple;
 
 import java.util.Arrays;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -160,5 +169,52 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
                 .append(m_variableValue, other.m_variableValue)
                 .isEquals();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        throw new OperationNotSupportedException("Parameterization of MultipleSelection not supported!");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_VARIABLE_VALUE);
+            if (JsonValue.NULL.equals(val)) {
+                m_variableValue = null;
+            } else {
+                JsonArray array = json.getJsonArray(CFG_VARIABLE_VALUE);
+                m_variableValue = new String[array.size()];
+                for (int i = 0; i < array.size(); i++) {
+                    m_variableValue [i] = array.getString(i);
+                }
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected valid string array for key '" + CFG_VARIABLE_VALUE + ".", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObjectBuilder builder = Json.createObjectBuilder();
+        if (m_variableValue == null) {
+            builder.addNull(CFG_VARIABLE_VALUE);
+        } else {
+            JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
+            for (String value : m_variableValue) {
+                arrayBuilder.add(value);
+                }
+                builder.add(CFG_VARIABLE_VALUE, arrayBuilder);
+            }
+            return builder.build();
+        }
 
 }

@@ -47,6 +47,12 @@
  */
 package org.knime.js.base.node.quickform.input.bool;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.naming.OperationNotSupportedException;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
@@ -157,6 +163,42 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
         return new EqualsBuilder()
                 .append(m_boolean, other.m_boolean)
                 .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+        setBoolean("true".equals(fromCmdLine));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromJson(final JsonObject json) throws JsonException {
+        try {
+            JsonValue val = json.get(CFG_BOOLEAN);
+            if (JsonValue.NULL.equals(val)) {
+                m_boolean = false;
+            } else {
+                m_boolean = json.getBoolean(CFG_BOOLEAN);
+            }
+        } catch (Exception e) {
+            throw new JsonException("Expected boolean value for key '" + CFG_BOOLEAN + "'.", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonObject toJson() {
+        JsonObject value = Json.createObjectBuilder()
+                .add(CFG_BOOLEAN, m_boolean)
+                .build();
+        return value;
     }
 
 }
