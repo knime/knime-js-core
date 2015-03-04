@@ -76,7 +76,7 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
      * Creates a new file download node model.
      */
     public TextOutputNodeModel() {
-        super(new PortType[]{FlowVariablePortObject.TYPE}, new PortType[0]);
+        super(new PortType[]{FlowVariablePortObject.TYPE_OPTIONAL}, new PortType[0]);
     }
 
     /**
