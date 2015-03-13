@@ -53,6 +53,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.util.regex.Matcher;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -72,6 +73,7 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NodeView;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.dialog.DialogNode;
 import org.knime.core.node.dialog.DialogNodeValue;
 import org.knime.core.node.dialog.ValueControlledDialogPane;
 import org.knime.core.node.port.PortObjectSpec;
@@ -310,6 +312,15 @@ public abstract class QuickFormNodeDialog
         m_parameterNameField.setText(parameterName);
     }
 
+    private boolean validateParameterName() {
+        String name = getParameterName();
+        if (name == null || name.trim().isEmpty()) {
+            return true;
+        }
+        Matcher matcher = DialogNode.PARAMETER_NAME_PATTERN.matcher(name);
+        return matcher.matches();
+    }
+
     /**
      * @param config The {@link QuickFormFlowVariableConfig} to load from
      */
@@ -326,11 +337,20 @@ public abstract class QuickFormNodeDialog
 
     /**
      * @param config The {@link QuickFormFlowVariableConfig} to save to
+     * @throws InvalidSettingsException
      */
-    protected void saveSettingsTo(final QuickFormFlowVariableConfig<? extends DialogNodeValue> config) {
-        config.setLabel(getLabel());
+    protected void saveSettingsTo(final QuickFormFlowVariableConfig<? extends DialogNodeValue> config)
+        throws InvalidSettingsException {
+     config.setLabel(getLabel());
         config.setDescription(getDescription());
         config.setFlowVariableName(getFlowVariableName());
+        if (!validateParameterName()) {
+            throw new InvalidSettingsException(
+                "Parameter name not valid.\nMust only consist of word characters or "
+                + "dashes - no spaces no special characters. Name must start with a "
+                + "letter, then it may contain any word character (including '-' and '_') "
+                + "and ends with a word character (no '-' or '_'),");
+        }
         config.setParameterName(getParameterName());
         config.setHideInWizard(getHideInWizard());
         config.setHideInDialog(getHideInDialog());
