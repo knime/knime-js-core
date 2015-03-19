@@ -56,7 +56,9 @@
 			</ul>
 			<p><b>Example</b></p>
 			<p>Loop over all values contained in the table object and process only number types:</p>
-			<pre>for (var rowID = 0; rowID &lt; knimeDataTable.getNumRows(); rowID++) {
+			<pre>var rows = knimeDataTable.getRows();
+for (var rowID = 0; rowID &lt; knimeDataTable.getNumRows(); rowID++) {
+    var row = rows[rowID];
     for (var colID = 0; colID &lt; knimeDataTable.getNumColumns(); colID++) {
         if (knimeDataTable.getColumnTypes()[colID] === 'number') {
             var value = row.data[colID];
