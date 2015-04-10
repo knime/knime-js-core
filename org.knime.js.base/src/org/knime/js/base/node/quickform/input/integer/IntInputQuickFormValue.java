@@ -50,7 +50,6 @@ package org.knime.js.base.node.quickform.input.integer;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
-import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -168,12 +167,12 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
      * {@inheritDoc}
      */
     @Override
-    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+    public void loadFromString(final String fromCmdLine) throws UnsupportedOperationException {
         Integer number = null;
         try {
             number = Integer.parseInt(fromCmdLine);
         } catch (Exception e) {
-            throw new OperationNotSupportedException("Could not parse '" + fromCmdLine + "' as integer type.");
+            throw new UnsupportedOperationException("Could not parse '" + fromCmdLine + "' as integer type.");
         }
         setInteger(number);
     }

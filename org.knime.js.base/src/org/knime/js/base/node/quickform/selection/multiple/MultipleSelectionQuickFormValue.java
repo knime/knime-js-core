@@ -56,7 +56,6 @@ import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
-import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -174,8 +173,8 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
      * {@inheritDoc}
      */
     @Override
-    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Parameterization of MultipleSelection not supported!");
+    public void loadFromString(final String fromCmdLine) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Parameterization of MultipleSelection not supported!");
     }
 
     /**

@@ -56,7 +56,6 @@ import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
-import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -205,8 +204,8 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
      * {@inheritDoc}
      */
     @Override
-    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Parameterization of ValueFilter not supported!");
+    public void loadFromString(final String fromCmdLine) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Parameterization of ValueFilter not supported!");
     }
 
     /**

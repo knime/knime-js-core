@@ -55,7 +55,6 @@ import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
-import javax.naming.OperationNotSupportedException;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -200,7 +199,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
      * {@inheritDoc}
      */
     @Override
-    public void loadFromString(final String fromCmdLine) throws OperationNotSupportedException {
+    public void loadFromString(final String fromCmdLine) throws UnsupportedOperationException {
         try {
             if (fromCmdLine == null || fromCmdLine.isEmpty()) {
                 m_date = null;
@@ -208,7 +207,7 @@ public class DateInputQuickFormValue extends JSONViewContent implements DialogNo
                 m_date = dateFormat.parse(fromCmdLine);
             }
         } catch (Exception e) {
-            throw new OperationNotSupportedException("Could not parse '" + fromCmdLine + "' as dateTime in format '"
+            throw new UnsupportedOperationException("Could not parse '" + fromCmdLine + "' as dateTime in format '"
                 + DateInputQuickFormNodeModel.DATE_TIME_FORMAT + "'.");
         }
     }
