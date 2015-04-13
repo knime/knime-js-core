@@ -19,6 +19,7 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Parameter Name">Parameter identifier for external parameterization (e.g. batch execution).</option>
         <option name="Default Value">
           The value that is selected by default.
         </option>

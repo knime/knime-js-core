@@ -17,6 +17,7 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Parameter Name">Parameter identifier for external parameterization (e.g. batch execution).</option>
 		<option name="Selection">If a date or a date with time is selectable.</option>
 		<option name="Earliest">The earliest allowed date.</option>
 		<option name="Latest">The latest allowed date.</option>

@@ -17,6 +17,7 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Parameter Name">Parameter identifier for external parameterization (e.g. batch execution).</option>
 		<option name="Selection Type">The type of the selection element. This can be either check boxes with a vertical or horizontal layout, a list or a twinlist.</option>
 		<option name="Possible Choices">The possible choices, each line is one possible value.</option>
 		<option name="Default Values">Values selected by default.</option>

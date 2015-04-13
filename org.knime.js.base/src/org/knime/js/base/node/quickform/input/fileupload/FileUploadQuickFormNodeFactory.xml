@@ -22,6 +22,7 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier.</option>
+		<option name="Parameter Name">Parameter identifier for external parameterization (e.g. batch execution).</option>
 		<option name="Valid File Extensions">
           A list of file extensions that is used as filter in the 
           file browser (not only the one in the "Default File" option but also

@@ -17,6 +17,7 @@
           If the setting should be hidden in the sub node dialog.
         </option>
 		<option name="Variable Name">Variable identifier and column name.</option>
+		<option name="Parameter Name">Parameter identifier for external parameterization (e.g. batch execution).</option>
 		<option name="Separator">An undelimited list of char separators including \n and \t; back slashes and/or quotes are not supported.
 			All tokens are used as delimiters.</option>
 		<option name="Omit Empty Values">
