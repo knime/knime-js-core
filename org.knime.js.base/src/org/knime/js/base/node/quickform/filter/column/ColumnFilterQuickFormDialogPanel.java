@@ -86,7 +86,7 @@ public class ColumnFilterQuickFormDialogPanel extends QuickFormDialogPanel<Colum
         m_columns.saveConfiguration(config);
         NodeSettings settings = new NodeSettings("columnFilter");
         config.saveConfiguration(settings);
-        value.setsettings(settings);
+        value.setSettings(settings);
         value.updateFromSpec(m_representation.getSpec());
         return value;
     }

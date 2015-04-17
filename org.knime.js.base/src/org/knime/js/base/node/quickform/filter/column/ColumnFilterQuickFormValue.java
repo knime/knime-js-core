@@ -143,7 +143,7 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
      * @param settings the settings to set
      */
     @JsonIgnore
-    public void setsettings(final NodeSettings settings) {
+    public void setSettings(final NodeSettings settings) {
         m_settings = settings;
     }
 

@@ -126,7 +126,7 @@ public class ColumnFilterQuickFormNodeDialog extends QuickFormNodeDialog {
         m_defaultField.saveConfiguration(filterConfig);
         NodeSettings filterSettings = new NodeSettings("columnFilter");
         filterConfig.saveConfiguration(filterSettings);
-        m_config.getDefaultValue().setsettings(filterSettings);
+        m_config.getDefaultValue().setSettings(filterSettings);
         m_config.setType((String)m_type.getSelectedItem());
         m_config.setPossibleColumns(m_possibleColumns);
         m_config.saveSettings(settings);
