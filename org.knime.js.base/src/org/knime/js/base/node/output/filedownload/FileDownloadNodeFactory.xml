@@ -23,6 +23,12 @@
           Some lines of description that will be shown in the remote control 
           form, for instance by means of a tooltip.
         </option>
+        <option name="Link Title">
+          Title for the link shown in the Web Portal
+        </option>
+        <option name="Output resource name">
+          A name for the output resource, used for web service calls.
+        </option>
         <option name="File Path Variable">
           Select the name of the variable whose value points to the download
           file.

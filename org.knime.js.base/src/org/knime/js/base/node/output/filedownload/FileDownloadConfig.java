@@ -48,11 +48,14 @@
  */
 package org.knime.js.base.node.output.filedownload;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.DialogNode;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.js.base.util.LabeledViewConfig;
 
 /**
@@ -68,6 +71,9 @@ public class FileDownloadConfig extends LabeledViewConfig {
     private static final String CFG_FLOW_VARIABLE = "flowvariable";
     private static final String DEFAULT_FLOW_VARIABLE = "";
     private String m_flowVariable = DEFAULT_FLOW_VARIABLE;
+
+    private static final String CFG_RESOURCE_NAME = "resourceName";
+    private String m_resourceName = "";
 
     /**
      * @return the linkTitle
@@ -98,6 +104,30 @@ public class FileDownloadConfig extends LabeledViewConfig {
     }
 
     /**
+     * Sets the name for the resource created by the node.
+     *
+     * @param name the name
+     * @throws InvalidSettingsException if the name in invalid
+     */
+    public void setResourceName(final String name) throws InvalidSettingsException {
+        CheckUtils.checkSetting(StringUtils.isNotEmpty(name), "parameter name must not be null or empty");
+        CheckUtils.checkSetting(DialogNode.PARAMETER_NAME_PATTERN.matcher(name).matches(),
+            "Parameter doesn't match pattern - must start with character, followed by other characters, digits, "
+            + "or single dashes or underscores:\n  Input: %s\n  Pattern: %s",
+            name, DialogNode.PARAMETER_NAME_PATTERN.pattern());
+        m_resourceName = name;
+    }
+
+    /**
+     * Returns the name of the resource created by the node.
+     *
+     * @return a resource name
+     */
+    public String getResourceName() {
+        return m_resourceName;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -105,6 +135,7 @@ public class FileDownloadConfig extends LabeledViewConfig {
         super.saveSettings(settings);
         settings.addString(CFG_LINK_TITLE, m_linkTitle);
         settings.addString(CFG_FLOW_VARIABLE, m_flowVariable);
+        settings.addString(CFG_RESOURCE_NAME, m_resourceName);
     }
 
     /**
@@ -115,6 +146,8 @@ public class FileDownloadConfig extends LabeledViewConfig {
         super.loadSettings(settings);
         m_linkTitle = settings.getString(CFG_LINK_TITLE);
         m_flowVariable = settings.getString(CFG_FLOW_VARIABLE);
+        // new in 2.12
+        m_resourceName = settings.getString(CFG_RESOURCE_NAME, "file-download");
     }
 
     /**
@@ -125,6 +158,7 @@ public class FileDownloadConfig extends LabeledViewConfig {
         super.loadSettingsInDialog(settings);
         m_linkTitle = settings.getString(CFG_LINK_TITLE, DEFAULT_LINK_TITLE);
         m_flowVariable = settings.getString(CFG_FLOW_VARIABLE, DEFAULT_FLOW_VARIABLE);
+        m_resourceName = settings.getString(CFG_RESOURCE_NAME, "");
     }
 
     /**
@@ -138,6 +172,8 @@ public class FileDownloadConfig extends LabeledViewConfig {
         sb.append(m_linkTitle);
         sb.append(", flowvariable=");
         sb.append(m_flowVariable);
+        sb.append(", parameterName=");
+        sb.append(m_resourceName);
         return sb.toString();
     }
 
@@ -150,6 +186,7 @@ public class FileDownloadConfig extends LabeledViewConfig {
                 .appendSuper(super.hashCode())
                 .append(m_linkTitle)
                 .append(m_flowVariable)
+                .append(m_resourceName)
                 .toHashCode();
     }
 
@@ -172,7 +209,7 @@ public class FileDownloadConfig extends LabeledViewConfig {
                 .appendSuper(super.equals(obj))
                 .append(m_linkTitle, other.m_linkTitle)
                 .append(m_flowVariable, other.m_flowVariable)
+                .append(m_resourceName, other.m_resourceName)
                 .isEquals();
     }
-
 }

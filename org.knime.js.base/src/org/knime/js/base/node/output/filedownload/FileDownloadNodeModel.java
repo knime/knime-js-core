@@ -48,13 +48,19 @@
  */
 package org.knime.js.base.node.output.filedownload;
 
-import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.NoSuchElementException;
 
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.ExternalNodeOutput;
+import org.knime.core.node.dialog.OutputNode;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
@@ -66,7 +72,8 @@ import org.knime.js.core.node.AbstractWizardNodeModel;
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadRepresentation, FileDownloadValue> {
+public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadRepresentation, FileDownloadValue>
+    implements OutputNode {
 
     private FileDownloadConfig m_config = new FileDownloadConfig();
 
@@ -99,12 +106,12 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
             representation.setLabel(m_config.getLabel());
             representation.setDescription(m_config.getDescription());
             representation.setLinkTitle(m_config.getLinkTitle());
-            representation.setPath(getPathFromVariable());
+            representation.setPath(getPathFromVariable().toString());
         }
         return new PortObject[0];
     }
 
-    private String getPathFromVariable() throws InvalidSettingsException {
+    private Path getPathFromVariable() throws InvalidSettingsException {
         String varName = m_config.getFlowVariable();
         if (varName == null || varName.length() == 0) {
             throw new InvalidSettingsException("Invalid (empty) variable name");
@@ -116,12 +123,12 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
         } catch (NoSuchElementException e) {
             throw new InvalidSettingsException(e.getMessage(), e);
         }
-        File f = new File(value);
-        if (!f.exists()) {
+        Path path = Paths.get(value);
+        if (!Files.exists(path)) {
             throw new InvalidSettingsException("Variable \"" + varName + "\" does not denote an existing file: "
                 + value);
         }
-        return value;
+        return path;
     }
 
     /**
@@ -218,6 +225,20 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
     @Override
     protected void useCurrentValueAsDefault() {
         // do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExternalNodeOutput getExternalOutput() {
+        try {
+            URL url = getPathFromVariable().toUri().toURL();
+            return ExternalNodeOutput.builder(m_config.getResourceName()).resource(url).build();
+        } catch (MalformedURLException | InvalidSettingsException ex) {
+            getLogger().error("Could not get output resource URL: " + ex.getMessage(), ex);
+            return ExternalNodeOutput.builder(m_config.getResourceName()).build();
+        }
     }
 
 }

@@ -72,6 +72,7 @@ public class FileDownloadNodeDialog extends LabeledViewNodeDialog {
 
     private final JComboBox<FlowVariable> m_filePathVariableNameCombo;
     private final JTextField m_linkTitle;
+    private final JTextField m_resourceName;
 
     /**
      * Create new dialog.
@@ -80,6 +81,7 @@ public class FileDownloadNodeDialog extends LabeledViewNodeDialog {
         m_filePathVariableNameCombo = new JComboBox<FlowVariable>(new DefaultComboBoxModel<FlowVariable>());
         m_filePathVariableNameCombo.setRenderer(new FlowVariableListCellRenderer());
         m_linkTitle = new JTextField(DEF_TEXTFIELD_WIDTH);
+        m_resourceName = new JTextField(DEF_TEXTFIELD_WIDTH);
         createAndAddTab();
     }
 
@@ -97,6 +99,7 @@ public class FileDownloadNodeDialog extends LabeledViewNodeDialog {
     @Override
     protected void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
         addPairToPanel("Link Title", m_linkTitle, panelWithGBLayout, gbc);
+        addPairToPanel("Output resource name", m_resourceName, panelWithGBLayout, gbc);
         addPairToPanel("File Path Variable", m_filePathVariableNameCombo, panelWithGBLayout, gbc);
     }
 
@@ -110,6 +113,7 @@ public class FileDownloadNodeDialog extends LabeledViewNodeDialog {
         config.loadSettingsInDialog(settings);
         loadSettingsFrom(config);
         m_linkTitle.setText(config.getLinkTitle());
+        m_resourceName.setText(config.getResourceName());
         String flowVariableName = config.getFlowVariable();
 
         FlowVariable selectedVar = null;
@@ -137,6 +141,7 @@ public class FileDownloadNodeDialog extends LabeledViewNodeDialog {
         FileDownloadConfig config = new FileDownloadConfig();
         saveSettingsTo(config);
         config.setLinkTitle(m_linkTitle.getText());
+        config.setResourceName(m_resourceName.getText());
         config.setFlowVariable(getFlowVariableName());
         config.saveSettings(settings);
     }
