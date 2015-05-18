@@ -198,6 +198,7 @@ public abstract class QuickFormConfig
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD);
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG);
         m_required = settings.getBoolean(CFG_REQUIRED);
+        // added in 2.12
         m_parameterName = settings.getString(CFG_PARAMETER_NAME, DEFAULT_PARAMETER_NAME);
     }
 
