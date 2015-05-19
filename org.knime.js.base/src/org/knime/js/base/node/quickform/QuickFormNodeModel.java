@@ -49,6 +49,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.JsonObject;
+
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.InvalidSettingsException;
@@ -58,6 +62,8 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.dialog.DialogNode;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.dialog.ExternalNodeData;
+import org.knime.core.node.dialog.InputNode;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
@@ -77,7 +83,7 @@ import org.knime.js.core.JavaScriptViewCreator;
  *
  */
 public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl<VAL, CONF>, VAL extends DialogNodeValue & WebViewContent, CONF extends QuickFormConfig<VAL>>
-    extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL> {
+    extends NodeModel implements DialogNode<REP, VAL>, WizardNode<REP, VAL>, InputNode {
 
     /**
      * Config key for the overwrite mode. Used in {@link #saveCurrentValue(NodeSettingsWO)}.
@@ -414,4 +420,64 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExternalNodeData getInputData() {
+        VAL dialogValue = getDialogValue();
+        if (dialogValue == null) {
+            // if not value have been set explicitly, use the default values
+            dialogValue = getDefaultValue();
+        }
+
+        JsonObject jsonObject = dialogValue != null ? dialogValue.toJson() : null;
+        if (jsonObject == null) {
+            jsonObject = Json.createObjectBuilder().build();
+        }
+
+        return ExternalNodeData.builder(getParameterName()).jsonObject(jsonObject).build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInputData(final ExternalNodeData inputData) {
+        VAL dialogValue = validateAndLoadDialogValue(inputData);
+        setDialogValue(dialogValue);
+    }
+
+    private VAL validateAndLoadDialogValue(final ExternalNodeData inputData) {
+        VAL dialogValue = createEmptyDialogValue();
+        try {
+            if (inputData.getJSONObject() != null) {
+                dialogValue.loadFromJson(inputData.getJSONObject());
+            } else if (inputData.getStringValue() != null) {
+                dialogValue.loadFromString(inputData.getStringValue());
+            } else {
+                throw new IllegalArgumentException("No suitable input data for node \"" + getParameterName()
+                    + "\" provided, only string or JSON are supported.");
+            }
+            validateDialogValue(dialogValue);
+            return dialogValue;
+        } catch (JsonException e) {
+            throw new IllegalArgumentException("Invalid JSON parameter for node \"" + getParameterName()
+                + "\", cannot read provided JSON input: " + e.getMessage(), e);
+        } catch (UnsupportedOperationException e) {
+            throw new IllegalArgumentException(e.getMessage() + " for node \"" + getParameterName()
+                + "\".", e);
+        } catch (InvalidSettingsException se) {
+            throw new IllegalArgumentException("Invalid parameter for node \"" + getParameterName()
+                + "\", provided value does not pass node's validation method: " + se.getMessage(), se);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateInputData(final ExternalNodeData inputData) throws InvalidSettingsException {
+        validateAndLoadDialogValue(inputData);
+    }
 }

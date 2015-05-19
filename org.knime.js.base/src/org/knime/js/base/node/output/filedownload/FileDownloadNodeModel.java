@@ -59,7 +59,7 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.dialog.ExternalNodeOutput;
+import org.knime.core.node.dialog.ExternalNodeData;
 import org.knime.core.node.dialog.OutputNode;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortObjectSpec;
@@ -231,13 +231,13 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
      * {@inheritDoc}
      */
     @Override
-    public ExternalNodeOutput getExternalOutput() {
+    public ExternalNodeData getExternalOutput() {
         try {
             URL url = getPathFromVariable().toUri().toURL();
-            return ExternalNodeOutput.builder(m_config.getResourceName()).resource(url).build();
+            return ExternalNodeData.builder(m_config.getResourceName()).resource(url).build();
         } catch (MalformedURLException | InvalidSettingsException ex) {
             getLogger().error("Could not get output resource URL: " + ex.getMessage(), ex);
-            return ExternalNodeOutput.builder(m_config.getResourceName()).build();
+            return ExternalNodeData.builder(m_config.getResourceName()).build();
         }
     }
 

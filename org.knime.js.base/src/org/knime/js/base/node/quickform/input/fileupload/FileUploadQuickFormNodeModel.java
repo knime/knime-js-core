@@ -51,9 +51,11 @@ package org.knime.js.base.node.quickform.input.fileupload;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeLogger;
+import org.knime.core.node.dialog.ExternalNodeData;
 import org.knime.core.node.web.ValidationError;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 
@@ -63,9 +65,6 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
  */
 public class FileUploadQuickFormNodeModel extends QuickFormFlowVariableNodeModel<FileUploadQuickFormRepresentation,
         FileUploadQuickFormValue, FileUploadQuickFormConfig> {
-
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(FileUploadQuickFormNodeModel.class);
-
     /**
      * {@inheritDoc}
      */
@@ -145,4 +144,42 @@ public class FileUploadQuickFormNodeModel extends QuickFormFlowVariableNodeModel
         getConfig().getDefaultValue().setPath(getViewValue().getPath());
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExternalNodeData getInputData() {
+        Path p = Paths.get(getConfig().getDefaultValue().getPath());
+        try {
+            URL url = p.toUri().toURL();
+            return ExternalNodeData.builder(getConfig().getParameterName()).resource(url).build();
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex); // should never happen
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInputData(final ExternalNodeData inputData) {
+        FileUploadQuickFormValue val = createEmptyDialogValue();
+        val.setPath(inputData.getResource().getPath());
+        setDialogValue(val);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void validateInputData(final ExternalNodeData inputData) throws InvalidSettingsException {
+        if (inputData.getResource() == null) {
+            throw new InvalidSettingsException("No external resource URL provided for file upload");
+        }
+        FileUploadQuickFormValue val = createEmptyDialogValue();
+        val.setPath(inputData.getResource().getPath());
+        validateDialogValue(val);
+    }
 }
