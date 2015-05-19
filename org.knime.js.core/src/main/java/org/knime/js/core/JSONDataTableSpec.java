@@ -51,13 +51,22 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 
+import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
+import org.knime.core.data.DataColumnSpec;
+import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.date.DateAndTimeValue;
+import org.knime.core.data.def.BooleanCell;
+import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -175,6 +184,43 @@ public class JSONDataTableSpec {
             types[i] = getJSONType(colType).name;
         }
         setColTypes(types);
+    }
+
+    /**
+     * Creates a new {@link DataTableSpec} from the current settings.
+     * @return the generated spec
+     */
+    public DataTableSpec createDataTableSpec() {
+        DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
+        for (int i = 0; i < m_numColumns; i++) {
+            JSTypes type = JSTypes.valueOf(m_colTypes.get(i));
+            DataType dataType = null;
+            switch (type) {
+                case BOOLEAN:
+                    dataType = DataType.getType(BooleanCell.class);
+                    break;
+                case NUMBER:
+                    dataType = DataType.getType(DoubleCell.class);
+                    break;
+                case DATE_TIME:
+                    dataType = DataType.getType(DateAndTimeCell.class);
+                    break;
+                case STRING:
+                    dataType = DataType.getType(StringCell.class);
+                    break;
+                case SVG:
+                    dataType = DataType.getType(SvgCell.class);
+                    break;
+                case PNG:
+                    dataType = DataType.getType(PNGImageCell.class);
+                    break;
+                default:
+                    dataType = DataType.getType(MissingCell.class);
+                    break;
+            }
+            columns[i] = new DataColumnSpecCreator(m_colNames.get(i), dataType).createSpec();
+        }
+        return new DataTableSpec(columns);
     }
 
     /**

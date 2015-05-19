@@ -99,7 +99,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
         PortObject svgPortObject = createSVGImagePortObjectFromView(createThirdsExecutionContext(exec));
         exec.setProgress(2.0 / 3.0, "Creating output...");
-        PortObject[] output = performExecuteCreatePortObjects(svgPortObject, createThirdsExecutionContext(exec));
+        PortObject[] output =
+            performExecuteCreatePortObjects(svgPortObject, inObjects, createThirdsExecutionContext(exec));
         exec.setProgress(1.0);
         return output;
     }
@@ -129,12 +130,13 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      * Called AFTER image creation.
      *
      * @param svgImageFromView The port object, containing the SVG created by the view, or inactive port object.
+     * @param inObjects The input objects.
      * @param exec For {@link BufferedDataTable} creation and progress.
      * @return The output objects.
      * @throws Exception If the node execution fails for any reason.
      */
-    protected abstract PortObject[] performExecuteCreatePortObjects(PortObject svgImageFromView,
-        final ExecutionContext exec) throws Exception;
+    protected abstract PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
+        final PortObject[] inObjects, final ExecutionContext exec) throws Exception;
 
     /**
      * @return true if the SVG image is supposed to be rendered and retrieved, false otherwise

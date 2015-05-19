@@ -52,22 +52,32 @@ import java.util.LinkedHashSet;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
+import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.DataType;
 import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.MissingCell;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.date.DateAndTimeValue;
+import org.knime.core.data.def.BooleanCell;
+import org.knime.core.data.def.DefaultRow;
+import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.data.image.png.PNGImageValue;
-import org.knime.core.data.property.ColorAttr;
+import org.knime.core.node.BufferedDataContainer;
+import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.ExecutionMonitor;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
@@ -164,7 +174,8 @@ public class JSONDataTable {
                 continue;
             }
 
-            rowColorList.add(cssHexStringFromColor(spec.getRowColor(row)));
+            String rC = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
+            rowColorList.add(rC);
 
             String rowKey = row.getKey().getString();
             rowList.add(new JSONDataTableRow(rowKey, numOfColumns));
@@ -234,19 +245,76 @@ public class JSONDataTable {
         getSpec().setRowColorValues(rowColorList.toArray(new String[0]));
         setRows(rowList.toArray(new JSONDataTableRow[0]));
         setExtensions(extensionArray);
-
     }
 
     /**
-     * @param rowColor
-     * @return
+     * Creates a new buffered data table from this table instance.
+     * @param exec The execution context
+     * @return The newly created {@link BufferedDataTable}.
      */
-    private String cssHexStringFromColor(final ColorAttr colorAttr) {
-        //get color value, omit alpha
-        int colorValue = colorAttr.getColor().getRGB() & 0xFFFFFF;
-        //convert to CSS hex color string
-        String hexString = Integer.toHexString(colorValue);
-        return "#" + StringUtils.leftPad(hexString, 6, '0').toUpperCase();
+    public BufferedDataTable createBufferedDataTable(final ExecutionContext exec) {
+        DataTableSpec spec = m_spec.createDataTableSpec();
+        BufferedDataContainer container = exec.createDataContainer(spec);
+        for (JSONDataTableRow row : m_rows) {
+            DataCell[] dataCells = new DataCell[row.getData().length];
+            for (int colId = 0; colId < row.getData().length; colId++) {
+                Object value = row.getData()[colId];
+                DataType type = spec.getColumnSpec(colId).getType();
+                if (type.isCompatible(SvgValue.class)) {
+                    try {
+                        dataCells[colId] = new SvgCell(value.toString());
+                    } catch (IOException e) {
+                        dataCells[colId] = new MissingCell(e.getMessage());
+                    }
+                } else if (type.isCompatible(PNGImageValue.class)) {
+                    byte[] imageBytes = Base64.decodeBase64(value.toString());
+                    dataCells[colId] = (new PNGImageContent(imageBytes)).toImageCell();
+                } else if (type.isCompatible(BooleanValue.class)) {
+                    Boolean bVal = null;
+                    if (value instanceof Boolean) {
+                        bVal = (Boolean)value;
+                    } else if (value instanceof String) {
+                        bVal = Boolean.parseBoolean((String)value);
+                    }
+                    if (bVal == null) {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as boolean.");
+                    } else {
+                        dataCells[colId] = BooleanCell.get(bVal);
+                    }
+                } else if (type.isCompatible(DateAndTimeValue.class)) {
+                    Long lVal = null;
+                    if (value instanceof Long) {
+                        lVal = (Long)value;
+                    } else if (value instanceof String) {
+                        lVal = Long.parseLong((String)value);
+                    }
+                    if (lVal == null) {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as long.");
+                    } else {
+                        dataCells[colId] = new DateAndTimeCell(lVal, true, true, true);
+                    }
+                } else if (type.isCompatible(DoubleValue.class)) {
+                    Number nVal = null;
+                    if (value instanceof Number) {
+                        nVal = (Number)value;
+                    } else  if (value instanceof String) {
+                        nVal = Double.parseDouble((String)value);
+                    }
+                    if (nVal == null) {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as number.");
+                    } else {
+                        dataCells[colId] = new DoubleCell(nVal.doubleValue());
+                    }
+                } else if (type.isCompatible(StringValue.class)) {
+                    dataCells[colId] = new StringCell(value.toString());
+                } else {
+                    dataCells[colId] = new MissingCell("Type conversion to " + type + " not supported.");
+                }
+            }
+            DataRow newRow = new DefaultRow(row.getRowKey(), dataCells);
+            container.addRowToTable(newRow);
+        }
+        return container.getTable();
     }
 
     private Object getJSONCellValue(final DataCell cell) {

@@ -254,7 +254,7 @@ public class ScatterPlotNodeModel extends
      */
     @Override
     protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
-        final ExecutionContext exec) throws Exception {
+        final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         BufferedDataTable out = m_table;
         synchronized (getLock()) {
             ScatterPlotViewRepresentation representation = getViewRepresentation();

@@ -259,7 +259,7 @@ final class LinePlotNodeModel extends AbstractSVGWizardNodeModel<LinePlotViewRep
      */
     @Override
     protected PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
-        final ExecutionContext exec) throws Exception {
+        final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
         BufferedDataTable out = m_table;
         synchronized (getLock()) {
             LinePlotViewRepresentation representation = getViewRepresentation();
