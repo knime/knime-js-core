@@ -186,7 +186,7 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
                 m_moleculeString = json.getString(CFG_STRING);
             }
         } catch (Exception e) {
-            throw new JsonException("Expected molecule string value for key '" + CFG_STRING + ".", e);
+            throw new JsonException("Expected molecule string value for key '" + CFG_STRING + "'.", e);
         }
     }
 

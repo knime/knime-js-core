@@ -186,7 +186,7 @@ public class ListBoxInputQuickFormValue extends JSONViewContent implements Dialo
                 m_string = json.getString(CFG_STRING);
             }
         } catch (Exception e) {
-            throw new JsonException("Expected string value for key '" + CFG_STRING + ".", e);
+            throw new JsonException("Expected string value for key '" + CFG_STRING + "'.", e);
         }
     }
 

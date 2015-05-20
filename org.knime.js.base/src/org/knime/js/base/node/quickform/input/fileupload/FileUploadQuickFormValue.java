@@ -186,7 +186,7 @@ public class FileUploadQuickFormValue extends JSONViewContent implements DialogN
                 m_path = json.getString(CFG_PATH);
             }
         } catch (Exception e) {
-            throw new JsonException("Expected path value for key '" + CFG_PATH + ".", e);
+            throw new JsonException("Expected path value for key '" + CFG_PATH + "'.", e);
         }
     }
 
