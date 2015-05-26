@@ -78,7 +78,7 @@
 	<ports>
 		<inPort index="0" name="Display data">Data table with data to display.</inPort>
 		<inPort index="1" name="Line color data" optional="true">Data table containing one column with the column names of table which has in addition a color assigned.</inPort>
-		<outPort index="0" name="Image">SVG image rendered by the JavaScript implementation of the scatter plot.</outPort>
+		<outPort index="0" name="Image">SVG image rendered by the JavaScript implementation of the line plot.</outPort>
 		<outPort index="1" name="Input data and view selection">Data table containing the input data appended with a column, that represents the selection made in the line plot view.</outPort>
 	</ports>	
 </knimeNode>
