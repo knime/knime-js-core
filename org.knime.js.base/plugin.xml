@@ -132,6 +132,12 @@
             factory-class="org.knime.js.base.node.output.text.TextOutputNodeFactory"
             id="org.knime.js.base.node.output.image.TextOutputNodeFactory">
       </node>
+      <node
+            category-path="/labs/quickform/view"
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -766,6 +772,23 @@
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="ROC Curve"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.roc.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/roc/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/roc/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/plotter/roc/knime-roc-plot.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jsFreeChart_0.5">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.knime.js.core.javascriptComponents">
@@ -997,6 +1020,16 @@
             name="Text Output"
             namespace="org_knime_js_base_node_output_text"
             setValidationError-method-name="setValidationErrorMessage"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.roc.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.viz.plotter.roc"
+            name="ROC Curve"
+            namespace="knime_roc_curve"
+            setValidationError-method-name="setValidationError"
             validate-method-name="validate">
       </javascriptComponent>
    </extension>
