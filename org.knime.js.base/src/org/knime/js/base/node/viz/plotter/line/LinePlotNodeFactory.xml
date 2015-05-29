@@ -21,7 +21,7 @@
             <p>Additionally a static SVG image can be rendered, which is then made available at the first output port.</p>
             <p>Note, this node is currently under development. Future versions of the node might have more or changed functionality.</p>
 		</intro>
-		<tab name="Scatter Plot Options">
+		<tab name="Line Plot Options">
             <option name="Hide in wizard">If the view should be hidden in the wizard execution.</option>
             <option name="Create image at outport">If an image is supposed to be rendered during execute for the upper outport. Disable this option if image is not needed or creation is too time consuming.</option>
             <option name="Maximum number of rows">Use this numerical value to restrict the number of rows used for this visualization.</option>
