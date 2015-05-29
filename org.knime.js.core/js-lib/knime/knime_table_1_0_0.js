@@ -30,11 +30,15 @@ kt = function() {
 	}
 	
 	kt.getColumn = function(columnID) {
-		if (columnID < dataTable.spec.numColumns) {
+		var id = columnID;
+		if (typeof columnID === "string") {
+			id = kt_getDataColumnID(columnID);
+		}
+		if (id != null && id < dataTable.spec.numColumns) {
 			var col = [];
 			
 			for (var i = 0; i < kt.getNumRows(); i++) {
-				col.push(dataTable.rows[i].data[columnID]);
+				col.push(dataTable.rows[i].data[id]);
 			}
 			return col;
 		}
@@ -56,8 +60,17 @@ kt = function() {
 		return dataTable.spec.numRows;
 	};
 	
-	kt.getPossibleValues = function() {
-		return dataTable.spec.possibleValues;
+	kt.getPossibleValues = function(columnName) {
+		if (columnName) {
+			var colID = kt_getDataColumnID(columnName); 
+			if (colID && colID < dataTable.spec.numColumns) {
+				return dataTable.spec.possibleValues[colID];
+			} else {
+				return null;
+			}
+		} else {
+			return dataTable.spec.possibleValues;
+		}
 	};
 	
 	kt.getRowColors = function() {
