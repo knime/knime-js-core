@@ -53,7 +53,10 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.dialog.DialogNode;
 import org.knime.core.node.dialog.DialogNodeValue;
+import org.knime.core.node.util.CheckUtils;
+import org.knime.core.node.workflow.SubNodeContainer;
 
 /**
  * Configuration of a quick form node.
@@ -74,7 +77,6 @@ public abstract class QuickFormConfig
 
     private static final String DEFAULT_LABEL = "Label";
     private static final String DEFAULT_DESCRIPTION = "Enter Description";
-    private static final String DEFAULT_PARAMETER_NAME = null;
     private static final boolean DEFAULT_HIDE_IN_WIZARD = false;
     private static final boolean DEFAULT_HIDE_IN_DIALOG = false;
     private static final boolean DEFAULT_REQUIRED = true;
@@ -85,7 +87,7 @@ public abstract class QuickFormConfig
     private boolean m_hideInDialog = DEFAULT_HIDE_IN_DIALOG;
     private VAL m_defaultValue = createEmptyValue();
     private boolean m_required = DEFAULT_REQUIRED;
-    private String m_parameterName = DEFAULT_PARAMETER_NAME;
+    private String m_parameterName = SubNodeContainer.getDialogNodeParameterNameDefault(getClass());
 
     /**
      * @return the label
@@ -165,10 +167,14 @@ public abstract class QuickFormConfig
     }
 
     /**
-     * @param parameterName the parameterName to set
+     * @param s the parameterName to set
+     * @throws InvalidSettingsException If null or invalid
      */
-    public void setParameterName(final String parameterName) {
-        m_parameterName = parameterName;
+    public void setParameterName(final String s) throws InvalidSettingsException {
+        CheckUtils.checkSettingNotNull(s, "Parameter name must not be null");
+        CheckUtils.checkSetting("".equals(s) || DialogNode.PARAMETER_NAME_PATTERN.matcher(s).matches(),
+            "Parameter name \"%s\" is invalid - only character, digits and a dash character are allowed", s);
+        m_parameterName = s;
     }
 
     /**
@@ -198,8 +204,8 @@ public abstract class QuickFormConfig
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD);
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG);
         m_required = settings.getBoolean(CFG_REQUIRED);
-        // added in 2.12
-        m_parameterName = settings.getString(CFG_PARAMETER_NAME, DEFAULT_PARAMETER_NAME);
+        // added in 2.12 - "" is discouraged but OK
+        setParameterName(settings.getString(CFG_PARAMETER_NAME, ""));
     }
 
     /**
@@ -219,7 +225,13 @@ public abstract class QuickFormConfig
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD, DEFAULT_HIDE_IN_WIZARD);
         m_hideInDialog = settings.getBoolean(CFG_HIDE_IN_DIALOG, DEFAULT_HIDE_IN_DIALOG);
         m_required = settings.getBoolean(CFG_REQUIRED, DEFAULT_REQUIRED);
-        m_parameterName = settings.getString(CFG_PARAMETER_NAME, DEFAULT_PARAMETER_NAME);
+        final String defaultParName = SubNodeContainer.getDialogNodeParameterNameDefault(getClass());
+        String parName = settings.getString(CFG_PARAMETER_NAME, defaultParName);
+        try {
+            setParameterName(parName);
+        } catch (InvalidSettingsException ise) {
+            m_parameterName = defaultParName;
+        }
     }
 
     /**
@@ -254,6 +266,9 @@ public abstract class QuickFormConfig
         sb.append("hideInDialog=");
         sb.append(m_hideInDialog);
         sb.append(", ");
+        sb.append("paramaterName=");
+        sb.append(m_parameterName);
+        sb.append(", ");
         sb.append("defaultValue=");
         sb.append("{");
         sb.append(m_defaultValue);
@@ -274,6 +289,7 @@ public abstract class QuickFormConfig
                 .append(m_description)
                 .append(m_hideInWizard)
                 .append(m_hideInDialog)
+                .append(m_parameterName)
                 .append(m_defaultValue)
                 .append(m_required)
                 .toHashCode();
@@ -300,6 +316,7 @@ public abstract class QuickFormConfig
                 .append(m_description, other.m_description)
                 .append(m_hideInWizard, other.m_hideInWizard)
                 .append(m_hideInDialog, other.m_hideInDialog)
+                .append(m_parameterName, other.m_parameterName)
                 .append(m_defaultValue, other.m_defaultValue)
                 .append(m_required, other.m_required)
                 .isEquals();

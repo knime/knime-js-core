@@ -314,8 +314,11 @@ public abstract class QuickFormNodeDialog
 
     private boolean validateParameterName() {
         String name = getParameterName();
-        if (name == null || name.trim().isEmpty()) {
-            return true;
+        if (name == null) {
+            return false;
+        }
+        if (name.isEmpty()) {
+            return true; // for backward compatibility reasons
         }
         Matcher matcher = DialogNode.PARAMETER_NAME_PATTERN.matcher(name);
         return matcher.matches();
@@ -341,7 +344,7 @@ public abstract class QuickFormNodeDialog
      */
     protected void saveSettingsTo(final QuickFormFlowVariableConfig<? extends DialogNodeValue> config)
         throws InvalidSettingsException {
-     config.setLabel(getLabel());
+        config.setLabel(getLabel());
         config.setDescription(getDescription());
         config.setFlowVariableName(getFlowVariableName());
         if (!validateParameterName()) {

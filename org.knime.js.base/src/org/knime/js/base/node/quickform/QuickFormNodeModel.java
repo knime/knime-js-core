@@ -69,7 +69,6 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
-import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.js.core.JavaScriptViewCreator;
 
 /**
@@ -179,12 +178,7 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     /** {@inheritDoc} */
     @Override
     public String getParameterName() {
-        String name = m_config.getParameterName();
-        if (name == null || name.trim().isEmpty()) {
-            return SubNodeContainer.getDialogNodeParameterNameDefault(getClass());
-        } else {
-            return name;
-        }
+        return m_config.getParameterName();
     }
 
     /**
