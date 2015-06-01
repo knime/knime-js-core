@@ -138,6 +138,11 @@
             factory-class="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory"
             id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
       </node>
+      <node
+            expert-flag="false"
+            factory-class="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory"
+            id="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory">
+      </node>
    </extension>
    <extension
          point="org.knime.workbench.repository.categories">
@@ -786,7 +791,24 @@
                type="JAVASCRIPT">
          </importResource>
          <webDependency
-               webResourceBundleID="jsFreeChart_0.5">
+               webResourceBundleID="D3_3.2.8">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Lift Chart"
+            version="1.0"
+            webResourceBundleID="org.knime.js.base.node.viz.plotter.lift.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/viz/plotter/lift/"
+               relativePathTarget="org/knime/js/base/node/viz/plotter/lift/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/viz/plotter/lift/knime-lift-chart.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.2.8">
          </webDependency>
       </webResourceBundle>
    </extension>
@@ -1029,6 +1051,16 @@
             javascriptComponentID="org.knime.js.base.node.viz.plotter.roc"
             name="ROC Curve"
             namespace="knime_roc_curve"
+            setValidationError-method-name="setValidationError"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="getComponentValue"
+            implementationBundleID="org.knime.js.base.node.viz.plotter.lift.bundle"
+            init-method-name="init"
+            javascriptComponentID="org.knime.js.base.node.viz.plotter.lift"
+            name="Lift Chart"
+            namespace="knime_lift_chart"
             setValidationError-method-name="setValidationError"
             validate-method-name="validate">
       </javascriptComponent>

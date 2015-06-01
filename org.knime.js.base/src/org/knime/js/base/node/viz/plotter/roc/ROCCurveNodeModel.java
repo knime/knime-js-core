@@ -222,7 +222,7 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
                     for (DataRow row : colorTable) {
                         String col = row.getCell(0).toString();
                         Color c = colorTable.getSpec().getRowColor(row).getColor();
-                        colors.put(col, ROCCurveViewRepresentation.colorToRGBString(c));
+                        colors.put(col, ROCCurveViewConfig.getRGBAStringFromColor(c));
                     }
                     String[] col = new String[colors.size()];
                     for (int i = 0; i < representation.getCurves().length; i++) {

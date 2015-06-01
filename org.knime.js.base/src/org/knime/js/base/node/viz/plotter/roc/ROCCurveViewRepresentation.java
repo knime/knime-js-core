@@ -145,41 +145,21 @@ public class ROCCurveViewRepresentation extends JSONViewContent {
      * @param c the color to set
      */
     public void setGridColor(final Color c) {
-        m_gridColor = colorToRGBString(c);
+        m_gridColor = ROCCurveViewConfig.getRGBAStringFromColor(c);
     }
 
     /**
      * @param c the color to set
      */
     public void setBackgroundColor(final Color c) {
-        m_backgroundColor = colorToRGBString(c);
+        m_backgroundColor = ROCCurveViewConfig.getRGBAStringFromColor(c);
     }
 
     /**
      * @param c the color to set
      */
     public void setDataAreaColor(final Color c) {
-        m_dataAreaColor = colorToRGBString(c);
-    }
-
-    /**
-     * Creates a color string for javascript.
-     * @param c the color
-     * @return the color's string representation (no alpha!)
-     */
-    public static String colorToRGBString(final Color c) {
-        return "rgb(" + c.getRed() + "," + c.getGreen() + "," + c.getBlue() + ")";
-    }
-
-    /**
-     * Creates a color from a rgb string.
-     * @param c a color string in the format rgb(r, g, b)
-     * @return an awt color object
-     */
-    public static Color colorFromRGBString(final String c) {
-        String sub = c.substring(4, c.length() - 1);
-        String[] split = sub.split(",");
-        return new Color(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+        m_dataAreaColor = ROCCurveViewConfig.getRGBAStringFromColor(c);//colorToRGBString(c);
     }
 
     /**

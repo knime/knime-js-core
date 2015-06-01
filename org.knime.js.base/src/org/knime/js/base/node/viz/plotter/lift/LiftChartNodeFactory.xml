@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knimeNode icon="../../js.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
+	<name>JavaScript Lift Chart</name>
+	
+	<shortDescription>
+	    A lift chart using a JavaScript based charting library.
+	</shortDescription>
+		
+	<fullDescription>
+		<intro>Creates a lift chart. Additionally, a chart for the cumulative 
+        percent of responses captured is shown. A lift chart is used to evaluate 
+        a predictive model. The higher the lift (the difference between the "lift" line 
+        and the base line), the better performs the predictive model.
+        The lift is the ratio between the results obtained with and without the 
+        predictive model. 
+        It is calculated as number of positive hits (e .g. responses) divided by
+        the average number of positives without model.
+        The data table must have a column containing probabilities and a nominal 
+        column, containing the actual labels.
+        At first, the data is sorted by probability, divided into deciles,
+        then the actual labels are counted and the average rate is calculated.
+        </intro>
+        <tab name="Data Options">
+	        <option name="Column containing true labels">Nominal column containing the actual labels, e. g. if a person responded</option>
+	        <option name="Response Label">The label for a positive value (hit).</option>
+	        <option name="Column containing score (probabilities)">Numeric column containing the predicted score in probabilities of the model</option>
+	        <option name="Interval width in %">The width in which the data is separated before counting.</option>
+        </tab>
+        <tab name="General Plot Options">
+            <option name="Hide in wizard">If the view should be hidden in the wizard execution.</option>
+            <option name="Create image at outport">If an image is supposed to be rendered during execute for the upper outport. Disable this option if image is not needed or creation is too time consuming.</option>
+            <option name="Width of image (in px)">The width of the generated SVG image.</option>
+            <option name="Height of image (in px)">The height of the generated SVG image.</option>
+            <option name="Line width (in px)">The width of the shown lines.</option>
+
+            <option name="Resize view to fill window">Setting this option resizes the view to the available area of the window. If disabled the view size is static according to the set width and height.</option>
+            <option name="Background color">The color of the background of the image.</option>
+            <option name="Data area color">The background color of the data area, within the axes.</option>
+            <option name="Show grid">If an additional grid is being rendered at the axes tick positions.</option>
+            <option name="Grid color">The color of the grid.</option>
+        </tab>
+        
+	</fullDescription>
+	
+	<interactiveView name="Lift Chart">
+		Displays a lift chart visualization.
+	</interactiveView>
+	<ports>
+		<inPort index="0" name="Display data">Data table with data to display.</inPort>
+		<outPort index="0" name="Image">SVG image rendered by the JavaScript implementation of the lift chart.</outPort>
+		<outPort index="1" name="Input data and view selection">Data table containing the input data appended with a column, that represents the selection made in the lift chart view.</outPort>
+	</ports>	
+</knimeNode>

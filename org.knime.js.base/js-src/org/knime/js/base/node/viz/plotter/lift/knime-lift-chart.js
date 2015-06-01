@@ -1,60 +1,64 @@
-knime_roc_curve = function() {
-	
-	view = {};
-	var _representation = null;
-	var _value = null;
-	var containerID = "lineContainer";
-	
-	var minWidth = 400;
-	var minHeight = 300;
-	var defaultFont = "sans-serif";
-	var defaultFontSize = 12;
-	var xy = {};
-	var legendHeight = 0;
-	
-	view.init = function(representation, value) {
-		_value = value;
-		_representation = representation;
-		//var rep_json = JSON.stringify(representation);
-		//console.log(rep_json);
-		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
+knime_lift_chart = function() {
+    view = {};
+    var _representation = null;
+    var _value = null;
+    var containerID = "lineContainer";
+    
+    var minWidth = 400;
+    var minHeight = 300;
+    var defaultFont = "sans-serif";
+    var defaultFontSize = 12;
+    var xy = {};
+    var legendHeight = 0;
+    var _maxY = 0;
+        
+    view.init = function(representation, value) {
+        _value = value;
+        _representation = representation;
+        
+        d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
             d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
             var layoutContainer = "layoutContainer";
             d3.select("body").attr("id", "body").append("div").attr("id", layoutContainer)
                 .style("width", "100%").style("height", "100%")
                 .style("min-width", minWidth + "px").style("min-height", (minHeight + getControlHeight()) + "px");
-        
-        var colors = ["red", "green", "blue", "yellow", "brown", "lime", "orange"];
-        
-        for (var i = 0; i < _representation.curves.length; i++) {
-            var curve = _representation.curves[i];
-
-            var color;
-            if (_representation.colors && _representation.colors.length == _representation.curves.length) {
-                var c = parseColor(_representation.colors[i]);
-                color = c.rgb;
-            } else {
-                color = colors[i % colors.length];
-            }
             
-            xy[curve.name] = {data : [], color : color, area : curve.area};
-            
-            for (var j = 0; j < curve.x.length; j++) {
-                xy[curve.name].data.push({x : curve.x[j], y : curve.y[j]});
-            }
+        xy["Lift"] = {color : "red", data : []};
+        xy["Cumulative Lift"] = {color : "blue", data : []};  
+        xy["Baseline"] = {color : "lime", data : [{x : representation.intervalWidth, y : representation.baseline},
+                                                  {x : 100, y : representation.baseline}]};
+        
+        _maxY = representation.baseline;
+        for (var i = 0; i < representation.liftValues.length; i++) {
+            var x = (i + 1) * representation.intervalWidth;
+            var y = representation.liftValues[i];
+            xy["Lift"].data.push({x : x, y : y});
         }
-        xy.random = {data : [{x : 0, y : 0}, {x : 1, y : 1}], color : "black"};
-            
+        for (var i = 0; i < representation.cumulativeLift.length; i++) {
+            var x = (i + 1) * representation.intervalWidth;
+            var y = representation.cumulativeLift[i];
+            if (y > _maxY) {
+                _maxY = y;
+            }
+            xy["Cumulative Lift"].data.push({x : x, y : y});
+        }
+        
         drawChart(layoutContainer);
         if (parent != undefined && parent.KnimePageLoader != undefined) {
             parent.KnimePageLoader.autoResize(window.frameElement.id);
         }
-	};
-	
-	function drawChart(layoutContainer) {
-	    var cw = Math.max(minWidth, _representation.imageWidth);
-	    var ch = Math.max(minHeight, _representation.imageHeight);
-	    var chartWidth = cw + "px;"
+    }
+    
+    view.getSVG = function() {
+        var svg = d3.select("svg")[0][0];
+        return (new XMLSerializer()).serializeToString(svg);
+    };
+    
+    
+    function drawChart(layoutContainer) {
+        var cw = Math.max(minWidth, _representation.imageWidth);
+        var ch = Math.max(minHeight, _representation.imageHeight);
+        var chartWidth = cw + "px;"
         var chartHeight = ch + "px";
 
         if (_representation.resizeToWindow) {
@@ -76,7 +80,7 @@ knime_roc_curve = function() {
             .style("height", chartHeight)
             .style("width", chartWidth);
         
-        var margin = {top : 10, left : 70, bottom : legendHeight + 10, right : 10};
+        var margin = {top : 10, left : 70, bottom : legendHeight + 10, right : 20};
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
@@ -95,9 +99,9 @@ knime_roc_curve = function() {
         svg.append("rect").attr({fill : bg.rgb, "fill-opacity" : bg.opacity, width : margin.left + w + margin.right,
                                     height : margin.top + margin.bottom + h, x : -margin.left, y : -margin.top});
         svg.append("rect").attr({fill : areaColor.rgb, "fill-opacity" : areaColor.opacity, width : w, height : h});
-                
-        var x = d3.scale.linear().range([0, w]);
-        var y = d3.scale.linear().range([h, 0]);
+                    
+        var x = d3.scale.linear().domain([0, 100]).range([0, w]);
+        var y = d3.scale.linear().domain([0, _maxY]).nice().range([h, 0]);
 
         var xAxis, yAxis;
 
@@ -143,7 +147,7 @@ knime_roc_curve = function() {
             .attr("text-anchor", "end")
             .attr("x", w - 10)
             .attr("y", h + 45)
-            .text("False Positive Rate");
+            .text("Percentage");
             
         svg.append("text")
             .attr("class", "y label")
@@ -151,12 +155,11 @@ knime_roc_curve = function() {
             .attr("y", -55)
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
-            .text("True Positive Rate");
+            .text("Lift");
         
         var gridColor = parseColor(_representation.gridColor);
-        
         var stroke = _representation.showGrid ? gridColor.rgb : "#000";
-
+        
         d3YAxis.selectAll("line").attr("stroke", stroke);
         d3XAxis.selectAll("line").attr("stroke", stroke);
         d3YAxis.selectAll("path").attr({"stroke" : stroke, "stroke-width" : 1, "fill" : "none"});
@@ -188,16 +191,6 @@ knime_roc_curve = function() {
             } else {
                 xPos += 10;
             }
-            if (key !== "random" && _representation.showArea) {
-                var area = areaG.append("text")
-                    .attr("y", areaCount++ * 25)
-                    .attr("fill", xy[key].color)
-                    .text(key + " (" + Math.round(parseFloat(xy[key].area) * 1000) / 1000 + ")");
-                var width = parseInt(area.style("width"));
-                if (width > maxWidth) {
-                    maxWidth = width;
-                }
-            }
         }
         
         areaG.attr("transform", "translate(" + (w - maxWidth - 10) + "," + (h - areaCount * 25 + margin.top) + ")");
@@ -206,51 +199,46 @@ knime_roc_curve = function() {
             legendHeight = Math.max(yPos, 75);
             drawChart("layoutContainer");
         }
-             
+
         if (_representation.resizeToWindow) {
             var win = document.defaultView || document.parentWindow;
             win.onresize = resize;
         }
-	}
-	
-	function parseColor(col) {
-	   var COLOR_REGEX = /rgba\(([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3}),([0-9]\.[0-9])\)/g;
-	   var match = COLOR_REGEX.exec(col), rgb, opacity;
-	   if (match) {
-	       rgb = "rgb(" + match[1] + "," + match[2] + "," + match[3] + ")";
-	       opacity = match[4];
-	   } else {
-	       rgb = col;
-	       opacity = "1.0";
-	   }
-	   return {rgb : rgb, opacity : opacity};
-	}
-	
-	function resize(event) {
-	   legendHeight = 0;
+    }
+    
+    function parseColor(col) {
+       var COLOR_REGEX = /rgba\(([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3}),([0-9]\.[0-9])\)/g;
+       var match = COLOR_REGEX.exec(col), rgb, opacity;
+       if (match) {
+           rgb = "rgb(" + match[1] + "," + match[2] + "," + match[3] + ")";
+           opacity = match[4];
+       } else {
+           rgb = col;
+           opacity = "1.0";
+       }
+       return {rgb : rgb, opacity : opacity};
+    }
+    
+    function resize(event) {
+       legendHeight = 0;
         drawChart("layoutContainer");
     };
-
-	view.getSVG = function() {
-		var svg = d3.select("svg")[0][0];
-		return (new XMLSerializer()).serializeToString(svg);
-	};
-	
-	getControlHeight = function() {
+    
+    getControlHeight = function() {
         var height = rows = 0;
         var sizeFactor = 25;
         var padding = 10;
         if (height > 0) height += padding;
         return height;
     };
-	
-	view.validate = function() {
+    
+    view.validate = function() {
         return true;
     };
-	
-	view.getComponentValue = function() {
-		return _value;
-	};
+    
+    view.getComponentValue = function() {
+        return _value;
+    };
 
-	return view;
+    return view;
 }();

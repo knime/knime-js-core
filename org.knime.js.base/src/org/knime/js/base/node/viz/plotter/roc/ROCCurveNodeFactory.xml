@@ -25,13 +25,15 @@
             from the different predictors into one table and then selecting several column in the column filter
             panel.
             <br />
-            The light gray diagonal line in the diagram is the random line which is the worst possible performance a
+            The black diagonal line in the diagram is the random line which is the worst possible performance a
             model can achieve.
     	   <p>Additionally a static SVG image can be rendered, which is then made available at the first output port.</p>
             <p>Note, this node is currently under development. Future versions of the node might have more or changed functionality.</p>
 		</intro>
 		
 		<tab name="General Plot Options">
+		    <option name="Hide in wizard">If the view should be hidden in the wizard execution.</option>
+            <option name="Create image at outport">If an image is supposed to be rendered during execute for the upper outport. Disable this option if image is not needed or creation is too time consuming.</option>
             <option name="Width of image (in px)">The width of the generated SVG image.</option>
             <option name="Height of image (in px)">The height of the generated SVG image.</option>
             <option name="Line width (in px)">The width of the shown lines.</option>
@@ -43,7 +45,7 @@
             <option name="Show grid">If an additional grid is being rendered at the axes tick positions.</option>
             <option name="Grid color">The color of the grid.</option>
         </tab>
-        <tab name="Standard Settings">
+        <tab name="ROC Curve Settings">
             <option name="Class column">
                 Select the column that contains the two classes that the model was trained on.
             </option>

@@ -48,107 +48,115 @@
  * History
  *   13.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.base.node.viz.plotter.roc;
+package org.knime.js.base.node.viz.plotter.lift;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.knime.base.node.viz.liftchart.LiftChartNodeModel;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.NominalValue;
+import org.knime.core.data.StringValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeDialogPane;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponentColorChooser;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
+import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelColor;
-import org.knime.core.node.util.ColumnFilterPanel;
-import org.knime.core.node.util.ColumnSelectionComboxBox;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
-public class ROCCurveNodeDialogPane extends NodeDialogPane {
+public class LiftChartNodeDialogPane extends NodeDialogPane {
 
     private static final int TEXT_FIELD_SIZE = 20;
 
     private final JCheckBox m_hideInWizardCheckBox;
     private final JCheckBox m_generateImageCheckBox;
-    private final JCheckBox m_showArea;
-
     private final JCheckBox m_showGridCheckBox;
     private final JCheckBox m_resizeViewToWindow;
-
     private final JSpinner m_imageWidthSpinner;
-    private final JSpinner m_lineWidthSpinner;
     private final JSpinner m_imageHeightSpinner;
     private final DialogComponentColorChooser m_gridColorChooser;
     private final DialogComponentColorChooser m_dataAreaColorChooser;
     private final DialogComponentColorChooser m_backgroundColorChooser;
 
-    private DataTableSpec m_spec;
+    private SettingsModelString m_responseColumn =
+            LiftChartNodeModel.createResponseColumnModel();
 
-    @SuppressWarnings("unchecked")
-    private final ColumnSelectionComboxBox m_classColumn =
-            new ColumnSelectionComboxBox((Border)null, NominalValue.class);
+    private SettingsModelString m_probabilityColumn =
+            LiftChartNodeModel.createProbabilityColumnModel();
 
-    private final JComboBox<DataCell> m_positiveClass =
-            new JComboBox<>(new DefaultComboBoxModel<DataCell>());
+    private SettingsModelString m_responseLabel =
+            LiftChartNodeModel.createResponseLabelModel();
 
-    private final JSpinner m_maxPoints = new JSpinner(new SpinnerNumberModel(2000, -1, Integer.MAX_VALUE, 10));
+    private SettingsModelString m_intervalWidth =
+            LiftChartNodeModel.createIntervalWidthModel();
 
-    @SuppressWarnings("unchecked")
-    private final ColumnFilterPanel m_sortColumns =
-            new ColumnFilterPanel(false, DoubleValue.class);
+    private DataTableSpec m_dataTableSpec;
 
-    private final JLabel m_warningLabel = new JLabel();
+    private DialogComponentStringSelection m_signDC;
+    private DialogComponentColumnNameSelection m_responseColumnElement;
+    private DialogComponentColumnNameSelection m_probabilityColumnElement;
 
+    private JSpinner m_lineWidthSpinner;
 
     /**
      * Creates a new dialog pane.
      */
-    public ROCCurveNodeDialogPane() {
+    public LiftChartNodeDialogPane() {
         m_hideInWizardCheckBox = new JCheckBox("Hide in wizard");
         m_generateImageCheckBox = new JCheckBox("Create image at outport");
-        m_showArea = new JCheckBox("Show area under curve");
         m_showGridCheckBox = new JCheckBox("Show grid");
         m_resizeViewToWindow = new JCheckBox("Resize view to fill window");
+        m_lineWidthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
+
+        m_signDC =
+                new DialogComponentStringSelection(m_responseLabel,
+                        "Positive label (hits):",
+                        getPossibleLabels(m_responseColumn.getStringValue()));
+
+        m_responseColumn.addChangeListener(new ChangeListener() {
+            /**
+             * {@inheritDoc}
+             */
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                m_signDC.replaceListItems(getPossibleLabels(m_responseColumn
+                        .getStringValue()), null);
+            }
+        });
 
         m_imageWidthSpinner = new JSpinner(new SpinnerNumberModel(100, 100, Integer.MAX_VALUE, 1));
         m_imageHeightSpinner = new JSpinner(new SpinnerNumberModel(100, 100, Integer.MAX_VALUE, 1));
-        m_lineWidthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
-
         m_gridColorChooser = new DialogComponentColorChooser(
             new SettingsModelColor("gridColor", null), "Grid color: ", true);
         m_dataAreaColorChooser = new DialogComponentColorChooser(
             new SettingsModelColor("dataAreaColor", null), "Data area color: ", true);
         m_backgroundColorChooser = new DialogComponentColorChooser(
             new SettingsModelColor("backgroundColor", null), "Background color: ", true);
-
 
         m_showGridCheckBox.addChangeListener(new ChangeListener() {
 
@@ -159,75 +167,35 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
             }
         });
 
-        final JPanel p = new JPanel(new GridBagLayout());
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.insets = new Insets(2, 2, 2, 2);
-        c.anchor = GridBagConstraints.NORTHWEST;
-
-        p.add(new JLabel("Class column   "), c);
-        c.gridx++;
-        p.add(m_classColumn, c);
-        m_classColumn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(final ActionEvent e) {
-                changeClassColumn(p);
-            }
-        });
-
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Positive class value   "), c);
-        c.gridx++;
-//        m_positiveClass.setMinimumSize(new Dimension(100, m_positiveClass
-//                .getHeight()));
-        p.add(m_positiveClass, c);
-
-        c.gridx++;
-        c.anchor = GridBagConstraints.WEST;
-        p.add(m_warningLabel, c);
-        c.anchor = GridBagConstraints.NORTHWEST;
-
-
-        c.gridx = 0;
-        c.gridy++;
-        p.add(new JLabel("Limit data points for each curve to   "), c);
-        c.gridx++;
-        p.add(m_maxPoints, c);
-
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 3;
-        p.add(
-                new JLabel(
-                        "Columns containing the positive class probabilities"),
-                c);
-
-        c.gridy++;
-        c.gridx = 0;
-        c.gridwidth = 3;
-        p.add(m_sortColumns, c);
-
-        addTab("ROC Curve Settings", p);
+        addTab("Data Options", initLiftSettingsPanel());
         addTab("General Plot Options", initGeneralPanel());
     }
 
-    /**
-     * @return
-     */
-    private Component initOptionsPanel() {
+    private Component initLiftSettingsPanel() {
+
+        m_responseColumnElement
+        = new DialogComponentColumnNameSelection(m_responseColumn,
+                                                    "Response Column", 0, NominalValue.class);
+        m_probabilityColumnElement
+        = new DialogComponentColumnNameSelection(m_probabilityColumn,
+                                                     "Probability Column", 0, DoubleValue.class);
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(5, 5, 5, 5);
-        c.anchor = GridBagConstraints.NORTHWEST;
+        c.anchor = GridBagConstraints.NORTH;
         c.gridx = 0;
         c.gridy = 0;
-        c.gridwidth = 2;
-        panel.add(m_hideInWizardCheckBox, c);
-        c.gridx += 2;
-        panel.add(m_generateImageCheckBox, c);
+        panel.add(m_responseColumnElement.getComponentPanel(), c);
+        c.gridy++;
+        panel.add(m_probabilityColumnElement.getComponentPanel(), c);
+        c.gridy++;
+        panel.add(m_signDC.getComponentPanel(), c);
+        c.gridy++;
+        DialogComponentStringSelection intervalWidth = new DialogComponentStringSelection(m_intervalWidth,
+            "Interval width in %:",
+            "0.5", "1", "2", "2.5", "5", "10", "12.5", "20", "25");
+        panel.add(intervalWidth.getComponentPanel(), c);
+
         return panel;
     }
 
@@ -283,8 +251,6 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         sizesPanel.add(m_lineWidthSpinner, cc);
         cc.gridx = 0;
         cc.gridy++;
-        sizesPanel.add(m_showArea, cc);
-        cc.gridy++;
         cc.anchor = GridBagConstraints.CENTER;
         sizesPanel.add(m_resizeViewToWindow, cc);
         c.gridy++;
@@ -305,67 +271,90 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         return panel;
     }
 
-
-    /**
-     * Called if the user changed the class column.
-     *
-     * @param parent the panel which is the parent for message boxes
-     */
-    private void changeClassColumn(final JComponent parent) {
-        String selCol = m_classColumn.getSelectedColumn();
-        ((DefaultComboBoxModel<DataCell>)m_positiveClass.getModel()).removeAllElements();
-        if ((selCol != null) && (m_spec != null)) {
-            DataColumnSpec cs = m_spec.getColumnSpec(selCol);
-            Set<DataCell> values = cs.getDomain().getValues();
-            if (values == null) {
-                m_warningLabel.setForeground(Color.RED);
-                m_warningLabel.setText(" Column '" + selCol
-                        + "' contains no possible values");
-                return;
-            }
-
-            if (values.size() > 2) {
-                m_warningLabel.setText(" Column '" + selCol
-                        + "' contains more than two possible values");
-            } else {
-                m_warningLabel.setText("");
-            }
-            for (DataCell cell : values) {
-                m_positiveClass.addItem(cell);
-            }
-            parent.revalidate();
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
             throws NotConfigurableException {
-        ROCCurveViewConfig config = new ROCCurveViewConfig();
+        LiftChartViewConfig config = new LiftChartViewConfig();
         config.loadSettingsForDialog(settings, specs[0]);
         m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
         m_generateImageCheckBox.setSelected(config.getGenerateImage());
 
-        m_showArea.setSelected(config.getShowArea());
         m_showGridCheckBox.setSelected(config.getShowGrid());
         m_resizeViewToWindow.setSelected(config.getResizeToWindow());
 
-        m_lineWidthSpinner.setValue(config.getLineWidth());
         m_imageWidthSpinner.setValue(config.getImageWidth());
         m_imageHeightSpinner.setValue(config.getImageHeight());
         m_backgroundColorChooser.setColor(config.getBackgroundColor());
         m_dataAreaColorChooser.setColor(config.getDataAreaColor());
         m_gridColorChooser.setColor(config.getGridColor());
         m_gridColorChooser.getModel().setEnabled(m_showGridCheckBox.isSelected());
+        m_lineWidthSpinner.setValue(config.getLineWidth());
 
-        m_spec = specs[0];
-        m_classColumn.update(specs[0], config.getRocSettings().getClassColumn());
-        m_positiveClass.setSelectedItem(config.getRocSettings().getPositiveClass());
-        m_sortColumns.update(specs[0], false, config.getRocSettings().getCurves());
+        if (specs == null || specs.length == 0 || specs[0] == null) {
+            throw new NotConfigurableException("No column specs given.");
+        }
+        DataTableSpec specNull = specs[0];
+        if (specNull.getNumColumns() == 0) {
+            throw new NotConfigurableException("No column specs given.");
+        }
+        boolean foundColumn = false;
+        for (int col = 0; col < specNull.getNumColumns(); col++) {
+            DataColumnSpec cs = specNull.getColumnSpec(col);
+            if (cs.getType().isCompatible(NominalValue.class)
+                    && cs.getDomain().hasValues()) {
+                foundColumn = true;
+                break;
+            }
+        }
+        if (!foundColumn) {
+            throw new NotConfigurableException(
+                    "No nominal column with domain values found."
+                            + " Please use the domain calculator first.");
+        }
 
-        m_maxPoints.setValue(config.getRocSettings().getMaxPoints());
+        m_responseColumnElement.loadSettingsFrom(settings, specs);
+        m_probabilityColumnElement.loadSettingsFrom(settings, specs);
+        m_signDC.loadSettingsFrom(settings, specs);
+        m_responseColumn.setStringValue(config.getResponseColumn());
+        m_probabilityColumn.setStringValue(config.getProbabilityColumn());
+        m_responseLabel.setStringValue(config.getResponseLabel());
+
+        String intervalWidth = Double.toString(config.getIntervalWidth());
+        if (intervalWidth.endsWith(".0")) {
+            intervalWidth = intervalWidth.split("\\.")[0];
+        }
+        m_intervalWidth.setStringValue(intervalWidth);
+        m_dataTableSpec = specNull;
+
+        m_signDC.replaceListItems(getPossibleLabels(m_responseColumn
+                .getStringValue()), null);
+    }
+
+    private List<String> getPossibleLabels(final String resColumn) {
+        List<String> labels = new LinkedList<String>();
+
+        if (m_dataTableSpec == null) {
+            labels.add("No values given null");
+            return labels;
+        }
+        DataColumnSpec cs = m_dataTableSpec.getColumnSpec(resColumn);
+
+        if (cs == null) {
+            labels.add("Column doesn't exist");
+            return labels;
+        }
+
+        if (!cs.getDomain().hasValues()) {
+            labels.add("No values given no val");
+            return labels;
+        }
+        for (DataCell cell : cs.getDomain().getValues()) {
+            labels.add(((StringValue)cell).getStringValue());
+        }
+        return labels;
     }
 
     /**
@@ -373,28 +362,23 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
      */
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        ROCCurveViewConfig config = new ROCCurveViewConfig();
+        LiftChartViewConfig config = new LiftChartViewConfig();
         config.setHideInWizard(m_hideInWizardCheckBox.isSelected());
         config.setGenerateImage(m_generateImageCheckBox.isSelected());
 
-        config.setShowArea(m_showArea.isSelected());
-        config.setShowGrid(m_showGridCheckBox.isSelected());
         config.setResizeToWindow(m_resizeViewToWindow.isSelected());
 
-        config.setLineWidth((Integer)m_lineWidthSpinner.getValue());
         config.setImageWidth((Integer)m_imageWidthSpinner.getValue());
         config.setImageHeight((Integer)m_imageHeightSpinner.getValue());
         config.setBackgroundColor(m_backgroundColorChooser.getColor());
         config.setDataAreaColor(m_dataAreaColorChooser.getColor());
         config.setGridColor(m_gridColorChooser.getColor());
-
-        config.getRocSettings().setClassColumn(m_classColumn.getSelectedColumn());
-        config.getRocSettings()
-                .setPositiveClass((DataCell)m_positiveClass.getSelectedItem());
-        config.getRocSettings().getCurves().clear();
-        config.getRocSettings().getCurves().addAll(m_sortColumns.getIncludedColumnSet());
-        config.getRocSettings().setMaxPoints((Integer) m_maxPoints.getValue());
-
+        config.setShowGrid(m_showGridCheckBox.isSelected());
+        config.setResponseColumn(m_responseColumn.getStringValue());
+        config.setResponseLabel(m_responseLabel.getStringValue());
+        config.setProbabilityColumn(m_probabilityColumn.getStringValue());
+        config.setIntervalWidth(Double.parseDouble(m_intervalWidth.getStringValue()));
+        config.setLineWidth((int)m_lineWidthSpinner.getValue());
         config.saveSettings(settings);
     }
 }
