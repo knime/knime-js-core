@@ -78,6 +78,8 @@ import org.knime.js.core.JSONViewContent;
 public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends
     AbstractWizardNodeModel<REP, VAL> {
 
+    private static final Object m_viewGenerationLock = new Object();
+
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
      *
@@ -158,22 +160,28 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
         String svg = null;
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
+        // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
+        // View nodes will get executed sequentially as a result.
+        synchronized (m_viewGenerationLock) {
+            @SuppressWarnings({"rawtypes", "unchecked"})
+            // Inits PhantomJS AND the view
+            PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
 
-        exec.setProgress(0.75, "Retrieving generated image...");
-        String namespace = getViewNamespace();
-        String methodCall = "";
-        if (namespace != null && !namespace.isEmpty()) {
-            methodCall += namespace + ".";
-        }
-        methodCall += getExtractSVGMethodName() + "();";
-        Object imageData = generator.executeScript(methodCall);
+            exec.setProgress(0.75, "Retrieving generated image...");
+            String namespace = getViewNamespace();
+            String methodCall = "";
+            if (namespace != null && !namespace.isEmpty()) {
+                methodCall += namespace + ".";
+            }
+            methodCall += getExtractSVGMethodName() + "();";
+            // Retrieve the SVG string from the view.
+            Object imageData = generator.executeScript(methodCall);
 
-        if (imageData instanceof String) {
-            svg = (String)imageData;
+            if (imageData instanceof String) {
+                svg = (String)imageData;
+            }
+            exec.setProgress(0.9, "Creating image output...");
         }
-        exec.setProgress(0.9, "Creating image output...");
         if (svg == null || svg.isEmpty()) {
             svg = "<svg width=\"1px\" height=\"1px\"></svg>";
         }
