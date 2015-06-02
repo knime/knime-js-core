@@ -133,6 +133,10 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         window.setPosition(new Point(20, 20));
         window.setSize(new Dimension(800, 600));*/
         String viewPath = m_nodeModel.getViewHTMLPath();
+        if (viewPath == null || viewPath.isEmpty()) {
+        	LOGGER.error("Node model returned no path to view HTML. Cannot initialize view.");
+        	return;
+        }
         m_driver.navigate().to(new File(viewPath).toURI().toString());
         waitForDocumentReady();
         REP viewRepresentation = m_nodeModel.getViewRepresentation();
