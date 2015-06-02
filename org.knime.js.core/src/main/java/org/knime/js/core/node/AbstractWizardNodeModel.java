@@ -186,6 +186,7 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
         try {
             return viewCreator.createWebResources(getInteractiveViewName(), getViewRepresentation(), getViewValue());
         } catch (IOException e) {
+            LOGGER.error("Creating view HTML failed: " + e.getMessage(), e);
             return null;
         }
     }

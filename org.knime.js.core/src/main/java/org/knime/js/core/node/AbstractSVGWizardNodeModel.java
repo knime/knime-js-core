@@ -56,6 +56,7 @@ import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortType;
@@ -79,6 +80,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     AbstractWizardNodeModel<REP, VAL> {
 
     private static final Object m_viewGenerationLock = new Object();
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractSVGWizardNodeModel.class);
 
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
@@ -151,7 +153,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      * @return A {@link PortObject} containing the SVG created by the view.
      * @throws IOException if an I/O error occurs
      */
-    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
+    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) {
         if (!generateImage()) {
             return InactiveBranchPortObject.INSTANCE;
         }
@@ -175,12 +177,17 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             }
             methodCall += getExtractSVGMethodName() + "();";
             // Retrieve the SVG string from the view.
-            Object imageData = generator.executeScript(methodCall);
-
-            if (imageData instanceof String) {
-                svg = (String)imageData;
+            Object imageData;
+            try {
+                imageData = generator.executeScript(methodCall);
+                if (imageData instanceof String) {
+                    svg = (String)imageData;
+                }
+                exec.setProgress(0.9, "Creating image output...");
+            } catch (IOException e) {
+                LOGGER.error("Retrieving SVG from view failed: " + e.getMessage(), e);
             }
-            exec.setProgress(0.9, "Creating image output...");
+
         }
         if (svg == null || svg.isEmpty()) {
             svg = "<svg width=\"1px\" height=\"1px\"></svg>";
@@ -188,7 +195,12 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         svg = svgPrimer + svg;
         InputStream is = new ByteArrayInputStream(svg.getBytes());
         ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
-        ImagePortObject imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
+        ImagePortObject imagePort = null;
+        try {
+            imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
+        } catch (IOException e) {
+            LOGGER.error("Creating SVG port object failed: " + e.getMessage(), e);
+        }
         exec.setProgress(1);
         return imagePort;
     }
