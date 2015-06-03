@@ -102,7 +102,9 @@ import com.fasterxml.jackson.databind.ObjectReader;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONDataTable {
 
-    private static final String KNIME_DATA_TABLE_JSON = "knimeDataTableJSON";
+    /** Config key to load/save table */
+    public static final String KNIME_DATA_TABLE_CONF = "knimeDataTableJSON";
+
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JSONDataTable.class);
 
     /* serialized members */
@@ -441,7 +443,7 @@ public class JSONDataTable {
         try {
             tableString = mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) { /*do nothing*/ }
-        settings.addString(KNIME_DATA_TABLE_JSON, tableString);
+        settings.addString(KNIME_DATA_TABLE_CONF, tableString);
     }
 
     /**
@@ -452,7 +454,7 @@ public class JSONDataTable {
      */
     @JsonIgnore
     public static JSONDataTable loadFromNodeSettings(final NodeSettingsRO settings) {
-        String tableString = settings.getString(KNIME_DATA_TABLE_JSON, null);
+        String tableString = settings.getString(KNIME_DATA_TABLE_CONF, null);
         if (tableString == null) {
             return null;
         }
