@@ -52,14 +52,22 @@ knime_lift_chart = function() {
         });
             
         xy["Lift"] = {color : "red", data : []};
-        xy["Cumulative Lift"] = {color : "blue", data : []};  
-        xy["Baseline"] = {color : "lime", data : [{x : representation.intervalWidth, y : representation.baseline},
+        xy["Cumulative Lift"] = {color : "blue", data : []};
+        
+        if (!isNaN(representation.baseline)) {
+            xy["Baseline"] = {color : "lime", data : [{x : representation.intervalWidth, y : representation.baseline},
                                                   {x : 100, y : representation.baseline}]};
+        }
         
         _maxY = representation.baseline;
         for (var i = 0; i < representation.liftValues.length; i++) {
             var x = (i + 1) * representation.intervalWidth;
             var y = representation.liftValues[i];
+            if (isNaN(y)) {
+                delete xy["Lift"];
+                break;
+            }
+            
             if (y > _maxY) {
                 _maxY = y;
             }
@@ -68,6 +76,10 @@ knime_lift_chart = function() {
         for (var i = 0; i < representation.cumulativeLift.length; i++) {
             var x = (i + 1) * representation.intervalWidth;
             var y = representation.cumulativeLift[i];
+            if (isNaN(y)) {
+                delete xy["Cumulative Lift"];
+                break;
+            }
             if (y > _maxY) {
                 _maxY = y;
             }
@@ -78,6 +90,10 @@ knime_lift_chart = function() {
         for (var i = 0; i < representation.response.length; i++) {
             var x = i * representation.intervalWidth;
             var y = representation.response[i];
+            if (isNaN(y)) {
+                delete gainXY["Cumulative Gain"];
+                break;
+            }
             gainXY["Cumulative Gain"].data.push({x : x, y : y});
         }
         
@@ -329,7 +345,7 @@ knime_lift_chart = function() {
         var maxWidth = 0;
         
         // Add the valueline path.
-        for (var key in currentData) {
+        for (var key in currentData) {  
             var p;
             if (key != "random") {
                 p = svg.append("path")
