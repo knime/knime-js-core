@@ -60,6 +60,9 @@ knime_lift_chart = function() {
         for (var i = 0; i < representation.liftValues.length; i++) {
             var x = (i + 1) * representation.intervalWidth;
             var y = representation.liftValues[i];
+            if (y > _maxY) {
+                _maxY = y;
+            }
             xy["Lift"].data.push({x : x, y : y});
         }
         for (var i = 0; i < representation.cumulativeLift.length; i++) {
