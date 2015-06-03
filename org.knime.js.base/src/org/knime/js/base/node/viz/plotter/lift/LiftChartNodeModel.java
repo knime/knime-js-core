@@ -50,16 +50,13 @@
  */
 package org.knime.js.base.node.viz.plotter.lift;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.node.viz.liftchart.LiftCalculator;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
-import org.knime.core.data.StringValue;
+import org.knime.core.data.NominalValue;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
@@ -101,19 +98,61 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
      */
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
-        List<String> allAllowedCols = new LinkedList<String>();
 
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
-        for (DataColumnSpec colspec : tableSpec) {
-            if (colspec.getType().isCompatible(DoubleValue.class) || colspec.getType().isCompatible(StringValue.class)) {
-                allAllowedCols.add(colspec.getName());
+        if (m_config.getResponseColumn() == null
+                || m_config.getResponseColumn().trim().length() == 0
+                || !tableSpec.containsName(m_config.getResponseColumn())
+                || tableSpec.getColumnSpec(
+                    m_config.getResponseColumn()) == null) {
+            for (int i = 0; i < tableSpec.getNumColumns(); i++) {
+                DataColumnSpec cs = tableSpec.getColumnSpec(i);
+                if (cs.getType().isCompatible(NominalValue.class)
+                        && cs.getDomain().hasValues()) {
+                    m_config.setResponseColumn(cs.getName());
+                    setWarningMessage("Auto-selected column " + cs.getName()
+                            + " as response column.");
+                    break;
+                }
             }
         }
+        if (tableSpec.getColumnSpec(m_config.getResponseColumn()) == null
+                || !tableSpec.getColumnSpec(m_config.getResponseColumn())
+                .getType().isCompatible(NominalValue.class)) {
+            // auto-configure makes no sense here, since guessing the true label
+            // is maybe a bit too much
+            throw new InvalidSettingsException(
+                    "Selected response column contains no string values or"
+                            + " domain is not set."
+                            + " You might have to use a domain calculator.");
+        }
+        if (m_config.getProbabilityColumn() == null
+                || m_config.getProbabilityColumn().trim().length() == 0
+                || !tableSpec.containsName(
+                    m_config.getProbabilityColumn())
+                || tableSpec.getColumnSpec(
+                    m_config.getProbabilityColumn()) == null) {
+            for (int i = 0; i < tableSpec.getNumColumns(); i++) {
+                if (tableSpec.getColumnSpec(i).getType().isCompatible(
+                        DoubleValue.class)) {
+                    m_config.setProbabilityColumn(tableSpec
+                            .getColumnSpec(i).getName());
+                    setWarningMessage("Auto-selected column "
+                            + tableSpec.getColumnSpec(i).getName()
+                            + " as probability column.");
+                    break;
+                }
+            }
+        }
+        if (!tableSpec.getColumnSpec(m_config.getProbabilityColumn())
+                .getType().isCompatible(DoubleValue.class)) {
+            throw new InvalidSettingsException(
+                    "Selected probability column contains no double values.");
+        }
 
-        if (tableSpec.getNumColumns() < 1 || allAllowedCols.size() < 1) {
-            throw new InvalidSettingsException("Data table must have"
-                + " at least one numerical or categorical column.");
+        if (m_config.getResponseLabel() == null) {
+            throw new InvalidSettingsException("Response label must be set.");
         }
 
         DataTableSpec out = tableSpec;
@@ -200,12 +239,20 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
                 representation.setBaseline(1.0);
                 double[] lift = new double[calc.getLiftTable().getRowCount()];
                 double[] cumLift = new double[calc.getLiftTable().getRowCount()];
+                double[] response = new double[calc.getResponseTable().getRowCount()];
+
                 int counter = 0;
                 for (DataRow row : calc.getLiftTable()) {
                     lift[counter] = ((DoubleValue)row.getCell(0)).getDoubleValue();
                     cumLift[counter] = ((DoubleValue)row.getCell(2)).getDoubleValue();
                     counter++;
                 }
+                counter = 0;
+                for (DataRow row : calc.getResponseTable()) {
+                    response[counter] = ((DoubleValue)row.getCell(0)).getDoubleValue();
+                    counter++;
+                }
+                representation.setResponse(response);
                 representation.setCumulativeLift(cumLift);
                 representation.setLiftValues(lift);
             }
@@ -274,6 +321,9 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
      */
     @Override
     protected void useCurrentValueAsDefault() {
+        synchronized (getLock()) {
+            copyValueToConfig();
+        }
     }
 
     /**
@@ -294,5 +344,44 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
         representation.setGridColor(m_config.getGridColorString());
         representation.setIntervalWidth(m_config.getIntervalWidth());
         representation.setLineWidth(m_config.getLineWidth());
+        representation.setShowLegend(m_config.getShowLegend());
+        representation.setEnableControls(m_config.getEnableControls());
+        representation.setEnableEditSubtitle(m_config.getEnableEditSubtitle());
+        representation.setEnableEditTitle(m_config.getEnableEditTitle());
+        representation.setEnableEditXAxisLabel(m_config.getEnableEditXAxisLabel());
+        representation.setEnableEditYAxisLabel(m_config.getEnableEditYAxisLabel());
+        representation.setEnableViewToggle(m_config.getEnableViewToggle());
+        representation.setEnableSmoothingEdit(m_config.getEnableSmoothing());
+        LiftChartPlotViewValue value = getViewValue();
+        value.setTitleLift(m_config.getTitleLift());
+        value.setSubtitleLift(m_config.getSubtitleLift());
+        value.setxAxisTitleLift(m_config.getxAxisTitleLift());
+        value.setyAxisTitleLift(m_config.getyAxisTitleLift());
+
+        value.setTitleGain(m_config.getTitleGain());
+        value.setSubtitleGain(m_config.getSubtitleGain());
+        value.setxAxisTitleGain(m_config.getxAxisTitleGain());
+        value.setyAxisTitleGain(m_config.getyAxisTitleGain());
+        value.setShowGainChart(m_config.getShowGainChart());
+        value.setSmoothing(m_config.getSmoothing());
     }
+
+    /**
+    *
+    */
+   private void copyValueToConfig() {
+       LiftChartPlotViewValue val = getViewValue();
+       m_config.setTitleLift(val.getTitleLift());
+       m_config.setSubtitleLift(val.getSubtitleLift());
+       m_config.setxAxisTitleLift(val.getxAxisTitleLift());
+       m_config.setyAxisTitleLift(val.getyAxisTitleLift());
+
+       m_config.setTitleLift(val.getTitleGain());
+       m_config.setSubtitleLift(val.getSubtitleGain());
+       m_config.setxAxisTitleLift(val.getxAxisTitleGain());
+       m_config.setyAxisTitleLift(val.getyAxisTitleGain());
+
+       m_config.setShowGainChart(val.getShowGainChart());
+       m_config.setSmoothing(val.getSmoothing());
+   }
 }

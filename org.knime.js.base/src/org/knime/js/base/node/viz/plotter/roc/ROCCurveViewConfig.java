@@ -64,9 +64,9 @@ import org.knime.core.node.NodeSettingsWO;
  */
 public final class ROCCurveViewConfig {
 
-    /**
-     *
-     */
+    private static final String DEFAULT_Y_TITLE = "True Positive Rate";
+    private static final String DEFAULT_X_TITLE = "False Positive Rate";
+    private static final String DEFAULT_TITLE = "ROC Curve";
     private static final String LINE_WIDTH = "lineWidth";
     static final int DEFAULT_LINE_WIDTH = 1;
     static final int DEFAULT_WIDTH = 800;
@@ -75,6 +75,11 @@ public final class ROCCurveViewConfig {
     static final Color DEFAULT_BACKGROUND_COLOR = new Color(255, 255, 255);
     static final Color DEFAULT_DATA_AREA_COLOR = new Color(230, 230, 230);
     static final Color DEFAULT_GRID_COLOR = new Color(255, 255, 255);
+
+    static final String TITLE = "title";
+    static final String SUBTITLE = "subtitle";
+    static final String X_AXIS_TITLE = "xAxisTitle";
+    static final String Y_AXIS_TITLE = "yAxisTitle";
 
     static final String HIDE_IN_WIZARD = "hideInWizard";
     static final String GENERATE_IMAGE = "generateImage";
@@ -92,11 +97,19 @@ public final class ROCCurveViewConfig {
     static final String DATA_AREA_COLOR = "dataAreaColor";
     static final String GRID_COLOR = "gridColor";
     static final String SHOW_AREA = "showArea";
+    static final String SHOW_LEGEND = "showLegend";
+
+    static final String ENABLE_CONTROLS = "enableControls";
+    static final String ENABLE_EDIT_TITLE = "enableEditTitle";
+    static final String ENABLE_EDIT_SUBTITLE = "enableEditSubtitle";
+    static final String ENABLE_EDIT_X_AXIS_LABEL = "enableEditXAxisLabel";
+    static final String ENABLE_EDIT_Y_AXIS_LABEL = "enableEditYAxisLabel";
 
     private boolean m_hideInWizard = false;
     private boolean m_generateImage = true;
     private boolean m_showGrid = true;
     private boolean m_showArea = true;
+    private boolean m_showLegend = true;
     private boolean m_resizeToWindow = true;
     private int m_imageWidth = DEFAULT_WIDTH;
     private int m_imageHeight = DEFAULT_HEIGHT;
@@ -104,9 +117,161 @@ public final class ROCCurveViewConfig {
     private Color m_dataAreaColor = DEFAULT_DATA_AREA_COLOR;
     private Color m_gridColor = DEFAULT_GRID_COLOR;
     private int m_lineWidth = DEFAULT_LINE_WIDTH;
+
+    private boolean m_enableControls = true;
+    private boolean m_enableEditTitle = true;
+    private boolean m_enableEditSubtitle = true;
+    private boolean m_enableEditXAxisLabel = true;
+    private boolean m_enableEditYAxisLabel = true;
+
+    private String m_title = DEFAULT_TITLE;
+    private String m_subtitle = "";
+    private String m_xAxisTitle = DEFAULT_X_TITLE;
+    private String m_yAxisTitle = DEFAULT_Y_TITLE;
+
     private ROCSettings m_rocSettings = new ROCSettings();
 
 
+
+    /**
+     * @return the enableControls
+     */
+    public boolean getEnableControls() {
+        return m_enableControls;
+    }
+
+    /**
+     * @param enableControls the enableControls to set
+     */
+    public void setEnableControls(final boolean enableControls) {
+        m_enableControls = enableControls;
+    }
+
+    /**
+     * @return the enableEditTitle
+     */
+    public boolean getEnableEditTitle() {
+        return m_enableEditTitle;
+    }
+
+    /**
+     * @param enableEditTitle the enableEditTitle to set
+     */
+    public void setEnableEditTitle(final boolean enableEditTitle) {
+        m_enableEditTitle = enableEditTitle;
+    }
+
+    /**
+     * @return the enableEditSubtitle
+     */
+    public boolean getEnableEditSubtitle() {
+        return m_enableEditSubtitle;
+    }
+
+    /**
+     * @param enableEditSubtitle the enableEditSubtitle to set
+     */
+    public void setEnableEditSubtitle(final boolean enableEditSubtitle) {
+        m_enableEditSubtitle = enableEditSubtitle;
+    }
+
+    /**
+     * @return the enableEditXAxisLabel
+     */
+    public boolean getEnableEditXAxisLabel() {
+        return m_enableEditXAxisLabel;
+    }
+
+    /**
+     * @param enableEditXAxisLabel the enableEditXAxisLabel to set
+     */
+    public void setEnableEditXAxisLabel(final boolean enableEditXAxisLabel) {
+        m_enableEditXAxisLabel = enableEditXAxisLabel;
+    }
+
+    /**
+     * @return the enableEditYAxisLabel
+     */
+    public boolean getEnableEditYAxisLabel() {
+        return m_enableEditYAxisLabel;
+    }
+
+    /**
+     * @param enableEditYAxisLabel the enableEditYAxisLabel to set
+     */
+    public void setEnableEditYAxisLabel(final boolean enableEditYAxisLabel) {
+        m_enableEditYAxisLabel = enableEditYAxisLabel;
+    }
+
+    /**
+     * @return the showLegend
+     */
+    public boolean getShowLegend() {
+        return m_showLegend;
+    }
+
+    /**
+     * @param showLegend the showLegend to set
+     */
+    public void setShowLegend(final boolean showLegend) {
+        m_showLegend = showLegend;
+    }
+
+    /**
+     * @return the xAxisTitle
+     */
+    public String getxAxisTitle() {
+        return m_xAxisTitle;
+    }
+
+    /**
+     * @param xAxisTitle the xAxisTitle to set
+     */
+    public void setxAxisTitle(final String xAxisTitle) {
+        m_xAxisTitle = xAxisTitle;
+    }
+
+    /**
+     * @return the yAxisTitle
+     */
+    public String getyAxisTitle() {
+        return m_yAxisTitle;
+    }
+
+    /**
+     * @param yAxisTitle the yAxisTitle to set
+     */
+    public void setyAxisTitle(final String yAxisTitle) {
+        m_yAxisTitle = yAxisTitle;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return m_title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(final String title) {
+        m_title = title;
+    }
+
+    /**
+     * @return the subtitle
+     */
+    public String getSubtitle() {
+        return m_subtitle;
+    }
+
+    /**
+     * @param subtitle the subtitle to set
+     */
+    public void setSubtitle(final String subtitle) {
+        m_subtitle = subtitle;
+    }
 
     /**
      * @return the lineWidth
@@ -351,6 +516,16 @@ public final class ROCCurveViewConfig {
         settings.addString(DATA_AREA_COLOR, getDataAreaColorString());
         settings.addString(GRID_COLOR, getGridColorString());
         settings.addInt(LINE_WIDTH, m_lineWidth);
+        settings.addString(ROCCurveViewConfig.TITLE, m_title);
+        settings.addString(ROCCurveViewConfig.SUBTITLE, m_subtitle);
+        settings.addString(ROCCurveViewConfig.Y_AXIS_TITLE, m_yAxisTitle);
+        settings.addString(ROCCurveViewConfig.X_AXIS_TITLE, m_xAxisTitle);
+        settings.addBoolean(ROCCurveViewConfig.SHOW_LEGEND, m_showLegend);
+        settings.addBoolean(ENABLE_CONTROLS, m_enableControls);
+        settings.addBoolean(ENABLE_EDIT_TITLE, m_enableEditTitle);
+        settings.addBoolean(ENABLE_EDIT_SUBTITLE, m_enableEditSubtitle);
+        settings.addBoolean(ENABLE_EDIT_X_AXIS_LABEL, m_enableEditXAxisLabel);
+        settings.addBoolean(ENABLE_EDIT_Y_AXIS_LABEL, m_enableEditYAxisLabel);
         m_rocSettings.saveSettings(settings);
     }
 
@@ -375,6 +550,16 @@ public final class ROCCurveViewConfig {
         String gridColorString = settings.getString(GRID_COLOR);
         setGridColor(getColorFromString(gridColorString));
         setLineWidth(settings.getInt(LINE_WIDTH));
+        m_title = settings.getString(TITLE);
+        m_subtitle = settings.getString(SUBTITLE);
+        m_xAxisTitle = settings.getString(X_AXIS_TITLE);
+        m_yAxisTitle = settings.getString(Y_AXIS_TITLE);
+        m_showLegend = settings.getBoolean(SHOW_LEGEND);
+        m_enableControls = settings.getBoolean(ENABLE_CONTROLS);
+        m_enableEditTitle = settings.getBoolean(ENABLE_EDIT_TITLE);
+        m_enableEditSubtitle = settings.getBoolean(ENABLE_EDIT_SUBTITLE);
+        m_enableEditXAxisLabel = settings.getBoolean(ENABLE_EDIT_X_AXIS_LABEL);
+        m_enableEditYAxisLabel = settings.getBoolean(ENABLE_EDIT_Y_AXIS_LABEL);
         m_rocSettings.loadSettings(settings);
     }
 
@@ -417,5 +602,15 @@ public final class ROCCurveViewConfig {
         } catch (Exception e) {
             m_rocSettings = new ROCSettings();
         }
+        m_title = settings.getString(ROCCurveViewConfig.TITLE, DEFAULT_TITLE);
+        m_subtitle = settings.getString(ROCCurveViewConfig.SUBTITLE, "");
+        m_xAxisTitle = settings.getString(ROCCurveViewConfig.X_AXIS_TITLE, DEFAULT_X_TITLE);
+        m_yAxisTitle = settings.getString(ROCCurveViewConfig.Y_AXIS_TITLE, DEFAULT_Y_TITLE);
+        m_enableControls = settings.getBoolean(ENABLE_CONTROLS, true);
+        m_enableEditTitle = settings.getBoolean(ENABLE_EDIT_TITLE, true);
+        m_enableEditSubtitle = settings.getBoolean(ENABLE_EDIT_SUBTITLE, true);
+        m_enableEditXAxisLabel = settings.getBoolean(ENABLE_EDIT_X_AXIS_LABEL, true);
+        m_enableEditYAxisLabel = settings.getBoolean(ENABLE_EDIT_Y_AXIS_LABEL, true);
+        m_showLegend = settings.getBoolean(SHOW_LEGEND, true);
     }
 }

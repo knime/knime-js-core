@@ -53,7 +53,6 @@ package org.knime.js.base.node.viz.plotter.roc;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -111,26 +110,28 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
 
-        if (m_config.getRocSettings().getCurves() == null || m_config.getRocSettings().getCurves().size() == 0) {
-            throw new InvalidSettingsException("No curves defined");
-        }
-        List<String> allAllowedCols = new LinkedList<String>();
-
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
 
-        for (DataColumnSpec colspec : tableSpec) {
-            if (colspec.getType().isCompatible(DoubleValue.class)
-                    || colspec.getType().isCompatible(StringValue.class)) {
-                allAllowedCols.add(colspec.getName());
+        if (m_config.getRocSettings().getCurves().size() == 0) {
+            throw new InvalidSettingsException("No curves defined");
+        }
+
+        if (!tableSpec.containsName(m_config.getRocSettings().getClassColumn())) {
+            throw new InvalidSettingsException("Class column '"
+                    + m_config.getRocSettings().getClassColumn() + " ' does not exist");
+        }
+
+        for (String c : m_config.getRocSettings().getCurves()) {
+            if (!tableSpec.containsName(c)) {
+                throw new InvalidSettingsException("Sort column '" + c
+                        + " ' does not exist");
             }
         }
 
-        if (tableSpec.getNumColumns() < 1 || allAllowedCols.size() < 1) {
-            throw new InvalidSettingsException("Data table must have"
-                + " at least one numerical or categorical column.");
+        if (m_config.getRocSettings().getPositiveClass() == null) {
+            throw new InvalidSettingsException(
+                    "No value for the positive class chosen");
         }
-
-        //DataTableSpec out = tableSpec;
 
         PortObjectSpec imageSpec;
         if (generateImage()) {
@@ -234,7 +235,7 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
                 }
 
                 m_table = calc.getOutputTable();
-                copyConfigToRepresentation(representation);
+                copyConfigToView();
 
                 // don't use staggered rendering and resizing for image creation
                 representation.setEnableStaggeredRendering(false);
@@ -243,7 +244,8 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
         }
     }
 
-    private void copyConfigToRepresentation(final ROCCurveViewRepresentation representation) {
+    private void copyConfigToView() {
+        ROCCurveViewRepresentation representation = getViewRepresentation();
         representation.setResizeToWindow(m_config.getResizeToWindow());
         representation.setShowGrid(m_config.getShowGrid());
         representation.setImageHeight(m_config.getImageHeight());
@@ -253,6 +255,19 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
         representation.setBackgroundColor(m_config.getBackgroundColor());
         representation.setDataAreaColor(m_config.getDataAreaColor());
         representation.setShowArea(m_config.getShowArea());
+        representation.setShowLegend(m_config.getShowLegend());
+
+        representation.setEnableControls(m_config.getEnableControls());
+        representation.setEnableEditSubtitle(m_config.getEnableEditSubtitle());
+        representation.setEnableEditTitle(m_config.getEnableEditTitle());
+        representation.setEnableEditXAxisLabel(m_config.getEnableEditXAxisLabel());
+        representation.setEnableEditYAxisLabel(m_config.getEnableEditYAxisLabel());
+
+        ROCCurveViewValue value = getViewValue();
+        value.setTitle(m_config.getTitle());
+        value.setSubtitle(m_config.getSubtitle());
+        value.setxAxisTitle(m_config.getxAxisTitle());
+        value.setyAxisTitle(m_config.getyAxisTitle());
     }
 
     /**
@@ -367,8 +382,21 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
     @Override
     protected void useCurrentValueAsDefault() {
         synchronized (getLock()) {
-
+            copyValueToConfig();
         }
+    }
+
+    /**
+     *
+     */
+    private void copyValueToConfig() {
+        ROCCurveViewValue val = getViewValue();
+        m_config.setTitle(val.getTitle());
+        m_config.setSubtitle(val.getSubtitle());
+        m_config.setxAxisTitle(val.getxAxisTitle());
+        m_config.setyAxisTitle(val.getyAxisTitle());
+
+
     }
 
     /**

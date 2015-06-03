@@ -68,6 +68,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
@@ -110,6 +111,12 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
     private final DialogComponentColorChooser m_dataAreaColorChooser;
     private final DialogComponentColorChooser m_backgroundColorChooser;
 
+    private final JCheckBox m_enableViewConfigCheckBox;
+    private final JCheckBox m_enableXAxisLabelEditCheckBox;
+    private final JCheckBox m_enableYAxisLabelEditCheckBox;
+    private final JCheckBox m_enableTitleChangeCheckBox;
+    private final JCheckBox m_enableSubtitleChangeCheckBox;
+
     private DataTableSpec m_spec;
 
     @SuppressWarnings("unchecked")
@@ -127,6 +134,16 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
 
     private final JLabel m_warningLabel = new JLabel();
 
+    private JTextField m_xAxisLabelField;
+
+    private JTextField m_yAxisLabelField;
+
+    private JCheckBox m_showLegendCheckBox;
+
+    private JTextField m_chartTitleTextField;
+
+    private JTextField m_chartSubtitleTextField;
+
 
     /**
      * Creates a new dialog pane.
@@ -142,6 +159,18 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         m_imageHeightSpinner = new JSpinner(new SpinnerNumberModel(100, 100, Integer.MAX_VALUE, 1));
         m_lineWidthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
 
+        m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
+        m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
+        m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
+        m_enableXAxisLabelEditCheckBox = new JCheckBox("Enable label edit for x-axis");
+        m_enableYAxisLabelEditCheckBox = new JCheckBox("Enable label edit for y-axis");
+
+        m_chartTitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_chartSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_xAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
+        m_yAxisLabelField = new JTextField(TEXT_FIELD_SIZE);
+        m_showLegendCheckBox = new JCheckBox("Show color legend");
+
         m_gridColorChooser = new DialogComponentColorChooser(
             new SettingsModelColor("gridColor", null), "Grid color: ", true);
         m_dataAreaColorChooser = new DialogComponentColorChooser(
@@ -149,6 +178,13 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         m_backgroundColorChooser = new DialogComponentColorChooser(
             new SettingsModelColor("backgroundColor", null), "Background color: ", true);
 
+        m_enableViewConfigCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+               enableViewControls();
+            }
+        });
 
         m_showGridCheckBox.addChangeListener(new ChangeListener() {
 
@@ -212,6 +248,88 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
 
         addTab("ROC Curve Settings", p);
         addTab("General Plot Options", initGeneralPanel());
+        addTab("Axis Configuration", initAxisPanel());
+        addTab("View Controls", initControlsPanel());
+    }
+
+    private Component initControlsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.ipadx = 20;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        JPanel viewControlsPanel = new JPanel(new GridBagLayout());
+        viewControlsPanel.setBorder(BorderFactory.createTitledBorder("View edit controls"));
+        panel.add(viewControlsPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        viewControlsPanel.add(m_enableViewConfigCheckBox, cc);
+        cc.gridy++;
+        viewControlsPanel.add(m_enableTitleChangeCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableSubtitleChangeCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableXAxisLabelEditCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableYAxisLabelEditCheckBox, cc);
+        return panel;
+    }
+
+    private void enableViewControls() {
+        boolean enable = m_enableViewConfigCheckBox.isSelected();
+        m_enableTitleChangeCheckBox.setEnabled(enable);
+        m_enableSubtitleChangeCheckBox.setEnabled(enable);
+        m_enableXAxisLabelEditCheckBox.setEnabled(enable);
+        m_enableYAxisLabelEditCheckBox.setEnabled(enable);
+    }
+
+
+    private Component initAxisPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel labelsPanel = new JPanel(new GridBagLayout());
+        labelsPanel.setBorder(BorderFactory.createTitledBorder("Labels"));
+        panel.add(labelsPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        labelsPanel.add(new JLabel("Label for x axis: "), cc);
+        cc.gridx++;
+        labelsPanel.add(m_xAxisLabelField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        labelsPanel.add(new JLabel("Label for y axis: "), cc);
+        cc.gridx++;
+        labelsPanel.add(m_yAxisLabelField, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        JPanel legendPanel = new JPanel(new GridBagLayout());
+        legendPanel.setBorder(BorderFactory.createTitledBorder("Legends"));
+        panel.add(legendPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        legendPanel.add(m_showLegendCheckBox, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        return panel;
     }
 
     /**
@@ -226,7 +344,7 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         c.gridy = 0;
         c.gridwidth = 2;
         panel.add(m_hideInWizardCheckBox, c);
-        c.gridx += 2;
+        c.gridx += 1;
         panel.add(m_generateImageCheckBox, c);
         return panel;
     }
@@ -250,15 +368,25 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         JPanel genPanel = new JPanel(new GridBagLayout());
         genPanel.setBorder(BorderFactory.createTitledBorder("General"));
         panel.add(genPanel, c);
-        cc.gridwidth = 2;
         genPanel.add(m_hideInWizardCheckBox, cc);
-        cc.gridx = 2;
+        cc.gridx = 1;
         genPanel.add(m_generateImageCheckBox, cc);
+        cc.gridwidth = 1;
+        cc.gridy++;
+        cc.gridx = 0;
+        genPanel.add(new JLabel("Chart title:"), cc);
+        cc.gridx = 1;
+        genPanel.add(m_chartTitleTextField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        genPanel.add(new JLabel("Chart title:"), cc);
+        cc.gridx = 1;
+        genPanel.add(m_chartSubtitleTextField, cc);
+
         c.gridy++;
 
         cc.gridx = 0;
         cc.gridy = 0;
-        cc.gridwidth = 1;
 
         JPanel sizesPanel = new JPanel(new GridBagLayout());
         sizesPanel.setBorder(BorderFactory.createTitledBorder("Display"));
@@ -360,11 +488,21 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         m_gridColorChooser.setColor(config.getGridColor());
         m_gridColorChooser.getModel().setEnabled(m_showGridCheckBox.isSelected());
 
+        m_showLegendCheckBox.setSelected(config.getShowLegend());
+        m_xAxisLabelField.setText(config.getxAxisTitle());
+        m_yAxisLabelField.setText(config.getyAxisTitle());
+        m_chartTitleTextField.setText(config.getTitle());
+        m_chartSubtitleTextField.setText(config.getSubtitle());
+
         m_spec = specs[0];
         m_classColumn.update(specs[0], config.getRocSettings().getClassColumn());
         m_positiveClass.setSelectedItem(config.getRocSettings().getPositiveClass());
         m_sortColumns.update(specs[0], false, config.getRocSettings().getCurves());
-
+        m_enableViewConfigCheckBox.setSelected(config.getEnableControls());
+        m_enableTitleChangeCheckBox.setSelected(config.getEnableEditTitle());
+        m_enableSubtitleChangeCheckBox.setSelected(config.getEnableEditSubtitle());
+        m_enableXAxisLabelEditCheckBox.setSelected(config.getEnableEditXAxisLabel());
+        m_enableYAxisLabelEditCheckBox.setSelected(config.getEnableEditYAxisLabel());
         m_maxPoints.setValue(config.getRocSettings().getMaxPoints());
     }
 
@@ -387,6 +525,18 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         config.setBackgroundColor(m_backgroundColorChooser.getColor());
         config.setDataAreaColor(m_dataAreaColorChooser.getColor());
         config.setGridColor(m_gridColorChooser.getColor());
+
+        config.setTitle(m_chartTitleTextField.getText());
+        config.setSubtitle(m_chartSubtitleTextField.getText());
+        config.setxAxisTitle(m_xAxisLabelField.getText());
+        config.setyAxisTitle(m_yAxisLabelField.getText());
+        config.setShowLegend(m_showLegendCheckBox.isSelected());
+
+        config.setEnableControls(m_enableViewConfigCheckBox.isSelected());
+        config.setEnableEditTitle(m_enableTitleChangeCheckBox.isSelected());
+        config.setEnableEditSubtitle(m_enableSubtitleChangeCheckBox.isSelected());
+        config.setEnableEditXAxisLabel(m_enableXAxisLabelEditCheckBox.isSelected());
+        config.setEnableEditYAxisLabel(m_enableYAxisLabelEditCheckBox.isSelected());
 
         config.getRocSettings().setClassColumn(m_classColumn.getSelectedColumn());
         config.getRocSettings()

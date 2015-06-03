@@ -4,7 +4,7 @@ knime_roc_curve = function() {
 	var _representation = null;
 	var _value = null;
 	var containerID = "lineContainer";
-	
+	var layoutContainerID = "layoutContainer";
 	var minWidth = 400;
 	var minHeight = 300;
 	var defaultFont = "sans-serif";
@@ -18,11 +18,31 @@ knime_roc_curve = function() {
 		//var rep_json = JSON.stringify(representation);
 		//console.log(rep_json);
 		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
-            d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
-            var layoutContainer = "layoutContainer";
-            d3.select("body").attr("id", "body").append("div").attr("id", layoutContainer)
-                .style("width", "100%").style("height", "100%")
-                .style("min-width", minWidth + "px").style("min-height", (minHeight + getControlHeight()) + "px");
+        d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
+
+        var body = d3.select("body").attr("id", "body");
+        
+        var layoutContainer = body.append("div").attr("id", layoutContainerID)
+                .style("width", "100%").style("height", "calc(100% - 50px)")
+                .style("min-width", minWidth + "px");
+        
+
+        var controlHeight;
+        if (_representation.enableControls) {
+             var controlsContainer = body.append("div").style({position : "absolute", bottom : "0px",
+                         width : "100%", padding : "5px", "padding-left" : "60px",
+                          "border-top" : "1px solid black", "background-color" : "white"}).attr("id", "controlContainer");
+
+            createControls(controlsContainer);
+            controlHeight = controlsContainer.node().getBoundingClientRect().height;
+        } else {
+            controlHeight = 0;
+        }
+
+        layoutContainer.style({
+            "height" : "calc(100% - " + controlHeight + "px)",
+            "min-height" :  (minHeight + controlHeight) + "px"
+        });
         
         var colors = ["red", "green", "blue", "yellow", "brown", "lime", "orange"];
         
@@ -45,13 +65,66 @@ knime_roc_curve = function() {
         }
         xy.random = {data : [{x : 0, y : 0}, {x : 1, y : 1}], color : "black"};
             
-        drawChart(layoutContainer);
+        drawChart();
         if (parent != undefined && parent.KnimePageLoader != undefined) {
             parent.KnimePageLoader.autoResize(window.frameElement.id);
         }
 	};
 	
-	function drawChart(layoutContainer) {
+	function createControls(controlsContainer) {
+	    var titleDiv;
+        
+        if (_representation.enableEditTitle || _representation.enableEditSubtitle) {
+            titleDiv = controlsContainer.append("div").style({"margin-top" : "5px"});
+        }
+        
+        if (_representation.enableEditTitle) {
+            titleDiv.append("label").attr("for", "titleIn").text("Title:").style({"display" : "inline-block", "width" : "100px"});
+            titleDiv.append("input")
+            .attr({id : "titleIn", type : "text", value : _value.title}).style("width", 150)
+            .on("keyup", function() {
+                _value.title = this.value;
+                d3.select("#title").text(this.value);
+            });
+        }
+        
+        if (_representation.enableEditSubtitle) {
+            titleDiv.append("label").attr("for", "subtitleIn").text("Subtitle:").style({"margin-left" : "10px", "display" : "inline-block", "width" : "100px"});
+            titleDiv.append("input")
+            .attr({id : "subtitleIn", type : "text", value : _value.subtitle}).style("width", 150)
+            .on("keyup", function() {
+                _value.subtitle = this.value;
+                d3.select("#subtitle").text(this.value);
+            });
+        }
+        
+        var axisTitleDiv;
+        if (_representation.enableEditYAxisLabel || _representation.enableEditXAxisLabel) {
+            axisTitleDiv = controlsContainer.append("div").style({"margin-top" : "5px"});
+        }
+        
+        if (_representation.enableEditXAxisLabel) {
+            axisTitleDiv.append("label").attr("for", "xTitleIn").text("X-axis title:").style({"display" : "inline-block", "width" : "100px"});
+            axisTitleDiv.append("input")
+            .attr({id : "xTitleIn", type : "text", value : _value.xAxisTitle}).style("width", 150)
+            .on("keyup", function() {
+                _value.xAxisTitle = this.value;
+                d3.select("#xtitle").text(this.value);
+            });
+        }
+        
+        if (_representation.enableEditYAxisLabel) {
+            axisTitleDiv.append("label").attr("for", "yTitleIn").text("Y-axis title:").style({"margin-left" : "10px", "display" : "inline-block", "width" : "100px"});
+            axisTitleDiv.append("input")
+            .attr({id : "yTitleIn", type : "text", value : _value.yAxisTitle}).style("width", 150)
+            .on("keyup", function() {
+                _value.yAxisTitle = this.value;
+                d3.select("#ytitle").text(this.value);
+            });
+        }
+	}
+	
+	function drawChart() {
 	    var cw = Math.max(minWidth, _representation.imageWidth);
 	    var ch = Math.max(minHeight, _representation.imageHeight);
 	    var chartWidth = cw + "px;"
@@ -59,10 +132,12 @@ knime_roc_curve = function() {
 
         if (_representation.resizeToWindow) {
             chartWidth = "100%";
-            chartHeight = "calc(100% - " + getControlHeight() + "px)";
+            chartHeight = "100%";//"calc(100% - " + getControlHeight() + "px)";
         }
 
-        var lc = d3.select("#"+layoutContainer);
+        var lc = d3.select("#"+layoutContainerID);
+        
+        // Clear the container
         lc.selectAll("*").remove();
         
         var div = lc.append("div")
@@ -76,7 +151,11 @@ knime_roc_curve = function() {
             .style("height", chartHeight)
             .style("width", chartWidth);
         
-        var margin = {top : 10, left : 70, bottom : legendHeight + 10, right : 10};
+        var mTop = 10;
+        if (_value.title || _value.subtitle) {
+            mTop += 55;
+        }
+        var margin = {top : mTop, left : 70, bottom : (legendHeight > 0 ? legendHeight + 10 : 60), right : 20};
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
@@ -95,6 +174,10 @@ knime_roc_curve = function() {
         svg.append("rect").attr({fill : bg.rgb, "fill-opacity" : bg.opacity, width : margin.left + w + margin.right,
                                     height : margin.top + margin.bottom + h, x : -margin.left, y : -margin.top});
         svg.append("rect").attr({fill : areaColor.rgb, "fill-opacity" : areaColor.opacity, width : w, height : h});
+        
+        var titleG = d3svg.append("g").attr("transform", "translate(" + margin.left + ",0)");
+        var title = titleG.append("text").text(_value.title).attr({"y" : 30, "id" : "title"}).attr("font-size", 24);
+        var subtitle = titleG.append("text").text(_value.subtitle).attr({"y" : mTop - 15, "id" : "subtitle"});
                 
         var x = d3.scale.linear().range([0, w]);
         var y = d3.scale.linear().range([h, 0]);
@@ -143,7 +226,8 @@ knime_roc_curve = function() {
             .attr("text-anchor", "end")
             .attr("x", w - 10)
             .attr("y", h + 45)
-            .text("False Positive Rate");
+            .attr("id", "xtitle")
+            .text(_value.xAxisTitle);
             
         svg.append("text")
             .attr("class", "y label")
@@ -151,8 +235,9 @@ knime_roc_curve = function() {
             .attr("y", -55)
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
-            .text("True Positive Rate");
-        
+            .attr("id", "ytitle")
+            .text(_value.yAxisTitle);
+            
         var gridColor = parseColor(_representation.gridColor);
         
         var stroke = _representation.showGrid ? gridColor.rgb : "#000";
@@ -175,19 +260,22 @@ knime_roc_curve = function() {
             .style({stroke : xy[key].color, fill : "none", "stroke-width" : _representation.lineWidth})
             .attr("d", valueline(xy[key].data));
             
-            var g = svg.append("g").attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
-            var l = g.append("text").attr({x : 20}).text(key);
-            g.append("circle").attr({"r" : 5, "fill" : xy[key].color, cx : 5, cy : -5});
-            xPos += parseInt(l.style("width")) + 20;
-            
-            if (xPos > w) {
-                yPos += 25;
-                xPos = 0;
-                g.attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
-                xPos += parseInt(l.style("width")) + 30;
-            } else {
-                xPos += 10;
+            if (_representation.showLegend) { 
+                var g = svg.append("g").attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
+                var l = g.append("text").attr({x : 20}).text(key);
+                g.append("circle").attr({"r" : 5, "fill" : xy[key].color, cx : 5, cy : -5});
+                xPos += parseInt(l.style("width")) + 20;
+                
+                if (xPos > w) {
+                    yPos += 25;
+                    xPos = 0;
+                    g.attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
+                    xPos += parseInt(l.style("width")) + 30;
+                } else {
+                    xPos += 10;
+                }
             }
+            
             if (key !== "random" && _representation.showArea) {
                 var area = areaG.append("text")
                     .attr("y", areaCount++ * 25)
@@ -200,11 +288,11 @@ knime_roc_curve = function() {
             }
         }
         
-        areaG.attr("transform", "translate(" + (w - maxWidth - 10) + "," + (h - areaCount * 25 + margin.top) + ")");
+        areaG.attr("transform", "translate(" + (w - maxWidth - 10) + "," + (h - areaCount * 25) + ")");
         
-        if (legendHeight == 0) {
+        if (legendHeight == 0 && _representation.showLegend) {
             legendHeight = Math.max(yPos, 75);
-            drawChart("layoutContainer");
+            drawChart();
         }
              
         if (_representation.resizeToWindow) {
@@ -228,21 +316,13 @@ knime_roc_curve = function() {
 	
 	function resize(event) {
 	   legendHeight = 0;
-        drawChart("layoutContainer");
+        drawChart();
     };
 
 	view.getSVG = function() {
 		var svg = d3.select("svg")[0][0];
 		return (new XMLSerializer()).serializeToString(svg);
 	};
-	
-	getControlHeight = function() {
-        var height = rows = 0;
-        var sizeFactor = 25;
-        var padding = 10;
-        if (height > 0) height += padding;
-        return height;
-    };
 	
 	view.validate = function() {
         return true;

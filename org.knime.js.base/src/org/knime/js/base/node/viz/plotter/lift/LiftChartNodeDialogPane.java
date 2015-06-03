@@ -59,10 +59,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -121,7 +125,32 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
     private DialogComponentColumnNameSelection m_responseColumnElement;
     private DialogComponentColumnNameSelection m_probabilityColumnElement;
 
+    private JCheckBox m_showLegendCheckBox;
+
+    private JTextField m_xAxisLiftLabelField;
+    private JTextField m_yAxisLiftLabelField;
+    private JTextField m_chartLiftTitleTextField;
+    private JTextField m_chartLiftSubtitleTextField;
+
+    private JTextField m_xAxisGainLabelField;
+    private JTextField m_yAxisGainLabelField;
+    private JTextField m_chartGainTitleTextField;
+    private JTextField m_chartGainSubtitleTextField;
+
     private JSpinner m_lineWidthSpinner;
+
+    private JRadioButton m_showLift;
+    private JRadioButton m_showGain;
+
+    private final JCheckBox m_enableViewConfigCheckBox;
+    private final JCheckBox m_enableXAxisLabelEditCheckBox;
+    private final JCheckBox m_enableYAxisLabelEditCheckBox;
+    private final JCheckBox m_enableTitleChangeCheckBox;
+    private final JCheckBox m_enableSubtitleChangeCheckBox;
+    private final JCheckBox m_enableViewToggleCheckBox;
+    private final JCheckBox m_enableSmoothingCheckBox;
+
+    private final JComboBox<String> m_smoothing;
 
     /**
      * Creates a new dialog pane.
@@ -133,10 +162,46 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
         m_resizeViewToWindow = new JCheckBox("Resize view to fill window");
         m_lineWidthSpinner = new JSpinner(new SpinnerNumberModel(1, 1, Integer.MAX_VALUE, 1));
 
+        m_enableViewConfigCheckBox = new JCheckBox("Enable view edit controls");
+        m_enableTitleChangeCheckBox = new JCheckBox("Enable title edit controls");
+        m_enableSubtitleChangeCheckBox = new JCheckBox("Enable subtitle edit controls");
+        m_enableXAxisLabelEditCheckBox = new JCheckBox("Enable label edit for x-axis");
+        m_enableYAxisLabelEditCheckBox = new JCheckBox("Enable label edit for y-axis");
+        m_enableViewToggleCheckBox = new JCheckBox("Enable toggle between views");
+        m_enableSmoothingCheckBox = new JCheckBox("Enable selection of smoothing");
+
+        m_smoothing = new JComboBox<String>(LiftChartViewConfig.getSmoothingOptions());
+
+        m_chartLiftTitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_chartLiftSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_xAxisLiftLabelField = new JTextField(TEXT_FIELD_SIZE);
+        m_yAxisLiftLabelField = new JTextField(TEXT_FIELD_SIZE);
+
+        m_chartGainTitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_chartGainSubtitleTextField = new JTextField(TEXT_FIELD_SIZE);
+        m_xAxisGainLabelField = new JTextField(TEXT_FIELD_SIZE);
+        m_yAxisGainLabelField = new JTextField(TEXT_FIELD_SIZE);
+
+        m_showLegendCheckBox = new JCheckBox("Show color legend");
+
+        ButtonGroup bg = new ButtonGroup();
+        m_showLift = new JRadioButton("Show Lift");
+        m_showGain = new JRadioButton("Show Cumulative Gain");
+        bg.add(m_showLift);
+        bg.add(m_showGain);
+
         m_signDC =
                 new DialogComponentStringSelection(m_responseLabel,
                         "Positive label (hits):",
                         getPossibleLabels(m_responseColumn.getStringValue()));
+
+        m_enableViewConfigCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+               enableViewControls();
+            }
+        });
 
         m_responseColumn.addChangeListener(new ChangeListener() {
             /**
@@ -169,6 +234,111 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
 
         addTab("Data Options", initLiftSettingsPanel());
         addTab("General Plot Options", initGeneralPanel());
+        addTab("Axis Configuration", initAxisPanel());
+        addTab("View Controls", initControlsPanel());
+    }
+
+    private void enableViewControls() {
+        boolean enable = m_enableViewConfigCheckBox.isSelected();
+        m_enableTitleChangeCheckBox.setEnabled(enable);
+        m_enableSubtitleChangeCheckBox.setEnabled(enable);
+        m_enableViewToggleCheckBox.setEnabled(enable);
+        m_enableXAxisLabelEditCheckBox.setEnabled(enable);
+        m_enableYAxisLabelEditCheckBox.setEnabled(enable);
+        m_enableSmoothingCheckBox.setEnabled(enable);
+    }
+
+    private Component initControlsPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.ipadx = 20;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        JPanel viewControlsPanel = new JPanel(new GridBagLayout());
+        viewControlsPanel.setBorder(BorderFactory.createTitledBorder("View edit controls"));
+        panel.add(viewControlsPanel, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        viewControlsPanel.add(m_enableViewConfigCheckBox, cc);
+        cc.gridy++;
+        viewControlsPanel.add(m_enableTitleChangeCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableSubtitleChangeCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableXAxisLabelEditCheckBox, cc);
+        cc.gridx += 2;
+        viewControlsPanel.add(m_enableYAxisLabelEditCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableViewToggleCheckBox, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        viewControlsPanel.add(m_enableSmoothingCheckBox, cc);
+        return panel;
+    }
+
+    private Component initAxisPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(5, 5, 5, 5);
+        c.anchor = GridBagConstraints.NORTHWEST;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+
+        JPanel labelsPanel1 = new JPanel(new GridBagLayout());
+        labelsPanel1.setBorder(BorderFactory.createTitledBorder("Labels Lift Chart"));
+        panel.add(labelsPanel1, c);
+        GridBagConstraints cc = new GridBagConstraints();
+        cc.insets = new Insets(5, 5, 5, 5);
+        cc.anchor = GridBagConstraints.NORTHWEST;
+        cc.gridx = 0;
+        cc.gridy = 0;
+        labelsPanel1.add(new JLabel("Label for x axis: "), cc);
+        cc.gridx++;
+        labelsPanel1.add(m_xAxisLiftLabelField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        labelsPanel1.add(new JLabel("Label for y axis: "), cc);
+        cc.gridx++;
+        labelsPanel1.add(m_yAxisLiftLabelField, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        JPanel labelsPanel2 = new JPanel(new GridBagLayout());
+        labelsPanel2.setBorder(BorderFactory.createTitledBorder("Labels Gains Chart"));
+        panel.add(labelsPanel2, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        labelsPanel2.add(new JLabel("Label for x axis: "), cc);
+        cc.gridx++;
+        labelsPanel2.add(m_xAxisGainLabelField, cc);
+        cc.gridx = 0;
+        cc.gridy++;
+        labelsPanel2.add(new JLabel("Label for y axis: "), cc);
+        cc.gridx++;
+        labelsPanel2.add(m_yAxisGainLabelField, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        JPanel legendPanel = new JPanel(new GridBagLayout());
+        legendPanel.setBorder(BorderFactory.createTitledBorder("Legends"));
+        panel.add(legendPanel, c);
+        cc.gridx = 0;
+        cc.gridy = 0;
+        legendPanel.add(m_showLegendCheckBox, cc);
+        c.gridx = 0;
+        c.gridy++;
+
+        return panel;
     }
 
     private Component initLiftSettingsPanel() {
@@ -222,6 +392,12 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
         genPanel.add(m_hideInWizardCheckBox, cc);
         cc.gridx = 2;
         genPanel.add(m_generateImageCheckBox, cc);
+        cc.gridy++;
+
+        cc.gridx = 0;
+        genPanel.add(m_showLift, cc);
+        cc.gridx = 2;
+        genPanel.add(m_showGain, cc);
         c.gridy++;
 
         cc.gridx = 0;
@@ -251,6 +427,11 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
         sizesPanel.add(m_lineWidthSpinner, cc);
         cc.gridx = 0;
         cc.gridy++;
+        sizesPanel.add(new JLabel("Smoothing: "), cc);
+        cc.gridx++;
+        sizesPanel.add(m_smoothing, cc);
+        cc.gridx = 0;
+        cc.gridy++;
         cc.anchor = GridBagConstraints.CENTER;
         sizesPanel.add(m_resizeViewToWindow, cc);
         c.gridy++;
@@ -277,6 +458,10 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
             throws NotConfigurableException {
+        if (specs == null || specs.length == 0 || specs[0] == null) {
+            throw new NotConfigurableException("No column specs given.");
+        }
+
         LiftChartViewConfig config = new LiftChartViewConfig();
         config.loadSettingsForDialog(settings, specs[0]);
         m_hideInWizardCheckBox.setSelected(config.getHideInWizard());
@@ -293,9 +478,6 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
         m_gridColorChooser.getModel().setEnabled(m_showGridCheckBox.isSelected());
         m_lineWidthSpinner.setValue(config.getLineWidth());
 
-        if (specs == null || specs.length == 0 || specs[0] == null) {
-            throw new NotConfigurableException("No column specs given.");
-        }
         DataTableSpec specNull = specs[0];
         if (specNull.getNumColumns() == 0) {
             throw new NotConfigurableException("No column specs given.");
@@ -331,6 +513,29 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
 
         m_signDC.replaceListItems(getPossibleLabels(m_responseColumn
                 .getStringValue()), null);
+
+        m_showLegendCheckBox.setSelected(config.getShowLegend());
+
+        m_xAxisLiftLabelField.setText(config.getxAxisTitleLift());
+        m_yAxisLiftLabelField.setText(config.getyAxisTitleLift());
+        m_chartLiftTitleTextField.setText(config.getTitleLift());
+        m_chartLiftSubtitleTextField.setText(config.getSubtitleLift());
+
+        m_xAxisGainLabelField.setText(config.getxAxisTitleGain());
+        m_yAxisGainLabelField.setText(config.getyAxisTitleGain());
+        m_chartGainTitleTextField.setText(config.getTitleGain());
+        m_chartGainSubtitleTextField.setText(config.getSubtitleGain());
+        m_showGain.setSelected(config.getShowGainChart());
+        m_showLift.setSelected(!config.getShowGainChart());
+
+        m_enableViewConfigCheckBox.setSelected(config.getEnableControls());
+        m_enableTitleChangeCheckBox.setSelected(config.getEnableEditTitle());
+        m_enableSubtitleChangeCheckBox.setSelected(config.getEnableEditSubtitle());
+        m_enableXAxisLabelEditCheckBox.setSelected(config.getEnableEditXAxisLabel());
+        m_enableYAxisLabelEditCheckBox.setSelected(config.getEnableEditYAxisLabel());
+        m_enableViewToggleCheckBox.setSelected(config.getEnableViewToggle());
+        m_enableSmoothingCheckBox.setSelected(config.getEnableSmoothing());
+        m_smoothing.setSelectedItem(LiftChartViewConfig.mapSmoothingValueToInput(config.getSmoothing()));
     }
 
     private List<String> getPossibleLabels(final String resColumn) {
@@ -368,6 +573,18 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
 
         config.setResizeToWindow(m_resizeViewToWindow.isSelected());
 
+        config.setTitleLift(m_chartLiftTitleTextField.getText());
+        config.setSubtitleLift(m_chartLiftSubtitleTextField.getText());
+        config.setxAxisTitleLift(m_xAxisLiftLabelField.getText());
+        config.setyAxisTitleLift(m_yAxisLiftLabelField.getText());
+
+        config.setTitleGain(m_chartGainTitleTextField.getText());
+        config.setSubtitleGain(m_chartGainSubtitleTextField.getText());
+        config.setxAxisTitleGain(m_xAxisGainLabelField.getText());
+        config.setyAxisTitleGain(m_yAxisGainLabelField.getText());
+
+        config.setShowLegend(m_showLegendCheckBox.isSelected());
+
         config.setImageWidth((Integer)m_imageWidthSpinner.getValue());
         config.setImageHeight((Integer)m_imageHeightSpinner.getValue());
         config.setBackgroundColor(m_backgroundColorChooser.getColor());
@@ -379,6 +596,16 @@ public class LiftChartNodeDialogPane extends NodeDialogPane {
         config.setProbabilityColumn(m_probabilityColumn.getStringValue());
         config.setIntervalWidth(Double.parseDouble(m_intervalWidth.getStringValue()));
         config.setLineWidth((int)m_lineWidthSpinner.getValue());
+        config.setShowGainChart(m_showGain.isSelected());
+
+        config.setEnableControls(m_enableViewConfigCheckBox.isSelected());
+        config.setEnableEditTitle(m_enableTitleChangeCheckBox.isSelected());
+        config.setEnableEditSubtitle(m_enableSubtitleChangeCheckBox.isSelected());
+        config.setEnableEditXAxisLabel(m_enableXAxisLabelEditCheckBox.isSelected());
+        config.setEnableEditYAxisLabel(m_enableYAxisLabelEditCheckBox.isSelected());
+        config.setEnableViewToggle(m_enableViewToggleCheckBox.isSelected());
+        config.setEnableSmoothing(m_enableSmoothingCheckBox.isSelected());
+        config.setSmoothing(LiftChartViewConfig.mapSmoothingInputToValue(m_smoothing.getSelectedItem().toString()));
         config.saveSettings(settings);
     }
 }

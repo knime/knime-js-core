@@ -69,6 +69,7 @@ public class LiftChartViewRepresentation extends JSONViewContent {
     private static final String LIFT_VALUES = "liftValues";
     private static final String BASELINE = "baseline";
     private static final String CUMULATIVE_LIFT = "cumLift";
+    private static final String RESPONSE_VALUES = "responseValues";
 
     private boolean m_showGrid;
     private boolean m_resizeToWindow;
@@ -78,15 +79,149 @@ public class LiftChartViewRepresentation extends JSONViewContent {
     private String m_backgroundColor;
     private String m_dataAreaColor;
     private String m_gridColor;
+    private boolean m_showLegend;
 
     private double m_intervalWidth;
     private double[] m_liftValues;
     private double m_baseline;
     private double[] m_cumulativeLift;
+    private double[] m_response;
+
+    private boolean m_enableControls = true;
+    private boolean m_enableViewToggle = true;
+    private boolean m_enableEditTitle = true;
+    private boolean m_enableEditSubtitle = true;
+    private boolean m_enableEditXAxisLabel = true;
+    private boolean m_enableEditYAxisLabel = true;
+    private boolean m_enableSmoothingEdit = true;
 
     private boolean m_enableStaggeredRendering = true;
 
+    /**
+     * @return the enableSmoothingEdit
+     */
+    public boolean getEnableSmoothingEdit() {
+        return m_enableSmoothingEdit;
+    }
 
+    /**
+     * @param enableSmoothingEdit the enableSmoothingEdit to set
+     */
+    public void setEnableSmoothingEdit(final boolean enableSmoothingEdit) {
+        m_enableSmoothingEdit = enableSmoothingEdit;
+    }
+
+    /**
+     * @return the enableControls
+     */
+    public boolean getEnableControls() {
+        return m_enableControls;
+    }
+
+    /**
+     * @param enableControls the enableControls to set
+     */
+    public void setEnableControls(final boolean enableControls) {
+        m_enableControls = enableControls;
+    }
+
+    /**
+     * @return the enableViewToggle
+     */
+    public boolean getEnableViewToggle() {
+        return m_enableViewToggle;
+    }
+
+    /**
+     * @param enableViewToggle the enableViewToggle to set
+     */
+    public void setEnableViewToggle(final boolean enableViewToggle) {
+        m_enableViewToggle = enableViewToggle;
+    }
+
+    /**
+     * @return the enableEditTitle
+     */
+    public boolean getEnableEditTitle() {
+        return m_enableEditTitle;
+    }
+
+    /**
+     * @param enableEditTitle the enableEditTitle to set
+     */
+    public void setEnableEditTitle(final boolean enableEditTitle) {
+        m_enableEditTitle = enableEditTitle;
+    }
+
+    /**
+     * @return the enableEditSubtitle
+     */
+    public boolean getEnableEditSubtitle() {
+        return m_enableEditSubtitle;
+    }
+
+    /**
+     * @param enableEditSubtitle the enableEditSubtitle to set
+     */
+    public void setEnableEditSubtitle(final boolean enableEditSubtitle) {
+        m_enableEditSubtitle = enableEditSubtitle;
+    }
+
+    /**
+     * @return the enableEditXAxisLabel
+     */
+    public boolean getEnableEditXAxisLabel() {
+        return m_enableEditXAxisLabel;
+    }
+
+    /**
+     * @param enableEditXAxisLabel the enableEditXAxisLabel to set
+     */
+    public void setEnableEditXAxisLabel(final boolean enableEditXAxisLabel) {
+        m_enableEditXAxisLabel = enableEditXAxisLabel;
+    }
+
+    /**
+     * @return the enableEditYAxisLabel
+     */
+    public boolean getEnableEditYAxisLabel() {
+        return m_enableEditYAxisLabel;
+    }
+
+    /**
+     * @param enableEditYAxisLabel the enableEditYAxisLabel to set
+     */
+    public void setEnableEditYAxisLabel(final boolean enableEditYAxisLabel) {
+        m_enableEditYAxisLabel = enableEditYAxisLabel;
+    }
+
+    /**
+     * @return the showLegend
+     */
+    public boolean isShowLegend() {
+        return m_showLegend;
+    }
+
+    /**
+     * @param showLegend the showLegend to set
+     */
+    public void setShowLegend(final boolean showLegend) {
+        m_showLegend = showLegend;
+    }
+
+    /**
+     * @return the response
+     */
+    public double[] getResponse() {
+        return m_response;
+    }
+
+    /**
+     * @param response the response to set
+     */
+    public void setResponse(final double[] response) {
+        m_response = response;
+    }
 
     /**
      * @return the lineWidth
@@ -286,9 +421,18 @@ public class LiftChartViewRepresentation extends JSONViewContent {
 
         settings.addDoubleArray(LIFT_VALUES, m_liftValues);
         settings.addDoubleArray(CUMULATIVE_LIFT, m_cumulativeLift);
+        settings.addDoubleArray(RESPONSE_VALUES, m_response);
         settings.addDouble(BASELINE, m_baseline);
         settings.addDouble(LiftChartViewConfig.INTERVAL_WIDTH, m_intervalWidth);
         settings.addInt(LiftChartViewConfig.LINE_WIDTH, m_lineWidth);
+        settings.addBoolean(LiftChartViewConfig.SHOW_LEGEND, m_showLegend);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_CONTROLS, m_enableControls);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_VIEW_TOGGLE, m_enableViewToggle);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_EDIT_TITLE, m_enableEditTitle);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_EDIT_SUBTITLE, m_enableEditSubtitle);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_EDIT_X_AXIS_LABEL, m_enableEditXAxisLabel);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_EDIT_Y_AXIS_LABEL, m_enableEditYAxisLabel);
+        settings.addBoolean(LiftChartViewConfig.ENABLE_EDIT_SMOOTHING, m_enableSmoothingEdit);
     }
 
     /**
@@ -309,5 +453,14 @@ public class LiftChartViewRepresentation extends JSONViewContent {
         m_cumulativeLift = settings.getDoubleArray(LIFT_VALUES);
         m_baseline = settings.getDouble(BASELINE);
         m_intervalWidth = settings.getDouble(LiftChartViewConfig.INTERVAL_WIDTH);
+        m_response = settings.getDoubleArray(RESPONSE_VALUES);
+        m_showLegend = settings.getBoolean(LiftChartViewConfig.SHOW_LEGEND);
+        m_enableControls = settings.getBoolean(LiftChartViewConfig.ENABLE_CONTROLS);
+        m_enableViewToggle = settings.getBoolean(LiftChartViewConfig.ENABLE_VIEW_TOGGLE);
+        m_enableEditTitle = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_TITLE);
+        m_enableEditSubtitle = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_SUBTITLE);
+        m_enableEditXAxisLabel = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_X_AXIS_LABEL);
+        m_enableEditYAxisLabel = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_Y_AXIS_LABEL);
+        m_enableSmoothingEdit = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_SMOOTHING);
     }
 }

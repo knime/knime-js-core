@@ -65,11 +65,177 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class LiftChartPlotViewValue extends JSONViewContent {
+    private String m_titleLift = "";
+    private String m_subtitleLift = "";
+    private String m_xAxisTitleLift = "";
+    private String m_yAxisTitleLift = "Y";
+
+    private String m_titleGain = "";
+    private String m_subtitleGain = "";
+    private String m_xAxisTitleGain = "";
+    private String m_yAxisTitleGain = "Y";
+
+    private String m_smoothing = "none";
+
+    private boolean m_showGainChart = false;
+
+    /**
+     * @return the smoothing
+     */
+    public String getSmoothing() {
+        return m_smoothing;
+    }
+
+    /**
+     * @param smoothing the smoothing to set
+     */
+    public void setSmoothing(final String smoothing) {
+        m_smoothing = smoothing;
+    }
+
+    /**
+     * @return the showGainChart
+     */
+    public boolean getShowGainChart() {
+        return m_showGainChart;
+    }
+
+    /**
+     * @param showGainChart the showGainChart to set
+     */
+    public void setShowGainChart(final boolean showGainChart) {
+        m_showGainChart = showGainChart;
+    }
+
+    /**
+     * @return the titleLift
+     */
+    public String getTitleLift() {
+        return m_titleLift;
+    }
+
+    /**
+     * @param titleLift the titleLift to set
+     */
+    public void setTitleLift(final String titleLift) {
+        m_titleLift = titleLift;
+    }
+
+    /**
+     * @return the subtitleLift
+     */
+    public String getSubtitleLift() {
+        return m_subtitleLift;
+    }
+
+    /**
+     * @param subtitleLift the subtitleLift to set
+     */
+    public void setSubtitleLift(final String subtitleLift) {
+        m_subtitleLift = subtitleLift;
+    }
+
+    /**
+     * @return the xAxisTitleLift
+     */
+    public String getxAxisTitleLift() {
+        return m_xAxisTitleLift;
+    }
+
+    /**
+     * @param xAxisTitleLift the xAxisTitleLift to set
+     */
+    public void setxAxisTitleLift(final String xAxisTitleLift) {
+        m_xAxisTitleLift = xAxisTitleLift;
+    }
+
+    /**
+     * @return the yAxisTitleLift
+     */
+    public String getyAxisTitleLift() {
+        return m_yAxisTitleLift;
+    }
+
+    /**
+     * @param yAxisTitleLift the yAxisTitleLift to set
+     */
+    public void setyAxisTitleLift(final String yAxisTitleLift) {
+        m_yAxisTitleLift = yAxisTitleLift;
+    }
+
+    /**
+     * @return the titleGain
+     */
+    public String getTitleGain() {
+        return m_titleGain;
+    }
+
+    /**
+     * @param titleGain the titleGain to set
+     */
+    public void setTitleGain(final String titleGain) {
+        m_titleGain = titleGain;
+    }
+
+    /**
+     * @return the subtitleGain
+     */
+    public String getSubtitleGain() {
+        return m_subtitleGain;
+    }
+
+    /**
+     * @param subtitleGain the subtitleGain to set
+     */
+    public void setSubtitleGain(final String subtitleGain) {
+        m_subtitleGain = subtitleGain;
+    }
+
+    /**
+     * @return the xAxisTitleGain
+     */
+    public String getxAxisTitleGain() {
+        return m_xAxisTitleGain;
+    }
+
+    /**
+     * @param xAxisTitleGain the xAxisTitleGain to set
+     */
+    public void setxAxisTitleGain(final String xAxisTitleGain) {
+        m_xAxisTitleGain = xAxisTitleGain;
+    }
+
+    /**
+     * @return the yAxisTitleGain
+     */
+    public String getyAxisTitleGain() {
+        return m_yAxisTitleGain;
+    }
+
+    /**
+     * @param yAxisTitleGain the yAxisTitleGain to set
+     */
+    public void setyAxisTitleGain(final String yAxisTitleGain) {
+        m_yAxisTitleGain = yAxisTitleGain;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(LiftChartViewConfig.TITLE_LIFT, m_titleLift);
+        settings.addString(LiftChartViewConfig.SUBTITLE_LIFT, m_subtitleLift);
+        settings.addString(LiftChartViewConfig.Y_AXIS_TITLE_LIFT, m_yAxisTitleLift);
+        settings.addString(LiftChartViewConfig.X_AXIS_TITLE_LIFT, m_xAxisTitleLift);
+
+
+        settings.addString(LiftChartViewConfig.TITLE_GAIN, m_titleGain);
+        settings.addString(LiftChartViewConfig.SUBTITLE_GAIN, m_subtitleGain);
+        settings.addString(LiftChartViewConfig.Y_AXIS_TITLE_GAIN, m_yAxisTitleGain);
+        settings.addString(LiftChartViewConfig.X_AXIS_TITLE_GAIN, m_xAxisTitleGain);
+        settings.addBoolean(LiftChartViewConfig.SHOW_GAIN_CHART, m_showGainChart);
+        settings.addString(LiftChartViewConfig.SMOOTHING, m_smoothing);
 
     }
 
@@ -78,7 +244,16 @@ public class LiftChartPlotViewValue extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_titleLift = settings.getString(LiftChartViewConfig.TITLE_LIFT);
+        m_subtitleLift = settings.getString(LiftChartViewConfig.SUBTITLE_LIFT);
+        m_xAxisTitleLift = settings.getString(LiftChartViewConfig.X_AXIS_TITLE_LIFT);
+        m_yAxisTitleLift = settings.getString(LiftChartViewConfig.Y_AXIS_TITLE_LIFT);
 
+        m_titleGain = settings.getString(LiftChartViewConfig.TITLE_GAIN);
+        m_subtitleGain = settings.getString(LiftChartViewConfig.SUBTITLE_GAIN);
+        m_xAxisTitleGain = settings.getString(LiftChartViewConfig.X_AXIS_TITLE_GAIN);
+        m_yAxisTitleGain = settings.getString(LiftChartViewConfig.Y_AXIS_TITLE_GAIN);
+        m_showGainChart = settings.getBoolean(LiftChartViewConfig.SHOW_GAIN_CHART);
+        m_smoothing = settings.getString(LiftChartViewConfig.SMOOTHING);
     }
-
 }

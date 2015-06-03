@@ -65,13 +65,77 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class ROCCurveViewValue extends JSONViewContent {
+    private String m_title = "";
+    private String m_subtitle = "";
+    private String m_xAxisTitle = "X";
+    private String m_yAxisTitle = "Y";
+
+    /**
+     * @return the xAxisTitle
+     */
+    public String getxAxisTitle() {
+        return m_xAxisTitle;
+    }
+
+    /**
+     * @param xAxisTitle the xAxisTitle to set
+     */
+    public void setxAxisTitle(final String xAxisTitle) {
+        m_xAxisTitle = xAxisTitle;
+    }
+
+    /**
+     * @return the yAxisTitle
+     */
+    public String getyAxisTitle() {
+        return m_yAxisTitle;
+    }
+
+    /**
+     * @param yAxisTitle the yAxisTitle to set
+     */
+    public void setyAxisTitle(final String yAxisTitle) {
+        m_yAxisTitle = yAxisTitle;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return m_title;
+    }
+
+    /**
+     * @param title the title to set
+     */
+    public void setTitle(final String title) {
+        m_title = title;
+    }
+
+    /**
+     * @return the subtitle
+     */
+    public String getSubtitle() {
+        return m_subtitle;
+    }
+
+    /**
+     * @param subtitle the subtitle to set
+     */
+    public void setSubtitle(final String subtitle) {
+        m_subtitle = subtitle;
+    }
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-
+        settings.addString(ROCCurveViewConfig.TITLE, m_title);
+        settings.addString(ROCCurveViewConfig.SUBTITLE, m_subtitle);
+        settings.addString(ROCCurveViewConfig.Y_AXIS_TITLE, m_yAxisTitle);
+        settings.addString(ROCCurveViewConfig.X_AXIS_TITLE, m_xAxisTitle);
     }
 
     /**
@@ -79,7 +143,10 @@ public class ROCCurveViewValue extends JSONViewContent {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-
+        m_title = settings.getString(ROCCurveViewConfig.TITLE);
+        m_subtitle = settings.getString(ROCCurveViewConfig.SUBTITLE);
+        m_xAxisTitle = settings.getString(ROCCurveViewConfig.X_AXIS_TITLE);
+        m_yAxisTitle = settings.getString(ROCCurveViewConfig.Y_AXIS_TITLE);
     }
 
 }

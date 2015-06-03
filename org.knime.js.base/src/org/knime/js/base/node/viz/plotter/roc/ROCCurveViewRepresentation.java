@@ -91,6 +91,97 @@ public class ROCCurveViewRepresentation extends JSONViewContent {
     private String m_gridColor;
     private String m_backgroundColor;
     private String m_dataAreaColor;
+    private boolean m_showLegend;
+
+    private boolean m_enableControls = true;
+    private boolean m_enableEditTitle = true;
+    private boolean m_enableEditSubtitle = true;
+    private boolean m_enableEditXAxisLabel = true;
+    private boolean m_enableEditYAxisLabel = true;
+
+    /**
+     * @return the enableControls
+     */
+    public boolean isEnableControls() {
+        return m_enableControls;
+    }
+
+    /**
+     * @param enableControls the enableControls to set
+     */
+    public void setEnableControls(final boolean enableControls) {
+        m_enableControls = enableControls;
+    }
+
+    /**
+     * @return the enableEditTitle
+     */
+    public boolean isEnableEditTitle() {
+        return m_enableEditTitle;
+    }
+
+    /**
+     * @param enableEditTitle the enableEditTitle to set
+     */
+    public void setEnableEditTitle(final boolean enableEditTitle) {
+        m_enableEditTitle = enableEditTitle;
+    }
+
+    /**
+     * @return the enableEditSubtitle
+     */
+    public boolean isEnableEditSubtitle() {
+        return m_enableEditSubtitle;
+    }
+
+    /**
+     * @param enableEditSubtitle the enableEditSubtitle to set
+     */
+    public void setEnableEditSubtitle(final boolean enableEditSubtitle) {
+        m_enableEditSubtitle = enableEditSubtitle;
+    }
+
+    /**
+     * @return the enableEditXAxisLabel
+     */
+    public boolean isEnableEditXAxisLabel() {
+        return m_enableEditXAxisLabel;
+    }
+
+    /**
+     * @param enableEditXAxisLabel the enableEditXAxisLabel to set
+     */
+    public void setEnableEditXAxisLabel(final boolean enableEditXAxisLabel) {
+        m_enableEditXAxisLabel = enableEditXAxisLabel;
+    }
+
+    /**
+     * @return the enableEditYAxisLabel
+     */
+    public boolean isEnableEditYAxisLabel() {
+        return m_enableEditYAxisLabel;
+    }
+
+    /**
+     * @param enableEditYAxisLabel the enableEditYAxisLabel to set
+     */
+    public void setEnableEditYAxisLabel(final boolean enableEditYAxisLabel) {
+        m_enableEditYAxisLabel = enableEditYAxisLabel;
+    }
+
+    /**
+     * @return the showLegend
+     */
+    public boolean isShowLegend() {
+        return m_showLegend;
+    }
+
+    /**
+     * @param showLegend the showLegend to set
+     */
+    public void setShowLegend(final boolean showLegend) {
+        m_showLegend = showLegend;
+    }
 
     /**
      * @return the showArea
@@ -268,6 +359,12 @@ public class ROCCurveViewRepresentation extends JSONViewContent {
         settings.addBoolean(SHOW_GRID, m_showGrid);
         settings.addBoolean(SHOW_AREA, m_showArea);
         settings.addStringArray(COLORS, m_colors);
+        settings.addBoolean(ROCCurveViewConfig.SHOW_LEGEND, m_showLegend);
+        settings.addBoolean(ROCCurveViewConfig.ENABLE_CONTROLS, m_enableControls);
+        settings.addBoolean(ROCCurveViewConfig.ENABLE_EDIT_TITLE, m_enableEditTitle);
+        settings.addBoolean(ROCCurveViewConfig.ENABLE_EDIT_SUBTITLE, m_enableEditSubtitle);
+        settings.addBoolean(ROCCurveViewConfig.ENABLE_EDIT_X_AXIS_LABEL, m_enableEditXAxisLabel);
+        settings.addBoolean(ROCCurveViewConfig.ENABLE_EDIT_Y_AXIS_LABEL, m_enableEditYAxisLabel);
     }
 
     /**
@@ -295,6 +392,12 @@ public class ROCCurveViewRepresentation extends JSONViewContent {
         m_showGrid = settings.getBoolean(SHOW_GRID);
         m_showArea = settings.getBoolean(SHOW_AREA);
         m_colors = settings.getStringArray(COLORS);
+        m_showLegend = settings.getBoolean(ROCCurveViewConfig.SHOW_LEGEND);
+        m_enableControls = settings.getBoolean(ROCCurveViewConfig.ENABLE_CONTROLS);
+        m_enableEditTitle = settings.getBoolean(ROCCurveViewConfig.ENABLE_EDIT_TITLE);
+        m_enableEditSubtitle = settings.getBoolean(ROCCurveViewConfig.ENABLE_EDIT_SUBTITLE);
+        m_enableEditXAxisLabel = settings.getBoolean(ROCCurveViewConfig.ENABLE_EDIT_X_AXIS_LABEL);
+        m_enableEditYAxisLabel = settings.getBoolean(ROCCurveViewConfig.ENABLE_EDIT_Y_AXIS_LABEL);
     }
 
     /**
