@@ -103,8 +103,8 @@
       <node
             category-path="/labs/quickform/view"
             expert-flag="false"
-            factory-class="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory"
-            id="org.knime.js.base.node.viz.generic.GenericJSViewNodeFactory">
+            factory-class="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory"
+            id="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory">
       </node>
       <node
             category-path="/labs/quickform/view"

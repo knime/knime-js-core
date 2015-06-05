@@ -1,8 +1,10 @@
 knime_generic_view = function() {
 	
 	view = {};
+	var _representation;
 	
 	view.init = function(representation, value) {
+		_representation = representation;
 		if (representation.jsCode == null) {
 			document.body.innerHTML = 'Error: No script available.';
 		} else {
@@ -58,6 +60,14 @@ knime_generic_view = function() {
 	view.getComponentValue = function() {
 		return null;
 	};
+	
+	view.getSVG = function() {
+		try {
+			return eval(_representation.jsSVGCode);
+		} catch (e) {
+			return null;
+		}
+	}
 	
 	return view;
 }();

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<knimeNode icon="../js.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd" deprecated="true">
+<knimeNode icon="../js.png" type="Visualizer" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
 	<name>Generic JavaScript View</name>
 	
 	<shortDescription>
@@ -74,5 +74,6 @@ for (var rowID = 0; rowID &lt; knimeDataTable.getNumRows(); rowID++) {
 	</interactiveView>
 	<ports>
 		<inPort index="0" name="Display data" optional="true">Data table with data to be converted in JavaScript object available to the view.</inPort>
+		<outPort index="0" name="SVG Image">Generated SVG image if view implementation is producing and exporting it.</outPort>
 	</ports>	
 </knimeNode>
