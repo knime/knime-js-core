@@ -165,8 +165,8 @@ knime_roc_curve = function() {
             .append("g").attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-        var w = parseInt(d3svg.style('width')) - margin.left - margin.right;
-        var h = parseInt(d3svg.style('height')) - margin.top - margin.bottom;
+        var w = Math.max(50, cw - margin.left - margin.right);
+        var h = Math.max(50, ch - margin.top - margin.bottom);
         
         var bg = parseColor(_representation.backgroundColor);
         var areaColor = parseColor(_representation.dataAreaColor);
