@@ -139,6 +139,7 @@
             id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
       </node>
       <node
+            category-path="/labs/quickform/view"
             expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory"
             id="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory">
