@@ -52,6 +52,7 @@ package org.knime.ext.phantomjs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
@@ -59,14 +60,21 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.Duration;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
 
 /**
  * 
@@ -86,13 +94,25 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     /**
      * Creates a new image generator object.<br>
      * The PhantomJS process is started if not present and the view is loaded and initialized.
-     * @param nodeModel 
+     * @param nodeModel The node model.
+     * @param waitForView If view executes animations after 
+     * initialization it might be sensible to wait for a specific time.
+     * 
+     */
+    public PhantomJSImageGenerator(final T nodeModel, final Long waitForView) {
+        m_nodeModel = nodeModel;
+        m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
+        generateView(waitForView);
+    }
+    
+    /**
+     * Creates a new image generator object.<br>
+     * The PhantomJS process is started if not present and the view is loaded and initialized.
+     * @param nodeModel The node model.
      * 
      */
     public PhantomJSImageGenerator(final T nodeModel) {
-        m_nodeModel = nodeModel;
-        m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
-        generateView();
+    	this(nodeModel, null);
     }
     
     /**
@@ -127,7 +147,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         return null;
     }
 
-    private void generateView() {
+    private void generateView(final Long optionalWait) {
         //TODO make size editable
         /*Window window = m_driver.manage().window();
         window.setPosition(new Point(20, 20));
@@ -146,6 +166,22 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+        
+        //wait additional specified time to compensate for initial animation, etc.
+        if (optionalWait != null & optionalWait > 0L) {
+        	Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
+        			.withTimeout(optionalWait, TimeUnit.MILLISECONDS)
+        			.pollingEvery(optionalWait, TimeUnit.MILLISECONDS)
+        			.ignoring(NoSuchElementException.class);
+			try {
+				timedWait.until(new Function<WebDriver, WebElement>() {
+					@Override
+					public WebElement apply(WebDriver input) {
+						return null;
+					}
+				});
+			} catch (Exception e) { /* do nothing */ }
+        }
         //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
     }
     
