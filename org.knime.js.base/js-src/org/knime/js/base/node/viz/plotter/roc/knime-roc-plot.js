@@ -15,8 +15,7 @@ knime_roc_curve = function() {
 	view.init = function(representation, value) {
 		_value = value;
 		_representation = representation;
-		//var rep_json = JSON.stringify(representation);
-		//console.log(rep_json);
+		
 		d3.select("html").style("width", "100%").style("height", "100%")/*.style("overflow", "hidden")*/;
         d3.select("body").style("width", "100%").style("height", "100%").style("margin", "0").style("padding", "0");
 
@@ -26,7 +25,6 @@ knime_roc_curve = function() {
                 .style("width", "100%").style("height", "calc(100% - 50px)")
                 .style("min-width", minWidth + "px");
         
-
         var controlHeight;
         if (_representation.enableControls) {
              var controlsContainer = body.append("div").style({position : "absolute", bottom : "0px",
@@ -44,8 +42,12 @@ knime_roc_curve = function() {
             "min-height" :  (minHeight + controlHeight) + "px"
         });
         
-        var colors = ["red", "green", "blue", "yellow", "brown", "lime", "orange"];
-        
+        //var colors = ["red", "green", "blue", "yellow", "brown", "lime", "orange"];
+        var catCol = d3.scale.category10();
+        if (_representation.curves.length > 10) {
+            d3.scale.category20();
+        }
+        // Build data set for the graph
         for (var i = 0; i < _representation.curves.length; i++) {
             var curve = _representation.curves[i];
 
@@ -54,7 +56,7 @@ knime_roc_curve = function() {
                 var c = parseColor(_representation.colors[i]);
                 color = c.rgb;
             } else {
-                color = colors[i % colors.length];
+                color = catCol(i, i);//colors[i % colors.length];
             }
             
             xy[curve.name] = {data : [], color : color, area : curve.area};
@@ -132,7 +134,7 @@ knime_roc_curve = function() {
 
         if (_representation.resizeToWindow) {
             chartWidth = "100%";
-            chartHeight = "100%";//"calc(100% - " + getControlHeight() + "px)";
+            chartHeight = "100%";
         }
 
         var lc = d3.select("#"+layoutContainerID);
@@ -140,6 +142,7 @@ knime_roc_curve = function() {
         // Clear the container
         lc.selectAll("*").remove();
         
+        // The container for the chart
         var div = lc.append("div")
             .attr("id", containerID)
             .style("min-width", minWidth + "px")
@@ -151,6 +154,7 @@ knime_roc_curve = function() {
             .style("height", chartHeight)
             .style("width", chartWidth);
         
+        // Calculate margin of the chart
         var mTop = 10;
         if (_value.title || _value.subtitle) {
             mTop += 55;
@@ -165,16 +169,19 @@ knime_roc_curve = function() {
             .append("g").attr("transform", 
               "translate(" + margin.left + "," + margin.top + ")");
 
-        var w = Math.max(50, cw - margin.left - margin.right);
-        var h = Math.max(50, ch - margin.top - margin.bottom);
+        var w = Math.max(50, parseInt(d3svg.style('width')) - margin.left - margin.right);
+        var h = Math.max(50, parseInt(d3svg.style('height')) - margin.top - margin.bottom);
         
+        // Convert colors from rgba to rgb + opacity
         var bg = parseColor(_representation.backgroundColor);
         var areaColor = parseColor(_representation.dataAreaColor);
 
+        // Draw backgrounds
         svg.append("rect").attr({fill : bg.rgb, "fill-opacity" : bg.opacity, width : margin.left + w + margin.right,
                                     height : margin.top + margin.bottom + h, x : -margin.left, y : -margin.top});
         svg.append("rect").attr({fill : areaColor.rgb, "fill-opacity" : areaColor.opacity, width : w, height : h});
         
+        // Draw titles
         var titleG = d3svg.append("g").attr("transform", "translate(" + margin.left + ",0)");
         var title = titleG.append("text").text(_value.title).attr({"y" : 30, "id" : "title"}).attr("font-size", 24);
         var subtitle = titleG.append("text").text(_value.subtitle).attr({"y" : mTop - 15, "id" : "subtitle"});
@@ -290,6 +297,7 @@ knime_roc_curve = function() {
         
         areaG.attr("transform", "translate(" + (w - maxWidth - 10) + "," + (h - areaCount * 25) + ")");
         
+        // Now we have the correct legend height and redraw the chart with the correct size
         if (legendHeight == 0 && _representation.showLegend) {
             legendHeight = Math.max(yPos, 75);
             drawChart();
