@@ -69,6 +69,7 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
@@ -120,15 +121,22 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
     private final JSSnippetTextArea m_jsTextArea;
     private final JSSnippetTextArea m_jsSVGTextArea;
     private final CSSSnippetTextArea m_cssTextArea;
+    private final JSpinner m_WaitTimeSpinner;
+
+    private Border m_noBorder = BorderFactory.createEmptyBorder();
+    private Border m_paddingBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+    private Border m_lineBorder = BorderFactory.createLineBorder(new Color(200, 200, 200), 1);
 
     /**
      * Initializes new dialog pane.
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     GenericJSViewNodeDialogPane() {
         //m_viewName = new JTextField(20);
         m_hideInWizardCheckBox = new JCheckBox("Hide in wizard");
-        m_generateViewCheckBox = new JCheckBox("Generate view");
-        m_maxRowsSpinner = new JSpinner();
+        m_generateViewCheckBox = new JCheckBox("Generate image at outport");
+        m_maxRowsSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
+        m_WaitTimeSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 500));
         m_flowVarList = new JList(new DefaultListModel());
         m_flowVarList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_flowVarList.setCellRenderer(new FlowVariableListCellRenderer());
@@ -180,26 +188,18 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         m_dependenciesTable.getColumnModel().getColumn(0).setMaxWidth(30);
         //m_dependenciesTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         m_dependenciesTable.setTableHeader(null);
-        addTab("JavaScript View", initLayout());
+        addTab("JavaScript View", initViewLayout());
+        addTab("Image Generation", initImageGenerationLayout());
     }
 
-    /**
-     * @return
-     */
-    private JPanel initLayout() {
-        Border noBorder = BorderFactory.createEmptyBorder();
-        Border paddingBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
-        Border lineBorder = BorderFactory.createLineBorder(new Color(200, 200, 200), 1);
-
+    private JPanel initViewLayout() {
         JPanel wrapperPanel = new JPanel(new BorderLayout());
-        wrapperPanel.setBorder(paddingBorder);
+        wrapperPanel.setBorder(m_paddingBorder);
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-        topPanel.setBorder(lineBorder);
+        topPanel.setBorder(m_lineBorder);
         topPanel.add(Box.createHorizontalStrut(10));
         topPanel.add(m_hideInWizardCheckBox);
-        topPanel.add(Box.createHorizontalGlue());
-        topPanel.add(m_generateViewCheckBox);
         topPanel.add(Box.createHorizontalGlue());
         topPanel.add(new JLabel("Maximum number of rows: "));
         m_maxRowsSpinner.setMaximumSize(new Dimension(100, 20));
@@ -213,16 +213,16 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         JPanel p = new JPanel(new BorderLayout());
 
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-        leftPane.setBorder(noBorder);
+        leftPane.setBorder(m_noBorder);
         leftPane.setDividerLocation(120);
         JPanel topLeftPanel = new JPanel(new BorderLayout(2, 2));
-        topLeftPanel.setBorder(paddingBorder);
+        topLeftPanel.setBorder(m_paddingBorder);
         topLeftPanel.add(new JLabel("Flow Variables"), BorderLayout.NORTH);
         JScrollPane flowVarScroller = new JScrollPane(m_flowVarList);
         topLeftPanel.add(flowVarScroller, BorderLayout.CENTER);
         topLeftPanel.setPreferredSize(new Dimension(400, 130));
         JPanel bottomLeftPanel = new JPanel(new BorderLayout(2, 2));
-        bottomLeftPanel.setBorder(paddingBorder);
+        bottomLeftPanel.setBorder(m_paddingBorder);
         bottomLeftPanel.add(new JLabel("CSS"), BorderLayout.NORTH);
         JScrollPane cssScroller = new RTextScrollPane(m_cssTextArea);
         bottomLeftPanel.add(cssScroller, BorderLayout.CENTER);
@@ -231,28 +231,25 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         leftPane.setBottomComponent(bottomLeftPanel);
 
         JSplitPane rightPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true);
-        rightPane.setBorder(noBorder);
+        rightPane.setBorder(m_noBorder);
         rightPane.setDividerLocation(120);
         JPanel topRightPanel = new JPanel(new BorderLayout(2, 2));
-        topRightPanel.setBorder(paddingBorder);
+        topRightPanel.setBorder(m_paddingBorder);
         topRightPanel.add(new JLabel("Dependencies"), BorderLayout.NORTH);
         JScrollPane dependenciesScroller = new JScrollPane(m_dependenciesTable);
         topRightPanel.add(dependenciesScroller, BorderLayout.CENTER);
         topRightPanel.setPreferredSize(new Dimension(400, 130));
         JPanel bottomRightPanel = new JPanel(new BorderLayout(2, 2));
-        bottomRightPanel.setBorder(paddingBorder);
+        bottomRightPanel.setBorder(m_paddingBorder);
         bottomRightPanel.add(new JLabel("JavaScript"), BorderLayout.NORTH);
         JScrollPane jsScroller = new RTextScrollPane(m_jsTextArea);
-        m_jsSVGTextArea.setRows(4);
-        JScrollPane svgScroller = new RTextScrollPane(m_jsSVGTextArea);
         bottomRightPanel.add(jsScroller, BorderLayout.CENTER);
-        bottomRightPanel.add(svgScroller, BorderLayout.SOUTH);
         bottomRightPanel.setPreferredSize(new Dimension(400, 400));
         rightPane.setTopComponent(topRightPanel);
         rightPane.setBottomComponent(bottomRightPanel);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true);
-        splitPane.setBorder(noBorder);
+        splitPane.setBorder(m_noBorder);
         splitPane.setDividerLocation(0.5);
         splitPane.setLeftComponent(leftPane);
         splitPane.setRightComponent(rightPane);
@@ -263,12 +260,43 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         return wrapperPanel;
     }
 
+    private JPanel initImageGenerationLayout() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBorder(m_paddingBorder);
+
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
+        topPanel.setBorder(m_lineBorder);
+        topPanel.add(Box.createHorizontalStrut(10));
+        topPanel.add(m_generateViewCheckBox);
+        topPanel.add(Box.createHorizontalGlue());
+        topPanel.add(new JLabel("Additional wait time after initialization in ms: "));
+        m_WaitTimeSpinner.setMaximumSize(new Dimension(100, 20));
+        m_WaitTimeSpinner.setMinimumSize(new Dimension(100, 20));
+        m_WaitTimeSpinner.setPreferredSize(new Dimension(100, 20));
+        topPanel.add(m_WaitTimeSpinner);
+        topPanel.add(Box.createHorizontalStrut(10));
+        panel.add(topPanel, BorderLayout.NORTH);
+
+        JPanel bottomPanel = new JPanel(new BorderLayout(2, 2));
+        bottomPanel.setBorder(m_paddingBorder);
+        bottomPanel.add(new JLabel("JavaScript to retrieve generated SVG as string"), BorderLayout.NORTH);
+        m_jsSVGTextArea.setRows(10);
+        JScrollPane svgScroller = new RTextScrollPane(m_jsSVGTextArea);
+        bottomPanel.add(svgScroller, BorderLayout.CENTER);
+        panel.add(bottomPanel, BorderLayout.CENTER);
+
+        return panel;
+    }
+
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected void loadSettingsFrom(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
+        @SuppressWarnings("rawtypes")
         DefaultListModel listModel = (DefaultListModel)m_flowVarList.getModel();
         listModel.removeAllElements();
         for (FlowVariable e : getAvailableFlowVariables().values()) {
@@ -301,6 +329,7 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         m_jsTextArea.setText(config.getJsCode());
         m_jsSVGTextArea.setText(config.getJsSVGCode());
         m_cssTextArea.setText(config.getCssCode());
+        m_WaitTimeSpinner.setValue(config.getWaitTime());
     }
 
     private BiMap<String, String> getAvailableLibraries() {
@@ -365,6 +394,7 @@ final class GenericJSViewNodeDialogPane extends NodeDialogPane {
         config.setJsSVGCode(m_jsSVGTextArea.getText());
         config.setCssCode(m_cssTextArea.getText());
         config.setDependencies(dependencies.toArray(new String[0]));
+        config.setWaitTime((Integer)m_WaitTimeSpinner.getValue());
         config.saveSettings(settings);
     }
 

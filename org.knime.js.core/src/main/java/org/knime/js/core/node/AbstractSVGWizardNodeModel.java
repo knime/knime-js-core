@@ -82,6 +82,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     private static final Object m_viewGenerationLock = new Object();
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractSVGWizardNodeModel.class);
 
+    private Long m_optionalViewWaitTime = null;
+
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
      *
@@ -99,18 +101,14 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
         exec.setProgress(0.0, "Creating view model...");
-        performExecuteCreateView(inObjects, createThirdsExecutionContext(exec));
+        performExecuteCreateView(inObjects, exec.createSubExecutionContext(0.25));
         exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
-        PortObject svgPortObject = createSVGImagePortObjectFromView(createThirdsExecutionContext(exec));
+        PortObject svgPortObject = createSVGImagePortObjectFromView(exec.createSubExecutionContext(0.5));
         exec.setProgress(2.0 / 3.0, "Creating output...");
         PortObject[] output =
-            performExecuteCreatePortObjects(svgPortObject, inObjects, createThirdsExecutionContext(exec));
+            performExecuteCreatePortObjects(svgPortObject, inObjects, exec.createSubExecutionContext(0.25));
         exec.setProgress(1.0);
         return output;
-    }
-
-    private ExecutionContext createThirdsExecutionContext(final ExecutionContext originalExec) {
-        return originalExec.createSubExecutionContext(1.0 / 3.0);
     }
 
     /**
@@ -165,9 +163,10 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
         // View nodes will get executed sequentially as a result.
         synchronized (m_viewGenerationLock) {
-            @SuppressWarnings({"rawtypes", "unchecked"})
             // Inits PhantomJS AND the view
-            PhantomJSImageGenerator generator = new PhantomJSImageGenerator(this);
+            @SuppressWarnings({"rawtypes", "unchecked"})
+            PhantomJSImageGenerator generator =
+                new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
 
             exec.setProgress(0.75, "Retrieving generated image...");
             String namespace = getViewNamespace();
@@ -203,6 +202,20 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         }
         exec.setProgress(1);
         return imagePort;
+    }
+
+    /**
+     * @return the optionalViewTimeout
+     */
+    protected Long getOptionalViewWaitTime() {
+        return m_optionalViewWaitTime;
+    }
+
+    /**
+     * @param optionalViewTimeout the optionalViewTimeout to set
+     */
+    protected void setOptionalViewWaitTime(final Long optionalViewTimeout) {
+        m_optionalViewWaitTime = optionalViewTimeout;
     }
 
     /**

@@ -130,6 +130,7 @@ final class GenericJSViewNodeModel extends AbstractSVGWizardNodeModel<GenericJSV
             representation.setJsSVGCode(m_config.getJsSVGCode());
             representation.setCssCode(m_config.getCssCode());
             setPathsFromLibNames(m_config.getDependencies());
+            setOptionalViewWaitTime((long)m_config.getWaitTime());
         }
     }
 

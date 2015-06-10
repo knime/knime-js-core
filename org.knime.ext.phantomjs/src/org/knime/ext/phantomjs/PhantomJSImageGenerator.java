@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
@@ -61,11 +62,9 @@ import org.knime.core.node.wizard.WizardNode;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Duration;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -97,12 +96,19 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @param nodeModel The node model.
      * @param waitForView If view executes animations after 
      * initialization it might be sensible to wait for a specific time.
+     * @param exec An execution context used for progress reporting.
      * 
      */
-    public PhantomJSImageGenerator(final T nodeModel, final Long waitForView) {
+    public PhantomJSImageGenerator(final T nodeModel, final Long waitForView, final ExecutionContext exec) {
         m_nodeModel = nodeModel;
+        if (exec != null) {
+        	exec.setProgress("Starting PhantomJS");
+        }
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
-        generateView(waitForView);
+        if (exec != null) {
+        	exec.setProgress(0.25);
+        }
+        generateView(waitForView, exec);
     }
     
     /**
@@ -112,7 +118,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * 
      */
     public PhantomJSImageGenerator(final T nodeModel) {
-    	this(nodeModel, null);
+    	this(nodeModel, null, null);
     }
     
     /**
@@ -147,11 +153,14 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         return null;
     }
 
-    private void generateView(final Long optionalWait) {
+    private void generateView(final Long optionalWait, final ExecutionContext exec) {
         //TODO make size editable
         /*Window window = m_driver.manage().window();
         window.setPosition(new Point(20, 20));
         window.setSize(new Dimension(800, 600));*/
+        if (exec != null) {
+        	exec.setProgress("Initializing view");
+        }
         String viewPath = m_nodeModel.getViewHTMLPath();
         if (viewPath == null || viewPath.isEmpty()) {
         	LOGGER.error("Node model returned no path to view HTML. Cannot initialize view.");
@@ -163,26 +172,44 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         VAL viewValue = m_nodeModel.getViewValue();
         String initCall = m_nodeModel.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
         ((JavascriptExecutor)m_driver).executeScript(initCall);
+        if (exec != null) {
+        	exec.setProgress(0.66);
+        }
         WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+        //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
         
         //wait additional specified time to compensate for initial animation, etc.
         if (optionalWait != null & optionalWait > 0L) {
+        	int waitInS = (int) (optionalWait/1000);
+        	final double interval = 0.33 / Math.max(1, waitInS);
+        	if (exec != null) {
+        		String pString = "Waiting additional time.";
+        		if (waitInS > 0) {
+        			pString = "Waiting additional " + waitInS + " seconds.";
+        		}
+        		exec.setProgress(pString);
+        	}
         	Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
         			.withTimeout(optionalWait, TimeUnit.MILLISECONDS)
-        			.pollingEvery(optionalWait, TimeUnit.MILLISECONDS)
+        			.pollingEvery(1, TimeUnit.SECONDS)
         			.ignoring(NoSuchElementException.class);
 			try {
 				timedWait.until(new Function<WebDriver, WebElement>() {
 					@Override
 					public WebElement apply(WebDriver input) {
+						if (exec != null) {
+							exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
+						}
 						return null;
 					}
 				});
 			} catch (Exception e) { /* do nothing */ }
         }
-        //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+        if (exec != null) {
+        	exec.setProgress(1.0);
+        }
     }
     
     private void waitForDocumentReady()

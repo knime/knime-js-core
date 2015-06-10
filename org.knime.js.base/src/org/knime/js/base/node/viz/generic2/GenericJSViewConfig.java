@@ -80,6 +80,7 @@ final class GenericJSViewConfig {
     private static final String JS_SVG_CODE = "jsSVGCode";
     private static final String CSS_CODE = "cssCode";
     private static final String DEPENDENCIES = "dependencies";
+    private static final String WAIT_TIME = "waitTime";
     //private static final String VIEW_NAME = "viewName";
 
     private boolean m_hideInWizard = false;
@@ -89,6 +90,8 @@ final class GenericJSViewConfig {
     private String m_jsSVGCode;
     private String m_cssCode;
     private String[] m_dependencies;
+    private int m_waitTime;
+
     //private String m_viewName;
 
     /**
@@ -197,6 +200,20 @@ final class GenericJSViewConfig {
     }
 
     /**
+     * @return the waitTime
+     */
+    public int getWaitTime() {
+        return m_waitTime;
+    }
+
+    /**
+     * @param waitTime the waitTime to set
+     */
+    public void setWaitTime(final int waitTime) {
+        m_waitTime = waitTime;
+    }
+
+    /**
      * @return the viewName
      */
     /*public String getViewName() {
@@ -221,6 +238,7 @@ final class GenericJSViewConfig {
         settings.addString(JS_SVG_CODE, m_jsSVGCode);
         settings.addString(CSS_CODE, m_cssCode);
         settings.addStringArray(DEPENDENCIES, m_dependencies);
+        settings.addInt(WAIT_TIME, getWaitTime());
         //settings.addString(VIEW_NAME, m_viewName);
     }
 
@@ -229,17 +247,14 @@ final class GenericJSViewConfig {
      * @throws InvalidSettingsException If incomplete or wrong.
      */
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
-        // added in 2.11
-        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD, false));
-        // added in 2.12
-        setGenerateView(settings.getBoolean(GENERATE_VIEW, false));
-        // added in 2.11
+        setHideInWizard(settings.getBoolean(HIDE_IN_WIZARD));
+        setGenerateView(settings.getBoolean(GENERATE_VIEW));
         setMaxRows(settings.getInt(MAX_ROWS, DEFAULT_MAX_ROWS));
         m_jsCode = settings.getString(JS_CODE);
-        // added in 2.12
-        setJsSVGCode(settings.getString(JS_SVG_CODE, null));
+        setJsSVGCode(settings.getString(JS_SVG_CODE));
         m_cssCode = settings.getString(CSS_CODE);
         m_dependencies = settings.getStringArray(DEPENDENCIES);
+        setWaitTime(settings.getInt(WAIT_TIME));
         //m_viewName = settings.getString(VIEW_NAME);
     }
 
@@ -270,6 +285,7 @@ final class GenericJSViewConfig {
             }
         }
         m_dependencies = settings.getStringArray(DEPENDENCIES, new String[0]);
+        setWaitTime(settings.getInt(WAIT_TIME, 0));
         //m_viewName = settings.getString(VIEW_NAME, "");
     }
 }

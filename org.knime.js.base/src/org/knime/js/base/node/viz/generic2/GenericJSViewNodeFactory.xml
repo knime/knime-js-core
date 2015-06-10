@@ -16,6 +16,7 @@
             <p>Note, this node is currently under development. Future versions of the node will have more functionality,
             including the ability to define and use templates and to generate a static view/image output.</p>            
 		</intro>
+		<tab name="JavaScript View">
 		<option name="Flow Variables">
 		    <p>
 		      The list contains the flow variables that are currently available at the node input. Double clicking any of 
@@ -67,6 +68,23 @@ for (var rowID = 0; rowID &lt; knimeDataTable.getNumRows(); rowID++) {
     }
 }</pre>
 		</option>
+		</tab>
+		<tab name="Image Generation">
+			<option name="Create SVG image at outport">
+				<p>If an image is supposed to be rendered during execute for the upper outport. 
+				Disable this option if image is not needed or creation is too time consuming.</p>
+			</option>
+			<option name="Additional wait time">
+				<p>To compensate for initial layout delay or animation set an optional wait time in ms.
+				This is time is added after the view initialization and before the image retrieval.</p>
+			</option>
+			<option name="SVG JavaScript">
+				<p>Enter the JavaScript code to return the generated SVG as string.</p>
+				<p><b>Example</b></p>
+				<pre>var svgElement = document.getElementById("mySVG");
+return (new XMLSerializer()).serializeToString(svgElement);</pre>
+			</option>
+		</tab>
 	</fullDescription>
 	
 	<interactiveView name="Generic JavaScript View">
