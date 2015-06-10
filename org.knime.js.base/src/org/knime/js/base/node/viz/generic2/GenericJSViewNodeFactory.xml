@@ -13,8 +13,9 @@
 	       	</p>
             <p>Within the java script code block you have access to the input table and can use a set of predefined
             libraries to generate the view.</p>
+            <p>Additionally you can export a static image to the workflow, if the view is generated as an SVG structure.</p>
             <p>Note, this node is currently under development. Future versions of the node will have more functionality,
-            including the ability to define and use templates and to generate a static view/image output.</p>            
+            including the ability to define and use templates.</p>            
 		</intro>
 		<tab name="JavaScript View">
 		<option name="Flow Variables">
@@ -71,7 +72,7 @@ for (var rowID = 0; rowID &lt; knimeDataTable.getNumRows(); rowID++) {
 		</tab>
 		<tab name="Image Generation">
 			<option name="Create SVG image at outport">
-				<p>If an image is supposed to be rendered during execute for the upper outport. 
+				<p>If an image is supposed to be rendered during execute for the outport. 
 				Disable this option if image is not needed or creation is too time consuming.</p>
 			</option>
 			<option name="Additional wait time">
