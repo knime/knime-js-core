@@ -181,7 +181,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
         
         //wait additional specified time to compensate for initial animation, etc.
-        if (optionalWait != null & optionalWait > 0L) {
+        if (optionalWait != null && optionalWait > 0L) {
         	int waitInS = (int) (optionalWait/1000);
         	final double interval = 0.33 / Math.max(1, waitInS);
         	if (exec != null) {
