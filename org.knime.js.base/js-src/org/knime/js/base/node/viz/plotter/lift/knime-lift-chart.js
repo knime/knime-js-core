@@ -122,11 +122,10 @@ knime_lift_chart = function() {
     
     function viewToggled() {
         _value.showGainChart = !_value.showGainChart;
-        d3.select("#titleIn").attr("value", _value.showGainChart ? _value.titleGain : _value.titleLift);
-        d3.select("#subtitleIn").attr("value", _value.showGainChart ? _value.subtitleGain : _value.subtitleLift);
-        
-        d3.select("#xTitleIn").attr("value", _value.showGainChart ? _value.xAxisTitleGain : _value.xAxisTitleLift);
-        d3.select("#yTitleIn").attr("value", _value.showGainChart ? _value.yAxisTitleGain : _value.yAxisTitleLift);
+        d3.select("#titleIn").property("value", _value.showGainChart ? _value.titleGain : _value.titleLift);
+        d3.select("#subtitleIn").property("value", _value.showGainChart ? _value.subtitleGain : _value.subtitleLift);
+        d3.select("#xTitleIn").property("value", _value.showGainChart ? _value.xAxisTitleGain : _value.xAxisTitleLift);
+        d3.select("#yTitleIn").property("value", _value.showGainChart ? _value.yAxisTitleGain : _value.yAxisTitleLift);
         
         drawChart();
     }
@@ -151,12 +150,21 @@ knime_lift_chart = function() {
             titleDiv.append("input")
             .attr({id : "titleIn", type : "text", value : _value.showGainChart ? _value.titleGain : _value.titleLift}).style("width", 150)
             .on("keyup", function() {
+                var hadTitles, hasTitles;
+                
                 if (_value.showGainChart) {
+                    hadTitles = (_value.titleGain.length > 0) || (_value.subtitleGain.length > 0);
                     _value.titleGain = this.value;
+                    hasTitles = (_value.titleGain.length > 0) || (_value.subtitleGain.length > 0);
                 } else {
+                    hadTitles = (_value.titleLift.length > 0) || (_value.subtitleLift.length > 0);
                     _value.titleLift = this.value;
+                    hasTitles = (_value.titleLift.length > 0) || (_value.subtitleLift.length > 0);
                 }
                 d3.select("#title").text(this.value);
+                if (hadTitles != hasTitles) {
+                    drawChart();
+                }
             });
         }
         
@@ -166,12 +174,20 @@ knime_lift_chart = function() {
             titleDiv.append("input")
             .attr({id : "subtitleIn", type : "text", value : _value.showGainChart ? _value.subtitleGain : _value.subtitleLift}).style("width", 150)
             .on("keyup", function() {
+                var hadTitles, hasTitles;
                 if (_value.showGainChart) {
+                    hadTitles = (_value.titleGain.length > 0) || (_value.subtitleGain.length > 0);
                     _value.subtitleGain = this.value;
+                    hasTitles = (_value.titleGain.length > 0) || (_value.subtitleGain.length > 0);
                 } else {
+                    hadTitles = (_value.titleLift.length > 0) || (_value.subtitleLift.length > 0);
                     _value.subtitleLift = this.value;
+                    hasTitles = (_value.titleLift.length > 0) || (_value.subtitleLift.length > 0);
                 }
                 d3.select("#subtitle").text(this.value);
+                if (hadTitles != hasTitles) {
+                    drawChart();
+                }
             });
         }
         
@@ -265,7 +281,7 @@ knime_lift_chart = function() {
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
-        var d3svg = d3.select(svg1);
+        var d3svg = d3.select(svg1).style("font-family", "sans-serif");
 
         var svg = d3svg.attr({width : cw, height : ch}).style({width : chartWidth, height : chartHeight})
             .append("g").attr("transform", 

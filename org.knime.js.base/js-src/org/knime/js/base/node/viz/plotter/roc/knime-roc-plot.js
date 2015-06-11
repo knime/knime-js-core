@@ -85,8 +85,13 @@ knime_roc_curve = function() {
             titleDiv.append("input")
             .attr({id : "titleIn", type : "text", value : _value.title}).style("width", 150)
             .on("keyup", function() {
+                var hadTitles = (_value.title.length > 0) || (_value.subtitle.length > 0);
                 _value.title = this.value;
+                var hasTitles = (_value.title.length > 0) || (_value.subtitle.length > 0);
                 d3.select("#title").text(this.value);
+                if (hadTitles != hasTitles) {
+                    drawChart();
+                }
             });
         }
         
@@ -95,8 +100,13 @@ knime_roc_curve = function() {
             titleDiv.append("input")
             .attr({id : "subtitleIn", type : "text", value : _value.subtitle}).style("width", 150)
             .on("keyup", function() {
+                var hadTitles = (_value.title.length > 0) || (_value.subtitle.length > 0);
                 _value.subtitle = this.value;
+                var hasTitles = (_value.title.length > 0) || (_value.subtitle.length > 0);
                 d3.select("#subtitle").text(this.value);
+                if (hadTitles != hasTitles) {
+                    drawChart();
+                }
             });
         }
         
@@ -163,7 +173,7 @@ knime_roc_curve = function() {
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
-        var d3svg = d3.select(svg1);
+        var d3svg = d3.select(svg1).style("font-family", "sans-serif");
 
         var svg = d3svg.attr({width : cw, height : ch}).style({width : chartWidth, height : chartHeight})
             .append("g").attr("transform", 
