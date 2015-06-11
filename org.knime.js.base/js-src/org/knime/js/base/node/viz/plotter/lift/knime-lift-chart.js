@@ -31,26 +31,37 @@ knime_lift_chart = function() {
        
         var body = d3.select("body").attr("id", "body");
         
+        // Container for the chart. Height is calculated after the view controls have been inserted.
         var layoutContainer = body.append("div").attr("id", layoutContainerID)
                 .style("width", "100%").style("height", "calc(100% - 50px)")
                 .style("min-width", minWidth + "px");
         
+        
         var controlHeight;
         if (_representation.enableControls) {
-            var controlsContainer = body.append("div").style({position : "absolute", bottom : "0px", padding : "5px", "background-color" : "white",
-                                        "padding-left" : "60px", width : "100%", "border-top" : "1px solid black"})
-                                        .attr("id", "controlContainer");
+            // Container for the view controls
+            var controlsContainer = body.append("div")
+                .style({position : "absolute",
+                        bottom : "0px",
+                        padding : "5px",
+                        "background-color" : "white",
+                        "padding-left" : "60px",
+                        width : "100%",
+                        "border-top" : "1px solid black"})
+               .attr("id", "controlContainer");
             createControls(controlsContainer);
             controlHeight = controlsContainer.node().getBoundingClientRect().height;
         } else {
             controlHeight = 0;
         }
 
+        // Now set height of the chart container
         layoutContainer.style({
             "height" : "calc(100% - " + controlHeight + "px)",
             "min-height" :  (minHeight + controlHeight) + "px"
         });
-            
+        
+        // Build data structures for the two charts
         xy["Lift"] = {color : "red", data : []};
         xy["Cumulative Lift"] = {color : "blue", data : []};
         
@@ -59,7 +70,10 @@ knime_lift_chart = function() {
                                                   {x : 100, y : representation.baseline}]};
         }
         
+        // _maxY is used later to scale the y-axis properly
         _maxY = representation.baseline;
+        
+        // Build list of {x : ?, y : ?} objects for the lines to draw
         for (var i = 0; i < representation.liftValues.length; i++) {
             var x = (i + 1) * representation.intervalWidth;
             var y = representation.liftValues[i];
@@ -86,6 +100,7 @@ knime_lift_chart = function() {
             xy["Cumulative Lift"].data.push({x : x, y : y});
         }
         
+        // Same for cumulative gain chart
         gainXY["Cumulative Gain"] = { data : [], color : "red"};
         for (var i = 0; i < representation.response.length; i++) {
             var x = i * representation.intervalWidth;
@@ -117,13 +132,14 @@ knime_lift_chart = function() {
     }
     
     function createControls(controlsContainer) {
-        
         if (_representation.enableViewToggle) {
             var toggleDiv = controlsContainer.append("div");
-            toggleDiv.append("input").attr({type : "radio", id : "toggleLift", "name" : "toggleView"}).property("checked", !_value.showGainChart).on("click", viewToggled);
+            toggleDiv.append("input").attr({type : "radio", id : "toggleLift", "name" : "toggleView"})
+                .property("checked", !_value.showGainChart).on("click", viewToggled);
             toggleDiv.append("label").attr("for", "toggleLift").text(" Show Lift Chart");
             
-            toggleDiv.append("input").attr({type : "radio", id : "toggleGains", "name" : "toggleView"}).style("margin-left", "10px").property("checked", _value.showGainChart).on("click", viewToggled);
+            toggleDiv.append("input").attr({"type" : "radio", id : "toggleGains", "name" : "toggleView"}).style("margin-left", "10px")
+                .property("checked", _value.showGainChart).on("click", viewToggled);
             toggleDiv.append("label").attr("for", "toggleGains").text(" Show Cumulative Gains Chart");
         }
         var titleDiv;
@@ -145,7 +161,8 @@ knime_lift_chart = function() {
         }
         
         if (_representation.enableEditSubtitle) {
-            titleDiv.append("label").attr("for", "subtitleIn").text("Subtitle: ").style({"margin-left" : "10px", "width" : "100px", display : "inline-block"});
+            titleDiv.append("label").attr("for", "subtitleIn").text("Subtitle: ")
+                .style({"margin-left" : "10px", "width" : "100px", display : "inline-block"});
             titleDiv.append("input")
             .attr({id : "subtitleIn", type : "text", value : _value.showGainChart ? _value.subtitleGain : _value.subtitleLift}).style("width", 150)
             .on("keyup", function() {
@@ -177,7 +194,8 @@ knime_lift_chart = function() {
         }
         
         if (_representation.enableEditYAxisLabel) {
-            axisTitleDiv.append("label").attr("for", "yTitleIn").text("Y-axis title: ").style({"margin-left" : "10px", "width" : "100px", display : "inline-block"});
+            axisTitleDiv.append("label").attr("for", "yTitleIn").text("Y-axis title: ")
+                .style({"margin-left" : "10px", "width" : "100px", display : "inline-block"});
             axisTitleDiv.append("input")
             .attr({id : "yTitleIn", type : "text", value : _value.showGainChart ? _value.yAxisTitleGain : _value.yAxisTitleLift}).style("width", 150)
             .on("keyup", function() {
@@ -256,17 +274,20 @@ knime_lift_chart = function() {
         var w = parseInt(d3svg.style('width')) - margin.left - margin.right;
         var h = parseInt(d3svg.style('height')) - margin.top - margin.bottom;
         
+        // Background and data area color are in rgba format. We need to convert it first.
         var bg = parseColor(_representation.backgroundColor);
         var areaColor = parseColor(_representation.dataAreaColor);
 
         svg.append("rect").attr({fill : bg.rgb, "fill-opacity" : bg.opacity, width : margin.left + w + margin.right,
                                     height : margin.top + margin.bottom + h, x : -margin.left, y : -margin.top});
         svg.append("rect").attr({fill : areaColor.rgb, "fill-opacity" : areaColor.opacity, width : w, height : h});
-                    
+        
+        // Add title            
         var titleG = d3svg.append("g").attr("transform", "translate(" + margin.left + ",0)");
         var title = titleG.append("text").text(title).attr({"y" : 30, "id" : "title"}).attr("font-size", 24);
         var subtitle = titleG.append("text").text(subtitle).attr({"y" : mTop - 15, "id" : "subtitle"});
-                    
+        
+        // Scales for the plot     
         var x = d3.scale.linear().domain([0, 100]).range([0, w]);
         var y = d3.scale.linear().domain([0, _value.showGainChart ? 100 : _maxY]).nice().range([h, 0]);
 
@@ -298,6 +319,7 @@ knime_lift_chart = function() {
         .x(function(d) { return x(d.x); })
         .y(function(d) { return y(d.y); });
         
+        // This valueline is used for the random plot, which should not be interpolated.
         var valueline = d3.svg.line()
         .x(function(d) { return x(d.x); })
         .y(function(d) { return y(d.y); });
@@ -338,15 +360,16 @@ knime_lift_chart = function() {
         d3YAxis.selectAll("path").attr({"stroke" : stroke, "stroke-width" : 1, "fill" : "none"});
         d3XAxis.selectAll("path").attr({"stroke" : stroke, "stroke-width" : 1, "fill" : "none"});
         
+        // Helper variables for drawing the legend and the area under the curve
         var xPos = 0;
         var yPos = 70;
         var areaG = svg.append("g");
         var areaCount = 0;
         var maxWidth = 0;
         
-        // Add the valueline path.
         for (var key in currentData) {  
             var p;
+            // Draw lines
             if (key != "random") {
                 p = svg.append("path")
                 .attr("class", "line")
@@ -378,6 +401,8 @@ knime_lift_chart = function() {
         
         areaG.attr("transform", "translate(" + (w - maxWidth - 10) + "," + (h - areaCount * 25 + margin.top) + ")");
         
+        // After we have drawn the legend, we set the height and redraw everything
+        // To get the correct size for the chart
         if (legendHeight == 0 && _representation.showLegend) {
             legendHeight = Math.max(yPos, 75);
             drawChart();
