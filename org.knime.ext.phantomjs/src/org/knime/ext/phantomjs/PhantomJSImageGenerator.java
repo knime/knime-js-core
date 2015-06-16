@@ -99,7 +99,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @param exec An execution context used for progress reporting.
      * 
      */
-    public PhantomJSImageGenerator(final T nodeModel, final Long waitForView, final ExecutionContext exec) {
+    public PhantomJSImageGenerator(final T nodeModel, final Long waitForView, final ExecutionContext exec) throws Exception {
         m_nodeModel = nodeModel;
         if (exec != null) {
         	exec.setProgress("Starting PhantomJS");
@@ -117,7 +117,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @param nodeModel The node model.
      * 
      */
-    public PhantomJSImageGenerator(final T nodeModel) {
+    public PhantomJSImageGenerator(final T nodeModel) throws Exception {
     	this(nodeModel, null, null);
     }
     
@@ -129,7 +129,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @return One of Boolean, Long, String, List or WebElement. Or null if script has no return value.
      * @throws IOException on script execution exception
      */
-    public Object executeScript(final String script, final Object... args) throws IOException{
+    public Object executeScript(final String script, final Object... args) throws IOException {
         if (m_driver instanceof JavascriptExecutor) {
             try {
                 return ((JavascriptExecutor)m_driver).executeScript("return " + script, args);
@@ -175,7 +175,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         if (exec != null) {
         	exec.setProgress(0.66);
         }
-        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
+        WebDriverWait wait = new WebDriverWait(m_driver, /*DEFAULT_TIMEOUT*/ 30);
         //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
         //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));

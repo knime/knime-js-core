@@ -151,6 +151,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      * @return A {@link PortObject} containing the SVG created by the view.
      * @throws IOException if an I/O error occurs
      */
+    @SuppressWarnings({"rawtypes", "unchecked"})
     private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) {
         if (!generateImage()) {
             return InactiveBranchPortObject.INSTANCE;
@@ -163,10 +164,14 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
         // View nodes will get executed sequentially as a result.
         synchronized (m_viewGenerationLock) {
-            // Inits PhantomJS AND the view
-            @SuppressWarnings({"rawtypes", "unchecked"})
-            PhantomJSImageGenerator generator =
-                new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
+            // Inits PhantomJS AND the view.
+
+            PhantomJSImageGenerator generator = null;
+            try {
+                generator = new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
+            } catch (Exception e) {
+                LOGGER.error("Initializing view failed: " + e.getMessage(), e);
+            }
 
             exec.setProgress(0.75, "Retrieving generated image...");
             String namespace = getViewNamespace();
@@ -178,9 +183,11 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             // Retrieve the SVG string from the view.
             Object imageData;
             try {
-                imageData = generator.executeScript(methodCall);
-                if (imageData instanceof String) {
-                    svg = (String)imageData;
+                if (generator != null) {
+                    imageData = generator.executeScript(methodCall);
+                    if (imageData instanceof String) {
+                        svg = (String)imageData;
+                    }
                 }
                 exec.setProgress(0.9, "Creating image output...");
             } catch (IOException e) {
