@@ -103,6 +103,10 @@ public class PhantomJSActivator extends Plugin {
         if (m_phantomJSPath != null) {
             DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, m_phantomJSPath);
+            capabilities.setJavascriptEnabled(true);
+            String [] phantomJsArgs = {"--ignore-ssl-errors=yes"};
+            capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, phantomJsArgs);
+            capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "localToRemoteUrlAccessEnabled", true);
             m_driver = new PhantomJSDriver(capabilities);
         }
     }
