@@ -85,7 +85,7 @@ import com.google.common.base.Function;
 public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
     
     private static final NodeLogger LOGGER = NodeLogger.getLogger(PhantomJSImageGenerator.class); 
-    private static final long DEFAULT_TIMEOUT = 10;
+    private static final long DEFAULT_TIMEOUT = 30;
     
     private final WebDriver m_driver;
     private final T m_nodeModel;
@@ -175,7 +175,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         if (exec != null) {
         	exec.setProgress(0.66);
         }
-        WebDriverWait wait = new WebDriverWait(m_driver, /*DEFAULT_TIMEOUT*/ 30);
+        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
         wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
         //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
