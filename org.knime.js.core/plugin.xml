@@ -4,6 +4,7 @@
    <extension-point id="webResources" name="Web Resources" schema="schema/webResources.exsd"/>
    <extension-point id="javascriptComponents" name="Javascript Components" schema="schema/javascriptComponents.exsd"/>
    <extension
+         id="D3-tip-master"
          point="org.knime.js.core.webResources">
       <webResourceBundle
             debug="false"
@@ -91,7 +92,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="D3"
+            name="D3_3.2.8_Debug"
             version="3.2.8"
             webResourceBundleID="D3_3.2.8_Debug">
          <webResource
@@ -105,7 +106,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
-            name="D3"
+            name="D3_3.2.8"
             version="3.2.8"
             webResourceBundleID="D3_3.2.8">
          <webResource
@@ -218,6 +219,84 @@
          </webResource>
          <importResource
                relativePath="js-lib/firebug-lite/firebug-lite.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="NVD3"
+            version="1.7.1"
+            webResourceBundleID="NVD3_1.7.1_Debug">
+         <webResource
+               relativePathSource="js-lib/nvd3/nv.d3.v1_7_1.js"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_7_1.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/nvd3/nv.d3.v1_7_1.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/nvd3/nv.d3.v1_7_1.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5_Debug">
+         </webDependency>
+         <webResource
+               relativePathSource="js-lib/nvd3/"
+               relativePathTarget="js-lib/nvd3/">
+         </webResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="NVD3"
+            version="1.7.1"
+            webResourceBundleID="NVD3_1.7.1">
+         <webResource
+               relativePathSource="js-lib/nvd3/nv.d3.v1_7_1.min.js"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_7_1.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/nvd3/nv.d3.v1_7_1.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/nvd3/nv.d3.v1_7_1.min.css"
+               type="CSS">
+         </importResource>
+         <webResource
+               relativePathSource="js-lib/nvd3/"
+               relativePathTarget="js-lib/nvd3/">
+         </webResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="D3"
+            version="3.5.5"
+            webResourceBundleID="D3_3.5.5_Debug">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_5_5.js"
+               relativePathTarget="js-lib/d3/d3.v3_5_5.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_5_5.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="D3"
+            version="3.5.5"
+            webResourceBundleID="D3_3.5.5">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_5_5.min.js"
+               relativePathTarget="js-lib/d3/d3.v3_5_5.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_5_5.min.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
