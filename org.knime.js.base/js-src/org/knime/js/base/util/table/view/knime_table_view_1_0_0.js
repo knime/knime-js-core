@@ -16,6 +16,7 @@ knime_table_view = function(table, containerElement) {
 	var sortColumn = null;
 	var sortAscending = true;
 	var enableSelection = true;
+	var fullFrame = false;
 	var selectAllCheckbox;
 	
 	var initialSelections = [];
@@ -92,7 +93,12 @@ knime_table_view = function(table, containerElement) {
 				};
 			})(table, startIndex + chunkSize, newChunkSize), chunkDuration);
 		} else {
-			selectAllCheckbox.prop('disabled', false);
+			if (enableSelection) {
+				selectAllCheckbox.prop('disabled', false);
+			}
+			if (fullFrame) {
+				_resizeParent();
+			}
 			//var totalDrawDuration = new Date().getTime() - drawingStartTime;
 			//console.log("Total layout time " + totalDrawDuration + "ms.");
 		}
@@ -164,6 +170,12 @@ knime_table_view = function(table, containerElement) {
 		}
 	};
 	
+	_resizeParent = function(width, height) {
+		if (parent != undefined && parent.KnimePageLoader != undefined) {
+			parent.KnimePageLoader.autoResize(window.frameElement.id, width, height);
+		}
+	};
+	
 	tableView.setSelection = function(selections) {
 		initialSelections = selections;
 	};
@@ -190,6 +202,13 @@ knime_table_view = function(table, containerElement) {
 	}
 	tableView.isEnableSelection = function() {
 		return enableSelection;
+	}
+
+	tableView.setFullFrame = function(full) {
+		fullFrame = full;
+	}
+	tableView.isFullFrame = function() {
+		return fullFrame;
 	}
 	
 	tableView.setShowColumnHeader = function(show, redraw) {

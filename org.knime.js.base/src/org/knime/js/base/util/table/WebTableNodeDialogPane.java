@@ -74,6 +74,9 @@ public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
             WebTableNodeModel.createLastDisplayedRowModel(WebTableNodeModel.END),
             "No. of rows to display:", 10));
 
+        final SettingsModelBoolean fullFrameModel = WebTableNodeModel.createFullFrameModel();
+        addDialogComponent(new DialogComponentBoolean(fullFrameModel, "Extend frame to table height"));
+
         final SettingsModelBoolean numberFormatterModel = WebTableNodeModel.createUseNumberFormatterModel();
         addDialogComponent(new DialogComponentBoolean(numberFormatterModel, "Enable number formatter"));
 

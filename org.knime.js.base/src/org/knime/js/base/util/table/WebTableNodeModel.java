@@ -50,6 +50,7 @@ package org.knime.js.base.util.table;
 import java.lang.reflect.ParameterizedType;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -103,6 +104,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public static final String CFG_ENABLE_SELECTION = "enableSelection";
     /** Config key for selection column name. */
     public static final String CFG_SELECTION_COLUMN_NAME = "selectionColumnName";
+    /** Config key for enlarging the frame to fit the entire contents of the table. */
+    public static final String CFG_FULL_FRAME = "fullFrame";
     /** Config key for the number of decimal places. */
     public static final String CFG_DECIMAL_PLACES = "decimalPlaces";
     /** Config key for the decimal separator sign. */
@@ -125,6 +128,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
     private final SettingsModelBoolean m_enableSelection = createEnableSelectionModel();
     private final SettingsModelString m_selectionColumnName = createSelectionColumnNameModel();
+    private final SettingsModelBoolean m_fullFrame = createFullFrameModel();
 //    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
 //    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
 
@@ -167,6 +171,11 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         return new SettingsModelString(CFG_SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME);
     }
 
+    /** @return Settings model for the hide in wizard property. */
+    static SettingsModelBoolean createFullFrameModel() {
+        return new SettingsModelBoolean(CFG_FULL_FRAME, false);
+    }
+
     /** @param useNumberFormatter for enable/disablement
      * @return settings model for the decimal places property. */
     static SettingsModelIntegerBounded createDecimalPlacesModel(final SettingsModelBoolean useNumberFormatter) {
@@ -185,7 +194,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     /** @return settings model for the decimal separator property. */
     static SettingsModelString createDecimalSeparatorModel() {
         @SuppressWarnings("static-access")
-        DecimalFormat format = (DecimalFormat)DecimalFormat.getInstance();
+        DecimalFormat format = (DecimalFormat)NumberFormat.getInstance();
         DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
         char sep = symbols.getDecimalSeparator();
         return new SettingsModelString(CFG_DECIMAL_SEPARATOR, String.valueOf(sep));
@@ -194,7 +203,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     /** @return settings model for the thousands separator property. */
     static SettingsModelString createThousandsSeparatorModel() {
         @SuppressWarnings("static-access")
-        DecimalFormat format = (DecimalFormat)DecimalFormat.getInstance();
+        DecimalFormat format = (DecimalFormat)NumberFormat.getInstance();
         DecimalFormatSymbols symbols = format.getDecimalFormatSymbols();
         char sep = symbols.getGroupingSeparator();
         return new SettingsModelString(CFG_THOUSANDS_SEPARATOR, String.valueOf(sep));
@@ -259,6 +268,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 viewRepresentation.setTable(m_jsonTable);
                 setNumberFormatter();
                 viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+                viewRepresentation.setFullFrame(m_fullFrame.getBooleanValue());
             }
 
             if (m_enableSelection.getBooleanValue()) {
@@ -309,6 +319,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                     viewRepresentation.setTable(m_jsonTable);
                     setNumberFormatter();
                     viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+                    viewRepresentation.setFullFrame(m_fullFrame.getBooleanValue());
                 } catch (Exception e) {
                     LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
                 }
@@ -377,6 +388,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_hideInWizard.saveSettingsTo(settings);
         m_maxRows.saveSettingsTo(settings);
+        m_fullFrame.saveSettingsTo(settings);
         m_useNumberFormatter.saveSettingsTo(settings);
         m_decimalPlaces.saveSettingsTo(settings);
         m_enableSelection.saveSettingsTo(settings);
@@ -417,6 +429,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_decimalPlaces.loadSettingsFrom(settings);
         m_enableSelection.loadSettingsFrom(settings);
         m_selectionColumnName.loadSettingsFrom(settings);
+
+        //added in 2.12
+        boolean fullFrame = settings.getBoolean(CFG_FULL_FRAME, false);
+        m_fullFrame.loadSettingsFrom(settings);
 //        m_decimalSeparator.loadSettingsFrom(settings);
 //        m_thousandsSeparator.loadSettingsFrom(settings);
     }

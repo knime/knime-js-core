@@ -69,6 +69,7 @@ public class WebTableViewRepresentation extends JSONViewContent {
     private JSONDataTable m_table;
     private JSONNumberFormatter m_numberFormatter;
     private boolean m_enableSelection;
+    private boolean m_fullFrame;
 
     /** Serialization constructor. Don't use. */
     public WebTableViewRepresentation() { }
@@ -124,6 +125,20 @@ public class WebTableViewRepresentation extends JSONViewContent {
      */
     public void setEnableSelection(final boolean enableSelection) {
         m_enableSelection = enableSelection;
+    }
+
+    /**
+     * @return true if full frame table
+     */
+    public boolean getFullFrame() {
+        return m_fullFrame;
+    }
+
+    /**
+     * @param full true if full frame table
+     */
+    public void setFullFrame(final boolean full) {
+        m_fullFrame = full;
     }
 
     /**

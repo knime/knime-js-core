@@ -16,6 +16,7 @@ knime_table_viewer = function() {
 				table_view = new knime_table_view(knimeTable, body);
 				table_view.setShowRowKeys(true);
 				table_view.setEnableSelection(representation.enableSelection);
+				table_view.setFullFrame(representation.fullFrame);
 				if (representation.numberFormatter) {
 					var f = representation.numberFormatter;
 					table_view.setNumberFormatter(f.decimalPlaces, f.decimalSeparator, f.thousandsSeparator);

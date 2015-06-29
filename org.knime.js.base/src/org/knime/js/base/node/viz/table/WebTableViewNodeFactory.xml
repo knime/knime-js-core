@@ -10,6 +10,9 @@
         <option name="No. of rows to display">
             Use this numerical value to restrict the number of rows used for this visualization.
         </option>
+        <option name="Extend frame to table height">
+        	Usually large tables are not fully displayed and require a scrollbar. For small tables check this option to enlarge the frame to the full height of the table.
+        </option>
         <option name="Enable Number Formatter">If checked the options beneath will be applied to all columns of type <i>Number</i>.</option>
         <option name="Decimal Places">If number formatter is enabled use this value to restrict the display of decimal places in the table view.</option>
     </fullDescription>
