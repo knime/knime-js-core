@@ -63,7 +63,7 @@ knime_generic_view = function() {
 	
 	view.getSVG = function() {
 		try {
-			return eval(_representation.jsSVGCode);
+			return eval('(function() {' + _representation.jsSVGCode + '}())');
 		} catch (e) {
 			return null;
 		}
