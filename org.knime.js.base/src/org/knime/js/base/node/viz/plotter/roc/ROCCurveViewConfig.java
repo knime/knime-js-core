@@ -68,7 +68,7 @@ public final class ROCCurveViewConfig {
     private static final String DEFAULT_X_TITLE = "False Positive Rate";
     private static final String DEFAULT_TITLE = "ROC Curve";
     private static final String LINE_WIDTH = "lineWidth";
-    static final int DEFAULT_LINE_WIDTH = 1;
+    static final int DEFAULT_LINE_WIDTH = 2;
     static final int DEFAULT_WIDTH = 800;
     static final int DEFAULT_HEIGHT = 600;
     static final String COLOR_STRING_PREFIX = "rgba(";
@@ -118,7 +118,7 @@ public final class ROCCurveViewConfig {
     private Color m_gridColor = DEFAULT_GRID_COLOR;
     private int m_lineWidth = DEFAULT_LINE_WIDTH;
 
-    private boolean m_enableControls = true;
+    private boolean m_enableControls = false;
     private boolean m_enableEditTitle = true;
     private boolean m_enableEditSubtitle = true;
     private boolean m_enableEditXAxisLabel = true;
