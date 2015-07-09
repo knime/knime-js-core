@@ -383,7 +383,7 @@ public class ROCCurveNodeDialogPane extends NodeDialogPane {
         genPanel.add(m_chartTitleTextField, cc);
         cc.gridx = 0;
         cc.gridy++;
-        genPanel.add(new JLabel("Chart title:"), cc);
+        genPanel.add(new JLabel("Chart subtitle:"), cc);
         cc.gridx = 1;
         genPanel.add(m_chartSubtitleTextField, cc);
 
