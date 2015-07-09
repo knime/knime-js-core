@@ -84,7 +84,7 @@
 	</interactiveView>
 	<ports>
 		<inPort index="0" name="Display data">Data table with data to display.</inPort>
-		<inPort index="1" name="Color info">A table with one column that contains column names as rows. The color of each row is used in the plot.</inPort>
+		<inPort index="1" name="Color info">A table with one column that contains column names as rows. The color of each row is used in the plot. If this port is not connected, default colors are used.</inPort>
 		<outPort index="0" name="Image">SVG image rendered by the JavaScript implementation of the ROC curve.</outPort>
 		<outPort index="1" name="Area under curve">The areas under the ROC curves.</outPort>
 	</ports>	
