@@ -104,6 +104,8 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     public static final String CFG_ENABLE_SELECTION = "enableSelection";
     /** Config key for selection column name. */
     public static final String CFG_SELECTION_COLUMN_NAME = "selectionColumnName";
+    /** Config key for height of the table when part of a layout. */
+    public static final String CFG_TABLE_HEIGHT = "tableHeight";
     /** Config key for enlarging the frame to fit the entire contents of the table. */
     public static final String CFG_FULL_FRAME = "fullFrame";
     /** Config key for the number of decimal places. */
@@ -128,6 +130,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     private final SettingsModelIntegerBounded m_decimalPlaces = createDecimalPlacesModel(m_useNumberFormatter);
     private final SettingsModelBoolean m_enableSelection = createEnableSelectionModel();
     private final SettingsModelString m_selectionColumnName = createSelectionColumnNameModel();
+    private final SettingsModelIntegerBounded m_tableHeight = createTableHeightModel();
     private final SettingsModelBoolean m_fullFrame = createFullFrameModel();
 //    private final SettingsModelString m_decimalSeparator = createDecimalSeparatorModel();
 //    private final SettingsModelString m_thousandsSeparator = createThousandsSeparatorModel();
@@ -169,6 +172,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
 
     static SettingsModelString createSelectionColumnNameModel() {
         return new SettingsModelString(CFG_SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME);
+    }
+
+    static SettingsModelIntegerBounded createTableHeightModel() {
+        return new SettingsModelIntegerBounded(CFG_TABLE_HEIGHT, 300, 1, Integer.MAX_VALUE);
     }
 
     /** @return Settings model for the hide in wizard property. */
@@ -268,6 +275,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                 viewRepresentation.setTable(m_jsonTable);
                 setNumberFormatter();
                 viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+                viewRepresentation.setTableHeight(m_tableHeight.getIntValue());
                 viewRepresentation.setFullFrame(m_fullFrame.getBooleanValue());
             }
 
@@ -319,6 +327,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
                     viewRepresentation.setTable(m_jsonTable);
                     setNumberFormatter();
                     viewRepresentation.setEnableSelection(m_enableSelection.getBooleanValue());
+                    viewRepresentation.setTableHeight(m_tableHeight.getIntValue());
                     viewRepresentation.setFullFrame(m_fullFrame.getBooleanValue());
                 } catch (Exception e) {
                     LOGGER.error("Could not create JSON table: " + e.getMessage(), e);
@@ -388,6 +397,7 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
     protected void saveSettingsTo(final NodeSettingsWO settings) {
         m_hideInWizard.saveSettingsTo(settings);
         m_maxRows.saveSettingsTo(settings);
+        m_tableHeight.saveSettingsTo(settings);
         m_fullFrame.saveSettingsTo(settings);
         m_useNumberFormatter.saveSettingsTo(settings);
         m_decimalPlaces.saveSettingsTo(settings);
@@ -431,10 +441,12 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_selectionColumnName.loadSettingsFrom(settings);
 
         //added in 2.12
-        boolean fullFrame = settings.getBoolean(CFG_FULL_FRAME, false);
+        //int tableHeight = settings.getInt(CFG_TABLE_HEIGHT, 300);
+        //boolean fullFrame = settings.getBoolean(CFG_FULL_FRAME, false);
+        m_tableHeight.loadSettingsFrom(settings);
         m_fullFrame.loadSettingsFrom(settings);
-//        m_decimalSeparator.loadSettingsFrom(settings);
-//        m_thousandsSeparator.loadSettingsFrom(settings);
+        //m_tableHeight.setIntValue(tableHeight);
+        //m_fullFrame.setBooleanValue(fullFrame);
     }
 
     /**

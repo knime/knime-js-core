@@ -23,6 +23,7 @@
       <webResourceBundle
             debug="true"
             name="jQuery"
+            usesDefine="true"
             version="1.11.0"
             webResourceBundleID="jQuery_1.11.0_Debug">
          <webResource
@@ -37,6 +38,7 @@
       <webResourceBundle
             debug="false"
             name="jQuery"
+            usesDefine="true"
             version="1.11.0"
             webResourceBundleID="jQuery_1.11.0">
          <webResource
@@ -51,6 +53,7 @@
       <webResourceBundle
             debug="true"
             name="jQuery UI"
+            usesDefine="true"
             version="1.10.4"
             webResourceBundleID="jQueryUi_1.10.4_Debug">
          <webResource
@@ -72,6 +75,7 @@
       <webResourceBundle
             debug="false"
             name="jQuery UI"
+            usesDefine="true"
             version="1.10.4"
             webResourceBundleID="jQueryUi_1.10.4">
          <webResource
@@ -92,7 +96,9 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            exports="d3"
             name="D3_3.2.8_Debug"
+            usesDefine="false"
             version="3.2.8"
             webResourceBundleID="D3_3.2.8_Debug">
          <webResource
@@ -106,7 +112,9 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
+            exports="d3"
             name="D3_3.2.8"
+            usesDefine="false"
             version="3.2.8"
             webResourceBundleID="D3_3.2.8">
          <webResource
@@ -120,7 +128,9 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            exports="kt"
             name="Knime Table"
+            usesDefine="false"
             version="1.0.0"
             webResourceBundleID="KnimeTable_1.0.0">
          <webResource
@@ -151,7 +161,9 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
+            exports="jsfc"
             name="JSFreeChart"
+            usesDefine="false"
             version="0.5.0"
             webResourceBundleID="jsFreeChart_0.5">
          <webResource
@@ -225,49 +237,49 @@
       <webResourceBundle
             debug="true"
             name="NVD3"
-            version="1.7.1"
-            webResourceBundleID="NVD3_1.7.1_Debug">
+            version="1.8.1"
+            webResourceBundleID="NVD3_1.8.1_Debug">
          <webResource
-               relativePathSource="js-lib/nvd3/nv.d3.v1_7_1.js"
-               relativePathTarget="js-lib/nvd3/nv.d3.v1_7_1.js">
+               relativePathSource="js-lib/nvd3/nv.d3.v1_8_1.js"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_8_1.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/nvd3/nv.d3.v1_8_1.css"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_8_1.css">
          </webResource>
          <importResource
-               relativePath="js-lib/nvd3/nv.d3.v1_7_1.js"
+               relativePath="js-lib/nvd3/nv.d3.v1_8_1.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/nvd3/nv.d3.v1_7_1.css"
+               relativePath="js-lib/nvd3/nv.d3.v1_8_1.css"
                type="CSS">
          </importResource>
          <webDependency
                webResourceBundleID="D3_3.5.5_Debug">
          </webDependency>
-         <webResource
-               relativePathSource="js-lib/nvd3/"
-               relativePathTarget="js-lib/nvd3/">
-         </webResource>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
             name="NVD3"
-            version="1.7.1"
-            webResourceBundleID="NVD3_1.7.1">
+            version="1.8.1"
+            webResourceBundleID="NVD3_1.8.1">
          <webResource
-               relativePathSource="js-lib/nvd3/nv.d3.v1_7_1.min.js"
-               relativePathTarget="js-lib/nvd3/nv.d3.v1_7_1.min.js">
+               relativePathSource="js-lib/nvd3/nv.d3.v1_8_1.min.js"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_8_1.min.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/nvd3/nv.d3.v1_8_1.min.css"
+               relativePathTarget="js-lib/nvd3/nv.d3.v1_8_1.min.css">
          </webResource>
          <importResource
-               relativePath="js-lib/nvd3/nv.d3.v1_7_1.min.js"
+               relativePath="8js-lib/nvd3/nv.d3.v1_8_1.min.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/nvd3/nv.d3.v1_7_1.min.css"
+               relativePath="js-lib/nvd3/nv.d3.v1_8_1.min.css"
                type="CSS">
          </importResource>
-         <webResource
-               relativePathSource="js-lib/nvd3/"
-               relativePathTarget="js-lib/nvd3/">
-         </webResource>
          <webDependency
                webResourceBundleID="D3_3.5.5">
          </webDependency>
@@ -275,6 +287,7 @@
       <webResourceBundle
             debug="true"
             name="D3"
+            usesDefine="true"
             version="3.5.5"
             webResourceBundleID="D3_3.5.5_Debug">
          <webResource
@@ -289,6 +302,7 @@
       <webResourceBundle
             debug="false"
             name="D3"
+            usesDefine="true"
             version="3.5.5"
             webResourceBundleID="D3_3.5.5">
          <webResource

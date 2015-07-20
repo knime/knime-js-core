@@ -69,6 +69,7 @@ public class WebTableViewRepresentation extends JSONViewContent {
     private JSONDataTable m_table;
     private JSONNumberFormatter m_numberFormatter;
     private boolean m_enableSelection;
+    private int m_tableHeight;
     private boolean m_fullFrame;
 
     /** Serialization constructor. Don't use. */
@@ -125,6 +126,20 @@ public class WebTableViewRepresentation extends JSONViewContent {
      */
     public void setEnableSelection(final boolean enableSelection) {
         m_enableSelection = enableSelection;
+    }
+
+    /**
+     * @return the height
+     */
+    public int getTableHeight() {
+        return m_tableHeight;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setTableHeight(final int height) {
+        m_tableHeight = height;
     }
 
     /**

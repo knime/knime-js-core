@@ -29,6 +29,19 @@ kt = function() {
 		return dataTable.rows;
 	}
 	
+	kt.getCell = function(rowID, columnID) {
+		var colIndex = columnID;
+		if (typeof columnID === "string") {
+			colIndex = kt_getDataColumnID(columnID);
+		}
+		if (colIndex != null && colIndex < dataTable.spec.numColumns) {
+			var rowIndex = rowID;
+			if (typeof rowIndex === "string") {
+				rowIndex = kt_getRowID(rowID);
+			}
+		}
+	}
+	
 	kt.getColumn = function(columnID) {
 		var id = columnID;
 		if (typeof columnID === "string") {
@@ -196,6 +209,13 @@ kt = function() {
 		};
 		return colID;
 	};
+	
+	kt_getRowID = function(rowIDName) {
+		var rowID = null;
+		for (var i = 0; i < dataTable.spec.numRows; i++) {
+			
+		}
+	}
 	
 	kt_getExtColumnID = function(columnName) {
 		var colID = null;

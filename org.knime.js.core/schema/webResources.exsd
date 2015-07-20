@@ -95,6 +95,20 @@ It is good practice to always provide a production and debug bundle.
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="usesDefine" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="exports" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
@@ -139,7 +153,7 @@ If the resource is a folder, all contents of that folder are made available.
                   The destination-relative path to the JavaScript or stylesheet file.
                </documentation>
                <appInfo>
-                  <meta.attribute kind="identifier" basedOn=""/>
+                  <meta.attribute kind="identifier"/>
                </appInfo>
             </annotation>
          </attribute>

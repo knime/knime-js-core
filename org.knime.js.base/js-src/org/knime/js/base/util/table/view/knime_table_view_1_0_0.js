@@ -16,6 +16,7 @@ knime_table_view = function(table, containerElement) {
 	var sortColumn = null;
 	var sortAscending = true;
 	var enableSelection = true;
+	var tableHeight = 300;
 	var fullFrame = false;
 	var selectAllCheckbox;
 	
@@ -98,6 +99,9 @@ knime_table_view = function(table, containerElement) {
 			}
 			if (fullFrame) {
 				_resizeParent();
+			} else {
+				var height = Math.min(tableHeight, table.outerHeight(true));
+				_resizeParent(null, height);
 			}
 			//var totalDrawDuration = new Date().getTime() - drawingStartTime;
 			//console.log("Total layout time " + totalDrawDuration + "ms.");
@@ -202,6 +206,14 @@ knime_table_view = function(table, containerElement) {
 	}
 	tableView.isEnableSelection = function() {
 		return enableSelection;
+	}
+	
+	tableView.setTableHeight = function(height) {
+		tableHeight = height;
+	}
+	
+	tableView.getTableHeight = function() {
+		return tableHeight;
 	}
 
 	tableView.setFullFrame = function(full) {

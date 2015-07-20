@@ -48,11 +48,15 @@
  */
 package org.knime.js.base.util.table;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
 import org.knime.core.node.defaultnodesettings.DialogComponentNumber;
 import org.knime.core.node.defaultnodesettings.DialogComponentString;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelIntegerBounded;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 
 /**
@@ -74,8 +78,18 @@ public class WebTableNodeDialogPane extends DefaultNodeSettingsPane {
             WebTableNodeModel.createLastDisplayedRowModel(WebTableNodeModel.END),
             "No. of rows to display:", 10));
 
+        final SettingsModelIntegerBounded heightModel = WebTableNodeModel.createTableHeightModel();
+        addDialogComponent(new DialogComponentNumber(heightModel, "Maximum table height in layout", 1));
+
         final SettingsModelBoolean fullFrameModel = WebTableNodeModel.createFullFrameModel();
         addDialogComponent(new DialogComponentBoolean(fullFrameModel, "Extend frame to table height"));
+        heightModel.setEnabled(!fullFrameModel.getBooleanValue());
+        fullFrameModel.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                heightModel.setEnabled(!fullFrameModel.getBooleanValue());
+            }
+        });
 
         final SettingsModelBoolean numberFormatterModel = WebTableNodeModel.createUseNumberFormatterModel();
         addDialogComponent(new DialogComponentBoolean(numberFormatterModel, "Enable number formatter"));
