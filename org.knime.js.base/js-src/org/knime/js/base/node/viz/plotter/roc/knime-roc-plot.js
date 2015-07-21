@@ -281,13 +281,14 @@ knime_roc_curve = function() {
                 var g = svg.append("g").attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
                 var l = g.append("text").attr({x : 20}).text(key);
                 g.append("circle").attr({"r" : 5, "fill" : xy[key].color, cx : 5, cy : -5});
-                xPos += parseInt(l.style("width")) + 20;
+                xPos += parseInt(l.node().getComputedTextLength()) + 20;
                 
                 if (xPos > w) {
                     yPos += 25;
                     xPos = 0;
                     g.attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
-                    xPos += parseInt(l.style("width")) + 30;
+                    
+                    xPos += parseInt(l.node().getComputedTextLength()) + 30;
                 } else {
                     xPos += 10;
                 }
@@ -296,9 +297,10 @@ knime_roc_curve = function() {
             if (key !== "random" && _representation.showArea) {
                 var area = areaG.append("text")
                     .attr("y", areaCount++ * 25)
+                    .attr("x", 0)
                     .attr("fill", xy[key].color)
                     .text(key + " (" + Math.round(parseFloat(xy[key].area) * 1000) / 1000 + ")");
-                var width = parseInt(area.style("width"));
+                var width = parseInt(area.node().getComputedTextLength());
                 if (width > maxWidth) {
                     maxWidth = width;
                 }
