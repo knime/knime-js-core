@@ -173,7 +173,7 @@ knime_roc_curve = function() {
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
-        var d3svg = d3.select(svg1).style("font-family", "sans-serif");
+        var d3svg = d3.select("*").style("font-family", "sans-serif");
 
         var svg = d3svg.attr({width : cw, height : ch}).style({width : chartWidth, height : chartHeight})
             .append("g").attr("transform", 
@@ -281,14 +281,14 @@ knime_roc_curve = function() {
                 var g = svg.append("g").attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
                 var l = g.append("text").attr({x : 20}).text(key);
                 g.append("circle").attr({"r" : 5, "fill" : xy[key].color, cx : 5, cy : -5});
-                xPos += parseInt(l.node().getComputedTextLength()) + 20;
+                xPos += parseInt(l.node().getBoundingClientRect().width) + 20;
                 
                 if (xPos > w) {
                     yPos += 25;
                     xPos = 0;
                     g.attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
                     
-                    xPos += parseInt(l.node().getComputedTextLength()) + 30;
+                    xPos += parseInt(l.node().getBoundingClientRect().width) + 30;
                 } else {
                     xPos += 10;
                 }
@@ -300,7 +300,7 @@ knime_roc_curve = function() {
                     .attr("x", 0)
                     .attr("fill", xy[key].color)
                     .text(key + " (" + Math.round(parseFloat(xy[key].area) * 1000) / 1000 + ")");
-                var width = parseInt(area.node().getComputedTextLength());
+                var width = parseInt(area.node().getBoundingClientRect().width);
                 if (width > maxWidth) {
                     maxWidth = width;
                 }

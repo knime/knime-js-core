@@ -402,13 +402,13 @@ knime_lift_chart = function() {
                 var g = svg.append("g").attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
                 var l = g.append("text").attr({x : 20}).text(key);
                 g.append("circle").attr({"r" : 5, "fill" : currentData[key].color, cx : 5, cy : -5});
-                xPos += parseInt(l.node().getComputedTextLength()) + 20;
+                xPos += parseInt(l.node().getBoundingClientRect().width) + 20;
                 
                 if (xPos > w) {
                     yPos += 25;
                     xPos = 0;
                     g.attr("transform", "translate(" + xPos + "," + (h + yPos) + ")");
-                    xPos += parseInt(l.node().getComputedTextLength()) + 30;
+                    xPos += parseInt(l.node().getBoundingClientRect().width) + 30;
                 } else {
                     xPos += 10;
                 }
