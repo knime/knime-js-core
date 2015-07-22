@@ -43,6 +43,7 @@ knime_lift_chart = function() {
             var controlsContainer = body.append("div")
                 .style({position : "absolute",
                         bottom : "0px",
+                        "font-family" : "sans-serif",
                         padding : "5px",
                         "background-color" : "white",
                         "padding-left" : "60px",

@@ -28,7 +28,7 @@ knime_roc_curve = function() {
         var controlHeight;
         if (_representation.enableControls) {
              var controlsContainer = body.append("div").style({position : "absolute", bottom : "0px",
-                         width : "100%", padding : "5px", "padding-left" : "60px",
+                         width : "100%", padding : "5px", "padding-left" : "60px", "font-family" : "sans-serif",
                           "border-top" : "1px solid black", "background-color" : "white"}).attr("id", "controlContainer");
 
             createControls(controlsContainer);
@@ -173,7 +173,7 @@ knime_roc_curve = function() {
         var svg1 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         document.getElementById(containerID).appendChild(svg1);
         
-        var d3svg = d3.select("*").style("font-family", "sans-serif");
+        var d3svg = d3.select(svg1).style("font-family", "sans-serif");
 
         var svg = d3svg.attr({width : cw, height : ch}).style({width : chartWidth, height : chartHeight})
             .append("g").attr("transform", 
