@@ -84,7 +84,12 @@ import com.google.common.base.Function;
  */
 public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
     
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(PhantomJSImageGenerator.class); 
+	/** 
+	 * Global lock object to synchronize view generation and subsequent operations. 
+	 */
+    public static final Object VIEW_GENERATION_LOCK = new Object();
+    
+	private static final NodeLogger LOGGER = NodeLogger.getLogger(PhantomJSImageGenerator.class); 
     private static final long DEFAULT_TIMEOUT = 30;
     
     private final WebDriver m_driver;
