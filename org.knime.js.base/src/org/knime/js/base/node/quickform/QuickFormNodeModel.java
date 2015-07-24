@@ -51,7 +51,7 @@ import java.io.IOException;
 
 import javax.json.Json;
 import javax.json.JsonException;
-import javax.json.JsonObject;
+import javax.json.JsonValue;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -425,12 +425,12 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
             dialogValue = getDefaultValue();
         }
 
-        JsonObject jsonObject = dialogValue != null ? dialogValue.toJson() : null;
-        if (jsonObject == null) {
-            jsonObject = Json.createObjectBuilder().build();
+        JsonValue jsonValue = dialogValue != null ? dialogValue.toJson() : null;
+        if (jsonValue == null) {
+            jsonValue = Json.createObjectBuilder().build();
         }
 
-        return ExternalNodeData.builder(getParameterName()).jsonObject(jsonObject).build();
+        return ExternalNodeData.builder(getParameterName()).jsonValue(jsonValue).build();
     }
 
     /**
@@ -445,8 +445,8 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     private VAL validateAndLoadDialogValue(final ExternalNodeData inputData) {
         VAL dialogValue = createEmptyDialogValue();
         try {
-            if (inputData.getJSONObject() != null) {
-                dialogValue.loadFromJson(inputData.getJSONObject());
+            if (inputData.getJSONValue() != null) {
+                dialogValue.loadFromJson(inputData.getJSONValue());
             } else if (inputData.getStringValue() != null) {
                 dialogValue.loadFromString(inputData.getStringValue());
             } else {

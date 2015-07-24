@@ -51,6 +51,7 @@ import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -177,16 +178,22 @@ public class SingleSelectionQuickFormValue extends JSONViewContent implements Di
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_VARIABLE_VALUE);
-            if (JsonValue.NULL.equals(val)) {
-                m_variableValue = null;
-            } else {
-                m_variableValue = json.getString(CFG_VARIABLE_VALUE);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonString) {
+            loadFromString(((JsonString) json).getString());
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_VARIABLE_VALUE);
+                if (JsonValue.NULL.equals(val)) {
+                    m_variableValue = null;
+                } else {
+                    m_variableValue = ((JsonObject) json).getString(CFG_VARIABLE_VALUE);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected string value for key '" + CFG_VARIABLE_VALUE + ".", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected string value for key '" + CFG_VARIABLE_VALUE + ".", e);
+        } else {
+            throw new JsonException("Expected JSON object or JSON string, but got " + json.getValueType());
         }
     }
 

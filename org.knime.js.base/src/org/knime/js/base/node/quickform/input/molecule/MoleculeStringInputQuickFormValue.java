@@ -51,6 +51,7 @@ import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -177,16 +178,22 @@ public class MoleculeStringInputQuickFormValue extends JSONViewContent implement
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_STRING);
-            if (JsonValue.NULL.equals(val)) {
-                m_moleculeString = null;
-            } else {
-                m_moleculeString = json.getString(CFG_STRING);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonString) {
+            loadFromString(((JsonString) json).getString());
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_STRING);
+                if (JsonValue.NULL.equals(val)) {
+                    m_moleculeString = null;
+                } else {
+                    m_moleculeString = ((JsonObject) json).getString(CFG_STRING);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected molecule string value for key '" + CFG_STRING + "'.", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected molecule string value for key '" + CFG_STRING + "'.", e);
+        } else {
+            throw new JsonException("Expected JSON object or JSON string, but got " + json.getValueType());
         }
     }
 

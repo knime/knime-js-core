@@ -49,7 +49,10 @@ package org.knime.js.base.node.quickform.input.integer;
 
 import javax.json.Json;
 import javax.json.JsonException;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -181,11 +184,19 @@ public class IntInputQuickFormValue extends JSONViewContent implements DialogNod
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            m_integer = json.getInt(CFG_INTEGER);
-        } catch (Exception e) {
-            throw new JsonException("Expected integer value for key '" + CFG_INTEGER + "'."  , e);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonNumber) {
+            m_integer = ((JsonNumber)json).intValue();
+        } else if (json instanceof JsonString) {
+            loadFromString(((JsonString) json).getString());
+        } else if (json instanceof JsonObject) {
+            try {
+                m_integer = ((JsonObject) json).getInt(CFG_INTEGER);
+            } catch (Exception e) {
+                throw new JsonException("Expected double value for key '" + CFG_INTEGER + "'."  , e);
+            }
+        } else {
+            throw new JsonException("Expected JSON object or JSON number, but got " + json.getValueType());
         }
     }
 

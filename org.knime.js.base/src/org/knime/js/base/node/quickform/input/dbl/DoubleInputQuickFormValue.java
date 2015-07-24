@@ -49,7 +49,10 @@ package org.knime.js.base.node.quickform.input.dbl;
 
 import javax.json.Json;
 import javax.json.JsonException;
+import javax.json.JsonNumber;
 import javax.json.JsonObject;
+import javax.json.JsonString;
+import javax.json.JsonValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -181,11 +184,19 @@ public class DoubleInputQuickFormValue extends JSONViewContent implements Dialog
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            m_double = json.getJsonNumber(CFG_DOUBLE).doubleValue();
-        } catch (Exception e) {
-            throw new JsonException("Expected double value for key '" + CFG_DOUBLE + "'."  , e);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonNumber) {
+            m_double = ((JsonNumber)json).doubleValue();
+        } else if (json instanceof JsonString) {
+            loadFromString(((JsonString)json).getString());
+        } else if (json instanceof JsonObject) {
+            try {
+                m_double = ((JsonObject) json).getJsonNumber(CFG_DOUBLE).doubleValue();
+            } catch (Exception e) {
+                throw new JsonException("Expected double value for key '" + CFG_DOUBLE + "'."  , e);
+            }
+        } else {
+            throw new JsonException("Expected JSON object or JSON number, but got " + json.getValueType());
         }
     }
 

@@ -52,6 +52,7 @@ import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -177,16 +178,22 @@ public class FileUploadQuickFormValue extends JSONViewContent implements DialogN
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_PATH);
-            if (JsonValue.NULL.equals(val)) {
-                m_path = null;
-            } else {
-                m_path = json.getString(CFG_PATH);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonString) {
+            m_path = ((JsonString) json).getString();
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_PATH);
+                if (JsonValue.NULL.equals(val)) {
+                    m_path = null;
+                } else {
+                    m_path = ((JsonObject) json).getString(CFG_PATH);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected path value for key '" + CFG_PATH + "'.", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected path value for key '" + CFG_PATH + "'.", e);
+        } else {
+            throw new JsonException("Expected JSON object or JSON string, but got " + json.getValueType());
         }
     }
 

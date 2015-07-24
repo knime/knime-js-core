@@ -212,31 +212,35 @@ public class ValueFilterQuickFormValue extends JSONViewContent implements Dialog
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_COLUMN);
-            if (JsonValue.NULL.equals(val)) {
-                m_column = null;
-            } else {
-                m_column = json.getString(CFG_COLUMN);
-            }
-        } catch (Exception e) {
-            throw new JsonException("Expected string value for key '" + CFG_COLUMN + ".", e);
-        }
-
-        try {
-            JsonValue val = json.get(CFG_VALUES);
-            if (JsonValue.NULL.equals(val)) {
-                m_values = null;
-            } else {
-                JsonArray array = json.getJsonArray(CFG_VALUES);
-                m_values = new String[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                    m_values [i] = array.getString(i);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_COLUMN);
+                if (JsonValue.NULL.equals(val)) {
+                    m_column = null;
+                } else {
+                    m_column = ((JsonObject) json).getString(CFG_COLUMN);
                 }
+            } catch (Exception e) {
+                throw new JsonException("Expected string value for key '" + CFG_COLUMN + ".", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected valid string array for key '" + CFG_VALUES + ".", e);
+
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_VALUES);
+                if (JsonValue.NULL.equals(val)) {
+                    m_values = null;
+                } else {
+                    JsonArray array = ((JsonObject) json).getJsonArray(CFG_VALUES);
+                    m_values = new String[array.size()];
+                    for (int i = 0; i < array.size(); i++) {
+                        m_values [i] = array.getString(i);
+                    }
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected valid string array for key '" + CFG_VALUES + ".", e);
+            }
+        } else {
+            throw new JsonException("Expected JSON object, but got " + json.getValueType());
         }
     }
 

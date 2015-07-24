@@ -236,20 +236,30 @@ public class ColumnFilterQuickFormValue extends JSONViewContent implements Dialo
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_COLUMNS);
-            if (JsonValue.NULL.equals(val)) {
-                m_columns = null;
-            } else {
-                JsonArray array = json.getJsonArray(CFG_COLUMNS);
-                m_columns = new String[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                    m_columns [i] = array.getString(i);
-                }
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonArray) {
+            JsonArray array = (JsonArray) json;
+            m_columns = new String[array.size()];
+            for (int i = 0; i < array.size(); i++) {
+                m_columns [i] = array.getString(i);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected valid string array for key '" + CFG_COLUMNS + ".", e);
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_COLUMNS);
+                if (JsonValue.NULL.equals(val)) {
+                    m_columns = null;
+                } else {
+                    JsonArray array = ((JsonObject) json).getJsonArray(CFG_COLUMNS);
+                    m_columns = new String[array.size()];
+                    for (int i = 0; i < array.size(); i++) {
+                        m_columns [i] = array.getString(i);
+                    }
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected valid string array for key '" + CFG_COLUMNS + ".", e);
+            }
+        } else {
+            throw new JsonException("Expected JSON object or JSON array, but got " + json.getValueType());
         }
     }
 

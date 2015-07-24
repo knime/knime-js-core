@@ -50,7 +50,9 @@ package org.knime.js.base.node.quickform.input.bool;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonValue;
+import javax.json.JsonValue.ValueType;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -169,23 +171,33 @@ public class BooleanInputQuickFormValue extends JSONViewContent implements Dialo
      */
     @Override
     public void loadFromString(final String fromCmdLine) throws UnsupportedOperationException {
-        setBoolean("true".equals(fromCmdLine));
+        setBoolean("true".equalsIgnoreCase(fromCmdLine));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_BOOLEAN);
-            if (JsonValue.NULL.equals(val)) {
-                m_boolean = false;
-            } else {
-                m_boolean = json.getBoolean(CFG_BOOLEAN);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json.getValueType() == ValueType.TRUE) {
+            m_boolean = true;
+        } else if (json.getValueType() == ValueType.FALSE) {
+            m_boolean = false;
+        } else if (json instanceof JsonString) {
+            loadFromString(((JsonString) json).getString());
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_BOOLEAN);
+                if (JsonValue.NULL.equals(val)) {
+                    m_boolean = false;
+                } else {
+                    m_boolean = ((JsonObject) json).getBoolean(CFG_BOOLEAN);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected boolean value for key '" + CFG_BOOLEAN + "'.", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected boolean value for key '" + CFG_BOOLEAN + "'.", e);
+        } else {
+            throw new JsonException("Expected a JSON object, but got " + json.getValueType());
         }
     }
 

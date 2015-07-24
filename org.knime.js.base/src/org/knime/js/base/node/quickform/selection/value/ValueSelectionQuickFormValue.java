@@ -208,27 +208,31 @@ public class ValueSelectionQuickFormValue extends JSONViewContent implements Dia
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_COLUMN);
-            if (JsonValue.NULL.equals(val)) {
-                m_column = null;
-            } else {
-                m_column = json.getString(CFG_COLUMN);
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_COLUMN);
+                if (JsonValue.NULL.equals(val)) {
+                    m_column = null;
+                } else {
+                    m_column = ((JsonObject) json).getString(CFG_COLUMN);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected column name for key '" + CFG_COLUMN + ".", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected column name for key '" + CFG_COLUMN + ".", e);
-        }
 
-        try {
-            JsonValue val = json.get(CFG_VALUE);
-            if (JsonValue.NULL.equals(val)) {
-                m_value = null;
-            } else {
-                m_value = json.getString(CFG_VALUE);
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_VALUE);
+                if (JsonValue.NULL.equals(val)) {
+                    m_value = null;
+                } else {
+                    m_value = ((JsonObject) json).getString(CFG_VALUE);
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected string value for key '" + CFG_VALUE + ".", e);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected string value for key '" + CFG_VALUE + ".", e);
+        } else {
+            throw new JsonException("Expected JSON object, but got " + json.getValueType());
         }
     }
 

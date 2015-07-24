@@ -181,20 +181,30 @@ public class MultipleSelectionQuickFormValue extends JSONViewContent implements 
      * {@inheritDoc}
      */
     @Override
-    public void loadFromJson(final JsonObject json) throws JsonException {
-        try {
-            JsonValue val = json.get(CFG_VARIABLE_VALUE);
-            if (JsonValue.NULL.equals(val)) {
-                m_variableValue = null;
-            } else {
-                JsonArray array = json.getJsonArray(CFG_VARIABLE_VALUE);
-                m_variableValue = new String[array.size()];
-                for (int i = 0; i < array.size(); i++) {
-                    m_variableValue [i] = array.getString(i);
-                }
+    public void loadFromJson(final JsonValue json) throws JsonException {
+        if (json instanceof JsonArray) {
+            JsonArray array = (JsonArray) json;
+            m_variableValue = new String[array.size()];
+            for (int i = 0; i < array.size(); i++) {
+                m_variableValue [i] = array.getString(i);
             }
-        } catch (Exception e) {
-            throw new JsonException("Expected valid string array for key '" + CFG_VARIABLE_VALUE + ".", e);
+        } else if (json instanceof JsonObject) {
+            try {
+                JsonValue val = ((JsonObject) json).get(CFG_VARIABLE_VALUE);
+                if (JsonValue.NULL.equals(val)) {
+                    m_variableValue = null;
+                } else {
+                    JsonArray array = ((JsonObject) json).getJsonArray(CFG_VARIABLE_VALUE);
+                    m_variableValue = new String[array.size()];
+                    for (int i = 0; i < array.size(); i++) {
+                        m_variableValue [i] = array.getString(i);
+                    }
+                }
+            } catch (Exception e) {
+                throw new JsonException("Expected valid string array for key '" + CFG_VARIABLE_VALUE + ".", e);
+            }
+        } else {
+            throw new JsonException("Expected JSON object or JSON array, but got " + json.getValueType());
         }
     }
 
