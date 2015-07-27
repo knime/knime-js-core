@@ -149,7 +149,7 @@ knime_line_plot = function() {
 		var xAxis = plot.getXAxis();
         xAxis.setLabel(xAxisLabel);
         xAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
-        //xAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        xAxis.setTickLabelFont(new jsfc.Font("sans-serif", 11));
         xAxis.setGridLinesVisible(_representation.showGrid, false);
         xAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.xAxisMin && _value.xAxisMax) {
@@ -159,7 +159,7 @@ knime_line_plot = function() {
         var yAxis = plot.getYAxis();
         yAxis.setLabel(yAxisLabel);
         yAxis.setLabelFont(new jsfc.Font(defaultFont, defaultFontSize, true));
-        //yAxis.setTickLabelFont(new jsfc.Font("sans-serif", 10));
+        yAxis.setTickLabelFont(new jsfc.Font("sans-serif", 11));
         yAxis.setGridLinesVisible(_representation.showGrid, false);
         yAxis.setAutoRange(_representation.autoRangeAxes, false);
         if (_value.yAxisMin && _value.yAxisMax) {
@@ -192,7 +192,13 @@ knime_line_plot = function() {
         var chartTitle = _value.chartTitle ? _value.chartTitle : "";
         var chartSubtitle = _value.chartSubtitle ? _value.chartSubtitle : "";
         chart.setTitle(chartTitle, chartSubtitle, chart.getTitleAnchor());
-        if (!_representation.showLegend) {
+        chart.updateTitle(null, new jsfc.Font("sans-serif", 24, false, false));
+        chart.updateSubtitle(null, new jsfc.Font("sans-serif", 12));
+        if (_representation.showLegend) {
+        	var legendBuilder = new jsfc.StandardLegendBuilder();
+        	legendBuilder.setFont(new jsfc.Font("sans-serif", 12));
+        	chart.setLegendBuilder(legendBuilder);
+        } else {
         	chart.setLegendBuilder(null);
         }
         var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

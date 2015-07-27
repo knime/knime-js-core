@@ -30,5 +30,6 @@
     </interactiveView>
 	<ports>
 		<outPort index="0" name="Flow Variable Output">Variable output with the given variable defined.</outPort>
+		<outPort index="1" name="SVG Image Output">If sketcher outputs an SVG it can be retrieved here.</outPort>
 	</ports>
 </knimeNode>

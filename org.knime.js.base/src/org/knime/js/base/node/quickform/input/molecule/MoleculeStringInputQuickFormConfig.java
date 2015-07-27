@@ -65,6 +65,16 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     private static final String CFG_FORMAT = "format";
     private static final String DEFAULT_FORMAT = MoleculeStringInputQuickFormNodeModel.DEFAULT_FORMATS[0];
     private String m_format = DEFAULT_FORMAT;
+    private static final String CFG_GENERATE_IMAGE = "generateImage";
+    private static final boolean DEFAULT_GENERATE = true;
+    private boolean m_generateImage = DEFAULT_GENERATE;
+
+    private static final String CFG_WIDTH = "width";
+    private static final int DEFAULT_WIDTH = 600;
+    private int m_width = DEFAULT_WIDTH;
+    private static final String CFG_HEIGHT = "height";
+    private static final int DEFAULT_HEIGHT = 400;
+    private int m_height = DEFAULT_HEIGHT;
 
     /**
      * @return the format
@@ -81,12 +91,57 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     }
 
     /**
+     * @return the generateImage
+     */
+    boolean getGenerateImage() {
+        return m_generateImage;
+    }
+
+    /**
+     * @param generateImage the generateImage to set
+     */
+    void setGenerateImage(final boolean generateImage) {
+        m_generateImage = generateImage;
+    }
+
+    /**
+     * @return the width
+     */
+    public int getWidth() {
+        return m_width;
+    }
+
+    /**
+     * @param width the width to set
+     */
+    public void setWidth(final int width) {
+        m_width = width;
+    }
+
+    /**
+     * @return the height
+     */
+    public int getHeight() {
+        return m_height;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setHeight(final int height) {
+        m_height = height;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void saveSettings(final NodeSettingsWO settings) {
         super.saveSettings(settings);
+        settings.addBoolean(CFG_GENERATE_IMAGE, m_generateImage);
         settings.addString(CFG_FORMAT, m_format);
+        settings.addInt(CFG_WIDTH, m_width);
+        settings.addInt(CFG_HEIGHT, m_height);
     }
 
     /**
@@ -96,6 +151,11 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     public void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadSettings(settings);
         m_format = settings.getString(CFG_FORMAT);
+
+        //added with 2.12
+        m_generateImage = settings.getBoolean(CFG_GENERATE_IMAGE, DEFAULT_GENERATE);
+        m_width = settings.getInt(CFG_WIDTH, DEFAULT_WIDTH);
+        m_height = settings.getInt(CFG_HEIGHT, DEFAULT_HEIGHT);
     }
 
     /**
@@ -105,6 +165,11 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     public void loadSettingsInDialog(final NodeSettingsRO settings) {
         super.loadSettingsInDialog(settings);
         m_format = settings.getString(CFG_FORMAT, DEFAULT_FORMAT);
+
+        //added with 2.12
+        m_generateImage = settings.getBoolean(CFG_GENERATE_IMAGE, DEFAULT_GENERATE);
+        m_width = settings.getInt(CFG_WIDTH, DEFAULT_WIDTH);
+        m_height = settings.getInt(CFG_HEIGHT, DEFAULT_HEIGHT);
     }
 
     /**
@@ -125,6 +190,12 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
         sb.append(", ");
         sb.append("format=");
         sb.append(m_format);
+        sb.append(", ");
+        sb.append("width=");
+        sb.append(m_width);
+        sb.append(", ");
+        sb.append("height=");
+        sb.append(m_height);
         return sb.toString();
     }
 
@@ -134,7 +205,10 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     @Override
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
+                .append(m_generateImage)
                 .append(m_format)
+                .append(m_width)
+                .append(m_height)
                 .toHashCode();
     }
 
@@ -154,7 +228,10 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
         }
         MoleculeStringInputQuickFormConfig other = (MoleculeStringInputQuickFormConfig)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
+                .append(m_generateImage, other.m_generateImage)
                 .append(m_format, other.m_format)
+                .append(m_width, other.m_width)
+                .append(m_height, other.m_height)
                 .isEquals();
     }
 

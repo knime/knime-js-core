@@ -71,7 +71,15 @@ public abstract class QuickFormFlowVariableNodeModel
 
     /** Creates a new node model with no inports and one flow variable outport. */
     protected QuickFormFlowVariableNodeModel() {
-        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE});
+        this(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE});
+    }
+
+    /** Creates a new node model with specified inports and outports.
+     * @param inPortTypes
+     * @param outPortTypes
+     **/
+    protected QuickFormFlowVariableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
+        super(inPortTypes, outPortTypes);
     }
 
     /** {@inheritDoc} */

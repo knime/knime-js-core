@@ -72,9 +72,30 @@ public class MoleculeStringInputQuickFormRepresentation extends
         final MoleculeStringInputQuickFormConfig config) {
         super(currentValue, config);
         m_format = config.getFormat();
+        m_width = config.getWidth();
+        m_height = config.getHeight();
     }
 
     private final String m_format;
+    private String m_sketcherLocation;
+    private final int m_width;
+    private final int m_height;
+
+    /**
+     * @return the sketcherLocation
+     */
+    @JsonProperty("sketcherLocation")
+    public String getSketcherLocation() {
+        return m_sketcherLocation;
+    }
+
+    /**
+     * @param sketcherLocation the sketcherLocation to set
+     */
+    @JsonProperty("sketcherLocation")
+    public void setSketcherLocation(final String sketcherLocation) {
+        m_sketcherLocation = sketcherLocation;
+    }
 
     /**
      * @return the format
@@ -82,6 +103,22 @@ public class MoleculeStringInputQuickFormRepresentation extends
     @JsonProperty("format")
     public String getFormat() {
         return m_format;
+    }
+
+    /**
+     * @return the width
+     */
+    @JsonProperty("width")
+    public int getWidth() {
+        return m_width;
+    }
+
+    /**
+     * @return the height
+     */
+    @JsonProperty("height")
+    public int getHeight() {
+        return m_height;
     }
 
     /**
@@ -105,6 +142,12 @@ public class MoleculeStringInputQuickFormRepresentation extends
         sb.append(", ");
         sb.append("format=");
         sb.append(m_format);
+        sb.append(", ");
+        sb.append("width=");
+        sb.append(m_width);
+        sb.append(", ");
+        sb.append("height=");
+        sb.append(m_height);
         return sb.toString();
     }
 
@@ -115,6 +158,9 @@ public class MoleculeStringInputQuickFormRepresentation extends
     public int hashCode() {
         return new HashCodeBuilder().appendSuper(super.hashCode())
                 .append(m_format)
+                .append(m_sketcherLocation)
+                .append(m_width)
+                .append(m_height)
                 .toHashCode();
     }
 
@@ -135,6 +181,9 @@ public class MoleculeStringInputQuickFormRepresentation extends
         MoleculeStringInputQuickFormRepresentation other = (MoleculeStringInputQuickFormRepresentation)obj;
         return new EqualsBuilder().appendSuper(super.equals(obj))
                 .append(m_format, other.m_format)
+                .append(m_sketcherLocation, other.m_sketcherLocation)
+                .append(m_width, other.m_width)
+                .append(m_height, other.m_height)
                 .isEquals();
     }
 

@@ -44,8 +44,27 @@
  */
 package org.knime.js.base.node.quickform.input.molecule;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.knime.base.data.xml.SvgCell;
+import org.knime.base.data.xml.SvgImageContent;
+import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.node.port.PortObject;
+import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.port.PortType;
+import org.knime.core.node.port.flowvariable.FlowVariablePortObject;
+import org.knime.core.node.port.flowvariable.FlowVariablePortObjectSpec;
+import org.knime.core.node.port.image.ImagePortObject;
+import org.knime.core.node.port.image.ImagePortObjectSpec;
+import org.knime.core.node.port.inactive.InactiveBranchPortObject;
+import org.knime.core.node.port.inactive.InactiveBranchPortObjectSpec;
+import org.knime.ext.phantomjs.PhantomJSImageGenerator;
 import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
+import org.openqa.selenium.TimeoutException;
 
 /**
  * The model for the molecule string input quick form node.
@@ -58,10 +77,17 @@ public class MoleculeStringInputQuickFormNodeModel
         MoleculeStringInputQuickFormValue,
         MoleculeStringInputQuickFormConfig> {
 
+    private static NodeLogger LOGGER = NodeLogger.getLogger(MoleculeStringInputQuickFormNodeModel.class);
+
     /**
      * The default formats shown in the molecule quickform input.
      */
     static final String[] DEFAULT_FORMATS = {"SDF", "SMILES", "MOL", "SMARTS", "RXN"};
+
+    /** Creates a new node model with no inports and a flow variable and SVG outport. */
+    protected MoleculeStringInputQuickFormNodeModel() {
+        super(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE, ImagePortObject.TYPE});
+    }
 
     /**
      * {@inheritDoc}
@@ -76,7 +102,101 @@ public class MoleculeStringInputQuickFormNodeModel
      */
     @Override
     public String getJavascriptObjectID() {
-        return "org_knime_js_base_node_quickform_input_molecule";
+        return "org.knime.js.base.node.quickform.input.molecule";
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
+        createAndPushFlowVariable();
+        PortObjectSpec imageSpec;
+        if (getConfig().getGenerateImage()) {
+            imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        } else {
+            imageSpec = InactiveBranchPortObjectSpec.INSTANCE;
+        }
+        return new PortObjectSpec[]{FlowVariablePortObjectSpec.INSTANCE, imageSpec};
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected PortObject[] execute(final PortObject[] inObjects, final ExecutionContext exec) throws Exception {
+        createAndPushFlowVariable();
+        PortObject imageObj = createSVGImagePortObjectFromView(exec);
+        return new PortObject[]{FlowVariablePortObject.INSTANCE, imageObj};
+    }
+
+    /**
+     * Renders the view with PhantomJS and retrieves the created SVG image.
+     *
+     * @return A {@link PortObject} containing the SVG created by the view.
+     * @throws IOException if an I/O error occurs
+     */
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) {
+        if (!getConfig().getGenerateImage()) {
+            return InactiveBranchPortObject.INSTANCE;
+        }
+        String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+        String svgPrimer =
+            xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
+                + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
+        String svg = null;
+        String errorText = "";
+        // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
+        // View nodes will get executed sequentially as a result.
+        synchronized (PhantomJSImageGenerator.VIEW_GENERATION_LOCK) {
+            // Inits PhantomJS AND the view.
+
+            PhantomJSImageGenerator generator = null;
+            try {
+                generator = new PhantomJSImageGenerator(this, 500L, exec.createSubExecutionContext(0.75));
+            } catch (Exception e) {
+                if (e instanceof TimeoutException) {
+                    errorText = "No elements added to body. Possible JavaScript implementation error.";
+                } else {
+                    errorText = e.getMessage();
+                }
+                LOGGER.error("Initializing view failed: " + e.getMessage(), e);
+            }
+
+            exec.setProgress(0.75, "Retrieving generated image...");
+            String methodCall = "org_knime_js_base_node_quickform_input_molecule.getSVG();";
+            // Retrieve the SVG string from the view.
+            Object imageData;
+            try {
+                if (generator != null) {
+                    imageData = generator.executeScript(methodCall);
+                    if (imageData instanceof String) {
+                        svg = (String)imageData;
+                    }
+                }
+                exec.setProgress(0.9, "Creating image output...");
+            } catch (IOException e) {
+                errorText = e.getMessage();
+                LOGGER.error("Retrieving SVG from view failed: " + e.getMessage(), e);
+            }
+
+        }
+        if (svg == null || svg.isEmpty()) {
+            if (errorText.isEmpty()) {
+                errorText = "JavaScript returned nothing. Possible implementation error.";
+            }
+            svg = "<svg width=\"600px\" height=\"40px\">"
+                + "<text x=\"0\" y=\"20\" font-family=\"sans-serif;\" font-size=\"10\">"
+                + "SVG retrieval failed: " + errorText + "</text></svg>";
+         }
+        svg = svgPrimer + svg;
+        InputStream is = new ByteArrayInputStream(svg.getBytes());
+        ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
+        ImagePortObject imagePort = null;
+        try {
+            imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
+        } catch (IOException e) {
+            LOGGER.error("Creating SVG port object failed: " + e.getMessage(), e);
+        }
+        exec.setProgress(1);
+        return imagePort;
     }
 
     /**
