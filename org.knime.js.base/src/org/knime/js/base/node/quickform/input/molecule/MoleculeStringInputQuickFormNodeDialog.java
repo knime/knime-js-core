@@ -49,7 +49,9 @@ import java.awt.GridBagConstraints;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.SpinnerNumberModel;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -72,6 +74,9 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
 
     private final JTextArea m_defaultArea;
 
+    private final JSpinner m_widthSpinner;
+    private final JSpinner m_heightSpinner;
+
     private MoleculeStringInputQuickFormConfig m_config;
 
     /** Constructors, inits fields calls layout routines. */
@@ -81,6 +86,12 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
         m_formatBox = new JComboBox(MoleculeStringInputQuickFormNodeModel.DEFAULT_FORMATS);
         m_formatBox.setEditable(true);
         m_defaultArea = new JTextArea(TEXT_AREA_HEIGHT, DEF_TEXTFIELD_WIDTH);
+        m_widthSpinner =
+            new JSpinner(new SpinnerNumberModel(MoleculeStringInputQuickFormConfig.DEFAULT_WIDTH, 300,
+                Integer.MAX_VALUE, 1));
+        m_heightSpinner =
+            new JSpinner(new SpinnerNumberModel(MoleculeStringInputQuickFormConfig.DEFAULT_HEIGHT, 300,
+                Integer.MAX_VALUE, 1));
         createAndAddTab();
     }
 
@@ -89,6 +100,8 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
      */
     @Override
     protected final void fillPanel(final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
+        addPairToPanel("Width", m_widthSpinner, panelWithGBLayout, gbc);
+        addPairToPanel("Height", m_heightSpinner, panelWithGBLayout, gbc);
         addPairToPanel("Format: ", m_formatBox, panelWithGBLayout, gbc);
         addPairToPanel("Default Value: ", new JScrollPane(m_defaultArea), panelWithGBLayout, gbc);
     }
@@ -101,6 +114,8 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
             throws NotConfigurableException {
         m_config.loadSettingsInDialog(settings);
         loadSettingsFrom(m_config);
+        m_widthSpinner.setValue(m_config.getWidth());
+        m_heightSpinner.setValue(m_config.getHeight());
         m_defaultArea.setText(m_config.getDefaultValue().getMoleculeString());
         m_formatBox.setSelectedItem(m_config.getFormat());
     }
@@ -111,6 +126,8 @@ public class MoleculeStringInputQuickFormNodeDialog extends QuickFormNodeDialog 
     @Override
     protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
         saveSettingsTo(m_config);
+        m_config.setWidth((int)m_widthSpinner.getValue());
+        m_config.setHeight((int)m_heightSpinner.getValue());
         m_config.setFormat(m_formatBox.getSelectedItem().toString());
         m_config.getDefaultValue().setMoleculeString(m_defaultArea.getText());
         m_config.saveSettings(settings);

@@ -914,25 +914,28 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 					}
 				} 
 			});
+			qfdiv.append(sketcherFrame);
 		} else {
+			var sketcherDiv = jQuery('<div class="knime-sketcher-div">');
+			sketcherDiv.width(width);
+			sketcherDiv.height(height);
+			sketcherDiv.css("position", "relative");
+			qfdiv.append(sketcherDiv);
 			qfdiv.width(width);
-			qfdiv.height(height);
 			eval(localInitCode);
-			qfdiv.html(localKetcherContent);
+			sketcherDiv.html(localKetcherContent);
 			ketcher.init();
 			ketcher.setMolecule(currentMolecule);
 		} 
 		
-		/*input = jQuery('<input>');
-		qfdiv.attr('title', representation.description);
-		qfdiv.append('<div class="label">' + representation.label + '</div>');
-		qfdiv.append(sketcherFrame);
 		errorMessage = jQuery('<div>');
 		errorMessage.css('display', 'none');
 		errorMessage.css('color', 'red');
 		errorMessage.css('font-style', 'italic');
-		errorMessage.css('font-size', '75%');
-		qfdiv.append(errorMessage);*/
+		errorMessage.css('margin', '10px');
+		qfdiv.prepend(errorMessage);
+		qfdiv.prepend('<div class="label" style="margin-left: 10px">' + representation.label + '</div>');
+		qfdiv.attr('title', representation.description);
 		resizeParent();
 		viewValid = true;
 	};

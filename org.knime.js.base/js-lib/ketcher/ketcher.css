@@ -3,7 +3,7 @@ body
     margin: 0;
 }
 
-body > div:first-child
+div#ketcher_div
 {
     position: absolute;
     width: 100%;

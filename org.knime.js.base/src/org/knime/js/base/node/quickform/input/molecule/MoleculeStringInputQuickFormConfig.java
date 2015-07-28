@@ -70,10 +70,10 @@ public class MoleculeStringInputQuickFormConfig extends QuickFormFlowVariableCon
     private boolean m_generateImage = DEFAULT_GENERATE;
 
     private static final String CFG_WIDTH = "width";
-    private static final int DEFAULT_WIDTH = 600;
+    static final int DEFAULT_WIDTH = 830;
     private int m_width = DEFAULT_WIDTH;
     private static final String CFG_HEIGHT = "height";
-    private static final int DEFAULT_HEIGHT = 400;
+    static final int DEFAULT_HEIGHT = 500;
     private int m_height = DEFAULT_HEIGHT;
 
     /**
