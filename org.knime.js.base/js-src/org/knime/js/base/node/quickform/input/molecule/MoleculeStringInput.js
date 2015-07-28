@@ -894,8 +894,8 @@ org_knime_js_base_node_quickform_input_molecule = function() {
     	
 		if (inLayout) {
 			sketcherFrame = jQuery('<iframe class="knime-sketcher-frame">');
-			sketcherFrame.attr("width", width);
-			sketcherFrame.attr("height", height);
+			sketcherFrame.width(width);
+			sketcherFrame.height(height);
 			sketcherFrame.attr("frameborder", "0");
 	    	sketcherFrame.css("border", "none");
 	    	sketcherFrame.css("margin", "0");
@@ -911,6 +911,9 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 					sketchTranslator = sketcherFrame.get(0).contentWindow.document.SketchTranslator;
 					if (sketchTranslator) {
 						sketchTranslator.init(currentMolecule, null, moleculeInput.update);
+					} else {
+						errorMessage.text("Could not initialize sketcher. SketchTranslator not found.");
+						errorMessage.css('display', 'block');
 					}
 				} 
 			});
@@ -945,6 +948,30 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 	}
 	
 	moleculeInput.validate = function() {
+		if (customSketcher) {
+			if (!sketchTranslator) {
+				errorMessage.text("Could not fetch molecule from sketcher. SketchTranslator not found.");
+				errorMessage.css('display', 'block');
+				return false;
+			}
+			try {
+				molecule = sketchTranslator.getData(format);
+			} catch (exception) {
+				errorMessage.text("Could not fetch molecule from sketcher: " + exception);
+				errorMessage.css('display', 'block');
+				return false;
+			}
+		} else {
+			var k = ketcher;
+			if (inLayout) {
+				k = sketcherFrame.get(0).contentWindow.document.ketcher;
+			}
+            if (typeof ketcher == 'undefined') {
+            	errorMessage.text("Ketcher object not defined.");
+				errorMessage.css('display', 'block');
+				return false;
+            }
+		}
 		return true;
 	}
 	
@@ -968,7 +995,12 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		}
 		var molecule;
 		if (customSketcher && sketchTranslator) {
-			molecule = sketchTranslator.getData(format);
+			try {
+				molecule = sketchTranslator.getData(format);
+			} catch (exception) {
+				// should not happen after succesful validate
+				molecule = null;
+			}
 		} else {
 			var k = ketcher;
 			if (inLayout) {
@@ -984,6 +1016,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
             		molecule = ketcher.getSmiles();
             }
             else {
+            	// should not happen after succesful validate
             	molecule = null;
             }
 		}
@@ -993,8 +1026,10 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 	};
 	
 	moleculeInput.getSVG = function() {
+		// specific ketcher svg selection
 		var svg = jQuery("#client_area svg");
 		if (svg.length == 0) {
+			// generic svg selection
 			svg = jQuery("svg");
 		}
 		if (svg.length > 0) {
