@@ -889,42 +889,63 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		var body = jQuery('body');
 		var qfdiv = jQuery('<div class="quickformcontainer">');
 		body.append(qfdiv);
-		var width = Math.max(MIN_WIDTH, representation.width) + "px";
-		var height = Math.max(MIN_HEIGHT, representation.height) + "px";
+		var width = Math.max(MIN_WIDTH, representation.width);
+		var height = Math.max(MIN_HEIGHT, representation.height);
     	
 		if (inLayout) {
+			jQuery('script').each(function() {
+				var s = jQuery(this);
+				var src = s.attr("src");
+				if (src && src.indexOf("js-lib/ketcher/") != -1) {
+					s.remove();
+				}
+			});
 			sketcherFrame = jQuery('<iframe class="knime-sketcher-frame">');
-			sketcherFrame.width(width);
-			sketcherFrame.height(height);
+			sketcherFrame.width((width + 20) + "px");
+			sketcherFrame.height((height + 20) + "px");
+			qfdiv.width((width + 20) + "px");
 			sketcherFrame.attr("frameborder", "0");
 	    	sketcherFrame.css("border", "none");
 	    	sketcherFrame.css("margin", "0");
 	    	sketcherFrame.css("background", "none");
 			var loc = "./VAADIN/src-js/js-lib/ketcher/ketcher.html";
-			sketcherFrame.setAttribute("name", currentMolecule);
+			sketcherFrame.attr("name", currentMolecule);
 			if (customSketcher) {
 				loc = representation.sketcherLocation;
 			}
 			sketcherFrame.attr("src", loc);
 			sketcherFrame.load(function() {
-				if (customSketcher) {
-					sketchTranslator = sketcherFrame.get(0).contentWindow.document.SketchTranslator;
-					if (sketchTranslator) {
-						sketchTranslator.init(currentMolecule, null, moleculeInput.update);
+				setTimeout(function() {
+					if (customSketcher) {
+						sketchTranslator = sketcherFrame.get(0).contentWindow.SketchTranslator;
+						if (sketchTranslator) {
+							sketchTranslator.init(currentMolecule, null, moleculeInput.update);
+						} else {
+							errorMessage.text("Could not initialize sketcher. SketchTranslator not found.");
+							errorMessage.css('display', 'block');
+							resizeParent();
+						}
 					} else {
-						errorMessage.text("Could not initialize sketcher. SketchTranslator not found.");
-						errorMessage.css('display', 'block');
+						var ketcher = sketcherFrame.get(0).contentWindow.ketcher;
+						if (ketcher) {
+							ketcher.init();
+							ketcher.setMolecule(currentMolecule);
+						} else {
+							errorMessage.text("Could not initialize sketcher. Ketcher object not found.");
+							errorMessage.css('display', 'block');
+							resizeParent();
+						}
 					}
-				} 
+				}, 500);
 			});
 			qfdiv.append(sketcherFrame);
 		} else {
 			var sketcherDiv = jQuery('<div class="knime-sketcher-div">');
-			sketcherDiv.width(width);
-			sketcherDiv.height(height);
+			sketcherDiv.width(width + "px");
+			sketcherDiv.height(height + "px");
 			sketcherDiv.css("position", "relative");
 			qfdiv.append(sketcherDiv);
-			qfdiv.width(width);
+			qfdiv.width(width + "px");
 			eval(localInitCode);
 			sketcherDiv.html(localKetcherContent);
 			ketcher.init();
@@ -952,6 +973,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 			if (!sketchTranslator) {
 				errorMessage.text("Could not fetch molecule from sketcher. SketchTranslator not found.");
 				errorMessage.css('display', 'block');
+				resizeParent();
 				return false;
 			}
 			try {
@@ -959,6 +981,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 			} catch (exception) {
 				errorMessage.text("Could not fetch molecule from sketcher: " + exception);
 				errorMessage.css('display', 'block');
+				resizeParent();
 				return false;
 			}
 		} else {
@@ -969,6 +992,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
             if (typeof ketcher == 'undefined') {
             	errorMessage.text("Ketcher object not defined.");
 				errorMessage.css('display', 'block');
+				resizeParent();
 				return false;
             }
 		}
@@ -1004,7 +1028,7 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		} else {
 			var k = ketcher;
 			if (inLayout) {
-				k = sketcherFrame.get(0).contentWindow.document.ketcher;
+				k = sketcherFrame.get(0).contentWindow.ketcher;
 			}
 			if (!format) {
                 format = "SDF";
