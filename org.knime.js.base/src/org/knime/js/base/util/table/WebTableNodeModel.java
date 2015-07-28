@@ -441,12 +441,13 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
         m_selectionColumnName.loadSettingsFrom(settings);
 
         //added in 2.12
-        //int tableHeight = settings.getInt(CFG_TABLE_HEIGHT, 300);
-        //boolean fullFrame = settings.getBoolean(CFG_FULL_FRAME, false);
-        m_tableHeight.loadSettingsFrom(settings);
-        m_fullFrame.loadSettingsFrom(settings);
-        //m_tableHeight.setIntValue(tableHeight);
-        //m_fullFrame.setBooleanValue(fullFrame);
+        if (settings.containsKey(CFG_TABLE_HEIGHT)) {
+            m_tableHeight.loadSettingsFrom(settings);
+            m_fullFrame.loadSettingsFrom(settings);
+        } else {
+            m_tableHeight.setIntValue(300);
+            m_fullFrame.setBooleanValue(false);
+        }
     }
 
     /**
