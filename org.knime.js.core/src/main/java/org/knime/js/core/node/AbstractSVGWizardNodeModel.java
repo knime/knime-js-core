@@ -68,6 +68,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.ext.phantomjs.PhantomJSImageGenerator;
 import org.knime.js.core.JSONViewContent;
+import org.openqa.selenium.TimeoutException;
 
 /**
  *
@@ -161,15 +162,21 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
         String svg = null;
+        String errorText = "";
         // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
         // View nodes will get executed sequentially as a result.
-        synchronized (m_viewGenerationLock) {
+        synchronized (PhantomJSImageGenerator.VIEW_GENERATION_LOCK) {
             // Inits PhantomJS AND the view.
 
             PhantomJSImageGenerator generator = null;
             try {
                 generator = new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
             } catch (Exception e) {
+                if (e instanceof TimeoutException) {
+                    errorText = "No elements added to body. Possible JavaScript implementation error.";
+                } else {
+                    errorText = e.getMessage();
+                }
                 LOGGER.error("Initializing view failed: " + e.getMessage(), e);
             }
 
@@ -191,12 +198,18 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
                 }
                 exec.setProgress(0.9, "Creating image output...");
             } catch (IOException e) {
+                errorText = e.getMessage();
                 LOGGER.error("Retrieving SVG from view failed: " + e.getMessage(), e);
             }
 
         }
         if (svg == null || svg.isEmpty()) {
-            svg = "<svg width=\"1px\" height=\"1px\"></svg>";
+            if (errorText.isEmpty()) {
+                errorText = "JavaScript returned nothing. Possible implementation error.";
+            }
+            svg = "<svg width=\"600px\" height=\"40px\">"
+                    + "<text x=\"0\" y=\"20\" font-family=\"sans-serif;\" font-size=\"10\">"
+               + "SVG retrieval failed: " + errorText + "</text></svg>";
         }
         svg = svgPrimer + svg;
         InputStream is = new ByteArrayInputStream(svg.getBytes());
