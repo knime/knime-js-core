@@ -118,7 +118,7 @@ public final class ROCCurveViewConfig {
     private Color m_gridColor = DEFAULT_GRID_COLOR;
     private int m_lineWidth = DEFAULT_LINE_WIDTH;
 
-    private boolean m_enableControls = false;
+    private boolean m_enableControls = true;
     private boolean m_enableEditTitle = true;
     private boolean m_enableEditSubtitle = true;
     private boolean m_enableEditXAxisLabel = true;
