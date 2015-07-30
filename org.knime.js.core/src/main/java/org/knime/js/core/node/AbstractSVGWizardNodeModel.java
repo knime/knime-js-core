@@ -214,7 +214,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
                + "SVG retrieval failed: " + errorText + "</text></svg>";
         }
         svg = svgPrimer + svg;
-        InputStream is = new ByteArrayInputStream(svg.getBytes());
+        InputStream is = new ByteArrayInputStream(svg.getBytes("UTF-8"));
         ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
         ImagePortObject imagePort = null;
         try {
