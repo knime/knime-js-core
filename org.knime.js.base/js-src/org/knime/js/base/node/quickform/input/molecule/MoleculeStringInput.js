@@ -877,8 +877,12 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 	
 	var inLayout = (parent != undefined && parent.KnimePageLoader != undefined);
 	var customSketcher = inLayout;
-
+	var callCount = 0;
+	
 	moleculeInput.init = function(representation) {
+		if (callCount++ > 0) {
+			return;
+		}
 		if (checkMissingData(representation)) {
 			return;
 		}
