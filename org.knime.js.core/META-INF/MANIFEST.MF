@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KNIME Javascript Core API
+Bundle-Name: KNIME JavaScript Core API
 Bundle-SymbolicName: org.knime.js.core;singleton:=true
 Bundle-Version: 2.12.0.qualifier
 Bundle-ClassPath: js-core.jar
