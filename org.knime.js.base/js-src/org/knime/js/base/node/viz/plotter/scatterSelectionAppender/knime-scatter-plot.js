@@ -28,17 +28,23 @@ knime_scatter_plot_selection_appender = function() {
 			//console.time("Total init time");
 			_keyedDataset = new jsfc.KeyedValues2DDataset();
 			//_keyedDataset.load(_representation.keyedDataset);
-			//var seriesKey = _representation.keyedDataset.series[0].seriesKey;
-			for (var rowIndex = 0; rowIndex < _representation.keyedDataset.rows.length; rowIndex++) {
-				var rowKey = _representation.keyedDataset.rows[rowIndex].rowKey;
-				var row = _representation.keyedDataset.rows[rowIndex];
-				var properties = row.properties;
-				for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
-					var columnKey = _representation.keyedDataset.columnKeys[col];
-					_keyedDataset.add(rowKey, columnKey, row.values[col]);
-				}
-				for (var propertyKey in properties) {
-					_keyedDataset.setRowProperty(rowKey, propertyKey, properties[propertyKey]);
+			
+			// workaround for https://bugs.knime.org/show_bug.cgi?id=6229, remove when solved
+			if (_representation.keyedDataset.rows.length == 1) {
+				alert("Chart with only one data sample not supported at this time. Please provide a data set with at least 2 samples.")
+			} else {
+				for (var rowIndex = 0; rowIndex < _representation.keyedDataset.rows.length; rowIndex++) {
+					var rowKey = _representation.keyedDataset.rows[rowIndex].rowKey;
+					var row = _representation.keyedDataset.rows[rowIndex];
+					var properties = row.properties;
+					for (var col = 0; col < _representation.keyedDataset.columnKeys.length; col++) {
+						var columnKey = _representation.keyedDataset.columnKeys[col];
+						_keyedDataset.add(rowKey, columnKey, row.values[col]);
+					}
+					for ( var propertyKey in properties) {
+						_keyedDataset.setRowProperty(rowKey, propertyKey,
+								properties[propertyKey]);
+					}
 				}
 			}
 			
