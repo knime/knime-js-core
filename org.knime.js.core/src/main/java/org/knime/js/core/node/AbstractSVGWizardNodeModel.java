@@ -153,7 +153,7 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      * @throws IOException if an I/O error occurs
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) {
+    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
         if (!generateImage()) {
             return InactiveBranchPortObject.INSTANCE;
         }
@@ -171,6 +171,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             PhantomJSImageGenerator generator = null;
             try {
                 generator = new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
+            } catch (IOException ex) {
+                throw ex;
             } catch (Exception e) {
                 if (e instanceof TimeoutException) {
                     errorText = "No elements added to body. Possible JavaScript implementation error.";

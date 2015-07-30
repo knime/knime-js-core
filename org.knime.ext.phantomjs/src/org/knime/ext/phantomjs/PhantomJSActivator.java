@@ -47,6 +47,7 @@
  */
 package org.knime.ext.phantomjs;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
@@ -99,7 +100,7 @@ public class PhantomJSActivator extends Plugin {
         createPhantomJSDriver();
     }
 
-    private static void createPhantomJSDriver() {
+    private static void createPhantomJSDriver() throws IOException {
         if (m_phantomJSPath != null) {
             DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, m_phantomJSPath);
@@ -108,6 +109,8 @@ public class PhantomJSActivator extends Plugin {
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, phantomJsArgs);
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_PAGE_SETTINGS_PREFIX + "localToRemoteUrlAccessEnabled", true);
             m_driver = new PhantomJSDriver(capabilities);
+        } else {
+        	throw new IOException("Could not find PhantomJS installation, please check your installation.");
         }
     }
     
@@ -137,8 +140,9 @@ public class PhantomJSActivator extends Plugin {
      * Returns a {@link PhantomJSDriver} with the correct executable set.
      * @return a correctly configured PhantomJSDriver, or <code>null</code> if the 
      * executable could not be found
+     * @throws IOException if an error occurs while creating the PhantomJS instance
      */
-    public static PhantomJSDriver getConfiguredPhantomJSDriver() {
+    public static PhantomJSDriver getConfiguredPhantomJSDriver() throws IOException {
         if (m_driver == null) {
             createPhantomJSDriver();
         }
