@@ -991,9 +991,9 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 		} else {
 			var k = ketcher;
 			if (inLayout) {
-				k = sketcherFrame.get(0).contentWindow.document.ketcher;
+				k = sketcherFrame.get(0).contentWindow.ketcher;
 			}
-            if (typeof ketcher == 'undefined') {
+            if (typeof k == 'undefined') {
             	errorMessage.text("Ketcher object not defined.");
 				errorMessage.css('display', 'block');
 				resizeParent();
@@ -1037,11 +1037,11 @@ org_knime_js_base_node_quickform_input_molecule = function() {
 			if (!format) {
                 format = "SDF";
             }
-            if (typeof ketcher != 'undefined') {
+            if (typeof k != 'undefined') {
             	if (format.toLowerCase() === "rxn" || format.toLowerCase() === "sdf")
-            		molecule = ketcher.getMolfile();
+            		molecule = k.getMolfile();
             	else	
-            		molecule = ketcher.getSmiles();
+            		molecule = k.getSmiles();
             }
             else {
             	// should not happen after succesful validate
