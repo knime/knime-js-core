@@ -133,7 +133,7 @@ public class MoleculeStringInputQuickFormNodeModel
      * @throws IOException if an I/O error occurs
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) {
+    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
         if (!getConfig().getGenerateImage()) {
             return InactiveBranchPortObject.INSTANCE;
         }
@@ -151,6 +151,8 @@ public class MoleculeStringInputQuickFormNodeModel
             PhantomJSImageGenerator generator = null;
             try {
                 generator = new PhantomJSImageGenerator(this, 500L, exec.createSubExecutionContext(0.75));
+            } catch (IOException ex) {
+                throw ex;
             } catch (Exception e) {
                 if (e instanceof TimeoutException) {
                     errorText = "No elements added to body. Possible JavaScript implementation error.";
@@ -187,7 +189,7 @@ public class MoleculeStringInputQuickFormNodeModel
                 + "SVG retrieval failed: " + errorText + "</text></svg>";
          }
         svg = svgPrimer + svg;
-        InputStream is = new ByteArrayInputStream(svg.getBytes());
+        InputStream is = new ByteArrayInputStream(svg.getBytes("UTF-8"));
         ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
         ImagePortObject imagePort = null;
         try {

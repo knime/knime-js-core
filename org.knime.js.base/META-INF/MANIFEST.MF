@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: KNIME Javascript Base Nodes
+Bundle-Name: KNIME JavaScript Base Nodes
 Bundle-SymbolicName: org.knime.js.base;singleton:=true
 Bundle-Version: 2.12.0.qualifier
 Bundle-ClassPath: js-base.jar

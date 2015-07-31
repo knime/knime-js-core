@@ -41,14 +41,15 @@ knime_lift_chart = function() {
         if (_representation.enableControls) {
             // Container for the view controls
             var controlsContainer = body.append("div")
-                .style({position : "absolute",
+                .style({position : "relative",
                         bottom : "0px",
                         "font-family" : "sans-serif",
                         padding : "5px",
                         "background-color" : "white",
                         "padding-left" : "60px",
                         width : "100%",
-                        "border-top" : "1px solid black"})
+                        "border-top" : "1px solid black",
+                        "box-sizing": "border-box"})
                .attr("id", "controlContainer");
             createControls(controlsContainer);
             controlHeight = controlsContainer.node().getBoundingClientRect().height;
