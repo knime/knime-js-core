@@ -5,15 +5,15 @@ Bundle-SymbolicName: org.knime.js.base;singleton:=true
 Bundle-Version: 3.0.0.qualifier
 Bundle-ClassPath: js-base.jar
 Bundle-Vendor: KNIME.com, Zurich, Switzerland
-Require-Bundle: org.knime.base;bundle-version="[2.9.0,3.0.0)",
- org.knime.js.core;bundle-version="[2.9.0,3.0.0)",
+Require-Bundle: org.knime.base;bundle-version="[3.0.0,4.0.0)",
+ org.knime.js.core;bundle-version="[3.0.0,4.0.0)",
  org.fife.rsyntaxtextarea;bundle-version="[2.5.0,2.6.0)",
  org.apache.commons.lang;bundle-version="[2.6.0,3.0.0)",
  com.google.guava;bundle-version="[16.0.0,17.0.0)",
- org.knime.ext.svg;bundle-version="[2.11.0,3.0.0)",
+ org.knime.ext.svg;bundle-version="[3.0.0,4.0.0)",
  org.apache.commons.codec;bundle-version="[1.6.0,1.7.0)",
  org.openqa.selenium;bundle-version="[2.43.0,3.0.0)",
- org.knime.ext.phantomjs;bundle-version="[2.12.0,3.0.0)",
+ org.knime.ext.phantomjs;bundle-version="[3.0.0,4.0.0)",
  com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.4.3,3.0.0)",
  com.fasterxml.jackson.core.jackson-core;bundle-version="[2.4.3,3.0.0)",
  com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.4.3,3.0.0)"
