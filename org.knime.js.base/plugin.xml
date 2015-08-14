@@ -64,12 +64,10 @@
       </node>
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
       </node>
       <!-- <node
-            expert-flag="false"
             factory-class="org.knime.base.node.preproc.select.value.InteractiveValueSelectNodeFactory"
             id="org.knime.base.node.preproc.select.value.InteractiveValueSelectNodeFactory">
       </node> -->
@@ -80,7 +78,6 @@
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/> -->
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory">
       </node>
@@ -97,13 +94,11 @@
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory"
             id="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory">
       </node>
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory">
       </node>
@@ -129,13 +124,11 @@
       </node>
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory"
             id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
       </node>
       <node
             category-path="/labs/quickform/view"
-            expert-flag="false"
             factory-class="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory"
             id="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory">
       </node>
