@@ -41,36 +41,28 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   05.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.base.node.ui;
 
-import org.fife.rsyntaxarea.internal.RSyntaxAreaActivator;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 @SuppressWarnings("serial")
 public class CSSSnippetTextArea extends RSyntaxTextArea {
-    
-    static {
-        RSyntaxAreaActivator.ensureWorkaroundBug3692Applied();
-    }
-    
     /**
-     * 
+     *
      */
     public CSSSnippetTextArea() {
         super(20,60);
-        
+
         setCodeFoldingEnabled(true);
         setSyntaxEditingStyle(SYNTAX_STYLE_CSS);
         setAntiAliasingEnabled(true);
-        
     }
-
 }
