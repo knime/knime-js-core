@@ -64,7 +64,7 @@ public final class GenericJSViewNodeFactory extends NodeFactory<GenericJSViewNod
      */
     @Override
     public GenericJSViewNodeModel createNodeModel() {
-        return new GenericJSViewNodeModel();
+        return new GenericJSViewNodeModel(getInteractiveViewName());
     }
 
     /**

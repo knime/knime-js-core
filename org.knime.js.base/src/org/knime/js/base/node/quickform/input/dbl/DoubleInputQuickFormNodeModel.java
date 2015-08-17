@@ -60,6 +60,13 @@ public class DoubleInputQuickFormNodeModel
         DoubleInputQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected DoubleInputQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

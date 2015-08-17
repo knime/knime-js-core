@@ -67,7 +67,7 @@ public class ScatterPlotNodeFactory extends NodeFactory<ScatterPlotNodeModel> im
      */
     @Override
     public ScatterPlotNodeModel createNodeModel() {
-        return new ScatterPlotNodeModel();
+        return new ScatterPlotNodeModel(getInteractiveViewName());
     }
 
     /**

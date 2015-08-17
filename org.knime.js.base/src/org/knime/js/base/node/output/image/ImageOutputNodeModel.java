@@ -76,9 +76,10 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
 
     /**
      * Creates a new file download node model.
+     * @param viewName the view name
      */
-    public ImageOutputNodeModel() {
-        super(new PortType[]{ImagePortObject.TYPE}, new PortType[0]);
+    public ImageOutputNodeModel(final String viewName) {
+        super(new PortType[]{ImagePortObject.TYPE}, new PortType[0], viewName);
     }
 
     /**
@@ -206,14 +207,6 @@ public class ImageOutputNodeModel extends AbstractWizardNodeModel<ImageOutputRep
     @Override
     public void saveCurrentValue(final NodeSettingsWO content) {
         // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new ImageOutputNodeFactory()).getInteractiveViewName();
     }
 
     /**

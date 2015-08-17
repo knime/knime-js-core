@@ -69,10 +69,11 @@ public class ColumnSelectionQuickFormNodeModel
         ColumnSelectionQuickFormValue,
         ColumnSelectionQuickFormConfig> {
 
-    /** Creates a new value selection node model. */
-    public ColumnSelectionQuickFormNodeModel() {
+    /** Creates a new value selection node model.
+     * @param viewName the view name*/
+    public ColumnSelectionQuickFormNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{FlowVariablePortObject.TYPE});
+                new PortType[]{FlowVariablePortObject.TYPE}, viewName);
     }
 
     /**

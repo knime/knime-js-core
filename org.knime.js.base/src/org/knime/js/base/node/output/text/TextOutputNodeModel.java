@@ -74,9 +74,10 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
 
     /**
      * Creates a new file download node model.
+     * @param viewName the view name
      */
-    public TextOutputNodeModel() {
-        super(new PortType[]{FlowVariablePortObject.TYPE_OPTIONAL}, new PortType[0]);
+    public TextOutputNodeModel(final String viewName) {
+        super(new PortType[]{FlowVariablePortObject.TYPE_OPTIONAL}, new PortType[0], viewName);
     }
 
     /**
@@ -189,14 +190,6 @@ public class TextOutputNodeModel extends AbstractWizardNodeModel<TextOutputRepre
     @Override
     public void saveCurrentValue(final NodeSettingsWO content) {
         // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new TextOutputNodeFactory()).getInteractiveViewName();
     }
 
     /**

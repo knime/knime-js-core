@@ -65,7 +65,7 @@ public class TextOutputNodeFactory extends NodeFactory<TextOutputNodeModel> impl
      */
     @Override
     public TextOutputNodeModel createNodeModel() {
-        return new TextOutputNodeModel();
+        return new TextOutputNodeModel(getInteractiveViewName());
     }
 
     /**

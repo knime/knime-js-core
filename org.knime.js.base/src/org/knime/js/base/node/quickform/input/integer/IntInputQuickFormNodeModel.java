@@ -60,6 +60,13 @@ public class IntInputQuickFormNodeModel
         IntInputQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected IntInputQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

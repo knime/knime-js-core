@@ -105,15 +105,18 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     private String m_viewPath;
 
     private final JavaScriptViewCreator<REP, VAL> m_viewCreator;
+    private final String m_viewName;
 
     /**
      * Creates a new quick form model with the given number (and types!) of input and output types.
      *
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
+     * @param viewName the view name
      */
-    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
+    protected QuickFormNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final String viewName) {
         super(inPortTypes, outPortTypes);
+        m_viewName = viewName;
         m_viewCreator = new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
@@ -408,7 +411,7 @@ public abstract class QuickFormNodeModel<REP extends QuickFormRepresentationImpl
     private String createViewPath() {
         JavaScriptViewCreator viewCreator = new JavaScriptViewCreator(getJavascriptObjectID());
         try {
-            return viewCreator.createWebResources("Quickform View", getViewRepresentation(), getViewValue());
+            return viewCreator.createWebResources(m_viewName, getViewRepresentation(), getViewValue());
         } catch (IOException e) {
             return null;
         }

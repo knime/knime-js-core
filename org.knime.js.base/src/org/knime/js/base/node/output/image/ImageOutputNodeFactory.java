@@ -65,7 +65,7 @@ public class ImageOutputNodeFactory extends NodeFactory<ImageOutputNodeModel> im
      */
     @Override
     public ImageOutputNodeModel createNodeModel() {
-        return new ImageOutputNodeModel();
+        return new ImageOutputNodeModel(getInteractiveViewName());
     }
 
     /**

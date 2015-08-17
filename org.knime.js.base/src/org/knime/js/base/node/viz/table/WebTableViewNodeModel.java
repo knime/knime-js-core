@@ -61,9 +61,10 @@ import org.knime.js.base.util.table.WebTableViewValue;
 public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewRepresentation, WebTableViewValue> {
 
     /**
+     * @param viewName the view name
      */
-    protected WebTableViewNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE});
+    protected WebTableViewNodeModel(final String viewName) {
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{BufferedDataTable.TYPE}, viewName);
     }
 
     /**
@@ -81,14 +82,6 @@ public class WebTableViewNodeModel extends WebTableNodeModel<WebTableViewReprese
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new WebTableViewNodeFactory()).getInteractiveViewName();
     }
 
 }

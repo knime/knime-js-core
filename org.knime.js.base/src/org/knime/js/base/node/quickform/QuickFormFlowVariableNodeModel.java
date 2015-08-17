@@ -69,17 +69,19 @@ public abstract class QuickFormFlowVariableNodeModel
         CONF extends QuickFormFlowVariableConfig<VAL>>
         extends QuickFormNodeModel<REP, VAL, CONF> {
 
-    /** Creates a new node model with no inports and one flow variable outport. */
-    protected QuickFormFlowVariableNodeModel() {
-        this(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE});
+    /** Creates a new node model with no inports and one flow variable outport.
+     * @param viewName the view name */
+    protected QuickFormFlowVariableNodeModel(final String viewName) {
+        this(new PortType[0], new PortType[]{FlowVariablePortObject.TYPE}, viewName);
     }
 
     /** Creates a new node model with specified inports and outports.
      * @param inPortTypes
      * @param outPortTypes
+     * @param viewName the view name
      **/
-    protected QuickFormFlowVariableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
-        super(inPortTypes, outPortTypes);
+    protected QuickFormFlowVariableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final String viewName) {
+        super(inPortTypes, outPortTypes, viewName);
     }
 
     /** {@inheritDoc} */

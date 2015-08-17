@@ -66,7 +66,7 @@ public class SingleSelectionQuickFormNodeFactory
      */
     @Override
     public SingleSelectionQuickFormNodeModel createNodeModel() {
-        return new SingleSelectionQuickFormNodeModel();
+        return new SingleSelectionQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

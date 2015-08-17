@@ -141,9 +141,10 @@ public abstract class WebTableNodeModel<REP extends WebTableViewRepresentation, 
      * output types.
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
+     * @param viewName the view name
      */
-    protected WebTableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
-        super(inPortTypes, outPortTypes);
+    protected WebTableNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final String viewName) {
+        super(inPortTypes, outPortTypes, viewName);
     }
 
     /** @return Settings model for the hide in wizard property. */

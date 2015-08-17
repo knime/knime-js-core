@@ -72,10 +72,11 @@ public class ValueFilterQuickFormNodeModel
         ValueFilterQuickFormValue,
         ValueFilterQuickFormConfig> {
 
-    /** Creates a new value selection node model. */
-    public ValueFilterQuickFormNodeModel() {
+    /** Creates a new value selection node model.
+     * @param viewName the view name*/
+    public ValueFilterQuickFormNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE});
+                new PortType[]{BufferedDataTable.TYPE}, viewName);
     }
 
     /**

@@ -66,7 +66,7 @@ public class ListBoxInputQuickFormNodeFactory
      */
     @Override
     public ListBoxInputQuickFormNodeModel createNodeModel() {
-        return new ListBoxInputQuickFormNodeModel();
+        return new ListBoxInputQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

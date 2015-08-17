@@ -98,9 +98,9 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
     /**
      * Creates a new model instance.
      */
-    ROCCurveNodeModel() {
+    ROCCurveNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE, new PortType(BufferedDataTable.class, true)},
-            new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
+            new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE}, viewName);
         m_config = new ROCCurveViewConfig();
     }
 
@@ -338,14 +338,6 @@ final class ROCCurveNodeModel extends AbstractSVGWizardNodeModel<ROCCurveViewRep
     @Override
     protected void performReset() {
         m_table = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new ROCCurveNodeFactory()).getInteractiveViewName();
     }
 
     /**

@@ -88,6 +88,7 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     private String m_viewPath;
     private REP m_representation;
     private VAL m_value;
+    private final String m_viewName;
     private final JavaScriptViewCreator<REP, VAL> m_viewCreator;
 
     /**
@@ -95,9 +96,11 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      * output types.
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
+     * @param viewName The view name
      */
-    protected AbstractWizardNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
+    protected AbstractWizardNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final String viewName) {
         super(inPortTypes, outPortTypes);
+        m_viewName = viewName;
         m_viewCreator = new JavaScriptViewCreator<>(getJavascriptObjectID());
     }
 
@@ -196,7 +199,9 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      * This can usually be achieved by returning the concrete {@link NodeFactory#getInteractiveViewName()}.
      * @return the view name
      */
-    protected abstract String getInteractiveViewName();
+    protected final String getInteractiveViewName() {
+        return m_viewName;
+    }
 
     /**
      * Resets the view HTML, attempts to delete file.

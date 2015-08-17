@@ -67,7 +67,7 @@ public class ROCCurveNodeFactory extends NodeFactory<ROCCurveNodeModel> implemen
      */
     @Override
     public ROCCurveNodeModel createNodeModel() {
-        return new ROCCurveNodeModel();
+        return new ROCCurveNodeModel(getInteractiveViewName());
     }
 
     /**

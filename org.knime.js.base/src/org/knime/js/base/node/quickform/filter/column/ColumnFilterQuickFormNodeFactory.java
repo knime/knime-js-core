@@ -66,7 +66,7 @@ public class ColumnFilterQuickFormNodeFactory
      */
     @Override
     public ColumnFilterQuickFormNodeModel createNodeModel() {
-        return new ColumnFilterQuickFormNodeModel();
+        return new ColumnFilterQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

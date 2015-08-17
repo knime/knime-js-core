@@ -67,7 +67,7 @@ public class LinePlotNodeFactory extends NodeFactory<LinePlotNodeModel> implemen
      */
     @Override
     public LinePlotNodeModel createNodeModel() {
-        return new LinePlotNodeModel();
+        return new LinePlotNodeModel(getInteractiveViewName());
     }
 
     /**

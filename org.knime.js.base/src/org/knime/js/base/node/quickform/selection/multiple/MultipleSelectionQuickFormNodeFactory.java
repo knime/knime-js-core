@@ -66,7 +66,7 @@ public class MultipleSelectionQuickFormNodeFactory
      */
     @Override
     public MultipleSelectionQuickFormNodeModel createNodeModel() {
-        return new MultipleSelectionQuickFormNodeModel();
+        return new MultipleSelectionQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

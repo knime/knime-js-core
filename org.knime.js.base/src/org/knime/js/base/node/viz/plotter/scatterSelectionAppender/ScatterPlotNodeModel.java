@@ -107,9 +107,10 @@ public class ScatterPlotNodeModel extends
 
     /**
      * Creates a new model instance.
+     * @param viewName the view name
      */
-    protected ScatterPlotNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE});
+    protected ScatterPlotNodeModel(final String viewName) {
+        super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{ImagePortObject.TYPE, BufferedDataTable.TYPE}, viewName);
         m_config = new ScatterPlotViewConfig();
     }
 
@@ -378,14 +379,6 @@ public class ScatterPlotNodeModel extends
     @Override
     protected void performReset() {
         m_table = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new ScatterPlotNodeFactory()).getInteractiveViewName();
     }
 
     /**

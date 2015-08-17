@@ -79,9 +79,10 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
 
     /**
      * Creates a new file download node model.
+     * @param viewName the view name
      */
-    public FileDownloadNodeModel() {
-        super(new PortType[]{FlowVariablePortObject.TYPE}, new PortType[0]);
+    public FileDownloadNodeModel(final String viewName) {
+        super(new PortType[]{FlowVariablePortObject.TYPE}, new PortType[0], viewName);
     }
 
     /**
@@ -209,14 +210,6 @@ public class FileDownloadNodeModel extends AbstractWizardNodeModel<FileDownloadR
     @Override
     public void saveCurrentValue(final NodeSettingsWO content) {
         // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new FileDownloadNodeFactory()).getInteractiveViewName();
     }
 
     /**

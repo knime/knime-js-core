@@ -90,9 +90,10 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
      *
      * @param inPortTypes an array of non-null in-port types
      * @param outPortTypes an array of non-null out-port types
+     * @param viewName the view name
      */
-    protected AbstractSVGWizardNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes) {
-        super(inPortTypes, outPortTypes);
+    protected AbstractSVGWizardNodeModel(final PortType[] inPortTypes, final PortType[] outPortTypes, final String viewName) {
+        super(inPortTypes, outPortTypes, viewName);
     }
 
     /**

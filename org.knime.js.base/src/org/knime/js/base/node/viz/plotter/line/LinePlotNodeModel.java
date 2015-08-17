@@ -110,9 +110,9 @@ final class LinePlotNodeModel extends AbstractSVGWizardNodeModel<LinePlotViewRep
     /**
      * Creates a new model instance.
      */
-    LinePlotNodeModel() {
+    LinePlotNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE, BufferedDataTable.TYPE_OPTIONAL}, new PortType[]{
-            ImagePortObject.TYPE, BufferedDataTable.TYPE});
+            ImagePortObject.TYPE, BufferedDataTable.TYPE}, viewName);
         m_config = new LinePlotViewConfig();
     }
 
@@ -403,14 +403,6 @@ final class LinePlotNodeModel extends AbstractSVGWizardNodeModel<LinePlotViewRep
     @Override
     protected void performReset() {
         m_table = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new LinePlotNodeFactory()).getInteractiveViewName();
     }
 
     /**

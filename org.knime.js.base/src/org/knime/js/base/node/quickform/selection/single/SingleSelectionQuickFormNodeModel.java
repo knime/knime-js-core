@@ -59,6 +59,13 @@ public class SingleSelectionQuickFormNodeModel
     SingleSelectionQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected SingleSelectionQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

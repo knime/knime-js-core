@@ -67,7 +67,7 @@ public class WebTableViewNodeFactory extends NodeFactory<WebTableViewNodeModel> 
      */
     @Override
     public WebTableViewNodeModel createNodeModel() {
-        return new WebTableViewNodeModel();
+        return new WebTableViewNodeModel(getInteractiveViewName());
     }
 
     /**

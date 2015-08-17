@@ -66,7 +66,7 @@ public class DoubleInputQuickFormNodeFactory
      */
     @Override
     public DoubleInputQuickFormNodeModel createNodeModel() {
-        return new DoubleInputQuickFormNodeModel();
+        return new DoubleInputQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

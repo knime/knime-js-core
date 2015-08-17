@@ -63,6 +63,13 @@ public class DateInputQuickFormNodeModel
         DateInputQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected DateInputQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * Format string for the date to string and string to date operations.
      */
     static final String DATE_FORMAT = "yyyy-MM-dd";

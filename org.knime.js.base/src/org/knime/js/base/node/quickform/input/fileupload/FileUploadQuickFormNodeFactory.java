@@ -66,7 +66,7 @@ public class FileUploadQuickFormNodeFactory
      */
     @Override
     public FileUploadQuickFormNodeModel createNodeModel() {
-        return new FileUploadQuickFormNodeModel();
+        return new FileUploadQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

@@ -65,7 +65,7 @@ public class FileDownloadNodeFactory extends NodeFactory<FileDownloadNodeModel> 
      */
     @Override
     public FileDownloadNodeModel createNodeModel() {
-        return new FileDownloadNodeModel();
+        return new FileDownloadNodeModel(getInteractiveViewName());
     }
 
     /**

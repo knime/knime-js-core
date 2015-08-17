@@ -66,7 +66,7 @@ public class ColumnSelectionQuickFormNodeFactory
      */
     @Override
     public ColumnSelectionQuickFormNodeModel createNodeModel() {
-        return new ColumnSelectionQuickFormNodeModel();
+        return new ColumnSelectionQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

@@ -79,8 +79,8 @@ final class GenericJSViewNodeModel extends AbstractWizardNodeModel<GenericJSView
 
     /**
      */
-    GenericJSViewNodeModel() {
-        super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, new PortType[0]);
+    GenericJSViewNodeModel(final String viewName) {
+        super(new PortType[]{BufferedDataTable.TYPE_OPTIONAL}, new PortType[0], viewName);
         m_config = new GenericJSViewConfig();
     }
 
@@ -262,14 +262,6 @@ final class GenericJSViewNodeModel extends AbstractWizardNodeModel<GenericJSView
     public void saveCurrentValue(final NodeSettingsWO content) {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new GenericJSViewNodeFactory()).getInteractiveViewName();
     }
 
     /**

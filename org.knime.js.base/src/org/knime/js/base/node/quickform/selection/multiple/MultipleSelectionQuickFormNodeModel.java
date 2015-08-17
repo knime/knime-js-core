@@ -75,9 +75,10 @@ public class MultipleSelectionQuickFormNodeModel
 
     /**
      * Creates the node model.
+     * @param viewName the view name
      */
-    public MultipleSelectionQuickFormNodeModel() {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
+    public MultipleSelectionQuickFormNodeModel(final String viewName) {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, viewName);
     }
 
     /** {@inheritDoc} */

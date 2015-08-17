@@ -66,7 +66,7 @@ public class BooleanInputQuickFormNodeFactory
      */
     @Override
     public BooleanInputQuickFormNodeModel createNodeModel() {
-        return new BooleanInputQuickFormNodeModel();
+        return new BooleanInputQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

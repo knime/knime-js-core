@@ -60,6 +60,13 @@ public class StringInputQuickFormNodeModel
         StringInputQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected StringInputQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

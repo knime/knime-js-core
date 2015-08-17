@@ -76,9 +76,10 @@ public class ListBoxInputQuickFormNodeModel
 
     /**
      * Creates a list box input node model.
+     * @param viewName the view name
      */
-    protected ListBoxInputQuickFormNodeModel() {
-        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE});
+    protected ListBoxInputQuickFormNodeModel(final String viewName) {
+        super(new PortType[0], new PortType[]{BufferedDataTable.TYPE}, viewName);
     }
 
     /**

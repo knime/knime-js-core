@@ -66,7 +66,7 @@ public class ValueSelectionQuickFormNodeFactory
      */
     @Override
     public ValueSelectionQuickFormNodeModel createNodeModel() {
-        return new ValueSelectionQuickFormNodeModel();
+        return new ValueSelectionQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

@@ -87,9 +87,9 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
     /**
      * Creates a new model instance.
      */
-    LiftChartNodeModel() {
+    LiftChartNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE}, new PortType[]{
-            ImagePortObject.TYPE, BufferedDataTable.TYPE});
+            ImagePortObject.TYPE, BufferedDataTable.TYPE}, viewName);
         m_config = new LiftChartViewConfig();
     }
 
@@ -282,14 +282,6 @@ final class LiftChartNodeModel extends AbstractSVGWizardNodeModel<LiftChartViewR
     @Override
     protected void performReset() {
         m_table = null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String getInteractiveViewName() {
-        return (new LiftChartNodeFactory()).getInteractiveViewName();
     }
 
     /**

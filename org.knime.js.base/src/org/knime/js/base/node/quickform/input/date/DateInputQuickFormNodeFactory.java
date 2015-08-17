@@ -66,7 +66,7 @@ public class DateInputQuickFormNodeFactory
      */
     @Override
     public DateInputQuickFormNodeModel createNodeModel() {
-        return new DateInputQuickFormNodeModel();
+        return new DateInputQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

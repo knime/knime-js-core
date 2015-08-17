@@ -77,9 +77,9 @@ public class ColumnFilterQuickFormNodeModel
     private BufferedDataTable m_inTable = null;
 
     /** Creates a new value selection node model. */
-    public ColumnFilterQuickFormNodeModel() {
+    public ColumnFilterQuickFormNodeModel(final String viewName) {
         super(new PortType[]{BufferedDataTable.TYPE},
-                new PortType[]{BufferedDataTable.TYPE});
+                new PortType[]{BufferedDataTable.TYPE}, viewName);
     }
 
     /**

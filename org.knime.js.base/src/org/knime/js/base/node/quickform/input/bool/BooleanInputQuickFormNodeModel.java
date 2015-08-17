@@ -59,6 +59,13 @@ public class BooleanInputQuickFormNodeModel
     BooleanInputQuickFormConfig> {
 
     /**
+     * @param viewName
+     */
+    protected BooleanInputQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

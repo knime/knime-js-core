@@ -66,7 +66,7 @@ public class ValueFilterQuickFormNodeFactory
      */
     @Override
     public ValueFilterQuickFormNodeModel createNodeModel() {
-        return new ValueFilterQuickFormNodeModel();
+        return new ValueFilterQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**

@@ -67,7 +67,7 @@ public class LiftChartNodeFactory extends NodeFactory<LiftChartNodeModel> implem
      */
     @Override
     public LiftChartNodeModel createNodeModel() {
-        return new LiftChartNodeModel();
+        return new LiftChartNodeModel(getInteractiveViewName());
     }
 
     /**

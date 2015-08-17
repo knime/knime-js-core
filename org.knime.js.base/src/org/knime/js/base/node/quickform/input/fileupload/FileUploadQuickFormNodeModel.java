@@ -66,6 +66,13 @@ import org.knime.js.base.node.quickform.QuickFormFlowVariableNodeModel;
 public class FileUploadQuickFormNodeModel extends QuickFormFlowVariableNodeModel<FileUploadQuickFormRepresentation,
         FileUploadQuickFormValue, FileUploadQuickFormConfig> {
     /**
+     * @param viewName
+     */
+    protected FileUploadQuickFormNodeModel(final String viewName) {
+        super(viewName);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

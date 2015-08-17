@@ -66,7 +66,7 @@ public class IntInputQuickFormNodeFactory
      */
     @Override
     public IntInputQuickFormNodeModel createNodeModel() {
-        return new IntInputQuickFormNodeModel();
+        return new IntInputQuickFormNodeModel(getInteractiveViewName());
     }
 
     /**
