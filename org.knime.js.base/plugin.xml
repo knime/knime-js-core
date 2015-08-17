@@ -282,26 +282,6 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="Molecule Input Quickform"
-            version="1.0.0"
-            webResourceBundleID="org.knime.js.base.node.quickform.input.molecule.bundle">
-         <webResource
-               relativePathSource="js-src/org/knime/js/base/node/quickform/input/molecule/"
-               relativePathTarget="org/knime/js/base/node/quickform/input/molecule/">
-         </webResource>
-         <importResource
-               relativePath="org/knime/js/base/node/quickform/input/molecule/MoleculeStringInput.js"
-               type="JAVASCRIPT">
-         </importResource>
-         <webDependency
-               webResourceBundleID="KnimeQuickformUtils_1.0.0">
-         </webDependency>
-         <webDependency
-               webResourceBundleID="Ketcher_1.1">
-         </webDependency>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="true"
             name="Integer Input Quickform"
             version="1.0.0"
             webResourceBundleID="org.knime.js.base.node.quickform.input.integer.bundle">
@@ -850,16 +830,6 @@
             javascriptComponentID="knime_table_viewer"
             name="Table Viewer"
             namespace="knime_table_viewer"
-            setValidationError-method-name="setValidationErrorMessage"
-            validate-method-name="validate">
-      </javascriptComponent>
-      <javascriptComponent
-            getComponentValue-method-name="value"
-            implementationBundleID="org.knime.js.base.node.quickform.input.molecule.bundle"
-            init-method-name="init"
-            javascriptComponentID="org.knime.js.base.node.quickform.input.molecule"
-            name="Molecule Input Quickform"
-            namespace="org_knime_js_base_node_quickform_input_molecule"
             setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
