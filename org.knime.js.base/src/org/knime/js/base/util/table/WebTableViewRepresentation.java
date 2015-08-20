@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.util.table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -172,6 +174,44 @@ public class WebTableViewRepresentation extends JSONViewContent {
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         // load nothing?
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        WebTableViewRepresentation other = (WebTableViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_table, other.m_table)
+                .append(m_numberFormatter, other.m_numberFormatter)
+                .append(m_enableSelection, other.m_enableSelection)
+                .append(m_tableHeight, other.m_tableHeight)
+                .append(m_fullFrame, other.m_fullFrame)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_table)
+                .append(m_numberFormatter)
+                .append(m_enableSelection)
+                .append(m_tableHeight)
+                .append(m_fullFrame)
+                .toHashCode();
     }
 
 }

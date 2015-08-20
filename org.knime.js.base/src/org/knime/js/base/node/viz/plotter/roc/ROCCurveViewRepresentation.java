@@ -52,6 +52,8 @@ package org.knime.js.base.node.viz.plotter.roc;
 
 import java.awt.Color;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -413,5 +415,69 @@ public class ROCCurveViewRepresentation extends JSONViewContent {
      */
     public void setCurves(final JSONROCCurve[] curves) {
         m_curves = curves;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ROCCurveViewRepresentation other = (ROCCurveViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_curves, other.m_curves)
+                .append(m_colors, other.m_colors)
+                .append(m_showGrid, other.m_showGrid)
+                .append(m_showArea, other.m_showArea)
+                .append(m_resizeToWindow, other.m_resizeToWindow)
+                .append(m_enableStaggeredRendering, other.m_enableStaggeredRendering)
+                .append(m_imageWidth, other.m_imageWidth)
+                .append(m_imageHeight, other.m_imageHeight)
+                .append(m_lineWidth, other.m_lineWidth)
+                .append(m_gridColor, other.m_gridColor)
+                .append(m_backgroundColor, other.m_backgroundColor)
+                .append(m_dataAreaColor, other.m_dataAreaColor)
+                .append(m_showLegend, other.m_showLegend)
+                .append(m_enableControls, other.m_enableControls)
+                .append(m_enableEditTitle, other.m_enableEditTitle)
+                .append(m_enableEditSubtitle, other.m_enableEditSubtitle)
+                .append(m_enableEditXAxisLabel, other.m_enableEditXAxisLabel)
+                .append(m_enableEditYAxisLabel, other.m_enableEditYAxisLabel)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_curves)
+                .append(m_colors)
+                .append(m_showGrid)
+                .append(m_showArea)
+                .append(m_resizeToWindow)
+                .append(m_enableStaggeredRendering)
+                .append(m_imageWidth)
+                .append(m_imageHeight)
+                .append(m_lineWidth)
+                .append(m_gridColor)
+                .append(m_backgroundColor)
+                .append(m_dataAreaColor)
+                .append(m_showLegend)
+                .append(m_enableControls)
+                .append(m_enableEditTitle)
+                .append(m_enableEditSubtitle)
+                .append(m_enableEditXAxisLabel)
+                .append(m_enableEditYAxisLabel)
+                .toHashCode();
     }
 }

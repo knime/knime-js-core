@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.node.viz.generic2;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -187,5 +189,43 @@ public class GenericJSViewRepresentation extends JSONViewContent {
         m_jsDependencies = settings.getStringArray(JS_DEPENDENCIES, new String[0]);
         m_cssDependencies = settings.getStringArray(CSS_DEPENDENCIES, new String[0]);
         m_table = JSONDataTable.loadFromNodeSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        GenericJSViewRepresentation other = (GenericJSViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_jsCode, other.m_jsCode)
+                .append(m_cssCode, other.m_cssCode)
+                .append(m_jsDependencies, other.m_jsDependencies)
+                .append(m_cssDependencies, other.m_cssDependencies)
+                .append(m_table, other.m_table)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_jsCode)
+                .append(m_cssCode)
+                .append(m_jsDependencies)
+                .append(m_cssDependencies)
+                .append(m_table)
+                .toHashCode();
     }
 }

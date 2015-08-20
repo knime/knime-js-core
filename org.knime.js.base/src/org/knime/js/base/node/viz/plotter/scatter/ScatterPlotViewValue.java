@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.scatter;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -271,6 +273,56 @@ public class ScatterPlotViewValue extends JSONViewContent {
         setyAxisMin(yMin == null ? null : Double.parseDouble(yMin));
         setyAxisMax(yMax == null ? null : Double.parseDouble(yMax));
         setDotSize(dotSize == null ? null : Integer.parseInt(dotSize));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ScatterPlotViewValue other = (ScatterPlotViewValue)obj;
+        return new EqualsBuilder()
+                .append(m_chartTitle, other.m_chartTitle)
+                .append(m_chartSubtitle, other.m_chartSubtitle)
+                .append(m_xAxisLabel, other.m_xAxisLabel)
+                .append(m_yAxisLabel, other.m_yAxisLabel)
+                .append(m_xColumn, other.m_xColumn)
+                .append(m_yColumn, other.m_yColumn)
+                .append(m_xAxisMin, other.m_xAxisMin)
+                .append(m_xAxisMax, other.m_xAxisMax)
+                .append(m_yAxisMin, other.m_yAxisMin)
+                .append(m_yAxisMax, other.m_yAxisMax)
+                .append(m_dotSize, other.m_dotSize)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_chartTitle)
+                .append(m_chartSubtitle)
+                .append(m_xAxisLabel)
+                .append(m_yAxisLabel)
+                .append(m_xColumn)
+                .append(m_yColumn)
+                .append(m_xAxisMin)
+                .append(m_xAxisMax)
+                .append(m_yAxisMin)
+                .append(m_yAxisMax)
+                .append(m_dotSize)
+                .toHashCode();
     }
 
 }

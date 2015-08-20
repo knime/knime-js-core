@@ -393,4 +393,96 @@ public class JSONDataTableSpec {
         m_rowColorValues = rowColorValues;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((m_colNames == null) ? 0 : m_colNames.hashCode());
+        result = prime * result + ((m_colTypes == null) ? 0 : m_colTypes.hashCode());
+        result = prime * result + ((m_extensionNames == null) ? 0 : m_extensionNames.hashCode());
+        result = prime * result + ((m_extensionTypes == null) ? 0 : m_extensionTypes.hashCode());
+        result = prime * result + Arrays.hashCode(m_maxValues);
+        result = prime * result + Arrays.hashCode(m_minValues);
+        result = prime * result + m_numColumns;
+        result = prime * result + m_numExtensions;
+        result = prime * result + m_numRows;
+        result = prime * result + ((m_possibleValues == null) ? 0 : m_possibleValues.hashCode());
+        result = prime * result + Arrays.hashCode(m_rowColorValues);
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        JSONDataTableSpec other = (JSONDataTableSpec)obj;
+        if (m_colNames == null) {
+            if (other.m_colNames != null) {
+                return false;
+            }
+        } else if (!m_colNames.equals(other.m_colNames)) {
+            return false;
+        }
+        if (m_colTypes == null) {
+            if (other.m_colTypes != null) {
+                return false;
+            }
+        } else if (!m_colTypes.equals(other.m_colTypes)) {
+            return false;
+        }
+        if (m_extensionNames == null) {
+            if (other.m_extensionNames != null) {
+                return false;
+            }
+        } else if (!m_extensionNames.equals(other.m_extensionNames)) {
+            return false;
+        }
+        if (m_extensionTypes == null) {
+            if (other.m_extensionTypes != null) {
+                return false;
+            }
+        } else if (!m_extensionTypes.equals(other.m_extensionTypes)) {
+            return false;
+        }
+        if (!Arrays.equals(m_maxValues, other.m_maxValues)) {
+            return false;
+        }
+        if (!Arrays.equals(m_minValues, other.m_minValues)) {
+            return false;
+        }
+        if (m_numColumns != other.m_numColumns) {
+            return false;
+        }
+        if (m_numExtensions != other.m_numExtensions) {
+            return false;
+        }
+        if (m_numRows != other.m_numRows) {
+            return false;
+        }
+        if (m_possibleValues == null) {
+            if (other.m_possibleValues != null) {
+                return false;
+            }
+        } else if (!m_possibleValues.equals(other.m_possibleValues)) {
+            return false;
+        }
+        if (!Arrays.equals(m_rowColorValues, other.m_rowColorValues)) {
+            return false;
+        }
+        return true;
+    }
+
 }

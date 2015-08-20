@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.scatter;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -312,5 +314,59 @@ public class ScatterPlotViewRepresentation extends JSONViewContent {
             m_keyedDataset = new JSONKeyedValues2DDataset();
             m_keyedDataset.loadFromNodeSettings(datasetSettings);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ScatterPlotViewRepresentation other = (ScatterPlotViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_keyedDataset, other.m_keyedDataset)
+                .append(m_enableViewConfiguration, other.m_enableViewConfiguration)
+                .append(m_enableTitleChange, other.m_enableTitleChange)
+                .append(m_enableSubtitleChange, other.m_enableSubtitleChange)
+                .append(m_enableXColumnChange, other.m_enableXColumnChange)
+                .append(m_enableYColumnChange, other.m_enableYColumnChange)
+                .append(m_enableXAxisLabelEdit, other.m_enableXAxisLabelEdit)
+                .append(m_enableYAxisLabelEdit, other.m_enableYAxisLabelEdit)
+                .append(m_enableDotSizeChange, other.m_enableDotSizeChange)
+                .append(m_enableZooming, other.m_enableZooming)
+                .append(m_enableDragZooming, other.m_enableDragZooming)
+                .append(m_enablePanning, other.m_enablePanning)
+                .append(m_showZoomResetButton, other.m_showZoomResetButton)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_keyedDataset)
+                .append(m_enableViewConfiguration)
+                .append(m_enableTitleChange)
+                .append(m_enableSubtitleChange)
+                .append(m_enableXColumnChange)
+                .append(m_enableYColumnChange)
+                .append(m_enableXAxisLabelEdit)
+                .append(m_enableYAxisLabelEdit)
+                .append(m_enableDotSizeChange)
+                .append(m_enableZooming)
+                .append(m_enableDragZooming)
+                .append(m_enablePanning)
+                .append(m_showZoomResetButton)
+                .toHashCode();
     }
 }

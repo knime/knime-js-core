@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.lift;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -255,5 +257,53 @@ public class LiftChartPlotViewValue extends JSONViewContent {
         m_yAxisTitleGain = settings.getString(LiftChartViewConfig.Y_AXIS_TITLE_GAIN);
         m_showGainChart = settings.getBoolean(LiftChartViewConfig.SHOW_GAIN_CHART);
         m_smoothing = settings.getString(LiftChartViewConfig.SMOOTHING);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        LiftChartPlotViewValue other = (LiftChartPlotViewValue)obj;
+        return new EqualsBuilder()
+                .append(m_titleLift, other.m_titleLift)
+                .append(m_subtitleLift, other.m_subtitleLift)
+                .append(m_xAxisTitleLift, other.m_xAxisTitleLift)
+                .append(m_yAxisTitleLift, other.m_yAxisTitleLift)
+                .append(m_titleGain, other.m_titleGain)
+                .append(m_subtitleGain, other.m_subtitleGain)
+                .append(m_xAxisTitleGain, other.m_xAxisTitleGain)
+                .append(m_yAxisTitleGain, other.m_yAxisTitleGain)
+                .append(m_smoothing, other.m_smoothing)
+                .append(m_showGainChart, other.m_showGainChart)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_titleLift)
+                .append(m_subtitleLift)
+                .append(m_xAxisTitleLift)
+                .append(m_yAxisTitleLift)
+                .append(m_titleGain)
+                .append(m_subtitleGain)
+                .append(m_xAxisTitleGain)
+                .append(m_yAxisTitleGain)
+                .append(m_smoothing)
+                .append(m_showGainChart)
+                .toHashCode();
     }
 }

@@ -41,12 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Feb 3, 2014 ("Patrick Winter"): created
  */
 package org.knime.js.base.node.rowselector;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -58,31 +60,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author "Patrick Winter", University of Konstanz
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class RowSelectorValue extends JSONViewContent {
-    
+
     private static final String CFG_SELECTIONS = "selections";
-    
+
     private long[] m_selections = new long[0];
-    
+
     /**
      * Default constructor for bean initialization.
      */
     public RowSelectorValue() {
      // do nothing
     }
-    
+
     /**
      * @param selections the selections
      */
     public RowSelectorValue(final long[] selections) {
         setSelections(selections);
     }
-    
+
     /**
      * @return the selections
      */
@@ -90,7 +92,7 @@ public class RowSelectorValue extends JSONViewContent {
     public long[] getSelections() {
         return m_selections;
     }
-    
+
     /**
      * @param selections the selections to set
      */
@@ -115,6 +117,36 @@ public class RowSelectorValue extends JSONViewContent {
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_selections = settings.getLongArray(CFG_SELECTIONS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        RowSelectorValue other = (RowSelectorValue)obj;
+        return new EqualsBuilder()
+                .append(m_selections, other.m_selections)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_selections)
+                .toHashCode();
     }
 
 }

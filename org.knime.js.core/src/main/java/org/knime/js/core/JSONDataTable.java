@@ -48,6 +48,7 @@ package org.knime.js.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 
@@ -430,6 +431,46 @@ public class JSONDataTable {
         public void setData(final Object[] data) {
             m_data = data;
         }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + Arrays.hashCode(m_data);
+            result = prime * result + ((m_rowKey == null) ? 0 : m_rowKey.hashCode());
+            return result;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            JSONDataTableRow other = (JSONDataTableRow)obj;
+            if (!Arrays.equals(m_data, other.m_data)) {
+                return false;
+            }
+            if (m_rowKey == null) {
+                if (other.m_rowKey != null) {
+                    return false;
+                }
+            } else if (!m_rowKey.equals(other.m_rowKey)) {
+                return false;
+            }
+            return true;
+        }
     }
 
     /**
@@ -473,5 +514,49 @@ public class JSONDataTable {
         } finally {
             Thread.currentThread().setContextClassLoader(oldLoader);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.deepHashCode(m_extensions);
+        result = prime * result + Arrays.hashCode(m_rows);
+        result = prime * result + ((m_spec == null) ? 0 : m_spec.hashCode());
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        JSONDataTable other = (JSONDataTable)obj;
+        if (!Arrays.deepEquals(m_extensions, other.m_extensions)) {
+            return false;
+        }
+        if (!Arrays.equals(m_rows, other.m_rows)) {
+            return false;
+        }
+        if (m_spec == null) {
+            if (other.m_spec != null) {
+                return false;
+            }
+        } else if (!m_spec.equals(other.m_spec)) {
+            return false;
+        }
+        return true;
     }
 }

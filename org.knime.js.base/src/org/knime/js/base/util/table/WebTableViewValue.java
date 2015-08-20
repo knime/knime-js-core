@@ -47,6 +47,8 @@
  */
 package org.knime.js.base.util.table;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -98,6 +100,36 @@ public class WebTableViewValue extends JSONViewContent {
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         setSelection(settings.getStringArray(SELECTED_KEYS));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        WebTableViewValue other = (WebTableViewValue)obj;
+        return new EqualsBuilder()
+                .append(m_selection, other.m_selection)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_selection)
+                .toHashCode();
     }
 
 }

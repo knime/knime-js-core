@@ -41,12 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   Feb 3, 2014 ("Patrick Winter"): created
  */
 package org.knime.js.base.node.rowselector;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.core.JSONDataTable;
@@ -58,7 +60,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author "Patrick Winter", University of Konstanz
  */
 @JsonAutoDetect
@@ -113,6 +115,36 @@ public class RowSelectorRepresentation extends JSONViewContent {
     public void loadFromNodeSettings(final NodeSettingsRO settings) {
         // TODO Auto-generated method stub
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        RowSelectorRepresentation other = (RowSelectorRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_table, other.m_table)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_table)
+                .toHashCode();
     }
 
 }

@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.lift;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -462,5 +464,77 @@ public class LiftChartViewRepresentation extends JSONViewContent {
         m_enableEditXAxisLabel = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_X_AXIS_LABEL);
         m_enableEditYAxisLabel = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_Y_AXIS_LABEL);
         m_enableSmoothingEdit = settings.getBoolean(LiftChartViewConfig.ENABLE_EDIT_SMOOTHING);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        LiftChartViewRepresentation other = (LiftChartViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_showGrid, other.m_showGrid)
+                .append(m_resizeToWindow, other.m_resizeToWindow)
+                .append(m_lineWidth, other.m_lineWidth)
+                .append(m_imageWidth, other.m_imageWidth)
+                .append(m_imageHeight, other.m_imageHeight)
+                .append(m_backgroundColor, other.m_backgroundColor)
+                .append(m_dataAreaColor, other.m_dataAreaColor)
+                .append(m_gridColor, other.m_gridColor)
+                .append(m_showLegend, other.m_showLegend)
+                .append(m_intervalWidth, other.m_intervalWidth)
+                .append(m_liftValues, other.m_liftValues)
+                .append(m_baseline, other.m_baseline)
+                .append(m_cumulativeLift, other.m_cumulativeLift)
+                .append(m_response, other.m_response)
+                .append(m_enableControls, other.m_enableControls)
+                .append(m_enableViewToggle, other.m_enableViewToggle)
+                .append(m_enableEditTitle, other.m_enableEditTitle)
+                .append(m_enableEditSubtitle, other.m_enableEditSubtitle)
+                .append(m_enableEditXAxisLabel, other.m_enableEditXAxisLabel)
+                .append(m_enableEditYAxisLabel, other.m_enableEditYAxisLabel)
+                .append(m_enableSmoothingEdit, other.m_enableSmoothingEdit)
+                .append(m_enableStaggeredRendering, other.m_enableStaggeredRendering)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_showGrid)
+                .append(m_resizeToWindow)
+                .append(m_lineWidth)
+                .append(m_imageWidth)
+                .append(m_imageHeight)
+                .append(m_backgroundColor)
+                .append(m_dataAreaColor)
+                .append(m_gridColor)
+                .append(m_showLegend)
+                .append(m_intervalWidth)
+                .append(m_liftValues)
+                .append(m_baseline)
+                .append(m_cumulativeLift)
+                .append(m_response)
+                .append(m_enableControls)
+                .append(m_enableViewToggle)
+                .append(m_enableEditTitle)
+                .append(m_enableEditSubtitle)
+                .append(m_enableEditXAxisLabel)
+                .append(m_enableEditYAxisLabel)
+                .append(m_enableSmoothingEdit)
+                .append(m_enableStaggeredRendering)
+                .toHashCode();
     }
 }

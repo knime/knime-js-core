@@ -48,6 +48,8 @@
  */
 package org.knime.js.base.node.viz.plotter.roc;
 
+import java.util.Arrays;
+
 import org.knime.base.node.viz.roc.ROCCurve;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -135,5 +137,53 @@ public class JSONROCCurve extends ROCCurve implements JSONDataset {
         setY(settings.getDoubleArray(Y_VALUES_CFG));
         setName(settings.getString(NAME_CFG));
         setArea(settings.getDouble(AREA_CFG));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(getX());
+        result = prime * result + Arrays.hashCode(getY());
+        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        result = prime * result + new Double(getArea()).hashCode();
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        JSONROCCurve other = (JSONROCCurve)obj;
+        if (!Arrays.equals(getX(), other.getX())) {
+            return false;
+        }
+        if (!Arrays.equals(getY(), other.getY())) {
+            return false;
+        }
+        if (getName() == null) {
+            if (other.getName() != null) {
+                return false;
+            }
+        } else if (!getName().equals(other.getName())) {
+            return false;
+        }
+        if (getArea() != other.getArea()) {
+            return false;
+        }
+        return true;
     }
 }

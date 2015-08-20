@@ -41,12 +41,14 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ------------------------------------------------------------------------
- * 
+ *
  * History
  *   30.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
 package org.knime.js.base.node.viz.generic;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -57,7 +59,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * 
+ *
  * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonAutoDetect
@@ -68,20 +70,20 @@ public class GenericJSViewRepresentation extends JSONViewContent {
     private static final String CSS_CODE = "cssCode";
     private static final String JS_DEPENDENCIES = "jsDependencies";
     private static final String CSS_DEPENDENCIES = "cssDependencies";
-    
+
     private String m_jsCode;
     private String m_cssCode;
     private String[] m_jsDependencies;
     private String[] m_cssDependencies;
     private JSONDataTable m_table;
-    
+
     /** Serialization constructor. Don't use. */
     public GenericJSViewRepresentation() { }
-    
+
     /**
      * @param dependencies
      * @param jsCode
-     * @param table 
+     * @param table
      */
     public GenericJSViewRepresentation(final String jsCode, final String cssCode, final String[] jsDependencies, final String[] cssDependencies, final JSONDataTable table) {
         m_jsDependencies = jsDependencies;
@@ -90,77 +92,77 @@ public class GenericJSViewRepresentation extends JSONViewContent {
         m_cssCode = cssCode;
         m_table = table;
     }
-    
+
     /**
      * @return the jsCode
      */
     public String getJsCode() {
         return m_jsCode;
     }
-    
+
     /**
      * @param jsCode the jsCode to set
      */
     public void setJsCode(final String jsCode) {
         m_jsCode = jsCode;
     }
-    
+
     /**
      * @return the cssCode
      */
     public String getCssCode() {
         return m_cssCode;
     }
-    
+
     /**
      * @param cssCode the cssCode to set
      */
     public void setCssCode(final String cssCode) {
         m_cssCode = cssCode;
     }
-    
+
     /**
      * @return the jsDependencies
      */
     public String[] getJsDependencies() {
         return m_jsDependencies;
     }
-    
+
     /**
      * @param jsDependencies the jsDependencies to set
      */
     public void setJsDependencies(final String[] jsDependencies) {
         m_jsDependencies = jsDependencies;
     }
-    
+
     /**
      * @return the cssDependencies
      */
     public String[] getCssDependencies() {
         return m_cssDependencies;
     }
-    
+
     /**
      * @param cssDependencies the cssDependencies to set
      */
     public void setCssDependencies(final String[] cssDependencies) {
         m_cssDependencies = cssDependencies;
     }
-    
+
     /**
      * @return the table
      */
     public JSONDataTable getTable() {
         return m_table;
     }
-    
+
     /**
      * @param table the table to set
      */
     public void setTable(final JSONDataTable table) {
         m_table = table;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -185,5 +187,43 @@ public class GenericJSViewRepresentation extends JSONViewContent {
         m_jsDependencies = settings.getStringArray(JS_DEPENDENCIES, new String[0]);
         m_cssDependencies = settings.getStringArray(CSS_DEPENDENCIES, new String[0]);
         m_table = JSONDataTable.loadFromNodeSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        GenericJSViewRepresentation other = (GenericJSViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_jsCode, other.m_jsCode)
+                .append(m_cssCode, other.m_cssCode)
+                .append(m_jsDependencies, other.m_jsDependencies)
+                .append(m_cssDependencies, other.m_cssDependencies)
+                .append(m_table, other.m_table)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_jsCode)
+                .append(m_cssCode)
+                .append(m_jsDependencies)
+                .append(m_cssDependencies)
+                .append(m_table)
+                .toHashCode();
     }
 }

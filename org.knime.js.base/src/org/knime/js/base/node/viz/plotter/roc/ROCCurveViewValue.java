@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.roc;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -147,6 +149,42 @@ public class ROCCurveViewValue extends JSONViewContent {
         m_subtitle = settings.getString(ROCCurveViewConfig.SUBTITLE);
         m_xAxisTitle = settings.getString(ROCCurveViewConfig.X_AXIS_TITLE);
         m_yAxisTitle = settings.getString(ROCCurveViewConfig.Y_AXIS_TITLE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        ROCCurveViewValue other = (ROCCurveViewValue)obj;
+        return new EqualsBuilder()
+                .append(m_title, other.m_title)
+                .append(m_subtitle, other.m_subtitle)
+                .append(m_xAxisTitle, other.m_xAxisTitle)
+                .append(m_yAxisTitle, other.m_yAxisTitle)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_title)
+                .append(m_subtitle)
+                .append(m_xAxisTitle)
+                .append(m_yAxisTitle)
+                .toHashCode();
     }
 
 }

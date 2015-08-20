@@ -113,4 +113,18 @@ public abstract class JSONViewContent implements WebViewContent {
         return out;
     }
 
+    //Force equals and hashCode
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract boolean equals(Object obj);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public abstract int hashCode();
+
 }

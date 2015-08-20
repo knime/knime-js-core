@@ -50,6 +50,8 @@
  */
 package org.knime.js.base.node.viz.plotter.line;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -613,5 +615,93 @@ public class LinePlotViewRepresentation extends JSONViewContent {
             m_keyedDataset = new JSONKeyedValues2DDataset();
             m_keyedDataset.loadFromNodeSettings(datasetSettings);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        LinePlotViewRepresentation other = (LinePlotViewRepresentation)obj;
+        return new EqualsBuilder()
+                .append(m_keyedDataset, other.m_keyedDataset)
+                .append(m_showLegend, other.m_showLegend)
+                .append(m_autoRangeAxes, other.m_autoRangeAxes)
+                .append(m_useDomainInformation, other.m_useDomainInformation)
+                .append(m_showGrid, other.m_showGrid)
+                .append(m_showCrosshair, other.m_showCrosshair)
+                .append(m_snapToPoints, other.m_snapToPoints)
+                .append(m_resizeToWindow, other.m_resizeToWindow)
+                .append(m_enableViewConfiguration, other.m_enableViewConfiguration)
+                .append(m_enableTitleChange, other.m_enableTitleChange)
+                .append(m_enableSubtitleChange, other.m_enableSubtitleChange)
+                .append(m_enableXColumnChange, other.m_enableXColumnChange)
+                .append(m_enableYColumnChange, other.m_enableYColumnChange)
+                .append(m_enableXAxisLabelEdit, other.m_enableXAxisLabelEdit)
+                .append(m_enableYAxisLabelEdit, other.m_enableYAxisLabelEdit)
+                .append(m_enableDotSizeChange, other.m_enableDotSizeChange)
+                .append(m_enableZooming, other.m_enableZooming)
+                .append(m_enableDragZooming, other.m_enableDragZooming)
+                .append(m_enablePanning, other.m_enablePanning)
+                .append(m_showZoomResetButton, other.m_showZoomResetButton)
+                .append(m_enableSelection, other.m_enableSelection)
+                .append(m_enableRectangleSelection, other.m_enableRectangleSelection)
+                .append(m_enableLassoSelection, other.m_enableLassoSelection)
+                .append(m_imageWidth, other.m_imageWidth)
+                .append(m_imageHeight, other.m_imageHeight)
+                .append(m_dateTimeFormat, other.m_dateTimeFormat)
+                .append(m_backgroundColor, other.m_backgroundColor)
+                .append(m_dataAreaColor, other.m_dataAreaColor)
+                .append(m_gridColor, other.m_gridColor)
+                .append(m_enableStaggeredRendering, other.m_enableStaggeredRendering)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_keyedDataset)
+                .append(m_showLegend)
+                .append(m_autoRangeAxes)
+                .append(m_useDomainInformation)
+                .append(m_showGrid)
+                .append(m_showCrosshair)
+                .append(m_snapToPoints)
+                .append(m_resizeToWindow)
+                .append(m_enableViewConfiguration)
+                .append(m_enableTitleChange)
+                .append(m_enableSubtitleChange)
+                .append(m_enableXColumnChange)
+                .append(m_enableYColumnChange)
+                .append(m_enableXAxisLabelEdit)
+                .append(m_enableYAxisLabelEdit)
+                .append(m_enableDotSizeChange)
+                .append(m_enableZooming)
+                .append(m_enableDragZooming)
+                .append(m_enablePanning)
+                .append(m_showZoomResetButton)
+                .append(m_enableSelection)
+                .append(m_enableRectangleSelection)
+                .append(m_enableLassoSelection)
+                .append(m_imageWidth)
+                .append(m_imageHeight)
+                .append(m_dateTimeFormat)
+                .append(m_backgroundColor)
+                .append(m_dataAreaColor)
+                .append(m_gridColor)
+                .append(m_enableStaggeredRendering)
+                .toHashCode();
     }
 }
