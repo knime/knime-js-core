@@ -6,6 +6,7 @@ knime_line_plot = function() {
 	var _keyedDataset = null;
 	var chartManager = null;
 	var containerID = "lineContainer";
+	var initialAxisBounds;
 	
 	var minWidth = 400;
 	var minHeight = 300;
@@ -260,6 +261,8 @@ knime_line_plot = function() {
         	var win = document.defaultView || document.parentWindow;
         	win.onresize = resize;
         }
+        
+        initialAxisBounds = {xMin: xAxis.getLowerBound(), xMax: xAxis.getUpperBound(), yMin: yAxis.getLowerBound(), yMax: yAxis.getUpperBound()};
 	};
 	
 	getJsfcColor = function(colorString) {
@@ -531,6 +534,9 @@ knime_line_plot = function() {
 		for (var i = 0; i < selectionsArray.length; i++) {
 			selectionIDs.push(_keyedDataset.rowKey(selectionsArray[i].itemKey));
 		}
+		if (selectionsArray.length == 0) {
+			return null;
+		}
 		return selectionIDs;
 	};
 	
@@ -559,10 +565,17 @@ knime_line_plot = function() {
 		var plot = chartManager.getChart().getPlot();
 		var xAxis = plot.getXAxis();
 		var yAxis = plot.getYAxis();
-		_value.xAxisMin = xAxis.getLowerBound();
-		_value.xAxisMax = xAxis.getUpperBound();
-		_value.yAxisMin = yAxis.getLowerBound();
-		_value.yAxisMax = yAxis.getUpperBound();
+		var xMin = xAxis.getLowerBound();
+		var xMax = xAxis.getUpperBound();
+		var yMin = yAxis.getLowerBound();
+		var yMax = yAxis.getUpperBound();
+		if (xMin != initialAxisBounds.xMin || xMax != initialAxisBounds.xMax 
+				|| yMin != initialAxisBounds.yMin || yMax != initialAxisBounds.yMax) {
+			_value.xAxisMin = xMin;
+			_value.xAxisMax = xMax;
+			_value.yAxisMin = yMin;
+			_value.yAxisMax = yMax;
+		}
 	};
 	
 	return view;

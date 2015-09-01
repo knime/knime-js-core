@@ -189,6 +189,9 @@ knime_table_view = function(table, containerElement) {
 		$('td.knimeTableSelectCell input').each(function() {
 			$(this).prop('checked') && selected.push($(this).attr('class'));
 		});
+		if (selected.length == 0) {
+			return null;
+		}
 		return selected;
 	};
 	
