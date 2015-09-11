@@ -160,10 +160,10 @@
             path="/labs/quickform"/>
       <category
             after="filter"
-            icon="icons/missing.gif"
+            icon="src/org/knime/js/base/node/viz/js.png"
             level-id="view"
             locked="true"
-            name="Views &amp; Interactive Nodes"
+            name="Interactive Views"
             path="/labs/quickform">
       </category>
       <category
