@@ -69,6 +69,12 @@ org_knime_js_base_node_quickform_selection_value = function() {
 			qfdiv.append("Error: No data available");
 		} else {
 			var columnSelection = representation.currentValue.column;
+			if (columnSelection == "" || !representation.possibleValues.hasOwnProperty(columnSelection)) {
+				for (var key in representation.possibleValues) {
+					columnSelection = key;
+					break;
+				}
+			}
 			if (!representation.lockColumn) {
 				colselection = $('<select>');
 				colselection.addClass('dropdown');
@@ -95,8 +101,12 @@ org_knime_js_base_node_quickform_selection_value = function() {
 				selector = new dropdownSingleSelection();
 			}
 			qfdiv.append(selector.getComponent());
-			selector.setChoices(viewRepresentation.possibleValues[columnSelection]);
+			var choices = viewRepresentation.possibleValues[columnSelection];
+			selector.setChoices(choices);
 			var valueSelection = representation.currentValue.value;
+			if (valueSelection == "" || !$.inArray(valueSelection, choices)) {
+				valueSelection = viewRepresentation.possibleValues[columnSelection][0];
+			}
 			selector.setSelection(valueSelection);
 			selector.addValueChangedListener(callUpdate);
 		}

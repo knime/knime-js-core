@@ -247,6 +247,10 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         for (DataColumnSpec colSpec : filteredSpec) {
             final Set<DataCell> vals = colSpec.getDomain().getValues();
             if (vals != null) {
+                if (colSpec.getType().isCompatible(StringValue.class) && vals.size() < 1) {
+                    //skip if no possible values for string column
+                    continue;
+                }
                 List<String> v = new ArrayList<String>();
                 for (final DataCell cell : vals) {
                     v.add(cell.toString());
