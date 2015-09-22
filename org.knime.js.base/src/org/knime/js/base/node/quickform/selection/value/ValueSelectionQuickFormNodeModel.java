@@ -45,7 +45,9 @@
 package org.knime.js.base.node.quickform.selection.value;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
@@ -126,17 +128,34 @@ public class ValueSelectionQuickFormNodeModel
      * @throws InvalidSettingsException If the current values are not available in the input
      */
     private void createAndPushFlowVariable() throws InvalidSettingsException {
-        String column = getRelevantValue().getColumn();
-        String value = getRelevantValue().getValue();
-        List<String> values = getConfig().getPossibleValues().get(column);
-        if (values == null || !values.contains(value)) {
-            throw new InvalidSettingsException("The selected value '"
-                    + value
-                    + "' is not among the possible values in the column '"
-                    + column + "'");
+        ValueSelectionQuickFormValue rValue = getRelevantValue();
+        String column = rValue.getColumn();
+        String value = rValue.getValue();
+        Map<String, List<String>> possibleValues = getConfig().getPossibleValues();
+        if (possibleValues.size() < 1) {
+            throw new InvalidSettingsException("No column available for selection in input table.");
+        }
+        if (!possibleValues.containsKey(column)) {
+            String warning = "";
+            if (!StringUtils.isEmpty(column)) {
+                warning = "Column '" + column + "' is not part of the table spec anymore.\n";
+            }
+            warning += "Auto-guessing default column and value.";
+            column = possibleValues.keySet().toArray(new String[0])[0];
+            value = possibleValues.get(column).get(0);
+            setWarningMessage(warning);
+        }
+        List<String> values = possibleValues.get(column);
+        if (values == null || values.isEmpty()) {
+            throw new InvalidSettingsException("No possible values found for column '" + column + "'");
+        }
+        if (!values.contains(value)) {
+            setWarningMessage("The selected value '" + value + "' is not among the possible values in the column '"
+                    + column + "'.\nAuto-guessing new default value.");
+            value = values.get(0);
         }
         String variableName = getConfig().getFlowVariableName();
-        pushFlowVariableString(variableName + " (column)", getRelevantValue().getColumn());
+        pushFlowVariableString(variableName + " (column)", rValue.getColumn());
         switch (getConfig().getColumnType()) {
         case Integer:
             pushFlowVariableInt(variableName, Integer.parseInt(value));

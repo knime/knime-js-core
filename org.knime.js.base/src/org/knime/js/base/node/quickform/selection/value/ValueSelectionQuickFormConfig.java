@@ -79,26 +79,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<ValueSelectionQuickFormValue> {
 
     private static final String CFG_COLUMN_TYPE = "columnType";
-
     private static final ColumnType DEFAULT_COLUMN_TYPE = ColumnType.All;
-
     private ColumnType m_columnType = DEFAULT_COLUMN_TYPE;
 
     private static final String CFG_LOCK_COLUMN = "lockColumn";
-
     private static final boolean DEFAULT_LOCK_COLUMN = false;
-
     private boolean m_lockColumn = DEFAULT_LOCK_COLUMN;
 
     private static final String CFG_POSSIBLE_COLUMNS = "possibleColumns";
-
     private Map<String, List<String>> m_possibleValues = new TreeMap<String, List<String>>();
 
     private static final String CFG_TYPE = "type";
-
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
-
     private String m_type = DEFAULT_TYPE;
+
+    private static final String CFG_COL = "colValues_jkj36D";
 
     /**
      * @return the columnType
@@ -166,9 +161,10 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         settings.addBoolean(CFG_LOCK_COLUMN, m_lockColumn);
         settings.addStringArray(CFG_POSSIBLE_COLUMNS,
             m_possibleValues.keySet().toArray(new String[m_possibleValues.keySet().size()]));
+        NodeSettingsWO colSettings = settings.addNodeSettings(CFG_COL);
         for (String key : m_possibleValues.keySet()) {
             List<String> values = m_possibleValues.get(key);
-            settings.addStringArray(key, values.toArray(new String[values.size()]));
+            colSettings.addStringArray(key, values.toArray(new String[values.size()]));
         }
         settings.addString(CFG_TYPE, m_type);
     }
@@ -183,8 +179,12 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
+        NodeSettingsRO colSettings = settings;
+        if (settings.containsKey(CFG_COL)) {
+            colSettings = settings.getNodeSettings(CFG_COL);
+        }
         for (String column : columns) {
-            m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column)));
+            m_possibleValues.put(column, Arrays.asList(colSettings.getStringArray(column)));
         }
         m_type = settings.getString(CFG_TYPE);
     }
@@ -199,8 +199,14 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN, DEFAULT_LOCK_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, new String[0]);
+        NodeSettingsRO colSettings = settings;
+        if (settings.containsKey(CFG_COL)) {
+            try {
+                colSettings = settings.getNodeSettings(CFG_COL);
+            } catch (InvalidSettingsException e) { /* do nothing */ }
+        }
         for (String column : columns) {
-            m_possibleValues.put(column, Arrays.asList(settings.getStringArray(column, new String[0])));
+            m_possibleValues.put(column, Arrays.asList(colSettings.getStringArray(column, new String[0])));
         }
         m_type = settings.getString(CFG_TYPE, DEFAULT_TYPE);
     }
@@ -241,6 +247,10 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         for (DataColumnSpec colSpec : filteredSpec) {
             final Set<DataCell> vals = colSpec.getDomain().getValues();
             if (vals != null) {
+                if (colSpec.getType().isCompatible(StringValue.class) && vals.size() < 1) {
+                    //skip if no possible values for string column
+                    continue;
+                }
                 List<String> v = new ArrayList<String>();
                 for (final DataCell cell : vals) {
                     v.add(cell.toString());
