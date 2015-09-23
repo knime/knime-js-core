@@ -137,6 +137,9 @@ public class ValueSelectionQuickFormNodeModel
         if (!possibleValues.containsKey(column)) {
             String warning = "";
             if (!StringUtils.isEmpty(column)) {
+                if (getConfig().getLockColumn()) {
+                    throw new InvalidSettingsException("Locked column '" + column + "' is not part of the table spec anymore.");
+                }
                 warning = "Column '" + column + "' is not part of the table spec anymore.\n";
             }
             warning += "Auto-guessing default column and value.";
