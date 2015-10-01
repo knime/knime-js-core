@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <knimeNode icon="./quickform_value_select.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
-	<name>Value Selection (Labs)</name>
+	<name>Value Selection</name>
 	<shortDescription>Takes a data table and a selected column and returns a variable with the 
       selected value from this column.</shortDescription>
 	<fullDescription>

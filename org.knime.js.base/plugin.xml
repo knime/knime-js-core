@@ -3,67 +3,72 @@
 <plugin>
    <extension point="org.knime.workbench.repository.nodes">
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
+            factory-class="org.knime.js.base.node.quickform.input.credentials.CredentialsInputQuickFormNodeFactory"
+            id="org.knime.js.base.node.quickform.input.credentials.CredentialsInputQuickFormNodeFactory">
+      </node>
+      <node
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.integer.IntInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.integer.IntInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.dbl.DoubleInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.dbl.DoubleInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.date.DateInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.date.DateInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.listbox.ListBoxInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.listbox.ListBoxInputQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/selection"
+            category-path="/flowcontrol/quickforms/selection"
             factory-class="org.knime.js.base.node.quickform.selection.single.SingleSelectionQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.selection.single.SingleSelectionQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/selection"
+            category-path="/flowcontrol/quickforms/selection"
             factory-class="org.knime.js.base.node.quickform.selection.multiple.MultipleSelectionQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.selection.multiple.MultipleSelectionQuickFormNodeFactory">
       </node>
        <node
-            category-path="/labs/quickform/selection"
+            category-path="/flowcontrol/quickforms/selection"
             factory-class="org.knime.js.base.node.quickform.selection.value.ValueSelectionQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.selection.value.ValueSelectionQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/filter"
+            category-path="/flowcontrol/quickforms/filter"
             factory-class="org.knime.js.base.node.quickform.filter.value.ValueFilterQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.filter.value.ValueFilterQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/selection"
+            category-path="/flowcontrol/quickforms/selection"
             factory-class="org.knime.js.base.node.quickform.selection.column.ColumnSelectionQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.selection.column.ColumnSelectionQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/filter"
+            category-path="/flowcontrol/quickforms/filter"
             factory-class="org.knime.js.base.node.quickform.filter.column.ColumnFilterQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.filter.column.ColumnFilterQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
       </node>
@@ -73,62 +78,62 @@
       </node> -->
       <!-- <node
             after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/> -->
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory">
       </node>
       <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory">
       </node> -->
       <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory"
             id="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/input"
+            category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.fileupload.FileUploadQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.fileupload.FileUploadQuickFormNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/output"
+            category-path="/flowcontrol/quickforms/output"
             factory-class="org.knime.js.base.node.output.filedownload.FileDownloadNodeFactory"
             id="org.knime.js.base.node.output.filedownload.FileDownloadNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/output"
+            category-path="/flowcontrol/quickforms/output"
             factory-class="org.knime.js.base.node.output.image.ImageOutputNodeFactory"
             id="org.knime.js.base.node.output.image.ImageOutputNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/output"
+            category-path="/flowcontrol/quickforms/output"
             factory-class="org.knime.js.base.node.output.text.TextOutputNodeFactory"
             id="org.knime.js.base.node.output.image.TextOutputNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory"
             id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
       </node>
       <node
-            category-path="/labs/quickform/view"
+            category-path="/flowcontrol/quickforms/view"
             factory-class="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory"
             id="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory">
       </node>
@@ -136,41 +141,35 @@
    <extension
          point="org.knime.workbench.repository.categories">
       <category
-            icon="icons/quickform_category.png"
-            level-id="quickform"
-            name="Quick Form &amp; Interactive Nodes (Preview)"
-            path="/labs">
-      </category>
-      <category
       		icon="icons/missing.gif"
             level-id="input"
             name="Input"
-            path="/labs/quickform"/>
+            path="/flowcontrol/quickforms"/>
       <category
             after="input"
             icon="icons/missing.gif"
             level-id="selection"
             name="Selection"
-            path="/labs/quickform"/>
+            path="/flowcontrol/quickforms"/>
       <category
             after="selection"
             icon="icons/missing.gif"
             level-id="filter"
             name="Filter"
-            path="/labs/quickform"/>
+            path="/flowcontrol/quickforms"/>
       <category
             after="filter"
             icon="src/org/knime/js/base/node/viz/js.png"
             level-id="view"
             locked="true"
             name="Interactive Views"
-            path="/labs/quickform">
+            path="/flowcontrol/quickforms">
       </category>
       <category
             icon="icons/missing.gif"
             level-id="output"
             name="Output"
-            path="labs/quickform">
+            path="/flowcontrol/quickforms">
       </category>
    </extension>
    <extension
@@ -200,6 +199,23 @@
          </webResource>
          <importResource
                relativePath="org/knime/js/base/node/quickform/input/string/StringInput.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="KnimeQuickformUtils_1.0.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="Credentials Input Quickform"
+            version="1.0.0"
+            webResourceBundleID="org.knime.js.base.node.quickform.input.credentials.bundle">
+         <webResource
+               relativePathSource="js-src/org/knime/js/base/node/quickform/input/credentials/"
+               relativePathTarget="org/knime/js/base/node/quickform/input/credentials/">
+         </webResource>
+         <importResource
+               relativePath="org/knime/js/base/node/quickform/input/credentials/CredentialsInput.js"
                type="JAVASCRIPT">
          </importResource>
          <webDependency
@@ -820,6 +836,16 @@
             javascriptComponentID="org_knime_js_base_node_quickform_input_string"
             name="String Input Quickform"
             namespace="org_knime_js_base_node_quickform_input_string"
+            setValidationError-method-name="setValidationErrorMessage"
+            validate-method-name="validate">
+      </javascriptComponent>
+      <javascriptComponent
+            getComponentValue-method-name="value"
+            implementationBundleID="org.knime.js.base.node.quickform.input.credentials.bundle"
+            init-method-name="init"
+            javascriptComponentID="org_knime_js_base_node_quickform_input_credentials"
+            name="Credentials Input Quickform"
+            namespace="org_knime_js_base_node_quickform_input_credentials"
             setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>

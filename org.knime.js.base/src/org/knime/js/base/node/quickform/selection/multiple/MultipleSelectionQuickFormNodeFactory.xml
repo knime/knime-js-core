@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <knimeNode icon="./quickform_strsel.png" type="QuickForm" xmlns="http://knime.org/node/v2.8" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://knime.org/node/v2.8 http://knime.org/node/v2.8.xsd">
-	<name>Multiple Selections (Labs)</name>
+	<name>Multiple Selections</name>
 	<shortDescription>Allows selecting multiple values from a list of String which is returned as a data table and String flow variable.</shortDescription>
 	<fullDescription>
 		<intro>
