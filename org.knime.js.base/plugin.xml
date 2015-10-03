@@ -7,11 +7,12 @@
             factory-class="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.string.StringInputQuickFormNodeFactory">
       </node>
-      <node
+<!--      <node
             category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.credentials.CredentialsInputQuickFormNodeFactory"
             id="org.knime.js.base.node.quickform.input.credentials.CredentialsInputQuickFormNodeFactory">
       </node>
+-->
       <node
             category-path="/flowcontrol/quickforms/input"
             factory-class="org.knime.js.base.node.quickform.input.bool.BooleanInputQuickFormNodeFactory"
@@ -205,7 +206,7 @@
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
       </webResourceBundle>
-      <webResourceBundle
+<!--      <webResourceBundle
             debug="true"
             name="Credentials Input Quickform"
             version="1.0.0"
@@ -221,7 +222,8 @@
          <webDependency
                webResourceBundleID="KnimeQuickformUtils_1.0.0">
          </webDependency>
-      </webResourceBundle>
+      </webResourceBundle> -->
+      
       <!-- <webResourceBundle
             debug="true"
             name="Line Plotter"
@@ -839,7 +841,7 @@
             setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
-      <javascriptComponent
+<!--      <javascriptComponent
             getComponentValue-method-name="value"
             implementationBundleID="org.knime.js.base.node.quickform.input.credentials.bundle"
             init-method-name="init"
@@ -849,6 +851,7 @@
             setValidationError-method-name="setValidationErrorMessage"
             validate-method-name="validate">
       </javascriptComponent>
+-->
       <javascriptComponent
             getComponentValue-method-name="getComponentValue"
             implementationBundleID="org.knime.js.base.node.viz.table.bundle"
