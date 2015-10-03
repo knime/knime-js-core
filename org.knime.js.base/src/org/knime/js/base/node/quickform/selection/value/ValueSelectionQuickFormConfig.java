@@ -93,7 +93,7 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
     private static final String DEFAULT_TYPE = SingleSelectionComponentFactory.DROPDOWN;
     private String m_type = DEFAULT_TYPE;
 
-    private static final String CFG_COL = "colValues_jkj36D";
+    private static final String CFG_COL = "colValues";
 
     /**
      * @return the columnType
@@ -179,6 +179,8 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS);
+
+        // For backward compatibility, see https://bugs.knime.org/show_bug.cgi?id=6288, CFG_COL was added
         NodeSettingsRO colSettings = settings;
         if (settings.containsKey(CFG_COL)) {
             colSettings = settings.getNodeSettings(CFG_COL);
@@ -199,6 +201,8 @@ public class ValueSelectionQuickFormConfig extends QuickFormFlowVariableConfig<V
         m_lockColumn = settings.getBoolean(CFG_LOCK_COLUMN, DEFAULT_LOCK_COLUMN);
         m_possibleValues = new TreeMap<String, List<String>>();
         String[] columns = settings.getStringArray(CFG_POSSIBLE_COLUMNS, new String[0]);
+
+        // For backward compatibility, see https://bugs.knime.org/show_bug.cgi?id=6288, CFG_COL was added
         NodeSettingsRO colSettings = settings;
         if (settings.containsKey(CFG_COL)) {
             try {

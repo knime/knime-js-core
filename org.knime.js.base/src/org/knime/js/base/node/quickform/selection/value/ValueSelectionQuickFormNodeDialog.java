@@ -237,8 +237,9 @@ public class ValueSelectionQuickFormNodeDialog extends QuickFormNodeDialog {
         if (!selectedDefaultColumn.isEmpty()) {
             m_defaultColumnField.setSelectedColumn(selectedDefaultColumn);
         }
-        if (m_config.getDefaultValue() != null) {
-            m_defaultField.setSelectedItem(m_config.getDefaultValue());
+        String selectedDefaultValue = m_config.getDefaultValue().getValue();
+        if (selectedDefaultValue != null) {
+            m_defaultField.setSelectedItem(selectedDefaultValue);
         }
         m_lockColumn.setSelected(m_config.getLockColumn());
         m_type.setSelectedItem(m_config.getType());
