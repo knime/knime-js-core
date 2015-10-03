@@ -160,7 +160,7 @@
             path="/flowcontrol/quickforms"/>
       <category
             after="filter"
-            icon="src/org/knime/js/base/node/viz/js.png"
+            icon="icons/js.png"
             level-id="view"
             locked="true"
             name="Interactive Views"
