@@ -136,11 +136,11 @@ knime_lift_chart = function() {
         if (_representation.enableViewToggle) {
             var toggleDiv = controlsContainer.append("div");
             toggleDiv.append("input").attr({type : "radio", id : "toggleLift", "name" : "toggleView"})
-                .property("checked", !_value.showGainChart).on("click", viewToggled);
+                .property("checked", !_value.showGainChart).on("change", viewToggled);
             toggleDiv.append("label").attr("for", "toggleLift").text(" Show Lift Chart");
             
             toggleDiv.append("input").attr({"type" : "radio", id : "toggleGains", "name" : "toggleView"}).style("margin-left", "10px")
-                .property("checked", _value.showGainChart).on("click", viewToggled);
+                .property("checked", _value.showGainChart).on("change", viewToggled);
             toggleDiv.append("label").attr("for", "toggleGains").text(" Show Cumulative Gains Chart");
         }
         var titleDiv;
