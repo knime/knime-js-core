@@ -69,7 +69,7 @@
             id="org.knime.js.base.node.quickform.filter.column.ColumnFilterQuickFormNodeFactory">
       </node>
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
             id="org.knime.js.base.node.viz.table.WebTableViewNodeFactory">
       </node>
@@ -79,32 +79,32 @@
       </node> -->
       <!-- <node
             after="org.knime.js.base.node.viz.table.WebTableViewNodeFactory"
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"
             id="org.knime.js.base.node.rowselector.RowSelectorNodeFactory"/> -->
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatterSelectionAppender.ScatterPlotNodeFactory">
       </node>
       <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter.ScatterPlotNodeFactory"
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory">
       </node> -->
       <!-- <node
             after="org.knime.js.base.node.viz.plotter.scatter_own.WebScatterPlotterNodeFactory"
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.WebLinePlotterNodeFactory"/> -->
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory"
             id="org.knime.js.base.node.viz.generic2.GenericJSViewNodeFactory">
       </node>
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory"
             id="org.knime.js.base.node.viz.plotter.line.LinePlotNodeFactory">
       </node>
@@ -129,12 +129,12 @@
             id="org.knime.js.base.node.output.image.TextOutputNodeFactory">
       </node>
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory"
             id="org.knime.js.base.node.viz.plotter.roc.ROCCurveNodeFactory">
       </node>
       <node
-            category-path="/flowcontrol/quickforms/view"
+            category-path="/labs/interactiveView"
             factory-class="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory"
             id="org.knime.js.base.node.viz.plotter.lift.LiftChartNodeFactory">
       </node>
@@ -159,12 +159,11 @@
             name="Filter"
             path="/flowcontrol/quickforms"/>
       <category
-            after="filter"
             icon="icons/js.png"
-            level-id="view"
+            level-id="interactiveView"
             locked="true"
             name="Interactive Views"
-            path="/flowcontrol/quickforms">
+            path="/labs">
       </category>
       <category
             icon="icons/missing.gif"
