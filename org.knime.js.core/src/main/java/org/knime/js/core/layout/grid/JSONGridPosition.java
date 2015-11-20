@@ -42,17 +42,11 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 16.09.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core;
-
-import java.util.Map;
-
-import org.knime.core.node.KNIMEConstants;
+package org.knime.js.core.layout.grid;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -61,62 +55,60 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePage {
+public class JSONGridPosition {
 
-    private final String m_version;
-    private JSONWebNodePageConfiguration m_configuration;
-    private Map<String, JSONWebNode> m_webNodes;
+    private int m_x;
+
+    private int m_y;
 
     /**
-     * @param configuration
-     * @param webNodes
-     *
+     * Serialization constructor. Don't use.
      */
-    @JsonCreator
-    public JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes) {
-        m_version = KNIMEConstants.VERSION;
-        m_configuration = configuration;
-        m_webNodes = webNodes;
+    public JSONGridPosition() { }
+
+    /**
+     * @param x x
+     * @param y y
+     */
+    public JSONGridPosition(final int x, final int y) {
+        m_x = x;
+        m_y = y;
     }
 
     /**
-     * @return the version
+     * @return the x
      */
-    @JsonProperty("version")
-    public String getVersion() {
-        return m_version;
+    public int getX() {
+        return m_x;
     }
 
     /**
-     * @return the configuration
+     * @param x the x to set
      */
-    @JsonProperty("webNodePageConfiguration")
-    public JSONWebNodePageConfiguration getWebNodePageConfiguration() {
-        return m_configuration;
+    public void setX(final int x) {
+        m_x = x;
     }
 
     /**
-     * @param configuration the configuration to set
+     * @return the y
      */
-    @JsonProperty("webNodePageConfiguration")
-    public void setWebNodePageConfiguration(final JSONWebNodePageConfiguration configuration) {
-        m_configuration = configuration;
+    public int getY() {
+        return m_y;
     }
 
     /**
-     * @return the webNodes
+     * @param y the y to set
      */
-    @JsonProperty("webNodes")
-    public Map<String, JSONWebNode> getWebNodes() {
-        return m_webNodes;
+    public void setY(final int y) {
+        m_y = y;
     }
 
     /**
-     * @param webNodes the webNodes to set
+     * {@inheritDoc}
      */
-    @JsonProperty("webNodes")
-    public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
-        m_webNodes = webNodes;
+    @Override
+    public String toString() {
+        return m_x + " " + m_y;
     }
+
 }

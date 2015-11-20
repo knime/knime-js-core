@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -42,44 +43,25 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 17.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   Nov 12, 2015 (albrecht): created
  */
-package org.knime.js.core.layout;
-
-import java.util.List;
+package org.knime.js.core.layout.bs;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
- */
+*
+* @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
+*/
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONGridContent {
-
-    private boolean m_containsView;
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayoutContent {
 
     private String m_nodeID;
-
-    private List<JSONGridEntry> m_nestedGridContent;
-
-    private JSONGridSizing m_sizing;
-
-    /**
-     * @return the containsView
-     */
-    public boolean getContainsView() {
-        return m_containsView;
-    }
-
-    /**
-     * @param containsView the containsView to set
-     */
-    public void setContainsView(final boolean containsView) {
-        m_containsView = containsView;
-    }
+    private boolean m_useAspectRatioResize;
+    private Integer m_aspectRatioWidth;
+    private Integer m_aspectRatioHeight;
 
     /**
      * @return the nodeID
@@ -96,31 +78,45 @@ public class JSONGridContent {
     }
 
     /**
-     * @return the gridContent
+     * @return the useAspectRatioResize
      */
-    public List<JSONGridEntry> getNestedGridContent() {
-        return m_nestedGridContent;
+    public boolean getUseAspectRatioResize() {
+        return m_useAspectRatioResize;
     }
 
     /**
-     * @param nestedGridContent the gridContent to set
+     * @param useAspectRatioResize the useAspectRatioResize to set
      */
-    public void setNestedGridContent(final List<JSONGridEntry> nestedGridContent) {
-        m_nestedGridContent = nestedGridContent;
+    public void setUseAspectRatioResize(final boolean useAspectRatioResize) {
+        m_useAspectRatioResize = useAspectRatioResize;
     }
 
     /**
-     * @return the sizing
+     * @return the aspectRatioWidth
      */
-    public JSONGridSizing getSizing() {
-        return m_sizing;
+    public Integer getAspectRatioWidth() {
+        return m_aspectRatioWidth;
     }
 
     /**
-     * @param sizing the sizing to set
+     * @param aspectRatioWidth the aspectRatioWidth to set
      */
-    public void setSizing(final JSONGridSizing sizing) {
-        m_sizing = sizing;
+    public void setAspectRatioWidth(final Integer aspectRatioWidth) {
+        m_aspectRatioWidth = aspectRatioWidth;
+    }
+
+    /**
+     * @return the aspectRatioHeight
+     */
+    public Integer getAspectRatioHeight() {
+        return m_aspectRatioHeight;
+    }
+
+    /**
+     * @param aspectRatioHeight the aspectRatioHeight to set
+     */
+    public void setAspectRatioHeight(final Integer aspectRatioHeight) {
+        m_aspectRatioHeight = aspectRatioHeight;
     }
 
 }

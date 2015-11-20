@@ -46,7 +46,8 @@
  */
 package org.knime.js.core;
 
-import org.knime.js.core.layout.JSONPageLayout;
+import org.knime.core.node.KNIMEConstants;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -59,7 +60,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONWebNodePageConfiguration {
 
-    private JSONPageLayout m_layout;
+    private String m_version;
+    private JSONLayoutPage m_layout;
     private JSONBlackBoard m_blackBoard;
 
     /** Serialization constructor. Don't use. */
@@ -69,9 +71,17 @@ public class JSONWebNodePageConfiguration {
      * @param layout the layout
      * @param blackBoard the blackboard
      */
-    public JSONWebNodePageConfiguration(final JSONPageLayout layout, final JSONBlackBoard blackBoard) {
+    public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard) {
+        m_version = KNIMEConstants.VERSION;
         m_layout = layout;
         m_blackBoard = blackBoard;
+    }
+
+    /**
+     * @return the version
+     */
+    public String getVersion() {
+        return m_version;
     }
 
     /**
@@ -91,14 +101,14 @@ public class JSONWebNodePageConfiguration {
     /**
      * @return the layout
      */
-    public JSONPageLayout getLayout() {
+    public JSONLayoutPage getLayout() {
         return m_layout;
     }
 
     /**
      * @param layout the layout to set
      */
-    public void setLayout(final JSONPageLayout layout) {
+    public void setLayout(final JSONLayoutPage layout) {
         m_layout = layout;
     }
 

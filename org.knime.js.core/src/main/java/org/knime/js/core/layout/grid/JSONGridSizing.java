@@ -42,9 +42,9 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Created on 17.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core.layout;
+package org.knime.js.core.layout.grid;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -55,54 +55,100 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONGridEntry {
+public class JSONGridSizing {
 
-    private JSONGridPosition m_position;
+    private int m_height;
+    private int m_minHeight;
+    private int m_maxHeight;
 
-    private JSONGridContent m_content;
+    private int m_width;
+    private int m_minWidth;
+    private int m_maxWidth;
+
+    private String m_padding;
 
     /**
-     * Serialization constructor. Don't use.
+     * @return the height
      */
-    public JSONGridEntry() { }
-
-    /**
-     * @param position the position
-     * @param content the content
-     */
-    public JSONGridEntry(final JSONGridPosition position, final JSONGridContent content) {
-        setPosition(position);
-        setContent(content);
+    public int getHeight() {
+        return m_height;
     }
-
     /**
-     * @return the position
+     * @param height the height to set
      */
-    public JSONGridPosition getPosition() {
-        return m_position;
+    public void setHeight(final int height) {
+        m_height = height;
     }
-
     /**
-     * @param position the position to set
+     * @return the minHeight
      */
-    public void setPosition(final JSONGridPosition position) {
-        m_position = position;
+    public int getMinHeight() {
+        return m_minHeight;
     }
-
     /**
-     * @return the content
+     * @param minHeight the minHeight to set
      */
-    public JSONGridContent getContent() {
-        return m_content;
+    public void setMinHeight(final int minHeight) {
+        m_minHeight = minHeight;
     }
-
     /**
-     * @param content the content to set
+     * @return the maxHeight
      */
-    public void setContent(final JSONGridContent content) {
-        m_content = content;
+    public int getMaxHeight() {
+        return m_maxHeight;
     }
-
-
-
+    /**
+     * @param maxHeight the maxHeight to set
+     */
+    public void setMaxHeight(final int maxHeight) {
+        m_maxHeight = maxHeight;
+    }
+    /**
+     * @return the width
+     */
+    public int getWidth() {
+        return m_width;
+    }
+    /**
+     * @param width the width to set
+     */
+    public void setWidth(final int width) {
+        m_width = width;
+    }
+    /**
+     * @return the minWidth
+     */
+    public int getMinWidth() {
+        return m_minWidth;
+    }
+    /**
+     * @param minWidth the minWidth to set
+     */
+    public void setMinWidth(final int minWidth) {
+        m_minWidth = minWidth;
+    }
+    /**
+     * @return the maxWidth
+     */
+    public int getMaxWidth() {
+        return m_maxWidth;
+    }
+    /**
+     * @param maxWidth the maxWidth to set
+     */
+    public void setMaxWidth(final int maxWidth) {
+        m_maxWidth = maxWidth;
+    }
+    /**
+     * @return the padding
+     */
+    public String getPadding() {
+        return m_padding;
+    }
+    /**
+     * @param padding the padding to set
+     */
+    public void setPadding(final String padding) {
+        m_padding = padding;
+    }
 }

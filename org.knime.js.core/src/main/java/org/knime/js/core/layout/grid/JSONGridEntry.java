@@ -42,17 +42,11 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 16.09.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core;
-
-import java.util.Map;
-
-import org.knime.core.node.KNIMEConstants;
+package org.knime.js.core.layout.grid;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -61,62 +55,54 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePage {
+public class JSONGridEntry {
 
-    private final String m_version;
-    private JSONWebNodePageConfiguration m_configuration;
-    private Map<String, JSONWebNode> m_webNodes;
+    private JSONGridPosition m_position;
+
+    private JSONGridContent m_content;
 
     /**
-     * @param configuration
-     * @param webNodes
-     *
+     * Serialization constructor. Don't use.
      */
-    @JsonCreator
-    public JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes) {
-        m_version = KNIMEConstants.VERSION;
-        m_configuration = configuration;
-        m_webNodes = webNodes;
+    public JSONGridEntry() { }
+
+    /**
+     * @param position the position
+     * @param content the content
+     */
+    public JSONGridEntry(final JSONGridPosition position, final JSONGridContent content) {
+        setPosition(position);
+        setContent(content);
     }
 
     /**
-     * @return the version
+     * @return the position
      */
-    @JsonProperty("version")
-    public String getVersion() {
-        return m_version;
+    public JSONGridPosition getPosition() {
+        return m_position;
     }
 
     /**
-     * @return the configuration
+     * @param position the position to set
      */
-    @JsonProperty("webNodePageConfiguration")
-    public JSONWebNodePageConfiguration getWebNodePageConfiguration() {
-        return m_configuration;
+    public void setPosition(final JSONGridPosition position) {
+        m_position = position;
     }
 
     /**
-     * @param configuration the configuration to set
+     * @return the content
      */
-    @JsonProperty("webNodePageConfiguration")
-    public void setWebNodePageConfiguration(final JSONWebNodePageConfiguration configuration) {
-        m_configuration = configuration;
+    public JSONGridContent getContent() {
+        return m_content;
     }
 
     /**
-     * @return the webNodes
+     * @param content the content to set
      */
-    @JsonProperty("webNodes")
-    public Map<String, JSONWebNode> getWebNodes() {
-        return m_webNodes;
+    public void setContent(final JSONGridContent content) {
+        m_content = content;
     }
 
-    /**
-     * @param webNodes the webNodes to set
-     */
-    @JsonProperty("webNodes")
-    public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
-        m_webNodes = webNodes;
-    }
+
+
 }

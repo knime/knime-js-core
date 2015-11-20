@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -42,81 +43,52 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 16.09.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   Nov 11, 2015 (albrecht): created
  */
-package org.knime.js.core;
+package org.knime.js.core.layout.bs;
 
-import java.util.Map;
-
-import org.knime.core.node.KNIMEConstants;
+import java.util.ArrayList;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePage {
+//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+public abstract class JSONLayoutElement {
 
-    private final String m_version;
-    private JSONWebNodePageConfiguration m_configuration;
-    private Map<String, JSONWebNode> m_webNodes;
+    private ArrayList<String> m_additionalClasses = new ArrayList<String>();
+    private ArrayList<String> m_additionalStyles = new ArrayList<String>();
 
     /**
-     * @param configuration
-     * @param webNodes
-     *
+     * @return the additionalClasses
      */
-    @JsonCreator
-    public JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes) {
-        m_version = KNIMEConstants.VERSION;
-        m_configuration = configuration;
-        m_webNodes = webNodes;
+    public ArrayList<String> getAdditionalClasses() {
+        return m_additionalClasses;
     }
 
     /**
-     * @return the version
+     * @param additionalClasses the additionalClasses to set
      */
-    @JsonProperty("version")
-    public String getVersion() {
-        return m_version;
+    public void setAdditionalClasses(final ArrayList<String> additionalClasses) {
+        m_additionalClasses = additionalClasses;
     }
 
     /**
-     * @return the configuration
+     * @return the additionalStyles
      */
-    @JsonProperty("webNodePageConfiguration")
-    public JSONWebNodePageConfiguration getWebNodePageConfiguration() {
-        return m_configuration;
+    public ArrayList<String> getAdditionalStyles() {
+        return m_additionalStyles;
     }
 
     /**
-     * @param configuration the configuration to set
+     * @param additionalStyles the additionalStyles to set
      */
-    @JsonProperty("webNodePageConfiguration")
-    public void setWebNodePageConfiguration(final JSONWebNodePageConfiguration configuration) {
-        m_configuration = configuration;
+    public void setAdditionalStyles(final ArrayList<String> additionalStyles) {
+        m_additionalStyles = additionalStyles;
     }
 
-    /**
-     * @return the webNodes
-     */
-    @JsonProperty("webNodes")
-    public Map<String, JSONWebNode> getWebNodes() {
-        return m_webNodes;
-    }
-
-    /**
-     * @param webNodes the webNodes to set
-     */
-    @JsonProperty("webNodes")
-    public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
-        m_webNodes = webNodes;
-    }
 }

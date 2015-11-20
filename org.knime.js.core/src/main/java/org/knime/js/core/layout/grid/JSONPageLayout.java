@@ -40,75 +40,52 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ---------------------------------------------------------------------
+ * ------------------------------------------------------------------------
  *
- * Created on 19.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
  */
-package org.knime.js.core.layout;
+package org.knime.js.core.layout.grid;
+
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONGridPosition {
+public class JSONPageLayout {
 
-    private int m_x;
-
-    private int m_y;
+    private List<JSONGridEntry> m_gridEntryList;
 
     /**
      * Serialization constructor. Don't use.
      */
-    public JSONGridPosition() { }
+    public JSONPageLayout() { }
 
     /**
-     * @param x x
-     * @param y y
+     * @param gridEntryList the content list
      */
-    public JSONGridPosition(final int x, final int y) {
-        m_x = x;
-        m_y = y;
+    public JSONPageLayout(final List<JSONGridEntry> gridEntryList) {
+        m_gridEntryList = gridEntryList;
     }
 
     /**
-     * @return the x
+     * @return the content
      */
-    public int getX() {
-        return m_x;
+    public List<JSONGridEntry> getGridEntryList() {
+        return m_gridEntryList;
     }
 
     /**
-     * @param x the x to set
+     * @param content the content to set
      */
-    public void setX(final int x) {
-        m_x = x;
-    }
-
-    /**
-     * @return the y
-     */
-    public int getY() {
-        return m_y;
-    }
-
-    /**
-     * @param y the y to set
-     */
-    public void setY(final int y) {
-        m_y = y;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return m_x + " " + m_y;
+    public void setContent(final List<JSONGridEntry> content) {
+        m_gridEntryList = content;
     }
 
 }

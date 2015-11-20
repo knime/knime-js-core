@@ -40,12 +40,11 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
- * History
- *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ * Created on 17.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
-package org.knime.js.core.layout;
+package org.knime.js.core.layout.grid;
 
 import java.util.List;
 
@@ -54,38 +53,74 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONPageLayout {
+public class JSONGridContent {
 
-    private List<JSONGridEntry> m_gridEntryList;
+    private boolean m_containsView;
+
+    private String m_nodeID;
+
+    private List<JSONGridEntry> m_nestedGridContent;
+
+    private JSONGridSizing m_sizing;
 
     /**
-     * Serialization constructor. Don't use.
+     * @return the containsView
      */
-    public JSONPageLayout() { }
-
-    /**
-     * @param gridEntryList the content list
-     */
-    public JSONPageLayout(final List<JSONGridEntry> gridEntryList) {
-        m_gridEntryList = gridEntryList;
+    public boolean getContainsView() {
+        return m_containsView;
     }
 
     /**
-     * @return the content
+     * @param containsView the containsView to set
      */
-    public List<JSONGridEntry> getGridEntryList() {
-        return m_gridEntryList;
+    public void setContainsView(final boolean containsView) {
+        m_containsView = containsView;
     }
 
     /**
-     * @param content the content to set
+     * @return the nodeID
      */
-    public void setContent(final List<JSONGridEntry> content) {
-        m_gridEntryList = content;
+    public String getNodeID() {
+        return m_nodeID;
+    }
+
+    /**
+     * @param nodeID the nodeID to set
+     */
+    public void setNodeID(final String nodeID) {
+        m_nodeID = nodeID;
+    }
+
+    /**
+     * @return the gridContent
+     */
+    public List<JSONGridEntry> getNestedGridContent() {
+        return m_nestedGridContent;
+    }
+
+    /**
+     * @param nestedGridContent the gridContent to set
+     */
+    public void setNestedGridContent(final List<JSONGridEntry> nestedGridContent) {
+        m_nestedGridContent = nestedGridContent;
+    }
+
+    /**
+     * @return the sizing
+     */
+    public JSONGridSizing getSizing() {
+        return m_sizing;
+    }
+
+    /**
+     * @param sizing the sizing to set
+     */
+    public void setSizing(final JSONGridSizing sizing) {
+        m_sizing = sizing;
     }
 
 }

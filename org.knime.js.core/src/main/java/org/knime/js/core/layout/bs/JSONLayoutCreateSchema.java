@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -42,113 +43,33 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 17.03.2014 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   Nov 16, 2015 (albrecht): created
  */
-package org.knime.js.core.layout;
+package org.knime.js.core.layout.bs;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author albrecht
  */
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONGridSizing {
-
-    private int m_height;
-    private int m_minHeight;
-    private int m_maxHeight;
-
-    private int m_width;
-    private int m_minWidth;
-    private int m_maxWidth;
-
-    private String m_padding;
+public class JSONLayoutCreateSchema {
 
     /**
-     * @return the height
+     * @param args
      */
-    public int getHeight() {
-        return m_height;
+    public static void main(final String[] args) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonSchema schema = mapper.generateJsonSchema(JSONLayoutPage.class);
+            String schemaString = schema.toString();
+            System.out.println(schemaString);
+        } catch (JsonMappingException e) {
+            // TODO Auto-generated catch block
+        }
     }
-    /**
-     * @param height the height to set
-     */
-    public void setHeight(final int height) {
-        m_height = height;
-    }
-    /**
-     * @return the minHeight
-     */
-    public int getMinHeight() {
-        return m_minHeight;
-    }
-    /**
-     * @param minHeight the minHeight to set
-     */
-    public void setMinHeight(final int minHeight) {
-        m_minHeight = minHeight;
-    }
-    /**
-     * @return the maxHeight
-     */
-    public int getMaxHeight() {
-        return m_maxHeight;
-    }
-    /**
-     * @param maxHeight the maxHeight to set
-     */
-    public void setMaxHeight(final int maxHeight) {
-        m_maxHeight = maxHeight;
-    }
-    /**
-     * @return the width
-     */
-    public int getWidth() {
-        return m_width;
-    }
-    /**
-     * @param width the width to set
-     */
-    public void setWidth(final int width) {
-        m_width = width;
-    }
-    /**
-     * @return the minWidth
-     */
-    public int getMinWidth() {
-        return m_minWidth;
-    }
-    /**
-     * @param minWidth the minWidth to set
-     */
-    public void setMinWidth(final int minWidth) {
-        m_minWidth = minWidth;
-    }
-    /**
-     * @return the maxWidth
-     */
-    public int getMaxWidth() {
-        return m_maxWidth;
-    }
-    /**
-     * @param maxWidth the maxWidth to set
-     */
-    public void setMaxWidth(final int maxWidth) {
-        m_maxWidth = maxWidth;
-    }
-    /**
-     * @return the padding
-     */
-    public String getPadding() {
-        return m_padding;
-    }
-    /**
-     * @param padding the padding to set
-     */
-    public void setPadding(final String padding) {
-        m_padding = padding;
-    }
+
 }
