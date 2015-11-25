@@ -86,7 +86,6 @@ public class JSONLayoutPage {
         mapper.setSerializationInclusion(Include.NON_EMPTY);
         mapper.registerSubtypes(
                 new NamedType(JSONLayoutRow.class, "row"),
-                new NamedType(JSONLayoutContainer.class, "container"),
                 new NamedType(JSONLayoutViewContent.class, "view"),
                 new NamedType(JSONLayoutHTMLContent.class, "html")
                 );
