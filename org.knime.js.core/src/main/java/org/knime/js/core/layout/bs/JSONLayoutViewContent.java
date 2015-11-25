@@ -48,7 +48,13 @@
  */
 package org.knime.js.core.layout.bs;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
 *
@@ -58,10 +64,103 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayoutContent {
 
+    // general fields
     private String m_nodeID;
-    private boolean m_useAspectRatioResize;
-    private Integer m_aspectRatioWidth;
-    private Integer m_aspectRatioHeight;
+    private Integer m_maxWidth;
+    private Integer m_maxHeight;
+    private Integer m_minWidth;
+    private Integer m_minHeight;
+    private ResizeMethod m_resizeMethod;
+
+    // iframe resizer fields
+    private boolean m_autoResize;
+    private Integer m_resizeInterval;
+    private boolean m_scrolling;
+    private boolean m_sizeHeight;
+    private boolean m_sizeWidth;
+    private Integer m_resizeTolerance;
+
+    public static enum ResizeMethod {
+        /* Iframe Resizer methods */
+        /** calculates offset height of body element */
+        VIEW_BODY_OFFSET,
+        /** uses document.body.scrollHeight */
+        VIEW_BODY_SCROLL,
+        /** uses document.documentElement.offsetHeight */
+        VIEW_DOCUMENT_ELEMENT_OFFSET,
+        /** uses document.documentElement.scrollHeight */
+        VIEW_DOCUMENT_ELEMENT_SCROLL,
+        /** largest value of the four main methods */
+        VIEW_MAX,
+        /** smallest value of the four main methods */
+        VIEW_MIN,
+        /** like VIEW_MAX but never shrinks */
+        VIEW_GROW,
+        /** lowest point of every DOM element present */
+        VIEW_LOWEST_ELEMENT,
+        /** lowest point of every element tagged with data-iframe-height attribute */
+        VIEW_TAGGED_ELEMENT,
+        /** like VIEW_LOWEST_ELEMENT with fall back to MAX on IE 10 or below */
+        VIEW_LOWEST_ELEMENT_IE_MAX,
+
+        /* Bootstrap responsive embed methods */
+        /** Resize according to available space in layout and keeping a 16:9 aspect ratio. */
+        ASPECT_RATIO_16by9,
+        /** Resize according to available space in layout and keeping a 4:3 aspect ratio. */
+        ASPECT_RATIO_4by3,
+
+        /* Manual resize method */
+        /** No automatic resizing. Resize calls need to be made manually from the view. */
+        MANUAL;
+
+        private static Map<String, ResizeMethod> namesMap = new HashMap<String, ResizeMethod>(13);
+
+        static {
+            namesMap.put("viewBodyOffset", VIEW_BODY_OFFSET);
+            namesMap.put("viewBodyScroll", VIEW_BODY_SCROLL);
+            namesMap.put("viewDocumentElementOffset", VIEW_DOCUMENT_ELEMENT_OFFSET);
+            namesMap.put("viewDocumentElementScroll", VIEW_DOCUMENT_ELEMENT_SCROLL);
+            namesMap.put("viewMax", VIEW_MAX);
+            namesMap.put("viewMin", VIEW_MIN);
+            namesMap.put("viewGrow", VIEW_GROW);
+            namesMap.put("viewLowestElement", VIEW_LOWEST_ELEMENT);
+            namesMap.put("viewTaggedElement", VIEW_TAGGED_ELEMENT);
+            namesMap.put("viewLowestElementIEMax", ResizeMethod.VIEW_LOWEST_ELEMENT_IE_MAX);
+            namesMap.put("aspectRatio16by9", ASPECT_RATIO_16by9);
+            namesMap.put("aspectRatio4by3", ASPECT_RATIO_4by3);
+            namesMap.put("manual", MANUAL);
+        }
+
+        @JsonCreator
+        public static ResizeMethod forValue(final String value) {
+            return namesMap.get(value);
+        }
+
+        @JsonValue
+        public String toValue() {
+            for (Entry<String, ResizeMethod> entry : namesMap.entrySet()) {
+                if (entry.getValue() == this) {
+                    return entry.getKey();
+                }
+            }
+
+            return null;
+        }
+    }
+
+    /**
+     *
+     */
+    public JSONLayoutViewContent() {
+        // set default resize method to lowest element and fall back to max on IE 10 and below
+        m_resizeMethod = ResizeMethod.VIEW_LOWEST_ELEMENT_IE_MAX;
+
+        // default boolean resize properties
+        m_autoResize = true;
+        m_scrolling = false;
+        m_sizeHeight = true;
+        m_sizeWidth = false;
+    }
 
     /**
      * @return the nodeID
@@ -78,45 +177,157 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
     }
 
     /**
-     * @return the useAspectRatioResize
+     * @return the resizeMethod
      */
-    public boolean getUseAspectRatioResize() {
-        return m_useAspectRatioResize;
+    public ResizeMethod getResizeMethod() {
+        return m_resizeMethod;
     }
 
     /**
-     * @param useAspectRatioResize the useAspectRatioResize to set
+     * @param resizeMethod the resizeMethod to set
      */
-    public void setUseAspectRatioResize(final boolean useAspectRatioResize) {
-        m_useAspectRatioResize = useAspectRatioResize;
+    public void setResizeMethod(final ResizeMethod resizeMethod) {
+        m_resizeMethod = resizeMethod;
     }
 
     /**
-     * @return the aspectRatioWidth
+     * @return the maxHeight
      */
-    public Integer getAspectRatioWidth() {
-        return m_aspectRatioWidth;
+    public Integer getMaxHeight() {
+        return m_maxHeight;
     }
 
     /**
-     * @param aspectRatioWidth the aspectRatioWidth to set
+     * @param maxHeight the maxHeight to set
      */
-    public void setAspectRatioWidth(final Integer aspectRatioWidth) {
-        m_aspectRatioWidth = aspectRatioWidth;
+    public void setMaxHeight(final Integer maxHeight) {
+        this.m_maxHeight = maxHeight;
     }
 
     /**
-     * @return the aspectRatioHeight
+     * @return the maxWidth
      */
-    public Integer getAspectRatioHeight() {
-        return m_aspectRatioHeight;
+    public Integer getMaxWidth() {
+        return m_maxWidth;
     }
 
     /**
-     * @param aspectRatioHeight the aspectRatioHeight to set
+     * @param maxWidth the maxWidth to set
      */
-    public void setAspectRatioHeight(final Integer aspectRatioHeight) {
-        m_aspectRatioHeight = aspectRatioHeight;
+    public void setMaxWidth(final Integer maxWidth) {
+        this.m_maxWidth = maxWidth;
+    }
+
+    /**
+     * @return the minHeight
+     */
+    public Integer getMinHeight() {
+        return m_minHeight;
+    }
+
+    /**
+     * @param minHeight the minHeight to set
+     */
+    public void setMinHeight(final Integer minHeight) {
+        this.m_minHeight = minHeight;
+    }
+
+    /**
+     * @return the minWidth
+     */
+    public Integer getMinWidth() {
+        return m_minWidth;
+    }
+
+    /**
+     * @param minWidth the minWidth to set
+     */
+    public void setMinWidth(final Integer minWidth) {
+        this.m_minWidth = minWidth;
+    }
+
+    /**
+     * @return the resizeInterval
+     */
+    public Integer getResizeInterval() {
+        return m_resizeInterval;
+    }
+
+    /**
+     * @param resizeInterval the resizeInterval to set
+     */
+    public void setResizeInterval(final Integer resizeInterval) {
+        m_resizeInterval = resizeInterval;
+    }
+
+    /**
+     * @return the resizeTolerance
+     */
+    public Integer getResizeTolerance() {
+        return m_resizeTolerance;
+    }
+
+    /**
+     * @param resizeTolerance the resizeTolerance to set
+     */
+    public void setResizeTolerance(final Integer resizeTolerance) {
+        m_resizeTolerance = resizeTolerance;
+    }
+
+    /**
+     * @return the autoResize
+     */
+    public boolean getAutoResize() {
+        return m_autoResize;
+    }
+
+    /**
+     * @param autoResize the autoResize to set
+     */
+    public void setAutoResize(final boolean autoResize) {
+        m_autoResize = autoResize;
+    }
+
+    /**
+     * @return the scrolling
+     */
+    public boolean getScrolling() {
+        return m_scrolling;
+    }
+
+    /**
+     * @param scrolling the scrolling to set
+     */
+    public void setScrolling(final boolean scrolling) {
+        m_scrolling = scrolling;
+    }
+
+    /**
+     * @return the sizeHeight
+     */
+    public boolean getSizeHeight() {
+        return m_sizeHeight;
+    }
+
+    /**
+     * @param sizeHeight the sizeHeight to set
+     */
+    public void setSizeHeight(final boolean sizeHeight) {
+        m_sizeHeight = sizeHeight;
+    }
+
+    /**
+     * @return the sizeWidth
+     */
+    public boolean getSizeWidth() {
+        return m_sizeWidth;
+    }
+
+    /**
+     * @param sizeWidth the sizeWidth to set
+     */
+    public void setSizeWidth(final boolean sizeWidth) {
+        m_sizeWidth = sizeWidth;
     }
 
 }

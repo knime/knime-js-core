@@ -87,7 +87,8 @@ public class JSONLayoutPage {
         mapper.registerSubtypes(
                 new NamedType(JSONLayoutRow.class, "row"),
                 new NamedType(JSONLayoutContainer.class, "container"),
-                new NamedType(JSONLayoutViewContent.class, "view")
+                new NamedType(JSONLayoutViewContent.class, "view"),
+                new NamedType(JSONLayoutHTMLContent.class, "html")
                 );
         return mapper;
     }

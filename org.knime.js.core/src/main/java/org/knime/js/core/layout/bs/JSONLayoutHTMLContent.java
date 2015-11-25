@@ -44,36 +44,30 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Nov 11, 2015 (albrecht): created
+ *   Nov 24, 2015 (albrecht): created
  */
 package org.knime.js.core.layout.bs;
-
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
-@JsonAutoDetect
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-public class JSONLayoutContainer extends JSONLayoutElement implements JSONLayoutContent {
+public class JSONLayoutHTMLContent implements JSONLayoutContent {
 
-    private List<JSONLayoutContent> m_content;
+    private String m_value;
 
     /**
-     * @return the content
+     * @return the value
      */
-    public List<JSONLayoutContent> getContent() {
-        return m_content;
+    public String getValue() {
+        return m_value;
     }
 
     /**
-     * @param content the content to set
+     * @param value the value to set
      */
-    public void setContent(final List<JSONLayoutContent> content) {
-        m_content = content;
+    public void setValue(final String value) {
+        m_value = value;
     }
 
 }
