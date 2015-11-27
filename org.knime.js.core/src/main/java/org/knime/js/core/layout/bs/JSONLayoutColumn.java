@@ -51,6 +51,7 @@ package org.knime.js.core.layout.bs;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  *
@@ -77,8 +78,10 @@ public class JSONLayoutColumn extends JSONLayoutElement {
 
     /**
      * @param widthXS the widthXS to set
+     * @throws JsonMappingException if width is out of bounds
      */
-    public void setWidthXS(final Integer widthXS) {
+    public void setWidthXS(final Integer widthXS) throws JsonMappingException {
+        checkWidth(widthXS);
         m_widthXS = widthXS;
     }
 
@@ -91,8 +94,10 @@ public class JSONLayoutColumn extends JSONLayoutElement {
 
     /**
      * @param widthSM the widthSM to set
+     * @throws JsonMappingException if width is out of bounds
      */
-    public void setWidthSM(final Integer widthSM) {
+    public void setWidthSM(final Integer widthSM) throws JsonMappingException {
+        checkWidth(widthSM);
         m_widthSM = widthSM;
     }
 
@@ -105,8 +110,10 @@ public class JSONLayoutColumn extends JSONLayoutElement {
 
     /**
      * @param widthMD the widthMD to set
+     * @throws JsonMappingException if width is out of bounds
      */
-    public void setWidthMD(final Integer widthMD) {
+    public void setWidthMD(final Integer widthMD) throws JsonMappingException {
+        checkWidth(widthMD);
         m_widthMD = widthMD;
     }
 
@@ -119,8 +126,10 @@ public class JSONLayoutColumn extends JSONLayoutElement {
 
     /**
      * @param widthLG the widthLG to set
+     * @throws JsonMappingException if width is out of bounds
      */
-    public void setWidthLG(final Integer widthLG) {
+    public void setWidthLG(final Integer widthLG) throws JsonMappingException {
+        checkWidth(widthLG);
         m_widthLG = widthLG;
     }
 
@@ -133,8 +142,10 @@ public class JSONLayoutColumn extends JSONLayoutElement {
 
     /**
      * @param widthXL the widthXL to set
+     * @throws JsonMappingException if width is out of bounds
      */
-    public void setWidthXL(final Integer widthXL) {
+    public void setWidthXL(final Integer widthXL) throws JsonMappingException {
+        checkWidth(widthXL);
         m_widthXL = widthXL;
     }
 
@@ -152,6 +163,12 @@ public class JSONLayoutColumn extends JSONLayoutElement {
         m_content = content;
     }
 
-
+    private void checkWidth(final Integer width) throws JsonMappingException {
+        if (width != null) {
+            if (width < 1 || width > 12) {
+                throw new JsonMappingException("Column width needs to be between 1 and 12 but was " + width.toString());
+            }
+        }
+    }
 
 }

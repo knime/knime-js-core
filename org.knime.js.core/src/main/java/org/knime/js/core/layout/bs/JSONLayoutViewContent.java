@@ -55,6 +55,7 @@ import java.util.Map.Entry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
 *
@@ -131,9 +132,18 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
             namesMap.put("manual", MANUAL);
         }
 
+        /**
+         * @param value a String representing a {@link ResizeMethod}
+         * @return a valid {@link ResizeMethod} for the given value
+         * @throws JsonMappingException if value cannot be resolved
+         */
         @JsonCreator
-        public static ResizeMethod forValue(final String value) {
-            return namesMap.get(value);
+        public static ResizeMethod forValue(final String value) throws JsonMappingException{
+            ResizeMethod method = namesMap.get(value);
+            if (method == null) {
+                throw new JsonMappingException(value + " is not a valid resize method.");
+            }
+            return method;
         }
 
         @JsonValue
