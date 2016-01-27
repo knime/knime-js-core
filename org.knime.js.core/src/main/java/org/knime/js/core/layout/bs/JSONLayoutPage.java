@@ -79,17 +79,31 @@ public class JSONLayoutPage {
     }
 
     /**
-     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes
+     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes and omitting empty fields
      */
     public static ObjectMapper getConfiguredObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(Include.NON_EMPTY);
-        mapper.registerSubtypes(
-                new NamedType(JSONLayoutRow.class, "row"),
-                new NamedType(JSONLayoutViewContent.class, "view"),
-                new NamedType(JSONLayoutHTMLContent.class, "html")
-                );
+        mapper = registerSubtypes(mapper);
         return mapper;
     }
 
+    /**
+     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes including empty fields
+     */
+    public static ObjectMapper getConfiguredVerboseObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(Include.ALWAYS);
+        mapper = registerSubtypes(mapper);
+        return mapper;
+    }
+
+    private static ObjectMapper registerSubtypes(final ObjectMapper mapper) {
+        mapper.registerSubtypes(
+            new NamedType(JSONLayoutRow.class, "row"),
+            new NamedType(JSONLayoutViewContent.class, "view"),
+            new NamedType(JSONLayoutHTMLContent.class, "html")
+                );
+        return mapper;
+    }
 }
