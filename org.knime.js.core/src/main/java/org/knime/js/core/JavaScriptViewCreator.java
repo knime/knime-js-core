@@ -392,8 +392,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             URL pluginURL = FileLocator.find(Platform.getBundle(pluginName), new Path("/"), null);
             if (pluginURL != null) {
                 try {
-                    URL url = FileLocator.resolve(pluginURL);
-                    url = FileLocator.toFileURL(url);
+                    URL url = FileLocator.toFileURL(pluginURL);
                     if ("file".equals(url.getProtocol())) {
                         pluginFile = new File(url.getFile());
                     } else {
