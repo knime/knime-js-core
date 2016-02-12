@@ -8,7 +8,7 @@ Bundle-Activator: org.knime.ext.phantomjs.PhantomJSActivator
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Export-Package: org.knime.ext.phantomjs
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
- com.google.guava;bundle-version="[15.0.0,17.0.0)",
+ com.google.guava;bundle-version="[19.0.0,20.0.0)",
  org.openqa.selenium;bundle-version="[2.43.0,3.0.0)",
  org.knime.core;bundle-version="[3.0.0,4.0.0)",
  com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.4.3,3.0.0)",
