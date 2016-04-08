@@ -314,6 +314,50 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="jsTree"
+            usesDefine="true"
+            version="3.3.0"
+            webResourceBundleID="jsTree_3.3.0_Debug">
+         <webResource
+               relativePathSource="js-lib/jsTree/debug/"
+               relativePathTarget="js-lib/jsTree/debug/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jsTree/debug/jstree.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/jsTree/debug/themes/default/style.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0_Debug">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="jsTree"
+            usesDefine="true"
+            version="3.3.0"
+            webResourceBundleID="jsTree_3.3.0">
+         <webResource
+               relativePathSource="js-lib/jsTree/min/"
+               relativePathTarget="js-lib/jsTree/min/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jsTree/min/jstree.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/jsTree/min/themes/default/style.min.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
