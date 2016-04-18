@@ -65,6 +65,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -79,6 +80,7 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.util.FileUtil;
+import org.osgi.framework.Bundle;
 
 /**
  *
@@ -385,27 +387,9 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         }
         IExtension[] webResExtensions = point.getExtensions();
         for (IExtension ext : webResExtensions) {
-
             // get plugin path
-            File pluginFile = null;
             String pluginName = ext.getContributor().getName();
-            URL pluginURL = FileLocator.find(Platform.getBundle(pluginName), new Path("/"), null);
-            if (pluginURL != null) {
-                try {
-                    URL url = FileLocator.resolve(pluginURL);
-                    url = FileLocator.toFileURL(url);
-                    if ("file".equals(url.getProtocol())) {
-                        pluginFile = new File(url.getFile());
-                    } else {
-                        pluginFile = new File(url.toURI());
-                    }
-                } catch (URISyntaxException e) {
-                    throw new IOException("Plugin path could not be resolved: " + pluginURL.toString(), e);
-                }
-            }
-            if (pluginFile == null) {
-                throw new IOException("Plugin path could not be resolved: " + pluginName);
-            }
+            Bundle bundle = Platform.getBundle(pluginName);
 
             // get relative paths and collect in map
             IConfigurationElement[] bundleElements = ext.getConfigurationElements();
@@ -413,22 +397,38 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
                 assert bundleElem.getName().equals(ELEM_BUNDLE);
                 for (IConfigurationElement resElement : bundleElem.getChildren(ELEM_RES)) {
                     String relSource = resElement.getAttribute(ATTR_SOURCE);
-                    File source = new File(pluginFile, relSource);
-                    if (!source.exists()) {
-                        LOGGER.errorWithFormat("CODING ERROR: Source file does not exist: %s for bundle %s",
-                            source.getAbsolutePath(), bundleElem.getAttribute(ATTR_BUNDLE_ID));
-                        continue;
-                        //throw new IOException("Source file does not exist: " + source.getAbsolutePath());
+
+                    try {
+                        resolveResource(copyLocations, bundle, resElement, relSource);
+                    } catch (IOException | URISyntaxException ex) {
+                        LOGGER.errorWithFormat(
+                            "Web resource source file '%s' from plug-in %s could not be resolved: %s", relSource,
+                            pluginName, ex.getMessage(), ex);
                     }
-                    String relTarget = resElement.getAttribute(ATTR_TARGET);
-                    if (relTarget == null || relTarget.isEmpty()) {
-                        relTarget = relSource;
-                    }
-                    copyLocations.put(source, relTarget);
                 }
             }
         }
         return copyLocations;
+    }
+
+    private void resolveResource(final Map<File, String> copyLocations, final Bundle bundle,
+        final IConfigurationElement resElement, final String relSource) throws IOException, URISyntaxException {
+        URL sourceURL = FileLocator.find(bundle, new Path(relSource), null);
+        if (sourceURL == null) {
+            throw new IOException("Cannot find location of '" + relSource + "' in bundle");
+        }
+
+        URL sourceFileURL = FileLocator.toFileURL(sourceURL);
+        java.nio.file.Path sourcePath = FileUtil.resolveToPath(sourceFileURL);
+        if (sourcePath == null) {
+            throw new IOException("Cannot resolve '" + sourceFileURL + "' to local file");
+        }
+
+        String relTarget = resElement.getAttribute(ATTR_TARGET);
+        if (StringUtils.isEmpty(relTarget)) {
+            relTarget = relSource;
+        }
+        copyLocations.put(sourcePath.toFile(), relTarget);
     }
 
 }
