@@ -915,19 +915,19 @@
             version="1.10.11"
             webResourceBundleID="dataTables_1_10_11_jqueryui_export_Debug">
          <webResource
-               relativePathSource="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.js"
-               relativePathTarget="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.js">
+               relativePathSource="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.js"
+               relativePathTarget="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.js">
          </webResource>
          <webResource
-               relativePathSource="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.css"
-               relativePathTarget="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.css">
+               relativePathSource="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.css"
+               relativePathTarget="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.css">
          </webResource>
          <importResource
-               relativePath="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.js"
+               relativePath="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.css"
+               relativePath="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.css"
                type="CSS">
          </importResource>
          <webDependency
@@ -943,19 +943,19 @@
             version="1.10.11"
             webResourceBundleID="dataTables_1_10_11_jqueryui_export">
          <webResource
-               relativePathSource="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.js"
-               relativePathTarget="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.js">
+               relativePathSource="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.js"
+               relativePathTarget="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.js">
          </webResource>
          <webResource
-               relativePathSource="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.css"
-               relativePathTarget="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.css">
+               relativePathSource="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.css"
+               relativePathTarget="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.css">
          </webResource>
          <importResource
-               relativePath="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.js"
+               relativePath="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/dataTables/1_10_11/export/jqueryUI/datatables.min.css"
+               relativePath="js-lib/dataTables/1_10_11/export/jQueryUI/datatables.min.css"
                type="CSS">
          </importResource>
          <webDependency
