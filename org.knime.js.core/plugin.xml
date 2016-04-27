@@ -962,6 +962,33 @@
                webResourceBundleID="jQueryUi_1.10.4">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            exports="jsfc"
+            name="JSFreeChart"
+            usesDefine="false"
+            version="0.5.0"
+            webResourceBundleID="jsFreeChart_0.5_Debug">
+         <webResource
+               relativePathSource="js-lib/JSFreeChart/"
+               relativePathTarget="js-lib/JSFreeChart/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/JSFreeChart/jsfreechart.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/JSFreeChart/opentip-native.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/JSFreeChart/opentip.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.2.8_Debug">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
