@@ -989,6 +989,38 @@
                webResourceBundleID="D3_3.2.8_Debug">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            exports="moment"
+            name="Moment"
+            usesDefine="true"
+            version="2.13.0"
+            webResourceBundleID="moment_2_13_Debug">
+         <webResource
+               relativePathSource="js-lib/moment/2_13/moment.js"
+               relativePathTarget="js-lib/moment/2_13/moment.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_13/moment.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="moment"
+            name="Moment"
+            usesDefine="true"
+            version="2.13.0"
+            webResourceBundleID="moment_2_13">
+         <webResource
+               relativePathSource="js-lib/moment/2_13/moment.min.js"
+               relativePathTarget="js-lib/moment/2_13/moment.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_13/moment.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
