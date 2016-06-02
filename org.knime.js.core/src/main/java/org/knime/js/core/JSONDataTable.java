@@ -129,6 +129,21 @@ public class JSONDataTable {
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int numOfRows, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
+        this(dTable, firstRow, numOfRows, new String[0], execMon);
+    }
+
+    /**
+     * Creates a new data table which can be serialized into a JSON string from a given BufferedDataTable.
+     * @param dTable the data table to read the rows from
+     * @param firstRow the first row to store (must be greater than zero)
+     * @param maxRows the number of rows to store (must be zero or more)
+     * @param excludeColumns a list of columns to exclude
+     * @param execMon the object listening to our progress and providing cancel functionality.
+     * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     */
+    public JSONDataTable(final DataTable dTable, final int firstRow,
+            final int maxRows, final String[] excludeColumns, final ExecutionMonitor execMon)
+            throws CanceledExecutionException {
 
         if (dTable == null) {
             throw new NullPointerException("Must provide non-null data table"
@@ -138,13 +153,27 @@ public class JSONDataTable {
             throw new IllegalArgumentException("Starting row must be greater"
                     + " than zero");
         }
-        if (numOfRows < 0) {
+        if (maxRows < 0) {
             throw new IllegalArgumentException("Number of rows to read must be"
                     + " greater than or equal zero");
         }
 
+        int numOfColumns = 0;
+        ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
         DataTableSpec spec = dTable.getDataTableSpec();
-        int numOfColumns = spec.getNumColumns();
+        for (int i = 0; i < spec.getNumColumns(); i++) {
+            String colName = spec.getColumnNames()[i];
+            if (!Arrays.asList(excludeColumns).contains(colName)) {
+                includeColIndices.add(i);
+                numOfColumns++;
+            }
+        }
+        long numOfRows = maxRows;
+        if (dTable instanceof BufferedDataTable) {
+            numOfRows = Math.min(((BufferedDataTable)dTable).size(), maxRows);
+        }
+
+        //int numOfColumns = spec.getNumColumns();
         DataCell[] maxValues = new DataCell[numOfColumns];
         DataCell[] minValues = new DataCell[numOfColumns];
         Object[] minJSONValues = new Object[numOfColumns];
@@ -154,7 +183,7 @@ public class JSONDataTable {
         Vector<LinkedHashSet<Object>> possValues = new Vector<LinkedHashSet<Object>>();
         possValues.setSize(numOfColumns);
         for (int c = 0; c < numOfColumns; c++) {
-            if (spec.getColumnSpec(c).getType()
+            if (spec.getColumnSpec(includeColIndices.get(c)).getType()
                     .isCompatible(NominalValue.class)) {
                 possValues.set(c, new LinkedHashSet<Object>());
             }
@@ -167,7 +196,7 @@ public class JSONDataTable {
         ArrayList<String> rowColorList = new ArrayList<String>();
         ArrayList<JSONDataTableRow> rowList = new ArrayList<JSONDataTableRow>();
 
-        while ((rIter.hasNext()) && (currentRowNumber + firstRow - 1 < numOfRows)) {
+        while ((rIter.hasNext()) && (currentRowNumber + firstRow - 1 < maxRows)) {
             // get the next row
             DataRow row = rIter.next();
             currentRowNumber++;
@@ -186,7 +215,8 @@ public class JSONDataTable {
 
             // add cells, check min, max values and possible values for each column
             for (int c = 0; c < numOfColumns; c++) {
-                DataCell cell = row.getCell(c);
+                int col = includeColIndices.get(c);
+                DataCell cell = row.getCell(col);
 
                 Object cellValue;
                 if (!cell.isMissing()) {
@@ -195,36 +225,36 @@ public class JSONDataTable {
                     cellValue = null;
                 }
 
-                rowList.get(currentRowNumber - firstRow).getData()[c] = cellValue;
+                rowList.get(currentRowNumber - firstRow).getData()[col] = cellValue;
                 if (cellValue == null) {
                     continue;
                 }
 
                 DataValueComparator comp =
-                        spec.getColumnSpec(c).getType().getComparator();
+                        spec.getColumnSpec(col).getType().getComparator();
 
                 // test the min value
-                if (minValues[c] == null) {
-                    minValues[c] = cell;
-                    minJSONValues[c] = getJSONCellValue(cell);
+                if (minValues[col] == null) {
+                    minValues[col] = cell;
+                    minJSONValues[col] = getJSONCellValue(cell);
                 } else {
-                    if (comp.compare(minValues[c], cell) > 0) {
-                        minValues[c] = cell;
-                        minJSONValues[c] = getJSONCellValue(cell);
+                    if (comp.compare(minValues[col], cell) > 0) {
+                        minValues[col] = cell;
+                        minJSONValues[col] = getJSONCellValue(cell);
                     }
                 }
                 // test the max value
-                if (maxValues[c] == null) {
-                    maxValues[c] = cell;
-                    maxJSONValues[c] = getJSONCellValue(cell);
+                if (maxValues[col] == null) {
+                    maxValues[col] = cell;
+                    maxJSONValues[col] = getJSONCellValue(cell);
                 } else {
-                    if (comp.compare(maxValues[c], cell) < 0) {
-                        maxValues[c] = cell;
-                        maxJSONValues[c] = getJSONCellValue(cell);
+                    if (comp.compare(maxValues[col], cell) < 0) {
+                        maxValues[col] = cell;
+                        maxJSONValues[col] = getJSONCellValue(cell);
                     }
                 }
                 // add it to the possible values if we record them for this col
-                LinkedHashSet<Object> possVals = possValues.get(c);
+                LinkedHashSet<Object> possVals = possValues.get(col);
                 if (possVals != null) {
                     // non-string cols have a null list and will be skipped here
                     possVals.add(getJSONCellValue(cell));
@@ -239,7 +269,7 @@ public class JSONDataTable {
         // TODO: Add extensions (color, shape, size, inclusion, selection, hiliting, ...)
         Object[][] extensionArray = null;
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, numRows);
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludeColumns, numRows);
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
@@ -336,7 +366,7 @@ public class JSONDataTable {
             case SVG:
                 return ((SvgValue)cell).toString();
             default:
-                return null;
+                return cell.toString();
         }
     }
 

@@ -172,18 +172,33 @@ public class JSONDataTableSpec {
      *
      */
     public JSONDataTableSpec(final DataTableSpec spec, final int numRows) {
+        this(spec, new String[0], numRows);
+    }
 
-        setNumColumns(spec.getNumColumns());
-        setNumRows(numRows);
-        setColNames(spec.getColumnNames());
+    /**
+     * @param spec the DataTableSpec for this JSONTable
+     * @param numRows the number of rows in the DataTable
+     *
+     */
+    public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows) {
 
-        String[] types = new String[spec.getNumColumns()];
-        //String[] kinds = new String[spec.getNumColumns()];
+        int numColumns = 0;
+        ArrayList<String> colNames = new ArrayList<String>();
+        ArrayList<String> colTypes = new ArrayList<String>();
         for (int i = 0; i < spec.getNumColumns(); i++) {
-            DataType colType = spec.getColumnSpec(i).getType();
-            types[i] = getJSONType(colType).name;
+            String colName = spec.getColumnNames()[i];
+            if (!Arrays.asList(excludeColumns).contains(colName)) {
+                colNames.add(colName);
+                DataType colType = spec.getColumnSpec(i).getType();
+                colTypes.add(getJSONType(colType).name);
+                numColumns++;
+            }
         }
-        setColTypes(types);
+
+        setNumColumns(numColumns);
+        setNumRows(numRows);
+        setColNames(colNames.toArray(new String[0]));
+        setColTypes(colTypes.toArray(new String[0]));
     }
 
     /**
