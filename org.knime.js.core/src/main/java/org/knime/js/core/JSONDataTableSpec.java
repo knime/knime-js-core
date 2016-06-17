@@ -147,6 +147,7 @@ public class JSONDataTableSpec {
     private int m_numColumns;
     private int m_numRows;
     private ArrayList<String> m_colTypes = new ArrayList<String>();
+    private ArrayList<String> m_knimeTypes = new ArrayList<String>();
     private ArrayList<String> m_colNames = new ArrayList<String>();
 
     private int m_numExtensions;
@@ -185,10 +186,12 @@ public class JSONDataTableSpec {
         int numColumns = 0;
         ArrayList<String> colNames = new ArrayList<String>();
         ArrayList<String> colTypes = new ArrayList<String>();
+        ArrayList<String> orgTypes = new ArrayList<String>();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
             if (!Arrays.asList(excludeColumns).contains(colName)) {
                 colNames.add(colName);
+                orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
                 colTypes.add(getJSONType(colType).name);
                 numColumns++;
@@ -199,6 +202,7 @@ public class JSONDataTableSpec {
         setNumRows(numRows);
         setColNames(colNames.toArray(new String[0]));
         setColTypes(colTypes.toArray(new String[0]));
+        setKnimeTypes(orgTypes.toArray(new String[0]));
     }
 
     /**
@@ -294,6 +298,21 @@ public class JSONDataTableSpec {
     public void setColTypes(final String[] types) {
         this.m_colTypes = new ArrayList<String>();
         this.m_colTypes.addAll(Arrays.asList(types));
+    }
+
+    /**
+     * @return the knimeTypes
+     */
+    public String[] getKnimeTypes() {
+        return m_knimeTypes.toArray(new String[0]);
+    }
+
+    /**
+     * @param knimeTypes the knimeTypes to set
+     */
+    public void setKnimeTypes(final String[] knimeTypes) {
+        m_knimeTypes = new ArrayList<String>();
+        m_knimeTypes.addAll(Arrays.asList(knimeTypes));
     }
 
     /**

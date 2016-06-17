@@ -73,6 +73,10 @@ kt = function() {
 		return dataTable.spec.numRows;
 	};
 	
+	kt.getKnimeColumnTypes = function() {
+		return dataTable.spec.knimeTypes;
+	};
+	
 	kt.getPossibleValues = function(columnName) {
 		if (columnName) {
 			var colID = kt_getDataColumnID(columnName); 
