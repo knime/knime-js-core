@@ -225,7 +225,7 @@ public class JSONDataTable {
                     cellValue = null;
                 }
 
-                rowList.get(currentRowNumber - firstRow).getData()[col] = cellValue;
+                rowList.get(currentRowNumber - firstRow).getData()[c] = cellValue;
                 if (cellValue == null) {
                     continue;
                 }
@@ -234,27 +234,27 @@ public class JSONDataTable {
                         spec.getColumnSpec(col).getType().getComparator();
 
                 // test the min value
-                if (minValues[col] == null) {
-                    minValues[col] = cell;
-                    minJSONValues[col] = getJSONCellValue(cell);
+                if (minValues[c] == null) {
+                    minValues[c] = cell;
+                    minJSONValues[c] = getJSONCellValue(cell);
                 } else {
-                    if (comp.compare(minValues[col], cell) > 0) {
-                        minValues[col] = cell;
-                        minJSONValues[col] = getJSONCellValue(cell);
+                    if (comp.compare(minValues[c], cell) > 0) {
+                        minValues[c] = cell;
+                        minJSONValues[c] = getJSONCellValue(cell);
                     }
                 }
                 // test the max value
-                if (maxValues[col] == null) {
-                    maxValues[col] = cell;
-                    maxJSONValues[col] = getJSONCellValue(cell);
+                if (maxValues[c] == null) {
+                    maxValues[c] = cell;
+                    maxJSONValues[c] = getJSONCellValue(cell);
                 } else {
-                    if (comp.compare(maxValues[col], cell) < 0) {
-                        maxValues[col] = cell;
-                        maxJSONValues[col] = getJSONCellValue(cell);
+                    if (comp.compare(maxValues[c], cell) < 0) {
+                        maxValues[c] = cell;
+                        maxJSONValues[c] = getJSONCellValue(cell);
                     }
                 }
                 // add it to the possible values if we record them for this col
-                LinkedHashSet<Object> possVals = possValues.get(col);
+                LinkedHashSet<Object> possVals = possValues.get(c);
                 if (possVals != null) {
                     // non-string cols have a null list and will be skipped here
                     possVals.add(getJSONCellValue(cell));
