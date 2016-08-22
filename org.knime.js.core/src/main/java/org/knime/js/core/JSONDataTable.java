@@ -53,6 +53,8 @@ import java.util.LinkedHashSet;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
@@ -106,9 +108,13 @@ public class JSONDataTable {
     /** Config key to load/save table */
     public static final String KNIME_DATA_TABLE_CONF = "knimeDataTableJSON";
 
+    /** Config key for the table ID. */
+    public static final String TABLE_ID = "tableID";
+
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JSONDataTable.class);
 
     /* serialized members */
+    private String m_id;
     private JSONDataTableSpec m_spec;
     private JSONDataTableRow[] m_rows;
     private Object[][] m_extensions;
@@ -129,7 +135,22 @@ public class JSONDataTable {
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int numOfRows, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
-        this(dTable, firstRow, numOfRows, new String[0], execMon);
+        this(dTable, firstRow, numOfRows, null, new String[0], execMon);
+    }
+
+    /**
+     * Creates a new data table which can be serialized into a JSON string from a given BufferedDataTable.
+     * @param dTable the data table to read the rows from
+     * @param firstRow the first row to store (must be greater than zero)
+     * @param maxRows the number of rows to store (must be zero or more)
+     * @param id An optional id to assign to this table instance
+     * @param execMon the object listening to our progress and providing cancel functionality.
+     * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     */
+    public JSONDataTable(final DataTable dTable, final int firstRow,
+            final int maxRows, final String id, final ExecutionMonitor execMon)
+            throws CanceledExecutionException {
+        this(dTable, firstRow, maxRows, id, new String[0], execMon);
     }
 
     /**
@@ -144,6 +165,23 @@ public class JSONDataTable {
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int maxRows, final String[] excludeColumns, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
+        this(dTable, firstRow, maxRows, null, excludeColumns, execMon);
+    }
+
+    /**
+     * Creates a new data table which can be serialized into a JSON string from a given BufferedDataTable.
+     * @param dTable the data table to read the rows from
+     * @param firstRow the first row to store (must be greater than zero)
+     * @param maxRows the number of rows to store (must be zero or more)
+     * @param id An optional id to assign to this table instance
+     * @param excludeColumns a list of columns to exclude
+     * @param execMon the object listening to our progress and providing cancel functionality.
+     * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     */
+    public JSONDataTable(final DataTable dTable, final int firstRow,
+            final int maxRows, final String id, final String[] excludeColumns,
+            final ExecutionMonitor execMon)
+            throws CanceledExecutionException {
 
         if (dTable == null) {
             throw new NullPointerException("Must provide non-null data table"
@@ -157,6 +195,8 @@ public class JSONDataTable {
             throw new IllegalArgumentException("Number of rows to read must be"
                     + " greater than or equal zero");
         }
+
+        m_id = id;
 
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
@@ -378,15 +418,36 @@ public class JSONDataTable {
         return jsonData;
     }
 
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return m_id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(final String id) {
+        m_id = id;
+    }
+
+    /**
+     * @return the spec
+     */
     public JSONDataTableSpec getSpec() {
         return m_spec;
     }
 
+    /**
+     * @param spec the spec to set
+     */
     public void setSpec(final JSONDataTableSpec spec) {
         m_spec = spec;
     }
 
     /**
+     * @return the table rows
      * @since 2.10
      */
     public JSONDataTableRow[] getRows() {
@@ -394,16 +455,23 @@ public class JSONDataTable {
     }
 
     /**
+     * @param rows the rows to set
      * @since 2.10
      */
     public void setRows(final JSONDataTableRow[] rows) {
         m_rows = rows;
     }
 
+    /**
+     * @return the extension defined on the table
+     */
     public Object[][] getExtensions() {
         return m_extensions;
     }
 
+    /**
+     * @param extensions the extensions to set on the table
+     */
     public void setExtensions(final Object[][] extensions) {
         m_extensions = extensions;
     }
@@ -467,11 +535,10 @@ public class JSONDataTable {
          */
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + Arrays.hashCode(m_data);
-            result = prime * result + ((m_rowKey == null) ? 0 : m_rowKey.hashCode());
-            return result;
+            return new HashCodeBuilder()
+                    .append(m_rowKey)
+                    .append(m_data)
+                    .toHashCode();
         }
 
         /**
@@ -489,17 +556,10 @@ public class JSONDataTable {
                 return false;
             }
             JSONDataTableRow other = (JSONDataTableRow)obj;
-            if (!Arrays.equals(m_data, other.m_data)) {
-                return false;
-            }
-            if (m_rowKey == null) {
-                if (other.m_rowKey != null) {
-                    return false;
-                }
-            } else if (!m_rowKey.equals(other.m_rowKey)) {
-                return false;
-            }
-            return true;
+            return new EqualsBuilder()
+                    .append(m_rowKey, other.m_rowKey)
+                    .append(m_data, other.m_data)
+                    .isEquals();
         }
     }
 
@@ -551,12 +611,12 @@ public class JSONDataTable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.deepHashCode(m_extensions);
-        result = prime * result + Arrays.hashCode(m_rows);
-        result = prime * result + ((m_spec == null) ? 0 : m_spec.hashCode());
-        return result;
+        return new HashCodeBuilder()
+                .append(m_id)
+                .append(m_spec)
+                .append(m_rows)
+                .append(m_extensions)
+                .toHashCode();
     }
 
     /**
@@ -574,19 +634,11 @@ public class JSONDataTable {
             return false;
         }
         JSONDataTable other = (JSONDataTable)obj;
-        if (!Arrays.deepEquals(m_extensions, other.m_extensions)) {
-            return false;
-        }
-        if (!Arrays.equals(m_rows, other.m_rows)) {
-            return false;
-        }
-        if (m_spec == null) {
-            if (other.m_spec != null) {
-                return false;
-            }
-        } else if (!m_spec.equals(other.m_spec)) {
-            return false;
-        }
-        return true;
+        return new EqualsBuilder()
+                .append(m_id, other.m_id)
+                .append(m_spec, other.m_spec)
+                .append(m_rows, other.m_rows)
+                .append(m_extensions, other.m_extensions)
+                .isEquals();
     }
 }

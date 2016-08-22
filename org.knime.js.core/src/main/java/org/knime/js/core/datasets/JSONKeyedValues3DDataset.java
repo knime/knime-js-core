@@ -50,6 +50,7 @@ package org.knime.js.core.datasets;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.JSONDataTable;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -62,6 +63,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONKeyedValues3DDataset implements JSONDataset {
 
+    private String m_id;
     private String[] m_columnKeys;
     private String[] m_rowKeys;
     private KeyedValues3DSeries[] m_series;
@@ -70,14 +72,30 @@ public class JSONKeyedValues3DDataset implements JSONDataset {
     public JSONKeyedValues3DDataset() { }
 
     /**
+     * @param id
      * @param columnKeys
      * @param rowKeys
      * @param series
      */
-    public JSONKeyedValues3DDataset(final String[] columnKeys, final String[] rowKeys, final KeyedValues3DSeries[] series) {
+    public JSONKeyedValues3DDataset(final String id, final String[] columnKeys, final String[] rowKeys, final KeyedValues3DSeries[] series) {
+        m_id = id;
         m_columnKeys = columnKeys;
         m_rowKeys = rowKeys;
         m_series = series;
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return m_id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(final String id) {
+        m_id = id;
     }
 
     /**
@@ -127,6 +145,7 @@ public class JSONKeyedValues3DDataset implements JSONDataset {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(JSONDataTable.TABLE_ID, m_id);
         settings.addStringArray("colKeys", m_columnKeys);
         settings.addStringArray("rowKeys", m_rowKeys);
         settings.addInt("numSeries", m_series.length);
@@ -141,6 +160,9 @@ public class JSONKeyedValues3DDataset implements JSONDataset {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        // id added with 3.3
+        m_id = settings.getString(JSONDataTable.TABLE_ID, null);
+
         m_columnKeys = settings.getStringArray("colKeys");
         m_rowKeys = settings.getStringArray("rowKeys");
         int numSeries = settings.getInt("numSeries");

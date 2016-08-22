@@ -54,6 +54,7 @@ import java.util.Map.Entry;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.JSONDataTable;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -67,6 +68,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONKeyedValues2DDataset implements JSONDataset {
 
+    private String m_id;
     private String[] m_columnKeys;
     private String[] m_columnColors;
     private Map<String, String>[] m_symbols;
@@ -77,15 +79,31 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     public JSONKeyedValues2DDataset() { }
 
     /**
+     * @param id
      * @param columnKeys
      * @param rows
      */
-    public JSONKeyedValues2DDataset(final String[] columnKeys, final JSONKeyedValuesRow[] rows) {
+    public JSONKeyedValues2DDataset(final String id, final String[] columnKeys, final JSONKeyedValuesRow[] rows) {
+        m_id = id;
         m_columnKeys = columnKeys;
         m_rows = rows;
         m_symbols = new Map[m_columnKeys.length];
         m_columnColors = new String[m_columnKeys.length];
         m_dateTimeFormats = new String[m_columnKeys.length];
+    }
+
+    /**
+     * @return the id
+     */
+    public String getId() {
+        return m_id;
+    }
+
+    /**
+     * @param id the id to set
+     */
+    public void setId(final String id) {
+        m_id = id;
     }
 
     /**
@@ -191,6 +209,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
      */
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(JSONDataTable.TABLE_ID, getId());
         settings.addStringArray("columnKeys", getColumnKeys());
         int propSize = 0;
         if (m_symbols != null) {
@@ -224,6 +243,9 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
      */
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
+        // id added with 3.3
+        m_id = settings.getString(JSONDataTable.TABLE_ID, null);
+
         m_columnKeys = settings.getStringArray("columnKeys");
         m_symbols = new Map[m_columnKeys.length];
         int numColProperties = settings.getInt("colPropsSize");

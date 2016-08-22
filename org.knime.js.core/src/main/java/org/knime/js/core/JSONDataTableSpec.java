@@ -51,6 +51,8 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
@@ -432,20 +434,20 @@ public class JSONDataTableSpec {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((m_colNames == null) ? 0 : m_colNames.hashCode());
-        result = prime * result + ((m_colTypes == null) ? 0 : m_colTypes.hashCode());
-        result = prime * result + ((m_extensionNames == null) ? 0 : m_extensionNames.hashCode());
-        result = prime * result + ((m_extensionTypes == null) ? 0 : m_extensionTypes.hashCode());
-        result = prime * result + Arrays.hashCode(m_maxValues);
-        result = prime * result + Arrays.hashCode(m_minValues);
-        result = prime * result + m_numColumns;
-        result = prime * result + m_numExtensions;
-        result = prime * result + m_numRows;
-        result = prime * result + ((m_possibleValues == null) ? 0 : m_possibleValues.hashCode());
-        result = prime * result + Arrays.hashCode(m_rowColorValues);
-        return result;
+        return new HashCodeBuilder()
+                .append(m_colNames)
+                .append(m_knimeTypes)
+                .append(m_colTypes)
+                .append(m_extensionNames)
+                .append(m_extensionTypes)
+                .append(m_maxValues)
+                .append(m_minValues)
+                .append(m_numColumns)
+                .append(m_numExtensions)
+                .append(m_numRows)
+                .append(m_possibleValues)
+                .append(m_rowColorValues)
+                .toHashCode();
     }
 
     /**
@@ -463,60 +465,20 @@ public class JSONDataTableSpec {
             return false;
         }
         JSONDataTableSpec other = (JSONDataTableSpec)obj;
-        if (m_colNames == null) {
-            if (other.m_colNames != null) {
-                return false;
-            }
-        } else if (!m_colNames.equals(other.m_colNames)) {
-            return false;
-        }
-        if (m_colTypes == null) {
-            if (other.m_colTypes != null) {
-                return false;
-            }
-        } else if (!m_colTypes.equals(other.m_colTypes)) {
-            return false;
-        }
-        if (m_extensionNames == null) {
-            if (other.m_extensionNames != null) {
-                return false;
-            }
-        } else if (!m_extensionNames.equals(other.m_extensionNames)) {
-            return false;
-        }
-        if (m_extensionTypes == null) {
-            if (other.m_extensionTypes != null) {
-                return false;
-            }
-        } else if (!m_extensionTypes.equals(other.m_extensionTypes)) {
-            return false;
-        }
-        if (!Arrays.equals(m_maxValues, other.m_maxValues)) {
-            return false;
-        }
-        if (!Arrays.equals(m_minValues, other.m_minValues)) {
-            return false;
-        }
-        if (m_numColumns != other.m_numColumns) {
-            return false;
-        }
-        if (m_numExtensions != other.m_numExtensions) {
-            return false;
-        }
-        if (m_numRows != other.m_numRows) {
-            return false;
-        }
-        if (m_possibleValues == null) {
-            if (other.m_possibleValues != null) {
-                return false;
-            }
-        } else if (!m_possibleValues.equals(other.m_possibleValues)) {
-            return false;
-        }
-        if (!Arrays.equals(m_rowColorValues, other.m_rowColorValues)) {
-            return false;
-        }
-        return true;
+        return new EqualsBuilder()
+                .append(m_colNames, other.m_colNames)
+                .append(m_knimeTypes, other.m_knimeTypes)
+                .append(m_colTypes, other.m_colTypes)
+                .append(m_extensionNames, other.m_extensionNames)
+                .append(m_extensionTypes, other.m_extensionTypes)
+                .append(m_maxValues, other.m_maxValues)
+                .append(m_minValues, other.m_minValues)
+                .append(m_numColumns, other.m_numColumns)
+                .append(m_numExtensions, other.m_numExtensions)
+                .append(m_numRows, other.m_numRows)
+                .append(m_possibleValues, other.m_possibleValues)
+                .append(m_rowColorValues, other.m_rowColorValues)
+                .isEquals();
     }
 
 }
