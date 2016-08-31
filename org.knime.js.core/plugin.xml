@@ -1021,6 +1021,49 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            description="Service/Framework component to be included in every JavaScript view. Defines abstraction layer for settings, interactivity and future view capabilities"
+            exports="knimeService"
+            name="KNIME Service"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimeService_1.0">
+         <webResource
+               relativePathSource="js-lib/knime/service/"
+               relativePathTarget="js-lib/knime/service/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/service/knime_service_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/knime/service/knime.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="fontAwesome_4.6.3">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="Font Awesome"
+            usesDefine="false"
+            version="4.6.3"
+            webResourceBundleID="fontAwesome_4.6.3">
+         <webResource
+               relativePathSource="js-lib/font-awesome/4_6_3/fonts/"
+               relativePathTarget="js-lib/font-awesome/4_6_3/fonts/">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/font-awesome/4_6_3/css/font-awesome.min.css"
+               relativePathTarget="js-lib/font-awesome/4_6_3/css/font-awesome.min.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/font-awesome/4_6_3/css/font-awesome.min.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">

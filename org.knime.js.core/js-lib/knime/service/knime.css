@@ -1,0 +1,133 @@
+html, body {
+	/* This will most likely be overwritten by view implementations,
+	 it provides a sensible default in any case. */
+	font-family: sans-serif;
+	font-size: 14px;
+}
+
+/* TODO: Initialize margins etc.? */
+
+#knime-service-header {
+	width: 100%;
+	padding: 12px;
+	box-sizing: border-box;
+	display: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	font-family: sans-serif;
+}
+
+#knime-service-header * {
+	box-sizing: border-box;
+}
+
+#knime-service-header .service-button {
+	float: right;
+	height: 20px;
+	width: 20px;
+	padding: 2px;
+	margin-left: 4px;
+	background-color: rgba(0, 0, 0, 0.2);
+	border: thin solid rgba(128, 128, 128, 0.2);
+	border-radius: 4px;
+	font-size: 14px;
+	color: rgba(128, 128, 128, 0.5);
+	cursor: pointer;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+#knime-service-header .service-button:hover,
+#knime-service-header .service-button.active {
+	background-color: rgba(100, 100, 100, 1);
+    border-color: rgba(80, 80, 80, 1);
+    color: rgba(230, 230, 230, 1);
+}
+
+#knime-service-header .service-button .ficon {
+    display: table-cell;
+    text-align: center;
+	vertical-align: middle;
+}
+
+#knime-service-header .service-button .uicon {
+	display: block;
+	margin-top: -4px;
+}
+
+#knime-service-header .service-nav-spacer {
+	float: right;
+	width: 20px;
+	height: 20px;
+	margin-left: 4px;
+}
+
+#knime-service-header #knime-service-menu {
+	position: absolute;
+	display: none;
+	top: 34px;
+	right: 0px;
+	margin-right: 12px;
+	padding: 4px;
+	background-color: rgba(255, 255, 255, 1);
+	font-size: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+}
+
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+#knime-service-header #knime-service-menu.open {
+	display: block;
+	opacity: 0;
+	animation: fadeIn ease-in 1;
+	animation-fill-mode: forwards;
+	animation-duration: 0.2s;
+}
+
+#knime-service-header #knime-service-menu ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	text-align: left;
+}
+
+#knime-service-header #knime-service-menu li {
+	cursor: pointer;
+}
+
+#knime-service-header #knime-service-menu li.divider {
+    height: 1px;
+    margin: 6px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+}
+
+#knime-service-header #knime-service-menu li a {
+	display: block;
+    padding: 3px 12px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+    text-decoration: none;
+    cursor: default;
+}
+
+#knime-service-header #knime-service-menu li.menuItem a {
+	cursor: pointer;
+}
+
+#knime-service-header #knime-service-menu li.menuItem a:hover {
+    color: #262626;
+    background-color: #f5f5f5;
+    outline: 0;
+}
+
+#knime-service-header #knime-service-menu li i {
+	margin-right: 6px;
+}
