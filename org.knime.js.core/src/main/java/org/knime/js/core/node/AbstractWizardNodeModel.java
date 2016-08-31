@@ -167,6 +167,15 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     protected abstract void performReset();
 
     /**
+     * @param portIndex the port index to retrieve the table id from
+     * @return a unique table id to separate interactivity events
+     */
+    protected final String getTableId(final int portIndex) {
+        // TODO: the hashCode is not guaranteed to be unique
+        return Integer.toString(getInHiLiteHandler(portIndex).hashCode());
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
