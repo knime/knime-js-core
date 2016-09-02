@@ -82,10 +82,13 @@ html, body {
 
 #knime-service-header #knime-service-menu.open {
 	display: block;
+}
+
+.cssanimations #knime-service-header #knime-service-menu.open {
 	opacity: 0;
 	animation: fadeIn ease-in 1;
 	animation-fill-mode: forwards;
-	animation-duration: 0.2s;
+	animation-duration: 0.2s;	
 }
 
 #knime-service-header #knime-service-menu ul {
