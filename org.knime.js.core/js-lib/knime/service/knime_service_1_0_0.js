@@ -130,7 +130,7 @@ knimeService = function() {
 			element = {};
 		}
 		if (typeof element.elements == 'undefined') {
-			filter.elements = [];
+			element.elements = [];
 		}
 		return element;
 	}
@@ -155,7 +155,7 @@ knimeService = function() {
 		if (!filterElement || !filterElement.id) {
 			return false;
 		}
-		var filter = getInteractivityElement(tableId);
+		var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
 		if (!filter) {
 			return false;
 		}
@@ -174,7 +174,7 @@ knimeService = function() {
 	}
 	
 	service.removeFromFilter = function(tableId, elementId) {
-		var filter = getInteractivityElement(tableId);
+		var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
 		if (!filter) {
 			return false;
 		}
@@ -205,12 +205,12 @@ knimeService = function() {
 	}
 	
 	addRowsForInteractivityEvent = function(type, tableId, rowKeys, elementId, forceNew) {
-		var selection = getInteractivityElement(tableId);
-		if (forceNew || !selection) {
-			selection = {'selectionMethod': type, 'elements': []};
+		var selection;
+		if (!forceNew) {
+			selection = getInteractivityElement(type + SEPARATOR + tableId);
 		}
 		if (!selection) {
-			return false;
+			selection = {'selectionMethod': type, 'elements': []};
 		}
 		var existing = false;
 		if (typeof elementId !== 'undefined') {
@@ -234,7 +234,7 @@ knimeService = function() {
 	}
 	
 	service.removeRowsFromFilter = function(tableId, elementId, rowKeys) {
-		var filter = getInteractivityElement(tableId);
+		var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
 		if (!filter) {
 			return false;
 		}
