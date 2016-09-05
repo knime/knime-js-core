@@ -262,16 +262,19 @@ knimeService = function() {
 		var link = document.createElement('a');
 		link.setAttribute('href', '#');
 		item.appendChild(link);
+		var leftSpan = document.createElement('span');
+		leftSpan.style.float = 'left';
+		link.appendChild(leftSpan);
 		if (icon) {
 			var iEl = document.createElement('i');
 			iEl.className = 'fa fa-fw fa-' + icon;
 			iEl.setAttribute('aria-hidden', 'true');
-			link.appendChild(iEl);
+			leftSpan.appendChild(iEl);
 		} else {
 			link.style.marginLeft = '24px';
 		}
 		if (typeof title == 'string' && title != '') {
-			link.appendChild(document.createTextNode(title));
+			leftSpan.appendChild(document.createTextNode(title));
 		}
 		if (element) {
 			// inline element

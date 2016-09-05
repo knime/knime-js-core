@@ -105,6 +105,7 @@ html, body {
 #knime-service-header #knime-service-menu li.divider {
     height: 1px;
     margin: 6px 0;
+    clear: both;
     overflow: hidden;
     background-color: #e5e5e5;
 }
@@ -119,6 +120,7 @@ html, body {
     white-space: nowrap;
     text-decoration: none;
     cursor: default;
+    overflow: auto;
 }
 
 #knime-service-header #knime-service-menu li.menuItem a {
