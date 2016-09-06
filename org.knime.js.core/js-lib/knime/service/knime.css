@@ -78,17 +78,28 @@ html, body {
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
 }
 
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
 #knime-service-header #knime-service-menu.open {
 	display: block;
 }
 
+@-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@-moz-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
 .cssanimations #knime-service-header #knime-service-menu.open {
 	opacity: 0;
+	
+	-webkit-animation: fadeIn ease-in 1;
+	-webkit-animation-fill-mode: forwards;
+	-webkit-animation-duration: 0.2s;
+	
+	-moz-animation: fadeIn ease-in 1;
+	-moz-animation-fill-mode: forwards;
+	-moz-animation-duration: 0.2s;
+	
 	animation: fadeIn ease-in 1;
 	animation-fill-mode: forwards;
-	animation-duration: 0.2s;	
+	animation-duration: 0.2s;
 }
 
 #knime-service-header #knime-service-menu ul {
