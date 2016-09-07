@@ -80,6 +80,7 @@ html, body {
 
 #knime-service-header #knime-service-menu.open {
 	display: block;
+	z-index: 2000;
 }
 
 @-webkit-keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
