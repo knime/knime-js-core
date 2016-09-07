@@ -103,7 +103,7 @@ html, body {
 }
 
 #knime-service-header #knime-service-menu ul {
-	margin: 0;
+	margin: 4px 0 0 0;
 	padding: 0;
 	list-style: none;
 	text-align: left;
@@ -111,6 +111,9 @@ html, body {
 
 #knime-service-header #knime-service-menu li {
 	cursor: pointer;
+	overflow: hidden;
+	clear: both;
+	margin: 0 0 4px 0;
 }
 
 #knime-service-header #knime-service-menu li.divider {

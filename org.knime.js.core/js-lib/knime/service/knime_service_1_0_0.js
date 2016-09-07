@@ -261,10 +261,14 @@ knimeService = function() {
 		var item = document.createElement('li');
 		var link = document.createElement('a');
 		link.setAttribute('href', '#');
-		item.appendChild(link);
 		var leftSpan = document.createElement('span');
 		leftSpan.style.float = 'left';
-		link.appendChild(leftSpan);
+		if (flags) {
+			link.appendChild(leftSpan);
+			item.appendChild(link);
+		} else {
+			item.appendChild(leftSpan);
+		}
 		if (icon) {
 			var iEl = document.createElement('i');
 			iEl.className = 'fa fa-fw fa-' + icon;
@@ -279,12 +283,9 @@ knimeService = function() {
 		if (element) {
 			// inline element
 			if (!flags) {
-				link.onclick = function(event) {
-					event.preventDefault();
-				}
-				element.style.margin = '0 0 0 6px';
+				element.style.marginLeft = '6px';
 				element.style.float = 'right';
-				link.appendChild(element);
+				item.appendChild(element);
 			} else {
 				item.className = 'menuItem';
 			}
