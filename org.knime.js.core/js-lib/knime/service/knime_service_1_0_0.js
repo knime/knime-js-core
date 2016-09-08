@@ -283,7 +283,15 @@ knimeService = function() {
 			link.style.marginLeft = '24px';
 		}
 		if (typeof title == 'string' && title != '') {
-			leftSpan.appendChild(document.createTextNode(title));
+			var text = document.createTextNode(title);
+			if (!useLink && typeof element.id !== 'undefined') {
+				var label = document.createElement('label');
+				label.setAttribute('for', element.id);
+				label.appendChild(text);
+				leftSpan.appendChild(label);
+			} else {
+				leftSpan.appendChild(text);
+			}
 		}
 		if (element) {
 			// inline element
@@ -315,12 +323,18 @@ knimeService = function() {
 		textField.setAttribute('type', 'text');
 		setFieldDefaults(textField, id, '150px');
 		if (callback) {
-			textField.addEventListener("keypress", function(event) {
-    			if (immediate || event.keyCode == 13) {
-    				callback();
-    			}
-    		});
-			if (!immediate) {
+			if (immediate) {
+				if (typeof textfield.oninput !== 'undefined') {
+					textfield.addEventListener('input', callback);
+				} else {
+					textfield.addEventListener('keyup', callback);
+				}
+			} else {
+				textField.addEventListener('keypress', function(event) {
+					if (event.keyCode == 13) {
+						callback();
+					}
+				});
 				textField.addEventListener('blur', callback);
 			}
 		}
@@ -328,6 +342,23 @@ knimeService = function() {
 			textField.value = initialValue;
 		}
 		return textField;
+	}
+	
+	service.createMenuCheckbox = function(id, initialState, callback, value) {
+		var checkbox = document.createElement('input');
+		checkbox.setAttribute('id', id);
+		checkbox.setAttribute('type', 'checkbox');
+		checkbox.setAttribute('name', id);
+		if (typeof value !== 'undefined') {
+			checkbox.setAttribute('value', value);
+		}
+		checkbox.checked = initialState;
+		checkbox.style.margin = '4px 0 0';
+		checkbox.style.padding = '0';
+		if (callback) {
+			checkbox.addEventListener('change', callback);
+		}
+		return checkbox;
 	}
 	
 	service.createMenuSelect = function(id, initialValue, options, callback) {
