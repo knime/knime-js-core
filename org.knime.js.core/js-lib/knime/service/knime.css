@@ -69,7 +69,7 @@ html, body {
 	top: 34px;
 	right: 0px;
 	margin-right: 12px;
-	padding: 4px;
+	padding: 4px 8px;
 	background-color: rgba(255, 255, 255, 1);
 	font-size: 14px;
 	border: 1px solid rgba(0, 0, 0, 0.15);
@@ -111,10 +111,25 @@ html, body {
 }
 
 #knime-service-header #knime-service-menu li {
-	cursor: pointer;
 	overflow: hidden;
 	clear: both;
 	margin: 0 0 4px 0;
+	font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+#knime-service-header #knime-service-menu li i.fa {
+	margin-right: 6px;
+}
+
+#knime-service-header #knime-service-menu li i.fa.small {
+	font-size: 0.8em;
+	position: relative;
+	top: -1px;
+	left: 2px;
+	margin-right: 10px;
 }
 
 #knime-service-header #knime-service-menu li.divider {
@@ -127,15 +142,10 @@ html, body {
 
 #knime-service-header #knime-service-menu li a {
 	display: block;
-    padding: 3px 12px;
+    /* padding: 3px 12px; */
     clear: both;
-    font-weight: normal;
-    line-height: 1.42857143;
-    color: #333;
-    white-space: nowrap;
     text-decoration: none;
-    cursor: default;
-    overflow: auto;
+    overflow: hidden;
 }
 
 #knime-service-header #knime-service-menu li.menuItem a {
@@ -148,6 +158,3 @@ html, body {
     outline: 0;
 }
 
-#knime-service-header #knime-service-menu li i {
-	margin-right: 6px;
-}

@@ -27,6 +27,7 @@ knimeService = function() {
 	service.OK = 2;
 	service.CANCEL = 4;
 	service.LINK = 8;
+	service.SMALL_ICON = 16;
 	
 	var SELECTION = 'selection', FILTER = 'filter', SEPARATOR = '-';
 	
@@ -260,10 +261,11 @@ knimeService = function() {
 		menu || initMenu();
 		var item = document.createElement('li');
 		var link = document.createElement('a');
+		var useLink = (service.LINK | service.CLOSE | service.OK | service.CANCEL) & flags;
 		link.setAttribute('href', '#');
 		var leftSpan = document.createElement('span');
 		leftSpan.style.float = 'left';
-		if (flags) {
+		if (useLink) {
 			link.appendChild(leftSpan);
 			item.appendChild(link);
 		} else {
@@ -273,6 +275,9 @@ knimeService = function() {
 			var iEl = document.createElement('i');
 			iEl.className = 'fa fa-fw fa-' + icon;
 			iEl.setAttribute('aria-hidden', 'true');
+			if (service.SMALL_ICON & flags) {
+				iEl.className = iEl.className + " small"
+			}
 			leftSpan.appendChild(iEl);
 		} else {
 			link.style.marginLeft = '24px';
@@ -282,7 +287,7 @@ knimeService = function() {
 		}
 		if (element) {
 			// inline element
-			if (!flags) {
+			if (!useLink) {
 				element.style.marginLeft = '6px';
 				element.style.float = 'right';
 				item.appendChild(element);
@@ -303,6 +308,56 @@ knimeService = function() {
 		}
 		menu.appendChild(item);
 		return item;
+	}
+	
+	service.createMenuTextField = function(id, initialValue, callback, immediate) {
+		var textField = document.createElement('input');
+		textField.setAttribute('type', 'text');
+		setFieldDefaults(textField, id, '150px');
+		if (callback) {
+			textField.addEventListener("keypress", function(event) {
+    			if (immediate || event.keyCode == 13) {
+    				callback();
+    			}
+    		});
+			if (!immediate) {
+				textField.addEventListener('blur', callback);
+			}
+		}
+		if (initialValue) {
+			textField.value = initialValue;
+		}
+		return textField;
+	}
+	
+	service.createMenuSelect = function(id, initialValue, options, callback) {
+		var select = document.createElement('select');
+		setFieldDefaults(select, id, '150px');
+		for (var oId = 0; oId < options.length; oId++) {
+			var option = document.createElement('option');
+			option.setAttribute('value', options[oId]);
+			option.appendChild(document.createTextNode(options[oId]));
+			select.appendChild(option);
+		}
+		if (callback) {
+			select.addEventListener('change', callback);
+		}
+		if (initialValue) {
+			select.value = initialValue;
+		}
+		return select;
+	}
+	
+	setFieldDefaults = function(field, id, width) {
+		field.setAttribute('id', id);
+		field.setAttribute('name', id);
+		field.style.fontSize = '12px';
+		if (width) {
+			field.style.width = width;
+		}
+		field.style.margin = '0';
+		field.style.outlineOffset = '-3px';
+		return field;
 	}
 	
 	service.addMenuDivider = function() {
