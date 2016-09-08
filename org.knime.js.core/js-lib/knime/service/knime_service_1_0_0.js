@@ -324,10 +324,10 @@ knimeService = function() {
 		setFieldDefaults(textField, id, '150px');
 		if (callback) {
 			if (immediate) {
-				if (typeof textfield.oninput !== 'undefined') {
-					textfield.addEventListener('input', callback);
+				if (typeof textField.oninput !== 'undefined') {
+					textField.addEventListener('input', callback);
 				} else {
-					textfield.addEventListener('keyup', callback);
+					textField.addEventListener('keyup', callback);
 				}
 			} else {
 				textField.addEventListener('keypress', function(event) {
