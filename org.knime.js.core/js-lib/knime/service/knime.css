@@ -147,6 +147,30 @@ html, body {
 	margin-right: 10px;
 }
 
+#knime-service-header #knime-service-menu li span.fa-stack {
+	width: 1.28571429em;
+    height: 1.28571429em;
+    line-height: normal;
+	margin-right: 6px;
+}
+
+#knime-service-header #knime-service-menu li span.fa-stack .left {
+	text-align: left;
+}
+
+#knime-service-header #knime-service-menu li span.fa-stack .right {
+	text-align: right;
+}
+
+#knime-service-header #knime-service-menu li span.fa-stack .faded {
+	color: gray;
+}
+
+#knime-service-header #knime-service-menu li span.fa-stack .sm {
+	font-size: 0.8em;
+	margin-top: 1px;
+}
+
 #knime-service-header #knime-service-menu li.divider {
     height: 1px;
     margin: 6px 0;

@@ -278,11 +278,14 @@ knimeService = function() {
 			item.appendChild(leftSpan);
 		}
 		if (icon) {
-			var iEl = document.createElement('i');
-			iEl.className = 'fa fa-fw fa-' + icon;
-			iEl.setAttribute('aria-hidden', 'true');
-			if (service.SMALL_ICON & flags) {
-				iEl.className = iEl.className + " small"
+			var iEl = icon;
+			if (typeof icon == 'string') {
+				iEl = document.createElement('i');
+				iEl.className = 'fa fa-fw fa-' + icon;
+				iEl.setAttribute('aria-hidden', 'true');
+				if (service.SMALL_ICON & flags) {
+					iEl.className = iEl.className + " small"
+				}
 			}
 			leftSpan.appendChild(iEl);
 		} else {
@@ -322,6 +325,18 @@ knimeService = function() {
 		}
 		menu.appendChild(item);
 		return item;
+	}
+	
+	service.createStackedIcon = function(firstIcon, secondIcon, firstClasses, secondClasses) {
+		var stack = document.createElement('span');
+		stack.className = 'fa-fw fa-stack';
+		var fEl = document.createElement('i');
+		fEl.className = 'fa fa-' + firstIcon + ' fa-stack-1x ' + firstClasses;
+		stack.appendChild(fEl);
+		var sEl = document.createElement('i');
+		sEl.className = 'fa fa-' + secondIcon + ' fa-stack-1x ' + secondClasses;
+		stack.appendChild(sEl);
+		return stack;
 	}
 	
 	service.createMenuTextField = function(id, initialValue, callback, immediate) {
