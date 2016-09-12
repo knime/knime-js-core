@@ -94,6 +94,10 @@ knimeService = function() {
 	
 	initMenu = function() {
 		addButton('knime-service-menu-button', 'bars', 'Settings', openMenu, true);
+		var overlay = document.createElement('div');
+		overlay.setAttribute('id', 'knime-service-overlay');
+		overlay.onclick = openMenu;
+		header.appendChild(overlay);
 		var mNav = document.createElement('nav');
 		mNav.setAttribute('id', 'knime-service-menu');
 		header.appendChild(mNav);
@@ -105,8 +109,10 @@ knimeService = function() {
 	openMenu = function() {
 		var mNav = document.getElementById('knime-service-menu');
 		var open = (mNav.className == 'open');
-		mNav.className = open ? '' : 'open';
-		
+		var clazz = open ? '' : 'open';
+		mNav.className = clazz;
+		var overlay = document.getElementById('knime-service-overlay');
+		overlay.className = clazz;
 		var button = document.getElementById('knime-service-menu-button');
 		button.className = open ? 'service-button' : 'service-button active';
 	}

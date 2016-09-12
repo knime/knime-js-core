@@ -63,6 +63,20 @@ html, body {
 	margin-left: 4px;
 }
 
+#knime-service-header #knime-service-overlay {
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#knime-service-header #knime-service-overlay.open {
+	display: block;
+	z-index: 1999;
+}
+
 #knime-service-header #knime-service-menu {
 	position: absolute;
 	display: none;
@@ -76,6 +90,7 @@ html, body {
 	border-radius: 4px;
 	-webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+    outline: none;
 }
 
 #knime-service-header #knime-service-menu.open {
