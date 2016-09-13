@@ -127,6 +127,11 @@ knimeService = function() {
 		return interactivityAvailable && GLOBAL_SERVICE.subscribe(id, callback, elementFilter);
 	}
 	
+	unsubscribeFromInteractivityEvent = function(id, callback) {
+		initialized || init();
+		return interactivityAvailable && GLOBAL_SERVICE.unsubscribe(id, callback);
+	}
+	
 	getInteractivityElement = function(id) {
 		initialized || init();
 		if (!interactivityAvailable) {
@@ -150,12 +155,20 @@ knimeService = function() {
 		return subscribeToInteractivityEvent(SELECTION + SEPARATOR + tableId, callback);
 	}
 	
+	service.unsubscribeSelection = function(tableId, callback) {
+		return unsubscribeFromInteractivityEvent(SELECTION + SEPARATOR + tableId, callback);
+	}
+	
 	service.publishFilter = function(tableId, filter) {
 		return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter);
 	}
 	
 	service.subscribeToFilter = function(tableId, callback, elementFilter) {
-		subscribeToInteractivityEvent(FILTER + SEPARATOR + tableId, callback, elementFilter);
+		return subscribeToInteractivityEvent(FILTER + SEPARATOR + tableId, callback, elementFilter);
+	}
+	
+	service.unsubscribeFilter = function(tableId, callback) {
+		return unsubscribeFromInteractivityEvent(FILTER + SEPARATOR + tableId, callback);
 	}
 	
 	service.addToFilter = function(tableId, filterElement) {

@@ -168,7 +168,11 @@ html, body {
 
 #knime-service-header #knime-service-menu li span.fa-stack .sm {
 	font-size: 0.8em;
-	margin-top: 1px;
+	line-height: 1.6em;
+}
+
+#knime-service-header #knime-service-menu li span.fa-stack .bold {
+	font-weight: bold;
 }
 
 #knime-service-header #knime-service-menu li.divider {
