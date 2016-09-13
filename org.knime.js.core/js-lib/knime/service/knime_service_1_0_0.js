@@ -53,6 +53,11 @@ knimeService = function() {
 		header.style.position = 'initial';
 	}
 	
+	service.floatingHeader = function() {
+		initialized || init();
+		header.style.position = 'absolute';
+	}
+	
 	service.isInteractivityAvailable = function() {
 		initialized || init();
 		//TODO: check if somebody is subscribed?
