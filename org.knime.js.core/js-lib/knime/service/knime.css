@@ -189,6 +189,15 @@ html, body {
 	padding: 0;
 }
 
+#knime-service-header #knime-service-menu .radioGroup label {
+	margin-left: 2px;
+	margin-right: 8px;
+}
+
+#knime-service-header #knime-service-menu .radioGroup label:last-child {
+	margin-right: 0;
+}
+
 #knime-service-header #knime-service-menu li a {
 	display: block;
     /* padding: 3px 12px; */

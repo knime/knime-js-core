@@ -421,7 +421,7 @@ knimeService = function() {
 	service.createMenuRadioButton = function(id, name, value, callback) {
 		var radio = document.createElement('input');
 		radio.setAttribute('type', 'radio');
-		radio.setAttriubte('name', name);
+		radio.setAttribute('name', name);
 		radio.setAttribute('id', id);
 		radio.setAttribute('value', value);
 		if (callback) {
@@ -433,6 +433,7 @@ knimeService = function() {
 	service.createInlineMenuRadioButtons = function(id, name, initialValue, options, callback) {
 		var container = document.createElement('span');
 		container.setAttribute('id', id);
+		container.className = 'radioGroup';
 		for (var oId = 0; oId < options.length; oId++) {
 			var value = options[oId];
 			var rId = name + '_' + value;
