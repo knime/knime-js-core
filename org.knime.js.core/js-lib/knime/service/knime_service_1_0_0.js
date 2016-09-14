@@ -434,9 +434,15 @@ knimeService = function() {
 		var container = document.createElement('span');
 		container.setAttribute('id', id);
 		for (var oId = 0; oId < options.length; oId++) {
-			var radio = service.createMenuRadioButton(name + '_' + value, name, options[oId], callback);
-			radio.checked = options[oId] === initialValue;
+			var value = options[oId];
+			var rId = name + '_' + value;
+			var radio = service.createMenuRadioButton(rId, name, value, callback);
+			radio.checked = value === initialValue;
 			container.appendChild(radio);
+			var label = document.createElement('label');
+			label.setAttribute('for', rId);
+			label.appendChild(document.createTextNode(value));
+			container.appendChild(label);
 		}
 		return container;
 	}
