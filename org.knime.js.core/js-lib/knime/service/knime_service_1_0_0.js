@@ -55,7 +55,7 @@ knimeService = function() {
 	
 	service.headerHeight = function() {
 		initialized || init();
-		var height = header.offsetHeight;
+		return header.offsetHeight;
 	}
 	
 	service.isInteractivityAvailable = function() {
