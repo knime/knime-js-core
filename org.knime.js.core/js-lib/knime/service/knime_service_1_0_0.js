@@ -58,6 +58,11 @@ knimeService = function() {
 		header.style.position = 'absolute';
 	}
 	
+	service.headerHeight = function() {
+		initialized || init();
+		var height = header.offsetHeight;
+	}
+	
 	service.isInteractivityAvailable = function() {
 		initialized || init();
 		//TODO: check if somebody is subscribed?
