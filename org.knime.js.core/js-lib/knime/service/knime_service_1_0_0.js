@@ -48,14 +48,9 @@ knimeService = function() {
 		initialized = true;
 	}
 	
-	service.noFloatingHeader = function() {
+	service.floatingHeader = function(float) {
 		initialized || init();
-		header.style.position = 'static';
-	}
-	
-	service.floatingHeader = function() {
-		initialized || init();
-		header.style.position = 'absolute';
+		header.style.position = float ? 'absolute' : 'static';
 	}
 	
 	service.headerHeight = function() {
