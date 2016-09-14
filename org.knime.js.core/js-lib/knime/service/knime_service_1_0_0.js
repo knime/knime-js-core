@@ -50,7 +50,7 @@ knimeService = function() {
 	
 	service.noFloatingHeader = function() {
 		initialized || init();
-		header.style.position = 'initial';
+		header.style.position = 'static';
 	}
 	
 	service.floatingHeader = function() {
