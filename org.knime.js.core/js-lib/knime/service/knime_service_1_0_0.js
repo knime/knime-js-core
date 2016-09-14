@@ -424,7 +424,7 @@ knimeService = function() {
 		radio.setAttriubte('name', name);
 		radio.setAttribute('id', id);
 		radio.setAttribute('value', value);
-		if (callback)
+		if (callback) {
 			radio.addEventListener('change', callback);
 		}
 		return radio;
