@@ -418,6 +418,29 @@ knimeService = function() {
 		return select;
 	}
 	
+	service.createMenuRadioButton = function(id, name, value, callback) {
+		var radio = document.createElement('input');
+		radio.setAttribute('type', 'radio');
+		radio.setAttriubte('name', name);
+		radio.setAttribute('id', id);
+		radio.setAttribute('value', value);
+		if (callback)
+			radio.addEventListener('change', callback);
+		}
+		return radio;
+	}
+	
+	service.createInlineMenuRadioButtons = function(id, name, initialValue, options, callback) {
+		var container = document.createElement('span');
+		container.setAttribute('id', id);
+		for (var oId = 0; oId < options.length; oId++) {
+			var radio = service.createMenuRadioButton(name + '_' + value, name, options[oId], callback);
+			radio.checked = options[oId] === initialValue;
+			container.appendChild(radio);
+		}
+		return container;
+	}
+	
 	setFieldDefaults = function(field, id, width) {
 		field.setAttribute('id', id);
 		field.setAttribute('name', id);
