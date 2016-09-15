@@ -122,9 +122,9 @@ knimeService = function() {
 		button.className = open ? 'service-button' : 'service-button active';
 	}
 	
-	publishInteractivityEvent = function(id, data) {
+	publishInteractivityEvent = function(id, data, skip) {
 		initialized || init();
-		return interactivityAvailable && GLOBAL_SERVICE.publish(id, data);
+		return interactivityAvailable && GLOBAL_SERVICE.publish(id, data, skip);
 	}
 	
 	subscribeToInteractivityEvent = function(id, callback, elementFilter) {
@@ -152,8 +152,8 @@ knimeService = function() {
 		return element;
 	}
 	
-	service.publishSelection = function(tableId, selection) {
-		return publishInteractivityEvent(SELECTION + SEPARATOR + tableId, selection);
+	service.publishSelection = function(tableId, selection, skip) {
+		return publishInteractivityEvent(SELECTION + SEPARATOR + tableId, selection, skip);
 	}
 	
 	service.subscribeToSelection = function(tableId, callback) {
@@ -164,8 +164,8 @@ knimeService = function() {
 		return unsubscribeFromInteractivityEvent(SELECTION + SEPARATOR + tableId, callback);
 	}
 	
-	service.publishFilter = function(tableId, filter) {
-		return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter);
+	service.publishFilter = function(tableId, filter, skip) {
+		return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter, skip);
 	}
 	
 	service.subscribeToFilter = function(tableId, callback, elementFilter) {
@@ -176,7 +176,7 @@ knimeService = function() {
 		return unsubscribeFromInteractivityEvent(FILTER + SEPARATOR + tableId, callback);
 	}
 	
-	service.addToFilter = function(tableId, filterElement) {
+	service.addToFilter = function(tableId, filterElement, skip) {
 		if (!filterElement || !filterElement.id) {
 			return false;
 		}
@@ -195,10 +195,10 @@ knimeService = function() {
 		if (!existing) {
 			filter.elements.push(filterElement);
 		}
-		return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter);		
+		return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter, skip);		
 	}
 	
-	service.removeFromFilter = function(tableId, elementId) {
+	service.removeFromFilter = function(tableId, elementId, skip) {
 		var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
 		if (!filter) {
 			return false;
@@ -207,29 +207,29 @@ knimeService = function() {
 		while (i--) {
 			if (filter.elements[i].id == filterElement.id) {
 				filter.elements.splice(i, 1);
-				return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter);
+				return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter, skip);
 			}
 		}
 		return false;
 	}
 	
-	service.setSelectedRows = function(tableId, rowKeys, elementId) {
-		return addRowsForInteractivityEvent(SELECTION, tableId, rowKeys, elementId, true);
+	service.setSelectedRows = function(tableId, rowKeys, skip, elementId) {
+		return addRowsForInteractivityEvent(SELECTION, tableId, rowKeys, skip, elementId, true);
 	}
 	
-	service.setFilteredRows = function(tableId, rowKeys, elementId) {
-		return addRowsForInteractivityEvent(FILTER, tableId, rowKeys, elementId, true);
+	service.setFilteredRows = function(tableId, rowKeys, skip, elementId) {
+		return addRowsForInteractivityEvent(FILTER, tableId, rowKeys, skip, elementId, true);
 	}
 	
-	service.addRowsToSelection = function(tableId, rowKeys, elementId) {
-		return addRowsForInteractivityEvent(SELECTION, tableId, rowKeys, elementId, false);
+	service.addRowsToSelection = function(tableId, rowKeys, skip, elementId) {
+		return addRowsForInteractivityEvent(SELECTION, tableId, rowKeys, skip, elementId, false);
 	}
 	
-	service.addRowsToFilter = function(tableId, rowKeys, elementId) {
-		return addRowsForInteractivityEvent(FILTER, tableId, rowKeys, elementId, false);
+	service.addRowsToFilter = function(tableId, rowKeys, skip, elementId) {
+		return addRowsForInteractivityEvent(FILTER, tableId, rowKeys, skip, elementId, false);
 	}
 	
-	addRowsForInteractivityEvent = function(type, tableId, rowKeys, elementId, forceNew) {
+	addRowsForInteractivityEvent = function(type, tableId, rowKeys, skip, elementId, forceNew) {
 		var selection;
 		if (!forceNew) {
 			selection = getInteractivityElement(type + SEPARATOR + tableId);
@@ -255,26 +255,34 @@ knimeService = function() {
 			}
 			selection.elements.push(selectionElement); 
 		}
-		return publishInteractivityEvent(type + SEPARATOR + tableId, selection);
+		return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 	}
 	
-	service.removeRowsFromFilter = function(tableId, elementId, rowKeys) {
-		var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
-		if (!filter) {
+	service.removeRowsFromSelection = function(tableId, rowKeys, skip, elementId) {
+		return removeRowsFromInteractivityEvent(Selection, tableId, rowKeys, skip, elementId);
+	}
+	
+	service.removeRowsFromFilter = function(tableId, rowKeys, skip, elementId) {
+		return removeRowsFromInteractivityEvent(FILTER, tableId, rowKeys, skip, elementId);
+	}
+	
+	removeRowsFromInteractivityEvent = function(type, tableId, rowKeys, skip, elementId) {
+		var selection = getInteractivityElement(FILTER + SEPARATOR + tableId);
+		if (!selection) {
 			return false;
 		}
-		var i = filter.elements.length;
+		var i = selection.elements.length;
 		while (i--) {
-			if (filter.elements[i].id == elementId) {
-				var filteredRows = filter.elements[i].rows.filter(function(value) {
+			if (!elementId || selection.elements[i].id == elementId) {
+				var filteredRows = selection.elements[i].rows.filter(function(value) {
 					return rowKeys.indexOf(value) == -1;
 				});
 				if (filteredRows.length == 0) {
-					filter.elements.splice(i, 1);
+					selection.elements.splice(i, 1);
 				} else {
-					filter.elements[i].rows = filteredRows;
+					selection.elements[i].rows = filteredRows;
 				}
-				return publishInteractivityEvent(FILTER + SEPARATOR + tableId, filter);
+				return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 			}
 		}
 		return false;
