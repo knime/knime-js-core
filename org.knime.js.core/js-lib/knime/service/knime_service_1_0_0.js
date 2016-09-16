@@ -238,13 +238,18 @@ knimeService = function() {
 			selection = {'selectionMethod': type, 'elements': []};
 		}
 		var existing = false;
-		if (typeof elementId !== 'undefined') {
-			for (var i = 0; i < selection.elements.length; i++) {
-				if (selection.elements[i].id == elementId) {
-					selection.elements[i].rows.concat(rowKeys);
+		for (var i = 0; i < selection.elements.length; i++) {
+			var element = selection.elements[i];
+			if (typeof elementId == 'undefined') {
+				if (typeof element.id == 'undefined') {
+					element.rows = element.rows.concat(rowKeys);
 					existing = true;
 					break;
 				}
+			} else if (element.id == elementId) {
+				element.rows = element.rows.concat(rowKeys);
+				existing = true;
+				break;
 			}
 		}
 		if (!existing) {
@@ -259,7 +264,7 @@ knimeService = function() {
 	}
 	
 	service.removeRowsFromSelection = function(tableId, rowKeys, skip, elementId) {
-		return removeRowsFromInteractivityEvent(Selection, tableId, rowKeys, skip, elementId);
+		return removeRowsFromInteractivityEvent(SELECTION, tableId, rowKeys, skip, elementId);
 	}
 	
 	service.removeRowsFromFilter = function(tableId, rowKeys, skip, elementId) {
@@ -267,7 +272,7 @@ knimeService = function() {
 	}
 	
 	removeRowsFromInteractivityEvent = function(type, tableId, rowKeys, skip, elementId) {
-		var selection = getInteractivityElement(FILTER + SEPARATOR + tableId);
+		var selection = getInteractivityElement(type + SEPARATOR + tableId);
 		if (!selection) {
 			return false;
 		}
