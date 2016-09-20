@@ -215,7 +215,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         String cssString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">";
 
         StringBuilder pageBuilder = new StringBuilder();
-        pageBuilder.append("<!doctype html><html><head>");
+        pageBuilder.append("<!doctype html><html lang=\"en-US\"><head>");
+        pageBuilder.append("<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">");
         pageBuilder.append("<meta charset=\"UTF-8\">");
         pageBuilder.append("<title>" + m_title + "</title>");
         pageBuilder.append(setIEVersion);
