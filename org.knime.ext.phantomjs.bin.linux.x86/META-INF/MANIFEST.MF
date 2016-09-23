@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: PhantomJS binaries for Linux x86
 Bundle-SymbolicName: org.knime.ext.phantomjs.bin.linux.x86;singleton:=true
-Bundle-Version: 1.9.8.qualifier
+Bundle-Version: 2.1.1.qualifier
 Bundle-Vendor: KNIME GmbH, Konstanz, Germany
 Fragment-Host: org.knime.ext.phantomjs;bundle-version="3.0.0"
 Eclipse-PlatformFilter: (&(osgi.os=linux)(osgi.arch=x86))
