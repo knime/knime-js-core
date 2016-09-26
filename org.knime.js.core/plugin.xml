@@ -188,6 +188,51 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            name="D3_3.5.5_Debug"
+            usesDefine="true"
+            version="3.5.5"
+            webResourceBundleID="D3_3.5.5_Debug">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_5_5.js"
+               relativePathTarget="js-lib/d3/d3.v3_5_5.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_5_5.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="D3"
+            usesDefine="true"
+            version="4.2.6"
+            webResourceBundleID="D3_4.2.6">
+         <webResource
+               relativePathSource="js-lib/d3/4_2_6/d3.min.js"
+               relativePathTarget="js-lib/d3/4_2_6/d3.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/4_2_6/d3.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="D3"
+            usesDefine="true"
+            version="4.2.6"
+            webResourceBundleID="D3_4.2.6_Debug">
+         <webResource
+               relativePathSource="js-lib/d3/4_2_6/d3.js"
+               relativePathTarget="js-lib/d3/4_2_6/d3.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/4_2_6/d3.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
             exports="kt"
             name="Knime Table"
             usesDefine="false"
@@ -343,36 +388,6 @@
          <webDependency
                webResourceBundleID="D3_3.5.5">
          </webDependency>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="true"
-            name="D3"
-            usesDefine="true"
-            version="3.5.5"
-            webResourceBundleID="D3_3.5.5_Debug">
-         <webResource
-               relativePathSource="js-lib/d3/d3.v3_5_5.js"
-               relativePathTarget="js-lib/d3/d3.v3_5_5.js">
-         </webResource>
-         <importResource
-               relativePath="js-lib/d3/d3.v3_5_5.js"
-               type="JAVASCRIPT">
-         </importResource>
-      </webResourceBundle>
-      <webResourceBundle
-            debug="false"
-            name="D3"
-            usesDefine="true"
-            version="3.5.5"
-            webResourceBundleID="D3_3.5.5">
-         <webResource
-               relativePathSource="js-lib/d3/d3.v3_5_5.min.js"
-               relativePathTarget="js-lib/d3/d3.v3_5_5.min.js">
-         </webResource>
-         <importResource
-               relativePath="js-lib/d3/d3.v3_5_5.min.js"
-               type="JAVASCRIPT">
-         </importResource>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -1061,6 +1076,84 @@
          </webResource>
          <importResource
                relativePath="js-lib/font-awesome/4_6_3/css/font-awesome.min.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="noUISlider"
+            usesDefine="false"
+            version="8.5.1"
+            webResourceBundleID="noUISlider_8_5_1_Debug">
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.js"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.css">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.pips.css">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.css"
+               type="CSS">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
+               type="CSS">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="noUISlider"
+            usesDefine="false"
+            version="8.5.1"
+            webResourceBundleID="noUISlider_8_5_1">
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.min.js"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.min.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.min.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.min.css">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.pips.css">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
+               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.min.css"
+               type="CSS">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
+               type="CSS">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
                type="CSS">
          </importResource>
       </webResourceBundle>
