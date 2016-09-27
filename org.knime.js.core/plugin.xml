@@ -1117,6 +1117,9 @@
                relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
                type="CSS">
          </importResource>
+         <webDependency
+               webResourceBundleID="wNumb">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
@@ -1155,6 +1158,25 @@
          <importResource
                relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
                type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="wNumb">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            exports="wNumb"
+            name="wNumb Number Formatter"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="wNumb">
+         <webResource
+               relativePathSource="js-lib/wNumb/wNumb.js"
+               relativePathTarget="js-lib/wNumb/wNumb.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/wNumb/wNumb.js"
+               type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
    </extension>
