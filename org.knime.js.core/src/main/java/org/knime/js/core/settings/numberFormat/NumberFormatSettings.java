@@ -48,7 +48,7 @@
  */
 package org.knime.js.core.settings.numberFormat;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -58,7 +58,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Settings for a number formatter to be used for node config settings and dialog and also for inclusion in JSON serialized objects.
+ * Settings for a number formatter to be used for node config settings, dialog and for inclusion in JSON serialized objects.
  * Incorporates all settings for the <a href="http://refreshless.com/wnumb/">wNumb</a> number formatter, as well as an extra classes parameter for negative values.
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
@@ -307,6 +307,12 @@ public class NumberFormatSettings implements Cloneable {
         settings.addString(CFG_UNDO, m_undo);
     }
 
+    /**
+     * Populates the object by loading from the NodeSettings object.
+     * The values are validated before being applied. On error this object stays unchanged.
+     * @param settings The settings to load from
+     * @throws InvalidSettingsException on load or validation error
+     */
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         NumberFormatSettings nVal = new NumberFormatSettings();
         nVal.loadValidateSettings(settings);
@@ -330,6 +336,10 @@ public class NumberFormatSettings implements Cloneable {
         m_undo = settings.getString(CFG_UNDO);
     }
 
+    /**
+     * Loading from NodeSettings object with defaults fallback.
+     * @param settings the settings object to load from.
+     */
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         String decimalString = settings.getString(CFG_DECIMALS, null);
         m_decimals = decimalString == null ? null : Integer.parseInt(decimalString);
