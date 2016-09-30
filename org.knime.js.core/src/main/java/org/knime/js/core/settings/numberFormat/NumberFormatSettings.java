@@ -412,7 +412,7 @@ public class NumberFormatSettings implements Cloneable {
      * {@inheritDoc}
      */
     @Override
-    protected Object clone() throws CloneNotSupportedException {
+    public NumberFormatSettings clone() {
         NumberFormatSettings clonedSettings = new NumberFormatSettings();
         copyInternals(this, clonedSettings);
         return clonedSettings;
