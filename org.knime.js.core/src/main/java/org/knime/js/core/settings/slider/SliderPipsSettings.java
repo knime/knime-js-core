@@ -63,6 +63,9 @@ import org.knime.js.core.settings.numberFormat.NumberFormatSettings;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -73,8 +76,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @since 3.3
  */
 @JsonAutoDetect
+@JsonInclude(Include.NON_EMPTY)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class SliderPipsSettings {
+public class SliderPipsSettings implements Cloneable {
 
     /**
      * Enumerates all possible modes used in the pip configuration.
@@ -225,7 +229,12 @@ public class SliderPipsSettings {
      * Validates the current settings.
      * @throws InvalidSettingsException If validation fails.
      */
+    @JsonIgnore
     public void validateSettings() throws InvalidSettingsException {
+        validateSettings(true);
+    }
+
+    private void validateSettings(final boolean validateFormat) throws InvalidSettingsException {
         if (m_mode == null) {
             throw new InvalidSettingsException("A mode for pip generation needs to be specified.");
         }
@@ -252,12 +261,16 @@ public class SliderPipsSettings {
                 throw new InvalidSettingsException("Stepped option is only applicable for the modes 'positions', 'count' or 'values', but mode is '" + m_mode.toValue() + "'.");
             }
         }
+        if (validateFormat && m_format != null) {
+            m_format.validateSettings();
+        }
     }
 
     /**
      * Saves the current state to the given node settings object.
      * @param settings The settings object to save to.
      */
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_MODE, m_mode == null ? null : m_mode.toValue());
         settings.addIntArray(CFG_DENSITY, m_density == null ? null : new int[]{m_density});
@@ -278,10 +291,11 @@ public class SliderPipsSettings {
      * @param settings The settings to load from
      * @throws InvalidSettingsException on load or validation error
      */
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         SliderPipsSettings sVal = new SliderPipsSettings();
         sVal.loadValidateSettings(settings);
-        sVal.validateSettings();
+        sVal.validateSettings(/* already validated during load */ false);
         copyInternals(sVal, this);
     }
 
@@ -297,7 +311,7 @@ public class SliderPipsSettings {
         boolean formatDefined = formatSettings.getBoolean(CFG_FORMAT_DEFINED);
         if (formatDefined) {
             NumberFormatSettings newFormat = new NumberFormatSettings();
-            newFormat.loadFromNodeSettingsInDialog(formatSettings);
+            newFormat.loadFromNodeSettings(formatSettings);
             m_format = newFormat;
         } else {
             m_format = null;
@@ -308,6 +322,7 @@ public class SliderPipsSettings {
      * Loading from NodeSettings object with defaults fallback.
      * @param settings the settings object to load from.
      */
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         m_mode = PipMode.forValue(settings.getString(CFG_MODE, null));
         int[] densityTemp = settings.getIntArray(CFG_DENSITY, null);
@@ -335,6 +350,7 @@ public class SliderPipsSettings {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(m_mode)
@@ -350,6 +366,7 @@ public class SliderPipsSettings {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
@@ -375,13 +392,14 @@ public class SliderPipsSettings {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public SliderPipsSettings clone() {
         SliderPipsSettings clonedSettings = new SliderPipsSettings();
         copyInternals(this, clonedSettings);
         return clonedSettings;
     }
 
-    private static void copyInternals(final SliderPipsSettings settingsFrom, final SliderPipsSettings settingsTo) {
+    private static synchronized void copyInternals(final SliderPipsSettings settingsFrom, final SliderPipsSettings settingsTo) {
         settingsTo.m_mode = settingsFrom.m_mode;
         settingsTo.m_density = settingsFrom.m_density;
         settingsTo.m_values = settingsFrom.m_values == null ? null : Arrays.copyOf(settingsFrom.m_values, settingsFrom.m_values.length);

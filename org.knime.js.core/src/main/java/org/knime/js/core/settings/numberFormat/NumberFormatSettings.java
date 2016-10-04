@@ -55,6 +55,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -65,6 +68,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * @since 3.3
  */
 @JsonAutoDetect
+@JsonInclude(Include.NON_EMPTY)
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class NumberFormatSettings implements Cloneable {
 
@@ -265,6 +269,7 @@ public class NumberFormatSettings implements Cloneable {
      * Validates the current settings.
      * @throws InvalidSettingsException If validation fails.
      */
+    @JsonIgnore
     public void validateSettings() throws InvalidSettingsException {
         if (m_decimals != null) {
             if (m_decimals < 0) {
@@ -292,6 +297,7 @@ public class NumberFormatSettings implements Cloneable {
      * Saves the current state to the given node settings object.
      * @param settings The settings object to save to.
      */
+    @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString(CFG_DECIMALS, m_decimals == 0 ? null : Integer.toString(m_decimals));
         settings.addString(CFG_MARK, m_mark);
@@ -313,6 +319,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param settings The settings to load from
      * @throws InvalidSettingsException on load or validation error
      */
+    @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         NumberFormatSettings nVal = new NumberFormatSettings();
         nVal.loadValidateSettings(settings);
@@ -340,6 +347,7 @@ public class NumberFormatSettings implements Cloneable {
      * Loading from NodeSettings object with defaults fallback.
      * @param settings the settings object to load from.
      */
+    @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         String decimalString = settings.getString(CFG_DECIMALS, null);
         m_decimals = decimalString == null ? null : Integer.parseInt(decimalString);
@@ -360,6 +368,7 @@ public class NumberFormatSettings implements Cloneable {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(m_decimals)
@@ -381,6 +390,7 @@ public class NumberFormatSettings implements Cloneable {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
@@ -412,13 +422,14 @@ public class NumberFormatSettings implements Cloneable {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public NumberFormatSettings clone() {
         NumberFormatSettings clonedSettings = new NumberFormatSettings();
         copyInternals(this, clonedSettings);
         return clonedSettings;
     }
 
-    private static void copyInternals(final NumberFormatSettings settingsFrom, final NumberFormatSettings settingsTo) {
+    private static synchronized void copyInternals(final NumberFormatSettings settingsFrom, final NumberFormatSettings settingsTo) {
         //all members immutable
         settingsTo.m_decimals = settingsFrom.m_decimals;
         settingsTo.m_mark = settingsFrom.m_mark;
