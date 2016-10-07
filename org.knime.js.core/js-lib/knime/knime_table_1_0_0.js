@@ -39,7 +39,9 @@ kt = function() {
 			if (typeof rowIndex === "string") {
 				rowIndex = kt_getRowID(rowID);
 			}
+			return dataTable.rows[rowIndex].data[colIndex];
 		}
+		return null;
 	}
 	
 	kt.getColumn = function(columnID) {
