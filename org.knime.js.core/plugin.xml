@@ -203,6 +203,21 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
+            name="D3_3.5.5"
+            usesDefine="true"
+            version="3.5.5"
+            webResourceBundleID="D3_3.5.5">
+         <webResource
+               relativePathSource="js-lib/d3/d3.v3_5_5.min.js"
+               relativePathTarget="js-lib/d3/d3.v3_5_5.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/d3.v3_5_5.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
             name="D3"
             usesDefine="true"
             version="4.2.6"
@@ -1083,38 +1098,38 @@
             debug="true"
             name="noUISlider"
             usesDefine="false"
-            version="8.5.1"
-            webResourceBundleID="noUISlider_8_5_1_Debug">
+            version="9.0.0"
+            webResourceBundleID="noUISlider_9_0_0_Debug">
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.js"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.js">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.js"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.js">
          </webResource>
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.css">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.css"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.css">
          </webResource>
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.pips.css">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.pips.css"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.pips.css">
          </webResource>
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.tooltips.css"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.tooltips.css">
          </webResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.js"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.css"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.css"
                type="CSS">
          </importResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.pips.css"
                type="CSS">
          </importResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.tooltips.css"
                type="CSS">
          </importResource>
          <webDependency
@@ -1125,38 +1140,22 @@
             debug="false"
             name="noUISlider"
             usesDefine="false"
-            version="8.5.1"
-            webResourceBundleID="noUISlider_8_5_1">
+            version="9.0.0"
+            webResourceBundleID="noUISlider_9_0_0">
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.min.js"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.min.js">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.min.js"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.min.js">
          </webResource>
          <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.min.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.min.css">
-         </webResource>
-         <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.pips.css">
-         </webResource>
-         <webResource
-               relativePathSource="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
-               relativePathTarget="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css">
+               relativePathSource="js-lib/noUiSlider/9_0_0/nouislider.min.css"
+               relativePathTarget="js-lib/noUiSlider/9_0_0/nouislider.min.css">
          </webResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.min.js"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.min.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.min.css"
-               type="CSS">
-         </importResource>
-         <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.pips.css"
-               type="CSS">
-         </importResource>
-         <importResource
-               relativePath="js-lib/noUiSlider/8_5_1/nouislider.tooltips.css"
+               relativePath="js-lib/noUiSlider/9_0_0/nouislider.min.css"
                type="CSS">
          </importResource>
          <webDependency
