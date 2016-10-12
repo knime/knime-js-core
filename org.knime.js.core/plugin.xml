@@ -22,7 +22,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="jQuery"
+            name="jQuery 1.11.0"
             usesDefine="true"
             version="1.11.0"
             webResourceBundleID="jQuery_1.11.0_Debug">
@@ -37,7 +37,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
-            name="jQuery"
+            name="jQuery 1.11.0"
             usesDefine="true"
             version="1.11.0"
             webResourceBundleID="jQuery_1.11.0">
@@ -110,9 +110,39 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+       <webResourceBundle
+            debug="true"
+            name="jQuery"
+            usesDefine="true"
+            version="3.1.1"
+            webResourceBundleID="jQuery_3.1.1_Debug">
+         <webResource
+               relativePathSource="js-lib/jQuery/jquery-3.1.1.js"
+               relativePathTarget="js-lib/jQuery/jquery-3.1.1.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQuery/jquery-3.1.1.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="jQuery"
+            usesDefine="true"
+            version="3.1.1"
+            webResourceBundleID="jQuery_3.1.1">
+         <webResource
+               relativePathSource="js-lib/jQuery/jquery-3.1.1.min.js"
+               relativePathTarget="js-lib/jQuery/jquery-3.1.1.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQuery/jquery-3.1.1.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="jQuery UI"
+            name="jQuery UI 1.10.4"
             usesDefine="true"
             version="1.10.4"
             webResourceBundleID="jQueryUi_1.10.4_Debug">
@@ -134,7 +164,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
-            name="jQuery UI"
+            name="jQuery UI 1.10.4"
             usesDefine="true"
             version="1.10.4"
             webResourceBundleID="jQueryUi_1.10.4">
@@ -152,6 +182,50 @@
          </importResource>
          <webDependency
                webResourceBundleID="jQuery_1.11.0">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="jQuery UI"
+            usesDefine="true"
+            version="1.12.1"
+            webResourceBundleID="jQueryUi_1.12.1_Debug">
+         <webResource
+               relativePathSource="js-lib/jQueryUI/1_12_1/debug/"
+               relativePathTarget="js-lib/jQueryUI/1_12_1/debug/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/1_12_1/debug/ui/jquery-ui.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/debug/1_12_1/themes/base/jquery-ui.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_3.1.1_Debug">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="jQuery UI"
+            usesDefine="true"
+            version="1.12.1"
+            webResourceBundleID="jQueryUi_1.12.1">
+         <webResource
+               relativePathSource="js-lib/jQueryUI/1_12_1/min/"
+               relativePathTarget="js-lib/jQueryUI/1_12_1/min/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/1_12_1/min/ui/jquery-ui.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/jQueryUI/1_12_1/min/themes/base/jquery-ui.min.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="jQuery_3.1.1">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
