@@ -195,11 +195,11 @@
                relativePathTarget="js-lib/jQueryUI/1_12_1/debug/">
          </webResource>
          <importResource
-               relativePath="js-lib/jQueryUI/1_12_1/debug/ui/jquery-ui.js"
+               relativePath="js-lib/jQueryUI/1_12_1/debug/jquery-ui.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/jQueryUI/debug/1_12_1/themes/base/jquery-ui.css"
+               relativePath="js-lib/jQueryUI/debug/1_12_1/debug/jquery-ui.css"
                type="CSS">
          </importResource>
          <webDependency
@@ -217,11 +217,11 @@
                relativePathTarget="js-lib/jQueryUI/1_12_1/min/">
          </webResource>
          <importResource
-               relativePath="js-lib/jQueryUI/1_12_1/min/ui/jquery-ui.min.js"
+               relativePath="js-lib/jQueryUI/1_12_1/min/jquery-ui.min.js"
                type="JAVASCRIPT">
          </importResource>
          <importResource
-               relativePath="js-lib/jQueryUI/1_12_1/min/themes/base/jquery-ui.min.css"
+               relativePath="js-lib/jQueryUI/1_12_1/min/jquery-ui.min.css"
                type="CSS">
          </importResource>
          <webDependency
