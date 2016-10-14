@@ -73,14 +73,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public class NumberFormatSettings implements Cloneable {
 
     private static final String CFG_DECIMALS = "decimals";
-    private Integer m_decimals;
+    private static final Integer DEFAULT_DECIMALS = 2;
+    private Integer m_decimals = DEFAULT_DECIMALS;
 
     private static final String CFG_MARK = "mark";
     private static final String DEFAULT_MARK = ".";
     private String m_mark = DEFAULT_MARK;
 
-    private static final String CFG_THOUSANDS = "thousands";
-    private String m_thousands;
+    private static final String CFG_THOUSAND = "thousand";
+    private String m_thousand;
 
     private static final String CFG_PREFIX = "prefix";
     private String m_prefix;
@@ -113,13 +114,13 @@ public class NumberFormatSettings implements Cloneable {
     /**
      * @return the decimals
      */
-    public int getDecimals() {
+    public Integer getDecimals() {
         return m_decimals;
     }
     /**
      * @param decimals the decimals to set
      */
-    public void setDecimals(final int decimals) {
+    public void setDecimals(final Integer decimals) {
         m_decimals = decimals;
     }
     /**
@@ -132,19 +133,19 @@ public class NumberFormatSettings implements Cloneable {
      * @param mark the mark to set
      */
     public void setMark(final String mark) {
-        m_mark = mark;
+        m_mark = noEmptyString(mark);
     }
     /**
      * @return the thousands
      */
-    public String getThousands() {
-        return m_thousands;
+    public String getThousand() {
+        return m_thousand;
     }
     /**
-     * @param thousands the thousands to set
+     * @param thousand the thousands to set
      */
-    public void setThousands(final String thousands) {
-        m_thousands = thousands;
+    public void setThousand(final String thousand) {
+        m_thousand = noEmptyString(thousand);
     }
     /**
      * @return the prefix
@@ -156,7 +157,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param prefix the prefix to set
      */
     public void setPrefix(final String prefix) {
-        m_prefix = prefix;
+        m_prefix = noEmptyString(prefix);
     }
     /**
      * @return the postfix
@@ -168,7 +169,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param postfix the postfix to set
      */
     public void setPostfix(final String postfix) {
-        m_postfix = postfix;
+        m_postfix = noEmptyString(postfix);
     }
     /**
      * @return the negative
@@ -180,7 +181,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param negative the negative to set
      */
     public void setNegative(final String negative) {
-        m_negative = negative;
+        m_negative = noEmptyString(negative);
     }
     /**
      * @return the negativeBefore
@@ -192,7 +193,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param negativeBefore the negativeBefore to set
      */
     public void setNegativeBefore(final String negativeBefore) {
-        m_negativeBefore = negativeBefore;
+        m_negativeBefore = noEmptyString(negativeBefore);
     }
 
     /**
@@ -206,7 +207,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param negativeClasses the negativeClasses to set
      */
     public void setNegativeClasses(final String negativeClasses) {
-        m_negativeClasses = negativeClasses;
+        m_negativeClasses = noEmptyString(negativeClasses);
     }
 
     /**
@@ -220,7 +221,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param encoder the encoder to set
      */
     public void setEncoder(final String encoder) {
-        m_encoder = encoder;
+        m_encoder = noEmptyString(encoder);
     }
 
     /**
@@ -234,7 +235,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param decoder the decoder to set
      */
     public void setDecoder(final String decoder) {
-        m_decoder = decoder;
+        m_decoder = noEmptyString(decoder);
     }
 
     /**
@@ -248,7 +249,7 @@ public class NumberFormatSettings implements Cloneable {
      * @param edit the edit to set
      */
     public void setEdit(final String edit) {
-        m_edit = edit;
+        m_edit = noEmptyString(edit);
     }
 
     /**
@@ -262,7 +263,11 @@ public class NumberFormatSettings implements Cloneable {
      * @param undo the undo to set
      */
     public void setUndo(final String undo) {
-        m_undo = undo;
+        m_undo = noEmptyString(undo);
+    }
+
+    private String noEmptyString(final String s) {
+        return "".equals(s) ? null : s;
     }
 
     /**
@@ -278,7 +283,7 @@ public class NumberFormatSettings implements Cloneable {
                 throw new InvalidSettingsException("JavaScript floating points are only stable up to 7 decimals");
             }
         }
-        if (existsAndEquals(m_mark, m_thousands)) {
+        if (existsAndEquals(m_mark, m_thousand)) {
             throw new InvalidSettingsException("Decimal separator and thousands mark can not be set to the same character.");
         }
         if (existsAndEquals(m_prefix, m_negative)) {
@@ -299,9 +304,9 @@ public class NumberFormatSettings implements Cloneable {
      */
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
-        settings.addString(CFG_DECIMALS, m_decimals == 0 ? null : Integer.toString(m_decimals));
+        settings.addString(CFG_DECIMALS, m_decimals == null ? null : Integer.toString(m_decimals));
         settings.addString(CFG_MARK, m_mark);
-        settings.addString(CFG_THOUSANDS, m_thousands);
+        settings.addString(CFG_THOUSAND, m_thousand);
         settings.addString(CFG_PREFIX, m_prefix);
         settings.addString(CFG_POSTFIX, m_postfix);
         settings.addString(CFG_NEGATIVE, m_negative);
@@ -331,7 +336,7 @@ public class NumberFormatSettings implements Cloneable {
         String decimalString = settings.getString(CFG_DECIMALS);
         m_decimals = decimalString == null ? null : Integer.parseInt(decimalString);
         m_mark = settings.getString(CFG_MARK);
-        m_thousands = settings.getString(CFG_THOUSANDS);
+        m_thousand = settings.getString(CFG_THOUSAND);
         m_prefix = settings.getString(CFG_PREFIX);
         m_postfix = settings.getString(CFG_POSTFIX);
         m_negative = settings.getString(CFG_NEGATIVE);
@@ -350,9 +355,9 @@ public class NumberFormatSettings implements Cloneable {
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
         String decimalString = settings.getString(CFG_DECIMALS, null);
-        m_decimals = decimalString == null ? null : Integer.parseInt(decimalString);
+        m_decimals = decimalString == null ? DEFAULT_DECIMALS : Integer.parseInt(decimalString);
         m_mark = settings.getString(CFG_MARK, DEFAULT_MARK);
-        m_thousands = settings.getString(CFG_THOUSANDS, null);
+        m_thousand = settings.getString(CFG_THOUSAND, null);
         m_prefix = settings.getString(CFG_PREFIX, null);
         m_postfix = settings.getString(CFG_POSTFIX, null);
         m_negative = settings.getString(CFG_NEGATIVE, DEFAULT_NEGATIVE);
@@ -373,7 +378,7 @@ public class NumberFormatSettings implements Cloneable {
         return new HashCodeBuilder()
                 .append(m_decimals)
                 .append(m_mark)
-                .append(m_thousands)
+                .append(m_thousand)
                 .append(m_prefix)
                 .append(m_postfix)
                 .append(m_negative)
@@ -405,7 +410,7 @@ public class NumberFormatSettings implements Cloneable {
         return new EqualsBuilder()
                 .append(m_decimals, other.m_decimals)
                 .append(m_mark, other.m_mark)
-                .append(m_thousands, other.m_thousands)
+                .append(m_thousand, other.m_thousand)
                 .append(m_prefix, other.m_prefix)
                 .append(m_postfix, other.m_postfix)
                 .append(m_negative, other.m_negative)
@@ -433,7 +438,7 @@ public class NumberFormatSettings implements Cloneable {
         //all members immutable
         settingsTo.m_decimals = settingsFrom.m_decimals;
         settingsTo.m_mark = settingsFrom.m_mark;
-        settingsTo.m_thousands = settingsFrom.m_thousands;
+        settingsTo.m_thousand = settingsFrom.m_thousand;
         settingsTo.m_prefix = settingsFrom.m_prefix;
         settingsTo.m_postfix = settingsFrom.m_postfix;
         settingsTo.m_negative = settingsFrom.m_negative;

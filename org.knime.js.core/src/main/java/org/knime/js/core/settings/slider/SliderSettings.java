@@ -183,6 +183,10 @@ public class SliderSettings implements Cloneable {
     private static final String CFG_CONNECT = "connect";
     private boolean[] m_connect;
 
+    private static final String CFG_CONNECT_COLOR = "connectColor";
+    private static final String DEFAULT_CONNECT_COLOR = "#3FB8AF";
+    private String m_connectColor = DEFAULT_CONNECT_COLOR;
+
     private static final String CFG_STEP = "step";
     private Double m_step;
 
@@ -387,6 +391,84 @@ public class SliderSettings implements Cloneable {
     }
 
     /**
+     * Returns the minimum value for the configured slider range.
+     * @return The minimum value for the range, or null if no minimum is set.
+     */
+    @JsonIgnore
+    public Double getRangeMinValue() {
+        if (m_range != null) {
+            double[] min = m_range.get(RANGE_MIN);
+            if (min != null && min.length > 0) {
+                return new Double(min[0]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the minimum value for the configured slider range.
+     * @param min the new minimum value
+     * @return the previous minimum value, or null if there was no minimum value set.
+     */
+    @JsonIgnore
+    public double[] setRangeMinValue(final double min) {
+        if (m_range == null) {
+            m_range = new LinkedHashMap<String, double[]>();
+        }
+        return m_range.put(RANGE_MIN, new double[]{min});
+    }
+
+    /**
+     * Returns the maximum value for the configured slider range.
+     * @return The maximum value for the range, or null if no maximum is set.
+     */
+    @JsonIgnore
+    public Double getRangeMaxValue() {
+        if (m_range != null) {
+            double[] max = m_range.get(RANGE_MAX);
+            if (max != null && max.length > 0) {
+                return new Double(max[0]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the maximum value for the configured slider range.
+     * @param max the new maximum value
+     * @return the previous maximum value, or null if there was no maximum value set.
+     */
+    @JsonIgnore
+    public double[] setRangeMaxValue(final double max) {
+        if (m_range == null) {
+            m_range = new LinkedHashMap<String, double[]>();
+        }
+        return m_range.put(RANGE_MAX, new double[]{max});
+    }
+
+    /**
+     * Checks if the configured slider will only produce integer values.
+     * Specifically the step and start values are checked. If any of the values is not set
+     * the method will also return false;
+     * @return true, if the slider settings only produce integer values, false otherwise
+     */
+    @JsonIgnore
+    public boolean outputsIntegerOnly() {
+        if (m_start != null) {
+            boolean startValid = true;
+            for (double startValue : m_start) {
+                startValid &= doubleIsInt(startValue);
+            }
+            return startValid && doubleIsInt(m_step);
+        }
+        return false;
+    }
+
+    private boolean doubleIsInt(final Double value) {
+        return value != null && value == Math.floor(value) && !Double.isInfinite(value);
+    }
+
+    /**
      * Validates the current settings.
      * @throws InvalidSettingsException If validation fails.
      */
@@ -396,7 +478,41 @@ public class SliderSettings implements Cloneable {
     }
 
     private void validateSettings(final boolean deepValidate) throws InvalidSettingsException {
-
+        if (getRangeMinValue() == null) {
+            throw new InvalidSettingsException("A range minimum needs to be specified.");
+        }
+        if (getRangeMaxValue() == null) {
+            throw new InvalidSettingsException("A range maximum needs to be specified.");
+        }
+        if (getRangeMinValue() >= getRangeMaxValue()) {
+            throw new InvalidSettingsException("The range maximum needs to be larger than the range minimum.");
+        }
+        if (m_start == null || m_start.length < 1) {
+            throw new InvalidSettingsException("At least one start value needs to be specified.");
+        }
+        for (double start : m_start) {
+            if (start < getRangeMinValue() || start > getRangeMaxValue()) {
+                throw new InvalidSettingsException("Start value needs to be inside range bounds.");
+            }
+        }
+        if (m_connect != null && m_connect.length != (m_start.length + 1)) {
+            throw new InvalidSettingsException("The connect array length needs to be start array length + 1");
+        }
+        if (m_tooltips != null && m_tooltips.length != m_start.length) {
+            throw new InvalidSettingsException("Tooltips array length needs to be equal to start array length");
+        }
+        for (Object tip : m_tooltips) {
+            if (tip instanceof NumberFormatSettings) {
+                if(deepValidate) {
+                    ((NumberFormatSettings)tip).validateSettings();
+                }
+            } else if (!(tip instanceof Boolean)) {
+                throw new InvalidSettingsException("Tooltip needs to be either Boolean or NumberFormatSettings object.");
+            }
+        }
+        if (deepValidate && m_pips != null) {
+            m_pips.validateSettings();
+        }
     }
 
     /**
@@ -592,6 +708,29 @@ public class SliderSettings implements Cloneable {
         } catch (InvalidSettingsException e) {
             m_pips = null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        if (m_range != null) {
+            builder.append("Range=(");
+            double[] min = m_range.get(RANGE_MIN);
+            builder.append((min == null || min.length < 1) ? Double.NEGATIVE_INFINITY : min[0]);
+            builder.append(" - ");
+            double[] max = m_range.get(RANGE_MAX);
+            builder.append((max == null || max.length < 1) ? Double.POSITIVE_INFINITY : max[0]);
+            builder.append(") ");
+        }
+        if (m_start != null && m_start.length > 0) {
+            builder.append("Start Values=");
+            builder.append(Arrays.toString(m_start));
+        }
+        return builder.toString();
     }
 
     /**
