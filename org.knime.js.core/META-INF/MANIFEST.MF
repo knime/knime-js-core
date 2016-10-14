@@ -10,6 +10,7 @@ Export-Package: org.knime.js.core,
  org.knime.js.core.layout.bs,
  org.knime.js.core.layout.grid,
  org.knime.js.core.node,
+ org.knime.js.core.selections.json,
  org.knime.js.core.settings,
  org.knime.js.core.settings.numberFormat,
  org.knime.js.core.settings.slider

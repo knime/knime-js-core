@@ -46,8 +46,9 @@
  * History
  *   18 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
+package org.knime.js.core.selections.json;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -57,33 +58,110 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
+@JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown=true)
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "type",
-    defaultImpl = NumericColumnRangeSelection.class
+    defaultImpl = RowSelection.class
     )
 @JsonSubTypes({
-    @Type(value = NumericColumnRangeSelection.class, name = "numeric"),
-    @Type(value = NominalColumnRangeSelection.class, name = "nominal")
+    @Type(value = RowSelection.class, name = "row"),
+    @Type(value = RangeSelection.class, name = "range")
     })
-public abstract class AbstractColumnRangeSelection {
-    
-    private String m_columnName;
-    
+public abstract class SelectionElement {
+
+    private String m_id;
+    private String[] m_rows;
+
+    //private boolean m_inverse = false;
+    //private SetOperation m_operation = SetOperation.ADD;
+
+    /*public static enum SetOperation {
+        ADD,
+        SUBTRACT;
+
+        private static Map<String, SetOperation> namesMap = new HashMap<String, SetOperation>(2);
+
+        static {
+            namesMap.put("add", SetOperation.ADD);
+            namesMap.put("subtract", SetOperation.SUBTRACT);
+        }
+
+        @JsonCreator
+        public static SetOperation forValue(final String value) throws JsonMappingException {
+            SetOperation method = namesMap.get(value.toLowerCase());
+            if (method == null) {
+                throw new JsonMappingException(null, value + " is not a valid set operation.");
+            }
+            return method;
+        }
+
+        @JsonValue
+        public String toValue() {
+            for (Entry<String, SetOperation> entry : namesMap.entrySet()) {
+                if (entry.getValue() == this) {
+                    return entry.getKey();
+                }
+            }
+            return null;
+        }
+    } */
+
     /**
-     * @return the columnName
+     * @return the id
      */
-    public String getColumnName() {
-        return m_columnName;
-    }
-    
-    /**
-     * @param columnName the columnName to set
-     */
-    public void setColumnName(String columnName) {
-        m_columnName = columnName;
+    public String getId() {
+        return m_id;
     }
 
+    /**
+     * @param id the id to set
+     */
+    public void setId(final String id) {
+        m_id = id;
+    }
+
+    /**
+     * @return the rows
+     */
+    public String[] getRows() {
+        return m_rows;
+    }
+
+    /**
+     * @param rows the rows to set
+     */
+    public void setRows(final String[] rows) {
+        m_rows = rows;
+    }
+
+    /**
+     * @return the inverse
+     */
+    /*public boolean getInverse() {
+        return m_inverse;
+    }*/
+
+    /**
+     * @param inverse the inverse to set
+     */
+    /*public void setInverse(final boolean inverse) {
+        m_inverse = inverse;
+    }*/
+
+    /**
+     * @return the operation
+     */
+    /*public SetOperation getOperation() {
+        return m_operation;
+    }*/
+
+    /**
+     * @param operation the operation to set
+     */
+    /*public void setOperation(final SetOperation operation) {
+        m_operation = operation;
+    }*/
 }

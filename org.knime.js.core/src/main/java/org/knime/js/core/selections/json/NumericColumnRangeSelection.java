@@ -46,7 +46,7 @@
  * History
  *   18 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
+package org.knime.js.core.selections.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
@@ -55,22 +55,67 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
+public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
 
-    private String[] m_values;
+    private double m_minimum = Double.NEGATIVE_INFINITY;
+    private double m_maximum = Double.POSITIVE_INFINITY;
+    private boolean m_minimumInclusive = true;
+    private boolean m_maximumInclusive = true;
 
     /**
-     * @return the values
+     * @return the minimum
      */
-    public String[] getValues() {
-        return m_values;
+    public double getMinimum() {
+        return m_minimum;
     }
 
     /**
-     * @param values the values to set
+     * @param minimum the minimum to set
      */
-    public void setValues(final String[] values) {
-        m_values = values;
+    public void setMinimum(final double minimum) {
+        m_minimum = minimum;
+    }
+
+    /**
+     * @return the maximum
+     */
+    public double getMaximum() {
+        return m_maximum;
+    }
+
+    /**
+     * @param maximum the maximum to set
+     */
+    public void setMaximum(final double maximum) {
+        m_maximum = maximum;
+    }
+
+    /**
+     * @return the minimumInclusive
+     */
+    public boolean getMinimumInclusive() {
+        return m_minimumInclusive;
+    }
+
+    /**
+     * @param minimumInclusive the minimumInclusive to set
+     */
+    public void setMinimumInclusive(final boolean minimumInclusive) {
+        m_minimumInclusive = minimumInclusive;
+    }
+
+    /**
+     * @return the maximumInclusive
+     */
+    public boolean getMaximumInclusive() {
+        return m_maximumInclusive;
+    }
+
+    /**
+     * @param maximumInclusive the maximumInclusive to set
+     */
+    public void setMaximumInclusive(final boolean maximumInclusive) {
+        m_maximumInclusive = maximumInclusive;
     }
 
 }

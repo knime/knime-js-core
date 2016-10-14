@@ -46,17 +46,44 @@
  * History
  *   18 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
+package org.knime.js.core.selections.json;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
-@JsonAutoDetect
-public class RowSelection extends SelectionElement {
-
-    /* implementation does not add to abstract class at the moment */
+@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type",
+    defaultImpl = NumericColumnRangeSelection.class
+    )
+@JsonSubTypes({
+    @Type(value = NumericColumnRangeSelection.class, name = "numeric"),
+    @Type(value = NominalColumnRangeSelection.class, name = "nominal")
+    })
+public abstract class AbstractColumnRangeSelection {
+    
+    private String m_columnName;
+    
+    /**
+     * @return the columnName
+     */
+    public String getColumnName() {
+        return m_columnName;
+    }
+    
+    /**
+     * @param columnName the columnName to set
+     */
+    public void setColumnName(String columnName) {
+        m_columnName = columnName;
+    }
 
 }

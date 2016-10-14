@@ -46,7 +46,7 @@
  * History
  *   18 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
+package org.knime.js.core.selections.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 

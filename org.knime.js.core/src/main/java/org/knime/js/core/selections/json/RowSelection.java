@@ -44,107 +44,19 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   17 Aug 2016 (albrecht): created
+ *   18 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+package org.knime.js.core.selections.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-public class JSONTableSelection {
+public class RowSelection extends SelectionElement {
 
-    private SelectionMethod m_selectionMethod = SelectionMethod.SELECTION;
-    private SelectionElement[] m_elements = null;
+    /* implementation does not add to abstract class at the moment */
 
-    //private boolean m_inverse = false;
-
-    public static enum SelectionMethod {
-        SELECTION,
-        FILTER;
-
-        private static Map<String, SelectionMethod> namesMap = new HashMap<String, SelectionMethod>(2);
-
-        static {
-            namesMap.put("selection", SelectionMethod.SELECTION);
-            namesMap.put("filter", SelectionMethod.FILTER);
-        }
-
-        @JsonCreator
-        public static SelectionMethod forValue(final String value) throws JsonMappingException {
-            SelectionMethod method = namesMap.get(value.toLowerCase());
-            if (method == null) {
-                throw new JsonMappingException(null, value + " is not a valid selection method.");
-            }
-            return method;
-        }
-
-        @JsonValue
-        public String toValue() {
-            for (Entry<String, SelectionMethod> entry : namesMap.entrySet()) {
-                if (entry.getValue() == this) {
-                    return entry.getKey();
-                }
-            }
-            return null;
-        }
-    }
-
-    /**
-     * @return the selectionMethod
-     */
-    public SelectionMethod getSelectionMethod() {
-        return m_selectionMethod;
-    }
-
-    /**
-     * @param selectionMethod the selectionMethod to set
-     */
-    public void setSelectionMethod(final SelectionMethod selectionMethod) {
-        m_selectionMethod = selectionMethod;
-    }
-
-    /**
-     * @return the inverseSelection
-     */
-    /*public boolean getInverse() {
-        return m_inverse;
-    }*/
-
-    /**
-     * @param inverse the inverseSelection to set
-     */
-    /*public void setInverse(final boolean inverse) {
-        m_inverse = inverse;
-    }*/
-
-    /**
-     * @return the elements
-     */
-    public SelectionElement[] getElements() {
-        return m_elements;
-    }
-
-    /**
-     * @param elements the elements to set
-     */
-    public void setElements(final SelectionElement[] elements) {
-        m_elements = elements;
-    }
-
-    @JsonIgnore
-    public static JSONTableSelection getEmptySelection() {
-        return new JSONTableSelection();
-    }
 }

@@ -44,78 +44,107 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   18 Aug 2016 (albrecht): created
+ *   17 Aug 2016 (albrecht): created
  */
-package org.knime.js.core.selections;
+package org.knime.js.core.selections.json;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
+public class JSONTableSelection {
 
-    private double m_minimum = Double.NEGATIVE_INFINITY;
-    private double m_maximum = Double.POSITIVE_INFINITY;
-    private boolean m_minimumInclusive = true;
-    private boolean m_maximumInclusive = true;
+    private SelectionMethod m_selectionMethod = SelectionMethod.SELECTION;
+    private SelectionElement[] m_elements = null;
 
-    /**
-     * @return the minimum
-     */
-    public double getMinimum() {
-        return m_minimum;
+    //private boolean m_inverse = false;
+
+    public static enum SelectionMethod {
+        SELECTION,
+        FILTER;
+
+        private static Map<String, SelectionMethod> namesMap = new HashMap<String, SelectionMethod>(2);
+
+        static {
+            namesMap.put("selection", SelectionMethod.SELECTION);
+            namesMap.put("filter", SelectionMethod.FILTER);
+        }
+
+        @JsonCreator
+        public static SelectionMethod forValue(final String value) throws JsonMappingException {
+            SelectionMethod method = namesMap.get(value.toLowerCase());
+            if (method == null) {
+                throw new JsonMappingException(null, value + " is not a valid selection method.");
+            }
+            return method;
+        }
+
+        @JsonValue
+        public String toValue() {
+            for (Entry<String, SelectionMethod> entry : namesMap.entrySet()) {
+                if (entry.getValue() == this) {
+                    return entry.getKey();
+                }
+            }
+            return null;
+        }
     }
 
     /**
-     * @param minimum the minimum to set
+     * @return the selectionMethod
      */
-    public void setMinimum(final double minimum) {
-        m_minimum = minimum;
+    public SelectionMethod getSelectionMethod() {
+        return m_selectionMethod;
     }
 
     /**
-     * @return the maximum
+     * @param selectionMethod the selectionMethod to set
      */
-    public double getMaximum() {
-        return m_maximum;
+    public void setSelectionMethod(final SelectionMethod selectionMethod) {
+        m_selectionMethod = selectionMethod;
     }
 
     /**
-     * @param maximum the maximum to set
+     * @return the inverseSelection
      */
-    public void setMaximum(final double maximum) {
-        m_maximum = maximum;
+    /*public boolean getInverse() {
+        return m_inverse;
+    }*/
+
+    /**
+     * @param inverse the inverseSelection to set
+     */
+    /*public void setInverse(final boolean inverse) {
+        m_inverse = inverse;
+    }*/
+
+    /**
+     * @return the elements
+     */
+    public SelectionElement[] getElements() {
+        return m_elements;
     }
 
     /**
-     * @return the minimumInclusive
+     * @param elements the elements to set
      */
-    public boolean getMinimumInclusive() {
-        return m_minimumInclusive;
+    public void setElements(final SelectionElement[] elements) {
+        m_elements = elements;
     }
 
-    /**
-     * @param minimumInclusive the minimumInclusive to set
-     */
-    public void setMinimumInclusive(final boolean minimumInclusive) {
-        m_minimumInclusive = minimumInclusive;
+    @JsonIgnore
+    public static JSONTableSelection getEmptySelection() {
+        return new JSONTableSelection();
     }
-
-    /**
-     * @return the maximumInclusive
-     */
-    public boolean getMaximumInclusive() {
-        return m_maximumInclusive;
-    }
-
-    /**
-     * @param maximumInclusive the maximumInclusive to set
-     */
-    public void setMaximumInclusive(final boolean maximumInclusive) {
-        m_maximumInclusive = maximumInclusive;
-    }
-
 }
