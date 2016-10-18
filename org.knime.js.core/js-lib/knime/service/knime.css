@@ -17,10 +17,17 @@ html, body {
 	left: 0;
 	z-index: 1000;
 	font-family: sans-serif;
+    pointer-events: none;
 }
 
 #knime-service-header * {
 	box-sizing: border-box;
+}
+
+#knime-service-header .service-button,
+#knime-service-header #knime-service-menu,
+#knime-service-header #knime-service-overlay {
+	pointer-events: auto;
 }
 
 #knime-service-header .service-button {
