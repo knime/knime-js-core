@@ -256,6 +256,11 @@ public class SliderPipsSettings implements Cloneable {
                 }
             }
         }
+        if (m_mode == PipMode.POSITIONS || m_mode == PipMode.COUNT || m_mode == PipMode.VALUES) {
+            if (m_values == null || m_values.length < 1) {
+                throw new InvalidSettingsException("At least one value needs to be defined for modes 'positions', 'count' or 'values'.");
+            }
+        }
         if (m_stepped != null && m_stepped == true) {
             if (!(m_mode == PipMode.POSITIONS || m_mode == PipMode.COUNT || m_mode == PipMode.VALUES)) {
                 throw new InvalidSettingsException("Stepped option is only applicable for the modes 'positions', 'count' or 'values', but mode is '" + m_mode.toValue() + "'.");
