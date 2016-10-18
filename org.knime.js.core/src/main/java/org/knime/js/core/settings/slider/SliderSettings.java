@@ -498,16 +498,18 @@ public class SliderSettings implements Cloneable {
         if (m_connect != null && m_connect.length != (m_start.length + 1)) {
             throw new InvalidSettingsException("The connect array length needs to be start array length + 1");
         }
-        if (m_tooltips != null && m_tooltips.length != m_start.length) {
-            throw new InvalidSettingsException("Tooltips array length needs to be equal to start array length");
-        }
-        for (Object tip : m_tooltips) {
-            if (tip instanceof NumberFormatSettings) {
-                if(deepValidate) {
-                    ((NumberFormatSettings)tip).validateSettings();
+        if (m_tooltips != null) {
+            if (m_tooltips.length != m_start.length) {
+                throw new InvalidSettingsException("Tooltips array length needs to be equal to start array length");
+            }
+            for (Object tip : m_tooltips) {
+                if (tip instanceof NumberFormatSettings) {
+                    if(deepValidate) {
+                        ((NumberFormatSettings)tip).validateSettings();
+                    }
+                } else if (!(tip instanceof Boolean)) {
+                    throw new InvalidSettingsException("Tooltip needs to be either Boolean or NumberFormatSettings object.");
                 }
-            } else if (!(tip instanceof Boolean)) {
-                throw new InvalidSettingsException("Tooltip needs to be either Boolean or NumberFormatSettings object.");
             }
         }
         if (deepValidate && m_pips != null) {
@@ -608,19 +610,24 @@ public class SliderSettings implements Cloneable {
         m_direction = directionTemp == null ? null : Direction.forValue(directionTemp);
         NodeSettingsRO tipsSettings = settings.getNodeSettings(CFG_TOOLTIPS);
         int numTips = tipsSettings.getInt(NUM_SETTINGS);
-        m_tooltips = new Object[numTips];
-        for (int t = 0; t < numTips; t++) {
-            String type = tipsSettings.getString("type_" + t);
-            Object value = null;
-            if ("boolean".equals(type)) {
-                value = tipsSettings.getBoolean("value_" + t);
-            } else if ("format".equals(type)) {
-                NodeSettingsRO formatSettings = tipsSettings.getNodeSettings("value_" + t);
-                value = new NumberFormatSettings();
-                ((NumberFormatSettings)value).loadFromNodeSettings(formatSettings);
+        if (numTips > 0) {
+            m_tooltips = new Object[numTips];
+            for (int t = 0; t < numTips; t++) {
+                String type = tipsSettings.getString("type_" + t);
+                Object value = null;
+                if ("boolean".equals(type)) {
+                    value = tipsSettings.getBoolean("value_" + t);
+                } else if ("format".equals(type)) {
+                    NodeSettingsRO formatSettings = tipsSettings.getNodeSettings("value_" + t);
+                    value = new NumberFormatSettings();
+                    ((NumberFormatSettings)value).loadFromNodeSettings(formatSettings);
+                }
+                m_tooltips[t] = value;
             }
-            m_tooltips[t] = value;
+        } else {
+            m_tooltips = null;
         }
+
         boolean[] animateTemp = settings.getBooleanArray(CFG_ANIMATE);
         m_animate = animateTemp == null ? null : animateTemp[0];
         int[] durationTemp = settings.getIntArray(CFG_ANIMATION_DURATION);
@@ -674,18 +681,22 @@ public class SliderSettings implements Cloneable {
         try {
             NodeSettingsRO tipsSettings = settings.getNodeSettings(CFG_TOOLTIPS);
             int numTips = tipsSettings.getInt(NUM_SETTINGS);
-            m_tooltips = new Object[numTips];
-            for (int t = 0; t < numTips; t++) {
-                String type = tipsSettings.getString("type_" + t);
-                Object value = null;
-                if ("boolean".equals(type)) {
-                    value = tipsSettings.getBoolean("value_" + t);
-                } else if ("format".equals(type)) {
-                    NodeSettingsRO formatSettings = tipsSettings.getNodeSettings("value_" + t);
-                    value = new NumberFormatSettings();
-                    ((NumberFormatSettings)value).loadFromNodeSettingsInDialog(formatSettings);
+            if (numTips > 0) {
+                m_tooltips = new Object[numTips];
+                for (int t = 0; t < numTips; t++) {
+                    String type = tipsSettings.getString("type_" + t);
+                    Object value = null;
+                    if ("boolean".equals(type)) {
+                        value = tipsSettings.getBoolean("value_" + t);
+                    } else if ("format".equals(type)) {
+                        NodeSettingsRO formatSettings = tipsSettings.getNodeSettings("value_" + t);
+                        value = new NumberFormatSettings();
+                        ((NumberFormatSettings)value).loadFromNodeSettingsInDialog(formatSettings);
+                    }
+                    m_tooltips[t] = value;
                 }
-                m_tooltips[t] = value;
+            } else {
+                m_tooltips = null;
             }
         } catch (InvalidSettingsException e) {
             m_tooltips = null;
