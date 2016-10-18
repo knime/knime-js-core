@@ -50,10 +50,7 @@ package org.knime.js.core.settings.numberFormat;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
-import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -61,12 +58,13 @@ import javax.swing.SpinnerNumberModel;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NotConfigurableException;
+import org.knime.js.core.settings.DialogUtil;
 
 /**
  * Utility class to create a Swing panel for number format settings.
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
-public class NumberFormatSettingsPanel {
+public class NumberFormatNodeDialogUI {
 
     private static final int SINGLE_CHAR_WIDTH = 3;
     private static final int MULTIPLE_CHAR_WIDTH = 20;
@@ -83,7 +81,7 @@ public class NumberFormatSettingsPanel {
     //TODO add functions (encoder, decoder, edit, undo)
 
     /** Creates a new utility object, initializes fields */
-    public NumberFormatSettingsPanel() {
+    public NumberFormatNodeDialogUI() {
         m_decimalSpinner = new JSpinner(new SpinnerNumberModel(2, 0, 7, 1));
         m_markField = new JTextField(SINGLE_CHAR_WIDTH);
         m_thousandField = new JTextField(SINGLE_CHAR_WIDTH);
@@ -91,6 +89,10 @@ public class NumberFormatSettingsPanel {
         m_postfixField = new JTextField(MULTIPLE_CHAR_WIDTH);
         m_negativeField = new JTextField(MULTIPLE_CHAR_WIDTH);
         m_negativeBeforeField = new JTextField(MULTIPLE_CHAR_WIDTH);
+        try {
+            //load defaults
+            loadSettingsFrom(null);
+        } catch (NotConfigurableException e) { /* do nothing */ }
     }
 
     /**
@@ -102,13 +104,13 @@ public class NumberFormatSettingsPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        addPairToPanel("Decimal digits", m_decimalSpinner, panel, gbc);
-        addPairToPanel("Decimal separator", m_markField, panel, gbc);
-        addPairToPanel("Thousands separator", m_thousandField, panel, gbc);
-        addPairToPanel("Custom prefix", m_prefixField, panel, gbc);
-        addPairToPanel("Custom postfix", m_postfixField, panel, gbc);
-        addPairToPanel("Negative sign", m_negativeField, panel, gbc);
-        addPairToPanel("Negative before string", m_negativeBeforeField, panel, gbc);
+        DialogUtil.addPairToPanel("Decimal digits", m_decimalSpinner, panel, gbc);
+        DialogUtil.addPairToPanel("Decimal separator", m_markField, panel, gbc);
+        DialogUtil.addPairToPanel("Thousands separator", m_thousandField, panel, gbc);
+        DialogUtil.addPairToPanel("Custom prefix", m_prefixField, panel, gbc);
+        DialogUtil.addPairToPanel("Custom postfix", m_postfixField, panel, gbc);
+        DialogUtil.addPairToPanel("Negative sign", m_negativeField, panel, gbc);
+        DialogUtil.addPairToPanel("Negative before string", m_negativeBeforeField, panel, gbc);
         return panel;
     }
 
@@ -171,32 +173,6 @@ public class NumberFormatSettingsPanel {
         settings.setNegativeBefore(m_negativeBeforeField.getText());
         settings.validateSettings();
         return settings;
-    }
-
-    /**
-     * Adds a panel sub-component to the dialog.
-     *
-     * @param label The label (left hand column)
-     * @param c The component (right hand column)
-     * @param panelWithGBLayout Panel to add
-     * @param gbc constraints.
-     */
-    private final void addPairToPanel(final String label, final JComponent c, final JPanel panelWithGBLayout, final GridBagConstraints gbc) {
-        int fill = gbc.fill;
-        Insets insets = gbc.insets;
-
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.gridwidth = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0;
-        panelWithGBLayout.add(new JLabel(label), gbc);
-
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.fill = fill;
-        gbc.insets = insets;
-        gbc.weightx = 1;
-        panelWithGBLayout.add(c, gbc);
-        gbc.weightx = 0;
     }
 
 }
