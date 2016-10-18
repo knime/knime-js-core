@@ -213,10 +213,12 @@ function twinlist() {
 	excludes.css('float', 'left');
 	excludes.prop('multiple', true);
 	excludes.css('border-color', 'red');
+	excludes.attr("aria-label", "Excludes");
 	includes = $('<select>');
 	includes.css('float', 'left');
 	includes.prop('multiple', true);
 	includes.css('border-color', 'green');
+	includes.attr("aria-label", "Includes");
 	var excludesSpan = $('<span>');
 	excludesSpan.css('float', 'left');
 	var includesSpan = $('<span>');
