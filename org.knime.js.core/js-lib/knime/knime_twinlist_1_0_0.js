@@ -69,15 +69,19 @@ function twinlist() {
 		}
 	}
 
-	setAvailableValues = function(newValues) {
+	setAvailableValues = function(newValues, sizeLimit) {
 		values = newValues;
 		refreshLists();
-		refreshSize();
+		refreshSize(sizeLimit);
 	};
 
-	refreshSize = function() {
-		excludes.attr('size', values.length);
-		includes.attr('size', values.length);
+	refreshSize = function(sizeLimit) {
+		if (sizeLimit === undefined) {
+			sizeLimit = Number.MAX_VALUE;
+		}
+		var size = values.length < sizeLimit ? values.length : sizeLimit;
+		excludes.attr('size', size);
+		includes.attr('size', size);
 		// All buttons get the same width
 		var widthMax = Math.max(add.width(), addAll.width(), remove.width(),
 				removeAll.width());
