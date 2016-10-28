@@ -48,7 +48,18 @@
  */
 package org.knime.js.core.selections.json;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import javax.naming.OperationNotSupportedException;
+
+import org.knime.core.data.DataCell;
+import org.knime.core.data.property.filter.FilterModel;
+import org.knime.core.data.property.filter.FilterModelNominal;
+import org.knime.core.data.property.filter.FilterModelRange;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -136,6 +147,66 @@ public abstract class SelectionElement {
     public void setRows(final String[] rows) {
         m_rows = rows;
     }
+
+    /**
+     * Creates a {@link SelectionElement} instance from a {@link FilterModel}
+     * @param columnName the name of the column the {@link FilterModel} is applied to
+     * @param model the model to create element from, may be null
+     * @return a new {@link SelectionElement} with all settings representing the given {@link FilterModel}. Returns null when the model is null.
+     * @throws IllegalArgumentException If concrete filter model class is not supported by this method
+     */
+    @JsonIgnore
+    public static final SelectionElement createFromFilterModel(final String columnName, final FilterModel model) throws IllegalArgumentException {
+        if (model == null) {
+            return null;
+        }
+        if (!(model instanceof FilterModelNominal || model instanceof FilterModelRange)) {
+            throw new IllegalArgumentException("Fitler model class not supported.");
+        }
+        SelectionElement element = null;
+        if (model instanceof FilterModelNominal) {
+            element = new RangeSelection();
+            NominalColumnRangeSelection nominalSelection = new NominalColumnRangeSelection();
+            Collection<DataCell> dataCells = ((FilterModelNominal)model).getValues();
+            String[] values = new String[dataCells.size()];
+            Iterator<DataCell> it = dataCells.iterator();
+            int i = 0;
+            while (it.hasNext()) {
+                values[i] = it.next().toString();
+                i++;
+            }
+            nominalSelection.setValues(values);
+            nominalSelection.setColumnName(columnName);
+            ((RangeSelection)element).setColumns(new AbstractColumnRangeSelection[]{nominalSelection});
+        } else if (model instanceof FilterModelRange) {
+            FilterModelRange rModel = (FilterModelRange)model;
+            element = new RangeSelection();
+            NumericColumnRangeSelection numericSelection = new NumericColumnRangeSelection();
+            numericSelection.setColumnName(columnName);
+            rModel.getMinimum().ifPresent(min -> {
+                numericSelection.setMinimum(min);
+                numericSelection.setMinimumInclusive(rModel.isMinimumInclusive());
+            });
+            rModel.getMaximum().ifPresent(max -> {
+                numericSelection.setMaximum(max);
+                numericSelection.setMinimumInclusive(rModel.isMaximumInclusive());
+            });
+            ((RangeSelection)element).setColumns(new AbstractColumnRangeSelection[]{numericSelection});
+        } else {
+            return null;
+        }
+        element.setId(model.getFilterUUID().toString());
+
+        return element;
+    }
+
+    /**
+     * Creates a new {@link FilterModel} instance from this {@link SelectionElement}
+     * @return a new filter model
+     * @throws OperationNotSupportedException if the selection element does not support filter model creation.
+     */
+    @JsonIgnore
+    public abstract FilterModel createFilterModel() throws OperationNotSupportedException;
 
     /**
      * @return the inverse
