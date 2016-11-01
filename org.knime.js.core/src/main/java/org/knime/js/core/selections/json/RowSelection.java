@@ -48,6 +48,10 @@
  */
 package org.knime.js.core.selections.json;
 
+import javax.naming.OperationNotSupportedException;
+
+import org.knime.core.data.property.filter.FilterModel;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -58,5 +62,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 public class RowSelection extends SelectionElement {
 
     /* implementation does not add to abstract class at the moment */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterModel createFilterModel() throws OperationNotSupportedException {
+        throw new OperationNotSupportedException("Row filters are currently not supported.");
+    }
 
 }

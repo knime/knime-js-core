@@ -48,6 +48,15 @@
  */
 package org.knime.js.core.selections.json;
 
+import java.util.Collection;
+import java.util.HashSet;
+
+import javax.naming.OperationNotSupportedException;
+
+import org.knime.core.data.DataCell;
+import org.knime.core.data.def.StringCell;
+import org.knime.core.data.property.filter.FilterModel;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -71,6 +80,37 @@ public class RangeSelection extends SelectionElement {
      */
     public void setColumns(final AbstractColumnRangeSelection[] columns) {
         m_columns = columns;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FilterModel createFilterModel() throws OperationNotSupportedException {
+        if (m_columns == null || m_columns.length == 0 || m_columns[0] == null) {
+            throw new OperationNotSupportedException("Element does not contain any filter definitions.");
+        }
+        if (m_columns.length > 1) {
+            throw new OperationNotSupportedException("Element contains more than one filter definition.");
+        }
+        FilterModel model = null;
+        if (m_columns[0] instanceof NumericColumnRangeSelection) {
+            NumericColumnRangeSelection fDef = (NumericColumnRangeSelection)m_columns[0];
+            model = FilterModel.newRangeModel(fDef.getMinimum(), fDef.getMaximum(), fDef.getMinimumInclusive(), fDef.getMaximumInclusive());
+        } else  if (m_columns[0] instanceof NominalColumnRangeSelection) {
+            NominalColumnRangeSelection fDef = (NominalColumnRangeSelection)m_columns[0];
+            Collection<DataCell> filterValues = new HashSet<DataCell>();
+            String[] values = fDef.getValues();
+            if (values != null) {
+                for (String value : values) {
+                    filterValues.add(new StringCell(value));
+                }
+            }
+            FilterModel.newNominalModel(filterValues);
+        } else {
+            throw new OperationNotSupportedException(m_columns[0].getClass().getSimpleName() + " is not supported.");
+        }
+        return model;
     }
 
 }
