@@ -396,6 +396,32 @@ knimeService = function() {
 		return textField;
 	}
 	
+	service.createMenuNumberField = function(id, initialValue, minimum, maximum, step, callback) {
+		var numberField = document.createElement('input');
+		numberField.setAttribute('type', 'number');
+		setFieldDefaults(numberField, id, '75px');
+		if (typeof minimum == 'number') {
+			numberField.setAttribute('min', minimum);
+		}
+		if (typeof maximum == 'number') {
+			numberField.setAttribute('max', maximum);
+		}
+		if (typeof step == 'number') {
+			numberField.setAttribute('step', step);
+		}
+		if (callback) {
+			if (typeof numberField.oninput !== 'undefined') {
+				numberField.addEventListener('input', callback);
+			} else {
+				numberField.addEventListener('change', callback);
+			}
+		}
+		if (typeof value == 'number') {
+			numberField.setAttribute('value', value);
+		}
+		return numberField;
+	}
+	
 	service.createMenuCheckbox = function(id, initialState, callback, value) {
 		var checkbox = document.createElement('input');
 		checkbox.setAttribute('id', id);
