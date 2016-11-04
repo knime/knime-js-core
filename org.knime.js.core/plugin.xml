@@ -1146,25 +1146,25 @@
                type="CSS">
          </importResource>
          <webDependency
-               webResourceBundleID="fontAwesome_4.6.3">
+               webResourceBundleID="fontAwesome_4.7.0">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
             name="Font Awesome"
             usesDefine="false"
-            version="4.6.3"
-            webResourceBundleID="fontAwesome_4.6.3">
+            version="4.7.0"
+            webResourceBundleID="fontAwesome_4.7.0">
          <webResource
-               relativePathSource="js-lib/font-awesome/4_6_3/fonts/"
-               relativePathTarget="js-lib/font-awesome/4_6_3/fonts/">
+               relativePathSource="js-lib/font-awesome/4_7_0/fonts/"
+               relativePathTarget="js-lib/font-awesome/4_7_0/fonts/">
          </webResource>
          <webResource
-               relativePathSource="js-lib/font-awesome/4_6_3/css/font-awesome.min.css"
-               relativePathTarget="js-lib/font-awesome/4_6_3/css/font-awesome.min.css">
+               relativePathSource="js-lib/font-awesome/4_7_0/css/font-awesome.min.css"
+               relativePathTarget="js-lib/font-awesome/4_7_0/css/font-awesome.min.css">
          </webResource>
          <importResource
-               relativePath="js-lib/font-awesome/4_6_3/css/font-awesome.min.css"
+               relativePath="js-lib/font-awesome/4_7_0/css/font-awesome.min.css"
                type="CSS">
          </importResource>
       </webResourceBundle>
