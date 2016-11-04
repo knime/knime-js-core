@@ -416,8 +416,8 @@ knimeService = function() {
 				numberField.addEventListener('change', callback);
 			}
 		}
-		if (typeof value == 'number') {
-			numberField.setAttribute('value', value);
+		if (typeof initialValue == 'number') {
+			numberField.setAttribute('value', initialValue);
 		}
 		return numberField;
 	}
