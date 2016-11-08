@@ -53,11 +53,17 @@ import java.util.HashSet;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.property.filter.FilterModel;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -65,6 +71,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 @JsonAutoDetect
 public class RangeSelection extends SelectionElement {
+
+    private static final String CFG_NUM_COLUMNS = "numColumns";
+    private static final String CFG_COL = "col_";
+    private static final String CFG_TYPE = "type_";
+    private static final String CFG_NOMINAL = "nominal";
+    private static final String CFG_NUMERIC = "numeric";
 
     private AbstractColumnRangeSelection[] m_columns;
 
@@ -86,6 +98,7 @@ public class RangeSelection extends SelectionElement {
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public FilterModel createFilterModel() throws OperationNotSupportedException {
         if (m_columns == null || m_columns.length == 0 || m_columns[0] == null) {
             throw new OperationNotSupportedException("Element does not contain any filter definitions.");
@@ -111,6 +124,118 @@ public class RangeSelection extends SelectionElement {
             throw new OperationNotSupportedException(m_columns[0].getClass().getSimpleName() + " is not supported.");
         }
         return model;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
+        int numColumns = m_columns == null ? 0 : m_columns.length;
+        settings.addInt(CFG_NUM_COLUMNS, numColumns);
+        for (int i = 0; i < numColumns; i++) {
+            String type = null;
+            if (m_columns[i] instanceof NominalColumnRangeSelection) {
+                type = CFG_NOMINAL;
+            } else  if (m_columns[i] instanceof NumericColumnRangeSelection) {
+                type = CFG_NUMERIC;
+            }
+            settings.addString(CFG_TYPE + i, type);
+            NodeSettingsWO colSettings = settings.addNodeSettings(CFG_COL + i);
+            m_columns[i].saveToNodeSettings(colSettings);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
+        m_columns = null;
+        int numColumns = settings.getInt(CFG_NUM_COLUMNS);
+        if (numColumns > 0) {
+            m_columns = new AbstractColumnRangeSelection[numColumns];
+            for (int i = 0; i < numColumns; i++) {
+                String type = settings.getString(CFG_TYPE + i);
+                AbstractColumnRangeSelection selection = null;
+                if (CFG_NOMINAL.equals(type)) {
+                    selection = new NominalColumnRangeSelection();
+                } else if (CFG_NUMERIC.equals(type)) {
+                    selection = new NumericColumnRangeSelection();
+                }
+                if (selection != null) {
+                    selection.loadFromNodeSettings(settings.getNodeSettings(CFG_COL + i));
+                }
+                m_columns[i] = selection;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        super.loadFromNodeSettingsInDialog(settings);
+        m_columns = null;
+        int numColumns = settings.getInt(CFG_NUM_COLUMNS, 0);
+        if (numColumns > 0) {
+            m_columns = new AbstractColumnRangeSelection[numColumns];
+            for (int i = 0; i < numColumns; i++) {
+                String type = settings.getString(CFG_TYPE + i, null);
+                AbstractColumnRangeSelection selection = null;
+                if (CFG_NOMINAL.equals(type)) {
+                    selection = new NominalColumnRangeSelection();
+                } else if (CFG_NUMERIC.equals(type)) {
+                    selection = new NumericColumnRangeSelection();
+                }
+                if (selection != null) {
+                    try {
+                        selection.loadFromNodeSettingsInDialog(settings.getNodeSettings(CFG_COL + i));
+                    } catch (InvalidSettingsException e) {
+                        selection = null;
+                    }
+                }
+                m_columns[i] = selection;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        RangeSelection other = (RangeSelection)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_columns, other.m_columns)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_columns)
+                .toHashCode();
     }
 
 }

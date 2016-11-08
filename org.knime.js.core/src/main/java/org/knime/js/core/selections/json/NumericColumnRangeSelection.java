@@ -48,7 +48,14 @@
  */
 package org.knime.js.core.selections.json;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -57,10 +64,21 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect
 public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
 
-    private double m_minimum = Double.NEGATIVE_INFINITY;
-    private double m_maximum = Double.POSITIVE_INFINITY;
-    private boolean m_minimumInclusive = true;
-    private boolean m_maximumInclusive = true;
+    private static final String CFG_MINIMUM = "minimum";
+    private static final double DEFAULT_MINIMUM = Double.NEGATIVE_INFINITY;
+    private double m_minimum = DEFAULT_MINIMUM;
+
+    private static final String CFG_MAXIMUM = "maximum";
+    private static final double DEFAULT_MAXIMUM = Double.POSITIVE_INFINITY;
+    private double m_maximum = DEFAULT_MAXIMUM;
+
+    private static final String CFG_MINIMUM_INCLUSIVE = "minimumInclusive";
+    private static final boolean DEFAULT_MINIMUM_INCLUSIVE = true;
+    private boolean m_minimumInclusive = DEFAULT_MINIMUM_INCLUSIVE;
+
+    private static final String CFG_MAXIMUM_INCLUSIVE = "maximumInclusive";
+    private static final boolean DEFAULT_MAXIMUM_INCLUSIVE = true;
+    private boolean m_maximumInclusive = DEFAULT_MAXIMUM_INCLUSIVE;
 
     /**
      * @return the minimum
@@ -116,6 +134,80 @@ public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
      */
     public void setMaximumInclusive(final boolean maximumInclusive) {
         m_maximumInclusive = maximumInclusive;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addDouble(CFG_MINIMUM, m_minimum);
+        settings.addDouble(CFG_MAXIMUM, m_maximum);
+        settings.addBoolean(CFG_MINIMUM_INCLUSIVE, m_minimumInclusive);
+        settings.addBoolean(CFG_MAXIMUM_INCLUSIVE, m_maximumInclusive);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_minimum = settings.getDouble(CFG_MINIMUM);
+        m_maximum = settings.getDouble(CFG_MAXIMUM);
+        m_minimumInclusive = settings.getBoolean(CFG_MINIMUM_INCLUSIVE);
+        m_maximumInclusive = settings.getBoolean(CFG_MAXIMUM_INCLUSIVE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_minimum = settings.getDouble(CFG_MINIMUM, DEFAULT_MINIMUM);
+        m_maximum = settings.getDouble(CFG_MAXIMUM, DEFAULT_MAXIMUM);
+        m_minimumInclusive = settings.getBoolean(CFG_MINIMUM_INCLUSIVE, DEFAULT_MINIMUM_INCLUSIVE);
+        m_maximumInclusive = settings.getBoolean(CFG_MAXIMUM_INCLUSIVE, DEFAULT_MAXIMUM_INCLUSIVE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        NumericColumnRangeSelection other = (NumericColumnRangeSelection)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_minimum, other.m_minimum)
+                .append(m_maximum, other.m_maximum)
+                .append(m_minimumInclusive, other.m_minimumInclusive)
+                .append(m_maximumInclusive, other.m_maximumInclusive)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_minimum)
+                .append(m_maximum)
+                .append(m_minimumInclusive)
+                .append(m_maximumInclusive)
+                .toHashCode();
     }
 
 }

@@ -53,10 +53,15 @@ import java.util.Iterator;
 
 import javax.naming.OperationNotSupportedException;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.property.filter.FilterModel;
 import org.knime.core.data.property.filter.FilterModelNominal;
 import org.knime.core.data.property.filter.FilterModelRange;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -83,7 +88,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     })
 public abstract class SelectionElement {
 
+    private static final String CFG_ID = "id";
     private String m_id;
+
+    private static final String CFG_ROWS = "rows";
     private String[] m_rows;
 
     //private boolean m_inverse = false;
@@ -235,4 +243,67 @@ public abstract class SelectionElement {
     /*public void setOperation(final SetOperation operation) {
         m_operation = operation;
     }*/
+
+    /**
+     * Saves the current state to the given settings object.
+     * @param settings the settings to save to
+     */
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(CFG_ID, m_id);
+        settings.addStringArray(CFG_ROWS, m_rows);
+    }
+
+    /**
+     * Loads the configuration from the given settings object.
+     * @param settings the settings to load from
+     * @throws InvalidSettingsException on load error
+     */
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_id = settings.getString(CFG_ID);
+        m_rows = settings.getStringArray(CFG_ROWS);
+    }
+
+    /**
+     * Loads the configuration from the given settings object for a dialog.
+     * @param settings the settings to load from
+     */
+    @JsonIgnore
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_id = settings.getString(CFG_ID, null);
+        m_rows = settings.getStringArray(CFG_ROWS, (String[])null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        SelectionElement other = (SelectionElement)obj;
+        return new EqualsBuilder()
+                .append(m_id, other.m_id)
+                .append(m_rows, other.m_rows)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_id)
+                .append(m_rows)
+                .toHashCode();
+    }
 }

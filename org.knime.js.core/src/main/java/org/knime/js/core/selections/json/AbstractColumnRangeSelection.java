@@ -48,6 +48,13 @@
  */
 package org.knime.js.core.selections.json;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
@@ -69,21 +76,73 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @Type(value = NominalColumnRangeSelection.class, name = "nominal")
     })
 public abstract class AbstractColumnRangeSelection {
-    
+
     private String m_columnName;
-    
+
     /**
      * @return the columnName
      */
     public String getColumnName() {
         return m_columnName;
     }
-    
+
     /**
      * @param columnName the columnName to set
      */
-    public void setColumnName(String columnName) {
+    public void setColumnName(final String columnName) {
         m_columnName = columnName;
+    }
+
+    /**
+     * Saves the current state to the given settings object.
+     * @param settings the settings to save to
+     */
+    @JsonIgnore
+    public abstract void saveToNodeSettings(NodeSettingsWO settings);
+
+    /**
+     * Loads the configuration from the given settings object.
+     * @param settings the settings to load from
+     * @throws InvalidSettingsException on load error
+     */
+    @JsonIgnore
+    public abstract void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException;
+
+    /**
+     * Loads the configuration from the given settings object for a dialog.
+     * @param settings the settings to load from
+     */
+    @JsonIgnore
+    public abstract void loadFromNodeSettingsInDialog(NodeSettingsRO settings);
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        AbstractColumnRangeSelection other = (AbstractColumnRangeSelection)obj;
+        return new EqualsBuilder()
+                .append(m_columnName, other.m_columnName)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_columnName)
+                .toHashCode();
     }
 
 }

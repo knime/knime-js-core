@@ -48,7 +48,14 @@
  */
 package org.knime.js.core.selections.json;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  *
@@ -57,6 +64,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect
 public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
 
+    private static final String CFG_VALUES = "values";
     private String[] m_values;
 
     /**
@@ -71,6 +79,65 @@ public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
      */
     public void setValues(final String[] values) {
         m_values = values;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addStringArray(CFG_VALUES, m_values);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_values = settings.getStringArray(CFG_VALUES);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @JsonIgnore
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_values = settings.getStringArray(CFG_VALUES, (String[])null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        NominalColumnRangeSelection other = (NominalColumnRangeSelection)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_values, other.m_values)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_values)
+                .toHashCode();
     }
 
 }

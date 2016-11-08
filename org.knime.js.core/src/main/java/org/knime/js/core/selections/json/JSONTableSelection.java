@@ -52,6 +52,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -65,7 +71,15 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @JsonAutoDetect
 public class JSONTableSelection {
 
-    private SelectionMethod m_selectionMethod = SelectionMethod.SELECTION;
+    private static final String CFG_SELECTION_METHOD = "method";
+    private static final SelectionMethod DEFAULT_SELECTION_METHOD = SelectionMethod.SELECTION;
+    private SelectionMethod m_selectionMethod = DEFAULT_SELECTION_METHOD;
+
+    private static final String NUM_SELECTION_ELEMENTS = "numElements";
+    private static final String CFG_SELECTION_ELEMENT = "element_";
+    private static final String CFG_TYPE = "type_";
+    private static final String CFG_ROW = "row";
+    private static final String CFG_RANGE = "range";
     private SelectionElement[] m_elements = null;
 
     //private boolean m_inverse = false;
@@ -146,5 +160,130 @@ public class JSONTableSelection {
     @JsonIgnore
     public static JSONTableSelection getEmptySelection() {
         return new JSONTableSelection();
+    }
+
+    /**
+     * Saves the current state to the given settings object.
+     * @param settings the settings to save to
+     */
+    @JsonIgnore
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(CFG_SELECTION_METHOD, m_selectionMethod.toValue());
+        int numElements = m_elements == null ? 0 : m_elements.length;
+        settings.addInt(NUM_SELECTION_ELEMENTS, numElements);
+        for (int i = 0; i < numElements; i++) {
+            String type = null;
+            if (m_elements[i] instanceof RowSelection) {
+                type = CFG_ROW;
+            } else if (m_elements[i] instanceof RangeSelection) {
+                type = CFG_RANGE;
+            }
+            settings.addString(CFG_TYPE + i, type);
+            if (type != null) {
+                NodeSettingsWO elementSettings = settings.addNodeSettings(CFG_SELECTION_ELEMENT + i);
+                m_elements[i].saveToNodeSettings(elementSettings);
+            }
+        }
+    }
+
+    /**
+     * Loads the configuration from the given settings object.
+     * @param settings the settings to load from
+     * @throws InvalidSettingsException on load error
+     */
+    @JsonIgnore
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        try {
+            m_selectionMethod = SelectionMethod.forValue(settings.getString(CFG_SELECTION_METHOD));
+        } catch (JsonMappingException e) {
+            throw new InvalidSettingsException(e);
+        }
+        m_elements = null;
+        int numElements = settings.getInt(NUM_SELECTION_ELEMENTS);
+        if (numElements > 0) {
+            m_elements = new SelectionElement[numElements];
+            for (int i = 0; i< numElements; i++) {
+                String type = settings.getString(CFG_TYPE + i);
+                SelectionElement element = null;
+                if (CFG_ROW.equals(type)) {
+                    element = new RowSelection();
+                } else if (CFG_RANGE.equals(type)) {
+                    element = new RangeSelection();
+                }
+                if (element != null) {
+                    NodeSettingsRO elementSettings = settings.getNodeSettings(CFG_SELECTION_ELEMENT + i);
+                    element.loadFromNodeSettings(elementSettings);
+                }
+                m_elements[i] = element;
+            }
+        }
+    }
+
+    /**
+     * Loads the configuration from the given settings object for a dialog.
+     * @param settings the settings to load from
+     */
+    @JsonIgnore
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        try {
+            m_selectionMethod = SelectionMethod.forValue(settings.getString(CFG_SELECTION_METHOD, DEFAULT_SELECTION_METHOD.toValue()));
+        } catch (JsonMappingException e) {
+            m_selectionMethod = DEFAULT_SELECTION_METHOD;
+        }
+        m_elements = null;
+        int numElements = settings.getInt(NUM_SELECTION_ELEMENTS, 0);
+        if (numElements > 0) {
+            m_elements = new SelectionElement[numElements];
+            for (int i = 0; i< numElements; i++) {
+                String type = settings.getString(CFG_TYPE + i, null);
+                SelectionElement element = null;
+                if (CFG_ROW.equals(type)) {
+                    element = new RowSelection();
+                } else if (CFG_RANGE.equals(type)) {
+                    element = new RangeSelection();
+                }
+                if (element != null) {
+                    try {
+                        NodeSettingsRO elementSettings = settings.getNodeSettings(CFG_SELECTION_ELEMENT + i);
+                        element.loadFromNodeSettingsInDialog(elementSettings);
+                    } catch (InvalidSettingsException e) {
+                        element = null;
+                    }
+                }
+                m_elements[i] = element;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONTableSelection other = (JSONTableSelection)obj;
+        return new EqualsBuilder()
+                .append(m_selectionMethod, other.m_selectionMethod)
+                .append(m_elements, other.m_elements)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_selectionMethod)
+                .append(m_elements)
+                .toHashCode();
     }
 }
