@@ -233,6 +233,43 @@ kt = function() {
 		};
 		return colID;
 	};
+	
+	kt.isRowIncludedInFilter = function(rowIndex, filter) {
+		if (filter && filter.elements) {
+			var included = true;
+			var row = dataTable.rows[rowIndex];
+			for (var i = 0; i < filter.elements.length; i++) {
+				var filterElement = filter.elements[i];
+				if (filterElement.type == "range" && filterElement.columns) {
+					for (var col = 0; col < filterElement.columns.length; col++) {
+						var column = filterElement.columns[col];
+						var columnIndex = kt_getDataColumnID(column.columnName);
+						if (columnIndex != null) {
+							var rowValue = row.data[columnIndex];
+							if (column.type = "numeric") {
+								if (column.minimumInclusive) {
+									included &= (rowValue >= column.minimum);
+								} else {
+									included &= (rowValue > column.minimum);
+								}
+								if (column.maximumInclusive) {
+									included &= (rowValue <= column.maximum);
+								} else {
+									included &= (rowValue < column.maximum);
+								}
+							} else if (column.type = "nominal") {
+								included &= (column.values.indexOf(rowValue) >= 0);
+							}
+						}
+					}
+				} else {
+					// TODO row filter - currently not possible
+				}
+			}
+			return included;
+		}
+		return true;
+	}
 
 	return kt;
 };
