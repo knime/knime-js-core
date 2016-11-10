@@ -48,9 +48,16 @@
  */
 package org.knime.js.core.settings.numberFormat;
 
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -79,6 +86,7 @@ public class NumberFormatNodeDialogUI {
     private final JTextField m_negativeField;
     private final JTextField m_negativeBeforeField;
     //TODO add functions (encoder, decoder, edit, undo)
+    private JPanel m_panel;
 
     /** Creates a new utility object, initializes fields */
     public NumberFormatNodeDialogUI() {
@@ -100,18 +108,51 @@ public class NumberFormatNodeDialogUI {
      * @return A {@link JPanel}
      */
     public JPanel createPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        DialogUtil.addPairToPanel("Decimal digits", m_decimalSpinner, panel, gbc);
-        DialogUtil.addPairToPanel("Decimal separator", m_markField, panel, gbc);
-        DialogUtil.addPairToPanel("Thousands separator", m_thousandField, panel, gbc);
-        DialogUtil.addPairToPanel("Custom prefix", m_prefixField, panel, gbc);
-        DialogUtil.addPairToPanel("Custom postfix", m_postfixField, panel, gbc);
-        DialogUtil.addPairToPanel("Negative sign", m_negativeField, panel, gbc);
-        DialogUtil.addPairToPanel("Negative before string", m_negativeBeforeField, panel, gbc);
-        return panel;
+        if (m_panel == null) {
+            m_panel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            DialogUtil.addPairToPanel("Decimal digits", m_decimalSpinner, m_panel, gbc);
+            DialogUtil.addPairToPanel("Decimal separator", m_markField, m_panel, gbc);
+            DialogUtil.addPairToPanel("Thousands separator", m_thousandField, m_panel, gbc);
+            DialogUtil.addPairToPanel("Custom prefix", m_prefixField, m_panel, gbc);
+            DialogUtil.addPairToPanel("Custom postfix", m_postfixField, m_panel, gbc);
+            DialogUtil.addPairToPanel("Negative sign", m_negativeField, m_panel, gbc);
+            DialogUtil.addPairToPanel("Negative before string", m_negativeBeforeField, m_panel, gbc);
+        }
+        return m_panel;
+    }
+
+    /**
+     * Returns a modal dialog that can be used from Swing based dialogs.
+     * @param owner the {@link Frame} from which the dialog is displayed
+     * @param title the {@link String} to display in the dialog's title bar
+     * @return A {@link JDialog}
+     */
+    public JDialog createDialog(final Frame owner, final String title) {
+        JDialog dialog = new JDialog(owner, title, true);
+        dialog.setResizable(false);
+        Container container = dialog.getContentPane();
+        container.setLayout(new BorderLayout());
+        container.add(createPanel(), BorderLayout.CENTER);
+
+        final JButton okButton = new JButton("OK");
+        final ActionListener okActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    saveSettingsTo().validateSettings();
+                    dialog.setVisible(false);
+                    dialog.dispose();
+                } catch (InvalidSettingsException ex) { /* TODO: show error? */ }
+            }
+        };
+        okButton.addActionListener(okActionListener);
+        container.add(okButton, BorderLayout.SOUTH);
+
+        dialog.pack();
+        return dialog;
     }
 
     /**
