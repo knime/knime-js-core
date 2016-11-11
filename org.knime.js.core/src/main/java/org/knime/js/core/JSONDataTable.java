@@ -347,6 +347,7 @@ public class JSONDataTable {
             DataRow newRow = new DefaultRow(row.getRowKey(), dataCells);
             container.addRowToTable(newRow);
         }
+        container.close();
         return container.getTable();
     }
 
