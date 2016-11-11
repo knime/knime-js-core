@@ -97,17 +97,17 @@ public class JSONDataTableSpec {
         DATE_TIME("dateTime"),
         UNDEFINED("undefined");
 
-        private String name;
+        private final String m_name;
 
         JSTypes(final String name) {
-            this.name = name;
+            m_name = name;
         }
 
         /**
          * @return the name
          */
         public String getName() {
-            return name;
+            return m_name;
         }
 
         /**
@@ -193,7 +193,7 @@ public class JSONDataTableSpec {
                 colNames.add(colName);
                 orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
-                colTypes.add(getJSONType(colType).name);
+                colTypes.add(getJSONType(colType).name());
                 numColumns++;
             }
         }
@@ -366,7 +366,7 @@ public class JSONDataTableSpec {
     public void addExtension(final String extensionName, final JSTypes dataType) {
         this.m_numExtensions++;
         this.m_extensionNames.add(extensionName);
-        this.m_extensionTypes.add(dataType.name);
+        this.m_extensionTypes.add(dataType.getName());
     }
 
     /**
