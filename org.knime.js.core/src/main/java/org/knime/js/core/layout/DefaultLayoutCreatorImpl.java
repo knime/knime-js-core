@@ -55,9 +55,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.util.layout.DefaultLayoutCreator;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;

@@ -3,7 +3,7 @@ package org.knime.js.core;
 import java.util.Hashtable;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.knime.core.util.layout.DefaultLayoutCreator;
+import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
