@@ -218,11 +218,13 @@ function twinlist() {
 	excludes.prop('multiple', true);
 	excludes.css('border-color', 'red');
 	excludes.attr("aria-label", "Excludes");
+	excludes.attr('data-iframe-height', '');
 	includes = $('<select>');
 	includes.css('float', 'left');
 	includes.prop('multiple', true);
 	includes.css('border-color', 'green');
 	includes.attr("aria-label", "Includes");
+	includes.attr('data-iframe-height', '');
 	var excludesSpan = $('<span>');
 	excludesSpan.css('float', 'left');
 	var includesSpan = $('<span>');
