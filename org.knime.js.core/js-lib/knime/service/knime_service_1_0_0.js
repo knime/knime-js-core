@@ -295,7 +295,7 @@ knimeService = function() {
 					selection.elements[i].rows = filteredRows;
 				}
 				selection.changeSet = {};
-				selection.changeSet.removed = rowkeys;
+				selection.changeSet.removed = rowKeys;
 				return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 			}
 		}
