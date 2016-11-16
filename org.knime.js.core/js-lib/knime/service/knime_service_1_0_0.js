@@ -294,11 +294,11 @@ knimeService = function() {
 				} else {
 					selection.elements[i].rows = filteredRows;
 				}
+				selection.changeSet = {};
+				selection.changeSet.removed = rowkeys;
 				return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 			}
 		}
-		selection.changeSet = {};
-		selection.changeSet.removed = rowkeys;
 		return false;
 	}
 	
