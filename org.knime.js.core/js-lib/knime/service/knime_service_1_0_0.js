@@ -237,6 +237,9 @@ knimeService = function() {
 		if (!selection) {
 			selection = {'selectionMethod': type, 'elements': []};
 		}
+		if (!selection.selectionMethod) {
+			selection.selectionMethod = type; 
+		}
 		var existing = false;
 		for (var i = 0; i < selection.elements.length; i++) {
 			var element = selection.elements[i];
@@ -259,6 +262,10 @@ knimeService = function() {
 					'rows': rowKeys
 			}
 			selection.elements.push(selectionElement); 
+		}
+		if (!forceNew) {
+			selection.changeSet = {};
+			selection.changeSet.added = rowKeys;
 		}
 		return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 	}
@@ -290,6 +297,8 @@ knimeService = function() {
 				return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
 			}
 		}
+		selection.changeSet = {};
+		selection.changeSet.removed = rowkeys;
 		return false;
 	}
 	
