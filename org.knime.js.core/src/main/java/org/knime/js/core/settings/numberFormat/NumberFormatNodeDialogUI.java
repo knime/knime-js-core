@@ -104,6 +104,21 @@ public class NumberFormatNodeDialogUI {
     }
 
     /**
+     * Sets a new value for the number of decimal points
+     * @param decimals the number of decimal points to set.
+     * Integer needs to be between 0 and 7.
+     * @throws InvalidSettingsException if decimals are out of bounds
+     */
+    public void setDecimals(final int decimals) throws InvalidSettingsException {
+        if (decimals < 0) {
+            throw new InvalidSettingsException("Number of decimals must be a positive integer.");
+        } else if (decimals > 7) {
+            throw new InvalidSettingsException("JavaScript floating points are only stable up to 7 decimals");
+        }
+        m_decimalSpinner.setValue(decimals);
+    }
+
+    /**
      * Returns a panel that can be included in Swing based dialogs.
      * @return A {@link JPanel}
      */

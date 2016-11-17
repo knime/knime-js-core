@@ -77,6 +77,7 @@ import org.knime.core.data.DataCell;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.IntValue;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponentColumnNameSelection;
@@ -339,6 +340,10 @@ public class SliderNodeDialogUI {
 
     private void setDomainValues(final boolean forceDomain) {
         String domainColumn = m_domainColumnSelection.getSelected();
+        DataColumnSpec colSpec = null;
+        if (domainColumn != null) {
+            colSpec = m_currentSpec.getColumnSpec(domainColumn);
+        }
         m_customRangeMinCheckbox.setEnabled(domainColumn != null);
         m_customRangeMaxCheckbox.setEnabled(domainColumn != null);
         if (domainColumn == null) {
@@ -352,7 +357,6 @@ public class SliderNodeDialogUI {
         m_rangeMaxValueSpinner.setEnabled(m_customRangeMaxCheckbox.isSelected());
         if (m_currentSpec != null) {
             if (domainColumn != null && !m_customRangeMinCheckbox.isSelected()) {
-                DataColumnSpec colSpec = m_currentSpec.getColumnSpec(domainColumn);
                 if (colSpec != null) {
                     DataCell lowerBound = colSpec.getDomain().getLowerBound();
                     if (lowerBound != null && lowerBound.getType().isCompatible(DoubleValue.class)) {
@@ -361,7 +365,6 @@ public class SliderNodeDialogUI {
                 }
             }
             if (domainColumn != null && !m_customRangeMaxCheckbox.isSelected()) {
-                DataColumnSpec colSpec = m_currentSpec.getColumnSpec(domainColumn);
                 if (colSpec != null) {
                     DataCell upperBound = colSpec.getDomain().getUpperBound();
                     if (upperBound != null && upperBound.getType().isCompatible(DoubleValue.class)) {
@@ -376,6 +379,28 @@ public class SliderNodeDialogUI {
                     m_startDomainExtendsCheckboxes[i].setSelected(true);
                 }
                 setDomainExtendOnStartValue(i);
+            }
+            if (forceDomain && colSpec != null) {
+                Integer decimalValues = null;
+                if (colSpec.getType().isCompatible(IntValue.class)) {
+                    decimalValues = 0;
+                    m_useStepCheckbox.setSelected(true);
+                    m_stepSpinner.setValue(1);
+                } else if (colSpec.getType().isCompatible(DoubleValue.class)) {
+                    decimalValues = 2;
+                    m_useStepCheckbox.setSelected(false);
+                }
+                if (decimalValues != null) {
+                    for (int i = 0; i < m_tooltipsFormats.length; i++) {
+                        m_tooltipsFormatCheckboxes[i].setSelected(true);
+                        try {
+                            m_tooltipsFormats[i].setDecimals(decimalValues);
+                        } catch (InvalidSettingsException e) { /* do nothing, never thrown */ }
+                    }
+                    try {
+                        m_pipsFormat.setDecimals(decimalValues);
+                    } catch (InvalidSettingsException e) { /* do nothing, never thrown */ }
+                }
             }
         }
     }
@@ -725,6 +750,14 @@ public class SliderNodeDialogUI {
                 for (int i = 0; i < connect.length; i++) {
                     m_connectCheckboxes[i].setSelected(connect[i]);
                 }
+            } else {
+                // enable connect for all odd numbers of connect fields
+                if (m_connectCheckboxes.length % 2 == 1) {
+                    for (int i = 0; i < m_connectCheckboxes.length; i++) {
+                        m_connectCheckboxes[i].setSelected(i % 2 == 1);
+                    }
+                }
+                // no sensible default for even number of connect fields -> leave all unchecked
             }
 
             boolean vertical = settings.getOrientation() == Orientation.VERTICAL;
@@ -803,7 +836,7 @@ public class SliderNodeDialogUI {
         if (m_sliderPanelUsed) {
             if (m_useStepCheckbox.isSelected()) {
                 double stepSize = (double)m_stepSpinner.getValue();
-                if (rangeMin != null && rangeMax != null && stepSize >= (rangeMax - rangeMin)) {
+                if (rangeMin != null && rangeMax != null && stepSize > (rangeMax - rangeMin)) {
                     throw new InvalidSettingsException("Step size needs to be smaller than slider range.");
                 }
             }
