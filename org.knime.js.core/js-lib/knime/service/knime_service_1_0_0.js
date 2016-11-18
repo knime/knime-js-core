@@ -245,12 +245,14 @@ knimeService = function() {
 			var element = selection.elements[i];
 			if (typeof elementId == 'undefined') {
 				if (typeof element.id == 'undefined') {
-					element.rows = element.rows.concat(rowKeys);
+					var rowArray = element.rows || [];
+					element.rows = rowArray.concat(rowKeys);
 					existing = true;
 					break;
 				}
 			} else if (element.id == elementId) {
-				element.rows = element.rows.concat(rowKeys);
+				var rowArray = element.rows || [];
+				element.rows = rowArray.concat(rowKeys);
 				existing = true;
 				break;
 			}
@@ -259,7 +261,7 @@ knimeService = function() {
 			var selectionElement = {
 					'id': elementId,
 					'type': 'row',
-					'rows': rowKeys
+					'rows': rowKeys || []
 			}
 			selection.elements.push(selectionElement); 
 		}
@@ -286,7 +288,8 @@ knimeService = function() {
 		var i = selection.elements.length;
 		while (i--) {
 			if (!elementId || selection.elements[i].id == elementId) {
-				var filteredRows = selection.elements[i].rows.filter(function(value) {
+				var rowArray = selection.elements[i].rows || [];
+				var filteredRows = rowArray.filter(function(value) {
 					return rowKeys.indexOf(value) == -1;
 				});
 				if (filteredRows.length == 0) {
