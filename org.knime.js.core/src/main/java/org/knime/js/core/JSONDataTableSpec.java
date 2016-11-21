@@ -48,12 +48,13 @@ package org.knime.js.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Vector;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -96,33 +97,32 @@ public class JSONDataTableSpec {
      */
     public static enum JSTypes {
         /** Boolean JavaScript type */
-        BOOLEAN,
+        BOOLEAN("boolean"),
         /** Number JavaScript type */
-        NUMBER,
+        NUMBER("number"),
         /** String JavaScript type */
-        STRING,
+        STRING("string"),
         /** PNG JavaScript type
          * @since 2.10 */
-        PNG,
+        PNG("png"),
         /** SVG JavaScript type
          * @since 2.10 */
-        SVG,
+        SVG("svg"),
         /** Date/Time JavaScript type
          * @since 2.11 */
-        DATE_TIME,
+        DATE_TIME("dateTime"),
         /** Undefined JavaScript type */
-        UNDEFINED;
+        UNDEFINED("undefined");
 
-        private static Map<String, JSTypes> namesMap = new HashMap<String, JSTypes>(7);
+        private final String m_jsName;
 
+        private JSTypes(final String jsName) {
+            m_jsName = jsName;
+        }
+
+        private static final Map<String, JSTypes> NAMES_MAP;
         static {
-            namesMap.put("boolean", JSTypes.BOOLEAN);
-            namesMap.put("number", JSTypes.NUMBER);
-            namesMap.put("string", JSTypes.STRING);
-            namesMap.put("png", JSTypes.PNG);
-            namesMap.put("svg", JSTypes.SVG);
-            namesMap.put("dateTime", DATE_TIME);
-            namesMap.put("undefined", UNDEFINED);
+            NAMES_MAP = Stream.of(values()).collect(Collectors.toMap(JSTypes::toString, Function.identity()));
         }
 
         /**
@@ -132,8 +132,8 @@ public class JSONDataTableSpec {
          * @throws JsonMappingException if  an invalid data type string was provided
          */
         @JsonCreator
-        public static JSTypes forValue(final String value) throws JsonMappingException {
-            JSTypes method = namesMap.get(value.toLowerCase());
+        private static JSTypes forValue(final String value) throws JsonMappingException {
+            JSTypes method = NAMES_MAP.get(value.toLowerCase());
             if (method == null) {
                 throw new JsonMappingException(null, value + " is not a valid JavaScript table data type.");
             }
@@ -141,16 +141,13 @@ public class JSONDataTableSpec {
         }
 
         /**
-         * @return a string representation of the enum value, used for serialization
+         * Returns the name of this type in the JavaScript world.
+         *
+         * @return the JS name
          */
         @JsonValue
-        public String toValue() {
-            for (Entry<String, JSTypes> entry : namesMap.entrySet()) {
-                if (entry.getValue() == this) {
-                    return entry.getKey();
-                }
-            }
-            return null;
+        public String getJSName() {
+            return m_jsName;
         }
 
         /**
@@ -158,7 +155,7 @@ public class JSONDataTableSpec {
          */
         @Override
         public String toString() {
-            return toValue();
+            return m_jsName;
         }
     }
 
@@ -409,7 +406,7 @@ public class JSONDataTableSpec {
     public void addExtension(final String extensionName, final JSTypes dataType) {
         this.m_numExtensions++;
         this.m_extensionNames.add(extensionName);
-        this.m_extensionTypes.add(dataType.toValue());
+        this.m_extensionTypes.add(dataType.getJSName());
     }
 
     /**
