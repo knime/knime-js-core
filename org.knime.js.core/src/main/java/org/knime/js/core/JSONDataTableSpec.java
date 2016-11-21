@@ -48,7 +48,11 @@ package org.knime.js.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -72,7 +76,10 @@ import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
 /**
  *
@@ -88,28 +95,62 @@ public class JSONDataTableSpec {
      * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
      */
     public static enum JSTypes {
-        BOOLEAN("boolean"),
-        NUMBER("number"),
-        STRING("string"),
-        /** @since 2.10 */
-        PNG("png"),
-        /** @since 2.10 */
-        SVG("svg"),
-        /** @since 2.11 */
-        DATE_TIME("dateTime"),
-        UNDEFINED("undefined");
+        /** Boolean JavaScript type */
+        BOOLEAN,
+        /** Number JavaScript type */
+        NUMBER,
+        /** String JavaScript type */
+        STRING,
+        /** PNG JavaScript type
+         * @since 2.10 */
+        PNG,
+        /** SVG JavaScript type
+         * @since 2.10 */
+        SVG,
+        /** Date/Time JavaScript type
+         * @since 2.11 */
+        DATE_TIME,
+        /** Undefined JavaScript type */
+        UNDEFINED;
 
-        private final String m_name;
+        private static Map<String, JSTypes> namesMap = new HashMap<String, JSTypes>(7);
 
-        JSTypes(final String name) {
-            m_name = name;
+        static {
+            namesMap.put("boolean", JSTypes.BOOLEAN);
+            namesMap.put("number", JSTypes.NUMBER);
+            namesMap.put("string", JSTypes.STRING);
+            namesMap.put("png", JSTypes.PNG);
+            namesMap.put("svg", JSTypes.SVG);
+            namesMap.put("dateTime", DATE_TIME);
+            namesMap.put("undefined", UNDEFINED);
         }
 
         /**
-         * @return the name
+         * Creates an enum type for a given string representation of a data type
+         * @param value the string representation of the data type
+         * @return a {@link JSTypes} enum type corresponding to the provided string
+         * @throws JsonMappingException if  an invalid data type string was provided
          */
-        public String getName() {
-            return m_name;
+        @JsonCreator
+        public static JSTypes forValue(final String value) throws JsonMappingException {
+            JSTypes method = namesMap.get(value.toLowerCase());
+            if (method == null) {
+                throw new JsonMappingException(null, value + " is not a valid JavaScript table data type.");
+            }
+            return method;
+        }
+
+        /**
+         * @return a string representation of the enum value, used for serialization
+         */
+        @JsonValue
+        public String toValue() {
+            for (Entry<String, JSTypes> entry : namesMap.entrySet()) {
+                if (entry.getValue() == this) {
+                    return entry.getKey();
+                }
+            }
+            return null;
         }
 
         /**
@@ -117,7 +158,7 @@ public class JSONDataTableSpec {
          */
         @Override
         public String toString() {
-            return getName();
+            return toValue();
         }
     }
 
@@ -148,13 +189,13 @@ public class JSONDataTableSpec {
 
     private int m_numColumns;
     private int m_numRows;
-    private ArrayList<String> m_colTypes = new ArrayList<String>();
-    private ArrayList<String> m_knimeTypes = new ArrayList<String>();
-    private ArrayList<String> m_colNames = new ArrayList<String>();
+    private List<JSTypes> m_colTypes = new ArrayList<JSTypes>();
+    private List<String> m_knimeTypes = new ArrayList<String>();
+    private List<String> m_colNames = new ArrayList<String>();
 
     private int m_numExtensions;
-    private ArrayList<String> m_extensionTypes = new ArrayList<String>();
-    private ArrayList<String> m_extensionNames = new ArrayList<String>();
+    private List<String> m_extensionTypes = new ArrayList<String>();
+    private List<String> m_extensionNames = new ArrayList<String>();
 
     private Vector<LinkedHashSet<Object>> m_possibleValues;
     private Object[] m_minValues;
@@ -180,22 +221,23 @@ public class JSONDataTableSpec {
 
     /**
      * @param spec the DataTableSpec for this JSONTable
+     * @param excludeColumns an array of column names to exclude from the creation of the spec
      * @param numRows the number of rows in the DataTable
      *
      */
     public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows) {
 
         int numColumns = 0;
-        ArrayList<String> colNames = new ArrayList<String>();
-        ArrayList<String> colTypes = new ArrayList<String>();
-        ArrayList<String> orgTypes = new ArrayList<String>();
+        List<String> colNames = new ArrayList<String>();
+        List<JSTypes> colTypes = new ArrayList<JSTypes>();
+        List<String> orgTypes = new ArrayList<String>();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
             if (!Arrays.asList(excludeColumns).contains(colName)) {
                 colNames.add(colName);
                 orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
-                colTypes.add(getJSONType(colType).name());
+                colTypes.add(getJSONType(colType));
                 numColumns++;
             }
         }
@@ -203,7 +245,7 @@ public class JSONDataTableSpec {
         setNumColumns(numColumns);
         setNumRows(numRows);
         setColNames(colNames.toArray(new String[0]));
-        setColTypes(colTypes.toArray(new String[0]));
+        setColTypes(colTypes.toArray(new JSTypes[0]));
         setKnimeTypes(orgTypes.toArray(new String[0]));
     }
 
@@ -214,7 +256,7 @@ public class JSONDataTableSpec {
     public DataTableSpec createDataTableSpec() {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
         for (int i = 0; i < m_numColumns; i++) {
-            JSTypes type = JSTypes.valueOf(m_colTypes.get(i));
+            JSTypes type = m_colTypes.get(i);
             DataType dataType = null;
             switch (type) {
                 case BOOLEAN:
@@ -290,16 +332,15 @@ public class JSONDataTableSpec {
     /**
      * @return the column types
      */
-    public String[] getColTypes() {
-        return m_colTypes.toArray(new String[0]);
+    public JSTypes[] getColTypes() {
+        return m_colTypes.toArray(new JSTypes[0]);
     }
 
     /**
-     * @param types the types to set
+     * @param types
      */
-    public void setColTypes(final String[] types) {
-        this.m_colTypes = new ArrayList<String>();
-        this.m_colTypes.addAll(Arrays.asList(types));
+    public void setColTypes(final JSTypes[] types) {
+        m_colTypes = Arrays.asList(types);
     }
 
     /**
@@ -368,7 +409,7 @@ public class JSONDataTableSpec {
     public void addExtension(final String extensionName, final JSTypes dataType) {
         this.m_numExtensions++;
         this.m_extensionNames.add(extensionName);
-        this.m_extensionTypes.add(dataType.getName());
+        this.m_extensionTypes.add(dataType.toValue());
     }
 
     /**
