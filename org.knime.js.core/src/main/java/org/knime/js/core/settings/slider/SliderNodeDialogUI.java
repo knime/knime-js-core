@@ -179,8 +179,24 @@ public class SliderNodeDialogUI {
         });
         m_rangeMinValueSpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_MINIMUM, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1));
         setSpinnerWidth(m_rangeMinValueSpinner);
+        m_rangeMinValueSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                for (int i = 0; i < m_startValueSpinners.length; i++) {
+                    setDomainExtendOnStartValue(i);
+                }
+            }
+        });
         m_rangeMaxValueSpinner = new JSpinner(new SpinnerNumberModel(DEFAULT_MAXIMUM, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, 1));
         setSpinnerWidth(m_rangeMaxValueSpinner);
+        m_rangeMaxValueSpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                for (int i = 0; i < m_startValueSpinners.length; i++) {
+                    setDomainExtendOnStartValue(i);
+                }
+            }
+        });
         m_startValueSpinners = new JSpinner[numHandles];
         m_startDomainExtendsCheckboxes = new JCheckBox[numHandles];
         for (int i = 0; i < numHandles; i++) {
@@ -722,6 +738,17 @@ public class SliderNodeDialogUI {
      * @throws NotConfigurableException on load error
      */
     public void loadSettingsFrom(final SliderSettings settings, final DataTableSpec spec) throws NotConfigurableException {
+        loadSettingsFrom(settings, spec, false);
+    }
+
+    /**
+     * Loads settings into the dialog components. Components that can not be filled by the given {@link SliderSettings} need to be load separately.
+     * @param settings the settings to load from
+     * @param spec the {@link DataTableSpec} to use for domain range calculation
+     * @param forceDomainUpdate true, if a domain update should be forced, this can be used for previously unconfigured settings
+     * @throws NotConfigurableException on load error
+     */
+    public void loadSettingsFrom(final SliderSettings settings, final DataTableSpec spec, final boolean forceDomainUpdate) throws NotConfigurableException {
         m_currentSpec = spec;
         if (settings != null) {
             if (settings.getRangeMinValue() != null) {
@@ -800,7 +827,7 @@ public class SliderNodeDialogUI {
             enableTooltipFields(i);
         }
         enablePipFields(false);
-        setDomainValues(false);
+        setDomainValues(forceDomainUpdate);
     }
 
     /**
