@@ -404,7 +404,7 @@ public class SliderNodeDialogUI {
                     m_stepSpinner.setValue(1);
                 } else if (colSpec.getType().isCompatible(DoubleValue.class)) {
                     decimalValues = 2;
-                    //m_useStepCheckbox.setSelected(false);
+                    m_useStepCheckbox.setSelected(false);
                 }
                 if (decimalValues != null) {
                     for (int i = 0; i < m_tooltipsFormats.length; i++) {
