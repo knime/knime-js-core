@@ -59,6 +59,7 @@ import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
 import org.knime.core.data.DataTableSpec;
@@ -222,10 +223,14 @@ public class JSONDataTable {
         // create a new list for the values - but only for native string columns
         Vector<LinkedHashSet<Object>> possValues = new Vector<LinkedHashSet<Object>>();
         possValues.setSize(numOfColumns);
+        String[] filterIds = new String[numOfColumns];
         for (int c = 0; c < numOfColumns; c++) {
-            if (spec.getColumnSpec(includeColIndices.get(c)).getType()
-                    .isCompatible(NominalValue.class)) {
+            DataColumnSpec columnSpec = spec.getColumnSpec(includeColIndices.get(c));
+            if (columnSpec.getType().isCompatible(NominalValue.class)) {
                 possValues.set(c, new LinkedHashSet<Object>());
+            }
+            if (columnSpec.getFilterHandler().isPresent()) {
+                filterIds[c] = columnSpec.getFilterHandler().get().getModel().getFilterUUID().toString();
             }
         }
 
@@ -313,6 +318,7 @@ public class JSONDataTable {
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
+        jsonTableSpec.setFilterIds(filterIds);
 
         setSpec(jsonTableSpec);
         getSpec().setRowColorValues(rowColorList.toArray(new String[0]));

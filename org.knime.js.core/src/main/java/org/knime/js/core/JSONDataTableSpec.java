@@ -199,6 +199,7 @@ public class JSONDataTableSpec {
     private Object[] m_maxValues;
 
     private String[] m_rowColorValues;
+    private String[] m_filterIds;
 
     /**
      * Empty default constructor for bean initialization.
@@ -468,6 +469,22 @@ public class JSONDataTableSpec {
     }
 
     /**
+     * @return the filterIds
+     * @since 3.3
+     */
+    public String[] getFilterIds() {
+        return m_filterIds;
+    }
+
+    /**
+     * @param filterIds the filterIds to set
+     * @since 3.3
+     */
+    public void setFilterIds(final String[] filterIds) {
+        m_filterIds = filterIds;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -485,6 +502,7 @@ public class JSONDataTableSpec {
                 .append(m_numRows)
                 .append(m_possibleValues)
                 .append(m_rowColorValues)
+                .append(m_filterIds)
                 .toHashCode();
     }
 
@@ -516,6 +534,7 @@ public class JSONDataTableSpec {
                 .append(m_numRows, other.m_numRows)
                 .append(m_possibleValues, other.m_possibleValues)
                 .append(m_rowColorValues, other.m_rowColorValues)
+                .append(m_filterIds, other.m_filterIds)
                 .isEquals();
     }
 
