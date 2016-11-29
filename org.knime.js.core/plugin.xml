@@ -1252,6 +1252,42 @@
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="d3-flextree"
+            usesDefine="false"
+            version="1.0.3"
+            webResourceBundleID="d3-flextree_1.0.3">
+         <webResource
+               relativePathSource="js-lib/d3-flextree/d3-flextree.min.js"
+               relativePathTarget="js-lib/d3-flextree/d3-flextree.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3-flextree/d3-flextree.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5_Debug">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="d3-flextree_debug"
+            usesDefine="false"
+            version="1.0.3"
+            webResourceBundleID="d3-flextree_1.0.3_debug">
+         <webResource
+               relativePathSource="js-lib/d3-flextree/d3-flextree.js"
+               relativePathTarget="js-lib/d3-flextree/d3-flextree.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3-flextree/d3-flextree.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5_Debug">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
