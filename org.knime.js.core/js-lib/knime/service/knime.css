@@ -52,6 +52,10 @@ html, body {
     color: rgba(230, 230, 230, 1);
 }
 
+#knime-service-header .service-button.inactive {
+    pointer-events: none;
+}
+
 #knime-service-header .service-button .ficon {
     display: table-cell;
     text-align: center;
