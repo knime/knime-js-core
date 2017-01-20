@@ -105,7 +105,7 @@ kt = function() {
 		var f = dataTable.spec.filterIds;
 		for (var i = 0; i < f.length; i++) {
 			if (f[i]) {
-				filters.push[f[i]];
+				filters.push(f[i]);
 			}
 		}
 		return filters;
