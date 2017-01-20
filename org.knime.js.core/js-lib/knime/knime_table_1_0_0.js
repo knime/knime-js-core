@@ -96,6 +96,21 @@ kt = function() {
 		return dataTable.spec.rowColorValues;
 	}
 	
+	kt.getTableId = function() {
+		return dataTable.id;
+	}
+	
+	kt.getFilterIds = function() {
+		var filters = [];
+		var f = dataTable.spec.filterIds;
+		for (var i = 0; i < f.length; i++) {
+			if (f[i]) {
+				filters.push[f[i]];
+			}
+		}
+		return filters;
+	}
+	
 	kt.registerView = function(view) {
 		for (var i = 0; i < view.extensionNames.length; i++) {
 			kt_registerViewExtension(view, view.extensionNames[i]);
