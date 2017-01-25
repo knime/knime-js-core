@@ -6,25 +6,10 @@
  */
 // eslint-disable-next-line no-extra-semi
 ;(function(root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module with d3 as a dependency.
-    define([
-      'd3-collection',
-      'd3-selection'
-    ], factory)
-  } else if (typeof module === 'object' && module.exports) {
-    /* eslint-disable global-require */
-    // CommonJS
-    var d3Collection = require('d3-collection'),
-        d3Selection = require('d3-selection')
-    module.exports = factory(d3Collection, d3Selection)
-    /* eslint-enable global-require */
-  } else {
     // Browser global.
     var d3 = root.d3
     // eslint-disable-next-line no-param-reassign
     root.d3.tip = factory(d3, d3)
-  }
 }(this, function(d3Collection, d3Selection) {
   // Public - contructs a new tooltip
   //
