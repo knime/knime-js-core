@@ -48,6 +48,7 @@
  */
 package org.knime.js.core.layout.bs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +64,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 */
 @JsonAutoDetect
 //@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayoutContent {
+public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayoutContent, Cloneable {
 
     // general fields
     private String m_nodeID;
@@ -338,6 +339,57 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
      */
     public void setSizeWidth(final boolean sizeWidth) {
         m_sizeWidth = sizeWidth;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        // TODO Auto-generated method stub
+        return super.equals(obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        // TODO Auto-generated method stub
+        return super.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONLayoutViewContent clone() {
+        JSONLayoutViewContent clone = new JSONLayoutViewContent();
+        clone.m_autoResize = m_autoResize;
+        clone.m_maxHeight = m_maxHeight == null ? null : new Integer(m_maxHeight);
+        clone.m_maxWidth = m_maxWidth == null ? null : new Integer(m_maxWidth);
+        clone.m_minHeight = m_minHeight == null ? null : new Integer(m_minHeight);
+        clone.m_minWidth = m_minWidth == null ? null : new Integer(m_minWidth);
+        clone.m_nodeID = m_nodeID;
+        clone.m_resizeInterval = m_resizeInterval == null ? null : new Integer(m_resizeInterval);
+        clone.m_resizeMethod = m_resizeMethod;
+        clone.m_resizeTolerance = m_resizeTolerance == null ? null : new Integer(m_resizeTolerance);
+        clone.m_scrolling = m_scrolling;
+        clone.m_sizeHeight = m_sizeHeight;
+        clone.m_sizeWidth = m_sizeWidth;
+        ArrayList<String> additionalClasses = null;
+        if (getAdditionalClasses() != null) {
+            additionalClasses = new ArrayList<String>();
+            additionalClasses.addAll(getAdditionalClasses());
+        }
+        clone.setAdditionalClasses(additionalClasses);
+        ArrayList<String> additionalStyles = null;
+        if (getAdditionalStyles() != null) {
+            additionalStyles = new ArrayList<String>();
+            additionalStyles.addAll(getAdditionalStyles());
+        }
+        clone.setAdditionalStyles(additionalStyles);
+        return clone;
     }
 
 }
