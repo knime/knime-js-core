@@ -480,6 +480,56 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            name="NVD3"
+            version="1.8.4"
+            webResourceBundleID="NVD3_1.8.4_Debug">
+         <webResource
+               relativePathSource="js-lib/nvd3/1.8.4/nv.d3.js"
+               relativePathTarget="js-lib/nvd3/1.8.4/nv.d3.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/nvd3/1.8.4/nv.d3.css"
+               relativePathTarget="js-lib/nvd3/1.8.4/nv.d3.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/nvd3/1.8.4/nv.d3.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/nvd3/1.8.4/nv.d3.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5_Debug">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="NVD3"
+            version="1.8.4"
+            webResourceBundleID="NVD3_1.8.4">
+         <webResource
+               relativePathSource="js-lib/nvd3/1.8.4/nv.d3.min.js"
+               relativePathTarget="js-lib/nvd3/1.8.4/nv.d3.min.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/nvd3/1.8.4/nv.d3.min.css"
+               relativePathTarget="js-lib/nvd3/1.8.4/nv.d3.min.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/nvd3/1.8.4/nv.d3.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/nvd3/1.8.4/nv.d3.min.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_3.5.5">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
             name="jsTree"
             usesDefine="true"
             version="3.3.0"
