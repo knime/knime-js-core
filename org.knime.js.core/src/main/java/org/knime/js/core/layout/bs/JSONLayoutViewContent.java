@@ -53,8 +53,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -345,24 +349,61 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public boolean equals(final Object obj) {
-        // TODO Auto-generated method stub
-        return super.equals(obj);
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutViewContent other = (JSONLayoutViewContent)obj;
+        return new EqualsBuilder()
+                .append(m_nodeID, other.m_nodeID)
+                .append(m_maxWidth, other.m_maxWidth)
+                .append(m_maxHeight, other.m_maxHeight)
+                .append(m_minWidth, other.m_minWidth)
+                .append(m_minHeight, other.m_minHeight)
+                .append(m_resizeMethod, other.m_resizeMethod)
+                .append(m_autoResize, other.m_autoResize)
+                .append(m_resizeInterval, other.m_resizeInterval)
+                .append(m_resizeTolerance, other.m_resizeTolerance)
+                .append(m_scrolling, other.m_scrolling)
+                .append(m_sizeWidth, other.m_sizeWidth)
+                .append(m_sizeHeight, other.m_sizeHeight)
+                .isEquals();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public int hashCode() {
-        // TODO Auto-generated method stub
-        return super.hashCode();
+        return new HashCodeBuilder()
+                .append(m_nodeID)
+                .append(m_maxWidth)
+                .append(m_maxHeight)
+                .append(m_minWidth)
+                .append(m_minHeight)
+                .append(m_resizeMethod)
+                .append(m_autoResize)
+                .append(m_resizeInterval)
+                .append(m_resizeTolerance)
+                .append(m_scrolling)
+                .append(m_sizeWidth)
+                .append(m_sizeHeight)
+                .toHashCode();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @JsonIgnore
     public JSONLayoutViewContent clone() {
         JSONLayoutViewContent clone = new JSONLayoutViewContent();
         clone.m_autoResize = m_autoResize;
