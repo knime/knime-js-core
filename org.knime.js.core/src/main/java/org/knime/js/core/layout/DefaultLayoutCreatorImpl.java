@@ -98,18 +98,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
         for (NodeIDSuffix suffix : viewNodes.keySet()) {
-            NodeID id = NodeID.fromString(suffix.toString());
             JSONLayoutRow row = new JSONLayoutRow();
             JSONLayoutColumn col = new JSONLayoutColumn();
-            JSONLayoutViewContent view = new JSONLayoutViewContent();
-            if (viewNodes.get(suffix) instanceof LayoutTemplateProvider) {
-                JSONLayoutViewContent layoutViewTemplate =
-                    ((LayoutTemplateProvider)viewNodes.get(suffix)).getLayoutTemplate();
-                if (layoutViewTemplate != null) {
-                    view = layoutViewTemplate;
-                }
-            }
-            view.setNodeID(Integer.toString(id.getIndex()));
+            JSONLayoutViewContent view = getDefaultViewContentForNode(suffix, viewNodes.get(suffix));
             col.setContent(Arrays.asList(new JSONLayoutViewContent[]{view}));
             try {
                 col.setWidthMD(12);
@@ -118,6 +109,27 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             rows.add(row);
         }
         return page;
+    }
+
+    /**
+     * Creates the view content element for a given node. If the node implements {@link LayoutTemplateProvider}, the
+     * template is used, otherwise the generic defaults.
+     *
+     * @param suffix the node id suffix as used in the layout definition
+     * @param viewNode the node to create the view content for
+     * @return a new view content element for a JSON layout
+     */
+    public JSONLayoutViewContent getDefaultViewContentForNode(final NodeIDSuffix suffix, @SuppressWarnings("rawtypes") final WizardNode viewNode) {
+        NodeID id = NodeID.fromString(suffix.toString());
+        JSONLayoutViewContent view = new JSONLayoutViewContent();
+        if (viewNode instanceof LayoutTemplateProvider) {
+            JSONLayoutViewContent layoutViewTemplate = ((LayoutTemplateProvider)viewNode).getLayoutTemplate();
+            if (layoutViewTemplate != null) {
+                view = layoutViewTemplate;
+            }
+        }
+        view.setNodeID(Integer.toString(id.getIndex()));
+        return view;
     }
 
 }
