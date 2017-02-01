@@ -65,6 +65,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.DataTypeRegistry;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.StringValue;
@@ -75,6 +76,10 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -173,6 +178,15 @@ public class JSONDataTableSpec {
             type = JSTypes.BOOLEAN;
         } else if (colType.isCompatible(DateAndTimeValue.class)) {
             type = JSTypes.DATE_TIME;
+        // CHECK: add PeriodValue and DurationValue, too?
+        } else if (colType.isCompatible(LocalDateValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(LocalDateTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(LocalTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(ZonedDateTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
         } else if (colType.isCompatible(DoubleValue.class)) {
             type = JSTypes.NUMBER;
         } else if (colType.isCompatible(StringValue.class)) {
@@ -251,33 +265,41 @@ public class JSONDataTableSpec {
      * Creates a new {@link DataTableSpec} from the current settings.
      * @return the generated spec
      */
+    // TODO: testcase
     public DataTableSpec createDataTableSpec() {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
+        // CHECK: assumption here: name is unique, else: http://stackoverflow.com/questions/20363719/java-8-listv-into-mapk-v
+        Map<String, DataType> nameToType = DataTypeRegistry.getInstance().availableDataTypes().stream()
+                .collect(Collectors.toMap(DataType::getName, Function.identity()));
+
         for (int i = 0; i < m_numColumns; i++) {
-            JSTypes type = m_colTypes.get(i);
-            DataType dataType = null;
-            switch (type) {
-                case BOOLEAN:
-                    dataType = DataType.getType(BooleanCell.class);
-                    break;
-                case NUMBER:
-                    dataType = DataType.getType(DoubleCell.class);
-                    break;
-                case DATE_TIME:
-                    dataType = DataType.getType(DateAndTimeCell.class);
-                    break;
-                case STRING:
-                    dataType = DataType.getType(StringCell.class);
-                    break;
-                case SVG:
-                    dataType = DataType.getType(SvgCell.class);
-                    break;
-                case PNG:
-                    dataType = DataType.getType(PNGImageCell.class);
-                    break;
-                default:
-                    dataType = DataType.getType(MissingCell.class);
-                    break;
+            DataType dataType = nameToType.get(m_knimeTypes.get(i));
+
+            if (dataType == null) {
+                JSTypes jsType = m_colTypes.get(i);
+                switch (jsType) {
+                    case BOOLEAN:
+                        dataType = DataType.getType(BooleanCell.class);
+                        break;
+                    case NUMBER:
+                        dataType = DataType.getType(DoubleCell.class);
+                        break;
+                    case DATE_TIME:
+                        dataType = DataType.getType(DateAndTimeCell.class);
+                        break;
+                    case STRING:
+                        dataType = DataType.getType(StringCell.class);
+                        break;
+                    case SVG:
+                        dataType = DataType.getType(SvgCell.class);
+                        break;
+                    case PNG:
+                        dataType = DataType.getType(PNGImageCell.class);
+                        break;
+                    default:
+                        dataType = DataType.getType(MissingCell.class);
+                        break;
+                }
             }
             columns[i] = new DataColumnSpecCreator(m_colNames.get(i), dataType).createSpec();
         }

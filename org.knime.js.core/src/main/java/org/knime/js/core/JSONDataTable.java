@@ -263,6 +263,8 @@ public class JSONDataTable {
                 int col = includeColIndices.get(c);
                 DataCell cell = row.getCell(col);
 
+                // TODO: Can I refactor the code so that getJSONCellValue is only called once?
+
                 Object cellValue;
                 if (!cell.isMissing()) {
                     cellValue = getJSONCellValue(cell);
@@ -360,6 +362,8 @@ public class JSONDataTable {
                     } else {
                         dataCells[colId] = BooleanCell.get(bVal);
                     }
+                // TODO: Add new date/time-types here
+                // TODO: parse to ISO
                 } else if (type.isCompatible(DateAndTimeValue.class)) {
                     Long lVal = null;
                     if (value instanceof Long) {
@@ -403,7 +407,8 @@ public class JSONDataTable {
             case BOOLEAN:
                 return ((BooleanValue)cell).getBooleanValue();
             case DATE_TIME:
-                return ((DateAndTimeValue)cell).getUTCTimeInMillis();
+                // TODO: Check if old data-time-cell yields iso-string, too
+                return cell.toString();
             case NUMBER:
                 return ((DoubleValue)cell).getDoubleValue();
             case STRING:
