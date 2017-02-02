@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME GmbH, Konstanz, Germany
  *  Website: http://www.knime.org; Email: contact@knime.org
  *
@@ -42,96 +43,18 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 16.09.2013 by Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * History
+ *   2 Feb 2017 (albrecht): created
  */
-package org.knime.js.core;
-
-import java.util.List;
-
-import org.knime.core.node.KNIMEConstants;
-import org.knime.js.core.layout.bs.JSONLayoutPage;
-import org.knime.js.core.selections.json.JSONSelectionTranslator;
+package org.knime.js.core.selections.json;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePageConfiguration {
-
-    private String m_version;
-    private JSONLayoutPage m_layout;
-    private JSONBlackBoard m_blackBoard;
-    private List<JSONSelectionTranslator> m_selectionTranslators;
-
-    /** Serialization constructor. Don't use. */
-    public JSONWebNodePageConfiguration() { }
-
-    /**
-     * @param layout the layout
-     * @param blackBoard the blackboard
-     * @param selectionTranslators
-     */
-    public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard, final List<JSONSelectionTranslator> selectionTranslators) {
-        m_version = KNIMEConstants.VERSION;
-        m_layout = layout;
-        m_blackBoard = blackBoard;
-        m_selectionTranslators = selectionTranslators;
-    }
-
-    /**
-     * @return the version
-     */
-    public String getVersion() {
-        return m_version;
-    }
-
-    /**
-     * @return the blackBoard
-     */
-    public JSONBlackBoard getBlackBoard() {
-        return m_blackBoard;
-    }
-
-    /**
-     * @param blackBoard the blackBoard to set
-     */
-    public void setBlackBoard(final JSONBlackBoard blackBoard) {
-        m_blackBoard = blackBoard;
-    }
-
-    /**
-     * @return the layout
-     */
-    public JSONLayoutPage getLayout() {
-        return m_layout;
-    }
-
-    /**
-     * @param layout the layout to set
-     */
-    public void setLayout(final JSONLayoutPage layout) {
-        m_layout = layout;
-    }
-
-    /**
-     * @return the selectionTranslators
-     */
-    public List<JSONSelectionTranslator> getSelectionTranslators() {
-        return m_selectionTranslators;
-    }
-
-    /**
-     * @param selectionTranslators the selectionTranslators to set
-     */
-    public void setSelectionTranslators(final List<JSONSelectionTranslator> selectionTranslators) {
-        m_selectionTranslators = selectionTranslators;
-    }
-
-    // TODO: insert other meta info about page
+public class JSONSelectionTranslator {
 
 }

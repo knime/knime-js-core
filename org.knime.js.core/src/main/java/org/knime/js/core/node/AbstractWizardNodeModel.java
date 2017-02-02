@@ -171,8 +171,7 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      * @return a unique table id to separate interactivity events
      */
     protected final String getTableId(final int portIndex) {
-        // TODO: the hashCode is not guaranteed to be unique
-        return Integer.toString(getInHiLiteHandler(portIndex).hashCode());
+        return getInHiLiteHandler(portIndex).getHiliteHandlerID().toString();
     }
 
     /**
