@@ -29,7 +29,9 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.knime.js.core.JSCorePlugin
-Import-Package: org.knime.core.data.time.localdate,
+Import-Package: org.knime.core.data.time.duration,
+ org.knime.core.data.time.localdate,
  org.knime.core.data.time.localdatetime,
  org.knime.core.data.time.localtime,
+ org.knime.core.data.time.period,
  org.knime.core.data.time.zoneddatetime

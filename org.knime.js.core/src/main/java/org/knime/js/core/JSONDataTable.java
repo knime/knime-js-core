@@ -80,12 +80,16 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.time.duration.DurationCellFactory;
+import org.knime.core.data.time.duration.DurationValue;
 import org.knime.core.data.time.localdate.LocalDateCellFactory;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.data.time.localdatetime.LocalDateTimeCellFactory;
 import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
 import org.knime.core.data.time.localtime.LocalTimeCellFactory;
 import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.period.PeriodCellFactory;
+import org.knime.core.data.time.period.PeriodValue;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCellFactory;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.BufferedDataContainer;
@@ -373,7 +377,6 @@ public class JSONDataTable {
                     } else {
                         dataCells[colId] = BooleanCell.get(bVal);
                     }
-                // TODO: Should I implement new date/time-range types as well?
                 } else if (type.isCompatible(DateAndTimeValue.class)) {
                     Long lVal = null;
                     if (value instanceof Long) {
@@ -434,6 +437,30 @@ public class JSONDataTable {
                             dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as zoned date and time.");
                         } catch (IllegalArgumentException ex) {
                             dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as zoned date and time.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
+                    }
+                } else if (type.isCompatible(DurationValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = DurationCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as duration.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as duration.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
+                    }
+                } else if (type.isCompatible(PeriodValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = PeriodCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as period.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as as period.");
                         }
                     } else {
                         dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
