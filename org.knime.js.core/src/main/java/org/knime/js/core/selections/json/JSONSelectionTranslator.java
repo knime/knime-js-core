@@ -48,6 +48,19 @@
  */
 package org.knime.js.core.selections.json;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.knime.core.data.RowKey;
+import org.knime.core.node.property.hilite.HiLiteHandler;
+import org.knime.core.node.property.hilite.HiLiteManager;
+import org.knime.core.node.property.hilite.HiLiteMapper;
+import org.knime.core.node.property.hilite.HiLiteTranslator;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -56,5 +69,77 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  */
 @JsonAutoDetect
 public class JSONSelectionTranslator {
+
+    private String m_sourceID;
+    private List<String> m_targetIDs;
+    private Map<String, List<String>> m_mapping;
+
+    /**
+     * Creates a new {@link JSONSelectionTranslator} instance from a given {@link HiLiteManager}.
+     * Only source and target IDs are retrieved and no mapping is provided.
+     * @param hiliteManager the {@link HiLiteManager} to create the selection translator from
+     */
+    public JSONSelectionTranslator(final HiLiteManager hiliteManager) {
+        if (hiliteManager == null) {
+            return;
+        }
+        setHiliteHandlers(hiliteManager.getFromHiLiteHandler(), hiliteManager.getToHiLiteHandlers());
+    }
+
+    /**
+     * Creates a new {@link JSONSelectionTranslator} instance from a given {@link HiLiteTranslator}.
+     * Source and target IDs are retrieved and, if present, a mapping is provided.
+     * @param hiliteTranslator the {@link HiLiteTranslator} to create the selection translator from
+     */
+    public JSONSelectionTranslator(final HiLiteTranslator hiliteTranslator) {
+        if (hiliteTranslator == null) {
+            return;
+        }
+        setHiliteHandlers(hiliteTranslator.getFromHiLiteHandler(), hiliteTranslator.getToHiLiteHandlers());
+        HiLiteMapper mapper = hiliteTranslator.getMapper();
+        if (mapper == null) {
+            return;
+        }
+        m_mapping = new HashMap<String, List<String>>();
+        for (RowKey key : mapper.keySet()) {
+            Set<RowKey> mappedSet = mapper.getKeys(key);
+            if (mappedSet != null) {
+                List<String> values = Arrays.asList(RowKey.toStrings(mappedSet.toArray(new RowKey[0])));
+                m_mapping.put(key.toString(), values);
+            }
+        }
+    }
+
+    private void setHiliteHandlers(final HiLiteHandler fromHiLiteHandler, final Set<HiLiteHandler> toHiLiteHandlers) {
+        if (fromHiLiteHandler == null || toHiLiteHandlers == null || toHiLiteHandlers.size() < 1) {
+            return;
+        }
+        m_sourceID = fromHiLiteHandler.getHiliteHandlerID().toString();
+        m_targetIDs = new ArrayList<String>(toHiLiteHandlers.size());
+        for (HiLiteHandler toHiliteHandler : toHiLiteHandlers) {
+            m_targetIDs.add(toHiliteHandler.getHiliteHandlerID().toString());
+        }
+    }
+
+    /**
+     * @return the sourceID
+     */
+    public String getSourceID() {
+        return m_sourceID;
+    }
+
+    /**
+     * @return the targetIDs
+     */
+    public List<String> getTargetIDs() {
+        return m_targetIDs;
+    }
+
+    /**
+     * @return the mapping
+     */
+    public Map<String, List<String>> getMapping() {
+        return m_mapping;
+    }
 
 }
