@@ -127,7 +127,7 @@ public class JSONDataTableSpec {
 
         private static final Map<String, JSTypes> NAMES_MAP;
         static {
-            NAMES_MAP = Stream.of(values()).collect(Collectors.toMap(JSTypes::toString, Function.identity()));
+            NAMES_MAP = Stream.of(values()).collect(Collectors.toMap(type -> type.toString().toLowerCase(), Function.identity()));
         }
 
         /**
