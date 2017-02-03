@@ -270,7 +270,7 @@ public class JSONDataTableSpec {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
         // CHECK: I assume that names are unique.
         Map<String, DataType> nameToType = DataTypeRegistry.getInstance().availableDataTypes().stream()
-                .collect(Collectors.toMap(DataType::getName, Function.identity()));
+                .collect(Collectors.toMap(DataType::getName, Function.identity(), (type1, type2) -> { return type1; }));
 
         for (int i = 0; i < m_numColumns; i++) {
             DataType dataType = nameToType.get(m_knimeTypes.get(i));
