@@ -265,10 +265,10 @@ public class JSONDataTableSpec {
      * Creates a new {@link DataTableSpec} from the current settings.
      * @return the generated spec
      */
-    // TODO: testcase
+    // TODO: test case
     public DataTableSpec createDataTableSpec() {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
-        // CHECK: assumption here: name is unique, else: http://stackoverflow.com/questions/20363719/java-8-listv-into-mapk-v
+        // CHECK: I assume that names are unique.
         Map<String, DataType> nameToType = DataTypeRegistry.getInstance().availableDataTypes().stream()
                 .collect(Collectors.toMap(DataType::getName, Function.identity()));
 

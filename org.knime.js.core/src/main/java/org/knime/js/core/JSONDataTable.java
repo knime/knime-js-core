@@ -47,6 +47,7 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -71,6 +72,7 @@ import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowIterator;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeCell;
+import org.knime.core.data.date.DateAndTimeCellFactory;
 import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DefaultRow;
@@ -78,6 +80,14 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.time.localdate.LocalDateCellFactory;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeCellFactory;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.localtime.LocalTimeCellFactory;
+import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeCellFactory;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
 import org.knime.core.node.BufferedDataContainer;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
@@ -263,14 +273,15 @@ public class JSONDataTable {
                 int col = includeColIndices.get(c);
                 DataCell cell = row.getCell(col);
 
-                // TODO: Can I refactor the code so that getJSONCellValue is only called once?
-
                 Object cellValue;
                 if (!cell.isMissing()) {
                     cellValue = getJSONCellValue(cell);
                 } else {
                     cellValue = null;
                 }
+
+                // TODO: Can I refactor the code so that getJSONCellValue is only called once?
+                // Just replace all occurrences of getJSONCellValue(cell) with cellValue?
 
                 rowList.get(currentRowNumber - firstRow).getData()[c] = cellValue;
                 if (cellValue == null) {
@@ -362,8 +373,7 @@ public class JSONDataTable {
                     } else {
                         dataCells[colId] = BooleanCell.get(bVal);
                     }
-                // TODO: Add new date/time-types here
-                // TODO: parse to ISO
+                // TODO: Should I implement new date/time-range types as well?
                 } else if (type.isCompatible(DateAndTimeValue.class)) {
                     Long lVal = null;
                     if (value instanceof Long) {
@@ -372,9 +382,61 @@ public class JSONDataTable {
                         lVal = Long.parseLong((String)value);
                     }
                     if (lVal == null) {
-                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as long.");
+                        try {
+                            dataCells[colId] = DateAndTimeCellFactory.create((String)value);
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as date and time.");
+                        }
                     } else {
                         dataCells[colId] = new DateAndTimeCell(lVal, true, true, true);
+                    }
+                } else if (type.isCompatible(LocalDateValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = LocalDateCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local date.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local date.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
+                    }
+                } else if (type.isCompatible(LocalDateTimeValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = LocalDateTimeCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local date and time.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local date and time.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
+                    }
+                } else if (type.isCompatible(LocalTimeValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = LocalTimeCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local time.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as local time.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
+                    }
+                } else if (type.isCompatible(ZonedDateTimeValue.class)) {
+                    if (value instanceof String) {
+                        try {
+                            dataCells[colId] = ZonedDateTimeCellFactory.create((String)value);
+                        } catch (DateTimeParseException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as zoned date and time.");
+                        } catch (IllegalArgumentException ex) {
+                            dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as zoned date and time.");
+                        }
+                    } else {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
                     }
                 } else if (type.isCompatible(DoubleValue.class)) {
                     Number nVal = null;
@@ -407,7 +469,8 @@ public class JSONDataTable {
             case BOOLEAN:
                 return ((BooleanValue)cell).getBooleanValue();
             case DATE_TIME:
-                // TODO: Check if old data-time-cell yields iso-string, too
+                // CHECK: Does DateAndTimeCell yields iso-string?
+                // I think so!
                 return cell.toString();
             case NUMBER:
                 return ((DoubleValue)cell).getDoubleValue();
