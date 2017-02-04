@@ -75,6 +75,8 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.property.ColorHandler;
+import org.knime.js.core.colormodels.JSONColorModel;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -201,6 +203,8 @@ public class JSONDataTableSpec {
     private String[] m_rowColorValues;
     private String[] m_filterIds;
 
+    private JSONColorModel[] m_colorModels;
+
     /**
      * Empty default constructor for bean initialization.
      */
@@ -229,6 +233,7 @@ public class JSONDataTableSpec {
         List<String> colNames = new ArrayList<String>();
         List<JSTypes> colTypes = new ArrayList<JSTypes>();
         List<String> orgTypes = new ArrayList<String>();
+        List<JSONColorModel> colorModels = new ArrayList<JSONColorModel>();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
             if (!Arrays.asList(excludeColumns).contains(colName)) {
@@ -236,6 +241,10 @@ public class JSONDataTableSpec {
                 orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
                 colTypes.add(getJSONType(colType));
+                ColorHandler cHandler = spec.getColumnSpec(i).getColorHandler();
+                if (cHandler != null) {
+                    colorModels.add(JSONColorModel.createFromColorModel(cHandler.getColorModel(), colName));
+                }
                 numColumns++;
             }
         }
@@ -245,6 +254,7 @@ public class JSONDataTableSpec {
         setColNames(colNames.toArray(new String[0]));
         setColTypes(colTypes.toArray(new JSTypes[0]));
         setKnimeTypes(orgTypes.toArray(new String[0]));
+        setColorModels(colorModels.toArray(new JSONColorModel[colorModels.size()]));
     }
 
     /**
@@ -485,6 +495,20 @@ public class JSONDataTableSpec {
     }
 
     /**
+     * @return the colorModels
+     */
+    public JSONColorModel[] getColorModels() {
+        return m_colorModels;
+    }
+
+    /**
+     * @param colorModels the colorModels to set
+     */
+    public void setColorModels(final JSONColorModel[] colorModels) {
+        m_colorModels = colorModels;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -503,6 +527,7 @@ public class JSONDataTableSpec {
                 .append(m_possibleValues)
                 .append(m_rowColorValues)
                 .append(m_filterIds)
+                .append(m_colorModels)
                 .toHashCode();
     }
 
@@ -535,6 +560,7 @@ public class JSONDataTableSpec {
                 .append(m_possibleValues, other.m_possibleValues)
                 .append(m_rowColorValues, other.m_rowColorValues)
                 .append(m_filterIds, other.m_filterIds)
+                .append(m_colorModels, other.m_colorModels)
                 .isEquals();
     }
 
