@@ -72,6 +72,7 @@ public class JSONSelectionTranslator {
 
     private String m_sourceID;
     private List<String> m_targetIDs;
+    private boolean m_forward;
     private Map<String, List<String>> m_mapping;
 
     /**
@@ -84,6 +85,7 @@ public class JSONSelectionTranslator {
             return;
         }
         setHiliteHandlers(hiliteManager.getFromHiLiteHandler(), hiliteManager.getToHiLiteHandlers());
+        m_forward = true;
     }
 
     /**
@@ -100,6 +102,7 @@ public class JSONSelectionTranslator {
         if (mapper == null) {
             return;
         }
+        m_forward = false;
         m_mapping = new HashMap<String, List<String>>();
         for (RowKey key : mapper.keySet()) {
             Set<RowKey> mappedSet = mapper.getKeys(key);
@@ -136,10 +139,16 @@ public class JSONSelectionTranslator {
     }
 
     /**
+     * @return the forward
+     */
+    public boolean isForward() {
+        return m_forward;
+    }
+
+    /**
      * @return the mapping
      */
     public Map<String, List<String>> getMapping() {
         return m_mapping;
     }
-
 }
