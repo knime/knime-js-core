@@ -66,6 +66,8 @@ import org.knime.js.core.CSSUtils;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -78,6 +80,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
     property = "type")
+@JsonSubTypes({
+    @Type(value = JSONColorModelNominal.class, name = "nominal"),
+    @Type(value = JSONColorModelRange.class, name = "range")
+    })
 public abstract class JSONColorModel {
     private static final String CFG_TITLE = "title";
     private String m_title;
