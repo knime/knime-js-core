@@ -67,6 +67,7 @@ import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
 import org.knime.core.data.DataValueComparator;
 import org.knime.core.data.DoubleValue;
+import org.knime.core.data.IntValue;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowIterator;
@@ -77,6 +78,7 @@ import org.knime.core.data.date.DateAndTimeValue;
 import org.knime.core.data.def.BooleanCell;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
+import org.knime.core.data.def.IntCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.data.image.png.PNGImageValue;
@@ -379,18 +381,26 @@ public class JSONDataTable {
                     }
                 } else if (type.isCompatible(DateAndTimeValue.class)) {
                     Long lVal = null;
+                    // Is value a long? (old format for DateAndTime)
                     if (value instanceof Long) {
                         lVal = (Long)value;
-                    } else if (value instanceof String) {
-                        lVal = Long.parseLong((String)value);
+                    } else {
+                        try {
+                            lVal = Long.parseLong((String)value);
+                        } catch(NumberFormatException e) {
+                            lVal = null;
+                        }
                     }
+
                     if (lVal == null) {
+                        // Parse string value to DateAndTime.
                         try {
                             dataCells[colId] = DateAndTimeCellFactory.create((String)value);
                         } catch (IllegalArgumentException ex) {
                             dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as date and time.");
                         }
                     } else {
+                        // Parse long value to DateAndTime.
                         dataCells[colId] = new DateAndTimeCell(lVal, true, true, true);
                     }
                 } else if (type.isCompatible(LocalDateValue.class)) {
@@ -465,11 +475,25 @@ public class JSONDataTable {
                     } else {
                         dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as string.");
                     }
+                } else if (type.isCompatible(IntValue.class)) {
+                    Number nVal = null;
+                    if (value instanceof Number) {
+                        nVal = (Number)value;
+                    } else  if (value instanceof String) {
+                        // CHECK: Should there be exception handling here?
+                        nVal = Integer.parseInt((String)value);
+                    }
+                    if (nVal == null) {
+                        dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as number.");
+                    } else {
+                        dataCells[colId] = new IntCell(nVal.intValue());
+                    }
                 } else if (type.isCompatible(DoubleValue.class)) {
                     Number nVal = null;
                     if (value instanceof Number) {
                         nVal = (Number)value;
                     } else  if (value instanceof String) {
+                        // CHECK: Should there be exception handling here?
                         nVal = Double.parseDouble((String)value);
                     }
                     if (nVal == null) {
