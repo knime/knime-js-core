@@ -76,12 +76,12 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.property.ColorHandler;
 import org.knime.core.data.time.localdate.LocalDateValue;
 import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
 import org.knime.core.data.time.localtime.LocalTimeValue;
 import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
-import org.knime.core.data.property.ColorHandler;
-import org.knime.js.core.colormodels.JSONColorModel;
+import org.knime.js.core.color.JSONColorModel;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -275,10 +275,9 @@ public class JSONDataTableSpec {
      * Creates a new {@link DataTableSpec} from the current settings.
      * @return the generated spec
      */
-    // TODO: test case
     public DataTableSpec createDataTableSpec() {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
-        // CHECK: I assume that names are unique.
+        // constructing names of knime types, assumes names are unique
         Map<String, DataType> nameToType = DataTypeRegistry.getInstance().availableDataTypes().stream()
                 .collect(Collectors.toMap(DataType::getName, Function.identity(), (type1, type2) -> { return type1; }));
 

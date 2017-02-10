@@ -46,7 +46,7 @@
  * History
  *   03.02.2017 (Oleg Yasnev): created
  */
-package org.knime.js.core.colormodels;
+package org.knime.js.core.color;
 
 import java.util.ArrayList;
 import java.util.List;

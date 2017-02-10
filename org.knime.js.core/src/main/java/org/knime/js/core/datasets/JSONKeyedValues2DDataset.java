@@ -55,9 +55,9 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.core.JSONDataTable;
-import org.knime.js.core.colormodels.JSONColorModel;
-import org.knime.js.core.colormodels.JSONColorModelNominal;
-import org.knime.js.core.colormodels.JSONColorModelRange;
+import org.knime.js.core.color.JSONColorModel;
+import org.knime.js.core.color.JSONColorModelNominal;
+import org.knime.js.core.color.JSONColorModelRange;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;

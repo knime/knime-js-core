@@ -46,7 +46,7 @@
  * History
  *   03.02.2017 (Oleg Yasnev): created
  */
-package org.knime.js.core.colormodels;
+package org.knime.js.core.color;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
