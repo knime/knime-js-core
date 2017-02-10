@@ -234,7 +234,7 @@ knimeService = function() {
 		if (!selection.selectionMethod) {
 			selection.selectionMethod = type; 
 		}
-		
+		rowKeys = rowKeys || [];
 		// create new changeSet
 		selection.changeSet = {};
 		if (forceNew && curElement && curElement.elements) {
