@@ -236,7 +236,7 @@ knimeService = function() {
 		}
 		rowKeys = rowKeys || [];
 		// create new changeSet
-		selection.changeSet = {};
+		var updateSelection = {'selectionMethod': type, 'changeSet': {}};
 		if (forceNew && curElement && curElement.elements) {
 			var curRows = [];
 			for (var i = 0; i < curElement.elements.length; i++) {
@@ -244,16 +244,18 @@ knimeService = function() {
 					curRows = curRows.concat(curElement.elements[i].rows);
 				}
 			}
-			selection.changeSet.added = rowKeys.filter(function(row) {
+			updateSelection.changeSet.added = rowKeys.filter(function(row) {
 				return curRows.indexOf(row) < 0;
 			});
-			selection.changeSet.removed = curRows.filter(function(row) {
+			updateSelection.changeSet.removed = curRows.filter(function(row) {
 				return rowKeys.indexOf(row) < 0;
 			});
 		} else {
-			selection.changeSet.added = rowKeys;
+			updateSelection.changeSet.added = rowKeys;
 		}
-		
+		// only send changeSet
+		return publishInteractivityEvent(type + SEPARATOR + tableId, updateSelection, skip);
+		/*
 		//query existing element with id
 		var existing = false;
 		for (var i = 0; i < selection.elements.length; i++) {
@@ -281,6 +283,7 @@ knimeService = function() {
 			selection.elements.push(selectionElement); 
 		}
 		return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
+		*/
 	}
 	
 	service.removeRowsFromSelection = function(tableId, rowKeys, skip, elementId) {
@@ -293,9 +296,14 @@ knimeService = function() {
 	
 	removeRowsFromInteractivityEvent = function(type, tableId, rowKeys, skip, elementId) {
 		var selection = getInteractivityElement(type + SEPARATOR + tableId);
-		if (!selection) {
+		if (!selection || !selection.elements) {
+			// nothing to remove
 			return false;
 		}
+		// only send changeSet
+		var updateSelection = {'selectionMethod': type, 'changeSet': {'removed': rowKeys}};
+		return publishInteractivityEvent(type + SEPARATOR + tableId, updateSelection, skip);
+		/*
 		var i = selection.elements.length;
 		while (i--) {
 			if (!elementId || selection.elements[i].id == elementId) {
@@ -314,6 +322,32 @@ knimeService = function() {
 			}
 		}
 		return false;
+		*/
+	}
+	
+	service.getAllRowsForSelection = function(tableId, selectionElement) {
+		var rows = [];
+		var selection = selectionElement;
+		if (!selection) {
+			selection = getInteractivityElement(SELECTION + SEPARATOR + tableId);
+		}
+		if (selection && selection.elements) {
+			for (var i = 0; i < selection.elements.length; i++) {
+				if (selection.elements[i].rows) {
+					rows = rows.concat(selection.elements[i].rows);
+				}
+			}
+		}
+		return rows;
+	}
+	
+	service.getAllPartiallySelectedRows = function(tableId) {
+		var selection = getInteractivityElement(SELECTION + SEPARATOR + tableId);
+		return selection.partial || [];
+	}
+	
+	service.isRowSelected = function(tableId, rowKey) {
+		return service.getAllRowsForSelection(tableId).indexOf(rowKey) > -1;
 	}
 	
 	service.addMenuItem = function(title, icon, element, path, flags) {
