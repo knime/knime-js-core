@@ -255,35 +255,6 @@ knimeService = function() {
 		}
 		// only send changeSet
 		return publishInteractivityEvent(type + SEPARATOR + tableId, updateSelection, skip);
-		/*
-		//query existing element with id
-		var existing = false;
-		for (var i = 0; i < selection.elements.length; i++) {
-			var element = selection.elements[i];
-			if (typeof elementId == 'undefined' && typeof element.id == 'undefined') {
-				var rowArray = element.rows || [];
-				element.rows = rowArray.concat(rowKeys);
-				existing = true;
-				break;
-			} else if (element.id == elementId) {
-				var rowArray = element.rows || [];
-				element.rows = rowArray.concat(rowKeys);
-				existing = true;
-				break;
-			}
-		}
-		
-		// create new element if not found
-		if (!existing) {
-			var selectionElement = {
-					'id': elementId,
-					'type': 'row',
-					'rows': rowKeys || []
-			}
-			selection.elements.push(selectionElement); 
-		}
-		return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
-		*/
 	}
 	
 	service.removeRowsFromSelection = function(tableId, rowKeys, skip, elementId) {
@@ -303,26 +274,6 @@ knimeService = function() {
 		// only send changeSet
 		var updateSelection = {'selectionMethod': type, 'changeSet': {'removed': rowKeys}};
 		return publishInteractivityEvent(type + SEPARATOR + tableId, updateSelection, skip);
-		/*
-		var i = selection.elements.length;
-		while (i--) {
-			if (!elementId || selection.elements[i].id == elementId) {
-				var rowArray = selection.elements[i].rows || [];
-				var filteredRows = rowArray.filter(function(value) {
-					return rowKeys.indexOf(value) == -1;
-				});
-				if (filteredRows.length == 0) {
-					selection.elements.splice(i, 1);
-				} else {
-					selection.elements[i].rows = filteredRows;
-				}
-				selection.changeSet = {};
-				selection.changeSet.removed = rowKeys;
-				return publishInteractivityEvent(type + SEPARATOR + tableId, selection, skip);
-			}
-		}
-		return false;
-		*/
 	}
 	
 	service.getAllRowsForSelection = function(tableId, selectionElement) {
