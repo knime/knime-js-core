@@ -350,6 +350,10 @@ knimeService = function() {
 		return service.getAllRowsForSelection(tableId).indexOf(rowKey) > -1;
 	}
 	
+	service.isRowPartiallySelected = function(tableId, rowKey) {
+		return service.getAllPartiallySelectedRows(tableId).indexOf(rowKey) > -1;
+	}
+	
 	service.addMenuItem = function(title, icon, element, path, flags) {
 		initialized || init();
 		menu || initMenu();
