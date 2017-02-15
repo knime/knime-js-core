@@ -1146,7 +1146,7 @@
       <webResourceBundle
             debug="true"
             exports="moment"
-            name="Moment"
+            name="Moment 2.13"
             usesDefine="true"
             version="2.13.0"
             webResourceBundleID="moment_2_13_Debug">
@@ -1162,7 +1162,7 @@
       <webResourceBundle
             debug="false"
             exports="moment"
-            name="Moment"
+            name="Moment 2.13"
             usesDefine="true"
             version="2.13.0"
             webResourceBundleID="moment_2_13">
@@ -1174,6 +1174,92 @@
                relativePath="js-lib/moment/2_13/moment.min.js"
                type="JAVASCRIPT">
          </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            exports="moment"
+            name="Moment"
+            usesDefine="true"
+            version="2.17.1"
+            webResourceBundleID="moment_2_17_Debug">
+         <webResource
+               relativePathSource="js-lib/moment/2_17/moment.js"
+               relativePathTarget="js-lib/moment/2_17/moment.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_17/moment.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="moment"
+            name="Moment"
+            usesDefine="true"
+            version="2.17.1"
+            webResourceBundleID="moment_2_17">
+         <webResource
+               relativePathSource="js-lib/moment/2_17/moment.min.js"
+               relativePathTarget="js-lib/moment/2_17/moment.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_17/moment.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="moment"
+            name="Moment with locales"
+            usesDefine="true"
+            version="2.17.1"
+            webResourceBundleID="moment_locales_2_17">
+         <webResource
+               relativePathSource="js-lib/moment/2_17/locales/moment-with-locales.min.js"
+               relativePathTarget="js-lib/moment/2_17/locales/moment-with-locales.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_17/locales/moment-with-locales.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="moment"
+            name="Moment Timezone"
+            usesDefine="true"
+            version="2.17.1"
+            webResourceBundleID="moment_timezone_2_17">
+         <webResource
+               relativePathSource="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js"
+               relativePathTarget="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="moment_2_17">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="moment"
+            name="Moment Timezone with locales"
+            usesDefine="true"
+            version="2.17.1"
+            webResourceBundleID="moment_timezone_locales_2_17">
+         <webResource
+               relativePathSource="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js"
+               relativePathTarget="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/moment/2_17/timezone/moment-timezone-with-data.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="moment_locales_2_17">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
