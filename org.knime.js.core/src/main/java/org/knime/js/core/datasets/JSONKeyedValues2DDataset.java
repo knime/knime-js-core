@@ -55,6 +55,9 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.color.JSONColorModel;
+import org.knime.js.core.color.JSONColorModelNominal;
+import org.knime.js.core.color.JSONColorModelRange;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -74,6 +77,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     private Map<String, String>[] m_symbols;
     private String[] m_dateTimeFormats;
     private JSONKeyedValuesRow[] m_rows;
+    private JSONColorModel[] m_colorModels;
 
     /** Serialization constructor. Don't use. */
     public JSONKeyedValues2DDataset() { }
@@ -205,6 +209,20 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     }
 
     /**
+     * @return the colorModels
+     */
+    public JSONColorModel[] getColorModels() {
+        return m_colorModels;
+    }
+
+    /**
+     * @param colorModels the colorModels to set
+     */
+    public void setColorModels(final JSONColorModel[] colorModels) {
+        m_colorModels = colorModels;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -235,6 +253,22 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
         for (int rowID = 0; rowID < m_rows.length; rowID++) {
             NodeSettingsWO rowSettings = settings.addNodeSettings("row_" + rowID);
             m_rows[rowID].saveToNodeSettings(rowSettings);
+        }
+
+        int numColorModels = m_colorModels == null ? 0 : m_colorModels.length;
+        settings.addInt("numColorModels", numColorModels);
+        for (int i = 0; i < numColorModels; i++) {
+            String type = null;
+            if (m_colorModels[i] instanceof JSONColorModelNominal) {
+                type = "nominal";
+            } else if (m_colorModels[i] instanceof JSONColorModelRange) {
+                type = "range";
+            }
+            settings.addString("type" + i, type);
+            if (type != null) {
+                NodeSettingsWO modelSettings = settings.addNodeSettings("colorModel_" + i);
+                m_colorModels[i].saveToNodeSettings(modelSettings);
+            }
         }
     }
 
@@ -270,6 +304,25 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
             NodeSettingsRO rowSettings = settings.getNodeSettings("row_" + rowID);
             m_rows[rowID] = new JSONKeyedValuesRow();
             m_rows[rowID].loadFromNodeSettings(rowSettings);
+        }
+
+        m_colorModels = null;
+        int numColorModels = settings.getInt("numColorModels", 0);
+        if (numColorModels > 0) {
+            m_colorModels = new JSONColorModel[numColorModels];
+            for (int i = 0; i < numColorModels; i++) {
+                String type = settings.getString("type" + i);
+                JSONColorModel model = null;
+                if ("nominal".equals(type)) {
+                    model = new JSONColorModelNominal();
+                } else if ("range".equals(type)) {
+                    model = new JSONColorModelRange();
+                }
+                if (model != null) {
+                    NodeSettingsRO modelSettings = settings.getNodeSettings("colorModel_" + i);
+                    model.loadFromNodeSettings(modelSettings);
+                }
+            }
         }
     }
 }

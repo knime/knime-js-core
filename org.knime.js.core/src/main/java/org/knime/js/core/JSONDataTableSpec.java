@@ -65,6 +65,7 @@ import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataColumnSpecCreator;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.DataType;
+import org.knime.core.data.DataTypeRegistry;
 import org.knime.core.data.DoubleValue;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.StringValue;
@@ -75,6 +76,12 @@ import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.StringCell;
 import org.knime.core.data.image.png.PNGImageCell;
 import org.knime.core.data.image.png.PNGImageValue;
+import org.knime.core.data.property.ColorHandler;
+import org.knime.core.data.time.localdate.LocalDateValue;
+import org.knime.core.data.time.localdatetime.LocalDateTimeValue;
+import org.knime.core.data.time.localtime.LocalTimeValue;
+import org.knime.core.data.time.zoneddatetime.ZonedDateTimeValue;
+import org.knime.js.core.color.JSONColorModel;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -122,7 +129,7 @@ public class JSONDataTableSpec {
 
         private static final Map<String, JSTypes> NAMES_MAP;
         static {
-            NAMES_MAP = Stream.of(values()).collect(Collectors.toMap(JSTypes::toString, Function.identity()));
+            NAMES_MAP = Stream.of(values()).collect(Collectors.toMap(type -> type.toString().toLowerCase(), Function.identity()));
         }
 
         /**
@@ -173,6 +180,15 @@ public class JSONDataTableSpec {
             type = JSTypes.BOOLEAN;
         } else if (colType.isCompatible(DateAndTimeValue.class)) {
             type = JSTypes.DATE_TIME;
+        // CHECK: add PeriodValue and DurationValue, too?
+        } else if (colType.isCompatible(LocalDateValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(LocalDateTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(LocalTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
+        } else if (colType.isCompatible(ZonedDateTimeValue.class)) {
+            type = JSTypes.DATE_TIME;
         } else if (colType.isCompatible(DoubleValue.class)) {
             type = JSTypes.NUMBER;
         } else if (colType.isCompatible(StringValue.class)) {
@@ -200,6 +216,8 @@ public class JSONDataTableSpec {
 
     private String[] m_rowColorValues;
     private String[] m_filterIds;
+
+    private JSONColorModel[] m_colorModels;
 
     /**
      * Empty default constructor for bean initialization.
@@ -229,6 +247,7 @@ public class JSONDataTableSpec {
         List<String> colNames = new ArrayList<String>();
         List<JSTypes> colTypes = new ArrayList<JSTypes>();
         List<String> orgTypes = new ArrayList<String>();
+        List<JSONColorModel> colorModels = new ArrayList<JSONColorModel>();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
             if (!Arrays.asList(excludeColumns).contains(colName)) {
@@ -236,6 +255,10 @@ public class JSONDataTableSpec {
                 orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
                 colTypes.add(getJSONType(colType));
+                ColorHandler cHandler = spec.getColumnSpec(i).getColorHandler();
+                if (cHandler != null) {
+                    colorModels.add(JSONColorModel.createFromColorModel(cHandler.getColorModel(), colName));
+                }
                 numColumns++;
             }
         }
@@ -245,6 +268,7 @@ public class JSONDataTableSpec {
         setColNames(colNames.toArray(new String[0]));
         setColTypes(colTypes.toArray(new JSTypes[0]));
         setKnimeTypes(orgTypes.toArray(new String[0]));
+        setColorModels(colorModels.toArray(new JSONColorModel[colorModels.size()]));
     }
 
     /**
@@ -253,31 +277,38 @@ public class JSONDataTableSpec {
      */
     public DataTableSpec createDataTableSpec() {
         DataColumnSpec[] columns = new DataColumnSpec[m_numColumns];
+        // constructing names of knime types, assumes names are unique
+        Map<String, DataType> nameToType = DataTypeRegistry.getInstance().availableDataTypes().stream()
+                .collect(Collectors.toMap(DataType::getName, Function.identity(), (type1, type2) -> { return type1; }));
+
         for (int i = 0; i < m_numColumns; i++) {
-            JSTypes type = m_colTypes.get(i);
-            DataType dataType = null;
-            switch (type) {
-                case BOOLEAN:
-                    dataType = DataType.getType(BooleanCell.class);
-                    break;
-                case NUMBER:
-                    dataType = DataType.getType(DoubleCell.class);
-                    break;
-                case DATE_TIME:
-                    dataType = DataType.getType(DateAndTimeCell.class);
-                    break;
-                case STRING:
-                    dataType = DataType.getType(StringCell.class);
-                    break;
-                case SVG:
-                    dataType = DataType.getType(SvgCell.class);
-                    break;
-                case PNG:
-                    dataType = DataType.getType(PNGImageCell.class);
-                    break;
-                default:
-                    dataType = DataType.getType(MissingCell.class);
-                    break;
+            DataType dataType = nameToType.get(m_knimeTypes.get(i));
+
+            if (dataType == null) {
+                JSTypes jsType = m_colTypes.get(i);
+                switch (jsType) {
+                    case BOOLEAN:
+                        dataType = DataType.getType(BooleanCell.class);
+                        break;
+                    case NUMBER:
+                        dataType = DataType.getType(DoubleCell.class);
+                        break;
+                    case DATE_TIME:
+                        dataType = DataType.getType(DateAndTimeCell.class);
+                        break;
+                    case STRING:
+                        dataType = DataType.getType(StringCell.class);
+                        break;
+                    case SVG:
+                        dataType = DataType.getType(SvgCell.class);
+                        break;
+                    case PNG:
+                        dataType = DataType.getType(PNGImageCell.class);
+                        break;
+                    default:
+                        dataType = DataType.getType(MissingCell.class);
+                        break;
+                }
             }
             columns[i] = new DataColumnSpecCreator(m_colNames.get(i), dataType).createSpec();
         }
@@ -485,6 +516,20 @@ public class JSONDataTableSpec {
     }
 
     /**
+     * @return the colorModels
+     */
+    public JSONColorModel[] getColorModels() {
+        return m_colorModels;
+    }
+
+    /**
+     * @param colorModels the colorModels to set
+     */
+    public void setColorModels(final JSONColorModel[] colorModels) {
+        m_colorModels = colorModels;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -503,6 +548,7 @@ public class JSONDataTableSpec {
                 .append(m_possibleValues)
                 .append(m_rowColorValues)
                 .append(m_filterIds)
+                .append(m_colorModels)
                 .toHashCode();
     }
 
@@ -535,6 +581,7 @@ public class JSONDataTableSpec {
                 .append(m_possibleValues, other.m_possibleValues)
                 .append(m_rowColorValues, other.m_rowColorValues)
                 .append(m_filterIds, other.m_filterIds)
+                .append(m_colorModels, other.m_colorModels)
                 .isEquals();
     }
 
