@@ -1442,6 +1442,30 @@
                webResourceBundleID="D3_3.5.5_Debug">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            exports="KnimePageLoader"
+            name="KNIME Page Builder"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimePageBuilder_1.0.0_Debug">
+         <webResource
+               relativePathSource="js-lib/knime/pageBuilder/knime_pagebuilder_1_0_0.js"
+               relativePathTarget="org/knime/debug/knime_pagebuilder.js">
+         </webResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            exports="KnimePageLoader"
+            name="KNIME Page Builder"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimePageBuilder_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/pageBuilder/knime_pagebuilder_1_0_0.min.js"
+               relativePathTarget="org/knime/core/knime_pagebuilder.js">
+         </webResource>
+      </webResourceBundle>
    </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
