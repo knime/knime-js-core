@@ -50,6 +50,8 @@ package org.knime.js.core.datasets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
 
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
@@ -67,7 +69,7 @@ public class JSONKeyedValuesRow implements JSONDataset {
 
     private String m_rowKey;
 
-    private double[] m_values;
+    private Double[] m_values;
     private Map<String, String> m_properties;
 
     /** Serialization constructor. Don't use. */
@@ -77,7 +79,7 @@ public class JSONKeyedValuesRow implements JSONDataset {
      * @param rowkey
      * @param values
      */
-    public JSONKeyedValuesRow(final String rowkey, final double[] values) {
+    public JSONKeyedValuesRow(final String rowkey, final Double[] values) {
         m_rowKey = rowkey;
         m_values = values;
         m_properties = new HashMap<String, String>();
@@ -100,14 +102,14 @@ public class JSONKeyedValuesRow implements JSONDataset {
     /**
      * @return the values
      */
-    public double[] getValues() {
+    public Double[] getValues() {
         return m_values;
     }
 
     /**
      * @param values the values to set
      */
-    public void setValues(final double[] values) {
+    public void setValues(final Double[] values) {
         m_values = values;
     }
 
@@ -158,7 +160,8 @@ public class JSONKeyedValuesRow implements JSONDataset {
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         settings.addString("rowKey", m_rowKey);
-        settings.addDoubleArray("values", m_values);
+        // Since the values type has changed to Double and node settings provide support only for double - we do a conversion to String
+        settings.addStringArray("values", Stream.of(m_values).map(value -> value == null ? null : value.toString()).toArray(String[]::new));
         settings.addInt("numProperties", m_properties.size());
         int propertyID = 0;
         for (Entry<String, String> propertyEntry : m_properties.entrySet()) {
@@ -174,7 +177,13 @@ public class JSONKeyedValuesRow implements JSONDataset {
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException{
         m_rowKey = settings.getString("rowKey");
-        m_values = settings.getDoubleArray("values");
+        // Since the values type has changed to Double and node settings provide support only for double - we do a conversion to String
+        // For backwards compatibility we need to address the double array though
+        try {
+            m_values = Stream.of(settings.getStringArray("values")).map(value -> value == null ? null : Double.parseDouble(value)).toArray(Double[]::new);
+        } catch (InvalidSettingsException e) {
+            m_values = DoubleStream.of(settings.getDoubleArray("values")).boxed().toArray(Double[]::new);
+        }
         int numProperties = settings.getInt("numProperties");
         m_properties = new HashMap<String, String>();
         for (int propertyID = 0; propertyID < numProperties; propertyID++) {
