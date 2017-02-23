@@ -54,21 +54,11 @@ import java.io.InputStream;
 
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
-import org.knime.core.node.BufferedDataTable;
-import org.knime.core.node.ExecutionContext;
-import org.knime.core.node.NodeLogger;
-import org.knime.core.node.NodeModel;
-import org.knime.core.node.port.PortObject;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.image.ImagePortObjectSpec;
-import org.knime.core.node.port.inactive.InactiveBranchPortObject;
-import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.wizard.WizardNode;
-import org.knime.core.node.workflow.WizardExecutionController;
-import org.knime.ext.phantomjs.PhantomJSImageGenerator;
 import org.knime.js.core.JSONViewContent;
-import org.openqa.selenium.TimeoutException;
 
 /**
  *
@@ -78,12 +68,7 @@ import org.openqa.selenium.TimeoutException;
  * @since 2.11
  */
 public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends
-    AbstractWizardNodeModel<REP, VAL> {
-
-    private static final Object m_viewGenerationLock = new Object();
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractSVGWizardNodeModel.class);
-
-    private Long m_optionalViewWaitTime = null;
+    AbstractImageWizardNodeModel<REP, VAL> {
 
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
@@ -96,166 +81,37 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
         super(inPortTypes, outPortTypes, viewName);
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
-    protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
-        throws Exception {
-        exec.setProgress(0.0, "Creating view model...");
-        performExecuteCreateView(inObjects, exec.createSubExecutionContext(0.25));
-        exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
-        PortObject svgPortObject = createSVGImagePortObjectFromView(exec.createSubExecutionContext(0.5));
-        exec.setProgress(2.0 / 3.0, "Creating output...");
-        PortObject[] output =
-            performExecuteCreatePortObjects(svgPortObject, inObjects, exec.createSubExecutionContext(0.25));
-        exec.setProgress(1.0);
-        return output;
-    }
-
-    /**
-     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}. View representation and value
-     * are populated in this method. <br>
-     * <br>
-     * Called BEFORE image creation.
-     *
-     * @param inObjects The input objects.
-     * @param exec For {@link BufferedDataTable} creation and progress.
-     * @throws Exception If the node execution fails for any reason.
-     */
-    protected abstract void performExecuteCreateView(final PortObject[] inObjects, final ExecutionContext exec)
-        throws Exception;
-
-    /**
-     * Called during {@link NodeModel#execute(PortObject[], ExecutionContext) execute}. Populates the resulting
-     * {@link PortObject} array. The {@link ImagePortObject} containing the required SVG image is passed in as a
-     * parameter. <br>
-     * <br>
-     * Called AFTER image creation.
-     *
-     * @param svgImageFromView The port object, containing the SVG created by the view, or inactive port object.
-     * @param inObjects The input objects.
-     * @param exec For {@link BufferedDataTable} creation and progress.
-     * @return The output objects.
-     * @throws Exception If the node execution fails for any reason.
-     */
-    protected abstract PortObject[] performExecuteCreatePortObjects(final PortObject svgImageFromView,
-        final PortObject[] inObjects, final ExecutionContext exec) throws Exception;
-
-    /**
-     * @return true if the SVG image is supposed to be rendered and retrieved, false otherwise
-     */
-    protected abstract boolean generateImage();
-
-    /**
-     * Renders the view with PhantomJS and retrieves the created SVG image.
-     *
-     * @return A {@link PortObject} containing the SVG created by the view.
-     * @throws IOException if an I/O error occurs
-     */
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private final PortObject createSVGImagePortObjectFromView(final ExecutionContext exec) throws IOException {
-        if (!generateImage()) {
-            return InactiveBranchPortObject.INSTANCE;
-        }
+    protected final ImagePortObject createImagePortObjectFromView(final String imageData, final String error) throws IOException {
         String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
         String svgPrimer =
             xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
-        String svg = null;
-        String errorText = "";
-        // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
-        // View nodes will get executed sequentially as a result.
-        synchronized (PhantomJSImageGenerator.VIEW_GENERATION_LOCK) {
-            // Inits PhantomJS AND the view.
-
-            PhantomJSImageGenerator generator = null;
-            try {
-                generator = new PhantomJSImageGenerator(this, m_optionalViewWaitTime, exec.createSubExecutionContext(0.75));
-            } catch (IOException ex) {
-                throw ex;
-            } catch (Exception e) {
-                if (e instanceof TimeoutException) {
-                    errorText = "No elements added to body. Possible JavaScript implementation error.";
-                } else {
-                    errorText = e.getMessage();
-                }
-                LOGGER.error("Initializing view failed: " + e.getMessage(), e);
-            }
-
-            exec.setProgress(0.75, "Retrieving generated image...");
-            String namespace = getViewNamespace();
-            String methodCall = "";
-            if (namespace != null && !namespace.isEmpty()) {
-                methodCall += namespace + ".";
-            }
-            methodCall += getExtractSVGMethodName() + "();";
-            // Retrieve the SVG string from the view.
-            Object imageData;
-            try {
-                if (generator != null) {
-                    imageData = generator.executeScript(methodCall);
-                    if (imageData instanceof String) {
-                        svg = (String)imageData;
-                    }
-                }
-                exec.setProgress(0.9, "Creating image output...");
-            } catch (IOException e) {
-                errorText = e.getMessage();
-                LOGGER.error("Retrieving SVG from view failed: " + e.getMessage(), e);
-            }
-
-        }
-        if (svg == null || svg.isEmpty()) {
+        String image = imageData;
+        String errorText = error;
+        if (image == null || image.isEmpty()) {
             if (errorText.isEmpty()) {
                 errorText = "JavaScript returned nothing. Possible implementation error.";
             }
-            svg = "<svg width=\"600px\" height=\"40px\">"
+            image = "<svg width=\"600px\" height=\"40px\">"
                     + "<text x=\"0\" y=\"20\" font-family=\"sans-serif;\" font-size=\"10\">"
                + "SVG retrieval failed: " + errorText + "</text></svg>";
         }
-        svg = svgPrimer + svg;
-        InputStream is = new ByteArrayInputStream(svg.getBytes("UTF-8"));
+        image = svgPrimer + image;
+        InputStream is = new ByteArrayInputStream(image.getBytes("UTF-8"));
         ImagePortObjectSpec imageSpec = new ImagePortObjectSpec(SvgCell.TYPE);
-        ImagePortObject imagePort = null;
-        try {
-            imagePort = new ImagePortObject(new SvgImageContent(is), imageSpec);
-        } catch (IOException e) {
-            LOGGER.error("Creating SVG port object failed: " + e.getMessage(), e);
-        }
-        exec.setProgress(1);
-        return imagePort;
+        return new ImagePortObject(new SvgImageContent(is), imageSpec);
     }
 
     /**
-     * @return the optionalViewTimeout
+     * {@inheritDoc}
      */
-    protected Long getOptionalViewWaitTime() {
-        return m_optionalViewWaitTime;
-    }
-
-    /**
-     * @param optionalViewTimeout the optionalViewTimeout to set
-     */
-    protected void setOptionalViewWaitTime(final Long optionalViewTimeout) {
-        m_optionalViewWaitTime = optionalViewTimeout;
-    }
-
-    /**
-     * @return
-     */
-    private String getViewNamespace() {
-        WebTemplate template = WizardExecutionController.getWebTemplateFromJSObjectID(getJavascriptObjectID());
-        return template.getNamespace();
-    }
-
-    /**
-     * Override this method, if JavaScript implementation uses a different method name then getSVG() for returning the
-     * rendered SVG.
-     *
-     * @return The method name, used in the JavaScript view implementation, which returns the rendered SVG.
-     */
-    protected String getExtractSVGMethodName() {
+    @Override
+    protected String getExtractImageMethodName() {
         return "getSVG";
     }
 }
