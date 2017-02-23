@@ -24,6 +24,7 @@ import org.knime.js.core.JSONViewContent;
 public abstract class AbstractPNGWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends AbstractImageWizardNodeModel<REP, VAL> {
 
     private static final String pngPrimer = "data:image/png;base64,";
+    private static final String tinyPng = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
     /**
      * Creates a new {@link WizardNode} model with the given number (and types!) of input and output types.
@@ -47,8 +48,8 @@ public abstract class AbstractPNGWizardNodeModel<REP extends JSONViewContent, VA
             if (errorText.isEmpty()) {
                 errorText = "JavaScript returned nothing. Possible implementation error.";
             }
-            setWarningMessage(errorText);
-            return null;
+            setWarningMessage("Creating outport image failed. " + errorText);
+            image = tinyPng;
         }
         if (image.startsWith(pngPrimer)) {
             image = image.substring(pngPrimer.length());
