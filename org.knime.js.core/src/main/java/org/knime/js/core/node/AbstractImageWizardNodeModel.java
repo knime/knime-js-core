@@ -96,7 +96,7 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
         throws Exception {
         exec.setProgress(0.0, "Creating view model...");
         performExecuteCreateView(inObjects, exec.createSubExecutionContext(0.25));
-        exec.setProgress(1.0 / 3.0, "Rendering SVG image...");
+        exec.setProgress(1.0 / 3.0, "Rendering image...");
         PortObject imagePortObject = renderViewAndCreateImage(exec.createSubExecutionContext(0.5));
         exec.setProgress(2.0 / 3.0, "Creating output...");
         PortObject[] output =
