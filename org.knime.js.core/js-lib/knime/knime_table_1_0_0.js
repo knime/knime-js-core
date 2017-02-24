@@ -29,6 +29,17 @@ kt = function() {
 		return dataTable.rows;
 	}
 	
+	kt.getRow = function(rowID) {
+		var id = rowID;
+		if (typeof rowID === "string") {
+			id = kt_getRowID(rowID);
+		}
+		if (id != null && id >= 0 && id < kt.getNumRows()) {
+			return dataTable.rows[id];
+		}
+		return null;
+	}
+	
 	kt.getCell = function(rowID, columnID) {
 		var colIndex = columnID;
 		if (typeof columnID === "string") {
@@ -231,11 +242,15 @@ kt = function() {
 		return colID;
 	};
 	
-	kt_getRowID = function(rowIDName) {
+	kt_getRowID = function(rowKey) {
 		var rowID = null;
 		for (var i = 0; i < dataTable.spec.numRows; i++) {
-			
+			if (dataTable.rows[i].rowKey == rowKey) {
+				rowID = i;
+				break;
+			}
 		}
+		return rowID;
 	}
 	
 	kt_getExtColumnID = function(columnName) {
@@ -249,10 +264,10 @@ kt = function() {
 		return colID;
 	};
 	
-	kt.isRowIncludedInFilter = function(rowIndex, filter) {
+	kt.isRowIncludedInFilter = function(rowID, filter) {
 		if (filter && filter.elements) {
 			var included = true;
-			var row = dataTable.rows[rowIndex];
+			var row = kt.getRow(rowID);
 			for (var i = 0; i < filter.elements.length; i++) {
 				var filterElement = filter.elements[i];
 				if (filterElement.type == "range" && filterElement.columns) {
