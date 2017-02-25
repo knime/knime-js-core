@@ -50,6 +50,9 @@ package org.knime.js.core.layout.bs;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -89,6 +92,38 @@ public abstract class JSONLayoutElement {
      */
     public void setAdditionalStyles(final ArrayList<String> additionalStyles) {
         m_additionalStyles = additionalStyles;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutElement other = (JSONLayoutElement)obj;
+        return new EqualsBuilder()
+                .append(m_additionalClasses, other.m_additionalClasses)
+                .append(m_additionalStyles, other.m_additionalStyles)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_additionalClasses)
+                .append(m_additionalStyles)
+                .toHashCode();
     }
 
 }

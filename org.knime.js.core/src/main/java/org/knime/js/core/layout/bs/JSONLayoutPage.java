@@ -49,6 +49,9 @@ package org.knime.js.core.layout.bs;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,5 +108,35 @@ public class JSONLayoutPage {
             new NamedType(JSONLayoutHTMLContent.class, "html")
                 );
         return mapper;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutPage other = (JSONLayoutPage)obj;
+        return new EqualsBuilder()
+                .append(m_rows, other.m_rows)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_rows)
+                .toHashCode();
     }
 }

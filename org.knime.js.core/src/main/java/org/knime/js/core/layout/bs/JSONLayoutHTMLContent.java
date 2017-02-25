@@ -48,6 +48,9 @@
  */
 package org.knime.js.core.layout.bs;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
@@ -68,6 +71,36 @@ public class JSONLayoutHTMLContent implements JSONLayoutContent {
      */
     public void setValue(final String value) {
         m_value = value;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutHTMLContent other = (JSONLayoutHTMLContent)obj;
+        return new EqualsBuilder()
+                .append(m_value, other.m_value)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_value)
+                .toHashCode();
     }
 
 }

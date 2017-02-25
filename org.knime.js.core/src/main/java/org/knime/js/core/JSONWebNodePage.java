@@ -48,7 +48,12 @@ package org.knime.js.core;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -61,7 +66,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePage {
+public class JSONWebNodePage extends JSONViewContent {
 
     private final String m_version;
     private JSONWebNodePageConfiguration m_configuration;
@@ -118,5 +123,51 @@ public class JSONWebNodePage {
     @JsonProperty("webNodes")
     public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
         m_webNodes = webNodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) { /* not needed so far */ }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException { /* not needed so far */ }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONWebNodePage other = (JSONWebNodePage)obj;
+        return new EqualsBuilder()
+                .append(m_version, other.m_version)
+                .append(m_configuration, other.m_configuration)
+                .append(m_webNodes, other.m_webNodes)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_version)
+                .append(m_configuration)
+                .append(m_webNodes)
+                .toHashCode();
     }
 }

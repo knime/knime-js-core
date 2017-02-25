@@ -48,6 +48,9 @@ package org.knime.js.core;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -213,6 +216,52 @@ public class JSONWebNode {
     @JsonProperty("viewValue")
     public void setViewValue(final JSONViewContent viewValue) {
         m_viewValue = viewValue;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONWebNode other = (JSONWebNode)obj;
+        return new EqualsBuilder()
+                .append(m_javascriptLibraries, other.m_javascriptLibraries)
+                .append(m_stylesheets, other.m_stylesheets)
+                .append(m_namespace, other.m_namespace)
+                .append(m_initMethodName, other.m_initMethodName)
+                .append(m_validateMethodName, other.m_validateMethodName)
+                .append(m_setValidationErrorMethodName, other.m_setValidationErrorMethodName)
+                .append(m_getViewValueMethodName, other.m_getViewValueMethodName)
+                .append(m_viewRepresentation, other.m_viewRepresentation)
+                .append(m_viewValue, other.m_viewValue)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_javascriptLibraries)
+                .append(m_stylesheets)
+                .append(m_namespace)
+                .append(m_initMethodName)
+                .append(m_validateMethodName)
+                .append(m_setValidationErrorMethodName)
+                .append(m_getViewValueMethodName)
+                .append(m_viewRepresentation)
+                .append(m_viewValue)
+                .toHashCode();
     }
 
 }

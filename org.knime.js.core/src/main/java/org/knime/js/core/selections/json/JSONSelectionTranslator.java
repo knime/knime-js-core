@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.data.RowKey;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteManager;
@@ -150,5 +152,41 @@ public class JSONSelectionTranslator {
      */
     public Map<String, List<String>> getMapping() {
         return m_mapping;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONSelectionTranslator other = (JSONSelectionTranslator)obj;
+        return new EqualsBuilder()
+                .append(m_sourceID, other.m_sourceID)
+                .append(m_targetIDs, other.m_targetIDs)
+                .append(m_forward, other.m_forward)
+                .append(m_mapping, other.m_mapping)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_sourceID)
+                .append(m_targetIDs)
+                .append(m_forward)
+                .append(m_mapping)
+                .toHashCode();
     }
 }

@@ -49,6 +49,9 @@ package org.knime.js.core;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -74,6 +77,36 @@ public class JSONBlackBoard {
      */
     public void setVariables(final Map<String, Object> variables) {
         m_variables = variables;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONBlackBoard other = (JSONBlackBoard)obj;
+        return new EqualsBuilder()
+                .append(m_variables, other.m_variables)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_variables)
+                .toHashCode();
     }
 
 }

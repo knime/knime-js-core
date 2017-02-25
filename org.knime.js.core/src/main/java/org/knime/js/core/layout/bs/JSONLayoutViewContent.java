@@ -362,6 +362,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
         }
         JSONLayoutViewContent other = (JSONLayoutViewContent)obj;
         return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
                 .append(m_nodeID, other.m_nodeID)
                 .append(m_maxWidth, other.m_maxWidth)
                 .append(m_maxHeight, other.m_maxHeight)
@@ -384,6 +385,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
     @JsonIgnore
     public int hashCode() {
         return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
                 .append(m_nodeID)
                 .append(m_maxWidth)
                 .append(m_maxHeight)

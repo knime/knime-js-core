@@ -101,7 +101,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
     private String m_title;
 
-    private static boolean isDebug() {
+    /**
+     * @return true if is running in debug mode, false otherwise
+     */
+    protected static boolean isDebug() {
         RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         if (runtimeBean != null && runtimeBean.getInputArguments() != null) {
             String inputArguments = runtimeBean.getInputArguments().toString();
@@ -117,10 +120,21 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     }
 
     /**
+     * Creates a new creator instance without deriving the view from a JavaScriptComponent definition.
+     * Implementations using this constructor must set their own {@link WebTemplate}.
+     */
+    protected JavaScriptViewCreator() {
+        this(null);
+    }
+
+    /**
+     * Creates a new creator instance from a given JavaScriptComponent id.
      * @param javascriptObjectID The id of the JavaScriptComponent defined in extension point.
      */
     public JavaScriptViewCreator(final String javascriptObjectID) {
-        m_template = WizardExecutionController.getWebTemplateFromJSObjectID(javascriptObjectID);
+        if (javascriptObjectID != null) {
+            m_template = WizardExecutionController.getWebTemplateFromJSObjectID(javascriptObjectID);
+        }
     }
 
     /**
@@ -129,6 +143,15 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     @Override
     public WebTemplate getWebTemplate() {
         return m_template;
+    }
+
+    /**
+     * Sets a custom web template, if the view is not derived from a JavaScript object ID
+     *
+     * @param template the template to set
+     */
+    protected void setWebTemplate(final WebTemplate template) {
+        m_template = template;
     }
 
     /**
@@ -204,7 +227,15 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         }
     }
 
-    private String buildHTMLResource(final REP viewRepresentation, final VAL viewValue)
+    /**
+     * Creates the HTML string representing the view page
+     *
+     * @param viewRepresentation the view representation
+     * @param viewValue the view value
+     * @return an HTML string representing the view page
+     * @throws IOException if the debug file cannot be written
+     */
+    protected String buildHTMLResource(final REP viewRepresentation, final VAL viewValue)
             throws IOException {
 
         String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";

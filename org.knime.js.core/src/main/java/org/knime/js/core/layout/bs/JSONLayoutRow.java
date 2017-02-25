@@ -51,6 +51,9 @@ package org.knime.js.core.layout.bs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
@@ -77,8 +80,43 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
         m_columns = columns;
     }
 
+    /**
+     * @param column the column to add
+     */
     public void addColumn(final JSONLayoutColumn column) {
         m_columns.add(column);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutRow other = (JSONLayoutRow)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_columns, other.m_columns)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_columns)
+                .toHashCode();
     }
 
 }

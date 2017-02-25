@@ -48,6 +48,8 @@ package org.knime.js.core;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.KNIMEConstants;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.selections.json.JSONSelectionTranslator;
@@ -133,5 +135,41 @@ public class JSONWebNodePageConfiguration {
     }
 
     // TODO: insert other meta info about page
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONWebNodePageConfiguration other = (JSONWebNodePageConfiguration)obj;
+        return new EqualsBuilder()
+                .append(m_version, other.m_version)
+                .append(m_layout, other.m_layout)
+                .append(m_selectionTranslators, other.m_selectionTranslators)
+                .append(m_blackBoard, other.m_blackBoard)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .append(m_version)
+                .append(m_layout)
+                .append(m_selectionTranslators)
+                .append(m_blackBoard)
+                .toHashCode();
+    }
 
 }

@@ -50,6 +50,9 @@ package org.knime.js.core.layout.bs;
 
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -169,6 +172,48 @@ public class JSONLayoutColumn extends JSONLayoutElement {
                 throw new JsonMappingException("Column width needs to be between 1 and 12 but was " + width.toString());
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONLayoutColumn other = (JSONLayoutColumn)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_content, other.m_content)
+                .append(m_widthXS, other.m_widthXS)
+                .append(m_widthSM, other.m_widthSM)
+                .append(m_widthMD, other.m_widthMD)
+                .append(m_widthLG, other.m_widthLG)
+                .append(m_widthXL, other.m_widthXL)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_content)
+                .append(m_widthXS)
+                .append(m_widthSM)
+                .append(m_widthMD)
+                .append(m_widthLG)
+                .append(m_widthXL)
+                .toHashCode();
     }
 
 }
