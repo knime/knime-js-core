@@ -53,6 +53,7 @@ import java.util.Map.Entry;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
@@ -76,13 +77,27 @@ public class JSONKeyedValuesRow implements JSONDataset {
     public JSONKeyedValuesRow() { }
 
     /**
-     * @param rowkey
-     * @param values
+     * Creates a new keyed values row.
+     *
+     * @param rowkey the row key
+     * @param values array of row values, missing values should be passed as null.
      */
     public JSONKeyedValuesRow(final String rowkey, final Double[] values) {
         m_rowKey = rowkey;
         m_values = values;
         m_properties = new HashMap<String, String>();
+    }
+
+    /**
+     * Creates a new keyed values row.
+     *
+     * @param rowkey the row key
+     * @param values array of row values
+     * @deprecated Use {@link #JSONKeyedValuesRow(String, Double[])} instead.
+     */
+    @Deprecated
+    public JSONKeyedValuesRow(final String rowkey, final double[] values) {
+        this(rowkey, ArrayUtils.toObject(values));
     }
 
     /**
@@ -107,10 +122,19 @@ public class JSONKeyedValuesRow implements JSONDataset {
     }
 
     /**
-     * @param values the values to set
+     * @param values the values to set, missing values should be passed as null.
      */
     public void setValues(final Double[] values) {
         m_values = values;
+    }
+
+    /**
+     * @param values the values to set
+     * @deprecated Use {@link #setValues(Double[])} instead.
+     */
+    @Deprecated
+    public void setValues(final double[] values) {
+        m_values = ArrayUtils.toObject(values);
     }
 
     /**
