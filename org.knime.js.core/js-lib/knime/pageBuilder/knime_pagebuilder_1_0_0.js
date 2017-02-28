@@ -53,14 +53,20 @@ KnimePageLoader = function() {
 	var isGridBasedLayout = true;
 	
 	// Function that will populate the container with iframes and generate the iframes' content
-	pageLoader.init = function(jsonString, w, updateState, debug, root) {
+	pageLoader.init = function(page, w, updateState, debug, root) {
 		widget = w;
 		updateWidgetStateFunction = updateState;
 		isDebug = debug;
-		contextRoot = root ? root : "./";
+		contextRoot = root || "./";
 		try {
 			// Parse JSON
-			var webNodePage = JSON.parse(jsonString);
+			var webNodePage = page;
+			if (typeof page === 'string') {
+				webNodePage = JSON.parse(page);
+			} else {
+				contextRoot = ".";
+				baseURL = "";
+			}
 			var version = "0.0.0";
 			if (webNodePage.version) {
 				version = webNodePage.version;
@@ -105,6 +111,14 @@ KnimePageLoader = function() {
 		return 0;
 	}
 	
+	_getContainerElement = function() {
+		var cont = document.getElementById(containerID);
+		if (!cont) {
+			cont = document.getElementsByTagName("body")[0];
+		}
+		return cont;
+	}
+	
 	_buildBSLayout = function(layout, parentContainer) {
 		var parent = parentContainer;
 		if (typeof parentContainer == "undefined" || parentContainer == null) {
@@ -112,7 +126,7 @@ KnimePageLoader = function() {
 			wrapperContainer.id = "knimeBSLayoutContainer";
 			wrapperContainer.setAttribute("class", "container-fluid");
 			wrapperContainer.style.padding = 0;
-			document.getElementById(containerID).appendChild(wrapperContainer);
+			_getContainerElement().appendChild(wrapperContainer);
 			if (layout.rows) {
 				for (var i = 0; i < layout.rows.length; i++) {
 					_buildBSLayout(layout.rows[i], wrapperContainer);
@@ -123,7 +137,7 @@ KnimePageLoader = function() {
 			return;
 		}
 		
-		if (layout.type === "row") {
+		if (layout.type === "row" || layout.type === "JSONLayoutRow") {
 			var row = document.createElement("div");
 			var rowClass = "row";
 			if (layout.additionalClasses) {
@@ -174,7 +188,7 @@ KnimePageLoader = function() {
 				}
 			}
 			
-		} else if (layout.type === "view") {
+		} else if (layout.type === "view" || layout.type === "JSONLayoutViewContent") {
 			if (layout.resizeMethod.substring( 0, "aspectRatio".length ) === "aspectRatio") {
 				var embed = document.createElement("div");
 				var cString = "embed-responsive";
@@ -253,7 +267,7 @@ KnimePageLoader = function() {
 			
 			// Add iframe to cell
 			parent.appendChild(frame);
-		} else  if (layout.type === "html") {
+		} else  if (layout.type === "html" || layout.type === "JSONLayoutHTMLContent") {
 			parent.innerHTML = layout.value;
 		}
 	}
@@ -268,7 +282,7 @@ KnimePageLoader = function() {
 		var gridTable = document.createElement("table");
 		if (typeof gridParentContainer == "undefined" || gridParentContainer == null) {
 			gridTable.id = "knimeLayoutGridTable";
-			document.getElementById(containerID).appendChild(gridTable);
+			_getContainerElement().appendChild(gridTable);
 		} else {
 			gridTable.setAttribute("class", "knimeInnerLayoutGridTable");
 			gridParentContainer.appendChild(gridTable);
@@ -361,7 +375,7 @@ KnimePageLoader = function() {
 					scrolling : true
 				}
 				// Add iframe to container
-				document.getElementById(containerID).appendChild(frame);
+				_getContainerElement().appendChild(frame);
 			}
 
 			// Create style imports
@@ -485,6 +499,10 @@ KnimePageLoader = function() {
 	
 	pageLoader.getContextRoot = function() {
 		return contextRoot;
+	}
+	
+	pageLoader.getBasePath = function() {
+		return contextRoot + baseURL;
 	}
 	
 	pageLoader.setInitialized = function(id) {

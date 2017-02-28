@@ -190,7 +190,13 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return m_tempIndexFile.getAbsolutePath();
     }
 
-    private String getViewRepresentationJSONString(final REP rep) {
+    /**
+     * Serializes a given view representation into a JSON string
+     * @param rep the representation to serialize
+     * @return the serialized JSON string
+     * @throws IllegalArgumentException on serialization error
+     */
+    protected String getViewRepresentationJSONString(final REP rep) {
         try {
             if (rep != null) {
                 return ((ByteArrayOutputStream)rep.saveToStream()).toString("UTF-8");
@@ -203,7 +209,13 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
     }
 
-    private String getViewValueJSONString(final VAL val) {
+    /**
+     * Serializes a given view value into a JSON string
+     * @param val the value to serialize
+     * @return the serialized JSON string
+     * @throws IllegalArgumentException on serialization error
+     */
+    protected String getViewValueJSONString(final VAL val) {
         try {
             if (val != null) {
                 return ((ByteArrayOutputStream)val.saveToStream()).toString("UTF-8");

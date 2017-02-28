@@ -9,14 +9,42 @@
       <webResourceBundle
             debug="false"
             name="RequireJS"
+            version="2.3.3"
+            webResourceBundleID="RequireJS_2.3.3">
+         <webResource
+               relativePathSource="js-lib/requireJS/2.3.3/require.min.js"
+               relativePathTarget="org/knime/core/require.js">
+         </webResource>
+         <importResource
+               relativePath="org/knime/core/require.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="RequireJS"
+            version="2.3.3"
+            webResourceBundleID="RequireJS_2.3.3_Debug">
+         <webResource
+               relativePathSource="js-lib/requireJS/2.3.3/require.js"
+               relativePathTarget="org/knime/debug/require.js">
+         </webResource>
+         <importResource
+               relativePath="org/knime/debug/require.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="RequireJS 2.1.8"
             version="2.1.8"
             webResourceBundleID="RequireJS_2.1.8">
          <webResource
-               relativePathSource="js-lib/requireJS/require.js"
-               relativePathTarget="js-lib/requireJS/require.js">
+               relativePathSource="js-lib/requireJS/2.1.8/require.js"
+               relativePathTarget="js-lib/requireJS/2.1.8/require.js">
          </webResource>
          <importResource
-               relativePath="js-lib/requireJS/require.js"
+               relativePath="js-lib/requireJS/2.1.8/require.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
@@ -1453,6 +1481,10 @@
                relativePathSource="js-lib/knime/pageBuilder/knime_pagebuilder_1_0_0.js"
                relativePathTarget="org/knime/debug/knime_pagebuilder.js">
          </webResource>
+         <webResource
+               relativePathSource="js-lib/knime/pageBuilder/initFrame/callInitFrame.js"
+               relativePathTarget="org/knime/debug/callInitFrame.js">
+         </webResource>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
@@ -1465,6 +1497,10 @@
                relativePathSource="js-lib/knime/pageBuilder/knime_pagebuilder_1_0_0.min.js"
                relativePathTarget="org/knime/core/knime_pagebuilder.js">
          </webResource>
+         <webResource
+               relativePathSource="js-lib/knime/pageBuilder/initFrame/callInitFrame.min.js"
+               relativePathTarget="org/knime/core/callInitFrame.js">
+         </webResource>
       </webResourceBundle>
       <webResourceBundle
             debug="true"
@@ -1473,8 +1509,12 @@
             version="3.5.1"
             webResourceBundleID="iframeResizer_3.5.1_Debug">
          <webResource
-               relativePathSource="js-lib/iframeResizer/3.5.1/debug/"
-               relativePathTarget="js-lib/iframeResizer/3.5.1/debug/">
+               relativePathSource="js-lib/iframeResizer/3.5.1/debug/iframeResizer.js"
+               relativePathTarget="org/knime/debug/iframeResizer/iframeResizer.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/iframeResizer/3.5.1/debug/iframeResizer.contentWindow.js"
+               relativePathTarget="org/knime/debug/iframeResizer/iframeResizer.contentWindow.js">
          </webResource>
       </webResourceBundle>
       <webResourceBundle
@@ -1484,8 +1524,12 @@
             version="3.5.1"
             webResourceBundleID="iframeResizer_3.5.1">
          <webResource
-               relativePathSource="js-lib/iframeResizer/3.5.1/min/"
-               relativePathTarget="js-lib/iframeResizer/3.5.1/min/">
+               relativePathSource="js-lib/iframeResizer/3.5.1/min/iframeResizer.js"
+               relativePathTarget="org/knime/core/iframeResizer/iframeResizer.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/iframeResizer/3.5.1/min/iframeResizer.contentWindow.js"
+               relativePathTarget="org/knime/core/iframeResizer/iframeResizer.contentWindow.js">
          </webResource>
       </webResourceBundle>
    </extension>
