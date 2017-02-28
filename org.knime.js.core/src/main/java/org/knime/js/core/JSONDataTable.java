@@ -136,6 +136,15 @@ public class JSONDataTable {
     private JSONDataTableRow[] m_rows;
     private Object[][] m_extensions;
 
+    /* builder members */
+    private DataTable m_dataTable;
+    private int m_firstRow;
+    private int m_maxRows;
+    private String[] m_excludeColumns;
+    private String[] m_includeColumns;
+    private boolean m_excludeColumnsWithMissingValues;
+    private boolean m_keepFilterColumns;
+
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
         // do nothing
@@ -148,7 +157,9 @@ public class JSONDataTable {
      * @param numOfRows the number of rows to store (must be zero or more)
      * @param execMon the object listening to our progress and providing cancel functionality.
      * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     * @deprecated Use Builder instead.
      */
+    @Deprecated
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int numOfRows, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
@@ -163,7 +174,9 @@ public class JSONDataTable {
      * @param id An optional id to assign to this table instance
      * @param execMon the object listening to our progress and providing cancel functionality.
      * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     * @deprecated Use Builder instead.
      */
+    @Deprecated
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int maxRows, final String id, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
@@ -178,7 +191,9 @@ public class JSONDataTable {
      * @param excludeColumns a list of columns to exclude
      * @param execMon the object listening to our progress and providing cancel functionality.
      * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     * @deprecated Use Builder instead.
      */
+    @Deprecated
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int maxRows, final String[] excludeColumns, final ExecutionMonitor execMon)
             throws CanceledExecutionException {
@@ -194,40 +209,57 @@ public class JSONDataTable {
      * @param excludeColumns a list of columns to exclude
      * @param execMon the object listening to our progress and providing cancel functionality.
      * @throws CanceledExecutionException If the execution of the node has been cancelled.
+     * @deprecated Use Builder instead.
      */
+    @Deprecated
     public JSONDataTable(final DataTable dTable, final int firstRow,
             final int maxRows, final String id, final String[] excludeColumns,
             final ExecutionMonitor execMon)
             throws CanceledExecutionException {
+        m_dataTable = dTable;
+        m_firstRow = firstRow;
+        m_maxRows = maxRows;
+        m_id = id;
+        m_excludeColumns = excludeColumns;
+        buildJSONTable(execMon);
+    }
 
-        if (dTable == null) {
+    private void buildJSONTable(final ExecutionMonitor execMon) throws CanceledExecutionException, IllegalArgumentException {
+        if (m_dataTable == null) {
             throw new NullPointerException("Must provide non-null data table"
                     + " for DataArray");
         }
-        if (firstRow < 1) {
+        if (m_firstRow < 1) {
             throw new IllegalArgumentException("Starting row must be greater"
                     + " than zero");
         }
-        if (maxRows < 0) {
+        if (m_maxRows < 0) {
             throw new IllegalArgumentException("Number of rows to read must be"
                     + " greater than or equal zero");
         }
 
-        m_id = id;
-
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
-        DataTableSpec spec = dTable.getDataTableSpec();
+        DataTableSpec spec = m_dataTable.getDataTableSpec();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
-            if (!Arrays.asList(excludeColumns).contains(colName)) {
+            boolean include = true;
+            if (m_includeColumns != null) {
+                include &= Arrays.asList(m_includeColumns).contains(colName);
+            } else if (m_excludeColumns != null) {
+                include &= !Arrays.asList(m_excludeColumns).contains(colName);
+            }
+            if (m_keepFilterColumns && spec.getColumnSpec(i).getFilterHandler().isPresent()) {
+                include = true;
+            }
+            if (include) {
                 includeColIndices.add(i);
                 numOfColumns++;
             }
         }
-        long numOfRows = maxRows;
-        if (dTable instanceof BufferedDataTable) {
-            numOfRows = Math.min(((BufferedDataTable)dTable).size(), maxRows);
+        long numOfRows = m_maxRows;
+        if (m_dataTable instanceof BufferedDataTable) {
+            numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
         }
 
         //int numOfColumns = spec.getNumColumns();
@@ -250,19 +282,19 @@ public class JSONDataTable {
             }
         }
 
-        RowIterator rIter = dTable.iterator();
+        RowIterator rIter = m_dataTable.iterator();
         int currentRowNumber = 0;
         int numRows = 0;
 
         ArrayList<String> rowColorList = new ArrayList<String>();
         ArrayList<JSONDataTableRow> rowList = new ArrayList<JSONDataTableRow>();
 
-        while ((rIter.hasNext()) && (currentRowNumber + firstRow - 1 < maxRows)) {
+        while ((rIter.hasNext()) && (currentRowNumber + m_firstRow - 1 < m_maxRows)) {
             // get the next row
             DataRow row = rIter.next();
             currentRowNumber++;
 
-            if (currentRowNumber < firstRow) {
+            if (currentRowNumber < m_firstRow) {
                 // skip all rows until we see the specified first row
                 continue;
             }
@@ -289,7 +321,7 @@ public class JSONDataTable {
                 // TODO: Can I refactor the code so that getJSONCellValue is only called once?
                 // Just replace all occurrences of getJSONCellValue(cell) with cellValue?
 
-                rowList.get(currentRowNumber - firstRow).getData()[c] = cellValue;
+                rowList.get(currentRowNumber - m_firstRow).getData()[c] = cellValue;
                 if (cellValue == null) {
                     continue;
                 }
@@ -325,15 +357,15 @@ public class JSONDataTable {
                 }
             }
             if (execMon != null) {
-                execMon.setProgress(((double)currentRowNumber - firstRow) / numOfRows,
-                    "Creating JSON table. Processing row " + (currentRowNumber - firstRow) + " of " + numOfRows);
+                execMon.setProgress(((double)currentRowNumber - m_firstRow) / numOfRows,
+                    "Creating JSON table. Processing row " + (currentRowNumber - m_firstRow) + " of " + numOfRows);
             }
         }
 
         // TODO: Add extensions (color, shape, size, inclusion, selection, hiliting, ...)
         Object[][] extensionArray = null;
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludeColumns, numRows);
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, m_excludeColumns, numRows);
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
@@ -691,6 +723,158 @@ public class JSONDataTable {
                     .append(m_data, other.m_data)
                     .isEquals();
         }
+    }
+
+    /**
+     * @return A new table builder to which table options can be added incrementally.
+     */
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    /** Builder for a {@link JSONDataTable}. */
+    public static class Builder {
+
+        private String m_id = null;
+        private DataTable m_dataTable = null;
+        private Integer m_firstRow = null;
+        private Integer m_maxRows = null;
+        private String[] m_excludeColumns = null;
+        private String[] m_includeColumns = null;
+        private Boolean m_excludeColumnsWithMissingValues = null;
+        private Boolean m_keepFilterColumns = null;
+
+        private Builder() { /* simple hidden default constructor */ }
+
+        /**
+         * @param id the table ID
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setId(final String id) {
+            m_id = id;
+            return this;
+        }
+
+        /**
+         * @param dataTable the table to be serialized
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setDataTable(final DataTable dataTable) {
+            m_dataTable = dataTable;
+            return this;
+        }
+
+        /**
+         * @param firstRow the first row number to be included in the result, must be larger than zero
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setFirstRow(final int firstRow) {
+            m_firstRow = firstRow;
+            return this;
+        }
+
+        /**
+         * @param maxRows the maximum number of rows to include in the result, must be larger than zero
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setMaxRows(final int maxRows) {
+            m_maxRows = maxRows;
+            return this;
+        }
+
+        /**
+         * @param excludeColumns an array of columns to exclude during the build of the JSONDataTable. Not listed columns are included.
+         * Include and exclude columns are mutually exclusive and can not both be set.
+         * Can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setExcludeColumns(final String[] excludeColumns) {
+            m_excludeColumns = excludeColumns;
+            return this;
+        }
+
+        /**
+         * @param includeColumns an array of columns to include during the build of the JSONDataTable. Not listed columns are excluded.
+         * Include and exclude columns are mutually exclusive and can not both be set.
+         * Can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder setIncludeColumns(final String[] includeColumns) {
+            m_includeColumns = includeColumns;
+            return this;
+        }
+
+        /**
+         * @param exclude true, if columns containing missing values should be excluded, false otherwise.
+         * This can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder excludeColumnsWithMissingValues(final boolean exclude) {
+            m_excludeColumnsWithMissingValues = exclude;
+            return this;
+        }
+
+        /**
+         * @param keep true, if columns with existing filter definitions should be kept,
+         * even if they are listed in exclude columns or would be omitted by missing value handling.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder keepFilterColumns(final boolean keep) {
+            m_keepFilterColumns = keep;
+            return this;
+        }
+
+        /**
+         * Builds a new JSONDataTable instance from the current configuration of this builder.
+         *
+         * @param exec an execution monitor for setting progress, may be null
+         * @return a new JSONDataTable instance
+         * @throws CanceledExecutionException If the execution of the node has been cancelled.
+         * @throws IllegalArgumentException If the configuration of the builder is faulty.
+         */
+        public JSONDataTable build(final ExecutionMonitor exec) throws CanceledExecutionException, IllegalArgumentException {
+            JSONDataTable result = new JSONDataTable();
+            if (m_dataTable == null) {
+                throw new IllegalArgumentException("Must provide non-null data table for JSONDataTable construction.");
+            }
+            result.m_dataTable = m_dataTable;
+            if (m_id != null) {
+                result.m_id = m_id;
+            }
+            if (m_firstRow == null) {
+                //first row defaults to one
+                m_firstRow = 1;
+            }
+            if (m_maxRows == null) {
+                if (m_dataTable instanceof BufferedDataTable) {
+                    //max rows defaults to table size
+                     m_maxRows = Math.toIntExact(Math.min(Integer.MAX_VALUE, ((BufferedDataTable)m_dataTable).size()));
+                } else {
+                    // can't determine default, this will result in building error
+                    m_maxRows = 0;
+                }
+            }
+            result.m_firstRow = m_firstRow;
+            result.m_maxRows = m_maxRows;
+            if (m_excludeColumns != null && m_includeColumns != null) {
+                throw new IllegalArgumentException("Exclude and include columns are mutually exclusive and cannot both be set");
+            }
+            if (m_excludeColumns != null) {
+                result.m_excludeColumns = m_excludeColumns;
+            }
+            if (m_includeColumns != null) {
+                result.m_includeColumns = m_includeColumns;
+            }
+            if (m_excludeColumnsWithMissingValues != null) {
+                result.m_excludeColumnsWithMissingValues = m_excludeColumnsWithMissingValues;
+                if (m_excludeColumnsWithMissingValues && m_keepFilterColumns != null) {
+                    result.m_keepFilterColumns = m_keepFilterColumns;
+                }
+            }
+            result.buildJSONTable(exec);
+            return result;
+        }
+
     }
 
     /**
