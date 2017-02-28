@@ -51,9 +51,11 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.base.data.xml.SvgCell;
@@ -272,6 +274,7 @@ public class JSONDataTable {
         Vector<LinkedHashSet<Object>> possValues = new Vector<LinkedHashSet<Object>>();
         possValues.setSize(numOfColumns);
         String[] filterIds = new String[numOfColumns];
+        boolean[] containsMissingValues = new boolean[numOfColumns];
         for (int c = 0; c < numOfColumns; c++) {
             DataColumnSpec columnSpec = spec.getColumnSpec(includeColIndices.get(c));
             if (columnSpec.getType().isCompatible(NominalValue.class)) {
@@ -312,10 +315,11 @@ public class JSONDataTable {
                 DataCell cell = row.getCell(col);
 
                 Object cellValue;
-                if (!cell.isMissing()) {
-                    cellValue = getJSONCellValue(cell);
-                } else {
+                if (cell.isMissing()) {
                     cellValue = null;
+                    containsMissingValues[c] = true;
+                } else {
+                    cellValue = getJSONCellValue(cell);
                 }
 
                 // TODO: Can I refactor the code so that getJSONCellValue is only called once?
@@ -362,19 +366,51 @@ public class JSONDataTable {
             }
         }
 
-        // TODO: Add extensions (color, shape, size, inclusion, selection, hiliting, ...)
+        // TODO: remove extensions?
         Object[][] extensionArray = null;
 
         JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, m_excludeColumns, numRows);
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
+        jsonTableSpec.setRowColorValues(rowColorList.toArray(new String[0]));
         jsonTableSpec.setFilterIds(filterIds);
+        jsonTableSpec.setContainsMissingValues(containsMissingValues);
 
         setSpec(jsonTableSpec);
-        getSpec().setRowColorValues(rowColorList.toArray(new String[0]));
         setRows(rowList.toArray(new JSONDataTableRow[0]));
         setExtensions(extensionArray);
+
+        if(m_excludeColumnsWithMissingValues) {
+            removeMissingValueColumns();
+        }
+    }
+
+    private synchronized void removeMissingValueColumns() {
+        List<String> colsToRemove = new ArrayList<String>();
+        boolean[] missingValues = m_spec.getContainsMissingValues();
+        String[] filters = m_spec.getFilterIds();
+        String[] colNames = m_spec.getColNames();
+        for (int i = 0; i < missingValues.length; i++) {
+            if (missingValues[i]) {
+                if (m_keepFilterColumns && filters[i] != null) {
+                    continue;
+                }
+                colsToRemove.add(colNames[i]);
+            }
+        }
+        if (colsToRemove.size() > 0) {
+            m_spec.removeColumns(colsToRemove.toArray(new String[0]));
+            for (String colToRemove : colsToRemove) {
+                int index = m_spec.getColumnIndex(colToRemove);
+                if (index < 0) {
+                    continue;
+                }
+                for (JSONDataTableRow row : m_rows) {
+                    row.m_data = ArrayUtils.remove(row.m_data, index);
+                }
+            }
+        }
     }
 
     /**

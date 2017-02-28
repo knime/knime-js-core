@@ -56,6 +56,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.base.data.xml.SvgCell;
@@ -85,6 +86,7 @@ import org.knime.js.core.color.JSONColorModel;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -216,6 +218,7 @@ public class JSONDataTableSpec {
 
     private String[] m_rowColorValues;
     private String[] m_filterIds;
+    private boolean[] m_containsMissingValues;
 
     private JSONColorModel[] m_colorModels;
 
@@ -269,6 +272,30 @@ public class JSONDataTableSpec {
         setColTypes(colTypes.toArray(new JSTypes[0]));
         setKnimeTypes(orgTypes.toArray(new String[0]));
         setColorModels(colorModels.toArray(new JSONColorModel[colorModels.size()]));
+    }
+
+    @JsonIgnore
+    int getColumnIndex(final String columnName) {
+        return m_colNames.indexOf(columnName);
+    }
+
+    void removeColumns(final String[] colsToRemove) {
+        for (String colToRemove : colsToRemove) {
+            int index = getColumnIndex(colToRemove);
+            if (index < 0) {
+                continue;
+            }
+            m_colNames.remove(index);
+            m_colTypes.remove(index);
+            m_knimeTypes.remove(index);
+            m_possibleValues.remove(index);
+            m_minValues = ArrayUtils.remove(m_minValues, index);
+            m_maxValues = ArrayUtils.remove(m_maxValues, index);
+            m_filterIds = ArrayUtils.remove(m_filterIds, index);
+            m_containsMissingValues = ArrayUtils.remove(m_containsMissingValues, index);
+            m_colorModels = ArrayUtils.remove(m_colorModels, index);
+            m_numColumns--;
+        }
     }
 
     /**
@@ -530,6 +557,21 @@ public class JSONDataTableSpec {
     }
 
     /**
+     * @return a boolean array, which is true for every column index that contains missing values
+     */
+    public boolean[] getContainsMissingValues() {
+        return m_containsMissingValues;
+    }
+
+    /**
+     * @param containsMissingValues a boolean array,
+     * which is true for every column index that contains missing values
+     */
+    public void setContainsMissingValues(final boolean[] containsMissingValues) {
+        m_containsMissingValues = containsMissingValues;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -549,6 +591,7 @@ public class JSONDataTableSpec {
                 .append(m_rowColorValues)
                 .append(m_filterIds)
                 .append(m_colorModels)
+                .append(m_containsMissingValues)
                 .toHashCode();
     }
 
@@ -582,7 +625,7 @@ public class JSONDataTableSpec {
                 .append(m_rowColorValues, other.m_rowColorValues)
                 .append(m_filterIds, other.m_filterIds)
                 .append(m_colorModels, other.m_colorModels)
+                .append(m_containsMissingValues, other.m_containsMissingValues)
                 .isEquals();
     }
-
 }
