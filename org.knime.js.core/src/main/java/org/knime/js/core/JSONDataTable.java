@@ -146,6 +146,8 @@ public class JSONDataTable {
     private String[] m_includeColumns;
     private boolean m_excludeColumnsWithMissingValues;
     private boolean m_keepFilterColumns;
+    private boolean m_excludeRowsWithMissingValues;
+    private boolean m_rowsWithMissingValuesRemoved;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -306,7 +308,8 @@ public class JSONDataTable {
             rowColorList.add(rC);
 
             String rowKey = row.getKey().getString();
-            rowList.add(new JSONDataTableRow(rowKey, numOfColumns));
+            JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
+            rowList.add(currentRow);
             numRows++;
 
             // add cells, check min, max values and possible values for each column
@@ -317,15 +320,18 @@ public class JSONDataTable {
                 Object cellValue;
                 if (cell.isMissing()) {
                     cellValue = null;
+                    if (m_excludeRowsWithMissingValues) {
+                        rowList.remove(currentRow);
+                        m_rowsWithMissingValuesRemoved = true;
+                        numRows--;
+                        break;
+                    }
                     containsMissingValues[c] = true;
                 } else {
                     cellValue = getJSONCellValue(cell);
                 }
 
-                // TODO: Can I refactor the code so that getJSONCellValue is only called once?
-                // Just replace all occurrences of getJSONCellValue(cell) with cellValue?
-
-                rowList.get(currentRowNumber - m_firstRow).getData()[c] = cellValue;
+                currentRow.getData()[c] = cellValue;
                 if (cellValue == null) {
                     continue;
                 }
@@ -675,6 +681,14 @@ public class JSONDataTable {
     }
 
     /**
+     * @return true, if rows with missing values were removed during the build, false otherwise
+     */
+    @JsonIgnore
+    public boolean buildRemovedRowsWithMissingValues() {
+        return m_rowsWithMissingValuesRemoved;
+    }
+
+    /**
      *
      * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
      * @since 2.10
@@ -779,6 +793,7 @@ public class JSONDataTable {
         private String[] m_includeColumns = null;
         private Boolean m_excludeColumnsWithMissingValues = null;
         private Boolean m_keepFilterColumns = null;
+        private Boolean m_excludeRowsWithMissingValues = null;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -861,6 +876,16 @@ public class JSONDataTable {
         }
 
         /**
+         * @param exclude true, if rows containing missing values should be excluded, false otherwise.
+         * To query if rows where excluded during build call {@link JSONDataTable#buildRemovedRowsWithMissingValues()}.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder excludeRowsWithMissingValues(final boolean exclude) {
+            m_excludeRowsWithMissingValues = exclude;
+            return this;
+        }
+
+        /**
          * Builds a new JSONDataTable instance from the current configuration of this builder.
          *
          * @param exec an execution monitor for setting progress, may be null
@@ -903,9 +928,12 @@ public class JSONDataTable {
             }
             if (m_excludeColumnsWithMissingValues != null) {
                 result.m_excludeColumnsWithMissingValues = m_excludeColumnsWithMissingValues;
-                if (m_excludeColumnsWithMissingValues && m_keepFilterColumns != null) {
-                    result.m_keepFilterColumns = m_keepFilterColumns;
-                }
+            }
+            if (m_keepFilterColumns != null) {
+                result.m_keepFilterColumns = m_keepFilterColumns;
+            }
+            if (m_excludeRowsWithMissingValues != null) {
+                result.m_excludeRowsWithMissingValues = m_excludeRowsWithMissingValues;
             }
             result.buildJSONTable(exec);
             return result;
