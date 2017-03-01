@@ -147,7 +147,7 @@ public class JSONDataTable {
     private boolean m_excludeColumnsWithMissingValues;
     private boolean m_keepFilterColumns;
     private boolean m_excludeRowsWithMissingValues;
-    private boolean m_rowsWithMissingValuesRemoved;
+    private int m_rowsWithMissingValuesRemoved;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -322,7 +322,7 @@ public class JSONDataTable {
                     cellValue = null;
                     if (m_excludeRowsWithMissingValues) {
                         rowList.remove(currentRow);
-                        m_rowsWithMissingValuesRemoved = true;
+                        m_rowsWithMissingValuesRemoved++;
                         numRows--;
                         break;
                     }
@@ -681,10 +681,10 @@ public class JSONDataTable {
     }
 
     /**
-     * @return true, if rows with missing values were removed during the build, false otherwise
+     * @return the number of rows removed during build, due to missing values, can only be called right after a build
      */
     @JsonIgnore
-    public boolean buildRemovedRowsWithMissingValues() {
+    public int numberRemovedRowsWithMissingValues() {
         return m_rowsWithMissingValuesRemoved;
     }
 
