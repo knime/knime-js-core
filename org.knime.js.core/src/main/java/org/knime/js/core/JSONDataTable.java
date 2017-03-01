@@ -108,6 +108,7 @@ import org.knime.js.core.JSONDataTableSpec.JSTypes;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -148,6 +149,7 @@ public class JSONDataTable {
     private boolean m_keepFilterColumns;
     private boolean m_excludeRowsWithMissingValues;
     private int m_rowsWithMissingValuesRemoved;
+    private String[] m_columnsRemoved;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -244,6 +246,7 @@ public class JSONDataTable {
 
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
+        List<String> excludedColumns = new ArrayList<String>();
         DataTableSpec spec = m_dataTable.getDataTableSpec();
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
@@ -259,8 +262,11 @@ public class JSONDataTable {
             if (include) {
                 includeColIndices.add(i);
                 numOfColumns++;
+            } else {
+                excludedColumns.add(colName);
             }
         }
+        m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
             numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
@@ -406,6 +412,7 @@ public class JSONDataTable {
             }
         }
         if (colsToRemove.size() > 0) {
+            m_columnsRemoved = ArrayUtils.addAll(m_columnsRemoved, colsToRemove.toArray(new String[0]));
             m_spec.removeColumns(colsToRemove.toArray(new String[0]));
             for (String colToRemove : colsToRemove) {
                 int index = m_spec.getColumnIndex(colToRemove);
@@ -614,14 +621,6 @@ public class JSONDataTable {
         }
     }
 
-    private Object[][] getJSONDataArray(final ArrayList<Object[]> dataArray, final int numCols) {
-        Object[][] jsonData = new Object[dataArray.size()][numCols];
-        for (int i = 0; i < jsonData.length; i++) {
-            jsonData[i] = dataArray.get(i);
-        }
-        return jsonData;
-    }
-
     /**
      * @return the id
      */
@@ -686,6 +685,15 @@ public class JSONDataTable {
     @JsonIgnore
     public int numberRemovedRowsWithMissingValues() {
         return m_rowsWithMissingValuesRemoved;
+    }
+
+    /**
+     * @return an array of all column names removed during the build of the table, may be null, can only be called right
+     *         after a build
+     */
+    @JsonIgnore
+    public String[] getColumnsRemovedDuringBuild() {
+        return m_columnsRemoved;
     }
 
     /**
@@ -778,11 +786,13 @@ public class JSONDataTable {
     /**
      * @return A new table builder to which table options can be added incrementally.
      */
+    @JsonIgnore
     public static Builder newBuilder() {
         return new Builder();
     }
 
     /** Builder for a {@link JSONDataTable}. */
+    @JsonIgnoreType
     public static class Builder {
 
         private String m_id = null;
@@ -877,7 +887,7 @@ public class JSONDataTable {
 
         /**
          * @param exclude true, if rows containing missing values should be excluded, false otherwise.
-         * To query if rows where excluded during build call {@link JSONDataTable#buildRemovedRowsWithMissingValues()}.
+         * To query if rows where excluded during build call {@link JSONDataTable#numberRemovedRowsWithMissingValues()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder excludeRowsWithMissingValues(final boolean exclude) {
