@@ -847,6 +847,7 @@ public class JSONDataTable {
          * @param excludeColumns an array of columns to exclude during the build of the JSONDataTable. Not listed columns are included.
          * Include and exclude columns are mutually exclusive and can not both be set.
          * Can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * To query if and how many columns where excluded during build call {@link JSONDataTable#getColumnsRemovedDuringBuild()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder setExcludeColumns(final String[] excludeColumns) {
@@ -858,6 +859,7 @@ public class JSONDataTable {
          * @param includeColumns an array of columns to include during the build of the JSONDataTable. Not listed columns are excluded.
          * Include and exclude columns are mutually exclusive and can not both be set.
          * Can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * To query if and how many columns where excluded during build call {@link JSONDataTable#getColumnsRemovedDuringBuild()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder setIncludeColumns(final String[] includeColumns) {
@@ -868,6 +870,7 @@ public class JSONDataTable {
         /**
          * @param exclude true, if columns containing missing values should be excluded, false otherwise.
          * This can be used in conjunction with {@link #keepFilterColumns(boolean)}.
+         * To query if and how many columns where excluded during build call {@link JSONDataTable#getColumnsRemovedDuringBuild()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder excludeColumnsWithMissingValues(final boolean exclude) {
@@ -887,7 +890,7 @@ public class JSONDataTable {
 
         /**
          * @param exclude true, if rows containing missing values should be excluded, false otherwise.
-         * To query if rows where excluded during build call {@link JSONDataTable#numberRemovedRowsWithMissingValues()}.
+         * To query if and how many rows where excluded during build call {@link JSONDataTable#numberRemovedRowsWithMissingValues()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder excludeRowsWithMissingValues(final boolean exclude) {
