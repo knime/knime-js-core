@@ -381,7 +381,7 @@ public class JSONDataTable {
         // TODO: remove extensions?
         Object[][] extensionArray = null;
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, m_excludeColumns, numRows);
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows);
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
