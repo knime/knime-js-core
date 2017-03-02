@@ -271,7 +271,7 @@ public class JSONDataTableSpec {
         setColNames(colNames.toArray(new String[0]));
         setColTypes(colTypes.toArray(new JSTypes[0]));
         setKnimeTypes(orgTypes.toArray(new String[0]));
-        setColorModels(colorModels.toArray(new JSONColorModel[colorModels.size()]));
+        setColorModels(colorModels.toArray(new JSONColorModel[0]));
     }
 
     @JsonIgnore
@@ -293,7 +293,13 @@ public class JSONDataTableSpec {
             m_maxValues = ArrayUtils.remove(m_maxValues, index);
             m_filterIds = ArrayUtils.remove(m_filterIds, index);
             m_containsMissingValues = ArrayUtils.remove(m_containsMissingValues, index);
-            m_colorModels = ArrayUtils.remove(m_colorModels, index);
+            //this assumes there is at most one color model per column
+            for (int i = 0; i < m_colorModels.length; i++) {
+                if (m_colorModels[i].getTitle().equals(colToRemove)) {
+                    m_colorModels = ArrayUtils.remove(m_colorModels, i);
+                    break;
+                }
+            }
             m_numColumns--;
         }
     }
@@ -367,7 +373,7 @@ public class JSONDataTableSpec {
      * @param num the num_rows to set
      */
     public void setNumRows(final int num) {
-        this.m_numRows = num;
+        m_numRows = num;
     }
 
     /**
@@ -381,8 +387,8 @@ public class JSONDataTableSpec {
      * @param names the colNames to set
      */
     public void setColNames(final String[] names) {
-        this.m_colNames = new ArrayList<String>();
-        this.m_colNames.addAll(Arrays.asList(names));
+        m_colNames = new ArrayList<String>();
+        m_colNames.addAll(Arrays.asList(names));
     }
 
     /**
@@ -396,7 +402,8 @@ public class JSONDataTableSpec {
      * @param types
      */
     public void setColTypes(final JSTypes[] types) {
-        m_colTypes = Arrays.asList(types);
+        m_colTypes = new ArrayList<JSTypes>();
+        m_colTypes.addAll(Arrays.asList(types));
     }
 
     /**
@@ -439,8 +446,8 @@ public class JSONDataTableSpec {
      * @param types
      */
     public void setExtensionTypes(final String[] types) {
-        this.m_extensionTypes = new ArrayList<String>();
-        this.m_extensionTypes.addAll(Arrays.asList(types));
+        m_extensionTypes = new ArrayList<String>();
+        m_extensionTypes.addAll(Arrays.asList(types));
     }
 
     /**
@@ -454,8 +461,8 @@ public class JSONDataTableSpec {
      * @param names
      */
     public void setExtensionNames(final String[] names) {
-        this.m_extensionNames = new ArrayList<String>();
-        this.m_extensionNames.addAll(Arrays.asList(names));
+        m_extensionNames = new ArrayList<String>();
+        m_extensionNames.addAll(Arrays.asList(names));
     }
 
     /**
@@ -463,9 +470,9 @@ public class JSONDataTableSpec {
      * @param dataType
      */
     public void addExtension(final String extensionName, final JSTypes dataType) {
-        this.m_numExtensions++;
-        this.m_extensionNames.add(extensionName);
-        this.m_extensionTypes.add(dataType.getJSName());
+        m_numExtensions++;
+        m_extensionNames.add(extensionName);
+        m_extensionTypes.add(dataType.getJSName());
     }
 
     /**
