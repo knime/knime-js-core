@@ -279,29 +279,28 @@ public class JSONDataTableSpec {
         return m_colNames.indexOf(columnName);
     }
 
-    void removeColumns(final String[] colsToRemove) {
-        for (String colToRemove : colsToRemove) {
-            int index = getColumnIndex(colToRemove);
-            if (index < 0) {
-                continue;
-            }
-            m_colNames.remove(index);
-            m_colTypes.remove(index);
-            m_knimeTypes.remove(index);
-            m_possibleValues.remove(index);
-            m_minValues = ArrayUtils.remove(m_minValues, index);
-            m_maxValues = ArrayUtils.remove(m_maxValues, index);
-            m_filterIds = ArrayUtils.remove(m_filterIds, index);
-            m_containsMissingValues = ArrayUtils.remove(m_containsMissingValues, index);
-            //this assumes there is at most one color model per column
-            for (int i = 0; i < m_colorModels.length; i++) {
-                if (m_colorModels[i].getTitle().equals(colToRemove)) {
-                    m_colorModels = ArrayUtils.remove(m_colorModels, i);
-                    break;
-                }
-            }
-            m_numColumns--;
+    boolean removeColumn(final String colToRemove) {
+        int index = getColumnIndex(colToRemove);
+        if (index < 0) {
+            return false;
         }
+        m_colNames.remove(index);
+        m_colTypes.remove(index);
+        m_knimeTypes.remove(index);
+        m_possibleValues.remove(index);
+        m_minValues = ArrayUtils.remove(m_minValues, index);
+        m_maxValues = ArrayUtils.remove(m_maxValues, index);
+        m_filterIds = ArrayUtils.remove(m_filterIds, index);
+        m_containsMissingValues = ArrayUtils.remove(m_containsMissingValues, index);
+        //this assumes there is at most one color model per column
+        for (int i = 0; i < m_colorModels.length; i++) {
+            if (m_colorModels[i].getTitle().equals(colToRemove)) {
+                m_colorModels = ArrayUtils.remove(m_colorModels, i);
+                break;
+            }
+        }
+        m_numColumns--;
+        return true;
     }
 
     /**

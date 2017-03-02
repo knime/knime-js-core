@@ -421,8 +421,8 @@ public class JSONDataTable {
                 for (JSONDataTableRow row : m_rows) {
                     row.m_data = ArrayUtils.remove(row.m_data, index);
                 }
+                m_spec.removeColumn(colToRemove);
             }
-            m_spec.removeColumns(colsToRemove.toArray(new String[0]));
         }
     }
 
