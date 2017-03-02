@@ -413,7 +413,6 @@ public class JSONDataTable {
         }
         if (colsToRemove.size() > 0) {
             m_columnsRemoved = ArrayUtils.addAll(m_columnsRemoved, colsToRemove.toArray(new String[0]));
-            m_spec.removeColumns(colsToRemove.toArray(new String[0]));
             for (String colToRemove : colsToRemove) {
                 int index = m_spec.getColumnIndex(colToRemove);
                 if (index < 0) {
@@ -423,6 +422,7 @@ public class JSONDataTable {
                     row.m_data = ArrayUtils.remove(row.m_data, index);
                 }
             }
+            m_spec.removeColumns(colsToRemove.toArray(new String[0]));
         }
     }
 
