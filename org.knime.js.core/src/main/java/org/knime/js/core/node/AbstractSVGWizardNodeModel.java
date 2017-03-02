@@ -52,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.lang3.StringUtils;
 import org.knime.base.data.xml.SvgCell;
 import org.knime.base.data.xml.SvgImageContent;
 import org.knime.core.node.port.PortType;
@@ -93,8 +94,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
         String image = imageData;
         String errorText = error;
-        if (image == null || image.isEmpty()) {
-            if (errorText.isEmpty()) {
+        if (StringUtils.isEmpty(image)) {
+            if (StringUtils.isEmpty(errorText)) {
                 errorText = "JavaScript returned nothing. Possible implementation error.";
             }
             image = "<svg width=\"600px\" height=\"40px\">"

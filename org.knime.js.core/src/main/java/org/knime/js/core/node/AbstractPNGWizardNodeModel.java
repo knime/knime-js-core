@@ -6,6 +6,7 @@ package org.knime.js.core.node;
 import java.io.IOException;
 import java.util.Base64;
 
+import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.image.ImageContent;
 import org.knime.core.data.image.png.PNGImageContent;
 import org.knime.core.node.port.PortType;
@@ -44,8 +45,8 @@ public abstract class AbstractPNGWizardNodeModel<REP extends JSONViewContent, VA
     protected ImagePortObject createImagePortObjectFromView(final String imageData, final String error) throws IOException {
         String image = imageData;
         String errorText = error;
-        if (image == null || image.isEmpty()) {
-            if (errorText.isEmpty()) {
+        if (StringUtils.isEmpty(image)) {
+            if (StringUtils.isEmpty(errorText)) {
                 errorText = "JavaScript returned nothing. Possible implementation error.";
             }
             setWarningMessage("Creating outport image failed. " + errorText);
