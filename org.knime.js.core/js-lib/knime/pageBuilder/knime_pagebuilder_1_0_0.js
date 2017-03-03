@@ -559,6 +559,8 @@ KnimePageLoader = function() {
 			}
 			if (updateWidgetStateFunction) {
 				updateWidgetStateFunction(widget, JSON.stringify(webViewValues));
+			} else {
+				return webViewValues;
 			}
 		} catch (exception) {
 			LOGGER.error(exception);
