@@ -268,6 +268,9 @@ kt = function() {
 		if (filter && filter.elements) {
 			var included = true;
 			var row = kt.getRow(rowID);
+			if (!row) {
+				return false;
+			}
 			for (var i = 0; i < filter.elements.length; i++) {
 				var filterElement = filter.elements[i];
 				if (filterElement.type == "range" && filterElement.columns) {
@@ -276,6 +279,10 @@ kt = function() {
 						var columnIndex = kt_getDataColumnID(column.columnName);
 						if (columnIndex != null) {
 							var rowValue = row.data[columnIndex];
+							if (rowValue == null) {
+								//missing value, can return false immediately
+								return false;
+							}
 							if (column.type = "numeric") {
 								if (column.minimumInclusive) {
 									included &= (rowValue >= column.minimum);
