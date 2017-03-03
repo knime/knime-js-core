@@ -520,8 +520,12 @@ public class JSONDataTable {
             case BOOLEAN:
                 return ((BooleanValue)cell).getBooleanValue();
             case DATE_TIME:
-                // CHECK: Does DateAndTimeCell yields iso-string?
-                // I think so!
+                if (cell.getType().isCompatible(DateAndTimeValue.class)) {
+                    //TODO: legacy date/time needs to return ISO-8601 string as well?
+                    // does it work with timestamps?
+                    return ((DateAndTimeValue)cell).getUTCTimeInMillis();
+                }
+                //all other date and time types return ISO-8601 formatted string
                 return cell.toString();
             case NUMBER:
                 return ((DoubleValue)cell).getDoubleValue();
