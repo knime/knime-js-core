@@ -54,6 +54,9 @@ KnimePageLoader = function() {
 	
 	// Function that will populate the container with iframes and generate the iframes' content
 	pageLoader.init = function(page, w, updateState, debug, root) {
+		if (!page) {
+			_getContainerElement().appendChild(document.createTextNode("No data available."));
+		}
 		widget = w;
 		updateWidgetStateFunction = updateState;
 		isDebug = debug;
