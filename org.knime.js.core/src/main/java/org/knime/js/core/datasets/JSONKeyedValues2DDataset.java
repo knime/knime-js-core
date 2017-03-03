@@ -78,6 +78,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     private String[] m_dateTimeFormats;
     private JSONKeyedValuesRow[] m_rows;
     private JSONColorModel[] m_colorModels;
+    private String[] m_hiddenColumns = new String[0];
 
     /** Serialization constructor. Don't use. */
     public JSONKeyedValues2DDataset() { }
@@ -223,6 +224,20 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     }
 
     /**
+     * @return the hiddenColumns
+     */
+    public String[] getHiddenColumns() {
+        return m_hiddenColumns;
+    }
+
+    /**
+     * @param hiddenColumns the hiddenColumns to set
+     */
+    public void setHiddenColumns(final String[] hiddenColumns) {
+        m_hiddenColumns = hiddenColumns;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -270,6 +285,8 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
                 m_colorModels[i].saveToNodeSettings(modelSettings);
             }
         }
+
+        settings.addStringArray("hiddenColumns", m_hiddenColumns);
     }
 
     /**
@@ -324,5 +341,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
                 }
             }
         }
+
+        m_hiddenColumns = settings.getStringArray("hiddenColumns", new String[0]);
     }
 }
