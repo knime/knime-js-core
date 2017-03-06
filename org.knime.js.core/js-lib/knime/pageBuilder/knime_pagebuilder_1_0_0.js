@@ -128,7 +128,9 @@ KnimePageLoader = function() {
 			var wrapperContainer = document.createElement("div");
 			wrapperContainer.id = "knimeBSLayoutContainer";
 			wrapperContainer.setAttribute("class", "container-fluid");
-			wrapperContainer.style.padding = 0;
+			if (document.getElementById(containerID)) { 
+				wrapperContainer.style.padding = 0;
+			}
 			_getContainerElement().appendChild(wrapperContainer);
 			if (layout.rows) {
 				for (var i = 0; i < layout.rows.length; i++) {
@@ -595,7 +597,7 @@ KnimePageLoader = function() {
 			}
 			if (func) valid &= func();
 		}
-		return valid;
+		return valid ? true : false;
 	};
 	
 	pageLoader.setValidationError = function(jsonError) {
