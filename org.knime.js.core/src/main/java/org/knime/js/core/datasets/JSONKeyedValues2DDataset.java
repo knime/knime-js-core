@@ -78,7 +78,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     private String[] m_dateTimeFormats;
     private JSONKeyedValuesRow[] m_rows;
     private JSONColorModel[] m_colorModels;
-    private String[] m_hiddenColumns = new String[0];
+    private String[] m_missingValueColumns = new String[0];
 
     /** Serialization constructor. Don't use. */
     public JSONKeyedValues2DDataset() { }
@@ -224,17 +224,17 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     }
 
     /**
-     * @return the hiddenColumns
+     * @return the missingValueColumns
      */
-    public String[] getHiddenColumns() {
-        return m_hiddenColumns;
+    public String[] getMissingValueColumns() {
+        return m_missingValueColumns;
     }
 
     /**
-     * @param hiddenColumns the hiddenColumns to set
+     * @param missingValueColumns the missingValueColumns to set
      */
-    public void setHiddenColumns(final String[] hiddenColumns) {
-        m_hiddenColumns = hiddenColumns;
+    public void setMissingValueColumns(final String[] missingValueColumns) {
+        m_missingValueColumns = missingValueColumns;
     }
 
     /**
@@ -286,7 +286,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
             }
         }
 
-        settings.addStringArray("hiddenColumns", m_hiddenColumns);
+        settings.addStringArray("missingValueColumns", m_missingValueColumns);
     }
 
     /**
@@ -342,6 +342,6 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
             }
         }
 
-        m_hiddenColumns = settings.getStringArray("hiddenColumns", new String[0]);
+        m_missingValueColumns = settings.getStringArray("missingValueColumns", new String[0]);
     }
 }
