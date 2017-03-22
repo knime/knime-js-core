@@ -2,3 +2,5 @@
 */target/
 */build/
 */xmlbeans/
+org.knime.dynamic.js/src/xmlbeans
+org.knime.dynamic.node.generation/src/xmlbeans
