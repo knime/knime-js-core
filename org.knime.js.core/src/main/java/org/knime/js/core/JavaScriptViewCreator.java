@@ -78,7 +78,7 @@ import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewCreator;
-import org.knime.core.node.workflow.WizardExecutionController;
+import org.knime.core.node.workflow.AbstractExecutionController;
 import org.knime.core.util.FileUtil;
 import org.osgi.framework.Bundle;
 
@@ -133,7 +133,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      */
     public JavaScriptViewCreator(final String javascriptObjectID) {
         if (javascriptObjectID != null) {
-            m_template = WizardExecutionController.getWebTemplateFromJSObjectID(javascriptObjectID);
+            m_template = AbstractExecutionController.getWebTemplateFromJSObjectID(javascriptObjectID);
         }
     }
 
