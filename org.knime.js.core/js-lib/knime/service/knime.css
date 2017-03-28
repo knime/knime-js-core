@@ -56,6 +56,18 @@ html, body {
     pointer-events: none;
 }
 
+#knime-service-header .service-button.warn-button {
+	background-color: rgba(255, 170, 0, 0.2);
+	border-color: rgba(255, 170, 0, 0.5);
+	color: rgba(255, 170, 0, 0.5);
+}
+
+#knime-service-header .service-button.warn-button:hover {
+	background-color: rgba(255, 170, 0, 0.5);
+	border-color: rgba(255, 170, 0, 1);
+	color: rgba(255, 170, 0, 1);
+}
+
 #knime-service-header .service-button .ficon {
     display: table-cell;
     text-align: center;

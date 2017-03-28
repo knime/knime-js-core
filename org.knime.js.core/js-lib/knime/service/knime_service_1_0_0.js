@@ -89,6 +89,26 @@ knimeService = function() {
 		return button;
 	}
 	
+	service.setWarningMessage = function(message) {
+		var id = 'knime-service-warn-button';
+		var button = document.getElementById(id);
+		if (typeof message !== 'undefined' && message != null && message !== '') {
+			if (button) {
+				button.setAttribute('title', message);
+				button.setAttribute('aria-label', message);
+			} else {
+				button = addButton(id, 'exclamation-triangle', message, function() {
+					alert(this.getAttribute('title'));
+				}, false);
+				button.classList.add('warn-button');
+			}
+		} else {
+			if (button) {
+				button.parentNode.removeChild(button);
+			}
+		}
+	}
+	
 	initMenu = function() {
 		addButton('knime-service-menu-button', 'bars', 'Settings', openMenu, true);
 		var overlay = document.createElement('div');
