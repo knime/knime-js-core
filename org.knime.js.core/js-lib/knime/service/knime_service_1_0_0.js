@@ -79,8 +79,23 @@ knimeService = function() {
 			iContainer.className = 'ficon fa fa-fw fa-' + icon;
 			iContainer.setAttribute('aria-hidden', 'true');
 		}
-		if (first) {
+		if (first === true) {
 			header.insertBefore(button, header.firstChild);
+		} else if (typeof first == 'string') {
+			var inserted = false;
+			var c = header.children;
+			for (var i = 0; i < c.length; i++) {
+				if (c[i].getAttribute('id') === first) {
+					if (i + 1 == c.length) {
+						header.appendChild(button);
+					} else {
+						header.insertBefore(button, c[i+1]);
+					}
+				}
+			}
+			if (!inserted) {
+				header.insertBefore(button, header.firstChild);
+			}
 		} else {
 			header.appendChild(button);
 		}
@@ -99,7 +114,7 @@ knimeService = function() {
 			} else {
 				button = addButton(id, 'exclamation-triangle', message, function() {
 					alert(this.getAttribute('title'));
-				}, false);
+				}, 'knime-service-menu-button');
 				button.classList.add('warn-button');
 			}
 		} else {
@@ -107,6 +122,10 @@ knimeService = function() {
 				button.parentNode.removeChild(button);
 			}
 		}
+	}
+	
+	service.clearWarningMessage = function() {
+		service.setWarningMessage(null);
 	}
 	
 	initMenu = function() {
