@@ -91,6 +91,8 @@ knimeService = function() {
 					} else {
 						header.insertBefore(button, c[i+1]);
 					}
+					inserted = true;
+					break;
 				}
 			}
 			if (!inserted) {
