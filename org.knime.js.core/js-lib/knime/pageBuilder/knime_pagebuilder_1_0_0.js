@@ -713,9 +713,11 @@ KnimePageLoader = function() {
 		interactivitySubscribers[id].push({'callback': callback, 'filter': filter});
 		if (interactivityMap[id]) {
 			var relevantElements = _createRelevantElements(id, filter);
-			if (relevantElements) {
-				_notifySubscriber(callback, relevantElements);
+			if (!relevantElements) {
+				relevantElements = {};
 			}
+			relevantElements.reevaluate = true;
+			_notifySubscriber(callback, relevantElements);
 		}
 	}
 	
