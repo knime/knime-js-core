@@ -25,6 +25,7 @@ knimeService = function() {
 	
 	var header, menu;
 	var initialized = false, interactivityAvailable = false;
+	var warnings = {};
 	var GLOBAL_SERVICE = this;
 	
 	init = function() {
@@ -106,10 +107,40 @@ knimeService = function() {
 		return button;
 	}
 	
-	service.setWarningMessage = function(message) {
+	service.setWarningMessage = function(message, id) {
+		if (typeof id == 'undefined' || id == null) {
+			id = "knimeGenericWarning";
+		}
+		warnings[id] = message;
+		showWarning();
+	}
+	
+	service.clearWarningMessage = function(id) {
+		if (typeof id == 'undefined' || id == null) {
+			id = "knimeGenericWarning";
+		}
+		if (warnings[id]) {
+			warnings[id] = null;
+		}
+		showWarning();
+	}
+	
+	service.clearAllWarningMessages = function() {
+		warnings = {};
+		showWarning();
+	}
+	
+	showWarning = function() {
+		var message = '';
+		for (var id in warnings) {
+			if (warnings[id]) {
+				message += warnings[id] + '\n';
+			}
+		}
 		var id = 'knime-service-warn-button';
 		var button = document.getElementById(id);
-		if (typeof message !== 'undefined' && message != null && message !== '') {
+		if (message !== '') {
+			message = message.substring(0, message.length - 1);
 			if (button) {
 				button.setAttribute('title', message);
 				button.setAttribute('aria-label', message);
@@ -124,10 +155,6 @@ knimeService = function() {
 				button.parentNode.removeChild(button);
 			}
 		}
-	}
-	
-	service.clearWarningMessage = function() {
-		service.setWarningMessage(null);
 	}
 	
 	initMenu = function() {
