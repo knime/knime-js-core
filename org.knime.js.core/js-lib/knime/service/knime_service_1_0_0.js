@@ -120,7 +120,7 @@ knimeService = function() {
 			id = "knimeGenericWarning";
 		}
 		if (warnings[id]) {
-			warnings[id] = null;
+			delete warnings[id];
 		}
 		showWarning();
 	}
