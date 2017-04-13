@@ -78,9 +78,9 @@ public class JSONWarnings {
             warningSettings.addInt(CFG_NUMBER_OF_WARNINGS, m_warningMap.size());
             int i = 0;
             for (Map.Entry<String, String> entry : m_warningMap.entrySet()) {
-                i++;
                 warningSettings.addString(CFG_WARNING_ID + i, entry.getKey());
                 warningSettings.addString(CFG_WARNING_MSG + i, entry.getValue());
+                i++;
             }
         } else {
             settings.addBoolean(CFG_HAS_WARNINGS, false);
