@@ -148,7 +148,7 @@ public class CSSUtils {
 
     private static Color colorFromRgbaString(final String rgbaString, final int numValues) {
         String zeroTo255 = "([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-        String zeroTo1 = "(0(?:.\\d+)?|1(?:.0)?)";
+        String zeroTo1 = "(0(?:.\\d+)?|1(?:.0+)?)";
         StringBuilder patternBuilder = new StringBuilder();
         patternBuilder.append("^rgb");
         if (numValues > 3) {
