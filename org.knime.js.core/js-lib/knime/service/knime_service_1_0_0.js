@@ -145,7 +145,7 @@ knimeService = function() {
 				button.setAttribute('title', message);
 				button.setAttribute('aria-label', message);
 			} else {
-				button = addButton(id, 'exclamation-triangle', message, function() {
+				button = addButton(id, 'exclamation', message, function() {
 					alert(this.getAttribute('title'));
 				}, 'knime-service-menu-button');
 				button.classList.add('warn-button');
