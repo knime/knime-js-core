@@ -602,6 +602,10 @@ KnimePageLoader = function() {
 	
 	pageLoader.setValidationError = function(jsonError) {
 		var errorList = JSON.parse(jsonError);
+		if (typeof errorList === 'string') {
+			alert(errorList);
+			return;
+		}
 		for (var errorNodeID in errorList) {
 			for (var webNodeName in webNodes) {
 				if (errorNodeID === webNodeName) {
