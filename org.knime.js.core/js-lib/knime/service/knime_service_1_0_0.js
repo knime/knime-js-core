@@ -149,7 +149,7 @@ knimeService = function() {
 				button = addButton(id, 'exclamation', message, function() {
 					alert(this.getAttribute('title'));
 				}, 'knime-service-menu-button');
-				button.classList.add('warn-button');
+				button.setAttribute('class', button.getAttribute('class') + ' warn-button');
 			}
 		} else {
 			if (button) {
