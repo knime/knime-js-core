@@ -24,14 +24,21 @@ knimeService = function() {
 	var SELECTION = 'selection', FILTER = 'filter', SEPARATOR = '-';
 	
 	var header, menu;
-	var initialized = false, interactivityAvailable = false;
+	var initialized = false, interactivityAvailable = false, runningInWebportal = false;
 	var warnings = {};
 	var GLOBAL_SERVICE = this;
 	
 	init = function() {
-		if (parent && parent.KnimePageLoader && parent.KnimePageLoader.publish) {
-			interactivityAvailable = true;
-			GLOBAL_SERVICE = parent.KnimePageLoader;
+		if (parent && parent.KnimePageLoader) {
+			try {
+				runningInWebportal = parent.KnimePageLoader.isRunningInWebportal();
+			} catch (err) {
+				runningInWebportal = false
+			}
+			if(parent.KnimePageLoader.publish) {
+				interactivityAvailable = true;
+				GLOBAL_SERVICE = parent.KnimePageLoader;
+			}
 		}
 		
 		var body = document.getElementsByTagName('body')[0];
@@ -55,6 +62,11 @@ knimeService = function() {
 		initialized || init();
 		//TODO: check if somebody is subscribed?
 		return interactivityAvailable;
+	}
+	
+	service.isRunningInWebportal = function() {
+		initialized || init();
+		return runningInWebportal;
 	}
 	
 	enableNav = function() {
