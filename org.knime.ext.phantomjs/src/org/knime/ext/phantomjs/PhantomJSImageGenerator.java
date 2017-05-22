@@ -182,7 +182,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         }
         WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
         //TODO wait until what?
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+        wait.until(driver -> ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
         //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
         
         //wait additional specified time to compensate for initial animation, etc.
@@ -201,14 +201,11 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         			.pollingEvery(1, TimeUnit.SECONDS)
         			.ignoring(NoSuchElementException.class);
 			try {
-				timedWait.until(new Function<WebDriver, WebElement>() {
-					@Override
-					public WebElement apply(WebDriver input) {
-						if (exec != null) {
-							exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
-						}
-						return null;
+				timedWait.until(driver -> {
+					if (exec != null) {
+						exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
 					}
+					return null;
 				});
 			} catch (Exception e) { /* do nothing */ }
         }
@@ -223,7 +220,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         if (!(m_driver instanceof JavascriptExecutor)) {
             throw new IllegalArgumentException("Driver must support javascript execution");
         }
-        wait.until(documentReady());
+        wait.until(driver -> documentReady());
     }
         private ExpectedCondition<Boolean> documentReady() {
           return new ExpectedCondition<Boolean>() {
