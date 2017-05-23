@@ -187,7 +187,7 @@ public class JSONKeyedValues2DDataset implements JSONDataset {
     }
 
     /**
-     * @param dateTimeFormat the dateTimeFormats to set
+     * @param dateTimeFormat the dateTimeFormats to set one of: Date Time, Local Date Time, Local Date, Local Time, Zoned Date Time
      * @param index the column index
      */
     @JsonIgnore
