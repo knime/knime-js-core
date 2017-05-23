@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Windows32 binaries for multi OS Selenium Drivers
+Bundle-SymbolicName: org.knime.ext.seleniumdrivers.multios.bin.win32.x86
+Bundle-Version: 3.4.0.qualifier
+Bundle-Vendor: KNIME.com GmbH, Konstanz, Germany
+Fragment-Host: org.knime.ext.seleniumdrivers.multios;bundle-version="[3.4.0,4.0.0)"

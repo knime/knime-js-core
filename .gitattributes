@@ -34,3 +34,4 @@
 *.msi binary filter=lfs diff=lfs merge=lfs
 *.tar.gz binary filter=lfs diff=lfs merge=lfs
 org.knime.ext.phantomjs.bin.*/**/phantomjs* filter=lfs diff=lfs merge=lfs -text
+org.knime.ext.seleniumdrivers.multios.bin.*/**/chromedriver* filter=lfs diff=lfs merge=lfs -text

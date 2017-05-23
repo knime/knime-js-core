@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Collection of Selenium Drivers for multiple OS
+Bundle-SymbolicName: org.knime.ext.seleniumdrivers.multios;singleton:=true
+Bundle-Version: 3.4.0.qualifier
+Bundle-Activator: org.knime.ext.seleniumdrivers.multios.Activator
+Bundle-Vendor: KNIME.com GmbH, Konstanz, Germany
+Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Export-Package: org.knime.ext.seleniumdrivers.multios
+Eclipse-PlatformFilter: (osgi.os=win32)
