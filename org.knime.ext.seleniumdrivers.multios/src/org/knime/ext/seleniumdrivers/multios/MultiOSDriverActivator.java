@@ -39,6 +39,7 @@ public class MultiOSDriverActivator extends Plugin {
 
         if (url != null) {
             url = FileLocator.toFileURL(url);
+            System.setProperty("webdriver.chrome.driver", url.getFile());
             CHROME_DRIVER_PATH = url.getFile();
         }
 	}

@@ -1,7 +1,11 @@
 package org.knime.js.core;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Hashtable;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
@@ -63,7 +67,27 @@ import org.osgi.framework.ServiceRegistration;
  */
 public final class JSCorePlugin extends AbstractUIPlugin {
 
+    /** Preference constant: browser to use for opening views. */
+    public static final String P_VIEW_BROWSER = "js.core.viewBrowser";
+
+    /** Preference constant: path to executable for chosen browser. */
+    public static final String P_BROWSER_PATH = "js.core.browserPath";
+
+    /** Preference constant: additional cli args for chosen browser. */
+    public static final String P_BROWSER_CLI_ARGS = "js.core.browserCliArgs";
+
+    /** Preference constant: if a debug HTML is supposed to be created. */
+    public static final String P_DEBUG_HTML = "js.core.createDebugHtml";
+
+    // The shared instance.
+    private static JSCorePlugin PLUGIN;
+    private String m_pluginRootPath;
     private ServiceRegistration<?> m_defaultLayoutCreatorService;
+
+    /** Plugin constructor */
+    public JSCorePlugin() {
+        PLUGIN = this;
+    }
 
     /**
      * {@inheritDoc}
@@ -71,6 +95,11 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     @Override
     public void start(final BundleContext context) throws Exception {
         super.start(context);
+
+        final URL pluginURL = FileLocator.resolve(FileLocator.find(PLUGIN.getBundle(), new Path(""), null));
+        final File tmpFile = new File(pluginURL.getPath());
+        m_pluginRootPath = tmpFile.getAbsolutePath();
+
         m_defaultLayoutCreatorService = context.registerService(DefaultLayoutCreator.class.getName(),
             new DefaultLayoutCreatorImpl(), new Hashtable<String, String>());
     }
@@ -80,8 +109,26 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      */
     @Override
     public void stop(final BundleContext context) throws Exception {
+        PLUGIN = null;
         context.ungetService(m_defaultLayoutCreatorService.getReference());
+
         super.stop(context);
+    }
+
+    /**
+     * Returns the shared instance.
+     *
+     * @return The shared instance
+     */
+    public static JSCorePlugin getDefault() {
+        return PLUGIN;
+    }
+
+    /**
+     * @return the absolute root path of this plugin
+     */
+    public String getPluginRootPath() {
+        return m_pluginRootPath;
     }
 
 }

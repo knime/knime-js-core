@@ -1533,6 +1533,15 @@
          </webResource>
       </webResourceBundle>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            category="org.knime.workbench.ui.preferences"
+            class="org.knime.js.core.preferences.JavaScriptPreferencePage"
+            id="org.knime.js.core.preferences"
+            name="JavaScript">
+      </page>
+   </extension>
    <!-- <extension
          point="org.eclipse.ui.preferencePages">
       <page

@@ -216,26 +216,26 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     
     private void waitForDocumentReady()
     {
-        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
-        if (!(m_driver instanceof JavascriptExecutor)) {
-            throw new IllegalArgumentException("Driver must support javascript execution");
-        }
-        wait.until(driver -> documentReady());
+    	WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
+    	if (!(m_driver instanceof JavascriptExecutor)) {
+    		throw new IllegalArgumentException("Driver must support javascript execution");
+    	}
+    	wait.until(driver -> documentReady());
     }
-        private ExpectedCondition<Boolean> documentReady() {
-          return new ExpectedCondition<Boolean>() {
-            @Override
-            public Boolean apply(final WebDriver driver) {
-                String readyState = ((JavascriptExecutor)m_driver).executeScript(
-                        "if (document.readyState) return document.readyState;").toString();
-                return "complete".equalsIgnoreCase(readyState);
-            }
+    private ExpectedCondition<Boolean> documentReady() {
+    	return new ExpectedCondition<Boolean>() {
+    		@Override
+    		public Boolean apply(final WebDriver driver) {
+    			String readyState = ((JavascriptExecutor)m_driver).executeScript(
+    					"if (document.readyState) return document.readyState;").toString();
+    			return "complete".equalsIgnoreCase(readyState);
+    		}
 
-            @Override
-            public String toString() {
-              return "document ready state";
-            }
-          };
-        }
+    		@Override
+    		public String toString() {
+    			return "document ready state";
+    		}
+    	};
+    }
 
 }
