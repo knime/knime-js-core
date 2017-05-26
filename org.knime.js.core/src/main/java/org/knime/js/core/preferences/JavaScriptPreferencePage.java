@@ -75,6 +75,8 @@ import org.knime.js.core.JSCorePlugin;
  */
 public class JavaScriptPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+    private static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
+
     private RadioGroupFieldEditor m_browserSelector;
     private FileFieldEditor m_browserExePath;
     private StringFieldEditor m_browserCLIArgs;
@@ -109,7 +111,11 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
             "Please choose the browser to use for displaying JavaScript views:", 1,
             AbstractWizardNodeView.getAllWizardNodeViews().stream()
-                .map(e -> new String[] {e.getViewName(), e.getViewClass().getCanonicalName()})
+                .sorted((e1, e2) -> {
+                    String s1 = e1.getViewClass().getCanonicalName();
+                    String s2 = e2.getViewClass().getCanonicalName();
+                    return INTERNAL_BROWSER.equals(s1) ? -1 : INTERNAL_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+                }).map(e -> new String[]{e.getViewName(), e.getViewClass().getCanonicalName()})
                 .toArray(String[][]::new),
             parent);
 
@@ -142,7 +148,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     private void enableBrowserField(final String view, final Composite parent) {
-        boolean enabled = !"org.knime.workbench.editor2.WizardNodeView".equals(view) && view != null;
+        boolean enabled = !INTERNAL_BROWSER.equals(view) && view != null;
         m_browserExePath.setEnabled(enabled, parent);
         m_browserCLIArgs.setEnabled(enabled, parent);
     }
