@@ -191,12 +191,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     }
 
     /**
-     * Serializes a given view representation into a JSON string
-     * @param rep the representation to serialize
-     * @return the serialized JSON string
-     * @throws IllegalArgumentException on serialization error
+     * {@inheritDoc}
      */
-    protected String getViewRepresentationJSONString(final REP rep) {
+    @Override
+    public String getViewRepresentationJSONString(final REP rep) {
         try {
             if (rep != null) {
                 return ((ByteArrayOutputStream)rep.saveToStream()).toString("UTF-8");
@@ -210,12 +208,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     }
 
     /**
-     * Serializes a given view value into a JSON string
-     * @param val the value to serialize
-     * @return the serialized JSON string
-     * @throws IllegalArgumentException on serialization error
+     * {@inheritDoc}
      */
-    protected String getViewValueJSONString(final VAL val) {
+    @Override
+    public String getViewValueJSONString(final VAL val) {
         try {
             if (val != null) {
                 return ((ByteArrayOutputStream)val.saveToStream()).toString("UTF-8");
@@ -328,24 +324,21 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     }
 
     /**
-     * Creates the JavaScript code to initialize the view implementation with the respective
-     * view representation and value objects.
-     *
-     * @param viewRepresentation The view representation.
-     * @param viewValue The view value.
-     * @return The JavaScript code to initialize the view.
+     * {@inheritDoc}
      */
     @Override
-    public String createInitJSViewMethodCall(final REP viewRepresentation, final VAL viewValue) {
-        String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
-        String jsonViewValue = getViewValueJSONString(viewValue);
+    public String createInitJSViewMethodCall(final boolean parseArguments, final REP viewRepresentation, final VAL viewValue) {
         StringBuilder builder = new StringBuilder();
-        String escapedRepresentation = jsonViewRepresentation.replace("\\", "\\\\").replace("'", "\\'");
-        String escapedValue = jsonViewValue.replace("\\", "\\\\").replace("'", "\\'");
-        String repParseCall = "var parsedRepresentation = JSON.parse('" + escapedRepresentation + "');";
-        builder.append(repParseCall);
-        String valParseCall = "var parsedValue = JSON.parse('" + escapedValue + "');";
-        builder.append(valParseCall);
+        if (parseArguments) {
+            String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
+            String jsonViewValue = getViewValueJSONString(viewValue);
+            String escapedRepresentation = jsonViewRepresentation.replace("\\", "\\\\").replace("'", "\\'");
+            String escapedValue = jsonViewValue.replace("\\", "\\\\").replace("'", "\\'");
+            String repParseCall = "var parsedRepresentation = JSON.parse('" + escapedRepresentation + "');";
+            builder.append(repParseCall);
+            String valParseCall = "var parsedValue = JSON.parse('" + escapedValue + "');";
+            builder.append(valParseCall);
+        }
         String initMethod = m_template.getInitMethodName();
         String initCall = getNamespacePrefix() + initMethod + "(parsedRepresentation, parsedValue);";
         builder.append(initCall);
@@ -473,6 +466,14 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             relTarget = relSource;
         }
         copyLocations.put(sourcePath.toFile(), relTarget);
+    }
+
+    @Override
+    public java.nio.file.Path getCurrentLocation() {
+        if (tempFolder == null) {
+            return null;
+        }
+        return tempFolder.toPath();
     }
 
 }
