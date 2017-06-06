@@ -49,7 +49,11 @@ public class MultiOSDriverActivator extends Plugin {
      */
     @Override
 	public void stop(BundleContext bundleContext) throws Exception {
+    	// close all possible started chrome windows
+    	ChromeViewService.getInstance().shutdown();
+    	
     	CHROME_DRIVER_PATH = null;
+    	
 	}
     
     
