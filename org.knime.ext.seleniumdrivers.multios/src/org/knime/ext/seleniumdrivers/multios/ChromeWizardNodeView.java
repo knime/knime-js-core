@@ -204,7 +204,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	}
 	
 	private String signalBrowserWindowCloseCode() {
-		//FIXME this doesn't work yet, better solution?
+		//FIXME this doesn't work yet, request returns with null, which also works, better solution?
 		StringBuilder builder = new StringBuilder();
 		builder.append("window.addEventListener('beforeunload', function (event) {\n");
 		builder.append("\tif (window.signal) { window.signal('");
