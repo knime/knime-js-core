@@ -20,8 +20,11 @@ public class ChromeViewService {
 	// signals for COMET-type request queries (callback emulation)
 	public static final String NO_ACTION = "NO_ACTION";
 	public static final String CLOSE_BUTTON_PRESSED = "CLOSE_BUTTON_PRESSED";
+	public static final String CLOSE_APPLY_BUTTON_PRESSED = "CLOSE_APPLY_BUTTON_PRESSED";
+	public static final String CLOSE_APPLY_DEFAULT_BUTTON_PRESSED = "CLOSE_APPLY_DEFAULT_BUTTON_PRESSED";
 	public static final String RESET_BUTTON_PRESSED = "RESET_BUTTON_PRESSED";
 	public static final String APPLY_BUTTON_PRESSED = "APPLY_BUTTON_PRESSED";
+	public static final String APPLY_DEFAULT_BUTTON_PRESSED = "APPLY_DEFAULT_BUTTON_PRESSED";
 	public static final String CLOSE_WINDOW = "CLOSE_WINDOW";
 	
 	private ChromeViewService() { /* hidden default constructor */ }

@@ -11,6 +11,7 @@ import org.osgi.framework.BundleContext;
 
 public class MultiOSDriverActivator extends Plugin {
 
+	private static String BUNDLE_NAME;
 	private static String CHROME_DRIVER_PATH;
 	
 	/**
@@ -19,6 +20,8 @@ public class MultiOSDriverActivator extends Plugin {
     @Override
 	public void start(BundleContext bundleContext) throws Exception {
     	super.start(bundleContext);
+    	
+    	BUNDLE_NAME = getBundle().getSymbolicName();
     	
     	String os = Platform.getOS();
         String arch = Platform.getOSArch();
@@ -59,6 +62,10 @@ public class MultiOSDriverActivator extends Plugin {
     
     static Optional<String> getBundledChromeDriverPath() {
     	return Optional.ofNullable(CHROME_DRIVER_PATH);
+    }
+    
+    static String getBundleName() {
+    	return BUNDLE_NAME;
     }
 
 }

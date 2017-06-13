@@ -1,16 +1,21 @@
 package org.knime.ext.seleniumdrivers.multios;
 
 import java.awt.Rectangle;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebViewContent;
@@ -93,6 +98,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
 		
 		writeTempViewFiles(viewRepresentation, viewValue, viewCreator);
+		try {
+			URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.js");
+			Path bridgePath = Paths.get(FileLocator.toFileURL(bridgeURL).getFile());
+			try (BufferedReader reader = Files.newBufferedReader(bridgePath, Charset.forName("UTF-8"))) {
+
+			}
+		} catch (Exception e) {
+			//TODO
+		}
 
 		String handle = initDriver(new File(viewPath).toURI().toString(), title, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		m_driver.executeScript(signalBrowserWindowCloseCode());

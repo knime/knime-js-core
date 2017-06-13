@@ -4,8 +4,11 @@ seleniumKnimeBridge = function() {
 	
 	const SIGNAL_NO_ACTION = 'NO_ACTION';
 	const SIGNAL_CLOSE_BUTTON_PRESSED = 'CLOSE_BUTTON_PRESSED';
+	const SIGNAL_CLOSE_APPLY_BUTTON_PRESSED = "CLOSE_APPLY_BUTTON_PRESSED";
+	const SIGNAL_CLOSE_APPLY_DEFAULT_BUTTON_PRESSED = "CLOSE_APPLY_DEFAULT_BUTTON_PRESSED";
 	const SIGNAL_RESET_BUTTON_PRESSED = 'RESET_BUTTON_PRESSED';
 	const SIGNAL_APPLY_BUTTON_PRESSED = 'APPLY_BUTTON_PRESSED';
+	const SIGNAL_APPLY_DEFAULT_BUTTON_PRESSED = "APPLY_DEFAULT_BUTTON_PRESSED";
 	const SIGNAL_CLOSE_WINDOW = 'CLOSE_WINDOW';
 	
 	var signalQueue = [];
@@ -26,6 +29,34 @@ seleniumKnimeBridge = function() {
 		}
 		httpRequest.open('GET', url);
 		httpRequest.send();
+	}
+	
+	bridge.initButtons = function() {
+		var body = document.getElementsByTagName('body')[0];
+		var buttonBar = document.createElement('div');
+		buttonBar.setAttribute('id', 'seleniumKnimeBridge_buttonBar');
+		body.appendChild(buttonBar);
+		var resetButton = document.createElement('a');
+		resetButton.setAttribute('href', '#');
+		resetButton.setAttribute('onclick', function(e) {
+			e.preventDefault(); 
+			signal(SIGNAL_RESET_BUTTON_PRESSED);
+		});
+		buttonBar.appendChild(resetButton);
+		var applyButton = document.createElement('a');
+		applyButton.setAttribute('href', '#');
+		applyButton.setAttribute('onclick', function(e) {
+			e.preventDefault(); 
+			signal(SIGNAL_APPLY_BUTTON_PRESSED);
+		});
+		buttonBar.appendChild(applyButton);
+		var closeButton = document.createElement('a');
+		closeButton.setAttribute('href', '#');
+		closeButton.setAttribute('onclick', function(e) {
+			e.preventDefault(); 
+			signal(SIGNAL_CLOSE_BUTTON_PRESSED);
+		});
+		buttonBar.appendChild(closeButton);
 	}
 	
 	bridge.initView = function() {
