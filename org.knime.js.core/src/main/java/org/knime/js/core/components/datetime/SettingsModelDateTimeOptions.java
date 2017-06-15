@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.knime.js.core.components.datatime;
+package org.knime.js.core.components.datetime;
 
 import java.util.TimeZone;
 
@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * @author Oleg Yasnev, KNIME.com GmbH, Berlin, Germany
- *
  */
 public class SettingsModelDateTimeOptions extends SettingsModel {
     static final String GLOBAL_DATE_TIME_LOCALE       = "globalDateTimeLocale";
@@ -108,7 +107,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalDateTimeLocale(final String globalDateTimeLocale) {
         String prevLocale = m_globalDateTimeLocale;
         m_globalDateTimeLocale = globalDateTimeLocale;
-        if (!prevLocale.equals(m_globalDateTimeLocale)) {
+        if (prevLocale == null && m_globalDateTimeLocale != null || prevLocale != null && !prevLocale.equals(m_globalDateTimeLocale)) {
             notifyChangeListeners();
         }
     }
@@ -126,7 +125,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalDateTimeFormat(final String globalDateTimeFormat) {
         String prevFormat = m_globalDateTimeFormat;
         m_globalDateTimeFormat = globalDateTimeFormat;
-        if (!prevFormat.equals(m_globalDateTimeFormat)) {
+        if (prevFormat == null && m_globalDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalDateTimeFormat)) {
             notifyChangeListeners();
         }
     }
@@ -144,7 +143,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalLocalDateFormat(final String globalLocalDateFormat) {
         String prevFormat = m_globalLocalDateFormat;
         m_globalLocalDateFormat = globalLocalDateFormat;
-        if (!prevFormat.equals(m_globalLocalDateFormat)) {
+        if (prevFormat == null && m_globalLocalDateFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalDateFormat)) {
             notifyChangeListeners();
         }
     }
@@ -162,7 +161,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalLocalDateTimeFormat(final String globalLocalDateTimeFormat) {
         String prevFormat = m_globalLocalDateTimeFormat;
         m_globalLocalDateTimeFormat = globalLocalDateTimeFormat;
-        if (!prevFormat.equals(m_globalLocalDateTimeFormat)) {
+        if (prevFormat == null && m_globalLocalDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalDateTimeFormat)) {
             notifyChangeListeners();
         }
     }
@@ -180,7 +179,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalLocalTimeFormat(final String globalLocalTimeFormat) {
         String prevFormat = m_globalLocalTimeFormat;
         m_globalLocalTimeFormat = globalLocalTimeFormat;
-        if (!prevFormat.equals(m_globalLocalTimeFormat)) {
+        if (prevFormat == null && m_globalLocalTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalTimeFormat)) {
             notifyChangeListeners();
         }
     }
@@ -198,7 +197,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setGlobalZonedDateTimeFormat(final String globalZonedDateTimeFormat) {
         String prevFormat = m_globalZonedDateTimeFormat;
         m_globalZonedDateTimeFormat = globalZonedDateTimeFormat;
-        if (!prevFormat.equals(m_globalZonedDateTimeFormat)) {
+        if (prevFormat == null && m_globalZonedDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalZonedDateTimeFormat)) {
             notifyChangeListeners();
         }
     }
@@ -216,7 +215,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     public void setTimezone(final String timezone) {
         String prevTimezone = m_timezone;
         m_timezone = timezone;
-        if (!prevTimezone.equals(m_timezone)) {
+        if (prevTimezone == null && m_timezone != null || prevTimezone != null && !prevTimezone.equals(m_timezone)) {
             notifyChangeListeners();
         }
     }
@@ -266,7 +265,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
         try {
             // use the current value, if no value is stored in the settings
             setGlobalDateTimeLocale(dateTimeSettings.getString(GLOBAL_DATE_TIME_LOCALE, m_globalDateTimeLocale));
-            setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT, m_globalDateTimeFormat));
+            setGlobalDateTimeFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT, m_globalDateTimeFormat));
             setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_FORMAT, m_globalLocalDateFormat));
             setGlobalLocalDateTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_TIME_FORMAT, m_globalLocalDateTimeFormat));
             setGlobalLocalTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_TIME_FORMAT, m_globalLocalTimeFormat));
@@ -317,7 +316,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
             NodeSettingsRO dateTimeSettings = settings.getNodeSettings(m_configName);
             // no default value, throw an exception instead
             setGlobalDateTimeLocale(dateTimeSettings.getString(GLOBAL_DATE_TIME_LOCALE));
-            setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT));
+            setGlobalDateTimeFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT));
             setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_FORMAT));
             setGlobalLocalDateTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_TIME_FORMAT));
             setGlobalLocalTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_TIME_FORMAT));
@@ -516,7 +515,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
             if (obj.getClass() != getClass()) {
                 return false;
             }
-            SettingsModelDateTimeOptions other = (SettingsModelDateTimeOptions)obj;
+            JSONDateTimeOptions other = (JSONDateTimeOptions)obj;
             return new EqualsBuilder()
                     .append(m_globalDateTimeLocale, other.m_globalDateTimeLocale)
                     .append(m_globalDateTimeFormat, other.m_globalDateTimeFormat)

@@ -8,6 +8,7 @@ Bundle-Activator: org.knime.js.core.JSCorePlugin
 Bundle-Vendor: KNIME.com, Zurich, Switzerland
 Export-Package: org.knime.js.core,
  org.knime.js.core.color,
+ org.knime.js.core.components.datetime,
  org.knime.js.core.datasets,
  org.knime.js.core.layout,
  org.knime.js.core.layout.bs,
