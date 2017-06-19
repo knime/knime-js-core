@@ -101,6 +101,11 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      * @return the globalDateTimeLocaleModel
      */
     public SettingsModelString getGlobalDateTimeLocaleModel() {
+        String value = m_globalDateTimeLocaleModel.getStringValue();
+        String inverseValue = DialogComponentDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.inverse().get(value);
+        if (inverseValue != null) {
+            m_globalDateTimeLocaleModel.setStringValue(inverseValue);
+        }
         return m_globalDateTimeLocaleModel;
     }
 
