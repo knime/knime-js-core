@@ -121,8 +121,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 	@Override
 	protected void modelChanged() {
-		// TODO Auto-generated method stub
-
+		m_driver.executeScript("seleniumKnimeBridge.clearView()");
+		//TODO fill again
 	}
 
     /**
@@ -369,16 +369,21 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 							    LOGGER.debug("KNIME-Selenium-COMET returned " + action);
 							}
 							if (ChromeViewService.RESET_BUTTON_PRESSED.equals(action)) {
-							    //TODO reset view
+							    // Could only call if actual settings have been changed,
+				                // however there might be things in views that one can change
+				                // which do not get saved, then it's nice to trigger the event anyways.
+				                /*if (checkSettingsChanged()) {*/
+				                    modelChanged();
+				                /*}*/
 							} else if (ChromeViewService.APPLY_BUTTON_PRESSED.equals(action)) {
 							    //TODO apply values
 							} else if (ChromeViewService.APPLY_DEFAULT_BUTTON_PRESSED.equals(action)) {
 							    //TODO apply values
 							} else if (ChromeViewService.CLOSE_BUTTON_PRESSED.equals(action)) {
-                                m_driver.quit();
-                                break;
+                                //TODO close dialog
                             } else if (ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED.equals(action)) {
-                                //TODO
+                                closeView();
+                                break;
                             } else if (ChromeViewService.CLOSE_APPLY_BUTTON_PRESSED.equals(action)) {
                                 //TODO
 							} else if (ChromeViewService.CLOSE_APPLY_DEFAULT_BUTTON_PRESSED.equals(action)) {

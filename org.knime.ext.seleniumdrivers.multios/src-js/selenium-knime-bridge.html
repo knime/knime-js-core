@@ -149,6 +149,14 @@
 		bridge.showModal = function(choices) {
 			//TODO: fill me
 		}
+		
+		bridge.clearView = function() {
+			signalFunction = null;			
+			if (signalTimeout) {
+				window.clearTimeout(signalTimeout);
+			}
+			window.location.reload();			
+		}
 
 		laodJSONFile = function(url, callback) {
 			var httpRequest = new XMLHttpRequest();
