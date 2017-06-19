@@ -98,10 +98,6 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
     private static final int FORMAT_CHOOSER_WIDTH = 235;
     private static final int FORMAT_CHOOSER_HEIGHT = 17;
 
-    private ChangeListener m_modelChangeListener;
-    private ChangeListener m_componentChangeListener;
-
-
     /**
      * Creates a date and time component with all controls
      * @param model
@@ -122,81 +118,56 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
 
         m_config = config;
 
-        m_componentChangeListener = new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent e) {
-                updateModel();
-            }
-        };
-
         if (m_config.getShowLocaleChooser()) {
-            m_globalDateTimeLocaleChooser =
-                    new DialogComponentStringSelection(
-                        new SettingsModelString(
-                            SettingsModelDateTimeOptions.GLOBAL_DATE_TIME_LOCALE,
-                            PREDEFINED_DATE_TIME_LOCALES.get(SettingsModelDateTimeOptions.DEFAULT_GLOBAL_DATE_TIME_LOCALE)
-                        ),
-                        "", PREDEFINED_DATE_TIME_LOCALES.values(), true);
-            m_globalDateTimeLocaleChooser.getModel().addChangeListener(m_componentChangeListener);
+            m_globalDateTimeLocaleChooser = new DialogComponentStringSelection(
+                model.getGlobalDateTimeLocaleModel(), "", PREDEFINED_DATE_TIME_LOCALES.values(), true);
         }
 
         if (m_config.getShowLegacyDateTimeFormatChooser()) {
             m_globalDateTimeFormatChooser =
-                new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.GLOBAL_DATE_TIME_FORMAT,
-                    SettingsModelDateTimeOptions.DEFAULT_GLOBAL_DATE_TIME_FORMAT), "", PREDEFINED_DATE_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalDateTimeFormatModel(), "", PREDEFINED_DATE_TIME_FORMATS, true);
             m_globalDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-            m_globalDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
         }
 
         if (m_config.getShowDateFormatChooser()) {
             m_globalLocalDateFormatChooser =
-                new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.GLOBAL_LOCAL_DATE_FORMAT,
-                    SettingsModelDateTimeOptions.DEFAULT_GLOBAL_LOCAL_DATE_FORMAT), "", PREDEFINED_LOCAL_DATE_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalDateFormatModel(), "", PREDEFINED_LOCAL_DATE_FORMATS, true);
             m_globalLocalDateFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-            m_globalLocalDateFormatChooser.getModel().addChangeListener(m_componentChangeListener);
         }
 
         if (m_config.getShowDateTimeFormatChooser()) {
             m_globalLocalDateTimeFormatChooser =
-                new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.GLOBAL_LOCAL_DATE_TIME_FORMAT,
-                    SettingsModelDateTimeOptions.DEFAULT_GLOBAL_LOCAL_DATE_TIME_FORMAT), "", PREDEFINED_LOCAL_DATE_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalDateTimeFormatModel(), "", PREDEFINED_LOCAL_DATE_TIME_FORMATS, true);
             m_globalLocalDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-            m_globalLocalDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
         }
 
         if (m_config.getShowTimeFormatChooser()) {
             m_globalLocalTimeFormatChooser =
-                new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.GLOBAL_LOCAL_TIME_FORMAT,
-                    SettingsModelDateTimeOptions.DEFAULT_GLOBAL_LOCAL_TIME_FORMAT), "", PREDEFINED_LOCAL_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalTimeFormatModel(), "", PREDEFINED_LOCAL_TIME_FORMATS, true);
             m_globalLocalTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-            m_globalLocalTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
         }
 
         if (m_config.getShowZonedDateTimeFormatChooser()) {
             m_globalZonedDateTimeFormatChooser =
-                new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.GLOBAL_ZONED_DATE_TIME_FORMAT,
-                    SettingsModelDateTimeOptions.DEFAULT_GLOBAL_ZONED_DATE_TIME_FORMAT), "", PREDEFINED_ZONED_DATE_TIME_FORMATS, true);
+                new DialogComponentStringSelection(model.getGlobalZonedDateTimeFormatModel(), "", PREDEFINED_ZONED_DATE_TIME_FORMATS, true);
             m_globalZonedDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-            m_globalZonedDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
 
             if (m_config.getShowTimezoneChooser()) {
-                m_timezoneChooser = new DialogComponentStringSelection(new SettingsModelString(SettingsModelDateTimeOptions.TIMEZONE, SettingsModelDateTimeOptions.DEFAULT_TIMEZONE), "",
-                   new LinkedHashSet<String>(Arrays.asList(TimeZone.getAvailableIDs())), false);
+                m_timezoneChooser =
+                        new DialogComponentStringSelection(model.getTimezoneModel(), "", new LinkedHashSet<String>(Arrays.asList(TimeZone.getAvailableIDs())), false);
                 m_timezoneChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
-                m_timezoneChooser.getModel().addChangeListener(m_componentChangeListener);
             }
         }
 
         initPanel(label);
 
         // update the inputs, whenever the model changes
-        m_modelChangeListener = new ChangeListener() {
+        model.prependChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(final ChangeEvent e) {
                 updateComponent();
             }
-        };
-        model.prependChangeListener(m_modelChangeListener);
+        });
 
         updateComponent();
     }
@@ -209,13 +180,13 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     public void loadSettingsFromModel(final SettingsModelDateTimeOptions model) {
         SettingsModelDateTimeOptions thisModel = (SettingsModelDateTimeOptions) getModel();
-        thisModel.setGlobalDateTimeLocale(model.getGlobalDateTimeLocale());
-        thisModel.setGlobalDateTimeFormat(model.getGlobalDateTimeFormat());
-        thisModel.setGlobalLocalDateTimeFormat(model.getGlobalLocalDateTimeFormat());
-        thisModel.setGlobalLocalDateFormat(model.getGlobalLocalDateFormat());
-        thisModel.setGlobalLocalTimeFormat(model.getGlobalLocalTimeFormat());
-        thisModel.setGlobalZonedDateTimeFormat(model.getGlobalZonedDateTimeFormat());
-        thisModel.setTimezone(model.getTimezone());
+        thisModel.getGlobalDateTimeLocaleModel().setStringValue(model.getGlobalDateTimeLocaleModel().getStringValue());
+        thisModel.getGlobalDateTimeFormatModel().setStringValue(model.getGlobalDateTimeFormatModel().getStringValue());
+        thisModel.getGlobalLocalDateTimeFormatModel().setStringValue(model.getGlobalLocalDateTimeFormatModel().getStringValue());
+        thisModel.getGlobalLocalDateFormatModel().setStringValue(model.getGlobalLocalDateFormatModel().getStringValue());
+        thisModel.getGlobalLocalTimeFormatModel().setStringValue(model.getGlobalLocalTimeFormatModel().getStringValue());
+        thisModel.getGlobalZonedDateTimeFormatModel().setStringValue(model.getGlobalZonedDateTimeFormatModel().getStringValue());
+        thisModel.getTimezoneModel().setStringValue(model.getTimezoneModel().getStringValue());
         updateComponent();
     }
 
@@ -224,83 +195,7 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     @Override
     protected void updateComponent() {
-        removeChangeListeners();
-
-        SettingsModelDateTimeOptions model = (SettingsModelDateTimeOptions) getModel();
-
-        if (m_config.getShowLocaleChooser()) {
-            m_globalDateTimeLocaleChooser.replaceListItems(loadDateTimeLocales().values(),
-                PREDEFINED_DATE_TIME_LOCALES.get(model.getGlobalDateTimeLocale()));
-        }
-        if (m_config.getShowLegacyDateTimeFormatChooser()) {
-            m_globalDateTimeFormatChooser.replaceListItems(createPredefinedDateTimeFormats(), model.getGlobalDateTimeFormat());
-        }
-        if (m_config.getShowDateFormatChooser()) {
-            m_globalLocalDateFormatChooser.replaceListItems(createPredefinedLocalDateFormats(), model.getGlobalLocalDateFormat());
-        }
-        if (m_config.getShowDateTimeFormatChooser()) {
-            m_globalLocalDateTimeFormatChooser.replaceListItems(createPredefinedLocalDateTimeFormats(), model.getGlobalLocalDateTimeFormat());
-        }
-        if (m_config.getShowTimeFormatChooser()) {
-            m_globalLocalTimeFormatChooser.replaceListItems(createPredefinedLocalTimeFormats(), model.getGlobalLocalTimeFormat());
-        }
-        if (m_config.getShowZonedDateTimeFormatChooser()) {
-            m_globalZonedDateTimeFormatChooser.replaceListItems(createPredefinedZonedDateTimeFormats(), model.getGlobalZonedDateTimeFormat());
-
-            if (m_config.getShowTimezoneChooser()) {
-                ((SettingsModelString)m_timezoneChooser.getModel()).setStringValue(model.getTimezone());
-            }
-        }
-
-        setEnabledComponents(model.isEnabled());
-
-        addChangeListeners();
-    }
-
-    private void updateModel() {
-        removeChangeListeners();
-
-        SettingsModelDateTimeOptions model = (SettingsModelDateTimeOptions) getModel();
-
-        if (m_config.getShowLocaleChooser()) {
-            String locale = PREDEFINED_DATE_TIME_LOCALES.inverse().get(((SettingsModelString)m_globalDateTimeLocaleChooser.getModel()).getStringValue());
-            model.setGlobalDateTimeLocale(locale);
-        }
-        if (m_config.getShowLegacyDateTimeFormatChooser()) {
-            String globalDateTimeFormat = ((SettingsModelString)m_globalDateTimeFormatChooser.getModel()).getStringValue();
-            model.setGlobalDateTimeFormat(globalDateTimeFormat);
-            StringHistory.getInstance(DATE_TIME_FORMAT_HISTORY_KEY).add(globalDateTimeFormat);
-        }
-        if (m_config.getShowDateFormatChooser()) {
-            String globalLocalDateFormat = ((SettingsModelString)m_globalLocalDateFormatChooser.getModel()).getStringValue();
-            model.setGlobalLocalDateFormat(globalLocalDateFormat);
-            StringHistory.getInstance(DATE_FORMAT_HISTORY_KEY).add(globalLocalDateFormat);
-        }
-        if (m_config.getShowDateTimeFormatChooser()) {
-            String globalLocalDateTimeFormat =
-                ((SettingsModelString)m_globalLocalDateTimeFormatChooser.getModel()).getStringValue();
-            model.setGlobalLocalDateTimeFormat(globalLocalDateTimeFormat);
-            StringHistory.getInstance(DATE_TIME_FORMAT_HISTORY_KEY).add(globalLocalDateTimeFormat);
-        }
-        if (m_config.getShowTimeFormatChooser()) {
-            String globalLocalTimeFormat =
-                ((SettingsModelString)m_globalLocalTimeFormatChooser.getModel()).getStringValue();
-            model.setGlobalLocalTimeFormat(globalLocalTimeFormat);
-            StringHistory.getInstance(TIME_FORMAT_HISTORY_KEY).add(globalLocalTimeFormat);
-        }
-        if (m_config.getShowZonedDateTimeFormatChooser()) {
-            String globalZonedDateTimeFormat =
-                ((SettingsModelString)m_globalZonedDateTimeFormatChooser.getModel()).getStringValue();
-            model.setGlobalZonedDateTimeFormat(globalZonedDateTimeFormat);
-            StringHistory.getInstance(ZONED_DATE_TIME_FORMAT_HISTORY_KEY).add(globalZonedDateTimeFormat);
-
-            if (m_config.getShowTimezoneChooser()) {
-                String timezone = ((SettingsModelString)m_timezoneChooser.getModel()).getStringValue();
-                model.setTimezone(timezone);
-            }
-        }
-
-        addChangeListeners();
+        setEnabledComponents(getModel().isEnabled());
     }
 
     /**
@@ -308,7 +203,6 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     @Override
     protected void validateSettingsBeforeSave() throws InvalidSettingsException {
-        updateModel();
     }
 
     /**
@@ -317,66 +211,6 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
     @Override
     protected void checkConfigurabilityBeforeLoad(final PortObjectSpec[] specs) throws NotConfigurableException {
         // always ok
-    }
-
-    /**
-     * Remove change listeners during the component or model updating to avoid cycling and setting wrong values
-     */
-    protected void removeChangeListeners() {
-        getModel().removeChangeListener(m_modelChangeListener);
-
-        if (m_config.getShowLocaleChooser()) {
-            m_globalDateTimeLocaleChooser.getModel().removeChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowLegacyDateTimeFormatChooser()) {
-            m_globalDateTimeFormatChooser.getModel().removeChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowDateFormatChooser()) {
-            m_globalLocalDateFormatChooser.getModel().removeChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowDateTimeFormatChooser()) {
-            m_globalLocalDateTimeFormatChooser.getModel().removeChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowTimeFormatChooser()) {
-            m_globalLocalTimeFormatChooser.getModel().removeChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowZonedDateTimeFormatChooser()) {
-            m_globalZonedDateTimeFormatChooser.getModel().removeChangeListener(m_componentChangeListener);
-
-            if (m_config.getShowTimezoneChooser()) {
-                m_timezoneChooser.getModel().removeChangeListener(m_componentChangeListener);
-            }
-        }
-    }
-
-    /**
-     * Add change listeners back after model and component updating
-     */
-    protected void addChangeListeners() {
-        ((SettingsModelDateTimeOptions)getModel()).prependChangeListener(m_modelChangeListener);
-
-        if (m_config.getShowLocaleChooser()) {
-            m_globalDateTimeLocaleChooser.getModel().addChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowLegacyDateTimeFormatChooser()) {
-            m_globalDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowDateFormatChooser()) {
-            m_globalLocalDateFormatChooser.getModel().addChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowDateTimeFormatChooser()) {
-            m_globalLocalDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowTimeFormatChooser()) {
-            m_globalLocalTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
-        }
-        if (m_config.getShowZonedDateTimeFormatChooser()) {
-            m_globalZonedDateTimeFormatChooser.getModel().addChangeListener(m_componentChangeListener);
-
-            if (m_config.getShowTimezoneChooser()) {
-                m_timezoneChooser.getModel().addChangeListener(m_componentChangeListener);
-            }
-        }
     }
 
     /**

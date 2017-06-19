@@ -14,7 +14,9 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.SettingsModel;
+import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.util.StringHistory;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -39,13 +41,13 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     static final String DEFAULT_GLOBAL_ZONED_DATE_TIME_FORMAT = DialogComponentDateTimeOptions.PREDEFINED_ZONED_DATE_TIME_FORMATS.iterator().next();
     static final String DEFAULT_TIMEZONE = TimeZone.getDefault().getID();
 
-    private String m_globalDateTimeLocale = DEFAULT_GLOBAL_DATE_TIME_LOCALE;
-    private String m_globalDateTimeFormat      = DEFAULT_GLOBAL_DATE_TIME_FORMAT;
-    private String m_globalLocalDateFormat     = DEFAULT_GLOBAL_LOCAL_DATE_FORMAT;
-    private String m_globalLocalDateTimeFormat = DEFAULT_GLOBAL_LOCAL_DATE_TIME_FORMAT;
-    private String m_globalLocalTimeFormat     = DEFAULT_GLOBAL_LOCAL_TIME_FORMAT;
-    private String m_globalZonedDateTimeFormat = DEFAULT_GLOBAL_ZONED_DATE_TIME_FORMAT;
-    private String m_timezone = DEFAULT_TIMEZONE;
+    private SettingsModelString m_globalDateTimeLocaleModel;
+    private SettingsModelString m_globalDateTimeFormatModel;
+    private SettingsModelString m_globalLocalDateFormatModel;
+    private SettingsModelString m_globalLocalDateTimeFormatModel;
+    private SettingsModelString m_globalLocalTimeFormatModel;
+    private SettingsModelString m_globalZonedDateTimeFormatModel;
+    private SettingsModelString m_timezoneModel;
 
     private final String m_configName;
 
@@ -59,6 +61,14 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
             throw new IllegalArgumentException("The configName must be a " + "non-empty string");
         }
         m_configName = configName;
+
+        m_globalDateTimeLocaleModel = new SettingsModelString(GLOBAL_DATE_TIME_LOCALE, DEFAULT_GLOBAL_DATE_TIME_LOCALE);
+        m_globalDateTimeFormatModel      = new SettingsModelString(GLOBAL_DATE_TIME_FORMAT,       DEFAULT_GLOBAL_DATE_TIME_FORMAT);
+        m_globalLocalDateFormatModel     = new SettingsModelString(GLOBAL_LOCAL_DATE_FORMAT,      DEFAULT_GLOBAL_LOCAL_DATE_FORMAT);
+        m_globalLocalDateTimeFormatModel = new SettingsModelString(GLOBAL_LOCAL_DATE_TIME_FORMAT, DEFAULT_GLOBAL_LOCAL_DATE_TIME_FORMAT);
+        m_globalLocalTimeFormatModel     = new SettingsModelString(GLOBAL_LOCAL_TIME_FORMAT,      DEFAULT_GLOBAL_LOCAL_TIME_FORMAT);
+        m_globalZonedDateTimeFormatModel = new SettingsModelString(GLOBAL_ZONED_DATE_TIME_FORMAT, DEFAULT_GLOBAL_ZONED_DATE_TIME_FORMAT);
+        m_timezoneModel = new SettingsModelString(TIMEZONE, DEFAULT_TIMEZONE);
     }
 
     /**
@@ -68,13 +78,6 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     @Override
     protected SettingsModelDateTimeOptions createClone() {
         SettingsModelDateTimeOptions copy = new SettingsModelDateTimeOptions(m_configName);
-        copy.setGlobalDateTimeLocale(m_globalDateTimeLocale);
-        copy.setGlobalDateTimeFormat(m_globalDateTimeFormat);
-        copy.setGlobalLocalDateTimeFormat(m_globalLocalDateTimeFormat);
-        copy.setGlobalLocalDateFormat(m_globalLocalDateFormat);
-        copy.setGlobalLocalTimeFormat(m_globalLocalTimeFormat);
-        copy.setGlobalZonedDateTimeFormat(m_globalZonedDateTimeFormat);
-        copy.setTimezone(m_timezone);
         return copy;
     }
 
@@ -95,129 +98,101 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     }
 
     /**
-     * @return the globalDateTimeLocale
+     * @return the globalDateTimeLocaleModel
      */
-    public String getGlobalDateTimeLocale() {
-        return m_globalDateTimeLocale;
+    public SettingsModelString getGlobalDateTimeLocaleModel() {
+        return m_globalDateTimeLocaleModel;
     }
 
     /**
-     * @param globalDateTimeLocale the globalDateTimeLocale to set
+     * @param globalDateTimeLocaleModel the globalDateTimeLocaleModel to set
      */
-    public void setGlobalDateTimeLocale(final String globalDateTimeLocale) {
-        String prevLocale = m_globalDateTimeLocale;
-        m_globalDateTimeLocale = globalDateTimeLocale;
-        if (prevLocale == null && m_globalDateTimeLocale != null || prevLocale != null && !prevLocale.equals(m_globalDateTimeLocale)) {
-            notifyChangeListeners();
-        }
+    public void setGlobalDateTimeLocaleModel(final SettingsModelString globalDateTimeLocaleModel) {
+        m_globalDateTimeLocaleModel = globalDateTimeLocaleModel;
     }
 
     /**
-     * @return the globalDateTimeFormat
+     * @return the globalDateTimeFormatModel
      */
-    public String getGlobalDateTimeFormat() {
-        return m_globalDateTimeFormat;
+    public SettingsModelString getGlobalDateTimeFormatModel() {
+        return m_globalDateTimeFormatModel;
     }
 
     /**
-     * @param globalDateTimeFormat the globalDateTimeFormat to set
+     * @param globalDateTimeFormatModel the globalDateTimeFormatModel to set
      */
-    public void setGlobalDateTimeFormat(final String globalDateTimeFormat) {
-        String prevFormat = m_globalDateTimeFormat;
-        m_globalDateTimeFormat = globalDateTimeFormat;
-        if (prevFormat == null && m_globalDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalDateTimeFormat)) {
-            notifyChangeListeners();
-        }
+    public void setGlobalDateTimeFormatModel(final SettingsModelString globalDateTimeFormatModel) {
+        m_globalDateTimeFormatModel = globalDateTimeFormatModel;
     }
 
     /**
-    * @return the globalLocalDateFormat
-    */
-    public String getGlobalLocalDateFormat() {
-        return m_globalLocalDateFormat;
-    }
-
-    /**
-    * @param globalLocalDateFormat the globalLocalDateFormat to set
-    */
-    public void setGlobalLocalDateFormat(final String globalLocalDateFormat) {
-        String prevFormat = m_globalLocalDateFormat;
-        m_globalLocalDateFormat = globalLocalDateFormat;
-        if (prevFormat == null && m_globalLocalDateFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalDateFormat)) {
-            notifyChangeListeners();
-        }
-    }
-
-    /**
-    * @return the globalLocalDateTimeFormat
-    */
-    public String getGlobalLocalDateTimeFormat() {
-        return m_globalLocalDateTimeFormat;
-    }
-
-    /**
-    * @param globalLocalDateTimeFormat the globalLocalDateTimeFormat to set
-    */
-    public void setGlobalLocalDateTimeFormat(final String globalLocalDateTimeFormat) {
-        String prevFormat = m_globalLocalDateTimeFormat;
-        m_globalLocalDateTimeFormat = globalLocalDateTimeFormat;
-        if (prevFormat == null && m_globalLocalDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalDateTimeFormat)) {
-            notifyChangeListeners();
-        }
-    }
-
-    /**
-    * @return the globalLocalTimeFormat
-    */
-    public String getGlobalLocalTimeFormat() {
-        return m_globalLocalTimeFormat;
-    }
-
-    /**
-    * @param globalLocalTimeFormat the globalLocalTimeFormat to set
-    */
-    public void setGlobalLocalTimeFormat(final String globalLocalTimeFormat) {
-        String prevFormat = m_globalLocalTimeFormat;
-        m_globalLocalTimeFormat = globalLocalTimeFormat;
-        if (prevFormat == null && m_globalLocalTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalLocalTimeFormat)) {
-            notifyChangeListeners();
-        }
-    }
-
-    /**
-    * @return the globalZonedDateTimeFormat
-    */
-    public String getGlobalZonedDateTimeFormat() {
-        return m_globalZonedDateTimeFormat;
-    }
-
-    /**
-    * @param globalZonedDateTimeFormat the globalZonedDateTimeFormat to set
-    */
-    public void setGlobalZonedDateTimeFormat(final String globalZonedDateTimeFormat) {
-        String prevFormat = m_globalZonedDateTimeFormat;
-        m_globalZonedDateTimeFormat = globalZonedDateTimeFormat;
-        if (prevFormat == null && m_globalZonedDateTimeFormat != null || prevFormat != null && !prevFormat.equals(m_globalZonedDateTimeFormat)) {
-            notifyChangeListeners();
-        }
-    }
-
-    /**
-     * @return the timezone
+     * @return the globalLocalDateFormatModel
      */
-    public String getTimezone() {
-        return m_timezone;
+    public SettingsModelString getGlobalLocalDateFormatModel() {
+        return m_globalLocalDateFormatModel;
     }
 
     /**
-     * @param timezone the timezone to set
+     * @param globalLocalDateFormatModel the globalLocalDateFormatModel to set
      */
-    public void setTimezone(final String timezone) {
-        String prevTimezone = m_timezone;
-        m_timezone = timezone;
-        if (prevTimezone == null && m_timezone != null || prevTimezone != null && !prevTimezone.equals(m_timezone)) {
-            notifyChangeListeners();
-        }
+    public void setGlobalLocalDateFormatModel(final SettingsModelString globalLocalDateFormatModel) {
+        m_globalLocalDateFormatModel = globalLocalDateFormatModel;
+    }
+
+    /**
+     * @return the globalLocalDateTimeFormatModel
+     */
+    public SettingsModelString getGlobalLocalDateTimeFormatModel() {
+        return m_globalLocalDateTimeFormatModel;
+    }
+
+    /**
+     * @param globalLocalDateTimeFormatModel the globalLocalDateTimeFormatModel to set
+     */
+    public void setGlobalLocalDateTimeFormatModel(final SettingsModelString globalLocalDateTimeFormatModel) {
+        m_globalLocalDateTimeFormatModel = globalLocalDateTimeFormatModel;
+    }
+
+    /**
+     * @return the globalLocalTimeFormatModel
+     */
+    public SettingsModelString getGlobalLocalTimeFormatModel() {
+        return m_globalLocalTimeFormatModel;
+    }
+
+    /**
+     * @param globalLocalTimeFormatModel the globalLocalTimeFormatModel to set
+     */
+    public void setGlobalLocalTimeFormatModel(final SettingsModelString globalLocalTimeFormatModel) {
+        m_globalLocalTimeFormatModel = globalLocalTimeFormatModel;
+    }
+
+    /**
+     * @return the globalZonedDateTimeFormatModel
+     */
+    public SettingsModelString getGlobalZonedDateTimeFormatModel() {
+        return m_globalZonedDateTimeFormatModel;
+    }
+
+    /**
+     * @param globalZonedDateTimeFormatModel the globalZonedDateTimeFormatModel to set
+     */
+    public void setGlobalZonedDateTimeFormatModel(final SettingsModelString globalZonedDateTimeFormatModel) {
+        m_globalZonedDateTimeFormatModel = globalZonedDateTimeFormatModel;
+    }
+
+    /**
+     * @return the timezoneModel
+     */
+    public SettingsModelString getTimezoneModel() {
+        return m_timezoneModel;
+    }
+
+    /**
+     * @param timezoneModel the timezoneModel to set
+     */
+    public void setTimezoneModel(final SettingsModelString timezoneModel) {
+        m_timezoneModel = timezoneModel;
     }
 
     /**
@@ -225,13 +200,13 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      */
     public JSONDateTimeOptions getJSONSerializableObject() {
         JSONDateTimeOptions options = new JSONDateTimeOptions();
-        options.setGlobalDateTimeLocale(getGlobalDateTimeLocale());
-        options.setGlobalDateTimeFormat(getGlobalDateTimeFormat());
-        options.setGlobalLocalDateFormat(getGlobalLocalDateFormat());
-        options.setGlobalLocalDateTimeFormat(getGlobalLocalDateTimeFormat());
-        options.setGlobalLocalTimeFormat(getGlobalLocalTimeFormat());
-        options.setGlobalZonedDateTimeFormat(getGlobalZonedDateTimeFormat());
-        options.setTimezone(getTimezone());
+        options.setGlobalDateTimeLocale(getGlobalDateTimeLocaleModel().getStringValue());
+        options.setGlobalDateTimeFormat(getGlobalDateTimeFormatModel().getStringValue());
+        options.setGlobalLocalDateFormat(getGlobalLocalDateFormatModel().getStringValue());
+        options.setGlobalLocalDateTimeFormat(getGlobalLocalDateTimeFormatModel().getStringValue());
+        options.setGlobalLocalTimeFormat(getGlobalLocalTimeFormatModel().getStringValue());
+        options.setGlobalZonedDateTimeFormat(getGlobalZonedDateTimeFormatModel().getStringValue());
+        options.setTimezone(getTimezoneModel().getStringValue());
         return options;
     }
 
@@ -240,13 +215,13 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      * @param options the JSON object
      */
     public void setFromJSON(final JSONDateTimeOptions options) {
-        setGlobalDateTimeLocale(options.getGlobalDateTimeLocale());
-        setGlobalDateTimeFormat(options.getGlobalDateTimeFormat());
-        setGlobalLocalDateTimeFormat(options.getGlobalLocalDateTimeFormat());
-        setGlobalLocalDateFormat(options.getGlobalLocalDateFormat());
-        setGlobalLocalTimeFormat(options.getGlobalLocalTimeFormat());
-        setGlobalZonedDateTimeFormat(options.getGlobalZonedDateTimeFormat());
-        setTimezone(options.getTimezone());
+        getGlobalDateTimeLocaleModel().setStringValue(options.getGlobalDateTimeLocale());
+        getGlobalDateTimeFormatModel().setStringValue(options.getGlobalDateTimeFormat());
+        getGlobalLocalDateTimeFormatModel().setStringValue(options.getGlobalLocalDateTimeFormat());
+        getGlobalLocalDateFormatModel().setStringValue(options.getGlobalLocalDateFormat());
+        getGlobalLocalTimeFormatModel().setStringValue(options.getGlobalLocalTimeFormat());
+        getGlobalZonedDateTimeFormatModel().setStringValue(options.getGlobalZonedDateTimeFormat());
+        getTimezoneModel().setStringValue(options.getTimezone());
     }
 
     /**
@@ -255,24 +230,11 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     @Override
     protected void loadSettingsForDialog(final NodeSettingsRO settings, final PortObjectSpec[] specs)
         throws NotConfigurableException {
-        NodeSettingsRO dateTimeSettings;
         try {
-            dateTimeSettings = settings.getNodeSettings(m_configName);
+            loadSettings(settings);
         } catch (InvalidSettingsException e) {
             // if settings not found: keep the old value.
             return;
-        }
-        try {
-            // use the current value, if no value is stored in the settings
-            setGlobalDateTimeLocale(dateTimeSettings.getString(GLOBAL_DATE_TIME_LOCALE, m_globalDateTimeLocale));
-            setGlobalDateTimeFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT, m_globalDateTimeFormat));
-            setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_FORMAT, m_globalLocalDateFormat));
-            setGlobalLocalDateTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_TIME_FORMAT, m_globalLocalDateTimeFormat));
-            setGlobalLocalTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_TIME_FORMAT, m_globalLocalTimeFormat));
-            setGlobalZonedDateTimeFormat(dateTimeSettings.getString(GLOBAL_ZONED_DATE_TIME_FORMAT, m_globalZonedDateTimeFormat));
-            setTimezone(dateTimeSettings.getString(TIMEZONE, m_timezone));
-        } catch (final IllegalArgumentException iae) {
-            // if the argument is not accepted: keep the old value.
         }
     }
 
@@ -281,15 +243,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      */
     @Override
     protected void saveSettingsForDialog(final NodeSettingsWO settings) throws InvalidSettingsException {
-        NodeSettingsWO dateTimeSettings = settings.addNodeSettings(m_configName);
-
-        dateTimeSettings.addString(GLOBAL_DATE_TIME_LOCALE, getGlobalDateTimeLocale());
-        dateTimeSettings.addString(GLOBAL_DATE_TIME_FORMAT, getGlobalDateTimeFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_DATE_FORMAT, getGlobalLocalDateFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_DATE_TIME_FORMAT, getGlobalLocalDateTimeFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_TIME_FORMAT, getGlobalLocalTimeFormat());
-        dateTimeSettings.addString(GLOBAL_ZONED_DATE_TIME_FORMAT, getGlobalZonedDateTimeFormat());
-        dateTimeSettings.addString(TIMEZONE, getTimezone());
+        saveSettings(settings);
     }
 
     /**
@@ -298,13 +252,13 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
     @Override
     protected void validateSettingsForModel(final NodeSettingsRO settings) throws InvalidSettingsException {
         NodeSettingsRO dateTimeSettings = settings.getNodeSettings(m_configName);
-        dateTimeSettings.getString(GLOBAL_DATE_TIME_LOCALE);
-        dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT);
-        dateTimeSettings.getString(GLOBAL_LOCAL_DATE_FORMAT);
-        dateTimeSettings.getString(GLOBAL_LOCAL_DATE_TIME_FORMAT);
-        dateTimeSettings.getString(GLOBAL_LOCAL_TIME_FORMAT);
-        dateTimeSettings.getString(GLOBAL_ZONED_DATE_TIME_FORMAT);
-        dateTimeSettings.getString(TIMEZONE);
+
+        getGlobalDateTimeLocaleModel().validateSettings(dateTimeSettings);
+        getGlobalDateTimeFormatModel().validateSettings(dateTimeSettings);
+        getGlobalLocalDateFormatModel().validateSettings(dateTimeSettings);
+        getGlobalLocalDateTimeFormatModel().validateSettings(dateTimeSettings);
+        getGlobalLocalTimeFormatModel().validateSettings(dateTimeSettings);
+        getGlobalZonedDateTimeFormatModel().validateSettings(dateTimeSettings);
     }
 
     /**
@@ -312,19 +266,7 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      */
     @Override
     protected void loadSettingsForModel(final NodeSettingsRO settings) throws InvalidSettingsException {
-        try {
-            NodeSettingsRO dateTimeSettings = settings.getNodeSettings(m_configName);
-            // no default value, throw an exception instead
-            setGlobalDateTimeLocale(dateTimeSettings.getString(GLOBAL_DATE_TIME_LOCALE));
-            setGlobalDateTimeFormat(dateTimeSettings.getString(GLOBAL_DATE_TIME_FORMAT));
-            setGlobalLocalDateFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_FORMAT));
-            setGlobalLocalDateTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_DATE_TIME_FORMAT));
-            setGlobalLocalTimeFormat(dateTimeSettings.getString(GLOBAL_LOCAL_TIME_FORMAT));
-            setGlobalZonedDateTimeFormat(dateTimeSettings.getString(GLOBAL_ZONED_DATE_TIME_FORMAT));
-            setTimezone(dateTimeSettings.getString(TIMEZONE));
-        } catch (final IllegalArgumentException iae) {
-            throw new InvalidSettingsException(iae.getMessage());
-        }
+        loadSettings(settings);
     }
 
     /**
@@ -332,15 +274,37 @@ public class SettingsModelDateTimeOptions extends SettingsModel {
      */
     @Override
     protected void saveSettingsForModel(final NodeSettingsWO settings) {
+        saveSettings(settings);
+    }
+
+    private void loadSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        NodeSettingsRO dateTimeSettings = settings.getNodeSettings(m_configName);
+
+        getGlobalDateTimeLocaleModel().loadSettingsFrom(dateTimeSettings);
+        getGlobalDateTimeFormatModel().loadSettingsFrom(dateTimeSettings);
+        getGlobalLocalDateFormatModel().loadSettingsFrom(dateTimeSettings);
+        getGlobalLocalDateTimeFormatModel().loadSettingsFrom(dateTimeSettings);
+        getGlobalLocalTimeFormatModel().loadSettingsFrom(dateTimeSettings);
+        getGlobalZonedDateTimeFormatModel().loadSettingsFrom(dateTimeSettings);
+        getTimezoneModel().loadSettingsFrom(dateTimeSettings);
+    }
+
+    private void saveSettings(final NodeSettingsWO settings) {
         NodeSettingsWO dateTimeSettings = settings.addNodeSettings(m_configName);
 
-        dateTimeSettings.addString(GLOBAL_DATE_TIME_LOCALE, getGlobalDateTimeLocale());
-        dateTimeSettings.addString(GLOBAL_DATE_TIME_FORMAT, getGlobalDateTimeFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_DATE_FORMAT, getGlobalLocalDateFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_DATE_TIME_FORMAT, getGlobalLocalDateTimeFormat());
-        dateTimeSettings.addString(GLOBAL_LOCAL_TIME_FORMAT, getGlobalLocalTimeFormat());
-        dateTimeSettings.addString(GLOBAL_ZONED_DATE_TIME_FORMAT, getGlobalZonedDateTimeFormat());
-        dateTimeSettings.addString(TIMEZONE, getTimezone());
+        getGlobalDateTimeLocaleModel().saveSettingsTo(dateTimeSettings);
+        getGlobalDateTimeFormatModel().saveSettingsTo(dateTimeSettings);
+        getGlobalLocalDateFormatModel().saveSettingsTo(dateTimeSettings);
+        getGlobalLocalDateTimeFormatModel().saveSettingsTo(dateTimeSettings);
+        getGlobalLocalTimeFormatModel().saveSettingsTo(dateTimeSettings);
+        getGlobalZonedDateTimeFormatModel().saveSettingsTo(dateTimeSettings);
+        getTimezoneModel().saveSettingsTo(dateTimeSettings);
+
+        StringHistory.getInstance(DialogComponentDateTimeOptions.DATE_TIME_FORMAT_HISTORY_KEY).add(getGlobalDateTimeFormatModel().getStringValue());
+        StringHistory.getInstance(DialogComponentDateTimeOptions.DATE_FORMAT_HISTORY_KEY).add(getGlobalLocalDateFormatModel().getStringValue());
+        StringHistory.getInstance(DialogComponentDateTimeOptions.DATE_TIME_FORMAT_HISTORY_KEY).add(getGlobalLocalDateTimeFormatModel().getStringValue());
+        StringHistory.getInstance(DialogComponentDateTimeOptions.TIME_FORMAT_HISTORY_KEY).add(getGlobalLocalTimeFormatModel().getStringValue());
+        StringHistory.getInstance(DialogComponentDateTimeOptions.ZONED_DATE_TIME_FORMAT_HISTORY_KEY).add(getGlobalZonedDateTimeFormatModel().getStringValue());
     }
 
     /**
