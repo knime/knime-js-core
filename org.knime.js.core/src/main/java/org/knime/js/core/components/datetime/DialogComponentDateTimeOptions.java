@@ -180,7 +180,7 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     public void loadSettingsFromModel(final SettingsModelDateTimeOptions model) {
         SettingsModelDateTimeOptions thisModel = (SettingsModelDateTimeOptions) getModel();
-        thisModel.getGlobalDateTimeLocaleModel().setStringValue(PREDEFINED_DATE_TIME_LOCALES.get(model.getGlobalDateTimeLocaleModel().getStringValue()));
+        thisModel.getGlobalDateTimeLocaleModel().setLocaleName(model.getGlobalDateTimeLocaleModel().getLocaleName());
         thisModel.getGlobalDateTimeFormatModel().setStringValue(model.getGlobalDateTimeFormatModel().getStringValue());
         thisModel.getGlobalLocalDateTimeFormatModel().setStringValue(model.getGlobalLocalDateTimeFormatModel().getStringValue());
         thisModel.getGlobalLocalDateFormatModel().setStringValue(model.getGlobalLocalDateFormatModel().getStringValue());
