@@ -146,6 +146,11 @@
 			signalNext();
 		}
 		
+		bridge.executeOnFrame = function(toExecute) {
+			var frame = document.getElementById(FRAME_ID);
+			return frame.contentWindow.eval('(function() {' + toExecute + '})();');
+		}
+		
 		bridge.showModal = function(choices) {
 			//TODO: fill me
 		}

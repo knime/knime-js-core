@@ -7,7 +7,9 @@ Bundle-Activator: org.knime.ext.seleniumdrivers.multios.MultiOSDriverActivator
 Bundle-Vendor: KNIME.com GmbH, Konstanz, Germany
 Require-Bundle: org.eclipse.core.runtime,
  org.openqa.selenium;bundle-version="[3.4.0,4.0.0)",
- org.knime.core;bundle-version="[3.4.0,4.0.0)"
+ org.knime.core;bundle-version="[3.4.0,4.0.0)",
+ org.knime.core.wizard;bundle-version="[3.4.0,4.0.0)",
+ org.knime.js.core;bundle-version="[3.4.0,4.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: org.knime.ext.seleniumdrivers.multios
