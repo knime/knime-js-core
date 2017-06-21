@@ -58,6 +58,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -505,7 +507,44 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
      */
     @Override
     protected boolean showApplyOptionsDialog(final boolean showDiscardOption, final String title, final String message) {
-        // TODO Auto-generated method stub
+        List<CloseDialogOption> options = new ArrayList<CloseDialogOption>(3);
+        if (showDiscardOption) {
+            options.add(new CloseDialogOption(DISCARD_LABEL, DISCARD_DESCRIPTION, ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED));
+        }
         return false;
+    }
+
+    private static class CloseDialogOption {
+
+        private String m_label;
+        private String m_description;
+        private String m_signal;
+
+        CloseDialogOption(final String label, final String description, final String signal) {
+            m_label = label;
+            m_description = description;
+            m_signal = signal;
+        }
+
+        /**
+         * @return the label
+         */
+        public String getLabel() {
+            return m_label;
+        }
+
+        /**
+         * @return the description
+         */
+        public String getDescription() {
+            return m_description;
+        }
+
+        /**
+         * @return the signal
+         */
+        public String getSignal() {
+            return m_signal;
+        }
     }
 }
