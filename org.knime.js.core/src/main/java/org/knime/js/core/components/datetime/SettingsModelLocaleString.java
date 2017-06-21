@@ -41,7 +41,7 @@ public class SettingsModelLocaleString extends SettingsModelString {
      */
     public String getLocaleCode() {
         String localeName = getStringValue();
-        return DialogComponentDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.inverse().get(localeName);
+        return SettingsModelDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.inverse().get(localeName);
     }
 
     /**
@@ -49,7 +49,7 @@ public class SettingsModelLocaleString extends SettingsModelString {
      * @param localeCode code of the locale
      */
     public void setLocaleCode(final String localeCode) {
-        String localeName = DialogComponentDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.get(localeCode);
+        String localeName = SettingsModelDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.get(localeCode);
         setStringValue(localeName);
     }
 

@@ -6,11 +6,8 @@ package org.knime.js.core.components.datetime;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.Properties;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -26,63 +23,12 @@ import org.knime.core.node.defaultnodesettings.DialogComponent;
 import org.knime.core.node.defaultnodesettings.DialogComponentStringSelection;
 import org.knime.core.node.defaultnodesettings.SettingsModelString;
 import org.knime.core.node.port.PortObjectSpec;
-import org.knime.core.node.util.StringHistory;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableBiMap.Builder;
 
 /**
  * @author Oleg Yasnev, KNIME.com GmbH, Berlin, Germany
  *
  */
 public class DialogComponentDateTimeOptions extends DialogComponent {
-
-    /** BiMap of locale keys and locale values as supported by moment.js */
-    public static final BiMap<String, String> PREDEFINED_DATE_TIME_LOCALES = loadDateTimeLocales();
-
-    // Keys for the string history to re-use user entered date formats.
-
-    /**
-     * New and old date and time format history key
-     */
-    public static final String DATE_TIME_FORMAT_HISTORY_KEY = "momentjs-date-formats";
-    /**
-     * Date only format history key
-     */
-    public static final String DATE_FORMAT_HISTORY_KEY = "momentjs-date-new-formats";
-    /**
-     * Time only format history key
-     */
-    public static final String TIME_FORMAT_HISTORY_KEY = "momentjs-time-formats";
-    /**
-     * Zoned date and time format history key
-     */
-    public static final String ZONED_DATE_TIME_FORMAT_HISTORY_KEY = "momentjs-zoned-date-time-formats";
-
-    // Sets of predefined date and time formats for JavaScript processing with moment.js.
-
-    /**
-     * Old date and time formats
-     */
-    public static final LinkedHashSet<String> PREDEFINED_DATE_TIME_FORMATS = createPredefinedDateTimeFormats();
-    /**
-     * Date only formats
-     */
-    public static final LinkedHashSet<String> PREDEFINED_LOCAL_DATE_FORMATS = createPredefinedLocalDateFormats();
-    /**
-     * New date and time formats
-     */
-    public static final LinkedHashSet<String> PREDEFINED_LOCAL_DATE_TIME_FORMATS = createPredefinedLocalDateTimeFormats();
-    /**
-     * Time only formats
-     */
-    public static final LinkedHashSet<String> PREDEFINED_LOCAL_TIME_FORMATS = createPredefinedLocalTimeFormats();
-    /**
-     * Zoned date and time formats
-     */
-    public static final LinkedHashSet<String> PREDEFINED_ZONED_DATE_TIME_FORMATS = createPredefinedZonedDateTimeFormats();
-
     private DialogComponentStringSelection m_globalDateTimeLocaleChooser;
     private DialogComponentStringSelection m_globalDateTimeFormatChooser;
     private DialogComponentStringSelection m_globalLocalDateFormatChooser;
@@ -120,36 +66,36 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
 
         if (m_config.getShowLocaleChooser()) {
             m_globalDateTimeLocaleChooser = new DialogComponentStringSelection(
-                model.getGlobalDateTimeLocaleModel(), "", PREDEFINED_DATE_TIME_LOCALES.values(), true);
+                model.getGlobalDateTimeLocaleModel(), "", SettingsModelDateTimeOptions.PREDEFINED_DATE_TIME_LOCALES.values(), true);
         }
 
         if (m_config.getShowLegacyDateTimeFormatChooser()) {
             m_globalDateTimeFormatChooser =
-                    new DialogComponentStringSelection(model.getGlobalDateTimeFormatModel(), "", PREDEFINED_DATE_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalDateTimeFormatModel(), "", model.getDateTimeFormatSet(), true);
             m_globalDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
         }
 
         if (m_config.getShowDateFormatChooser()) {
             m_globalLocalDateFormatChooser =
-                    new DialogComponentStringSelection(model.getGlobalLocalDateFormatModel(), "", PREDEFINED_LOCAL_DATE_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalDateFormatModel(), "", model.getLocalDateFormatSet(), true);
             m_globalLocalDateFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
         }
 
         if (m_config.getShowDateTimeFormatChooser()) {
             m_globalLocalDateTimeFormatChooser =
-                    new DialogComponentStringSelection(model.getGlobalLocalDateTimeFormatModel(), "", PREDEFINED_LOCAL_DATE_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalDateTimeFormatModel(), "", model.getLocalDateTimeFormatSet(), true);
             m_globalLocalDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
         }
 
         if (m_config.getShowTimeFormatChooser()) {
             m_globalLocalTimeFormatChooser =
-                    new DialogComponentStringSelection(model.getGlobalLocalTimeFormatModel(), "", PREDEFINED_LOCAL_TIME_FORMATS, true);
+                    new DialogComponentStringSelection(model.getGlobalLocalTimeFormatModel(), "", model.getLocalTimeFormatSet(), true);
             m_globalLocalTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
         }
 
         if (m_config.getShowZonedDateTimeFormatChooser()) {
             m_globalZonedDateTimeFormatChooser =
-                new DialogComponentStringSelection(model.getGlobalZonedDateTimeFormatModel(), "", PREDEFINED_ZONED_DATE_TIME_FORMATS, true);
+                new DialogComponentStringSelection(model.getGlobalZonedDateTimeFormatModel(), "", model.getZonedDateTimeFormatSet(), true);
             m_globalZonedDateTimeFormatChooser.setSizeComponents(FORMAT_CHOOSER_WIDTH, FORMAT_CHOOSER_HEIGHT);
 
             if (m_config.getShowTimezoneChooser()) {
@@ -180,6 +126,7 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     public void loadSettingsFromModel(final SettingsModelDateTimeOptions model) {
         SettingsModelDateTimeOptions thisModel = (SettingsModelDateTimeOptions) getModel();
+
         thisModel.getGlobalDateTimeLocaleModel().setLocaleName(model.getGlobalDateTimeLocaleModel().getLocaleName());
         thisModel.getGlobalDateTimeFormatModel().setStringValue(model.getGlobalDateTimeFormatModel().getStringValue());
         thisModel.getGlobalLocalDateTimeFormatModel().setStringValue(model.getGlobalLocalDateTimeFormatModel().getStringValue());
@@ -187,6 +134,14 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
         thisModel.getGlobalLocalTimeFormatModel().setStringValue(model.getGlobalLocalTimeFormatModel().getStringValue());
         thisModel.getGlobalZonedDateTimeFormatModel().setStringValue(model.getGlobalZonedDateTimeFormatModel().getStringValue());
         thisModel.getTimezoneModel().setStringValue(model.getTimezoneModel().getStringValue());
+
+        thisModel.setDateTimeFormatSet(model.getDateTimeFormatSet());
+        thisModel.setLocalDateFormatSet(model.getLocalDateFormatSet());
+        thisModel.setLocalDateTimeFormatSet(model.getLocalDateTimeFormatSet());
+        thisModel.setLocalTimeFormatSet(model.getLocalTimeFormatSet());
+        thisModel.setZonedDateTimeFormatSet(model.getZonedDateTimeFormatSet());
+        thisModel.setDateTimeFormatSet(model.getDateTimeFormatSet());
+
         updateComponent();
     }
 
@@ -195,7 +150,22 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
      */
     @Override
     protected void updateComponent() {
-        setEnabledComponents(getModel().isEnabled());
+        SettingsModelDateTimeOptions model = (SettingsModelDateTimeOptions) getModel();
+
+        m_globalDateTimeFormatChooser.replaceListItems(model.getDateTimeFormatSet(),
+            ((SettingsModelString)m_globalDateTimeFormatChooser.getModel()).getStringValue());
+
+        m_globalLocalDateFormatChooser.replaceListItems(model.getLocalDateFormatSet(),
+            ((SettingsModelString)m_globalLocalDateFormatChooser.getModel()).getStringValue());
+
+        m_globalLocalDateTimeFormatChooser.replaceListItems(model.getLocalDateTimeFormatSet(),
+            ((SettingsModelString)m_globalLocalDateTimeFormatChooser.getModel()).getStringValue());
+
+        m_globalLocalTimeFormatChooser.replaceListItems(model.getLocalTimeFormatSet(),
+            ((SettingsModelString)m_globalLocalTimeFormatChooser.getModel()).getStringValue());
+
+        m_globalZonedDateTimeFormatChooser.replaceListItems(model.getZonedDateTimeFormatSet(),
+            ((SettingsModelString)m_globalZonedDateTimeFormatChooser.getModel()).getStringValue());
     }
 
     /**
@@ -331,173 +301,6 @@ public class DialogComponentDateTimeOptions extends DialogComponent {
                 throw new InvalidSettingsException("Local Time format is not valid.");
             }
         }
-    }
-
-    /**
-     * @return a list of predefined formats for use in a date format with moment.js
-     */
-    private static LinkedHashSet<String> createPredefinedDateTimeFormats() {
-        LinkedHashSet<String> formats = new LinkedHashSet<String>();
-
-        // check the StringHistory first
-        String[] userFormats = StringHistory.getInstance(DATE_TIME_FORMAT_HISTORY_KEY).getHistory();
-        for (String userFormat : userFormats) {
-            formats.add(userFormat);
-        }
-
-        formats.add("YYYY-MM-DD");
-        formats.add("ddd MMM DD YYYY HH:mm:ss");
-        formats.add("M/D/YY");
-        formats.add("MMM D, YYYY");
-        formats.add("MMMM D, YYYY");
-        formats.add("dddd, MMM D, YYYY");
-        formats.add("h:mm A");
-        formats.add("h:mm:ss A");
-        formats.add("HH:mm:ss");
-        formats.add("YYYY-MM-DD;HH:mm:ss.SSS");
-
-        return formats;
-    }
-
-    /**
-     * @return a list of predefined formats for use in a date format with moment.js
-     */
-    private static LinkedHashSet<String> createPredefinedZonedDateTimeFormats() {
-        LinkedHashSet<String> formats = new LinkedHashSet<String>();
-
-        // check the StringHistory first
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(ZONED_DATE_TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(DATE_TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(DATE_FORMAT_HISTORY_KEY).getHistory()
-        ));
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-
-        formats.add("YYYY-MM-DD z");
-        formats.add("ddd MMM DD YYYY HH:mm:ss z");
-        formats.add("M/D/YY z");
-        formats.add("MMM D, YYYY z");
-        formats.add("MMMM D, YYYY z");
-        formats.add("dddd, MMM D, YYYY z");
-        formats.add("h:mm A z");
-        formats.add("h:mm:ss A z");
-        formats.add("HH:mm:ss z");
-        formats.add("YYYY-MM-DD;HH:mm:ss.SSS z");
-
-        formats.add("YYYY-MM-DD");
-        formats.add("ddd MMM DD YYYY HH:mm:ss");
-        formats.add("M/D/YY");
-        formats.add("MMM D, YYYY");
-        formats.add("MMMM D, YYYY");
-        formats.add("dddd, MMM D, YYYY");
-        formats.add("h:mm A");
-        formats.add("h:mm:ss A");
-        formats.add("HH:mm:ss");
-        formats.add("YYYY-MM-DD;HH:mm:ss.SSS");
-
-        return formats;
-    }
-
-    /**
-     * @return a list of predefined formats for use in a date format with moment.js
-     */
-    private static LinkedHashSet<String> createPredefinedLocalTimeFormats() {
-        LinkedHashSet<String> formats = new LinkedHashSet<String>();
-
-        // check also the StringHistory....
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-
-        formats.add("HH:mm:ss");
-        formats.add("h:mm A");
-        formats.add("h:mm:ss A");
-        formats.add("HH:mm:ss.SSS");
-
-        return formats;
-    }
-
-    /**
-     * @return a list of predefined formats for use in a date format with moment.js
-     */
-    private static LinkedHashSet<String> createPredefinedLocalDateTimeFormats() {
-        LinkedHashSet<String> formats = new LinkedHashSet<String>();
-        formats.add("YYYY-MM-DD");
-        formats.add("ddd MMM DD YYYY HH:mm:ss");
-        formats.add("M/D/YY");
-        formats.add("MMM D, YYYY");
-        formats.add("MMMM D, YYYY");
-        formats.add("dddd, MMM D, YYYY");
-        formats.add("h:mm A");
-        formats.add("h:mm:ss A");
-        formats.add("HH:mm:ss");
-        formats.add("YYYY-MM-DD;HH:mm:ss.SSS");
-
-        // check the StringHistory first
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(DATE_TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(DATE_FORMAT_HISTORY_KEY).getHistory()
-        ));
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(TIME_FORMAT_HISTORY_KEY).getHistory()
-        ));
-
-        return formats;
-    }
-
-    /**
-     * @return a list of predefined formats for use in a date format with moment.js
-     */
-    private static LinkedHashSet<String> createPredefinedLocalDateFormats() {
-        LinkedHashSet<String> formats = new LinkedHashSet<String>();
-
-        // check the StringHistory first
-        formats.addAll(Arrays.asList(
-            StringHistory.getInstance(DATE_FORMAT_HISTORY_KEY).getHistory()
-        ));
-
-        formats.add("YYYY-MM-DD");
-        formats.add("M/D/YY");
-        formats.add("MMM D, YYYY");
-        formats.add("MMMM D, YYYY");
-        formats.add("dddd, MMM D, YYYY");
-
-        return formats;
-    }
-
-    /**
-     * @return a BiMap of locale keys and locale values as supported by moment.js
-     * @throws IOException
-     */
-    private static BiMap<String, String> loadDateTimeLocales() {
-        Builder<String, String> biMapBuilder = ImmutableBiMap.builder();
-
-        Properties props = new Properties();
-        InputStream input = DialogComponentDateTimeOptions.class.getResourceAsStream("locales.properties");
-
-        try {
-            props.load(input);
-            props.entrySet().stream()
-                .sorted(
-                    (e1, e2) -> ((String)e1.getValue()).toLowerCase().compareTo(((String)e2.getValue()).toLowerCase())
-                )
-                .forEach(
-                    (entry) -> biMapBuilder.put((String)entry.getKey(), (String)entry.getValue())
-                );
-
-        } catch (IOException e) {
-            biMapBuilder.put("en", "English (United States)");
-        }
-
-        return biMapBuilder.build();
     }
 
     private void setTimezoneChooserState() {
