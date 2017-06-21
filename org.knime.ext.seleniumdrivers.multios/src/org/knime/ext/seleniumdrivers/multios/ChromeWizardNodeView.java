@@ -99,7 +99,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
 
-	private static final int DEFAULT_TIMEOUT = 10;
+	private static final int DEFAULT_TIMEOUT = 30;
 	private static final int DEFAULT_WIDTH = 1024;
 	private static final int DEFAULT_HEIGHT = 768;
 
@@ -353,6 +353,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	}
 
 	private void initializeCometQuery() {
+	    m_shutdownCometThread.set(false);
 		String handle = m_driver.getWindowHandle();
 		m_cometThread = new Thread(m_service.getCometThreadGroup(), new CometRunnable(handle), ChromeViewService.COMET_THREAD_NAME + handle);
 		m_cometThread.start();
@@ -368,7 +369,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 		@Override
 		public void run() {
-			int cometTimeout = DEFAULT_TIMEOUT;
+			int cometTimeout = 2;
 			int alertTimeout = 2;
 			m_driver.manage().timeouts().setScriptTimeout(cometTimeout * 2, TimeUnit.SECONDS);
 			while (true) {
@@ -396,11 +397,14 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				                // which do not get saved, then it's nice to trigger the event anyways.
 				                /*if (checkSettingsChanged()) {*/
 				                    modelChanged();
+				                    break;
 				                /*}*/
 							} else if (ChromeViewService.APPLY_BUTTON_PRESSED.equals(action)) {
 							    applyTriggered(false);
+							    break;
 							} else if (ChromeViewService.APPLY_DEFAULT_BUTTON_PRESSED.equals(action)) {
 							    applyTriggered(true);
+							    break;
 							} else if (ChromeViewService.CLOSE_BUTTON_PRESSED.equals(action)) {
 							    if (checkSettingsChanged()) {
 							        // close dialog triggers subsequent actions, leave comet thread intact
