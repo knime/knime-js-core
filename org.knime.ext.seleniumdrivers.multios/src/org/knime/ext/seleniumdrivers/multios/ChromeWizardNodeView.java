@@ -189,7 +189,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		Path bridgePath;
 		try {
 			URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
-			bridgePath = Paths.get(FileLocator.toFileURL(bridgeURL).getFile());
+			String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
+			if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
+			    bridgeFile = bridgeFile.substring(1);
+		    }
+			bridgePath = Paths.get(bridgeFile);
 		} catch (Exception e) {
 			throw new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage(), e);
 		}
