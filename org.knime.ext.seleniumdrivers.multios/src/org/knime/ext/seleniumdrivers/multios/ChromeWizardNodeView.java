@@ -84,6 +84,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * View implementation utilizing a Chromium browser via Selenium Webdriver. The view
@@ -350,7 +356,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				return true;
 			} catch (WebDriverException e) {
 				m_shutdownCometThread.set(true);
-				m_driver.quit();
+				try {
+				    m_driver.quit();
+				} catch (Exception ignore) { /* nothing to do at this point */ }
 				m_driver = null;
 				return false;
 			}
@@ -515,16 +523,30 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         if (showDiscardOption) {
             options.add(new CloseDialogOption(DISCARD_LABEL, DISCARD_DESCRIPTION, ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED));
         }
+        options.add(new CloseDialogOption(APPLY_LABEL, String.format(APPLY_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""), ChromeViewService.CLOSE_APPLY_BUTTON_PRESSED));
+        options.add(new CloseDialogOption(APPLY_DEFAULT_LABEL, String.format(APPLY_DEFAULT_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""), ChromeViewService.CLOSE_APPLY_DEFAULT_BUTTON_PRESSED));
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String optionsString = mapper.writeValueAsString(options);
+            testAlive();
+            if (m_driver != null) {
+                m_driver.executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);", title, message, optionsString);
+            }
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Could not trigger confirm close dialog: " + ex.getMessage(), ex);
+        }
         return false;
     }
 
+    @JsonAutoDetect
     private static class CloseDialogOption {
 
         private String m_label;
         private String m_description;
         private String m_signal;
 
-        CloseDialogOption(final String label, final String description, final String signal) {
+        @JsonCreator
+        CloseDialogOption(@JsonProperty("label") final String label, @JsonProperty("description") final String description, @JsonProperty("signal") final String signal) {
             m_label = label;
             m_description = description;
             m_signal = signal;
@@ -533,6 +555,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         /**
          * @return the label
          */
+        @JsonProperty("label")
         public String getLabel() {
             return m_label;
         }
@@ -540,6 +563,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         /**
          * @return the description
          */
+        @JsonProperty("description")
         public String getDescription() {
             return m_description;
         }
@@ -547,6 +571,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         /**
          * @return the signal
          */
+        @JsonProperty("signal")
         public String getSignal() {
             return m_signal;
         }
