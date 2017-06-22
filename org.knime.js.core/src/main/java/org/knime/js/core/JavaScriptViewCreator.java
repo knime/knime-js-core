@@ -73,6 +73,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebTemplate;
@@ -105,6 +106,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      * @return true if is running in debug mode, false otherwise
      */
     protected static boolean isDebug() {
+        IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
+        if (prefs.getBoolean(JSCorePlugin.P_DEBUG_HTML)) {
+            return true;
+        }
         RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         if (runtimeBean != null && runtimeBean.getInputArguments() != null) {
             String inputArguments = runtimeBean.getInputArguments().toString();

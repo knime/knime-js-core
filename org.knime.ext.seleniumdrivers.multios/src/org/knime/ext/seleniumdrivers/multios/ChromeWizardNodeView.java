@@ -66,6 +66,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebTemplate;
@@ -75,6 +76,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.js.core.JSCorePlugin;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -108,6 +110,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
 
 	private static final int DEFAULT_TIMEOUT = 30;
+	private static final int COMET_TIMEOUT = 1;
 	private static final int DEFAULT_WIDTH = 1024;
 	private static final int DEFAULT_HEIGHT = 768;
 
@@ -212,15 +215,22 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     private String initDriver(final int left, final int top, final int width, final int height) {
 		Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
 		if (!chromeDriverPath.isPresent()) {
-			//TODO throw error
-			return null;
+			throw new SeleniumViewException("Path to chrome driver could not be retrieved!");
 		}
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--app=" + m_bridgeTempFile.toURI().toString());
 		options.addArguments("--window-size=" + width + "," + height);
 		options.addArguments("--window-position=" + left + "," + top);
 		options.addArguments("--allow-file-access", "--allow-file-access-from-files");
-		//TODO set chrome executable and additional options from preferences
+		IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
+		String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
+		if (binPath != null && !binPath.isEmpty()) {
+		    options.setBinary(binPath);
+		}
+		String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
+		if (cliOptions != null && !cliOptions.isEmpty()) {
+		    options.addArguments(cliOptions);
+		}
 
 		m_driver = new ChromeDriver(options);
 		m_driver.manage().timeouts().pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
@@ -312,19 +322,19 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
                 m_repTempFile.delete();
                 m_repTempFile = null;
             }
-        } catch (Exception e) { /* continue shutdown */ }
+        } catch (Exception e) { /* continue */ }
         try {
             if (m_valTempFile != null && m_valTempFile.exists()) {
                 m_valTempFile.delete();
                 m_valTempFile = null;
             }
-        } catch (Exception e) { /* continue shutdown */ }
+        } catch (Exception e) { /* continue */ }
         try {
             if (deleteBridgeFile && m_bridgeTempFile != null && m_bridgeTempFile.exists()) {
                 m_bridgeTempFile.delete();
                 m_bridgeTempFile = null;
             }
-        } catch (Exception e) { /* continue shutdown */ }
+        } catch (Exception e) { /* continue */ }
     }
 
 	private void waitForDocumentReady() {
@@ -383,9 +393,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 		@Override
 		public void run() {
-			int cometTimeout = 2;
-			int alertTimeout = 2;
-			m_driver.manage().timeouts().setScriptTimeout(cometTimeout * 2, TimeUnit.SECONDS);
+			int alertTimeout = COMET_TIMEOUT;
+			m_driver.manage().timeouts().setScriptTimeout(COMET_TIMEOUT * 2, TimeUnit.SECONDS);
 			while (true) {
 				if (m_shutdownCometThread.get()) {
 					break;
@@ -401,7 +410,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 							break;
 						}
 						if (m_driver.getWindowHandle().equals(m_handle)) {
-							String action = (String)m_driver.executeAsyncScript("seleniumKnimeBridge.registerCometRequest(arguments);", cometTimeout);
+							String action = (String)m_driver.executeAsyncScript("seleniumKnimeBridge.registerCometRequest(arguments);", COMET_TIMEOUT);
 							if (action != null && !ChromeViewService.NO_ACTION.equals(action)) {
 							    LOGGER.debug("KNIME-Selenium-COMET returned " + action);
 							}
@@ -449,7 +458,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 								Thread.sleep(alertTimeout * 1000);
 							} catch (InterruptedException e) { /* do nothing */ }
 						}
-						/* do nothing */
+						/* do nothing, try again */
 						//LOGGER.warn(wde.getMessage());
 					}
 				}
