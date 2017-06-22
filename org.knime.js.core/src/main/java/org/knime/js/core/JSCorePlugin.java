@@ -79,6 +79,9 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     /** Preference constant: if a debug HTML is supposed to be created. */
     public static final String P_DEBUG_HTML = "js.core.createDebugHtml";
 
+    /** Preference constant: show context menu entry for legacy Quickform execution. */
+    public static final String P_SHOW_LEGACY_QUICKFORM_EXECUTION = "js.core.enableLegacyQuickformExecution";
+
     // The shared instance.
     private static JSCorePlugin PLUGIN;
     private String m_pluginRootPath;

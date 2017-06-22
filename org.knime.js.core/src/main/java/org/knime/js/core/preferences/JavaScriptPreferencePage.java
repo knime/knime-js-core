@@ -82,6 +82,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private StringFieldEditor m_browserCLIArgs;
 
     private BooleanFieldEditor m_createDebugHtml;
+    private BooleanFieldEditor m_enableLegacyQuickformExecution;
 
     /** Creates a new preference page */
     public JavaScriptPreferencePage() {
@@ -143,6 +144,9 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
         m_createDebugHtml = new BooleanFieldEditor(JSCorePlugin.P_DEBUG_HTML, "Create debug HTML for JavaScript views", BooleanFieldEditor.DEFAULT, parent);
         addField(m_createDebugHtml);
+
+        m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
+        addField(m_enableLegacyQuickformExecution);
 
         enableBrowserField(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
     }
