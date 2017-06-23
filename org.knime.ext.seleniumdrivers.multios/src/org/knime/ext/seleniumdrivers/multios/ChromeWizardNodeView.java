@@ -424,10 +424,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				                /*}*/
 							} else if (ChromeViewService.APPLY_BUTTON_PRESSED.equals(action)) {
 							    applyTriggered(false);
-							    break;
 							} else if (ChromeViewService.APPLY_DEFAULT_BUTTON_PRESSED.equals(action)) {
 							    applyTriggered(true);
-							    break;
 							} else if (ChromeViewService.CLOSE_BUTTON_PRESSED.equals(action)) {
 							    if (checkSettingsChanged()) {
 							        // close dialog triggers subsequent actions, leave comet thread intact
