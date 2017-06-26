@@ -608,7 +608,7 @@ knimeService = function() {
 	
 	service.allowFullscreen = function(element) {
 		initialized || init();
-		return interactivityAvailable && screenfull.enabled 
+		return interactivityAvailable && runningInWebportal && screenfull.enabled 
 			&& addButton('knime-service-fullscreen-button', 'arrows-alt', 'Toggle Fullscreen', function() {
 			if (screenfull.enabled) {
 				screenfull.toggle(element);
