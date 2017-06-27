@@ -78,6 +78,7 @@ import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JSCorePlugin;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -209,13 +210,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
 
 		m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		initView(true);
+		if (m_windowHandle != null) {
+		    initView(true);
+		}
 	}
 
     private String initDriver(final int left, final int top, final int width, final int height) {
 		Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
 		if (!chromeDriverPath.isPresent()) {
-			throw new SeleniumViewException("Path to chrome driver could not be retrieved!");
+			throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
 		}
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--app=" + m_bridgeTempFile.toURI().toString());
@@ -232,12 +235,21 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    options.addArguments(cliOptions);
 		}
 
-		m_driver = new ChromeDriver(options);
-		m_driver.manage().timeouts().pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+		try {
+		    m_driver = new ChromeDriver(options);
+		    m_driver.manage().timeouts().pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-		waitForDocumentReady();
-		//Store the current window handle
-		return m_driver.getWindowHandle();
+		    waitForDocumentReady();
+		    // Store the current window handle
+		    return m_driver.getWindowHandle();
+		} catch (Exception e) {
+		    String errorMessage = "Could not initialize Chrome driver. ";
+		    LOGGER.error(errorMessage + e.getMessage(), e);
+		    if (!(e instanceof SessionNotCreatedException)) {
+		        throw new SeleniumViewException(errorMessage + "Check log for more details.");
+		    }
+		    return null;
+		}
 	}
 
     private void initView(final boolean forceFocus) {
