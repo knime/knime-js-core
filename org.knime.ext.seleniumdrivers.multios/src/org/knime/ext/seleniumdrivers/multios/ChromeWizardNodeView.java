@@ -244,8 +244,14 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    return m_driver.getWindowHandle();
 		} catch (Exception e) {
 		    String errorMessage = "Could not initialize Chrome driver. ";
-		    LOGGER.error(errorMessage + e.getMessage(), e);
-		    if (!(e instanceof SessionNotCreatedException)) {
+		    if (e instanceof SessionNotCreatedException) {
+		        /*This exception is thrown when view is closed by user while loading,
+		        but might also occur in other cases.
+		        Message is only displayed as info, as to not confuse users.*/
+		        LOGGER.info(errorMessage + e.getMessage(), e);
+		    }
+		    else {
+		        LOGGER.error(errorMessage + e.getMessage(), e);
 		        throw new SeleniumViewException(errorMessage + "Check log for more details.");
 		    }
 		    return null;
