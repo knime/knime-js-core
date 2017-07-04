@@ -49,6 +49,7 @@
 package org.knime.js.core;
 
 import java.awt.Color;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,7 +115,7 @@ public class CSSUtils {
             }
         }
         formatBuilder.append(")");
-        return String.format(formatBuilder.toString(), args);
+        return String.format(Locale.US, formatBuilder.toString(), args);
     }
 
     /**
