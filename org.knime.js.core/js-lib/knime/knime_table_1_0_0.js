@@ -139,7 +139,7 @@ kt = function() {
 		return extension;
 	};
 	
-	kt_registerViewExtension = function(view, extensionName) {
+	var kt_registerViewExtension = function(view, extensionName) {
 		var extensionID;
 		for (var i = 0; i < extensions.length; i++) {
 			if (extensions[i].name === extensionName) {
@@ -154,13 +154,13 @@ kt = function() {
 		extensions[extensionID].registerView(view);
 	};
 	
-	kt_createExtension = function(name) {
+	var kt_createExtension = function(name) {
 		if (name === "hilite") {
 			return kt_createHiliteExtension();
 		}
 	};
 	
-	kt_createHiliteExtension = function() {
+	var kt_createHiliteExtension = function() {
 		var defaultValue = false;
 		var hiliteTable = [];
 		var clearListeners = [];
@@ -231,7 +231,7 @@ kt = function() {
 		};
 	};
 	
-	kt_getDataColumnID = function(columnName) {
+	var kt_getDataColumnID = function(columnName) {
 		var colID = null;
 		for (var i = 0; i < dataTable.spec.numColumns; i++) {
 			if (dataTable.spec.colNames[i] === columnName) {
@@ -242,7 +242,7 @@ kt = function() {
 		return colID;
 	};
 	
-	kt_getRowID = function(rowKey) {
+	var kt_getRowID = function(rowKey) {
 		var rowID = null;
 		for (var i = 0; i < dataTable.spec.numRows; i++) {
 			if (dataTable.rows[i].rowKey == rowKey) {
@@ -253,7 +253,7 @@ kt = function() {
 		return rowID;
 	}
 	
-	kt_getExtColumnID = function(columnName) {
+	var kt_getExtColumnID = function(columnName) {
 		var colID = null;
 		for (var i = 0; i < dataTable.spec.numExtensions; i++) {
 			if (dataTable.spec.extensionNames[i] === columnName) {
