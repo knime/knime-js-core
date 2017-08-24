@@ -51,12 +51,13 @@ package org.knime.js.core;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -188,10 +189,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             }
         }
         m_tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(m_tempIndexFile));
-        writer.write(buildHTMLResource(viewRepresentation, viewValue));
-        writer.flush();
-        writer.close();
+        try (BufferedWriter writer = Files.newBufferedWriter(m_tempIndexFile.toPath(), StandardCharsets.UTF_8)) {
+            writer.write(buildHTMLResource(viewRepresentation, viewValue));
+            writer.flush();
+        }
         return m_tempIndexFile.getAbsolutePath();
     }
 
@@ -301,10 +302,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             debugBuilder.append(bodyText);
             debugBuilder.append("</body></html>");
             File debugFile = FileUtil.createTempFile("debug_" + System.currentTimeMillis(), ".html", tempFolder, true);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(debugFile));
-            writer.write(debugBuilder.toString());
-            writer.flush();
-            writer.close();
+            try (BufferedWriter writer = Files.newBufferedWriter(debugFile.toPath(), StandardCharsets.UTF_8)) {
+                writer.write(debugBuilder.toString());
+                writer.flush();
+            }
             LOGGER.info("JavaScript view - " + m_title + " - created. Debug output at: " + debugFile.getAbsolutePath());
         }
         pageBuilder.append("</head><body>");
