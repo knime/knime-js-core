@@ -80,6 +80,7 @@ KnimePageLoader = function() {
 					_registerSelectionTranslator(pageConfig.selectionTranslators[i], i);
 				}
 			}
+			webNodes = webNodePage.webNodes;
 			if (typeof pageConfig != 'undefined' && pageConfig != null) {
 				if (typeof pageConfig.layout != 'undefined' && pageConfig.layout != null) {
 					if (_compareVersionString(version, "3.1.0") < 0) {
@@ -91,7 +92,6 @@ KnimePageLoader = function() {
 				}
 			}
 			
-			webNodes = webNodePage.webNodes;
 			framesInitialized = 0;
 			if (typeof webNodes != 'undefined' && webNodes != null) {
 				_processWebNodes();
@@ -206,6 +206,11 @@ KnimePageLoader = function() {
 				parent.appendChild(embed);
 				parent = embed;
 			}
+			if (!webNodes[layout.nodeID]) {
+				//don't create iframe for missing nodes
+				return;
+			}
+			
 			// Create iframe
 			var frame = document.createElement('iframe');
 			if (layout.additionalStyles) {
