@@ -63,6 +63,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONWebNode {
 
+    private JSONWebNodeInfo m_nodeInfo;
     private List<String> m_javascriptLibraries;
     private List<String> m_stylesheets;
     private String m_namespace;
@@ -73,6 +74,22 @@ public class JSONWebNode {
 
     private JSONViewContent m_viewRepresentation;
     private JSONViewContent m_viewValue;
+
+    /**
+     * @return the nodeInfo
+     */
+    @JsonProperty("nodeInfo")
+    public JSONWebNodeInfo getNodeInfo() {
+        return m_nodeInfo;
+    }
+
+    /**
+     * @param nodeInfo the nodeInfo to set
+     */
+    @JsonProperty("nodeInfo")
+    public void setNodeInfo(final JSONWebNodeInfo nodeInfo) {
+        m_nodeInfo = nodeInfo;
+    }
 
     /**
      * @return the javascript libraries
@@ -234,6 +251,7 @@ public class JSONWebNode {
         }
         JSONWebNode other = (JSONWebNode)obj;
         return new EqualsBuilder()
+                .append(m_nodeInfo, other.m_nodeInfo)
                 .append(m_javascriptLibraries, other.m_javascriptLibraries)
                 .append(m_stylesheets, other.m_stylesheets)
                 .append(m_namespace, other.m_namespace)
@@ -252,6 +270,7 @@ public class JSONWebNode {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(m_nodeInfo)
                 .append(m_javascriptLibraries)
                 .append(m_stylesheets)
                 .append(m_namespace)
