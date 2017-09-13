@@ -589,11 +589,14 @@ KnimePageLoader = function() {
 		try {
 			//LOGGER.log("getPageValues called");
 			webViewValues = new Object();
-			for ( var webNodeName in webNodes) {
+			for (var webNodeName in webNodes) {
+				var webNode = webNodes[webNodeName];
+				if (webNode.nodeInfo && !webNode.nodeInfo.displayPossible) {
+					continue;
+				}
 				//always initialize value object for each node
 				webViewValues[webNodeName] = {};
 				var value;
-				var webNode = webNodes[webNodeName];
 				var namespace = webNode.namespace;
 				var getPageValueFunction = null;
 				if (typeof namespace == 'undefined' || namespace == '') {
@@ -638,6 +641,9 @@ KnimePageLoader = function() {
 		//LOGGER.log("validate called");
 		for ( var webNodeName in webNodes) {
 			var webNode = webNodes[webNodeName];
+			if (webNode.nodeInfo && !webNode.nodeInfo.displayPossible) {
+				continue;
+			}
 			var namespace = webNode.namespace;
 			var func;
 			if (typeof namespace == 'undefined' || namespace == '') {
