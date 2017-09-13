@@ -118,10 +118,40 @@ public class JSONWebNodeInfo {
         }
     }
 
+    private String m_nodeName;
+    private String m_nodeAnnotation;
     private JSONNodeState m_nodeState;
     private boolean m_displayPossible;
     private String m_nodeErrorMessage;
     private String m_nodeWarnMessage;
+
+    /**
+     * @return the nodeName
+     */
+    public String getNodeName() {
+        return m_nodeName;
+    }
+
+    /**
+     * @param nodeName the nodeName to set
+     */
+    public void setNodeName(final String nodeName) {
+        m_nodeName = nodeName;
+    }
+
+    /**
+     * @return the nodeAnnotation
+     */
+    public String getNodeAnnotation() {
+        return m_nodeAnnotation;
+    }
+
+    /**
+     * @param nodeAnnotation the nodeAnnotation to set
+     */
+    public void setNodeAnnotation(final String nodeAnnotation) {
+        m_nodeAnnotation = nodeAnnotation;
+    }
 
     /**
      * @return the nodeState
@@ -195,6 +225,8 @@ public class JSONWebNodeInfo {
         }
         JSONWebNodeInfo other = (JSONWebNodeInfo)obj;
         return new EqualsBuilder()
+                .append(m_nodeName, other.m_nodeName)
+                .append(m_nodeAnnotation, other.m_nodeAnnotation)
                 .append(m_nodeState, other.m_nodeState)
                 .append(m_nodeErrorMessage, other.m_nodeErrorMessage)
                 .append(m_nodeWarnMessage, other.m_nodeWarnMessage)
@@ -207,6 +239,8 @@ public class JSONWebNodeInfo {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(m_nodeName)
+                .append(m_nodeAnnotation)
                 .append(m_nodeState)
                 .append(m_nodeErrorMessage)
                 .append(m_nodeWarnMessage)
