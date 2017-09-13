@@ -23,8 +23,13 @@ KnimePageLoader = function() {
 	// constants
 	var containerID = "knimeWebNode";
 	var baseURL = "VAADIN/src-js";
+	var defaultErrorMessage = " cannot be displayed.";
+	var noInfoErrorMessage = "No further information available. Please check the configuration of the workflow.";
+	var nodeStateErrorMessage = "The node was in state ";
 	var contextRoot;
 	
+	// The version number of the application
+	var version;
 	// The configuration object, containing the layout and blackboard config.
 	var pageConfig;
 	// Object holding the parsed JSON data, get single nodes with webNodes[nodeName]
@@ -70,7 +75,7 @@ KnimePageLoader = function() {
 				contextRoot = ".";
 				baseURL = "";
 			}
-			var version = "0.0.0";
+			version = "0.0.0";
 			if (webNodePage.version) {
 				version = webNodePage.version;
 			}
@@ -194,6 +199,14 @@ KnimePageLoader = function() {
 			}
 			
 		} else if (layout.type === "view" || layout.type === "JSONLayoutViewContent") {
+			var wn = webNodes[layout.nodeID];
+			if (!wn || (wn.nodeInfo && !wn.nodeInfo.displayPossible)) {
+				//don't create iframe for missing or not displayable nodes
+				parent.id = "node" + layout.nodeID.replace(/:/g, "-");
+				return;
+			}
+			
+			// for aspect ratio set sizes, set appropriate classes on parent
 			if (layout.resizeMethod.substring( 0, "aspectRatio".length ) === "aspectRatio") {
 				var embed = document.createElement("div");
 				var cString = "embed-responsive";
@@ -205,10 +218,6 @@ KnimePageLoader = function() {
 				embed.setAttribute("class", cString);
 				parent.appendChild(embed);
 				parent = embed;
-			}
-			if (!webNodes[layout.nodeID]) {
-				//don't create iframe for missing nodes
-				return;
 			}
 			
 			// Create iframe
@@ -369,6 +378,42 @@ KnimePageLoader = function() {
 			if (!frame) {
 				frame = document.getElementById(frameID);
 			}
+			
+			// If an error occurred for a node, display it in the correct place in the layout
+			if (webNode.nodeInfo && !webNode.nodeInfo.displayPossible) {
+				var errorMessage = '<strong>';
+				errorMessage += webNode.nodeInfo.nodeName;
+				errorMessage += ' (' + webNodeName + ')';
+				if (webNode.nodeInfo.nodeAnnotation) {
+					errorMessage += ' - "' + webNode.nodeInfo.nodeAnnotation + '" -';
+				}
+				errorMessage += defaultErrorMessage 
+				errorMessage += '</strong><br>';
+				if (webNode.nodeInfo.nodeErrorMessage) {
+					errorMessage += '<strong>Error message on node:</strong> '; 
+					errorMessage += webNode.nodeInfo.nodeErrorMessage;
+				} else if (webNode.nodeInfo.nodeWarnMessage){
+					errorMessage += '<strong>Warn message on node:</strong> '; 
+					errorMessage += webNode.nodeInfo.nodeWarnMessage;
+				} else {
+					errorMessage += noInfoErrorMessage;
+				}
+				if (isDebug) {
+					errorMessage += '<br>';
+					errorMessage += nodeStateErrorMessage;
+					errorMessage += '<span style="text-transform: uppercase;">';
+					errorMessage += webNode.nodeInfo.nodeState;
+					errorMessage += '</span>.';
+				}
+				var errorDiv = document.createElement('div');
+				errorDiv.setAttribute('class', 'nodeError alert alert-danger');
+				errorDiv.setAttribute('role', 'alert');
+				errorDiv.innerHTML = errorMessage;
+				var cont = frame ? frame : _getContainerElement();
+				cont.appendChild(errorDiv);
+				continue;
+			}
+			
 			if (typeof frame == 'undefined' || frame == null) {
 				frame = document.createElement('iframe');
 				frame.setAttribute("style", "border: none; " + /*"border: thin solid darkgrey; " +*/ "background-color: white; display:block;");
@@ -387,7 +432,7 @@ KnimePageLoader = function() {
 				// Add iframe to container
 				_getContainerElement().appendChild(frame);
 			}
-
+			
 			// Create style imports
 			var styles = "";
 			if (webNode.stylesheets) {
@@ -633,6 +678,7 @@ KnimePageLoader = function() {
 	};
 	
 	pageLoader.reset = function() {
+		version = null;
 		pageConfig = null;
 		webNodes = null;
 		frames = new Object();
