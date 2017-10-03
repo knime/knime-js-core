@@ -1532,6 +1532,42 @@
                relativePathTarget="org/knime/core/iframeResizer/iframeResizer.contentWindow.js">
          </webResource>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="D3 Layout Cloud"
+            usesDefine="true"
+            version="1.2.4"
+            webResourceBundleID="d3_layout_cloud_1.2.4_Debug">
+         <webResource
+               relativePathSource="js-lib/d3-cloud/d3.layout.cloud.js"
+               relativePathTarget="js-lib/d3-cloud/d3.layout.cloud.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3-cloud/d3.layout.cloud.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_4.2.6_Debug">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="D3 Layout Cloud"
+            usesDefine="false"
+            version="1.2.4"
+            webResourceBundleID="d3_layout_cloud_1.2.4">
+         <webResource
+               relativePathSource="js-lib/d3-cloud/d3.layout.cloud.min.js"
+               relativePathTarget="js-lib/d3-cloud/d3.layout.cloud.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3-cloud/d3.layout.cloud.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="D3_4.2.6">
+         </webDependency>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
