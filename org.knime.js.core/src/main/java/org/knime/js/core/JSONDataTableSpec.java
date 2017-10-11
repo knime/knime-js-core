@@ -217,6 +217,7 @@ public class JSONDataTableSpec {
     private Object[] m_maxValues;
 
     private String[] m_rowColorValues;
+    private Double[] m_rowSizeValues;
     private String[] m_filterIds;
     private boolean[] m_containsMissingValues;
 
@@ -530,6 +531,22 @@ public class JSONDataTableSpec {
      */
     public void setRowColorValues(final String[] rowColorValues) {
         m_rowColorValues = rowColorValues;
+    }
+
+    /**
+     * @return the rowSizeValues
+     * @since 3.5
+     */
+    public Double[] getRowSizeValues() {
+        return m_rowSizeValues;
+    }
+
+    /**
+     * @param rowSizeValues the rowSizeValues to set
+     * @since 3.5
+     */
+    public void setRowSizeValues(final Double[] rowSizeValues) {
+        m_rowSizeValues = rowSizeValues;
     }
 
     /**

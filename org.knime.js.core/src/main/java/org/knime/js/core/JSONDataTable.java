@@ -150,6 +150,8 @@ public class JSONDataTable {
     private boolean m_excludeRowsWithMissingValues;
     private int m_rowsWithMissingValuesRemoved;
     private String[] m_columnsRemoved;
+    private boolean m_extractRowColors = true /* default for backward compatibility */;
+    private boolean m_extractRowSizes = false;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -298,6 +300,7 @@ public class JSONDataTable {
         int numRows = 0;
 
         ArrayList<String> rowColorList = new ArrayList<String>();
+        ArrayList<Double> rowSizeList = new ArrayList<Double>();
         ArrayList<JSONDataTableRow> rowList = new ArrayList<JSONDataTableRow>();
 
         while ((rIter.hasNext()) && (currentRowNumber + m_firstRow - 1 < m_maxRows)) {
@@ -310,8 +313,13 @@ public class JSONDataTable {
                 continue;
             }
 
-            String rC = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
-            rowColorList.add(rC);
+            if (m_extractRowColors) {
+                String rC = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
+                rowColorList.add(rC);
+            }
+            if (m_extractRowSizes) {
+                rowSizeList.add(spec.getRowSizeFactor(row));
+            }
 
             String rowKey = row.getKey().getString();
             JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
@@ -385,7 +393,12 @@ public class JSONDataTable {
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);
-        jsonTableSpec.setRowColorValues(rowColorList.toArray(new String[0]));
+        if (m_extractRowColors) {
+            jsonTableSpec.setRowColorValues(rowColorList.toArray(new String[0]));
+        }
+        if (m_extractRowSizes) {
+            jsonTableSpec.setRowSizeValues(rowSizeList.toArray(new Double[0]));
+        }
         jsonTableSpec.setFilterIds(filterIds);
         jsonTableSpec.setContainsMissingValues(containsMissingValues);
 
@@ -804,6 +817,8 @@ public class JSONDataTable {
         private Boolean m_excludeColumnsWithMissingValues = null;
         private Boolean m_keepFilterColumns = null;
         private Boolean m_excludeRowsWithMissingValues = null;
+        private Boolean m_extractRowColors = null;
+        private Boolean m_extractRowSizes = null;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -889,12 +904,33 @@ public class JSONDataTable {
         }
 
         /**
-         * @param exclude true, if rows containing missing values should be excluded, false otherwise.
+         * @param exclude True, if rows containing missing values should be excluded, false otherwise.
          * To query if and how many rows where excluded during build call {@link JSONDataTable#numberRemovedRowsWithMissingValues()}.
          * @return This builder instance, which can be used for method chaining.
          */
         public Builder excludeRowsWithMissingValues(final boolean exclude) {
             m_excludeRowsWithMissingValues = exclude;
+            return this;
+        }
+
+        /**
+         * @param extract True, if individual row colors should be extracted into an array in the
+         * {@link JSONDataTableSpec}, false if individual row colors should not be saved.
+         * Color models will still be extracted either way.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder extractRowColors(final boolean extract) {
+            m_extractRowColors = extract;
+            return this;
+        }
+
+        /**
+         * @param extract True, if individual row sizes (size property) should be extracted into an
+         * array in the {@link JSONDataTableSpec}, false if individual row sizes should not be saved.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder extractRowSizes(final boolean extract) {
+            m_extractRowSizes = extract;
             return this;
         }
 
@@ -947,6 +983,12 @@ public class JSONDataTable {
             }
             if (m_excludeRowsWithMissingValues != null) {
                 result.m_excludeRowsWithMissingValues = m_excludeRowsWithMissingValues;
+            }
+            if (m_extractRowColors != null) {
+                result.m_extractRowColors = m_extractRowColors;
+            }
+            if (m_extractRowSizes != null) {
+                result.m_extractRowSizes = m_extractRowSizes;
             }
             result.buildJSONTable(exec);
             return result;
