@@ -167,8 +167,8 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
      * Creates a new view content element for a JSON layout, assuming defaults
      */
     public JSONLayoutViewContent() {
-        // set default resize method to lowest element and fall back to max on IE 10 and below
-        m_resizeMethod = ResizeMethod.VIEW_LOWEST_ELEMENT_IE_MAX;
+        // set default resize method to lowest element
+        m_resizeMethod = ResizeMethod.VIEW_LOWEST_ELEMENT;
 
         // default boolean resize properties
         m_autoResize = true;
