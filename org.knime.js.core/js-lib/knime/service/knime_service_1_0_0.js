@@ -477,7 +477,7 @@ knimeService = function() {
 			} else {
 				textField.addEventListener('keypress', function(event) {
 					if (event.keyCode == 13) {
-						callback();
+						callback.apply(this);
 					}
 				});
 				textField.addEventListener('blur', callback);
@@ -489,7 +489,7 @@ knimeService = function() {
 		return textField;
 	}
 	
-	service.createMenuNumberField = function(id, initialValue, minimum, maximum, step, callback) {
+	service.createMenuNumberField = function(id, initialValue, minimum, maximum, step, callback, immediate) {
 		var numberField = document.createElement('input');
 		numberField.setAttribute('type', 'number');
 		setFieldDefaults(numberField, id, '75px');
@@ -503,10 +503,19 @@ knimeService = function() {
 			numberField.setAttribute('step', step);
 		}
 		if (callback) {
-			if (typeof numberField.oninput !== 'undefined') {
-				numberField.addEventListener('input', callback);
+			if (immediate) {
+				if (typeof numberField.oninput !== 'undefined') {
+					numberField.addEventListener('input', callback);
+				} else {
+					numberField.addEventListener('change', callback);
+				}
 			} else {
-				numberField.addEventListener('change', callback);
+				numberField.addEventListener('keypress', function(event) {
+					if (event.keyCode == 13) {
+						callback.apply(this);
+					}
+				});
+				numberField.addEventListener('blur', callback);
 			}
 		}
 		if (typeof initialValue == 'number') {
