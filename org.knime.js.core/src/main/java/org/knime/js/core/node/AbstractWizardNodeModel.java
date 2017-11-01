@@ -52,7 +52,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.data.property.filter.FilterHandler;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -172,6 +177,21 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
      */
     protected final String getTableId(final int portIndex) {
         return getInHiLiteHandler(portIndex).getHiliteHandlerID().toString();
+    }
+
+    /**
+     * @param spec the table spec
+     * @return a string array containing all available filter ids
+     */
+    protected final String[] getSubscriptionFilterIds(final DataTableSpec spec) {
+        List<String> idList = new ArrayList<String>();
+        for (int i = 0; i < spec.getNumColumns(); i++) {
+            Optional<FilterHandler> filterHandler = spec.getColumnSpec(i).getFilterHandler();
+            if (filterHandler.isPresent()) {
+                idList.add(filterHandler.get().getModel().getFilterUUID().toString());
+            }
+        }
+        return idList.toArray(new String[0]);
     }
 
     /**
