@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   28.04.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   28.04.2014 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core.datasets;
 
@@ -51,7 +51,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
  */
 @JsonAutoDetect
 public abstract class JSONDatasetSeriesItem { /*empty*/ }

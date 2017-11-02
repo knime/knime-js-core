@@ -1,9 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright (C) 2003 - 2013
- *  University of Konstanz, Germany and
- *  KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -46,7 +44,7 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   22.09.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   22.09.2014 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.ext.phantomjs;
 
@@ -77,7 +75,7 @@ import com.google.common.base.Function;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
  * @param <T> 
  * @param <REP> 
  * @param <VAL> 

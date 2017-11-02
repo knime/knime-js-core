@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   27.05.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   27.05.2014 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core.datasets;
 
@@ -54,7 +54,7 @@ import org.knime.core.node.NodeSettingsWO;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
  */
 public interface JSONDataset {
 

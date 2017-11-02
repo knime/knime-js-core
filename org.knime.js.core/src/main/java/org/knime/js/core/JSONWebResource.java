@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@
  * ------------------------------------------------------------------------
  *
  * History
- *   24.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   24.09.2013 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
@@ -64,7 +64,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Helper class to allow serialization and deserialization of KNIME web resources.
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 @JsonSerialize(using = WebResourceToJSONStringSerializer.class, as = String.class)

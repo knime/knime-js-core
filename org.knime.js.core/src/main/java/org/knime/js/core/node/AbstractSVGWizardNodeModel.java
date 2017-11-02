@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   07.11.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   07.11.2014 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core.node;
 
@@ -63,7 +63,7 @@ import org.knime.js.core.JSONViewContent;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
  * @param <REP> The concrete class of the {@link JSONViewContent} acting as representation of the view.
  * @param <VAL> The concrete class of the {@link JSONViewContent} acting as value of the view.
  * @since 2.11

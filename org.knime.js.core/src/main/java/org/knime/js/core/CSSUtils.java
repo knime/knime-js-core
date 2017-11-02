@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   May 11, 2015 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   May 11, 2015 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
@@ -57,7 +57,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
  */
 public class CSSUtils {
 

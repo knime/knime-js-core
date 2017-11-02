@@ -1,6 +1,6 @@
 // JavaScript Document
 // KNIME Javascript Data Table Version 1.0.0
-// Copyright by KNIME.com AG, Zurich Switzerland.
+// Copyright by KNIME AG, Zurich Switzerland.
 // All rights reserved.
 
 kt = function() {

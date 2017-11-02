@@ -1,6 +1,6 @@
 /*
  * ------------------------------------------------------------------------
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -43,7 +43,7 @@
  * ------------------------------------------------------------------------
  * 
  * History
- *   25.09.2013 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   25.09.2013 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
@@ -57,7 +57,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  * 
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
  */
 public abstract class JSONTypedSerializer<T> extends StdSerializer<T> {
 

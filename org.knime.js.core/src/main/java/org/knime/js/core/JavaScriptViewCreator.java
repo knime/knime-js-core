@@ -1,7 +1,7 @@
 /*
  * ------------------------------------------------------------------------
  *
- *  Copyright by KNIME GmbH, Konstanz, Germany
+ *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   22.09.2014 (Christian Albrecht, KNIME.com AG, Zurich, Switzerland): created
+ *   22.09.2014 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
  */
 package org.knime.js.core;
 
@@ -86,7 +86,7 @@ import org.osgi.framework.Bundle;
 
 /**
  *
- * @author Christian Albrecht, KNIME.com AG, Zurich, Switzerland
+ * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
  * @param <REP> the {@link WebViewContent} implementation used as view representation
  * @param <VAL> the {@link WebViewContent} implementation used as view value
  */
