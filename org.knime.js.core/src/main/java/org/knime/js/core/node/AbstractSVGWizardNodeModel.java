@@ -93,6 +93,9 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
             xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
                 + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
         String image = imageData;
+        if (!image.substring(0, 4).equalsIgnoreCase("<svg")) {
+            image = null;
+        }
         String errorText = error;
         if (StringUtils.isEmpty(image)) {
             if (StringUtils.isEmpty(errorText)) {
