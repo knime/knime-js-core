@@ -2,6 +2,7 @@ package org.knime.js.core;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -118,7 +119,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         Enumeration<URL> e = null;
         if (Platform.OS_WIN32.equals(os)) {
             // 32 and 64bit Windows use the same 32bit executables
-            e = getBundle().findEntries("win32/x86", "chromium.exe", false);
+            e = getBundle().findEntries("win32/x86", "chrome.exe", false);
         }
         // not other platforms supported atm
 
@@ -130,6 +131,10 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         if (url != null) {
             url = FileLocator.toFileURL(url);
             m_chromiumPath = url.getFile();
+            if (Platform.OS_WIN32.equals(os) && m_chromiumPath.startsWith("/")) {
+                m_chromiumPath = m_chromiumPath.substring(1);
+            }
+            m_chromiumPath = Paths.get(m_chromiumPath).normalize().toString();
         }
 
 
