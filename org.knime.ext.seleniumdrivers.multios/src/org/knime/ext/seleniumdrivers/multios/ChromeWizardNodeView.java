@@ -229,6 +229,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		if (binPath != null && !binPath.isEmpty()) {
 		    options.setBinary(binPath);
+		} else {
+		    binPath = JSCorePlugin.getChromiumPath();
+		    if (binPath != null && !binPath.isEmpty()) {
+		        options.setBinary(binPath);
+		    }
 		}
 		String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
 		if (cliOptions != null && !cliOptions.isEmpty()) {
