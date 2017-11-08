@@ -275,8 +275,13 @@ public class JSONDataTableSpec {
         setColorModels(colorModels.toArray(new JSONColorModel[0]));
     }
 
+    /**
+     * Finds the column with the specified name in the TableSpec and returns its index
+     * @param columnName the name to search for
+     * @return the index of the column with the specified name, or -1 if not found.
+     */
     @JsonIgnore
-    int getColumnIndex(final String columnName) {
+    public int getColumnIndex(final String columnName) {
         return m_colNames.indexOf(columnName);
     }
 
