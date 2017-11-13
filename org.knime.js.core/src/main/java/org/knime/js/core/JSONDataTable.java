@@ -138,6 +138,7 @@ public class JSONDataTable {
     private JSONDataTableSpec m_spec;
     private JSONDataTableRow[] m_rows;
     private Object[][] m_extensions;
+    private String m_hash;
 
     /* builder members */
     private DataTable m_dataTable;
@@ -409,6 +410,7 @@ public class JSONDataTable {
         if(m_excludeColumnsWithMissingValues) {
             removeMissingValueColumns();
         }
+        m_hash = String.valueOf(new HashCodeBuilder().append(m_spec).append(m_rows).toHashCode());
     }
 
     private synchronized void removeMissingValueColumns() {
@@ -690,6 +692,20 @@ public class JSONDataTable {
      */
     public void setExtensions(final Object[][] extensions) {
         m_extensions = extensions;
+    }
+
+    /**
+     * @return the hash
+     */
+    public String getHash() {
+        return m_hash;
+    }
+
+    /**
+     * @param hash the hash to set
+     */
+    public void setHash(final String hash) {
+        m_hash = hash;
     }
 
     /**
