@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -138,7 +139,9 @@ public class JSONDataTable {
     private JSONDataTableSpec m_spec;
     private JSONDataTableRow[] m_rows;
     private Object[][] m_extensions;
-    private String m_hash;
+    // This hash takes into account only columns names and types and cells data.
+    // Used to check whether the input table has changed
+    private String m_dataHash;
 
     /* builder members */
     private DataTable m_dataTable;
@@ -247,6 +250,8 @@ public class JSONDataTable {
                     + " greater than or equal zero");
         }
 
+        StringBuilder hashString = new StringBuilder();
+
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
         List<String> excludedColumns = new ArrayList<String>();
@@ -268,11 +273,13 @@ public class JSONDataTable {
             } else {
                 excludedColumns.add(colName);
             }
+            hashString.append(colName);
+            hashString.append(spec.getColumnSpec(i).getType().getName());
         }
         m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
-            numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
+            numOfRows = ((BufferedDataTable)m_dataTable).size();
         }
 
         //int numOfColumns = spec.getNumColumns();
@@ -304,86 +311,95 @@ public class JSONDataTable {
         ArrayList<Double> rowSizeList = new ArrayList<Double>();
         ArrayList<JSONDataTableRow> rowList = new ArrayList<JSONDataTableRow>();
 
-        while ((rIter.hasNext()) && (currentRowNumber + m_firstRow - 1 < m_maxRows)) {
+        while (rIter.hasNext()) {
             // get the next row
             DataRow row = rIter.next();
-            currentRowNumber++;
-
-            if (currentRowNumber < m_firstRow) {
-                // skip all rows until we see the specified first row
-                continue;
-            }
-
-            if (m_extractRowColors) {
-                String rC = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
-                rowColorList.add(rC);
-            }
-            if (m_extractRowSizes) {
-                rowSizeList.add(spec.getRowSizeFactor(row));
-            }
 
             String rowKey = row.getKey().getString();
+            hashString.append(rowKey);
+
+            currentRowNumber++;
+
             JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
-            rowList.add(currentRow);
-            numRows++;
+            // don't add a row if it's not in the window for JSON data table
+            boolean excludeRow = currentRowNumber < m_firstRow || currentRowNumber + m_firstRow - 1 >= m_maxRows;
 
             // add cells, check min, max values and possible values for each column
-            for (int c = 0; c < numOfColumns; c++) {
-                int col = includeColIndices.get(c);
+            int c = 0;
+            for (int col = 0; col < spec.getNumColumns(); col++) {
                 DataCell cell = row.getCell(col);
+                // whether the current column is included into JSON data table
+                boolean includeColumn = includeColIndices.get(c) == col;
 
                 Object cellValue;
                 if (cell.isMissing()) {
                     cellValue = null;
-                    if (m_excludeRowsWithMissingValues) {
-                        rowList.remove(currentRow);
-                        m_rowsWithMissingValuesRemoved++;
-                        numRows--;
-                        break;
+                    if (!excludeRow && includeColumn) {
+                        if (m_excludeRowsWithMissingValues) {
+                            excludeRow = true;
+                            m_rowsWithMissingValuesRemoved++;
+                        }
+                        containsMissingValues[c] = true;
                     }
-                    containsMissingValues[c] = true;
                 } else {
                     cellValue = getJSONCellValue(cell);
                 }
+                hashString.append(cellValue);
 
-                currentRow.getData()[c] = cellValue;
-                if (cellValue == null) {
-                    continue;
-                }
+                if (!excludeRow && includeColumn) {
+                    currentRow.getData()[c] = cellValue;
 
-                DataValueComparator comp =
-                        spec.getColumnSpec(col).getType().getComparator();
+                    if (cellValue != null) {
+                        DataValueComparator comp =
+                                spec.getColumnSpec(col).getType().getComparator();
 
-                // test the min value
-                if (minValues[c] == null) {
-                    minValues[c] = cell;
-                    minJSONValues[c] = getJSONCellValue(cell);
-                } else {
-                    if (comp.compare(minValues[c], cell) > 0) {
-                        minValues[c] = cell;
-                        minJSONValues[c] = getJSONCellValue(cell);
+                        // test the min value
+                        if (minValues[c] == null) {
+                            minValues[c] = cell;
+                            minJSONValues[c] = getJSONCellValue(cell);
+                        } else {
+                            if (comp.compare(minValues[c], cell) > 0) {
+                                minValues[c] = cell;
+                                minJSONValues[c] = getJSONCellValue(cell);
+                            }
+                        }
+                        // test the max value
+                        if (maxValues[c] == null) {
+                            maxValues[c] = cell;
+                            maxJSONValues[c] = getJSONCellValue(cell);
+                        } else {
+                            if (comp.compare(maxValues[c], cell) < 0) {
+                                maxValues[c] = cell;
+                                maxJSONValues[c] = getJSONCellValue(cell);
+                            }
+                        }
+                        // add it to the possible values if we record them for this col
+                        LinkedHashSet<Object> possVals = possValues.get(c);
+                        if (possVals != null) {
+                            // non-string cols have a null list and will be skipped here
+                            possVals.add(getJSONCellValue(cell));
+                        }
                     }
-                }
-                // test the max value
-                if (maxValues[c] == null) {
-                    maxValues[c] = cell;
-                    maxJSONValues[c] = getJSONCellValue(cell);
-                } else {
-                    if (comp.compare(maxValues[c], cell) < 0) {
-                        maxValues[c] = cell;
-                        maxJSONValues[c] = getJSONCellValue(cell);
-                    }
-                }
-                // add it to the possible values if we record them for this col
-                LinkedHashSet<Object> possVals = possValues.get(c);
-                if (possVals != null) {
-                    // non-string cols have a null list and will be skipped here
-                    possVals.add(getJSONCellValue(cell));
+
+                    c++;
                 }
             }
+
+            if (!excludeRow) {
+                rowList.add(currentRow);
+                if (m_extractRowColors) {
+                    String rC = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
+                    rowColorList.add(rC);
+                }
+                if (m_extractRowSizes) {
+                    rowSizeList.add(spec.getRowSizeFactor(row));
+                }
+                numRows++;
+            }
+
             if (execMon != null) {
-                execMon.setProgress(((double)currentRowNumber - m_firstRow) / numOfRows,
-                    "Creating JSON table. Processing row " + (currentRowNumber - m_firstRow) + " of " + numOfRows);
+                execMon.setProgress(((double)currentRowNumber) / numOfRows,
+                    "Creating JSON table. Processing row " + currentRowNumber + " of " + numOfRows);
             }
         }
 
@@ -410,7 +426,8 @@ public class JSONDataTable {
         if(m_excludeColumnsWithMissingValues) {
             removeMissingValueColumns();
         }
-        m_hash = String.valueOf(new HashCodeBuilder().append(m_spec).append(m_rows).toHashCode());
+
+        m_dataHash = DigestUtils.md5Hex(hashString.toString());
     }
 
     private synchronized void removeMissingValueColumns() {
@@ -695,17 +712,17 @@ public class JSONDataTable {
     }
 
     /**
-     * @return the hash
+     * @return the dataHash
      */
-    public String getHash() {
-        return m_hash;
+    public String getDataHash() {
+        return m_dataHash;
     }
 
     /**
-     * @param hash the hash to set
+     * @param dataHash the dataHash to set
      */
-    public void setHash(final String hash) {
-        m_hash = hash;
+    public void setDataHash(final String dataHash) {
+        m_dataHash = dataHash;
     }
 
     /**
