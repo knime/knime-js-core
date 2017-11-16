@@ -52,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
@@ -141,7 +142,7 @@ public class JSONDataTable {
     private Object[][] m_extensions;
     // This hash takes into account only columns names and types and cells data.
     // Used to check whether the input table has changed
-    private String m_dataHash;
+    private Optional<String> m_dataHash = Optional.empty();
 
     /* builder members */
     private DataTable m_dataTable;
@@ -156,6 +157,7 @@ public class JSONDataTable {
     private String[] m_columnsRemoved;
     private boolean m_extractRowColors = true /* default for backward compatibility */;
     private boolean m_extractRowSizes = false;
+    private boolean m_calculateDataHash = false;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -273,8 +275,10 @@ public class JSONDataTable {
             } else {
                 excludedColumns.add(colName);
             }
-            hashString.append(colName);
-            hashString.append(spec.getColumnSpec(i).getType().getName());
+            if (m_calculateDataHash) {
+                hashString.append(colName);
+                hashString.append(spec.getColumnSpec(i).getType().getName());
+            }
         }
         m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
@@ -314,39 +318,55 @@ public class JSONDataTable {
         while (rIter.hasNext()) {
             // get the next row
             DataRow row = rIter.next();
+            currentRowNumber++;
 
             String rowKey = row.getKey().getString();
-            hashString.append(rowKey);
-
-            currentRowNumber++;
+            if (m_calculateDataHash) {
+                hashString.append(rowKey);
+            } else {
+                // if we don't calculate the hash, then we don't need to process the rows which won't go into the json data table
+                if (currentRowNumber < m_firstRow) {
+                    // skip all rows until we see the specified first row
+                    continue;
+                }
+                if (currentRowNumber + m_firstRow - 1 >= m_maxRows) {
+                    break;
+                }
+            }
 
             JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
             // don't add a row if it's not in the window for JSON data table
             boolean excludeRow = currentRowNumber < m_firstRow || currentRowNumber + m_firstRow - 1 >= m_maxRows;
 
             // add cells, check min, max values and possible values for each column
-            int c = 0;
+            int c = 0;  // index for includeColIndices
             for (int col = 0; col < spec.getNumColumns(); col++) {
                 DataCell cell = row.getCell(col);
                 // whether the current column is included into JSON data table
-                boolean includeColumn = includeColIndices.get(c) == col;
+                boolean includeColumn = c < includeColIndices.size() ? includeColIndices.get(c) == col : false;
 
-                Object cellValue;
-                if (cell.isMissing()) {
-                    cellValue = null;
-                    if (!excludeRow && includeColumn) {
-                        if (m_excludeRowsWithMissingValues) {
-                            excludeRow = true;
-                            m_rowsWithMissingValuesRemoved++;
+                Object cellValue = null;
+                if (includeColumn || m_calculateDataHash) {
+                    // if we don't calculate the hash, then we don't need to process the columns which won't go into the json data table
+                    if (cell.isMissing()) {
+                        if (!excludeRow && includeColumn) {
+                            if (m_excludeRowsWithMissingValues) {
+                                excludeRow = true;
+                                m_rowsWithMissingValuesRemoved++;
+                            }
+                            containsMissingValues[c] = true;
                         }
-                        containsMissingValues[c] = true;
+                    } else {
+                        cellValue = getJSONCellValue(cell);
                     }
-                } else {
-                    cellValue = getJSONCellValue(cell);
+                    if (m_calculateDataHash) {
+                        hashString.append(cellValue);
+                    }
                 }
-                hashString.append(cellValue);
 
-                if (!excludeRow && includeColumn) {
+                if (includeColumn && !excludeRow) {
+                    // do only for those values which will go into the json data table
+
                     currentRow.getData()[c] = cellValue;
 
                     if (cellValue != null) {
@@ -381,6 +401,7 @@ public class JSONDataTable {
                         }
                     }
 
+                    // the current column is included and processed, take the next one from includeColIndices
                     c++;
                 }
             }
@@ -427,7 +448,9 @@ public class JSONDataTable {
             removeMissingValueColumns();
         }
 
-        m_dataHash = DigestUtils.md5Hex(hashString.toString());
+        if (m_calculateDataHash) {
+            m_dataHash = Optional.of(DigestUtils.md5Hex(hashString.toString()));
+        }
     }
 
     private synchronized void removeMissingValueColumns() {
@@ -714,14 +737,14 @@ public class JSONDataTable {
     /**
      * @return the dataHash
      */
-    public String getDataHash() {
+    public Optional<String> getDataHash() {
         return m_dataHash;
     }
 
     /**
      * @param dataHash the dataHash to set
      */
-    public void setDataHash(final String dataHash) {
+    public void setDataHash(final Optional<String> dataHash) {
         m_dataHash = dataHash;
     }
 
@@ -852,6 +875,7 @@ public class JSONDataTable {
         private Boolean m_excludeRowsWithMissingValues = null;
         private Boolean m_extractRowColors = null;
         private Boolean m_extractRowSizes = null;
+        private Boolean m_calculateDataHash = null;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -968,6 +992,15 @@ public class JSONDataTable {
         }
 
         /**
+         * @param calcHash True, if the hash for the input data should be calculated during the JSONDataTable construction.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder calculateDataHash(final boolean calcHash) {
+            m_calculateDataHash = calcHash;
+            return this;
+        }
+
+        /**
          * Builds a new JSONDataTable instance from the current configuration of this builder.
          *
          * @param exec an execution monitor for setting progress, may be null
@@ -1022,6 +1055,9 @@ public class JSONDataTable {
             }
             if (m_extractRowSizes != null) {
                 result.m_extractRowSizes = m_extractRowSizes;
+            }
+            if (m_calculateDataHash != null) {
+                result.m_calculateDataHash = m_calculateDataHash;
             }
             result.buildJSONTable(exec);
             return result;

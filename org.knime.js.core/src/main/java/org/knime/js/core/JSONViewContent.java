@@ -63,6 +63,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  * ViewContent that creates and reads from a JSON string.
@@ -83,6 +84,7 @@ public abstract class JSONViewContent implements WebViewContent {
     @JsonIgnore
     public final void loadFromStream(final InputStream viewContentStream) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         ObjectReader reader = mapper.readerForUpdating(this);
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
@@ -106,6 +108,7 @@ public abstract class JSONViewContent implements WebViewContent {
     @JsonIgnore
     public final OutputStream saveToStream() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
         String viewContentString = mapper.writeValueAsString(this);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(viewContentString.getBytes(Charset.forName("UTF-8")));
