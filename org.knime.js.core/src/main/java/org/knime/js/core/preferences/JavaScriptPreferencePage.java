@@ -49,6 +49,7 @@
 package org.knime.js.core.preferences;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -76,6 +77,7 @@ import org.knime.js.core.JSCorePlugin;
 public class JavaScriptPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
+    private static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
 
     private RadioGroupFieldEditor m_browserSelector;
     private FileFieldEditor m_browserExePath;
@@ -108,14 +110,22 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
-
         m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
             "Please choose the browser to use for displaying JavaScript views:", 1,
             AbstractWizardNodeView.getAllWizardNodeViews().stream()
+                .filter(v -> {
+                    try {
+                        Method isEnabled = v.getViewClass().getMethod("isEnabled");
+                        return (boolean)isEnabled.invoke(null);
+                    } catch (Exception e) {
+                        /* if method is not present, assume view is enabled */
+                        return true;
+                    }
+                })
                 .sorted((e1, e2) -> {
                     String s1 = e1.getViewClass().getCanonicalName();
                     String s2 = e2.getViewClass().getCanonicalName();
-                    return INTERNAL_BROWSER.equals(s1) ? -1 : INTERNAL_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+                    return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
                 }).map(e -> new String[]{e.getViewName(), e.getViewClass().getCanonicalName()})
                 .toArray(String[][]::new),
             parent);
@@ -152,7 +162,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     private void enableBrowserField(final String view, final Composite parent) {
-        boolean enabled = !INTERNAL_BROWSER.equals(view) && view != null;
+        boolean enabled = !INTERNAL_BROWSER.equals(view) && !CHROMIUM_BROWSER.equals(view) && view != null;
         m_browserExePath.setEnabled(enabled, parent);
         m_browserCLIArgs.setEnabled(enabled, parent);
     }

@@ -137,6 +137,14 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		m_service = ChromeViewService.getInstance();
 	}
 
+	/**
+     * @return true if the view is enabled, false otherwise
+	 * @since 3.5
+     */
+	public static boolean isEnabled() {
+	    return MultiOSDriverActivator.getBundledChromeDriverPath().isPresent();
+	}
+
 	@Override
 	protected void closeView() {
 		if (m_driver != null) {
@@ -215,7 +223,28 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		}
 	}
 
-    private String initDriver(final int left, final int top, final int width, final int height) {
+    /**
+     * @param left left window coordinate
+     * @param top top window coordinate
+     * @param width window width
+     * @param height window height
+     * @return window handle as string to the newly created Chromium instance, or null
+     * @since 3.5
+     */
+    protected String initDriver(final int left, final int top, final int width, final int height) {
+        return initDriver(left, top, width, height, false);
+    }
+
+    /**
+     * @param left left window coordinate
+     * @param top top window coordinate
+     * @param width window width
+     * @param height window height
+     * @param resolveChromium true if distributed Chromium should be resolved, false otherwise
+     * @return window handle as string to the newly created Chromium instance, or null
+     * @since 3.5
+     */
+    protected String initDriver(final int left, final int top, final int width, final int height, final boolean resolveChromium) {
 		Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
 		if (!chromeDriverPath.isPresent()) {
 			throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
@@ -224,17 +253,22 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		options.addArguments("--app=" + m_bridgeTempFile.toURI().toString());
 		options.addArguments("--window-size=" + width + "," + height);
 		options.addArguments("--window-position=" + left + "," + top);
+		//options.addArguments("--disable-infobars");
 		options.addArguments("--allow-file-access", "--allow-file-access-from-files");
 		IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
-		String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
-		if (binPath != null && !binPath.isEmpty()) {
-		    options.setBinary(binPath);
+		if (resolveChromium) {
+		    Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
+		    if (!cPath.isPresent()) {
+		        throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
+		    }
+		    options.setBinary(cPath.get());
 		} else {
-		    binPath = JSCorePlugin.getChromiumPath();
+		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		    if (binPath != null && !binPath.isEmpty()) {
 		        options.setBinary(binPath);
 		    }
 		}
+
 		String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
 		if (cliOptions != null && !cliOptions.isEmpty()) {
 		    options.addArguments(cliOptions);

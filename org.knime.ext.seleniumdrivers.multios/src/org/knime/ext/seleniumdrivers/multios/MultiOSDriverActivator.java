@@ -49,6 +49,7 @@
 package org.knime.ext.seleniumdrivers.multios;
 
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Optional;
 
@@ -57,10 +58,17 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
+/**
+ *
+ * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
+ */
 public class MultiOSDriverActivator extends Plugin {
 
 	private static String BUNDLE_NAME;
 	private static String CHROME_DRIVER_PATH;
+
+	// Optional path to distributed chromium binaries
+    private static String CHROMIUM_PATH;
 
 	/**
      * {@inheritDoc}
@@ -74,24 +82,37 @@ public class MultiOSDriverActivator extends Plugin {
     	String os = Platform.getOS();
         String arch = Platform.getOSArch();
 
-
-        Enumeration<URL> e;
+        Enumeration<URL> eDriver = null;
+        Enumeration<URL> eChromium = null;
         if (Platform.OS_WIN32.equals(os)) {
             // 32 and 64bit Windows use the same 32bit executables
-            e = getBundle().findEntries("win32/x86", "chromedriver.exe", false);
+            eDriver = getBundle().findEntries("win32/x86", "chromedriver.exe", false);
+            eChromium = getBundle().findEntries("win32/x86", "chrome.exe", false);
         } else {
-            e = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
         }
 
-        URL url = null;
-        if ((e != null) && e.hasMoreElements()) {
-            url = e.nextElement();
+        URL urlDriver = null;
+        URL urlChromium = null;
+        if ((eDriver != null) && eDriver.hasMoreElements()) {
+            urlDriver = eDriver.nextElement();
+        }
+        if ((eChromium != null) && eChromium.hasMoreElements()) {
+            urlChromium = eChromium.nextElement();
         }
 
-        if (url != null) {
-            url = FileLocator.toFileURL(url);
-            System.setProperty("webdriver.chrome.driver", url.getFile());
-            CHROME_DRIVER_PATH = url.getFile();
+        if (urlDriver != null) {
+            urlDriver = FileLocator.toFileURL(urlDriver);
+            System.setProperty("webdriver.chrome.driver", urlDriver.getFile());
+            CHROME_DRIVER_PATH = urlDriver.getFile();
+        }
+        if (urlChromium != null) {
+            urlChromium = FileLocator.toFileURL(urlChromium);
+            CHROMIUM_PATH = urlChromium.getFile();
+            if (Platform.OS_WIN32.equals(os) && CHROMIUM_PATH.startsWith("/")) {
+                CHROMIUM_PATH = CHROMIUM_PATH.substring(1);
+            }
+            CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
 	}
 
@@ -104,12 +125,17 @@ public class MultiOSDriverActivator extends Plugin {
     	ChromeViewService.getInstance().shutdown();
 
     	CHROME_DRIVER_PATH = null;
+    	CHROMIUM_PATH = null;
 
 	}
 
 
     static Optional<String> getBundledChromeDriverPath() {
     	return Optional.ofNullable(CHROME_DRIVER_PATH);
+    }
+
+    static Optional<String> getChromiumPath() {
+        return Optional.ofNullable(CHROMIUM_PATH);
     }
 
     static String getBundleName() {

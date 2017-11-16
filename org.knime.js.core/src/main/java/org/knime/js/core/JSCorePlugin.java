@@ -2,13 +2,10 @@ package org.knime.js.core;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
@@ -91,9 +88,6 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     private String m_pluginRootPath;
     private ServiceRegistration<?> m_defaultLayoutCreatorService;
 
-    // Optional path to distributed chromium binaries
-    private static String m_chromiumPath;
-
     /** Plugin constructor */
     public JSCorePlugin() {
         PLUGIN = this;
@@ -113,31 +107,6 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         m_defaultLayoutCreatorService = context.registerService(DefaultLayoutCreator.class.getName(),
             new DefaultLayoutCreatorImpl(), new Hashtable<String, String>());
 
-        String os = Platform.getOS();
-        String arch = Platform.getOSArch();
-
-        Enumeration<URL> e = null;
-        if (Platform.OS_WIN32.equals(os)) {
-            // 32 and 64bit Windows use the same 32bit executables
-            e = getBundle().findEntries("win32/x86", "chrome.exe", false);
-        }
-        // not other platforms supported atm
-
-        URL url = null;
-        if ((e != null) && e.hasMoreElements()) {
-            url = e.nextElement();
-        }
-
-        if (url != null) {
-            url = FileLocator.toFileURL(url);
-            m_chromiumPath = url.getFile();
-            if (Platform.OS_WIN32.equals(os) && m_chromiumPath.startsWith("/")) {
-                m_chromiumPath = m_chromiumPath.substring(1);
-            }
-            m_chromiumPath = Paths.get(m_chromiumPath).normalize().toString();
-        }
-
-
     }
 
     /**
@@ -147,7 +116,6 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public void stop(final BundleContext context) throws Exception {
         PLUGIN = null;
         context.ungetService(m_defaultLayoutCreatorService.getReference());
-        m_chromiumPath = null;
         super.stop(context);
     }
 
@@ -166,10 +134,5 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public String getPluginRootPath() {
         return m_pluginRootPath;
     }
-
-    public static String getChromiumPath() {
-        return m_chromiumPath;
-    }
-
 
 }

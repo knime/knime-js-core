@@ -8,6 +8,11 @@
             name="Chrome Browser"
             viewClass="org.knime.ext.seleniumdrivers.multios.ChromeWizardNodeView">
       </wizardNodeView>
+      <wizardNodeView
+            description="This option uses the internal Chromium browser to display a node view."
+            name="Internal Chromium Browser"
+            viewClass="org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView">
+      </wizardNodeView>
    </extension>
 
 </plugin>
