@@ -64,6 +64,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -109,6 +110,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		extends AbstractWizardNodeView<T, REP, VAL> {
 
 	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
+	private static Boolean CHROME_PRESENT = null;
 
 	private static final int DEFAULT_TIMEOUT = 30;
 	private static final int COMET_TIMEOUT = 1;
@@ -296,6 +298,44 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    return null;
 		}
 	}
+
+    /**
+     * Tests if a Selenium session with a user installed Chrome instance can be successfully created.
+     * The test is only done if no preference setting for the desired browser type is found, otherwise
+     * the method always returns true.
+     * @return true, if preference setting is found or Chrome is present on the system, false otherwise
+     * @since 3.5
+     */
+    public static boolean isChromePresent() {
+        if (CHROME_PRESENT == null) {
+            String classString = JSCorePlugin.getDefault().getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER);
+            if (StringUtils.isNotEmpty(classString)) {
+                CHROME_PRESENT = true;
+            } else {
+                CHROME_PRESENT = testChromePresent();
+            }
+        }
+        return CHROME_PRESENT;
+    }
+
+    private static boolean testChromePresent() {
+        LOGGER.debug("Testing for presence of Chrome browser on system...");
+        Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
+        if (!chromeDriverPath.isPresent()) {
+            return false;
+        }
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        try {
+            ChromeDriver driver = new ChromeDriver(options);
+            driver.close();
+        } catch (Exception e) {
+            LOGGER.debug("Chrome browser could not be found or initialized", e);
+            return false;
+        }
+        LOGGER.debug("Chrome browser found successfully.");
+        return true;
+    }
 
     private void initView(final boolean forceFocus) {
         WizardViewCreator<REP, VAL> viewCreator = getModel().getViewCreator();
