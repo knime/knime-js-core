@@ -283,7 +283,7 @@ public class JSONDataTable {
         m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
-            numOfRows = ((BufferedDataTable)m_dataTable).size();
+            numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
         }
 
         //int numOfColumns = spec.getNumColumns();
@@ -419,8 +419,8 @@ public class JSONDataTable {
             }
 
             if (execMon != null) {
-                execMon.setProgress(((double)currentRowNumber) / numOfRows,
-                    "Creating JSON table. Processing row " + currentRowNumber + " of " + numOfRows);
+                execMon.setProgress(((double)currentRowNumber - m_firstRow) / numOfRows,
+                    "Creating JSON table. Processing row " + (currentRowNumber - m_firstRow) + " of " + numOfRows);
             }
         }
 
