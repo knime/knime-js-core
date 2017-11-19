@@ -284,7 +284,7 @@ public class JSONDataTable {
                 DigestUtils.updateDigest(md5Digest, colSpec.getType().toString());
             }
         }
-        m_columnsRemoved = excludedColumns.toArray(new String[m_columnsRemoved.length]);
+        m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
             numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
