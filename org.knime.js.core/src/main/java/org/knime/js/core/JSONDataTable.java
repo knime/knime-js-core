@@ -47,15 +47,18 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -252,21 +255,22 @@ public class JSONDataTable {
                     + " greater than or equal zero");
         }
 
-        StringBuilder hashString = new StringBuilder();
+        MessageDigest md5Digest = m_calculateDataHash ? DigestUtils.getMd5Digest() : null;
 
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
         List<String> excludedColumns = new ArrayList<String>();
         DataTableSpec spec = m_dataTable.getDataTableSpec();
         for (int i = 0; i < spec.getNumColumns(); i++) {
-            String colName = spec.getColumnNames()[i];
+            final DataColumnSpec colSpec = spec.getColumnSpec(i);
+            final String colName = colSpec.getName();
             boolean include = true;
             if (m_includeColumns != null) {
                 include &= Arrays.asList(m_includeColumns).contains(colName);
             } else if (m_excludeColumns != null) {
                 include &= !Arrays.asList(m_excludeColumns).contains(colName);
             }
-            if (m_keepFilterColumns && spec.getColumnSpec(i).getFilterHandler().isPresent()) {
+            if (m_keepFilterColumns && colSpec.getFilterHandler().isPresent()) {
                 include = true;
             }
             if (include) {
@@ -276,11 +280,11 @@ public class JSONDataTable {
                 excludedColumns.add(colName);
             }
             if (m_calculateDataHash) {
-                hashString.append(colName);
-                hashString.append(spec.getColumnSpec(i).getType().getName());
+                DigestUtils.updateDigest(md5Digest, colName);
+                DigestUtils.updateDigest(md5Digest, colSpec.getType().toString());
             }
         }
-        m_columnsRemoved = excludedColumns.toArray(new String[0]);
+        m_columnsRemoved = excludedColumns.toArray(new String[m_columnsRemoved.length]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
             numOfRows = Math.min(((BufferedDataTable)m_dataTable).size(), m_maxRows);
@@ -322,7 +326,7 @@ public class JSONDataTable {
 
             String rowKey = row.getKey().getString();
             if (m_calculateDataHash) {
-                hashString.append(rowKey);
+                DigestUtils.updateDigest(md5Digest, rowKey);
             } else {
                 // if we don't calculate the hash, then we don't need to process the rows which won't go into the json data table
                 if (currentRowNumber < m_firstRow) {
@@ -347,7 +351,8 @@ public class JSONDataTable {
 
                 Object cellValue = null;
                 if (includeColumn || m_calculateDataHash) {
-                    // if we don't calculate the hash, then we don't need to process the columns which won't go into the json data table
+                    // if we don't calculate the hash, then we don't need to process the columns which won't
+                    // go into the json data table
                     if (cell.isMissing()) {
                         if (!excludeRow && includeColumn) {
                             if (m_excludeRowsWithMissingValues) {
@@ -360,7 +365,8 @@ public class JSONDataTable {
                         cellValue = getJSONCellValue(cell);
                     }
                     if (m_calculateDataHash) {
-                        hashString.append(cellValue);
+                        DigestUtils.updateDigest(md5Digest,
+                            Objects.toString(cellValue, javax.json.JsonValue.NULL.toString()));
                     }
                 }
 
@@ -449,7 +455,7 @@ public class JSONDataTable {
         }
 
         if (m_calculateDataHash) {
-            m_dataHash = Optional.of(DigestUtils.md5Hex(hashString.toString()));
+            m_dataHash = Optional.of(Hex.encodeHexString(md5Digest.digest()));
         }
     }
 
