@@ -68,8 +68,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
-    property = "type",
-    defaultImpl = NumericColumnRangeSelection.class
+    property = "type"/*,
+    defaultImpl = NumericColumnRangeSelection.class*/
+    // can't use defaultImpl, see https://github.com/FasterXML/jackson-databind/issues/1488
     )
 @JsonSubTypes({
     @Type(value = NumericColumnRangeSelection.class, name = "numeric"),
