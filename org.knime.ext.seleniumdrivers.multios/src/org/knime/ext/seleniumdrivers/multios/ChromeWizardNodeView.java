@@ -293,7 +293,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    }
 		    else {
 		        LOGGER.error(errorMessage + e.getMessage(), e);
-		        throw new SeleniumViewException(errorMessage + "Check log for more details.");
+		        throw new SeleniumViewException(errorMessage + "Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
 		    }
 		    return null;
 		}
