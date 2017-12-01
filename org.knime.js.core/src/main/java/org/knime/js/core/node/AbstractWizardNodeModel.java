@@ -275,6 +275,20 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     }
 
     /**
+     * This method can be used to determine if a view representation was previously set. If the view representation
+     * is unchanged from the empty created state, this method returns true.
+     *
+     * @return true if the view representation is null or equals to the empty view representation, false otherwise
+     */
+    protected final boolean isViewRepresentationEmpty() {
+        synchronized (m_lock) {
+            REP emptyRepresentation = createEmptyViewRepresentation();
+            REP curRepresentation = getViewRepresentation();
+            return curRepresentation == null || emptyRepresentation.equals(curRepresentation);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -291,6 +305,20 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     protected void setViewValue(final VAL value) {
         synchronized (m_lock) {
             m_value = value;
+        }
+    }
+
+    /**
+     * This method can be used to determine if a view value was previously set. If the view value
+     * is unchanged from the empty created state, this method returns true.
+     *
+     * @return true if the view value is null or equals to the empty view value, false otherwise
+     */
+    protected final boolean isViewValueEmpty() {
+        synchronized (m_lock) {
+            VAL emptyValue = createEmptyViewValue();
+            VAL curValue = getViewValue();
+            return curValue == null || emptyValue.equals(curValue);
         }
     }
 
