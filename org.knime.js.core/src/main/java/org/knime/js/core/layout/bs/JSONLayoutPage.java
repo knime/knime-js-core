@@ -56,6 +56,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  *
@@ -86,6 +87,7 @@ public class JSONLayoutPage {
      */
     public static ObjectMapper getConfiguredObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModules(new Jdk8Module());
         mapper.setSerializationInclusion(Include.NON_EMPTY);
         mapper = registerSubtypes(mapper);
         return mapper;
@@ -97,6 +99,7 @@ public class JSONLayoutPage {
     public static ObjectMapper getConfiguredVerboseObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setSerializationInclusion(Include.ALWAYS);
+        mapper.registerModules(new Jdk8Module());
         mapper = registerSubtypes(mapper);
         return mapper;
     }
