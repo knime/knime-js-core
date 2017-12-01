@@ -119,6 +119,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 
 /**
@@ -1078,6 +1079,8 @@ public class JSONDataTable {
     @JsonIgnore
     public void saveJSONToNodeSettings(final NodeSettingsWO settings) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
+
         String tableString = null;
         try {
             tableString = mapper.writeValueAsString(this);
@@ -1098,6 +1101,7 @@ public class JSONDataTable {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         JSONDataTable table = new JSONDataTable();
         ObjectReader reader = mapper.readerForUpdating(table);
