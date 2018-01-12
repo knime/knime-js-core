@@ -492,7 +492,7 @@ public class SliderSettings implements Cloneable {
         }
         for (double start : m_start) {
             if (start < getRangeMinValue() || start > getRangeMaxValue()) {
-                throw new InvalidSettingsException("Start value needs to be inside range bounds.");
+                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
             }
         }
         if (m_connect != null && m_connect.length != (m_start.length + 1)) {
