@@ -7,9 +7,9 @@ knimeService = function() {
 	*/
 	!function(){"use strict";var a="undefined"!=typeof module&&module.exports,b="undefined"!=typeof Element&&"ALLOW_KEYBOARD_INPUT"in Element,c=function(){for(var a,b,c=[["requestFullscreen","exitFullscreen","fullscreenElement","fullscreenEnabled","fullscreenchange","fullscreenerror"],["webkitRequestFullscreen","webkitExitFullscreen","webkitFullscreenElement","webkitFullscreenEnabled","webkitfullscreenchange","webkitfullscreenerror"],["webkitRequestFullScreen","webkitCancelFullScreen","webkitCurrentFullScreenElement","webkitCancelFullScreen","webkitfullscreenchange","webkitfullscreenerror"],["mozRequestFullScreen","mozCancelFullScreen","mozFullScreenElement","mozFullScreenEnabled","mozfullscreenchange","mozfullscreenerror"],["msRequestFullscreen","msExitFullscreen","msFullscreenElement","msFullscreenEnabled","MSFullscreenChange","MSFullscreenError"]],d=0,e=c.length,f={};e>d;d++)if(a=c[d],a&&a[1]in document){for(d=0,b=a.length;b>d;d++)f[c[0][d]]=a[d];return f}return!1}(),d={request:function(a){var d=c.requestFullscreen;a=a||document.documentElement,/5\.1[\.\d]* Safari/.test(navigator.userAgent)?a[d]():a[d](b&&Element.ALLOW_KEYBOARD_INPUT)},exit:function(){document[c.exitFullscreen]()},toggle:function(a){this.isFullscreen?this.exit():this.request(a)},raw:c};return c?(Object.defineProperties(d,{isFullscreen:{get:function(){return Boolean(document[c.fullscreenElement])}},element:{enumerable:!0,get:function(){return document[c.fullscreenElement]}},enabled:{enumerable:!0,get:function(){return Boolean(document[c.fullscreenEnabled])}}}),void(a?module.exports=d:window.screenfull=d)):void(a?module.exports=!1:window.screenfull=!1)}();
 	
-	/*! modernizr 3.3.1 (Custom Build) | MIT *
-	 * https://modernizr.com/download/?-cssanimations-setclasses !*/
-	!function(e,n,t){function r(e,n){return typeof e===n}function o(){var e,n,t,o,s,i,a;for(var l in C)if(C.hasOwnProperty(l)){if(e=[],n=C[l],n.name&&(e.push(n.name.toLowerCase()),n.options&&n.options.aliases&&n.options.aliases.length))for(t=0;t<n.options.aliases.length;t++)e.push(n.options.aliases[t].toLowerCase());for(o=r(n.fn,"function")?n.fn():n.fn,s=0;s<e.length;s++)i=e[s],a=i.split("."),1===a.length?Modernizr[a[0]]=o:(!Modernizr[a[0]]||Modernizr[a[0]]instanceof Boolean||(Modernizr[a[0]]=new Boolean(Modernizr[a[0]])),Modernizr[a[0]][a[1]]=o),g.push((o?"":"no-")+a.join("-"))}}function s(e){var n=_.className,t=Modernizr._config.classPrefix||"";if(S&&(n=n.baseVal),Modernizr._config.enableJSClass){var r=new RegExp("(^|\\s)"+t+"no-js(\\s|$)");n=n.replace(r,"$1"+t+"js$2")}Modernizr._config.enableClasses&&(n+=" "+t+e.join(" "+t),S?_.className.baseVal=n:_.className=n)}function i(e,n){return!!~(""+e).indexOf(n)}function a(){return"function"!=typeof n.createElement?n.createElement(arguments[0]):S?n.createElementNS.call(n,"http://www.w3.org/2000/svg",arguments[0]):n.createElement.apply(n,arguments)}function l(e){return e.replace(/([a-z])-([a-z])/g,function(e,n,t){return n+t.toUpperCase()}).replace(/^-/,"")}function f(e,n){return function(){return e.apply(n,arguments)}}function u(e,n,t){var o;for(var s in e)if(e[s]in n)return t===!1?e[s]:(o=n[e[s]],r(o,"function")?f(o,t||n):o);return!1}function d(e){return e.replace(/([A-Z])/g,function(e,n){return"-"+n.toLowerCase()}).replace(/^ms-/,"-ms-")}function p(){var e=n.body;return e||(e=a(S?"svg":"body"),e.fake=!0),e}function c(e,t,r,o){var s,i,l,f,u="modernizr",d=a("div"),c=p();if(parseInt(r,10))for(;r--;)l=a("div"),l.id=o?o[r]:u+(r+1),d.appendChild(l);return s=a("style"),s.type="text/css",s.id="s"+u,(c.fake?c:d).appendChild(s),c.appendChild(d),s.styleSheet?s.styleSheet.cssText=e:s.appendChild(n.createTextNode(e)),d.id=u,c.fake&&(c.style.background="",c.style.overflow="hidden",f=_.style.overflow,_.style.overflow="hidden",_.appendChild(c)),i=t(d,e),c.fake?(c.parentNode.removeChild(c),_.style.overflow=f,_.offsetHeight):d.parentNode.removeChild(d),!!i}function m(n,r){var o=n.length;if("CSS"in e&&"supports"in e.CSS){for(;o--;)if(e.CSS.supports(d(n[o]),r))return!0;return!1}if("CSSSupportsRule"in e){for(var s=[];o--;)s.push("("+d(n[o])+":"+r+")");return s=s.join(" or "),c("@supports ("+s+") { #modernizr { position: absolute; } }",function(e){return"absolute"==getComputedStyle(e,null).position})}return t}function h(e,n,o,s){function f(){d&&(delete P.style,delete P.modElem)}if(s=r(s,"undefined")?!1:s,!r(o,"undefined")){var u=m(e,o);if(!r(u,"undefined"))return u}for(var d,p,c,h,v,y=["modernizr","tspan","samp"];!P.style&&y.length;)d=!0,P.modElem=a(y.shift()),P.style=P.modElem.style;for(c=e.length,p=0;c>p;p++)if(h=e[p],v=P.style[h],i(h,"-")&&(h=l(h)),P.style[h]!==t){if(s||r(o,"undefined"))return f(),"pfx"==n?h:!0;try{P.style[h]=o}catch(g){}if(P.style[h]!=v)return f(),"pfx"==n?h:!0}return f(),!1}function v(e,n,t,o,s){var i=e.charAt(0).toUpperCase()+e.slice(1),a=(e+" "+b.join(i+" ")+i).split(" ");return r(n,"string")||r(n,"undefined")?h(a,n,o,s):(a=(e+" "+E.join(i+" ")+i).split(" "),u(a,n,t))}function y(e,n,r){return v(e,t,t,n,r)}var g=[],C=[],w={_version:"3.3.1",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,n){var t=this;setTimeout(function(){n(t[e])},0)},addTest:function(e,n,t){C.push({name:e,fn:n,options:t})},addAsyncTest:function(e){C.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=w,Modernizr=new Modernizr;var _=n.documentElement,S="svg"===_.nodeName.toLowerCase(),x="Moz O ms Webkit",b=w._config.usePrefixes?x.split(" "):[];w._cssomPrefixes=b;var E=w._config.usePrefixes?x.toLowerCase().split(" "):[];w._domPrefixes=E;var N={elem:a("modernizr")};Modernizr._q.push(function(){delete N.elem});var P={style:N.elem.style};Modernizr._q.unshift(function(){delete P.style}),w.testAllProps=v,w.testAllProps=y,Modernizr.addTest("cssanimations",y("animationName","a",!0)),o(),s(g),delete w.addTest,delete w.addAsyncTest;for(var z=0;z<Modernizr._q.length;z++)Modernizr._q[z]();e.Modernizr=Modernizr}(window,document);
+	/*! modernizr 3.6.0 (Custom Build) | MIT *
+	 * https://modernizr.com/download/?-cssanimations-es6object-generators-promises-setclasses !*/
+	!function(e,n,t){function r(e,n){return typeof e===n}function o(){var e,n,t,o,s,i,a;for(var l in w)if(w.hasOwnProperty(l)){if(e=[],n=w[l],n.name&&(e.push(n.name.toLowerCase()),n.options&&n.options.aliases&&n.options.aliases.length))for(t=0;t<n.options.aliases.length;t++)e.push(n.options.aliases[t].toLowerCase());for(o=r(n.fn,"function")?n.fn():n.fn,s=0;s<e.length;s++)i=e[s],a=i.split("."),1===a.length?Modernizr[a[0]]=o:(!Modernizr[a[0]]||Modernizr[a[0]]instanceof Boolean||(Modernizr[a[0]]=new Boolean(Modernizr[a[0]])),Modernizr[a[0]][a[1]]=o),C.push((o?"":"no-")+a.join("-"))}}function s(e){var n=P.className,t=Modernizr._config.classPrefix||"";if(_&&(n=n.baseVal),Modernizr._config.enableJSClass){var r=new RegExp("(^|\\s)"+t+"no-js(\\s|$)");n=n.replace(r,"$1"+t+"js$2")}Modernizr._config.enableClasses&&(n+=" "+t+e.join(" "+t),_?P.className.baseVal=n:P.className=n)}function i(e,n){return!!~(""+e).indexOf(n)}function a(){return"function"!=typeof n.createElement?n.createElement(arguments[0]):_?n.createElementNS.call(n,"http://www.w3.org/2000/svg",arguments[0]):n.createElement.apply(n,arguments)}function l(e){return e.replace(/([a-z])-([a-z])/g,function(e,n,t){return n+t.toUpperCase()}).replace(/^-/,"")}function u(e,n){return function(){return e.apply(n,arguments)}}function f(e,n,t){var o;for(var s in e)if(e[s]in n)return t===!1?e[s]:(o=n[e[s]],r(o,"function")?u(o,t||n):o);return!1}function c(e){return e.replace(/([A-Z])/g,function(e,n){return"-"+n.toLowerCase()}).replace(/^ms-/,"-ms-")}function d(n,t,r){var o;if("getComputedStyle"in e){o=getComputedStyle.call(e,n,t);var s=e.console;if(null!==o)r&&(o=o.getPropertyValue(r));else if(s){var i=s.error?"error":"log";s[i].call(s,"getComputedStyle returning null, its possible modernizr test results are inaccurate")}}else o=!t&&n.currentStyle&&n.currentStyle[r];return o}function p(){var e=n.body;return e||(e=a(_?"svg":"body"),e.fake=!0),e}function m(e,t,r,o){var s,i,l,u,f="modernizr",c=a("div"),d=p();if(parseInt(r,10))for(;r--;)l=a("div"),l.id=o?o[r]:f+(r+1),c.appendChild(l);return s=a("style"),s.type="text/css",s.id="s"+f,(d.fake?d:c).appendChild(s),d.appendChild(c),s.styleSheet?s.styleSheet.cssText=e:s.appendChild(n.createTextNode(e)),c.id=f,d.fake&&(d.style.background="",d.style.overflow="hidden",u=P.style.overflow,P.style.overflow="hidden",P.appendChild(d)),i=t(c,e),d.fake?(d.parentNode.removeChild(d),P.style.overflow=u,P.offsetHeight):c.parentNode.removeChild(c),!!i}function y(n,r){var o=n.length;if("CSS"in e&&"supports"in e.CSS){for(;o--;)if(e.CSS.supports(c(n[o]),r))return!0;return!1}if("CSSSupportsRule"in e){for(var s=[];o--;)s.push("("+c(n[o])+":"+r+")");return s=s.join(" or "),m("@supports ("+s+") { #modernizr { position: absolute; } }",function(e){return"absolute"==d(e,null,"position")})}return t}function v(e,n,o,s){function u(){c&&(delete z.style,delete z.modElem)}if(s=r(s,"undefined")?!1:s,!r(o,"undefined")){var f=y(e,o);if(!r(f,"undefined"))return f}for(var c,d,p,m,v,g=["modernizr","tspan","samp"];!z.style&&g.length;)c=!0,z.modElem=a(g.shift()),z.style=z.modElem.style;for(p=e.length,d=0;p>d;d++)if(m=e[d],v=z.style[m],i(m,"-")&&(m=l(m)),z.style[m]!==t){if(s||r(o,"undefined"))return u(),"pfx"==n?m:!0;try{z.style[m]=o}catch(h){}if(z.style[m]!=v)return u(),"pfx"==n?m:!0}return u(),!1}function g(e,n,t,o,s){var i=e.charAt(0).toUpperCase()+e.slice(1),a=(e+" "+x.join(i+" ")+i).split(" ");return r(n,"string")||r(n,"undefined")?v(a,n,o,s):(a=(e+" "+j.join(i+" ")+i).split(" "),f(a,n,t))}function h(e,n,r){return g(e,t,t,n,r)}var C=[],w=[],S={_version:"3.6.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,n){var t=this;setTimeout(function(){n(t[e])},0)},addTest:function(e,n,t){w.push({name:e,fn:n,options:t})},addAsyncTest:function(e){w.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=S,Modernizr=new Modernizr,Modernizr.addTest("generators",function(){try{new Function("function* test() {}")()}catch(e){return!1}return!0}),Modernizr.addTest("es6object",!!(Object.assign&&Object.is&&Object.setPrototypeOf)),Modernizr.addTest("promises",function(){return"Promise"in e&&"resolve"in e.Promise&&"reject"in e.Promise&&"all"in e.Promise&&"race"in e.Promise&&function(){var n;return new e.Promise(function(e){n=e}),"function"==typeof n}()});var P=n.documentElement,_="svg"===P.nodeName.toLowerCase(),b="Moz O ms Webkit",x=S._config.usePrefixes?b.split(" "):[];S._cssomPrefixes=x;var j=S._config.usePrefixes?b.toLowerCase().split(" "):[];S._domPrefixes=j;var T={elem:a("modernizr")};Modernizr._q.push(function(){delete T.elem});var z={style:T.elem.style};Modernizr._q.unshift(function(){delete z.style}),S.testAllProps=g,S.testAllProps=h,Modernizr.addTest("cssanimations",h("animationName","a",!0)),o(),s(C),delete S.addTest,delete S.addAsyncTest;for(var E=0;E<Modernizr._q.length;E++)Modernizr._q[E]();e.Modernizr=Modernizr}(window,document);
 	
 	var service = {};
 	service.version = "1.0.0";
@@ -26,6 +26,7 @@ knimeService = function() {
 	var header, menu;
 	var initialized = false, interactivityAvailable = false, runningInWebportal = false;
 	var warnings = {};
+	var viewRequests = [], requestSequence = 0, responseBuffer = [], pushSupported;
 	var GLOBAL_SERVICE = this;
 	
 	init = function() {
@@ -40,6 +41,7 @@ knimeService = function() {
 				GLOBAL_SERVICE = parent.KnimePageLoader;
 			}
 		}
+		viewRequests = [], requestSequence = 0;
 		
 		var body = document.getElementsByTagName('body')[0];
 		header = document.createElement('nav');
@@ -633,6 +635,261 @@ knimeService = function() {
 		header.appendChild(spacer);
 	}
 	
+	service.isViewRequestsSupported = function() {
+		return Modernizr.promises && Modernizr.es6object;
+	}
+	
+	function MonitorablePromise(executor, promise) {
+		this.progressListeners = [];
+		this.monitor = {};
+		if (promise) {
+			this.realPromise = promise;
+		} else {
+			this.realPromise = new Promise(executor);
+		}
+	}
+	MonitorablePromise.prototype = {
+		progress: function(onProgress) {
+			this.progressListeners.push(onProgress);
+			//immediately call progress listener if progress is already available
+			if (this.monitor) {
+				onProgress(this.monitor);
+			}
+			return this;
+		},
+		then: function(onResolve, onReject) {
+			let newPromise = new MonitorablePromise(null, this.realPromise.then(onResolve, onReject));
+			newPromise.progressListeners = this.progressListeners;
+			newPromise.monitor = this.monitor;
+			return newPromise;
+		},
+		catch: function(onReject) {
+			let newPromise = new MonitorablePromise(null, this.realPromise.catch(onReject));
+			newPromise.progressListeners = this.progressListeners;
+			newPromise.monitor = this.monitor;
+			return newPromise;
+		},
+		finally: function(onFinally) {
+			let newPromise = new MonitorablePromise(null, this.realPromise.finally(onFinally));
+			newPromise.progressListeners = this.progressListeners;
+			newPromise.monitor = this.monitor;
+			return newPromise;
+		},
+		updateProgress: function(mon) {
+			this.monitor = mon;
+			this.progressListeners.forEach(function(onProgress) {
+				onProgress(mon);
+			});
+		}
+	}
+	
+	getNextRequestSequence = function(sequence) {
+		let mod = (typeof Number.MAX_SAFE_INTEGER !== 'undefined') ? 
+				Number.MAX_SAFE_INTEGER : Number.MAX_VALUE;
+		return ++sequence % mod;
+	}
+	
+	getPreviousRequestSequence = function(sequence) {
+		let mod = (typeof Number.MAX_SAFE_INTEGER !== 'undefined') ? 
+				Number.MAX_SAFE_INTEGER : Number.MAX_VALUE;
+		return --sequence % mod;
+	}
+	
+	getAndSetNextRequestSequence = function() {
+		requestSequence = getNextRequestSequence(requestSequence);
+		return requestSequence;
+	}
+	
+	async function _requestViewUpdate(request, resolvable) {
+		try {
+			let monitor;
+			if (interactivityAvailable) {
+				monitor = GLOBAL_SERVICE.requestViewUpdate(window.frameElement.id, JSON.stringify(request), request.sequence);
+			} else {
+				monitor = knimeViewRequest(JSON.stringify(request));
+			}
+			if (!monitor) {
+				monitor = {};
+			}
+			if (typeof monitor === 'string') {
+				monitor = JSON.parse(monitor);
+			}
+			if (!monitor.requestSequence) {
+				monitor.requestSequence = request.sequence;
+			}
+			resolvable.monitor = monitor;
+			if (resolvable.promise) {
+				resolvable.promise.updateProgress(monitor);
+			}
+			if (typeof pushSupported === 'undefined') {
+				initPushSupported();
+			}
+			if (!pushSupported) {
+				initUpdateMonitorPolling(resolvable);
+			}
+		} catch (exception) {
+			for (let i = 0; i < viewRequests.length; i++) {
+				if (viewRequests[i].requestSequence === request.sequence) {
+					viewRequests.splice(i, 1);
+					break;
+				}
+			}
+			if (resolvable.reject) {
+				resolvable.reject(exception);
+			}
+		}
+	}
+	
+	initPushSupported = function() {
+		if (interactivityAvailable) {
+			pushSupported = GLOBAL_SERVICE.isPushSupported();
+		} else {
+			pushSupported = knimePushSupported();
+		}
+	}
+	
+	service.requestViewUpdate = function(request, preserveOrder, notCancelable) {
+		let prevSequence = requestSequence;
+		request.sequence = getAndSetNextRequestSequence();
+		let resolvable = {
+				'sequence': request.sequence,
+				'monitor': {},
+				'notCancelable': notCancelable,
+				'preserveOrder': preserveOrder
+		};
+		let promise = new MonitorablePromise(function(res, rej) {
+			resolvable.resolve = res;
+			resolvable.reject = rej;
+		});
+		resolvable.promise = promise;
+		viewRequests.push(resolvable);
+		_requestViewUpdate(request, resolvable);
+		return promise;
+	}
+	
+	initUpdateMonitorPolling = function(resolvable) {
+		//initialize first update poll with a default of 500ms
+		setTimeout(pollMonitorUpdate, 500, resolvable, 500);
+	}
+	
+	pollMonitorUpdate = function(resolvable, time) {
+		let updatedMonitor, id = resolvable.monitor.id;
+		if (interactivityAvailable) {
+			updatedMonitor = GLOBAL_SERVICE.updateRequestStatus(window.frameElement.id, id);
+		} else {
+			updatedMonitor = knimeUpdateRequestStatus(id);
+		}
+		if (typeof updatedMonitor === 'string') {
+			updatedMonitor = JSON.parse(updatedMonitor);
+		}
+		if (!compareResponseMonitor(resolvable.monitor, updatedMonitor)) {
+			service.updateResponseMonitor(updatedMonitor);
+		}
+		
+		if (!((updatedMonitor.executionFinished && updatedMonitor.responseAvailable) 
+			|| updatedMonitor.executionFailed || updatedMonitor.cancelled)) {
+			//slightly increase timeout every time up to a maximum of 5s, long running requests will
+			//have fewer update calls
+			let newTime = Math.min(5000, 1.05 * time);
+			setTimeout(pollMonitorUpdate, newTime, resolvable, newTime);
+		}
+	}
+	
+	compareResponseMonitor = function(mon, otherMon) {
+		//naive string comparison for performance reasons 
+		return JSON.stringify(mon) === JSON.stringify(otherMon);
+	}
+	
+	service.updateResponseMonitor = function(updatedMonitor) {
+		let sequence = updatedMonitor.requestSequence;
+		if (typeof sequence === 'undefined') {
+			return;
+		}
+		if (updatedMonitor.executionFinished && updatedMonitor.responseAvailable) {
+			service.respondToViewRequest(updatedMonitor.response);
+		}
+		for (let i = 0; i < viewRequests.length; i++) {
+			let resolvable = viewRequests[i];
+			if (resolvable.sequence === sequence) {
+				if (updatedMonitor.executionFailed || updatedMonitor.cancelled) {
+					resolvable.reject(updatedMonitor.errorMessage);
+					viewRequests.splice(i, 1);
+				} else {
+					resolvable.monitor = updatedMonitor;
+					if (resolvable.promise) {
+						resolvable.promise.updateProgress(updatedMonitor);
+					}
+				}
+				break;
+			}
+		}
+	}
+	
+	service.respondToViewRequest = function(response) {
+		let sequence = response.sequence;
+		if (typeof sequence === 'undefined') {
+			return;
+		}
+		for (var i = 0; i < viewRequests.length; i++) {
+			let request = viewRequests[i];
+			if (request.sequence === sequence) {
+				if (request.preserveOrder) {
+					request.response = response;
+					for (let j = 0; j < viewRequests.length; j++) {
+						if (typeof viewRequests[j].response !== 'undefined') {
+							resolveResponse(j, viewRequests[j].response);
+							j--;
+						} else {
+							break;
+						}
+					}
+				} else {
+					resolveResponse(i, response);
+				}
+				break;
+			}
+		}
+	}
+	
+	resolveResponse = function(index, response) {
+		let resolvable = viewRequests[index];
+		if (resolvable.sequence !== response.sequence) {
+			return;
+		}
+		viewRequests.splice(index, 1);
+		try {
+			resolvable.resolve(response);
+		} catch (exception) {
+			resolvable.reject(exception);
+		}
+	}
+	
+	service.cancelViewRequest = function(sequence, invokeCatch) {
+		for (let i = 0; i < viewRequests.length; i++) {
+			let request = viewRequests[i];
+			if (request.sequence == sequence) {
+				if (!request.notCancelable) {
+					let id = request.sequence;
+					if (request.monitor && request.monitor.id) {
+						id = request.monitor.id;
+					}
+					id = '' + id;
+					if (interactivityAvailable) {
+						monitor = GLOBAL_SERVICE.cancelViewRequest(window.frameElement.id, id, invokeCatch);
+					} else {
+						knimeCancelRequest(id);
+					}
+					if (!invokeCatch) {
+						viewRequests.splice(i, 1);
+					}
+					return true;
+				}
+				break;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Inline global style declarations for SVG export
 	 * @param {*} svg 
@@ -707,3 +964,13 @@ knimeService = function() {
 	return service;
 	
 }();
+if (typeof KnimeInteractivity === 'undefined') {
+	KnimeInteractivity = {
+		respondToViewRequest: function(response) {
+			return knimeService.respondToViewRequest(response);
+		},
+		updateResponseMonitor: function(monitor) {
+			return knimeService.updateResponseMonitor(monitor);
+		}
+	}
+}

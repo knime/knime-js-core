@@ -51,11 +51,25 @@ KnimePageLoader = function() {
 	// Map for interactivity event subscribers
 	var interactivitySubscribers = new Object();
 	
-	var widget = null;
-	var updateWidgetStateFunction = null;
+	var viewRequests = [], requestSequence = 0
+	
+	var widget = null,
+		updateWidgetStateFunction = null,
+		processViewRequestFunction = null,
+		updateViewRequestStatusFunction = null,
+		cancelViewRequestFunction = null;
+	
 	
 	var isDebug = false;
 	var isGridBasedLayout = true;
+	
+	pageLoader.registerWidget = function(w, updateState, processRequest, updateRequest, cancelRequest) {
+		widget = w;
+		updateWidgetStateFunction = updateState;
+		processViewRequestFunction = processRequest;
+		updateViewRequestStatusFunction = updateRequest;
+		cancelViewRequestFunction = cancelRequest;
+	}
 	
 	// Function that will populate the container with iframes and generate the iframes' content
 	pageLoader.init = function(page, w, updateState, debug, root) {
@@ -701,9 +715,14 @@ KnimePageLoader = function() {
 		manualSizing = new Object();
 		interactivityMap = new Object();
 		interactivitySubscribers = new Object();
+		viewRequests = [];
+		requestSequence = 0;
 		
 		widget = null;
 		updateWidgetStateFunction = null;
+		processViewRequestFunction = null;
+		updateViewRequestStatusFunction = null;
+		cancelViewRequestFunction = null;
 		
 		isDebug = false;
 		isGridBasedLayout = true;
@@ -1167,7 +1186,195 @@ KnimePageLoader = function() {
 		}
 		return mappedData;
 	}
+	
+	getNextRequestSequence = function(sequence) {
+		var mod = (typeof Number.MAX_SAFE_INTEGER !== 'undefined') ? 
+				Number.MAX_SAFE_INTEGER : Number.MAX_VALUE;
+		return ++sequence % mod;
+	}
+	
+	getPreviousRequestSequence = function(sequence) {
+		var mod = (typeof Number.MAX_SAFE_INTEGER !== 'undefined') ? 
+				Number.MAX_SAFE_INTEGER : Number.MAX_VALUE;
+		return --sequence % mod;
+	}
+	
+	getAndSetNextRequestSequence = function() {
+		requestSequence = getNextRequestSequence(requestSequence);
+		return requestSequence;
+	}
+	
+	pageLoader.requestViewUpdate = function(frameID, request, requestSequence) {
+		var nodeID = frameID.substring('node'.length).replace(/-/g, ":");
+		var requestContainer = {
+				"sequence": getAndSetNextRequestSequence(),
+				"nodeID": nodeID,
+				"jsonRequest": request
+		}
+		var resolvable = {
+				"sequence": requestContainer.sequence,
+				"nodeID": requestContainer.nodeID,
+				"requestSequence": requestSequence
+		}
+		viewRequests.push(resolvable);
+		var monitor;
+		if (pageLoader.isRunningInWebportal()) {
+			if (widget && processViewRequestFunction) {
+				monitor = processViewRequestFunction(widget, JSON.stringify(requestContainer));
+			} else {
+				LOGGER.error("Could not request view update. Widget not registered.");
+			}
+		} else {
+			monitor = knimeViewRequest(JSON.stringify(requestContainer));
+		}
+		if (!monitor) {
+			monitor = {};
+		}
+		if (typeof monitor === 'string') {
+			monitor = JSON.parse(monitor);
+		}
+		monitor.requestSequence = requestSequence;
+		resolvable.monitor = monitor;
+		return monitor;
+	}
+	
+	pageLoader.isPushSupported = function() {
+		if (pageLoader.isRunningInWebportal()) {
+			//hard coded for now
+			return false;
+		} else {
+			return knimePushSupported();
+		}
+	}
+	
+	pageLoader.cancelViewRequest = function(frameID, monitorID, invokeCatch) {
+		var nodeID = frameID.substring('node'.length).replace(/-/g, ":");
+		var id = monitorID;
+		var index = -1;
+		// in case monitorID is request sequence, map sequence
+		for (var i = 0; i < viewRequests.length; i++) {
+			var resolvable = viewRequests[i];
+			if (resolvable.monitor && monitorID == resolvable.monitor.id) {
+					index = i;
+					break;
+			} else if (monitorID == resolvable.requestSequence && nodeID == resolvable.nodeID) {
+				index = i;
+				monitorID = resolvable.sequence;
+				break;
+			}
+		}
+		try {
+			if (pageLoader.isRunningInWebportal()) {
+				if (widget && cancelViewRequestFunction) {
+					cancelViewRequestFunction(widget, id);
+				} else {
+					LOGGER.error("Could not cancel view request. Widget not registered.");
+				}
+			} else {
+				knimeCancelRequest(id);
+			}
+			if (!invokeCatch && index > -1) {
+				viewRequests.splice(index, 1);
+			}
+		} catch (err) {
+			LOGGER.error("Could not cancel view request: " + err);
+		}
+	}
+	
+	pageLoader.respondToViewRequest = function(responseContainer) {
+		var frameID = "node" + responseContainer.nodeID.replace(/:/g, "-");
+		for (var i = 0; i < viewRequests.length; i++) {
+			if (viewRequests[i].sequence === responseContainer.sequence) {
+				viewRequests.splice(i, 1);
+				break;
+			}
+		}
+		var frame = document.getElementById(frameID);
+		if (typeof frame !== 'undefined') {
+			var response = responseContainer.jsonResponse;
+			frame.contentWindow.KnimeInteractivity.respondToViewRequest(response);
+		}
+	}
+	
+	pageLoader.updateResponseMonitor = function(monitor) {
+		if (typeof monitor === 'string') {
+			monitor = JSON.parse(monitor);
+		}
+		var resolvable, index;
+		for (var i = 0; i < viewRequests.length; i++) {
+			var res = viewRequests[i];
+			if (res.monitor && monitor.id === res.monitor.id || monitor.requestSequence === res.sequence) {
+				resolvable = res;
+				index = i;
+				break;
+			}
+		}
+		if (resolvable) {
+			monitor.requestSequence = resolvable.requestSequence;
+			if (monitor.executionFinished && monitor.responseAvailable) {
+				monitor.response = monitor.response.jsonResponse;
+			}
+			resolvable.monitor = monitor;
+			var frameID = "node" + resolvable.nodeID.replace(/:/g, "-");
+			var frame = document.getElementById(frameID);
+			if (monitor.executionFailed || monitor.cancelled || 
+				(monitor.executionFinished && monitor.responseAvailable)) {
+				viewRequests.splice(index, 1);
+			}
+			if (typeof frame !== 'undefined') {
+				frame.contentWindow.KnimeInteractivity.updateResponseMonitor(monitor);
+			}
+		}
+	}
+	
+	pageLoader.updateRequestStatus = function(frameID, monitorID) {
+		var resolvable;
+		for (var i = 0; i < viewRequests.length; i++) {
+			var res = viewRequests[i];
+			if (res.monitor && monitorID === res.monitor.id) {
+				resolvable = res;
+				break;
+			}
+		}
+		if (resolvable) {
+			try {
+				var updatedMonitor;
+				if (pageLoader.isRunningInWebportal()) {
+					if (widget && updateViewRequestStatusFunction) {
+						updatedMonitor = updateViewRequestStatusFunction(widget, monitorID);
+					} else {
+						LOGGER.error("Could not update view request status. Widget not registered.");
+					}
+				} else {
+					updatedMonitor = knimeUpdateRequestStatus(monitorID);
+				}
+				if (updatedMonitor) {
+					if (typeof updatedMonitor === 'string') {
+						updatedMonitor = JSON.parse(updatedMonitor);
+					}
+					updatedMonitor.requestSequence = resolvable.requestSequence;
+					if (updatedMonitor.executionFinished && updatedMonitor.responseAvailable) {
+						updatedMonitor.response = updatedMonitor.response.jsonResponse;
+					}
+					resolvable.monitor = updatedMonitor;
+					return updatedMonitor;
+				}
+			} catch (err) {
+				LOGGER.error("Could not update view request status: " + err);
+			}
+		}
+	}
 
 	return pageLoader;
 }();
+}
+if (typeof KnimeInteractivity === 'undefined') {
+	KnimeInteractivity = {
+		respondToViewRequest: function(response) {
+			return KnimePageLoader.respondToViewRequest(response);
+		},
+		updateResponseMonitor: function(monitor) {
+			return KnimePageLoader.updateResponseMonitor(monitor);
+		}
+	}
 }

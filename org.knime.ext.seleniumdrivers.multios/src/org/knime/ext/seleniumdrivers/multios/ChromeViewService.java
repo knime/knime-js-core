@@ -80,6 +80,9 @@ public class ChromeViewService {
 
 	// signals for COMET-type request queries (callback emulation)
 	static final String NO_ACTION = "NO_ACTION";
+	static final String VIEW_REQUEST = "VIEW_REQUEST";
+	static final String UPDATE_REQUEST_STATUS = "UPDATE_REQUEST_STATUS";
+	static final String CANCEL_REQUEST = "CANCEL_REQUEST";
 	static final String CLOSE_BUTTON_PRESSED = "CLOSE_BUTTON_PRESSED";
 	static final String CLOSE_DISCARD_BUTTON_PRESSED = "CLOSE_DISCARD_BUTTON_PRESSED";
 	static final String CLOSE_APPLY_BUTTON_PRESSED = "CLOSE_APPLY_BUTTON_PRESSED";

@@ -35,6 +35,7 @@ import org.knime.js.core.settings.table.TableSettings;
 
 /**
  * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  *
  */
 public class TableNodeDialogComponents {
