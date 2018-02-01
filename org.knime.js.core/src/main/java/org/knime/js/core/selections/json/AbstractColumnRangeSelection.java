@@ -78,6 +78,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     })
 public abstract class AbstractColumnRangeSelection {
 
+    private static final String CFG_COLUMN_NAME = "columnName";
+    private static final String DEFAULT_COLUMN_NAME = null;
     private String m_columnName;
 
     /**
@@ -99,7 +101,9 @@ public abstract class AbstractColumnRangeSelection {
      * @param settings the settings to save to
      */
     @JsonIgnore
-    public abstract void saveToNodeSettings(NodeSettingsWO settings);
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        settings.addString(CFG_COLUMN_NAME, m_columnName);
+    }
 
     /**
      * Loads the configuration from the given settings object.
@@ -107,14 +111,18 @@ public abstract class AbstractColumnRangeSelection {
      * @throws InvalidSettingsException on load error
      */
     @JsonIgnore
-    public abstract void loadFromNodeSettings(NodeSettingsRO settings) throws InvalidSettingsException;
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        m_columnName = settings.getString(CFG_COLUMN_NAME, DEFAULT_COLUMN_NAME);
+    }
 
     /**
      * Loads the configuration from the given settings object for a dialog.
      * @param settings the settings to load from
      */
     @JsonIgnore
-    public abstract void loadFromNodeSettingsInDialog(NodeSettingsRO settings);
+    public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        m_columnName = settings.getString(CFG_COLUMN_NAME, DEFAULT_COLUMN_NAME);
+    }
 
     /**
      * {@inheritDoc}

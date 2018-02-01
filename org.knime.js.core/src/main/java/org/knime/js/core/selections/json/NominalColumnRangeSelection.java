@@ -87,6 +87,7 @@ public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
         settings.addStringArray(CFG_VALUES, m_values);
     }
 
@@ -96,6 +97,7 @@ public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
         m_values = settings.getStringArray(CFG_VALUES);
     }
 
@@ -105,6 +107,7 @@ public class NominalColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        super.loadFromNodeSettingsInDialog(settings);
         m_values = settings.getStringArray(CFG_VALUES, (String[])null);
     }
 
