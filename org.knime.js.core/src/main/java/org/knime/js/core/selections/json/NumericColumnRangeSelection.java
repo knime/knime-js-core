@@ -142,6 +142,7 @@ public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
         settings.addDouble(CFG_MINIMUM, m_minimum);
         settings.addDouble(CFG_MAXIMUM, m_maximum);
         settings.addBoolean(CFG_MINIMUM_INCLUSIVE, m_minimumInclusive);
@@ -154,6 +155,7 @@ public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
         m_minimum = settings.getDouble(CFG_MINIMUM);
         m_maximum = settings.getDouble(CFG_MAXIMUM);
         m_minimumInclusive = settings.getBoolean(CFG_MINIMUM_INCLUSIVE);
@@ -166,6 +168,7 @@ public class NumericColumnRangeSelection extends AbstractColumnRangeSelection {
     @Override
     @JsonIgnore
     public void loadFromNodeSettingsInDialog(final NodeSettingsRO settings) {
+        super.loadFromNodeSettingsInDialog(settings);
         m_minimum = settings.getDouble(CFG_MINIMUM, DEFAULT_MINIMUM);
         m_maximum = settings.getDouble(CFG_MAXIMUM, DEFAULT_MAXIMUM);
         m_minimumInclusive = settings.getBoolean(CFG_MINIMUM_INCLUSIVE, DEFAULT_MINIMUM_INCLUSIVE);
