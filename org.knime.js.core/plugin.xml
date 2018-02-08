@@ -1568,6 +1568,26 @@
                webResourceBundleID="D3_4.2.6">
          </webDependency>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            description="Provides a common functionality for table-like views such as Table View, Table Editor, Data Explorer."
+            name="KNIME Base Table Viewer"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimeBaseTableViewer_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/tableViewer/"
+               relativePathTarget="js-lib/knime/tableViewer/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/tableViewer/knime_base_table_viewer_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/knime/tableViewer/knime_table_viewer.css"
+               type="CSS">
+         </importResource>
+      </webResourceBundle>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
