@@ -52,8 +52,10 @@ import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.util.filter.column.DataColumnSpecFilterConfiguration;
 
 /**
- * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * Common table settings.
  *
+ * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 public class TableSettings {
     final static String CFG_HIDE_IN_WIZARD = "hideInWizard";

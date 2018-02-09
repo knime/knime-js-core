@@ -16,8 +16,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * Common table settings which belong to representation object.
  *
+ * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 public class TableRepresentationSettings {
     private JSONDataTable m_table;

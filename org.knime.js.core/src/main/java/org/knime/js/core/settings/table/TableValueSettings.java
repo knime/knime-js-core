@@ -12,8 +12,10 @@ import org.knime.core.node.NodeSettingsWO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * Common table settings which belong to value object.
  *
+ * @author Oleg Yasnev, KNIME GmbH, Berlin, Germany
+ * @since 3.6
  */
 public class TableValueSettings {
     private static final String CFG_HIDE_UNSELECTED = "hideUnselected";
