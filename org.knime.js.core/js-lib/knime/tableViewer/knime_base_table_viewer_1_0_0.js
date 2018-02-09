@@ -48,9 +48,7 @@
  * Provides a common functionality for table-like views such as Table View, Table Editor, Data Explorer.
  * 
  * @constructor
- * @class 
  */
-
 KnimeBaseTableViewer = function() {	
 	// read-only settings coming from backend
 	this._representation = null;
@@ -86,6 +84,12 @@ KnimeBaseTableViewer = function() {
 	});
 }
 
+/**
+ * Initialize the table viewer and draw the view. Framework method.
+ * 
+ * @param representation  the representation input object from the backend
+ * @param value  the value input object from the backend
+ */
 KnimeBaseTableViewer.prototype.init = function(representation, value) {
 	if (!representation || !representation.table || !value) {
 		$('body').append("Error: No data available");
@@ -95,61 +99,25 @@ KnimeBaseTableViewer.prototype.init = function(representation, value) {
 	this._value = value;
 
 	if (parent && parent.KnimePageLoader) {
-		this.drawTable();
+		this._drawTable();
 	} else {
 		var self = this;
 		$(document).ready(function() {
-			self.drawTable();
+			self._drawTable();
 		});
 	}
 }
 
-KnimeBaseTableViewer.prototype.drawTable = function() {
-	try {
-		this._prepare();
-		this._createHtmlTableContainer();
-		
-		this._knimeTable = new kt();
-		this._knimeTable.setDataTable(this._representation.table);
-		
-		this._buildColumnSearching();
-		
-		this._buildDataTableConfig();		
-		this._dataTable = $('#knimePagedTable').DataTable(this._dataTableConfig);
-
-		this._addSortButtons();
-		
-		$('#knimePagedTable_paginate').css('display', 'none');
-
-		$('#knimePagedTable_info').html(
-			'<strong>Loading data</strong> - Displaying '
-			+ 1 + ' to ' + Math.min(this._knimeTable.getNumRows(), this._representation.initialPageSize)
-			+ ' of ' + this._knimeTable.getNumRows() + ' entries.');
-		
-		this._buildMenu();
-		this._applySelection();
-		this._applyColumnSearching();
-		
-		// load all data
-		var self = this;
-		setTimeout(function() {
-			var initialChunkSize = 100;
-			self._addDataToTable(self._representation.initialPageSize, initialChunkSize);
-		}, 0);
-
-	} catch (err) {
-		if (err.stack) {
-			alert(err.stack);
-		} else {
-			alert (err);
-		}
-	}
-}
-
+/**
+ * Validates the view state. Framework method.
+ */
 KnimeBaseTableViewer.prototype.validate = function() {
 	return true;
 }
 
+/**
+ * Fills the value output object for the backend. Framework method.
+ */
 KnimeBaseTableViewer.prototype.getComponentValue = function() {
 	if (!this._value) {
 		return null;
@@ -204,6 +172,54 @@ KnimeBaseTableViewer.prototype.getComponentValue = function() {
 	return this._value;
 }
 
+/**
+ * Main function to draw the table view
+ */
+KnimeBaseTableViewer.prototype._drawTable = function() {
+	try {
+		this._prepare();
+		this._createHtmlTableContainer();
+		
+		this._knimeTable = new kt();
+		this._knimeTable.setDataTable(this._representation.table);
+		
+		this._buildColumnSearching();
+		
+		this._buildDataTableConfig();		
+		this._dataTable = $('#knimePagedTable').DataTable(this._dataTableConfig);
+
+		this._addSortButtons();
+		
+		$('#knimePagedTable_paginate').css('display', 'none');
+
+		$('#knimePagedTable_info').html(
+			'<strong>Loading data</strong> - Displaying '
+			+ 1 + ' to ' + Math.min(this._knimeTable.getNumRows(), this._representation.initialPageSize)
+			+ ' of ' + this._knimeTable.getNumRows() + ' entries.');
+		
+		this._buildMenu();
+		this._applySelection();
+		this._processColumnSearching();
+		
+		// load all data
+		var self = this;
+		setTimeout(function() {
+			var initialChunkSize = 100;
+			self._addDataToTable(self._representation.initialPageSize, initialChunkSize);
+		}, 0);
+
+	} catch (err) {
+		if (err.stack) {
+			alert(err.stack);
+		} else {
+			alert (err);
+		}
+	}
+}
+
+/**
+ * Actions which have to be done before building the table
+ */
 KnimeBaseTableViewer.prototype._prepare = function() {
 	// Set locale for moment.js.
 	if (this._representation.dateTimeFormats.globalDateTimeLocale !== 'en') {
@@ -219,6 +235,9 @@ KnimeBaseTableViewer.prototype._prepare = function() {
 }
 
 
+/**
+ * Creates an HTML wrapper for the table view 
+ */
 KnimeBaseTableViewer.prototype._createHtmlTableContainer = function() {
 	var body = $('body');		
 	var wrapper = $('<div id="knimePagedTableContainer">');
@@ -233,6 +252,9 @@ KnimeBaseTableViewer.prototype._createHtmlTableContainer = function() {
 	wrapper.append(table);
 }
 
+/**
+ * Builds controls for searching through the columns
+ */
 KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 	if (this._representation.enableColumnSearching) {
 		$('#knimePagedTable').append('<tfoot><tr></tr></tfoot>');
@@ -264,6 +286,9 @@ KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 	}
 }
 
+/**
+ * Configure controls for rows selection
+ */
 KnimeBaseTableViewer.prototype._buildSelection = function() {
 	var self = this;
 	if (this._representation.enableSelection) {
@@ -309,6 +334,9 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 	}
 }
 
+/**
+ * Configure display of rows indices, ids and colors
+ */
 KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 	if (this._representation.displayRowIndex) {
 		this._dataTableConfig.columns.push({
@@ -329,10 +357,18 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 	}
 }
 
+/**
+ * Returns a column name by its index
+ * 
+ * @param i  column index
+ */
 KnimeBaseTableViewer.prototype._getColumnName = function(i) {
 	return this._knimeTable.getColumnNames()[i];
 }
 
+/**
+ * Configures columns for DataTables
+ */
 KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 	var self = this;
 	for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
@@ -420,6 +456,9 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 	}
 }
 
+/**
+ * Callback function after the table has been drawn
+ */
 KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 	if (!this._representation.displayColumnHeaders) {
 		$("#knimePagedTable thead").remove();
@@ -429,6 +468,9 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 	}
 }
 
+/**
+ * Builds a config object for DataTables
+ */
 KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 	this._dataTableConfig = {
 		'columns': [],
@@ -485,6 +527,9 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 		|| (knimeService && knimeService.isInteractivityAvailable());
 }
 
+/**
+ * Adds controls for sorting buttons
+ */
 KnimeBaseTableViewer.prototype._addSortButtons = function() {
 	// Clear sorting button placement and enable/disable on order change
 	if (this._representation.enableSorting && this._representation.enableClearSortButton) {
@@ -498,6 +543,9 @@ KnimeBaseTableViewer.prototype._addSortButtons = function() {
 	}
 }
 
+/**
+ * Builds the view menu
+ */
 KnimeBaseTableViewer.prototype._buildMenu = function() {
 	var self = this;
 	if (knimeService) {
@@ -601,6 +649,9 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
 	}
 }
 
+/**
+ * Applies the existing rows selection
+ */
 KnimeBaseTableViewer.prototype._applySelection = function() {
 	var self = this;
 	if (this._representation.enableSelection) {
@@ -676,7 +727,10 @@ KnimeBaseTableViewer.prototype._applySelection = function() {
 	}
 }
 
-KnimeBaseTableViewer.prototype._applyColumnSearching = function() {
+/**
+ * Adds a handler for column searching and processes the event 
+ */
+KnimeBaseTableViewer.prototype._processColumnSearching = function() {
 	if (this._representation.enableColumnSearching) {
 		this._dataTable.columns().every(function () {
 	        var that = this;
@@ -689,6 +743,12 @@ KnimeBaseTableViewer.prototype._applyColumnSearching = function() {
 	}
 }
 
+/**
+ * Loads data into the table in chunks until everything is loaded
+ * 
+ * @param startIndex  index of the first row in the chunk
+ * @param chunkSize  number of rows in a chunk
+ */
 KnimeBaseTableViewer.prototype._addDataToTable = function(startIndex, chunkSize) {
 	var startTime = new Date().getTime();
 	var tableSize = this._knimeTable.getNumRows()
@@ -723,6 +783,9 @@ KnimeBaseTableViewer.prototype._addDataToTable = function(startIndex, chunkSize)
 	}
 }
 
+/**
+ * Gets the rows whose indices are in the interval [start, end) 
+ */
 KnimeBaseTableViewer.prototype._getDataSlice = function(start, end) {
 	if (typeof end == 'undefined') {
 		end = this._knimeTable.getNumRows();
@@ -756,6 +819,9 @@ KnimeBaseTableViewer.prototype._getDataSlice = function(start, end) {
 	return data;
 }
 
+/**
+ * Applies the existing settings from the value
+ */
 KnimeBaseTableViewer.prototype._applyViewValue = function() {
 	if (this._representation.enableSearching && this._value.filterString) {
 		this._dataTable.search(this._value.filterString);
@@ -778,6 +844,9 @@ KnimeBaseTableViewer.prototype._applyViewValue = function() {
 	}
 }
 
+/**
+ * Actions which have to be done after the table has been initialized
+ */
 KnimeBaseTableViewer.prototype._finishInit = function() {
 	//Used to collect all checkboxes here, 
 	//but now keeping selection and checkbox state separate and applying checked state on every call of draw()
@@ -785,6 +854,12 @@ KnimeBaseTableViewer.prototype._finishInit = function() {
 	this._initialized = true;
 }
 
+/**
+ * Processes the 'select all rows' action
+ * 
+ * @param all  
+ * @param ignoreSearch
+ */
 KnimeBaseTableViewer.prototype._selectAll = function(all, ignoreSearch) {
 	// cannot select all rows before all data is loaded
 	if (!this._initialized) {
@@ -817,6 +892,9 @@ KnimeBaseTableViewer.prototype._selectAll = function(all, ignoreSearch) {
 	this._publishCurrentSelection();
 }
 
+/**
+ * Checks whether all the rows have been selected
+ */
 KnimeBaseTableViewer.prototype._checkSelectAllState = function() {
 	var selectAllCheckbox = $('#checkbox-select-all').get(0);
 	if (!selectAllCheckbox) { return; }
@@ -852,6 +930,9 @@ KnimeBaseTableViewer.prototype._checkSelectAllState = function() {
     this._value.selectAllIndeterminate = indeterminate;
 }
 
+/**
+ * Applies the selection to the currently display page
+ */
 KnimeBaseTableViewer.prototype._setSelectionOnPage = function() {
 	var curCheckboxes = this._dataTable.column(0, {page:'current'}).nodes().to$().children();
 	for (var i = 0; i < curCheckboxes.length; i++) {
@@ -867,6 +948,9 @@ KnimeBaseTableViewer.prototype._setSelectionOnPage = function() {
 	}
 }
 
+/**
+ * Publishes the current selection for other interactive views
+ */
 KnimeBaseTableViewer.prototype._publishCurrentSelection = function() {
 	if (knimeService && knimeService.isInteractivityAvailable() && this._value.publishSelection) {
 		var selArray = [];
@@ -882,6 +966,11 @@ KnimeBaseTableViewer.prototype._publishCurrentSelection = function() {
 	}
 }
 
+/**
+ * Handler on the selection change event
+ * 
+ * @data data  information of how the selection has been changed
+ */
 KnimeBaseTableViewer.prototype._selectionChanged = function(data) {
 	// cannot apply selection changed event before all data is loaded
 	if (!this._initialized) {
@@ -912,6 +1001,11 @@ KnimeBaseTableViewer.prototype._selectionChanged = function(data) {
 	}
 }
 
+/**
+ * Handler on the filter changed event
+ * 
+ * @data data  info of how the filter has been changed
+ */
 KnimeBaseTableViewer.prototype._filterChanged = function(data) {
 	// cannot apply selection changed event before all data is loaded
 	if (!this._initialized) {
@@ -924,11 +1018,21 @@ KnimeBaseTableViewer.prototype._filterChanged = function(data) {
 	this._dataTable.draw();
 }
 
+/**
+ * Returns whether a column of the specified type is available for sorting
+ * 
+ * @param colType  column type
+ */
 KnimeBaseTableViewer.prototype._isColumnSortable = function (colType) {
 	var allowedTypes = ['boolean', 'string', 'number', 'dateTime'];
 	return allowedTypes.indexOf(colType) >= 0;
 }
 
+/**
+ * Returns whether a column of the specified type is available for searching
+ * 
+ * @param colType  column type
+ */
 KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
 	var allowedTypes = ['boolean', 'string', 'number', 'dateTime', 'undefined'];
 	return allowedTypes.indexOf(colType) >= 0;
