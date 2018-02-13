@@ -172,17 +172,17 @@ public class TableRepresentationSettings {
     }
 
     /**
-     * @return the intialPageSize
+     * @return the initialPageSize
      */
-    public int getIntialPageSize() {
+    public int getInitialPageSize() {
         return m_initialPageSize;
     }
 
     /**
-     * @param intialPageSize the intialPageSize to set
+     * @param initialPageSize the initialPageSize to set
      */
-    public void setIntialPageSize(final int intialPageSize) {
-        m_initialPageSize = intialPageSize;
+    public void setInitialPageSize(final int initialPageSize) {
+        m_initialPageSize = initialPageSize;
     }
 
     /**

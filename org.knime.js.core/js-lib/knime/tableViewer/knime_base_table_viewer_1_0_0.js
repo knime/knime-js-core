@@ -751,7 +751,7 @@ KnimeBaseTableViewer.prototype._processColumnSearching = function() {
  */
 KnimeBaseTableViewer.prototype._addDataToTable = function(startIndex, chunkSize) {
 	var startTime = new Date().getTime();
-	var tableSize = this._knimeTable.getNumRows()
+	var tableSize = this._knimeTable.getNumRows();
 	var endIndex  = Math.min(tableSize, startIndex + chunkSize);
 	var chunk = this._getDataSlice(startIndex, endIndex);
 	this._dataTable.rows.add(chunk);
