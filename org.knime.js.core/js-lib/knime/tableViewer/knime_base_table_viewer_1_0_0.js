@@ -514,7 +514,7 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 					dt.order.neutral();
 					dt.draw();
 				},
-				'enabled': (order.length > 0)
+				'enabled': (this._dataTableConfig.order.length > 0)
 		}
 		this._dataTableConfig.buttons.push(unsortButton);
 	}

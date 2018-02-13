@@ -697,6 +697,7 @@ public class TableRepresentationSettings {
      */
     @JsonIgnore
     public void loadSettingsForDialog(final NodeSettingsRO settings) {
+        // load everything but table
         m_enablePaging = settings.getBoolean(CFG_ENABLE_PAGING, DEFAULT_ENABLE_PAGING);
         m_initialPageSize = settings.getInt(CFG_INITIAL_PAGE_SIZE, DEFAULT_INITIAL_PAGE_SIZE);
         m_enablePageSizeChange = settings.getBoolean(CFG_ENABLE_PAGE_SIZE_CHANGE, DEFAULT_ENABLE_PAGE_SIZE_CHANGE);

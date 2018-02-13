@@ -41,7 +41,8 @@ import org.knime.js.core.settings.table.TableSettings;
  * @since 3.6
  *
  */
-public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresentation, VAL extends AbstractTableValue> extends AbstractWizardNodeModel<REP, VAL> implements BufferedDataTableHolder  {
+public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresentation, VAL extends AbstractTableValue>
+    extends AbstractWizardNodeModel<REP, VAL> implements BufferedDataTableHolder  {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractTableNodeModel.class);
 
