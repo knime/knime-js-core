@@ -421,7 +421,7 @@ public class TableNodeDialogComponents {
         config.loadSettingsForDialog(nodeSettings, inSpec);
         m_maxRowsSpinner.setValue(config.getRepresentationSettings().getMaxRows());
         m_enablePagingCheckBox.setSelected(config.getRepresentationSettings().getEnablePaging());
-        m_initialPageSizeSpinner.setValue(config.getRepresentationSettings().getIntialPageSize());
+        m_initialPageSizeSpinner.setValue(config.getRepresentationSettings().getInitialPageSize());
         m_enablePageSizeChangeCheckBox.setSelected(config.getRepresentationSettings().getEnablePageSizeChange());
         m_allowedPageSizesField.setText(getAllowedPageSizesString(config.getRepresentationSettings().getAllowedPageSizes()));
         m_enableShowAllCheckBox.setSelected(config.getRepresentationSettings().getPageSizeShowAll());
@@ -473,7 +473,7 @@ public class TableNodeDialogComponents {
         TableSettings config = new TableSettings();
         config.getRepresentationSettings().setMaxRows((Integer)m_maxRowsSpinner.getValue());
         config.getRepresentationSettings().setEnablePaging(m_enablePagingCheckBox.isSelected());
-        config.getRepresentationSettings().setIntialPageSize((Integer)m_initialPageSizeSpinner.getValue());
+        config.getRepresentationSettings().setInitialPageSize((Integer)m_initialPageSizeSpinner.getValue());
         config.getRepresentationSettings().setEnablePageSizeChange(m_enablePageSizeChangeCheckBox.isSelected());
         config.getRepresentationSettings().setAllowedPageSizes(getAllowedPageSizes());
         config.getRepresentationSettings().setPageSizeShowAll(m_enableShowAllCheckBox.isSelected());
