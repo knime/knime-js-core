@@ -262,6 +262,9 @@
 			document.getElementById('knimeSeleniumBridge_closeApplyDefaultButton').onclick = function(e) {
 				handleButtonClick(e, SIGNAL_CLOSE_APPLY_DEFAULT_BUTTON_PRESSED);
 			}
+			$('#seleniumKnimeBridge_modal').on('hidden.bs.modal', function (e) {
+				emptyModal();
+			});
 		}
 		
 		showButtons = function(show) {
