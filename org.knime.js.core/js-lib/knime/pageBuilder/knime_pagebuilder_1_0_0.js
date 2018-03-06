@@ -604,7 +604,7 @@ KnimePageLoader = function() {
 				} else {
 					var registeredNamespace = value = pageLoader.getFrame(webNodeName).contentWindow[namespace];
 					if (typeof registeredNamespace != 'undefined') {
-						getPageValueFunction = registeredNamespace[webNode.getViewValueMethodName];
+						getPageValueFunction = registeredNamespace[webNode.getViewValueMethodName].bind(registeredNamespace);
 					}
 				}
 				if (getPageValueFunction) {
