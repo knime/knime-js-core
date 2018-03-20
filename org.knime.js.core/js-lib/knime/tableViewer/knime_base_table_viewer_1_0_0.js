@@ -188,6 +188,8 @@ KnimeBaseTableViewer.prototype._drawTable = function() {
 		this._buildDataTableConfig();		
 		this._dataTable = $('#knimePagedTable').DataTable(this._dataTableConfig);
 
+		this._addTableListeners();
+
 		this._addSortButtons();
 		
 		$('#knimePagedTable_paginate').css('display', 'none');
@@ -343,7 +345,6 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 			'title': "Row Index",
 			'searchable': false
 		});
-
 	}
 	
 	if (this._representation.displayRowIds || this._representation.displayRowColors) {
@@ -466,6 +467,18 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 	if (this._dataTableConfig.searching && !this._representation.enableSearching) {
 		$('#knimePagedTable_filter').remove();
 	}
+	if (this._dataTable) {
+		this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
+	}
+}
+
+/**
+ * Callback funciton before the table has been drawn
+ */
+KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function() {
+	if (this._dataTable) {
+		this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mousedown', this._bindCellMouseDownHandler);
+	}
 }
 
 /**
@@ -484,7 +497,13 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 		'processing': true,
 		'deferRender': !this._representation.enableSelection,
 		'buttons': [],
-		'fnDrawCallback': this._dataTableDrawCallback.bind(this)
+		'fnDrawCallback': this._dataTableDrawCallback.bind(this),
+		'preDrawCallback': this._dataTablePreDrawCallback.bind(this),
+		'select': {
+			items: 'cell',
+			style: 'api',
+			info: false
+		}
 	};
 	
 	this._buildSelection();
@@ -525,6 +544,18 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 	this._dataTableConfig.searching = this._representation.enableSearching || this._representation.enableColumnSearching
 		|| (this._representation.enableSelection && (this._value.hideUnselected || this._representation.enableHideUnselected)) 
 		|| (knimeService && knimeService.isInteractivityAvailable());
+}
+
+/**
+ * Registers table listeners
+ */
+KnimeBaseTableViewer.prototype._addTableListeners = function() {
+	var $table = $('#knimePagedTable');
+	$table.attr('tabindex', 0);
+	$table.on('keydown', this._keyDownHandler.bind(this));
+	// we need to listen to copy event on body level as user-select:none prevents copy event
+	// see more at https://stackoverflow.com/questions/45627286/disable-text-selection-but-allow-cut-copy-and-paste
+	$(document.body).on('copy', this._copyHandler.bind(this));
 }
 
 /**
@@ -1036,4 +1067,148 @@ KnimeBaseTableViewer.prototype._isColumnSortable = function (colType) {
 KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
 	var allowedTypes = ['boolean', 'string', 'number', 'dateTime', 'undefined'];
 	return allowedTypes.indexOf(colType) >= 0;
+}
+
+/**
+ * Mouse down handler for table cell
+ * 
+ * @param e event
+ */
+KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
+	// init selection or set it, if Shift key was pressed
+	var td = e.target;
+	var cell = this._dataTable.cell(td);
+	if (e.shiftKey && this._firstCorner) {
+		this._selectSecondCorner(cell);
+	} else {
+		this._selectFirstCorner(cell);		
+	}
+	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mouseover', this._bindCellMouseOverHandler = this._cellMouseOverHandler.bind(this));
+	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mouseup', this._bindCellMouseUpHandler = this._cellMouseUpHandler.bind(this));
+}
+
+/**
+ * Mouse over handler for table cell
+ * 
+ * @param e event
+ */
+
+KnimeBaseTableViewer.prototype._cellMouseOverHandler = function(e) {
+	// update selection that the current cell forms a rectangle
+	var td = e.target;
+	var cell = this._dataTable.cell(td);
+	this._selectSecondCorner(cell);
+}
+
+/**
+ * Mouse up handler for table cell
+ * 
+ * @param e event
+ */
+
+KnimeBaseTableViewer.prototype._cellMouseUpHandler = function(e) {
+	// stop listening to mouse events for selection
+	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mouseover', this._bindCellMouseOverHandler);
+	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mouseup', this._bindCellMouseUpHandler);
+}
+
+
+/**
+ * Make the cell to be the first corner of rectangular selection.
+ * 
+ * @param cell cell to be the first corner
+ */
+KnimeBaseTableViewer.prototype._selectFirstCorner = function(cell) {
+	this._firstCorner = cell;
+	// Make the selection to be of this cell only at the beginning
+	this._selectSecondCorner(cell);
+}
+
+/**
+ * Make the cell to be the second corner of rectangular selection.
+ * And then forms the selection
+ * 
+ * @param cell cell to be the second corner
+ */
+KnimeBaseTableViewer.prototype._selectSecondCorner = function(cell) {
+	this._deselectCells();
+	this._secondCorner = cell;	
+	this._selectRectangle();
+}
+
+/**
+ * Forms a rectangular selection
+ */
+KnimeBaseTableViewer.prototype._selectRectangle = function() {
+	var index1 = this._firstCorner.index();
+	var index2 = this._secondCorner.index();
+
+	var top = Math.min(index1.row, index2.row);
+	var bottom = Math.max(index1.row, index2.row);
+	var left = Math.min(index1.column, index2.column);
+	var right = Math.max(index1.column, index2.column);
+
+	var rowIndices = [];
+	for (var i = top; i <= bottom; i++) {
+		rowIndices.push(i);
+	}
+	var colIndices = [];
+	for (var i = left; i <= right; i++) {
+		colIndices.push(i);
+	}
+
+	this._dataTable.cells(rowIndices, colIndices).select();
+}
+
+/**
+ * Unselect currently selected cells, but don't reset the rectangle 
+ */
+KnimeBaseTableViewer.prototype._deselectCells = function() {
+	this._dataTable.cells({selected: true}).deselect();
+}
+
+/**
+ * Unselect currently selected cells, and reset the rectangle
+ */
+KnimeBaseTableViewer.prototype._clearSelection = function() {
+	this._deselectCells();
+	this._firstCorner = this._secondCorner = null;
+}
+
+/**
+ * Key down handler for the table
+ * 
+ * @param e event
+ */
+KnimeBaseTableViewer.prototype._keyDownHandler = function(e) {
+	if (e.key == 'Escape') {
+		this._clearSelection();
+	}
+}
+
+/**
+ * Copy handler for the table
+ * 
+ * @param e event
+ */
+KnimeBaseTableViewer.prototype._copyHandler = function(e) {
+	if (!$('#knimePagedTable').is(':focus')) {
+		// since we trigger copy event on the body level, then copy event happens from the table only when it's in focus
+		// check comment in _addTableListeners method
+		return;
+	}
+	var cellIndices = this._dataTable.cells({selected: true}).flatten();
+	
+	var nCols = Math.abs(this._firstCorner.index().column - this._secondCorner.index().column) + 1;
+	
+	var buffer = [];
+	for (var i = 0, col = 1; i < cellIndices.length; i++) {
+		buffer.push(this._dataTable.data()[cellIndices[i].row][cellIndices[i].column])
+		buffer.push(col++ % nCols == 0 ? '\n' : '\t');
+	}
+	buffer.pop();  // remove last '\n'
+	buffer = buffer.join('');
+
+	e.originalEvent.clipboardData.setData('text/plain', buffer);
+    e.preventDefault();	
 }
