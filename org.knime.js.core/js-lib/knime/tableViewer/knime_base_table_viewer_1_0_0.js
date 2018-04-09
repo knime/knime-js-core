@@ -69,6 +69,8 @@ KnimeBaseTableViewer = function() {
 	this._initialized = false;
 	// config object for DataTables
 	this._dataTableConfig = null;
+	// count of info columns (row id, color etc.)
+	this._infoColsCount = 0;
 	
 	// register neutral ordering method for clear selection button
 	$.fn.dataTable.Api.register('order.neutral()', function () {
@@ -333,6 +335,7 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 				}
 			});
 		}
+		this._infoColsCount++;
 	}
 }
 
@@ -345,6 +348,7 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 			'title': "Row Index",
 			'searchable': false
 		});
+		this._infoColsCount++;
 	}
 	
 	if (this._representation.displayRowIds || this._representation.displayRowColors) {
@@ -355,6 +359,7 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 			'orderable': orderable,
 			'className': 'no-break'
 		});
+		this._infoColsCount++;
 	}
 }
 
@@ -461,14 +466,18 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
  * Callback function after the table has been drawn
  */
 KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
+	var self = this;
 	if (!this._representation.displayColumnHeaders) {
 		$("#knimePagedTable thead").remove();
   	}
 	if (this._dataTableConfig.searching && !this._representation.enableSearching) {
 		$('#knimePagedTable_filter').remove();
 	}
-	if (this._dataTable) {
-		this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
+	if (this._dataTable) {		
+		this._curCells = this._dataTable.cells(function(ind) { 
+			return ind.column >= self._infoColsCount; 
+		}, {page: 'current'}).nodes().flatten().to$();
+		this._curCells.on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
 	}
 }
 
@@ -477,7 +486,12 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
  */
 KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function() {
 	if (this._dataTable) {
-		this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mousedown', this._bindCellMouseDownHandler);
+		if (this._curCells) {
+			// for uknown reason even in preDraw current page contains already new cells,
+			// therefore to clean the old page, we need to save them in a separate variable
+			this._curCells.off('mousedown', this._bindCellMouseDownHandler);
+		}
+		this._clearSelection();
 	}
 }
 
@@ -1076,6 +1090,7 @@ KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
  */
 KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 	// init selection or set it, if Shift key was pressed
+	var self = this;
 	var td = e.target;
 	var cell = this._dataTable.cell(td);
 	if (e.shiftKey && this._firstCorner) {
@@ -1083,8 +1098,10 @@ KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 	} else {
 		this._selectFirstCorner(cell);		
 	}
-	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mouseover', this._bindCellMouseOverHandler = this._cellMouseOverHandler.bind(this));
-	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().on('mouseup', this._bindCellMouseUpHandler = this._cellMouseUpHandler.bind(this));
+	this._dataTable.cells(function(ind) { 
+		return ind.column >= self._infoColsCount; 
+	}, {page: 'current'}).nodes().flatten().to$().on('mouseover', this._bindCellMouseOverHandler = this._cellMouseOverHandler.bind(this));
+	$(document).on('mouseup', this._bindCellMouseUpHandler = this._cellMouseUpHandler.bind(this));
 }
 
 /**
@@ -1108,8 +1125,11 @@ KnimeBaseTableViewer.prototype._cellMouseOverHandler = function(e) {
 
 KnimeBaseTableViewer.prototype._cellMouseUpHandler = function(e) {
 	// stop listening to mouse events for selection
-	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mouseover', this._bindCellMouseOverHandler);
-	this._dataTable.cells({page: 'current'}).nodes().flatten().to$().off('mouseup', this._bindCellMouseUpHandler);
+	var self = this;
+	this._dataTable.cells(function(ind) { 
+		return ind.column >= self._infoColsCount; 
+	}, {page: 'current'}).nodes().flatten().to$().off('mouseover', this._bindCellMouseOverHandler);
+	$(document).off('mouseup', this._bindCellMouseUpHandler);
 }
 
 
@@ -1143,19 +1163,20 @@ KnimeBaseTableViewer.prototype._selectRectangle = function() {
 	var index1 = this._firstCorner.index();
 	var index2 = this._secondCorner.index();
 
-	var top = Math.min(index1.row, index2.row);
-	var bottom = Math.max(index1.row, index2.row);
+	// select columns
 	var left = Math.min(index1.column, index2.column);
 	var right = Math.max(index1.column, index2.column);
-
-	var rowIndices = [];
-	for (var i = top; i <= bottom; i++) {
-		rowIndices.push(i);
-	}
 	var colIndices = [];
 	for (var i = left; i <= right; i++) {
 		colIndices.push(i);
 	}
+
+	// select rows
+	// here we need to take into account the actual order of rows (because of sorting or filtering)
+	var indexes = this._dataTable.rows( { page: 'current', search: 'applied' } ).indexes().toArray();
+	var top = Math.min(indexes.indexOf(index1.row), indexes.indexOf(index2.row));
+	var bottom = Math.max(indexes.indexOf(index1.row), indexes.indexOf(index2.row));
+	var rowIndices = indexes.slice(top, bottom + 1);
 
 	this._dataTable.cells(rowIndices, colIndices).select();
 }
