@@ -71,6 +71,10 @@ KnimeBaseTableViewer = function() {
 	this._dataTableConfig = null;
 	// count of info columns (row id, color etc.)
 	this._infoColsCount = 0;
+	// count of non-selectable columns (row selection)
+	this._nonSelectableColsCount = 0;
+	// index of the RowID column
+	this._rowIdColInd = null;
 	
 	// register neutral ordering method for clear selection button
 	$.fn.dataTable.Api.register('order.neutral()', function () {
@@ -336,6 +340,7 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 			});
 		}
 		this._infoColsCount++;
+		this._nonSelectableColsCount++;
 	}
 }
 
@@ -359,6 +364,7 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 			'orderable': orderable,
 			'className': 'no-break'
 		});
+		this._rowIdColInd = this._infoColsCount;
 		this._infoColsCount++;
 	}
 }
@@ -475,7 +481,7 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 	}
 	if (this._dataTable) {		
 		this._curCells = this._dataTable.cells(function(ind) { 
-			return ind.column >= self._infoColsCount; 
+			return ind.column >= self._nonSelectableColsCount; 
 		}, {page: 'current'}).nodes().flatten().to$();
 		this._curCells.on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
 	}
@@ -1091,7 +1097,7 @@ KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
 KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 	// init selection or set it, if Shift key was pressed
 	var self = this;
-	var td = e.target;
+	var td = e.currentTarget;
 	var cell = this._dataTable.cell(td);
 	if (e.shiftKey && this._firstCorner) {
 		this._selectSecondCorner(cell);
@@ -1099,7 +1105,7 @@ KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 		this._selectFirstCorner(cell);		
 	}
 	this._dataTable.cells(function(ind) { 
-		return ind.column >= self._infoColsCount; 
+		return ind.column >= self._nonSelectableColsCount; 
 	}, {page: 'current'}).nodes().flatten().to$().on('mouseover', this._bindCellMouseOverHandler = this._cellMouseOverHandler.bind(this));
 	$(document).on('mouseup', this._bindCellMouseUpHandler = this._cellMouseUpHandler.bind(this));
 }
@@ -1112,7 +1118,7 @@ KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 
 KnimeBaseTableViewer.prototype._cellMouseOverHandler = function(e) {
 	// update selection that the current cell forms a rectangle
-	var td = e.target;
+	var td = e.currentTarget;
 	var cell = this._dataTable.cell(td);
 	this._selectSecondCorner(cell);
 }
@@ -1127,7 +1133,7 @@ KnimeBaseTableViewer.prototype._cellMouseUpHandler = function(e) {
 	// stop listening to mouse events for selection
 	var self = this;
 	this._dataTable.cells(function(ind) { 
-		return ind.column >= self._infoColsCount; 
+		return ind.column >= self._nonSelectableColsCount; 
 	}, {page: 'current'}).nodes().flatten().to$().off('mouseover', this._bindCellMouseOverHandler);
 	$(document).off('mouseup', this._bindCellMouseUpHandler);
 }
@@ -1224,8 +1230,30 @@ KnimeBaseTableViewer.prototype._copyHandler = function(e) {
 	
 	var buffer = [];
 	for (var i = 0, col = 1; i < cellIndices.length; i++) {
-		buffer.push(this._dataTable.data()[cellIndices[i].row][cellIndices[i].column])
-		buffer.push(col++ % nCols == 0 ? '\n' : '\t');
+		var data = null;
+		if (cellIndices[i].column === this._rowIdColInd) {
+			// we need to filter the content of RowID cell to leave only RowID, but only if it's present, otherwise we skip the cell
+			if (this._representation.displayRowIds) {
+				data = this._knimeTable.getRow(cellIndices[i].row).rowKey;			
+			}
+		} else {
+			data = this._dataTable.data()[cellIndices[i].row][cellIndices[i].column];			
+		}
+		if (data !== null) {
+			buffer.push(data);
+			if (col % nCols !== 0) {
+				buffer.push('\t');
+			}
+		}
+		if (col % nCols === 0) {
+			// remove tailing \t or \n if there
+			var tail = buffer[buffer.length - 1];  
+			if (tail === '\t' || tail === '\n') {
+				buffer.pop();
+			}
+			buffer.push('\n');
+		}
+		col++;
 	}
 	buffer.pop();  // remove last '\n'
 	buffer = buffer.join('');
