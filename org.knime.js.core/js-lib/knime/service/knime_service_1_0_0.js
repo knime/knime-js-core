@@ -44,6 +44,7 @@ knimeService = function() {
 		var body = document.getElementsByTagName('body')[0];
 		header = document.createElement('nav');
 		header.setAttribute('id', 'knime-service-header');
+		header.setAttribute('class', 'knime-service-header');
 		body.insertBefore(header, body.firstChild);
 		initialized = true;
 	}
