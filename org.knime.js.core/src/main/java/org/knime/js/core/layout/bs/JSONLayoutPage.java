@@ -54,6 +54,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -63,14 +65,14 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
  * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonAutoDetect
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutPage {
-
     private List<JSONLayoutRow> m_rows;
 
     /**
      * @return the content
      */
+    @JsonProperty("rows")
     public List<JSONLayoutRow> getRows() {
         return m_rows;
     }
@@ -78,6 +80,7 @@ public class JSONLayoutPage {
     /**
      * @param rows the content to set
      */
+    @JsonProperty("rows")
     public void setRows(final List<JSONLayoutRow> rows) {
         m_rows = rows;
     }

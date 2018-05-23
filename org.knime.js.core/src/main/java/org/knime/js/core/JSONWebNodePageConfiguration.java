@@ -55,6 +55,8 @@ import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.selections.json.JSONSelectionTranslator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
@@ -78,16 +80,27 @@ public class JSONWebNodePageConfiguration {
      * @param blackBoard the blackboard
      * @param selectionTranslators
      */
-    public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard, final List<JSONSelectionTranslator> selectionTranslators) {
-        m_version = KNIMEConstants.VERSION;
+    public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
+        final List<JSONSelectionTranslator> selectionTranslators) {
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION);
+    }
+
+    @JsonCreator
+    private JSONWebNodePageConfiguration(@JsonProperty("layout") final JSONLayoutPage layout,
+        @JsonProperty("blackBoard") final JSONBlackBoard blackBoard,
+        @JsonProperty("selectionTranslators") final List<JSONSelectionTranslator> selectionTranslators,
+        @JsonProperty("version") final String version) {
+        m_version = version;
         m_layout = layout;
         m_blackBoard = blackBoard;
         m_selectionTranslators = selectionTranslators;
     }
 
+
     /**
      * @return the version
      */
+    @JsonProperty("version")
     public String getVersion() {
         return m_version;
     }
@@ -95,43 +108,25 @@ public class JSONWebNodePageConfiguration {
     /**
      * @return the blackBoard
      */
+    @JsonProperty("blackBoard")
     public JSONBlackBoard getBlackBoard() {
         return m_blackBoard;
     }
 
     /**
-     * @param blackBoard the blackBoard to set
-     */
-    public void setBlackBoard(final JSONBlackBoard blackBoard) {
-        m_blackBoard = blackBoard;
-    }
-
-    /**
      * @return the layout
      */
+    @JsonProperty("layout")
     public JSONLayoutPage getLayout() {
         return m_layout;
     }
 
     /**
-     * @param layout the layout to set
-     */
-    public void setLayout(final JSONLayoutPage layout) {
-        m_layout = layout;
-    }
-
-    /**
      * @return the selectionTranslators
      */
+    @JsonProperty("selectionTranslators")
     public List<JSONSelectionTranslator> getSelectionTranslators() {
         return m_selectionTranslators;
-    }
-
-    /**
-     * @param selectionTranslators the selectionTranslators to set
-     */
-    public void setSelectionTranslators(final List<JSONSelectionTranslator> selectionTranslators) {
-        m_selectionTranslators = selectionTranslators;
     }
 
     // TODO: insert other meta info about page

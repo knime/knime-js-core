@@ -77,10 +77,16 @@ public class JSONWebNodePage extends JSONViewContent {
      * @param webNodes
      *
      */
+    public JSONWebNodePage(final JSONWebNodePageConfiguration configuration,
+        final Map<String, JSONWebNode> webNodes) {
+        this(configuration, webNodes, KNIMEConstants.VERSION);
+    }
+
     @JsonCreator
-    public JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes) {
-        m_version = KNIMEConstants.VERSION;
+    private JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
+        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes,
+        @JsonProperty("version") final String version) {
+        m_version = version;
         m_configuration = configuration;
         m_webNodes = webNodes;
     }
