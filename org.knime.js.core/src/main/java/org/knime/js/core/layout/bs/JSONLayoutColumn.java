@@ -61,7 +61,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutColumn extends JSONLayoutElement {
 
     private Integer m_widthXS;

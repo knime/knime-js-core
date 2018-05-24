@@ -55,13 +55,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 @JsonAutoDetect
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutContent {
 
     private List<JSONLayoutColumn> m_columns = new ArrayList<JSONLayoutColumn>();
@@ -69,6 +69,7 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
     /**
      * @return the columns
      */
+    @JsonProperty("columns")
     public List<JSONLayoutColumn> getColumns() {
         return m_columns;
     }
@@ -76,6 +77,7 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
     /**
      * @param columns the columns to set
      */
+    @JsonProperty("columns")
     public void setColumns(final List<JSONLayoutColumn> columns) {
         m_columns = columns;
     }

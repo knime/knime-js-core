@@ -56,7 +56,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
 */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public interface JSONLayoutContent {
 
 }

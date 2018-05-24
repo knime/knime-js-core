@@ -55,7 +55,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -65,7 +64,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
  * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
  */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutPage {
     private List<JSONLayoutRow> m_rows;
 

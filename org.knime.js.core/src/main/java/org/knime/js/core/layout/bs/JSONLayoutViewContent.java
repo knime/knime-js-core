@@ -67,7 +67,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
 */
 @JsonAutoDetect
-//@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayoutContent, Cloneable {
 
     // general fields
