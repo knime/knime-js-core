@@ -126,4 +126,17 @@ public class DialogUtil {
         gbc.fill = fill;
     }
 
+    /**
+     * @return a new {@link GridBagConstraints} instance with default settings applied
+     * (insets 5 - anchor northwest)
+     */
+    public static GridBagConstraints defaultGridBagConstraints() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        return gbc;
+    }
+
 }
