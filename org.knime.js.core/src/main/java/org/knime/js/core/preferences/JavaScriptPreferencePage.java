@@ -54,6 +54,7 @@ import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -68,6 +69,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
+import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension;
 import org.knime.js.core.JSCorePlugin;
 
 /**
@@ -110,6 +112,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
+        boolean isWin = Platform.OS_WIN32.equals(Platform.getOS());
         m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
             "Please choose the browser to use for displaying JavaScript views:", 1,
             AbstractWizardNodeView.getAllWizardNodeViews().stream()
@@ -126,7 +129,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
                     String s1 = e1.getViewClass().getCanonicalName();
                     String s2 = e2.getViewClass().getCanonicalName();
                     return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
-                }).map(e -> new String[]{e.getViewName(), e.getViewClass().getCanonicalName()})
+                }).map(e -> new String[]{getViewName(e), e.getViewClass().getCanonicalName()})
                 .toArray(String[][]::new),
             parent);
 
@@ -159,6 +162,24 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         addField(m_enableLegacyQuickformExecution);
 
         enableBrowserField(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
+    }
+
+    private static String getViewName(final WizardNodeViewExtension view) {
+        String name = view.getViewName();
+        boolean isInternal = INTERNAL_BROWSER.equals(view.getViewClass().getCanonicalName());
+        if (isInternal) {
+            String os = Platform.getOS();
+            if (Platform.OS_WIN32.equals(os)) {
+                return name + " (IE - not recommended)";
+            }
+            if (Platform.OS_MACOSX.equals(os)) {
+                return name + " (Safari)";
+            }
+            if (Platform.OS_LINUX.equals(os)) {
+                return name + " (Webkit)";
+            }
+        }
+        return name;
     }
 
     private void enableBrowserField(final String view, final Composite parent) {

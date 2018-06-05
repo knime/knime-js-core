@@ -264,6 +264,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
 		    }
 		    options.setBinary(cPath.get());
+		    Path dataDir = Paths.get(cPath.get()).getParent().resolve("Data");
+		    if (!dataDir.toFile().exists()) {
+		        dataDir.toFile().mkdir();
+		    }
+		    options.addArguments("--user-data-dir=" + dataDir);
 		} else {
 		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		    if (binPath != null && !binPath.isEmpty()) {
