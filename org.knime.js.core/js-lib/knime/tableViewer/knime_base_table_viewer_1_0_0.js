@@ -206,8 +206,10 @@ KnimeBaseTableViewer.prototype._drawTable = function() {
 			+ ' of ' + this._knimeTable.getNumRows() + ' entries.');
 		
 		this._buildMenu();
-		this._applySelection();
+		this._setSelectionHandlers();
 		this._processColumnSearching();
+
+		this._setControlCssStyles();
 		
 		// load all data
 		var self = this;
@@ -248,15 +250,15 @@ KnimeBaseTableViewer.prototype._prepare = function() {
  */
 KnimeBaseTableViewer.prototype._createHtmlTableContainer = function() {
 	var body = $('body');		
-	var wrapper = $('<div id="knimePagedTableContainer">');
+	var wrapper = $('<div id="knimePagedTableContainer" class="knime-table-container">');
 	body.append(wrapper);
 	if (this._representation.title != null && this._representation.title != '') {
-		wrapper.append('<h1>' + this._representation.title + '</h1>')
+		wrapper.append('<h1 class="knime-title">' + this._representation.title + '</h1>')
 	}
 	if (this._representation.subtitle != null && this._representation.subtitle != '') {
-		wrapper.append('<h2>' + this._representation.subtitle + '</h2>')
+		wrapper.append('<h2 class="knime-subtitle">' + this._representation.subtitle + '</h2>')
 	}
-	var table = $('<table id="knimePagedTable" class="table table-striped table-bordered" width="100%">');
+	var table = $('<table id="knimePagedTable" class="table table-striped table-bordered knime-table" width="100%">');
 	wrapper.append(table);
 }
 
@@ -265,22 +267,22 @@ KnimeBaseTableViewer.prototype._createHtmlTableContainer = function() {
  */
 KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 	if (this._representation.enableColumnSearching) {
-		$('#knimePagedTable').append('<tfoot><tr></tr></tfoot>');
+		$('#knimePagedTable').append('<tfoot class="knime-table-footer"><tr class="knime-table-row knime-table-footer"></tr></tfoot>');
 		var footerRow = $('#knimePagedTable tfoot tr');
 		if (this._representation.enableSelection) {
-			footerRow.append('<th></th>');
+			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 		}
 		if (this._representation.displayRowIndex) {
-			footerRow.append('<th></th>');						
+			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');						
 		}
 		if (this._representation.displayRowColors || this._representation.displayRowIds) {
-			footerRow.append('<th></th>');
+			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 		}
 		for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
 			if (this._isColumnSearchable(this._knimeTable.getColumnTypes()[i])) {
-				footerRow.append('<th>' + this._knimeTable.getColumnNames()[i] + '</th>')
+				footerRow.append('<th class="knime-table-cell knime-table-footer">' + this._knimeTable.getColumnNames()[i] + '</th>')
 			} else {
-				footerRow.append('<th></th>');
+				footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 			}
 		}
 		
@@ -289,7 +291,7 @@ KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 	        if (title == '') {
 	        	return;
 	        }
-	        $(this).html('<input type="text" placeholder="Search ' + title + '" />' );
+	        $(this).html('<input class="knime-table-control-text knime-filter knime-single-line" type="text" placeholder="Search ' + title + '" />' );
 	    });
 	}
 }
@@ -302,7 +304,7 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 	if (this._representation.enableSelection) {
 		if (this._representation.singleSelection) {
 			var titleElement = this._representation.enableClearSelectionButton 
-				? ('<button type="button" id="clear-selection-button" class="btn btn-default btn-xs" title="Clear selection">' 
+				? ('<button type="button" id="clear-selection-button" class="btn btn-default btn-xs knime-control-text" title="Clear selection">' 
 					+ '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></button>')
 				: '';
 			this._dataTableConfig.columns.push({'title': titleElement});
@@ -310,21 +312,21 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 				'targets': 0,
 				'searchable': false,
 				'orderable': false,
-				'className': 'dt-body-center selection-cell',
+				'className': 'dt-body-center selection-cell knime-table-cell',
 				'render': function (data, type, full, meta) {
-					return '<input type="radio" name="radio_single_select"'
+					return '<input type="radio" class="knime-boolean" name="radio_single_select"'
 					+ (self._selection[data] ? ' checked' : '')
 					+' value="' + $('<div/>').text(data).html() + '">';
 				}
 			});
 		} else {
 			var all = this._value.selectAll;
-			this._dataTableConfig.columns.push({'title': '<input name="select_all" value="1" id="checkbox-select-all" type="checkbox"' + (all ? ' checked' : '')  + ' />'});
+			this._dataTableConfig.columns.push({'title': '<input name="select_all" value="1" id="checkbox-select-all" type="checkbox" class="knime-boolean"' + (all ? ' checked' : '')  + ' />'});
 			this._dataTableConfig.columnDefs.push({
 				'targets': 0,
 				'searchable': false,
 				'orderable': false,
-				'className': 'dt-body-center selection-cell',
+				'className': 'dt-body-center selection-cell knime-table-cell',
 				'render': function (data, type, full, meta) {
 					//var selected = selection[data] ? !all : all;
 					setTimeout(function(){
@@ -333,7 +335,7 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 						el.indeterminate = true;
 					}*/
 					}, 0);
-					return '<input type="checkbox" name="id[]"'
+					return '<input type="checkbox" class="knime-boolean" name="id[]"'
 					+ (self._selection[data] ? ' checked' : '')
 					+' value="' + $('<div/>').text(data).html() + '">';
 				}
@@ -351,7 +353,8 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 	if (this._representation.displayRowIndex) {
 		this._dataTableConfig.columns.push({
 			'title': "Row Index",
-			'searchable': false
+			'searchable': false,
+			'className': 'knime-table-cell'
 		});
 		this._infoColsCount++;
 	}
@@ -362,7 +365,7 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 		this._dataTableConfig.columns.push({
 			'title': title, 
 			'orderable': orderable,
-			'className': 'no-break'
+			'className': 'no-break knime-table-cell'
 		});
 		this._rowIdColInd = this._infoColsCount;
 		this._infoColsCount++;
@@ -390,10 +393,11 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 		var colDef = {
 			'title': this._getColumnName(i),
 			'orderable' : this._isColumnSortable(colType),
-			'searchable': this._isColumnSearchable(colType)					
+			'searchable': this._isColumnSearchable(colType),
+			'className': 'knime-table-cell'			
 		}
 		if (this._representation.displayMissingValueAsQuestionMark) {
-			colDef.defaultContent = '<span class="missing-value-cell">?</span>';
+			colDef.defaultContent = '<span class="knime-missing-value-cell">?</span>';
 		}
 		if (knimeColType == 'Date and Time' && this._representation.dateTimeFormats.globalDateTimeFormat) {
 			colDef.render = function (data, type, full, meta) {
@@ -408,23 +412,27 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 					return moment(data).utc().format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalDateTimeFormat);
 				}
 			}
+			colDef.className += ' knime-datetime';
 		}
 		if (knimeColType == 'Local Date' && this._representation.dateTimeFormats.globalLocalDateFormat) {
-		  colDef.render = function (data, type, full, meta) {
-		    return moment(data).format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalDateFormat);
-		  }
+			colDef.render = function (data, type, full, meta) {
+				return moment(data).format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalDateFormat);
+			}
+			colDef.className += ' knime-datetime knime-date';
 		}
 
 		if (knimeColType == 'Local Date Time' && this._representation.dateTimeFormats.globalLocalDateTimeFormat) {
-		  colDef.render = function (data, type, full, meta) {
-		    return moment(data).format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalDateTimeFormat);
-		  }
+			colDef.render = function (data, type, full, meta) {
+				return moment(data).format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalDateTimeFormat);
+			}
+			colDef.className += ' knime-datetime';
 		}
 
 		if (knimeColType == 'Local Time' && this._representation.dateTimeFormats.globalLocalTimeFormat) {
-		  colDef.render = function (data, type, full, meta) {
-		    return moment(data, "hh:mm:ss.SSSSSSSSS").format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalTimeFormat);
-		  }
+			colDef.render = function (data, type, full, meta) {
+				return moment(data, "hh:mm:ss.SSSSSSSSS").format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalLocalTimeFormat);
+			}
+			colDef.className += ' knime-datetime knime-time';
 		}
 
 		if (knimeColType == 'Zoned Date Time' && this._representation.dateTimeFormats.globalZonedDateTimeFormat) {
@@ -447,21 +455,37 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 
 				return date.format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalZonedDateTimeFormat);
 			}
+			colDef.className += ' knime-datetime knime-timezone';
 		}
-		if (colType == 'number' && this._representation.enableGlobalNumberFormat) {
+		if (colType == 'number') {
 			if (this._knimeTable.getKnimeColumnTypes()[i].indexOf('double') > -1) {
-				colDef.render = function(data, type, full, meta) {
-					if (!$.isNumeric(data)) {
-						return data;
+				if (this._representation.enableGlobalNumberFormat) {
+					colDef.render = function (data, type, full, meta) {
+						if (!$.isNumeric(data)) {
+							return data;
+						}
+						return Number(data).toFixed(self._representation.globalNumberFormatDecimals);
 					}
-					return Number(data).toFixed(self._representation.globalNumberFormatDecimals);
 				}
+				colDef.className += ' knime-double';
+			} else {
+				colDef.className += ' knime-integer';
 			}
 		}
 		if (colType == 'png') {
 			colDef.render = function (data, type, full, meta) {
 				return '<img src="data:image/png;base64,' + data + '" />';
 			}
+			colDef.className += ' knime-image knime-png';
+		}
+		if (colType == 'svg') {
+			colDef.className += ' knime-image knime-svg';
+		}
+		if (colType == 'boolean') {
+			colDef.className += ' knime-boolean';
+		}
+		if (colType == 'string') {
+			colDef.className += ' knime-string';
 		}
 		
 		this._dataTableConfig.columns.push(colDef);
@@ -485,6 +509,7 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 		}, {page: 'current'}).nodes().flatten().to$();
 		this._curCells.on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
 	}
+	this._setDynamicCssStyles();
 }
 
 /**
@@ -701,9 +726,9 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
 }
 
 /**
- * Applies the existing rows selection
+ * Sets rows selection handlers
  */
-KnimeBaseTableViewer.prototype._applySelection = function() {
+KnimeBaseTableViewer.prototype._setSelectionHandlers = function() {
 	var self = this;
 	if (this._representation.enableSelection) {
 		if (this._representation.singleSelection) {
@@ -716,8 +741,12 @@ KnimeBaseTableViewer.prototype._applySelection = function() {
 			}
 			// Handle click on radio button to set selection and publish event
 			$('#knimePagedTable tbody').on('change', 'input[type="radio"]', function() {
+				$('.selection-cell').parent().removeClass('knime-selected');  // set tr style
 				self._selection = {};
 				self._selection[this.value] = this.checked;
+				if (this.checked) {
+					$(this).parent().parent().addClass('knime-selected');  // set tr style
+				}
 				if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
 					if (this.checked) {
 						knimeService.setSelectedRows(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
@@ -753,6 +782,7 @@ KnimeBaseTableViewer.prototype._applySelection = function() {
 					if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
 						knimeService.addRowsToSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
 					}
+					$(this).parent().parent().addClass('knime-selected');  // set tr style
 				} else {
 					if (self._value.hideUnselected) {
 						self._dataTable.draw('full-hold');
@@ -760,8 +790,9 @@ KnimeBaseTableViewer.prototype._applySelection = function() {
 					if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
 						knimeService.removeRowsFromSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
 					}
+					$(this).parent().parent().removeClass('knime-selected');  // set tr style
 				}
-				self._checkSelectAllState();
+				self._checkSelectAllState();				
 			});
 			if (knimeService && this._representation.enableClearSelectionButton) {
 				knimeService.addButton('pagedTableClearSelectionButton', 'minus-square-o', 'Clear Selection', function() {
@@ -989,6 +1020,13 @@ KnimeBaseTableViewer.prototype._setSelectionOnPage = function() {
 	for (var i = 0; i < curCheckboxes.length; i++) {
 		var checkbox = curCheckboxes[i];
 		checkbox.checked = this._selection[checkbox.value];
+		// set tr style
+		var $tr = $(checkbox).parent().parent();
+		if (checkbox.checked) {
+			$tr.addClass('knime-selected');
+		} else {
+			$tr.removeClass('knime-selected');
+		}
 		if ('indeterminate' in checkbox) {
 			if (!checkbox.checked && this._partialSelectedRows.indexOf(checkbox.value) > -1) {
 				checkbox.indeterminate = true;
@@ -1185,12 +1223,14 @@ KnimeBaseTableViewer.prototype._selectRectangle = function() {
 	var rowIndices = indexes.slice(top, bottom + 1);
 
 	this._dataTable.cells(rowIndices, colIndices).select();
+	$('td.selected').addClass('knime-selected');
 }
 
 /**
  * Unselect currently selected cells, but don't reset the rectangle 
  */
 KnimeBaseTableViewer.prototype._deselectCells = function() {
+	$('td.selected').removeClass('knime-selected');
 	this._dataTable.cells({selected: true}).deselect();
 }
 
@@ -1260,4 +1300,30 @@ KnimeBaseTableViewer.prototype._copyHandler = function(e) {
 
 	e.originalEvent.clipboardData.setData('text/plain', buffer);
     e.preventDefault();	
+}
+
+/**
+ * Set CSS styles for table controls
+ */
+KnimeBaseTableViewer.prototype._setControlCssStyles = function() {
+	$('#knimePagedTable_length').addClass('knime-table-length');
+	$('#knimePagedTable_length label').addClass('knime-table-control-text');
+	$('#knimePagedTable_length select').addClass('knime-table-control-text knime-single-line');
+	$('.dt-buttons').addClass('knime-table-buttons');
+	$('.dt-buttons span').addClass('knime-table-control-text');
+	$('#knimePagedTable_filter').addClass('knime-table-search');
+	$('#knimePagedTable_filter label').addClass('knime-table-control-text');
+	$('#knimePagedTable_filter input').addClass('knime-filter knime-single-line');
+	$('#knimePagedTable_paginate').addClass('knime-table-paging');
+	$('#knimePagedTable_info').addClass('knime-table-info knime-table-control-text');
+}
+
+/**
+ * Set CSS styles for dynamically loaded objects controls
+ */
+KnimeBaseTableViewer.prototype._setDynamicCssStyles = function() {
+	$('#knimePagedTable tr').addClass('knime-table-row');	
+	$('#knimePagedTable_paginate ul').addClass('knime-table-control-text');
+	$('#knimePagedTable thead tr').addClass('knime-table-header');
+	$('#knimePagedTable thead th').addClass('knime-table-header');
 }
