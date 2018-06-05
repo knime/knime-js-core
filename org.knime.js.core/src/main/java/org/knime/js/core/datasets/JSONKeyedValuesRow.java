@@ -129,15 +129,6 @@ public class JSONKeyedValuesRow implements JSONDataset {
     }
 
     /**
-     * @param values the values to set
-     * @deprecated Use {@link #setValues(Double[])} instead.
-     */
-    @Deprecated
-    public void setValues(final double[] values) {
-        m_values = ArrayUtils.toObject(values);
-    }
-
-    /**
      * @return the properties
      */
     public Map<String, String> getProperties() {
