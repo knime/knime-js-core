@@ -1,3 +1,20 @@
+----------ChromeDriver v2.39 (2018-05-30)----------
+Supports Chrome v66-68
+Resolved issue 2436: ChromeDriver for Android does not provide useful error message for old adb version [[Pri-1]]
+Resolved issue 2431: ChromeDriver tests that close Windows are flaky [[Pri-1]]
+Resolved issue 2259: Click on component into an Iframe (with container padding > 0) is not working [[Pri-1]]
+Resolved issue 2161: ChromeDriver remote debug port reservation race conditions [[Pri-2]]
+Resolved issue 2420: Get Alert Text is not returning spec compliant error codes [[Pri-2]]
+Resolved issue 2369: Clean up state of androidUseRunningApp feature [[Pri-2]]
+Resolved issue 2406: Minimize/Maximize window need a w3c compliant endpoints [[Pri-]]
+
+----------ChromeDriver v2.38 (2018-04-17)----------
+Supports Chrome v65-67
+Resolved issue 2354: The chromedriver crashes/lose connection when navigate to gmail [[Pri-0]]
+Resolved issue 2381: Unknown session ID and cannot determine loading status [[Pri-1]]
+Resolved issue 2198: ChromeDriver 2.34 doesn't wait until iframe content loads after switching into iframe [[Pri-2]]
+Resolved issue 2142: unknown error: Element is not clickable at point - after updating chrome browser and chrome driver to latest version [[Pri-2]]
+
 ----------ChromeDriver v2.37 (2018-03-16)----------
 Supports Chrome v64-66
 Resolved issue 2304: Test ChromeDriverSiteIsolation.testCanClickOOPIF fails on Chrome v66 for all desktop platforms [[Pri-1]]
