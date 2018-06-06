@@ -91,8 +91,9 @@ public class MultiOSDriverActivator extends Plugin {
         } else if (Platform.OS_MACOSX.equals(os)) {
             eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
             eChromium = getBundle().findEntries("macosx/x86_64/Chromium.app/Contents/MacOS", "Chromium", false);
-        } else {
+        } else if (Platform.OS_LINUX.equals(os)) {
             eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
+            eChromium = getBundle().findEntries(os + "/" + arch, "chrome", false);
         }
 
         URL urlDriver = null;
