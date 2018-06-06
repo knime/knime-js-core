@@ -88,6 +88,9 @@ public class MultiOSDriverActivator extends Plugin {
             // 32 and 64bit Windows use the same 32bit executables
             eDriver = getBundle().findEntries("win32/x86", "chromedriver.exe", false);
             eChromium = getBundle().findEntries("win32/x86", "chrome.exe", false);
+        } else if (Platform.OS_MACOSX.equals(os)) {
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
+            eChromium = getBundle().findEntries("macosx/x86_64/Chromium.app/Contents/MacOS", "Chromium", false);
         } else {
             eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
         }

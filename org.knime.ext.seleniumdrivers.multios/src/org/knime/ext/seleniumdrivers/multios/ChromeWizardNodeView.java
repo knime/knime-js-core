@@ -268,7 +268,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    if (!dataDir.toFile().exists()) {
 		        dataDir.toFile().mkdir();
 		    }
-		    options.addArguments("--user-data-dir=" + dataDir);
+		    //make sure that this Chromium instance uses a different user directory and profile, than
+		    //other potentially installed Chrome/Chromium applications
+		    options.addArguments("--user-data-dir=" + dataDir, "--profile-directory=Default");
 		} else {
 		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		    if (binPath != null && !binPath.isEmpty()) {
