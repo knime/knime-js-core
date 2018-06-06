@@ -87,6 +87,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.osgi.framework.Bundle;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -264,13 +265,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
 		    }
 		    options.setBinary(cPath.get());
-		    Path dataDir = Paths.get(cPath.get()).getParent().resolve("Data");
-		    if (!dataDir.toFile().exists()) {
-		        dataDir.toFile().mkdir();
+
+		    /*Make sure that this Chromium instance uses a different user directory and profile, than
+            other potentially installed Chrome/Chromium applications.*/
+		    Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
+		    File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data");
+		    if (!dataDir.exists()) {
+		        dataDir.mkdir();
 		    }
-		    //make sure that this Chromium instance uses a different user directory and profile, than
-		    //other potentially installed Chrome/Chromium applications
-		    options.addArguments("--user-data-dir=" + dataDir, "--profile-directory=Default");
+		    options.addArguments("--user-data-dir=" + dataDir.getAbsolutePath(), "--profile-directory=Default");
 		} else {
 		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		    if (binPath != null && !binPath.isEmpty()) {
