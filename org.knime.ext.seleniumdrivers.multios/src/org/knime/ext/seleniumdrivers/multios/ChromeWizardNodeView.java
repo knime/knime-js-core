@@ -61,9 +61,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -112,6 +114,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
 	private static Boolean CHROME_PRESENT = null;
+	private static int CHROME_THREAD_COUNTER = 1;
 
 	private static final int DEFAULT_TIMEOUT = 30;
 	private static final int COMET_TIMEOUT = 1;
@@ -128,6 +131,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	private File m_repTempFile;
 	private File m_valTempFile;
 	private File m_bridgeTempFile;
+	private final File m_userDataDir;
 
 	private String m_viewTitle = "KNIME view";
 
@@ -138,6 +142,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	public ChromeWizardNodeView(final T viewableModel) {
 		super(viewableModel);
 		m_service = ChromeViewService.getInstance();
+		m_userDataDir = createUserDataDir();
 	}
 
 	/**
@@ -195,35 +200,42 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     @Override
     public final void callOpenView(final String title, final Rectangle knimeWindowBounds) {
 		m_viewTitle = title;
-        T model = getViewableModel();
-		int x = 0;
-		int y = 0;
-		if (knimeWindowBounds != null) {
-			x = (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x;
-			y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
-		}
+        final T model = getViewableModel();
+		final REP viewRepresentation = model.getViewRepresentation();
+		final VAL viewValue = model.getViewValue();
+		final WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
 
-		REP viewRepresentation = model.getViewRepresentation();
-		VAL viewValue = model.getViewValue();
-		WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
+		Thread openViewThread = new Thread(new Runnable() {
 
-		Path bridgePath;
-		try {
-			URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
-			String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
-			if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
-			    bridgeFile = bridgeFile.substring(1);
-		    }
-			bridgePath = Paths.get(bridgeFile);
-		} catch (Exception e) {
-			throw new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage(), e);
-		}
-		writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
+            @Override
+            public void run() {
+                int x = 0;
+                int y = 0;
+                if (knimeWindowBounds != null) {
+                    x = (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x;
+                    y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
+                }
 
-		m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		if (m_windowHandle != null) {
-		    initView(true);
-		}
+                Path bridgePath;
+                try {
+                    URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
+                    String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
+                    if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
+                        bridgeFile = bridgeFile.substring(1);
+                    }
+                    bridgePath = Paths.get(bridgeFile);
+                } catch (Exception e) {
+                    throw new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage(), e);
+                }
+                writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
+
+                m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+                if (m_windowHandle != null) {
+                    initView(true);
+                }
+            }
+        }, "Chrome view thread " + CHROME_THREAD_COUNTER++);
+		openViewThread.start();
 	}
 
     /**
@@ -265,15 +277,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
 		    }
 		    options.setBinary(cPath.get());
-
-		    /*Make sure that this Chromium instance uses a different user directory and profile, than
-            other potentially installed Chrome/Chromium applications.*/
-		    Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
-		    File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data");
-		    if (!dataDir.exists()) {
-		        dataDir.mkdir();
-		    }
-		    options.addArguments("--user-data-dir=" + dataDir.getAbsolutePath(), "--profile-directory=Default");
+		    options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
+		    options.addArguments("--no-first-run", "--no-experiments", "--noerrdialogs", "--bwsi");
+		    options.addArguments("--disable-breakpad", "--disable-infobars", "--disable-session-restore");
+            options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
 		} else {
 		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
 		    if (binPath != null && !binPath.isEmpty()) {
@@ -308,6 +315,25 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		    return null;
 		}
 	}
+
+    private File createUserDataDir() {
+        /*Make sure that a Chromium instance uses a different user directory and profile, than
+        other potentially installed Chrome/Chromium applications.*/
+        Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
+        File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data_" + UUID.randomUUID());
+        dataDir.deleteOnExit();
+        if (dataDir.exists()) {
+            try {
+                FileUtils.deleteDirectory(dataDir);
+            } catch (IOException ex) {
+                LOGGER.error("Could not cleanup Chromium user directory: " + ex.getMessage(), ex);
+            }
+        }
+        if (!dataDir.exists()) {
+            dataDir.mkdir();
+        }
+        return dataDir;
+    }
 
     /**
      * Tests if a Selenium session with a user installed Chrome instance can be successfully created.
@@ -421,9 +447,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
     /**
      * Tries to delete current temporary files. Potential errors are ignored.
-     * @param deleteBridgeFile true if the KNIME-Selenium-Bridge file is supposed to be deleted, false otherwise
+     * @param deleteBridgeAndUserDir true if the KNIME-Selenium-Bridge file and user data directory
+     * is supposed to be deleted, false otherwise
      */
-    private void tryDeleteTempFiles(final boolean deleteBridgeFile) {
+    private void tryDeleteTempFiles(final boolean deleteBridgeAndUserDir) {
         try {
             if (m_repTempFile != null && m_repTempFile.exists()) {
                 m_repTempFile.delete();
@@ -437,9 +464,14 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
             }
         } catch (Exception e) { /* continue */ }
         try {
-            if (deleteBridgeFile && m_bridgeTempFile != null && m_bridgeTempFile.exists()) {
+            if (deleteBridgeAndUserDir && m_bridgeTempFile != null && m_bridgeTempFile.exists()) {
                 m_bridgeTempFile.delete();
                 m_bridgeTempFile = null;
+            }
+        } catch (Exception e) { /* continue */ }
+        try {
+            if (deleteBridgeAndUserDir) {
+                FileUtils.deleteDirectory(m_userDataDir);
             }
         } catch (Exception e) { /* continue */ }
     }
@@ -472,11 +504,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				m_driver.getWindowHandles();
 				return true;
 			} catch (WebDriverException e) {
-				m_shutdownCometThread.set(true);
-				try {
-				    m_driver.quit();
-				} catch (Exception ignore) { /* nothing to do at this point */ }
-				m_driver = null;
+			    closeView();
 				return false;
 			}
 		}

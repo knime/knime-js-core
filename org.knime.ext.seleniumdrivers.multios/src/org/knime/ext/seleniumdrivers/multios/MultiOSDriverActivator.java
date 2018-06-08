@@ -48,6 +48,10 @@
  */
 package org.knime.ext.seleniumdrivers.multios;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Enumeration;
@@ -56,6 +60,7 @@ import java.util.Optional;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.knime.core.node.NodeLogger;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -64,7 +69,9 @@ import org.osgi.framework.BundleContext;
  */
 public class MultiOSDriverActivator extends Plugin {
 
-	private static String BUNDLE_NAME;
+	private static final NodeLogger LOGGER = NodeLogger.getLogger(MultiOSDriverActivator.class);
+
+    private static String BUNDLE_NAME;
 	private static String CHROME_DRIVER_PATH;
 
 	// Optional path to distributed chromium binaries
@@ -118,6 +125,10 @@ public class MultiOSDriverActivator extends Plugin {
             }
             CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
+        if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
+            String appPath = Paths.get(CHROMIUM_PATH).getParent().getParent().getParent().toString();
+            disableMacCloseWindowsAlertForApp(appPath);
+        }
 	}
 
     /**
@@ -132,6 +143,28 @@ public class MultiOSDriverActivator extends Plugin {
     	CHROMIUM_PATH = null;
 
 	}
+
+    private static void disableMacCloseWindowsAlertForApp(final String appPath) {
+        String command = "defaults write -app " + appPath + " NSQuitAlwaysKeepsWindows -bool false";
+        String error = "Unable to deactivate 'close windows' alerts from MacOS."
+                + "Chromium view might not behave as expected.";
+        StringBuilder errorBuilder = new StringBuilder();
+        try {
+            Process pr = Runtime.getRuntime().exec(command);
+            InputStream in = pr.getErrorStream();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    errorBuilder.append(line + "\n");
+                }
+            }
+            if (errorBuilder.length() > 0) {
+                LOGGER.error(error + " Error message from process: " + errorBuilder.toString());
+            }
+        } catch (IOException ex) {
+            LOGGER.error(error, ex);
+        }
+    }
 
 
     static Optional<String> getBundledChromeDriverPath() {
