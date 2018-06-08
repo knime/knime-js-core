@@ -61,11 +61,9 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -295,7 +293,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 		try {
 		    m_driver = new ChromeDriver(options);
-		    m_driver.manage().timeouts().pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS).setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+		    m_driver.manage().timeouts()
+		        .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+		        .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
 		    waitForDocumentReady();
 		    // Store the current window handle
@@ -309,26 +309,19 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        LOGGER.info(errorMessage + e.getMessage(), e);
 		    }
 		    else {
-		        LOGGER.error(errorMessage + e.getMessage(), e);
-		        throw new SeleniumViewException(errorMessage + "Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
-		    }
-		    return null;
+                LOGGER.error(errorMessage + e.getMessage(), e);
+                throw new SeleniumViewException(errorMessage
+                    + "Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
+            }
+            return null;
 		}
 	}
 
-    private File createUserDataDir() {
-        /*Make sure that a Chromium instance uses a different user directory and profile, than
+    private static File createUserDataDir() {
+        /*Make sure that the bundled Chromium instance uses a different user directory and profile, than
         other potentially installed Chrome/Chromium applications.*/
         Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
-        File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data_" + UUID.randomUUID());
-        dataDir.deleteOnExit();
-        if (dataDir.exists()) {
-            try {
-                FileUtils.deleteDirectory(dataDir);
-            } catch (IOException ex) {
-                LOGGER.error("Could not cleanup Chromium user directory: " + ex.getMessage(), ex);
-            }
-        }
+        File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data");
         if (!dataDir.exists()) {
             dataDir.mkdir();
         }
@@ -380,7 +373,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         String valURL = m_valTempFile.toURI().toString();
         String initCall = viewCreator.wrapInTryCatch(viewCreator.createInitJSViewMethodCall(false, null, null));
         // pass arguments 'nicely' to init method
-        m_driver.executeScript("seleniumKnimeBridge.initView(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);", viewURL,repURL, valURL, m_viewTitle, initCall);
+        m_driver.executeScript(
+            "seleniumKnimeBridge.initView(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);",
+            viewURL, repURL, valURL, m_viewTitle, initCall);
         if (forceFocus) {
             m_driver.switchTo().window(m_windowHandle);
         }
@@ -388,14 +383,18 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     }
 
     /**
-     * Writes view representation and value to disk as temporary JSON files. Optionally copies KNIME-Selenium-Bridge to temporary location.
+     * Writes view representation and value to disk as temporary JSON files. Optionally copies KNIME-Selenium-Bridge to
+     * temporary location.
+     *
      * @param viewRepresentation the view representation instance to write to disk
      * @param viewValue the view value instance to write to disk
      * @param viewCreator the view creator instance used for the view files and method creation
-     * @param bridgePath optional path to the KNIME-Selenium-Bridge file, null if file does not need to be copied (e.g. model changed)
+     * @param bridgePath optional path to the KNIME-Selenium-Bridge file, null if file does not need to be copied (e.g.
+     *            model changed)
      */
-    private void writeTempViewFiles(final REP viewRepresentation, final VAL viewValue, final WizardViewCreator<REP, VAL> viewCreator, final Path bridgePath) {
-		// we can't pass data in directly, as chrome seems to have a 2MB size limit for these calls
+    private void writeTempViewFiles(final REP viewRepresentation, final VAL viewValue,
+        final WizardViewCreator<REP, VAL> viewCreator, final Path bridgePath) {
+        // we can't pass data in directly, as chrome seems to have a 2MB size limit for these calls
 		// see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1026
 		// workaround is writing to disk and passing as urls to be fetched by AJAX call
 		String viewRepString = viewCreator.getViewRepresentationJSONString(viewRepresentation);
@@ -434,7 +433,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 			}
             if (bridgePath != null) {
                 try {
-                    Files.copy(bridgePath, m_bridgeTempFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                    Files.copy(bridgePath, m_bridgeTempFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                        StandardCopyOption.COPY_ATTRIBUTES);
                 } catch (Exception e) {
                     throw new SeleniumViewException("Error while copying KNIME-Selenium-Bridge: " + e.getMessage(), e);
                 }
@@ -447,10 +447,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
     /**
      * Tries to delete current temporary files. Potential errors are ignored.
-     * @param deleteBridgeAndUserDir true if the KNIME-Selenium-Bridge file and user data directory
+     * @param deleteBridgeFile true if the KNIME-Selenium-Bridge file and user data directory
      * is supposed to be deleted, false otherwise
      */
-    private void tryDeleteTempFiles(final boolean deleteBridgeAndUserDir) {
+    private void tryDeleteTempFiles(final boolean deleteBridgeFile) {
         try {
             if (m_repTempFile != null && m_repTempFile.exists()) {
                 m_repTempFile.delete();
@@ -464,14 +464,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
             }
         } catch (Exception e) { /* continue */ }
         try {
-            if (deleteBridgeAndUserDir && m_bridgeTempFile != null && m_bridgeTempFile.exists()) {
+            if (deleteBridgeFile && m_bridgeTempFile != null && m_bridgeTempFile.exists()) {
                 m_bridgeTempFile.delete();
                 m_bridgeTempFile = null;
-            }
-        } catch (Exception e) { /* continue */ }
-        try {
-            if (deleteBridgeAndUserDir) {
-                FileUtils.deleteDirectory(m_userDataDir);
             }
         } catch (Exception e) { /* continue */ }
     }
@@ -513,9 +508,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 	private void initializeCometQuery() {
 	    m_shutdownCometThread.set(false);
-		String handle = m_driver.getWindowHandle();
-		m_cometThread = new Thread(m_service.getCometThreadGroup(), new CometRunnable(handle), ChromeViewService.COMET_THREAD_NAME + handle);
-		m_cometThread.start();
+        String handle = m_driver.getWindowHandle();
+        m_cometThread = new Thread(m_service.getCometThreadGroup(), new CometRunnable(handle),
+            ChromeViewService.COMET_THREAD_NAME + handle);
+        m_cometThread.start();
 	}
 
 	private class CometRunnable implements Runnable {
@@ -545,7 +541,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 							break;
 						}
 						if (m_driver.getWindowHandle().equals(m_handle)) {
-							String action = (String)m_driver.executeAsyncScript("seleniumKnimeBridge.registerCometRequest(arguments);", COMET_TIMEOUT);
+                            String action = (String)m_driver.executeAsyncScript(
+                                "seleniumKnimeBridge.registerCometRequest(arguments);", COMET_TIMEOUT);
 							if (action != null && !ChromeViewService.NO_ACTION.equals(action)) {
 							    LOGGER.debug("KNIME-Selenium-COMET returned " + action);
 							}
@@ -638,7 +635,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         if (ns != null && !ns.isEmpty() && pullMethod != null && !pullMethod.isEmpty()) {
             String evalCode = creator.wrapInTryCatch("if (typeof " + ns.substring(0, ns.length() - 1)
                 + " != 'undefined') { return JSON.stringify(" + ns + pullMethod + "());}");
-            jsonString = (String)m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
+            jsonString =
+                (String)m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
         }
         return jsonString;
     }
@@ -652,7 +650,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         WebTemplate template = creator.getWebTemplate();
         String showErrorMethod = template.getSetValidationErrorMethodName();
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
-        String showErrorCall = creator.wrapInTryCatch(creator.getNamespacePrefix() + showErrorMethod + "('" + escapedError + "');");
+        String showErrorCall =
+            creator.wrapInTryCatch(creator.getNamespacePrefix() + showErrorMethod + "('" + escapedError + "');");
         m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", showErrorCall);
     }
 
@@ -660,19 +659,26 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
      * {@inheritDoc}
      */
     @Override
-    protected boolean showApplyOptionsDialog(final boolean showDiscardOption, final String title, final String message) {
+    protected boolean showApplyOptionsDialog(final boolean showDiscardOption, final String title,
+        final String message) {
         List<CloseDialogOption> options = new ArrayList<CloseDialogOption>(3);
         if (showDiscardOption) {
-            options.add(new CloseDialogOption(DISCARD_LABEL, DISCARD_DESCRIPTION, ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED));
+            options.add(new CloseDialogOption(DISCARD_LABEL, DISCARD_DESCRIPTION,
+                ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED));
         }
-        options.add(new CloseDialogOption(APPLY_LABEL, String.format(APPLY_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""), ChromeViewService.CLOSE_APPLY_BUTTON_PRESSED));
-        options.add(new CloseDialogOption(APPLY_DEFAULT_LABEL, String.format(APPLY_DEFAULT_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""), ChromeViewService.CLOSE_APPLY_DEFAULT_BUTTON_PRESSED));
+        options.add(new CloseDialogOption(APPLY_LABEL,
+            String.format(APPLY_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""),
+            ChromeViewService.CLOSE_APPLY_BUTTON_PRESSED));
+        options.add(new CloseDialogOption(APPLY_DEFAULT_LABEL,
+            String.format(APPLY_DEFAULT_DESCRIPTION_FORMAT, showDiscardOption ? ", closes the view" : ""),
+            ChromeViewService.CLOSE_APPLY_DEFAULT_BUTTON_PRESSED));
         ObjectMapper mapper = new ObjectMapper();
         try {
             String optionsString = mapper.writeValueAsString(options);
             testAlive();
             if (m_driver != null) {
-                m_driver.executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);", title, message, optionsString);
+                m_driver.executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);",
+                    title, message, optionsString);
             }
         } catch (JsonProcessingException ex) {
             LOGGER.error("Could not trigger confirm close dialog: " + ex.getMessage(), ex);
@@ -688,7 +694,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         private String m_signal;
 
         @JsonCreator
-        CloseDialogOption(@JsonProperty("label") final String label, @JsonProperty("description") final String description, @JsonProperty("signal") final String signal) {
+        CloseDialogOption(@JsonProperty("label") final String label,
+            @JsonProperty("description") final String description, @JsonProperty("signal") final String signal) {
             m_label = label;
             m_description = description;
             m_signal = signal;
