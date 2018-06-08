@@ -1,3 +1,10 @@
+----------ChromeDriver v2.40 (2018-06-07)----------
+Supports Chrome v66-68
+Resolved issue 2446: Regression: Chromedriver 2.39 hangs on open when user-data-dir is specified and exists [[Pri-1]]
+Resolved issue  779: Make ChromeDriver able to listen on requests from IPv6. [[Pri-1]]
+Resolved issue 2339: Chromedriver couldn't find the Android file using valid file path [[Pri-2]]
+Resolved issue 2307: /session/:sessionId/send_command and /session/:sessionId/send_command_and_get_result should be changed to be proper extension commands [[Pri-]]
+
 ----------ChromeDriver v2.39 (2018-05-30)----------
 Supports Chrome v66-68
 Resolved issue 2436: ChromeDriver for Android does not provide useful error message for old adb version [[Pri-1]]
