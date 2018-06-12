@@ -125,10 +125,10 @@ public class MultiOSDriverActivator extends Plugin {
             }
             CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
-        /*if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
+        if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
             String appPath = Paths.get(CHROMIUM_PATH).getParent().getParent().getParent().toString();
             disableMacCloseWindowsAlertForApp(appPath);
-        }*/
+        }
 	}
 
     /**
