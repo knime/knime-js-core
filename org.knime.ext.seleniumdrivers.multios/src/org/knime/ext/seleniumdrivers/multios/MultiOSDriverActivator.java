@@ -96,10 +96,10 @@ public class MultiOSDriverActivator extends Plugin {
             eDriver = getBundle().findEntries("win32/x86", "chromedriver.exe", false);
             eChromium = getBundle().findEntries("win32/x86", "chrome.exe", false);
         } else if (Platform.OS_MACOSX.equals(os)) {
-            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver-2_40", false);
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver_2.40", false);
             eChromium = getBundle().findEntries("macosx/x86_64/Chromium.app/Contents/MacOS", "Chromium", false);
         } else if (Platform.OS_LINUX.equals(os)) {
-            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver-2_40", false);
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver_2.40", false);
             eChromium = getBundle().findEntries(os + "/" + arch, "chrome", false);
         }
 

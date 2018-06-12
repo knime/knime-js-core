@@ -1,3 +1,3 @@
 instructions.install=\
     org.eclipse.equinox.p2.touchpoint.eclipse.chmod(targetDir:@artifact,\
-    targetFile:macosx/x86_64/chromedriver-2_40,permissions:755);
+    targetFile:macosx/x86_64/chromedriver_2.40,permissions:755);
