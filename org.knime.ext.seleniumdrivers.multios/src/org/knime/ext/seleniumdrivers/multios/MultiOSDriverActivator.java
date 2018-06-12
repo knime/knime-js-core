@@ -96,10 +96,10 @@ public class MultiOSDriverActivator extends Plugin {
             eDriver = getBundle().findEntries("win32/x86", "chromedriver.exe", false);
             eChromium = getBundle().findEntries("win32/x86", "chrome.exe", false);
         } else if (Platform.OS_MACOSX.equals(os)) {
-            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver-2_40", false);
             eChromium = getBundle().findEntries("macosx/x86_64/Chromium.app/Contents/MacOS", "Chromium", false);
         } else if (Platform.OS_LINUX.equals(os)) {
-            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver", false);
+            eDriver = getBundle().findEntries(os + "/" + arch, "chromedriver-2_40", false);
             eChromium = getBundle().findEntries(os + "/" + arch, "chrome", false);
         }
 
@@ -125,10 +125,10 @@ public class MultiOSDriverActivator extends Plugin {
             }
             CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
-        if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
+        /*if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
             String appPath = Paths.get(CHROMIUM_PATH).getParent().getParent().getParent().toString();
             disableMacCloseWindowsAlertForApp(appPath);
-        }
+        }*/
 	}
 
     /**
@@ -145,7 +145,7 @@ public class MultiOSDriverActivator extends Plugin {
 	}
 
     private static void disableMacCloseWindowsAlertForApp(final String appPath) {
-        String command = "defaults write -app " + appPath + " NSQuitAlwaysKeepsWindows -bool false";
+        String command = "defaults write -app \"" + appPath + "\" NSQuitAlwaysKeepsWindows -bool false";
         String error = "Unable to deactivate 'close windows' alerts from MacOS."
                 + "Chromium view might not behave as expected.";
         StringBuilder errorBuilder = new StringBuilder();

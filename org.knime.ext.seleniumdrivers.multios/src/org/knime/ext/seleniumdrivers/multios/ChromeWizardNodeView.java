@@ -68,6 +68,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebTemplate;
@@ -214,7 +217,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
                     y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
                 }
 
-                Path bridgePath;
+                Path bridgePath = null;
                 try {
                     URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
                     String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
@@ -223,11 +226,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
                     }
                     bridgePath = Paths.get(bridgeFile);
                 } catch (Exception e) {
-                    throw new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage(), e);
+                    displayErrorMessage(new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage()));
                 }
                 writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
 
-                m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+                try {
+                    m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+                } catch (Throwable t) {
+                    displayErrorMessage(t);
+                }
                 if (m_windowHandle != null) {
                     initView(true);
                 }
@@ -326,6 +333,19 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
             dataDir.mkdir();
         }
         return dataDir;
+    }
+
+    private static void displayErrorMessage(final Throwable t) {
+        Display.getDefault().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                final MessageBox mb = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
+                mb.setText("Interactive View cannot be opened");
+                mb.setMessage("The interactive view cannot be opened for the following reason:\n" + t.getMessage());
+                mb.open();
+            }
+        });
     }
 
     /**
@@ -497,6 +517,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 			try {
 				//this leads to exception if the browser was closed by user
 				m_driver.getWindowHandles();
+				if (m_driver.getSessionId() == null) {
+				    return false;
+				}
 				return true;
 			} catch (WebDriverException e) {
 			    closeView();
