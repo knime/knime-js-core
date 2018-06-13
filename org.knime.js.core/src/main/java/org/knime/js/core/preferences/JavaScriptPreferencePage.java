@@ -83,6 +83,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
     private static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
+    private static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
 
     private RadioGroupFieldEditor m_browserSelector;
@@ -203,10 +204,19 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private static String[][] retrieveHeadlessBrowsers() {
         return AbstractImageGenerator.getAllHeadlessBrowsers().stream()
+                .filter(v -> {
+                    try {
+                        Method isEnabled = v.getImageGeneratorClass().getMethod("isEnabled");
+                        return (boolean)isEnabled.invoke(null);
+                    } catch (Exception e) {
+                        /* if method is not present, assume view is enabled */
+                        return true;
+                    }
+                })
                 .sorted((e1, e2) -> {
                     String s1 = e1.getImageGeneratorClass().getCanonicalName();
                     String s2 = e2.getImageGeneratorClass().getCanonicalName();
-                    return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+                    return HEADLESS_CHROMIUM.equals(s1) ? -1 : HEADLESS_CHROMIUM.equals(s2) ? 1 : e1.getBrowserName().compareTo(e2.getBrowserName());
                 }).map(e -> new String[] {getHeadlessName(e), e.getImageGeneratorClass().getCanonicalName()})
                 .toArray(String[][]::new);
     }
@@ -247,7 +257,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private void enableHeadlessFields(final String view, final Composite parent) {
         boolean isPhantom = PHANTOMJS.equals(view);
-        boolean isChromium = CHROMIUM_BROWSER.equals(view);
+        boolean isChromium = HEADLESS_CHROMIUM.equals(view);
         m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
         m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
     }

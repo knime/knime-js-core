@@ -14,5 +14,16 @@
             viewClass="org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView">
       </wizardNodeView>
    </extension>
+   <extension
+         point="org.knime.js.core.headlessBrowsers">
+      <headlessBrowser
+            imageGeneratorClass="org.knime.ext.seleniumdrivers.multios.ChromeImageGenerator"
+            name="Headless Chrome">
+      </headlessBrowser>
+      <headlessBrowser
+            imageGeneratorClass="org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator"
+            name="Bundled Headless Chromium">
+      </headlessBrowser>
+   </extension>
 
 </plugin>

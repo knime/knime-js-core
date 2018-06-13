@@ -5,7 +5,7 @@
          point="org.knime.js.core.headlessBrowsers">
       <headlessBrowser
             imageGeneratorClass="org.knime.ext.phantomjs.PhantomJSImageGenerator"
-            name="PhantomJS">
+            name="Bundled PhantomJS">
       </headlessBrowser>
    </extension>
 

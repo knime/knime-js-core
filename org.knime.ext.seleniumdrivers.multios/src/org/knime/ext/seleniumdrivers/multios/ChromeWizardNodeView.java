@@ -117,7 +117,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	private static Boolean CHROME_PRESENT = null;
 	private static int CHROME_THREAD_COUNTER = 1;
 
-	private static final int DEFAULT_TIMEOUT = 30;
+	static final int DEFAULT_TIMEOUT = 30;
 	private static final int COMET_TIMEOUT = 1;
 	private static final int DEFAULT_WIDTH = 1024;
 	private static final int DEFAULT_HEIGHT = 768;
@@ -160,6 +160,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 			try {
 				m_shutdownCometThread.set(true);
 				m_driver.quit();
+				m_driver = null;
 			} catch (Exception e) { /* continue shutdown */ }
 		}
 		if (getViewableModel() instanceof SubnodeViewableModel) {
@@ -171,8 +172,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	@Override
 	protected void modelChanged() {
 	    m_shutdownCometThread.set(true);
-	    testAlive();
-	    if (m_driver == null) {
+	    if (m_driver == null || !testAlive()) {
 	        // view most likely disposed
 	        return;
 	    }
@@ -304,7 +304,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
 		        .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-		    waitForDocumentReady();
+		    waitForDocumentReady(m_driver);
 		    // Store the current window handle
 		    return m_driver.getWindowHandle();
 		} catch (Exception e) {
@@ -324,7 +324,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		}
 	}
 
-    private static File createUserDataDir() {
+    static File createUserDataDir() {
         /*Make sure that the bundled Chromium instance uses a different user directory and profile, than
         other potentially installed Chrome/Chromium applications.*/
         Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
@@ -491,16 +491,16 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         } catch (Exception e) { /* continue */ }
     }
 
-	private void waitForDocumentReady() {
-		WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
-		wait.until(driver -> documentReady());
+	static void waitForDocumentReady(final ChromeDriver driver) {
+		WebDriverWait wait = new WebDriverWait(driver, DEFAULT_TIMEOUT);
+		wait.until(d -> documentReady(driver));
 	}
 
-	private ExpectedCondition<Boolean> documentReady() {
+	private static ExpectedCondition<Boolean> documentReady(final ChromeDriver driver) {
 		return new ExpectedCondition<Boolean>() {
 			@Override
-			public Boolean apply(final WebDriver driver) {
-				String readyState = ((JavascriptExecutor) m_driver)
+			public Boolean apply(final WebDriver d) {
+				String readyState = ((JavascriptExecutor) driver)
 						.executeScript("if (document.readyState) return document.readyState;").toString();
 				return "complete".equalsIgnoreCase(readyState);
 			}
@@ -518,6 +518,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				//this leads to exception if the browser was closed by user
 				m_driver.getWindowHandles();
 				if (m_driver.getSessionId() == null) {
+				    closeView();
 				    return false;
 				}
 				return true;
