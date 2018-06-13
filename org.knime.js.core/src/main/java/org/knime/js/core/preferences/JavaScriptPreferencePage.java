@@ -70,7 +70,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension;
+import org.knime.js.core.AbstractImageGenerator;
+import org.knime.js.core.AbstractImageGenerator.HeadlessBrowserExtension;
 import org.knime.js.core.JSCorePlugin;
+import org.knime.workbench.ui.preferences.HorizontalLineField;
 
 /**
  *
@@ -80,10 +83,15 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
     private static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
+    private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
 
     private RadioGroupFieldEditor m_browserSelector;
     private FileFieldEditor m_browserExePath;
     private StringFieldEditor m_browserCLIArgs;
+
+    private RadioGroupFieldEditor m_headlessBrowserSelector;
+    private FileFieldEditor m_headlessBrowserExePath;
+    private StringFieldEditor m_headlesBrowserCLIArgs;
 
     private BooleanFieldEditor m_createDebugHtml;
     private BooleanFieldEditor m_enableLegacyQuickformExecution;
@@ -112,48 +120,57 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
-        boolean isWin = Platform.OS_WIN32.equals(Platform.getOS());
         m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
             "Please choose the browser to use for displaying JavaScript views:", 1,
-            AbstractWizardNodeView.getAllWizardNodeViews().stream()
-                .filter(v -> {
-                    try {
-                        Method isEnabled = v.getViewClass().getMethod("isEnabled");
-                        return (boolean)isEnabled.invoke(null);
-                    } catch (Exception e) {
-                        /* if method is not present, assume view is enabled */
-                        return true;
-                    }
-                })
-                .sorted((e1, e2) -> {
-                    String s1 = e1.getViewClass().getCanonicalName();
-                    String s2 = e2.getViewClass().getCanonicalName();
-                    return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
-                }).map(e -> new String[]{getViewName(e), e.getViewClass().getCanonicalName()})
-                .toArray(String[][]::new),
-            parent);
-
+            retrieveAllBrowsers(), parent);
         addField(m_browserSelector);
-
         for (Control radioButton : m_browserSelector.getRadioBoxControl(parent).getChildren()) {
             ((Button)radioButton).addSelectionListener(new SelectionListener() {
 
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
-                    enableBrowserField((String)e.widget.getData(), parent);
+                    enableBrowserFields((String)e.widget.getData(), parent);
                 }
 
                 @Override
                 public void widgetDefaultSelected(final SelectionEvent e) {
-                    enableBrowserField((String)e.widget.getData(), parent);
+                    enableBrowserFields((String)e.widget.getData(), parent);
                 }
             });
         }
-
-        m_browserExePath = new FileFieldEditor(JSCorePlugin.P_BROWSER_PATH, "Path to browser executable\n(leave empty for default):", true, parent);
+        m_browserExePath = new FileFieldEditor(JSCorePlugin.P_BROWSER_PATH,
+            "Path to browser executable\n(leave empty for default):", true, parent);
         addField(m_browserExePath);
-        m_browserCLIArgs = new StringFieldEditor(JSCorePlugin.P_BROWSER_CLI_ARGS, "Additional command\nline arguments for chosen browser:", parent);
+        m_browserCLIArgs = new StringFieldEditor(JSCorePlugin.P_BROWSER_CLI_ARGS,
+            "Additional command\nline arguments for chosen browser:", parent);
         addField(m_browserCLIArgs);
+        addField(new HorizontalLineField(parent));
+
+        m_headlessBrowserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER,
+            "Please choose the headless browser to use for generating images from JavaScript views:"
+            , 1, retrieveHeadlessBrowsers(), parent);
+        for (Control radioButton : m_headlessBrowserSelector.getRadioBoxControl(parent).getChildren()) {
+            ((Button)radioButton).addSelectionListener(new SelectionListener() {
+
+                @Override
+                public void widgetSelected(final SelectionEvent e) {
+                    enableHeadlessFields((String)e.widget.getData(), parent);
+                }
+
+                @Override
+                public void widgetDefaultSelected(final SelectionEvent e) {
+                    enableHeadlessFields((String)e.widget.getData(), parent);
+                }
+            });
+        }
+        addField(m_headlessBrowserSelector);
+        m_headlessBrowserExePath = new FileFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_PATH,
+            "Path to headless browser executable\n(leave empty for default):", true, parent);
+        addField(m_headlessBrowserExePath);
+        m_headlesBrowserCLIArgs = new StringFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS,
+            "Additional command\nline arguments for chosen headless browser:", parent);
+        addField(m_headlesBrowserCLIArgs);
+        addField(new HorizontalLineField(parent));
 
         m_createDebugHtml = new BooleanFieldEditor(JSCorePlugin.P_DEBUG_HTML, "Create debug HTML for JavaScript views", BooleanFieldEditor.DEFAULT, parent);
         addField(m_createDebugHtml);
@@ -161,7 +178,37 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
         addField(m_enableLegacyQuickformExecution);
 
-        enableBrowserField(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
+        enableBrowserFields(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
+        enableHeadlessFields(getPreferenceStore().getString(JSCorePlugin.P_HEADLESS_BROWSER), parent);
+    }
+
+    private static String[][] retrieveAllBrowsers() {
+        return AbstractWizardNodeView.getAllWizardNodeViews().stream()
+            .filter(v -> {
+                try {
+                    Method isEnabled = v.getViewClass().getMethod("isEnabled");
+                    return (boolean)isEnabled.invoke(null);
+                } catch (Exception e) {
+                    /* if method is not present, assume view is enabled */
+                    return true;
+                }
+            })
+            .sorted((e1, e2) -> {
+                String s1 = e1.getViewClass().getCanonicalName();
+                String s2 = e2.getViewClass().getCanonicalName();
+                return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+            }).map(e -> new String[]{getViewName(e), e.getViewClass().getCanonicalName()})
+            .toArray(String[][]::new);
+    }
+
+    private static String[][] retrieveHeadlessBrowsers() {
+        return AbstractImageGenerator.getAllHeadlessBrowsers().stream()
+                .sorted((e1, e2) -> {
+                    String s1 = e1.getImageGeneratorClass().getCanonicalName();
+                    String s2 = e2.getImageGeneratorClass().getCanonicalName();
+                    return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+                }).map(e -> new String[] {getHeadlessName(e), e.getImageGeneratorClass().getCanonicalName()})
+                .toArray(String[][]::new);
     }
 
     private static String getViewName(final WizardNodeViewExtension view) {
@@ -182,10 +229,27 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         return name;
     }
 
-    private void enableBrowserField(final String view, final Composite parent) {
-        boolean enabled = !INTERNAL_BROWSER.equals(view) && !CHROMIUM_BROWSER.equals(view) && view != null;
-        m_browserExePath.setEnabled(enabled, parent);
-        m_browserCLIArgs.setEnabled(enabled, parent);
+    private static String getHeadlessName(final HeadlessBrowserExtension browser) {
+        String name = browser.getBrowserName();
+        boolean isPhantom = PHANTOMJS.equals(browser.getImageGeneratorClass().getCanonicalName());
+        if (isPhantom) {
+            return name + " (support discontinued)";
+        }
+        return name;
+    }
+
+    private void enableBrowserFields(final String view, final Composite parent) {
+        boolean isSWT = INTERNAL_BROWSER.equals(view);
+        boolean isChromium = CHROMIUM_BROWSER.equals(view);
+        m_browserExePath.setEnabled(!isSWT && !isChromium && view != null, parent);
+        m_browserCLIArgs.setEnabled(!isSWT && view != null, parent);
+    }
+
+    private void enableHeadlessFields(final String view, final Composite parent) {
+        boolean isPhantom = PHANTOMJS.equals(view);
+        boolean isChromium = CHROMIUM_BROWSER.equals(view);
+        m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
+        m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
     }
 
 }

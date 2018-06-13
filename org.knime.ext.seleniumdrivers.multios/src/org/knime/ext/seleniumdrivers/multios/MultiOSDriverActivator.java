@@ -145,7 +145,7 @@ public class MultiOSDriverActivator extends Plugin {
 	}
 
     private static void disableMacCloseWindowsAlertForApp(final String appPath) {
-        String command = "defaults write -app \"" + appPath + "\" NSQuitAlwaysKeepsWindows -bool false";
+        String command = "defaults write -app " + appPath.replaceAll(" ", "\\ ") + " NSQuitAlwaysKeepsWindows -bool false";
         String error = "Unable to deactivate 'close windows' alerts from MacOS."
                 + "Chromium view might not behave as expected.";
         StringBuilder errorBuilder = new StringBuilder();

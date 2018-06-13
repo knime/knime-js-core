@@ -61,7 +61,7 @@ import org.knime.core.node.port.inactive.InactiveBranchPortObject;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.WebResourceController;
-import org.knime.ext.phantomjs.PhantomJSImageGenerator;
+import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JSONViewContent;
 import org.openqa.selenium.TimeoutException;
 
@@ -127,55 +127,53 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
         String image = null;
         String errorText = null;
 
-        // Only one instance of PhantomJS is running atm, synchronize view generation on static lock.
-        // View nodes will get executed sequentially as a result.
-        synchronized (PhantomJSImageGenerator.VIEW_GENERATION_LOCK) {
-            // Inits PhantomJS AND the view.
-
-            PhantomJSImageGenerator generator = null;
-            try {
-                generator = new PhantomJSImageGenerator(this, getOptionalViewWaitTime(), exec.createSubExecutionContext(0.75));
-            } catch (IOException ex) {
-                throw ex;
-            } catch (Exception e) {
-                if (e instanceof TimeoutException) {
-                    errorText = "No elements added to body. Possible JavaScript implementation error.";
-                } else {
-                    errorText = e.getMessage();
-                }
-                LOGGER.error("Initializing view failed: " + e.getMessage(), e);
-            }
-
-            exec.setProgress(0.75, "Retrieving generated image...");
-            String namespace = getViewNamespace();
-            String methodCall = "";
-            if (namespace != null && !namespace.isEmpty()) {
-                methodCall += namespace + ".";
-            }
-            methodCall += getExtractImageMethodName() + "();";
-            // Retrieve the SVG string from the view.
-            Object imageData;
-            try {
-                if (generator != null) {
-                    imageData = generator.executeScript(methodCall);
-                    if (imageData instanceof String) {
-                        image = (String)imageData;
-                    }
-                }
-                exec.setProgress(0.9, "Creating image output...");
-            } catch (IOException e) {
+        AbstractImageGenerator generator = null;
+        try {
+            generator = AbstractImageGenerator.getConfiguredHeadlessBrowser(this);
+            generator.generateView(getOptionalViewWaitTime(), exec.createSubExecutionContext(0.75));
+        } catch (IOException ex) {
+            throw ex;
+        } catch (Exception e) {
+            if (e instanceof TimeoutException) {
+                errorText = "No elements added to body. Possible JavaScript implementation error.";
+            } else {
                 errorText = e.getMessage();
-                LOGGER.error("Retrieving image from view failed: " + e.getMessage(), e);
             }
-            ImagePortObject imagePort = null;
-            try {
-                imagePort = createImagePortObjectFromView(image, errorText);
-                exec.setProgress(1);
-            } catch (IOException e) {
-                LOGGER.error("Creating image port object failed: " + e.getMessage(), e);
-            }
-            return imagePort;
+            LOGGER.error("Initializing view failed: " + e.getMessage(), e);
         }
+
+        exec.setProgress(0.75, "Retrieving generated image...");
+        String namespace = getViewNamespace();
+        String methodCall = "";
+        if (namespace != null && !namespace.isEmpty()) {
+            methodCall += namespace + ".";
+        }
+        methodCall += getExtractImageMethodName() + "();";
+        // Retrieve the SVG string from the view.
+        Object imageData;
+        try {
+            if (generator != null) {
+                imageData = generator.retrieveImage(methodCall);
+                if (imageData instanceof String) {
+                    image = (String)imageData;
+                }
+            }
+            exec.setProgress(0.9, "Creating image output...");
+        } catch (Exception e) {
+            errorText = e.getMessage();
+            LOGGER.error("Retrieving image from view failed: " + e.getMessage(), e);
+            if (generator != null) {
+                generator.cleanup();
+            }
+        }
+        ImagePortObject imagePort = null;
+        try {
+            imagePort = createImagePortObjectFromView(image, errorText);
+            exec.setProgress(1);
+        } catch (IOException e) {
+            LOGGER.error("Creating image port object failed: " + e.getMessage(), e);
+        }
+        return imagePort;
     }
 
     /**

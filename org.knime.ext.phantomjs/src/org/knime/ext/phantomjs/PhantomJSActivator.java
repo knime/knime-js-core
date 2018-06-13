@@ -97,7 +97,7 @@ public class PhantomJSActivator extends Plugin {
             m_phantomJSPath = url.getFile();
         }
         
-        createPhantomJSDriver();
+        //createPhantomJSDriver();
     }
 
     private static void createPhantomJSDriver() throws IOException {

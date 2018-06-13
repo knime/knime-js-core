@@ -51,18 +51,20 @@ package org.knime.ext.phantomjs;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
+import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.AbstractImageGenerator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -71,7 +73,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Function;
 
 /**
  * 
@@ -80,22 +81,23 @@ import com.google.common.base.Function;
  * @param <REP> 
  * @param <VAL> 
  */
-public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
+public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, 
+		VAL extends WebViewContent> extends AbstractImageGenerator<T, REP, VAL> {
     
 	/** 
 	 * Global lock object to synchronize view generation and subsequent operations. 
 	 */
-    public static final Object VIEW_GENERATION_LOCK = new Object();
+    //public static final Object VIEW_GENERATION_LOCK = new Object();
+    private static final ReentrantLock LOCK = new ReentrantLock();
     
 	private static final NodeLogger LOGGER = NodeLogger.getLogger(PhantomJSImageGenerator.class); 
     private static final long DEFAULT_TIMEOUT = 30;
     
     private final WebDriver m_driver;
-    private final T m_nodeModel;
     
     /**
      * Creates a new image generator object.<br>
-     * The PhantomJS process is started if not present and the view is loaded and initialized.
+     * The PhantomJS process is started if not present.
      * @param nodeModel The node model.
      * @param waitForView If view executes animations after 
      * initialization it might be sensible to wait for a specific time.
@@ -103,15 +105,15 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * 
      */
     public PhantomJSImageGenerator(final T nodeModel, final Long waitForView, final ExecutionContext exec) throws Exception {
-        m_nodeModel = nodeModel;
-        if (exec != null) {
+        super(nodeModel);
+    	if (exec != null) {
         	exec.setProgress("Starting PhantomJS");
         }
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
         if (exec != null) {
         	exec.setProgress(0.25);
         }
-        generateView(waitForView, exec);
+        //generateView(waitForView, exec);
     }
     
     /**
@@ -132,84 +134,71 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @return One of Boolean, Long, String, List or WebElement. Or null if script has no return value.
      * @throws IOException on script execution exception
      */
-    public Object executeScript(final String script, final Object... args) throws IOException {
-        if (m_driver instanceof JavascriptExecutor) {
-            try {
-                return ((JavascriptExecutor)m_driver).executeScript("return " + script, args);
-            } catch (Exception e) {
-                String errorMessage = e.getMessage();
-                if (e instanceof WebDriverException) {
-                    errorMessage = errorMessage.substring(0, errorMessage.indexOf('\n'));
-                    try {
-                        ObjectMapper mapper = new ObjectMapper();
-                        JsonNode root = mapper.readTree(errorMessage);
-                        JsonNode errorNode = root.findValue("errorMessage");
-                        if (errorNode != null) {
-                            errorMessage = errorNode.asText();
-                        }
-                    } catch (Exception e1) { /*do nothing*/ }
-                }
-                errorMessage = "Error executing JavaScript: " + errorMessage;
-                throw new IOException(errorMessage, e);
-            }
-        }
-        return null;
-    }
 
-    private void generateView(final Long optionalWait, final ExecutionContext exec) {
-        //TODO make size editable
-        /*Window window = m_driver.manage().window();
+    public void generateView(final Long optionalWait, final ExecutionContext exec) {
+    	try {
+    		//currently only one instance possible at a time
+    		//TODO: introduce PhantomJS pool
+    		LOCK.lock();
+    		
+    		//TODO make size editable
+    		/*Window window = m_driver.manage().window();
         window.setPosition(new Point(20, 20));
         window.setSize(new Dimension(800, 600));*/
-        if (exec != null) {
-        	exec.setProgress("Initializing view");
-        }
-        String viewPath = m_nodeModel.getViewHTMLPath();
-        if (viewPath == null || viewPath.isEmpty()) {
-        	LOGGER.error("Node model returned no path to view HTML. Cannot initialize view.");
-        	return;
-        }
-        m_driver.navigate().to(new File(viewPath).toURI().toString());
-        waitForDocumentReady();
-        REP viewRepresentation = m_nodeModel.getViewRepresentation();
-        VAL viewValue = m_nodeModel.getViewValue();
-        String initCall = m_nodeModel.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
-        ((JavascriptExecutor)m_driver).executeScript(initCall);
-        if (exec != null) {
-        	exec.setProgress(0.66);
-        }
-        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
-        //TODO wait until what?
-        wait.until(driver -> ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
-        //wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
-        
-        //wait additional specified time to compensate for initial animation, etc.
-        if (optionalWait != null && optionalWait > 0L) {
-        	int waitInS = (int) (optionalWait/1000);
-        	final double interval = 0.33 / Math.max(1, waitInS);
-        	if (exec != null) {
-        		String pString = "Waiting additional time.";
-        		if (waitInS > 0) {
-        			pString = "Waiting additional " + waitInS + " seconds.";
-        		}
-        		exec.setProgress(pString);
-        	}
-        	Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
-        			.withTimeout(optionalWait, TimeUnit.MILLISECONDS)
-        			.pollingEvery(1, TimeUnit.SECONDS)
-        			.ignoring(NoSuchElementException.class);
-			try {
-				timedWait.until(driver -> {
-					if (exec != null) {
-						exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
-					}
-					return null;
-				});
-			} catch (Exception e) { /* do nothing */ }
-        }
-        if (exec != null) {
-        	exec.setProgress(1.0);
-        }
+    		if (exec != null) {
+    			exec.setProgress("Initializing view");
+    		}
+    		T model = getNodeModel();
+    		String viewPath = model.getViewHTMLPath();
+    		if (viewPath == null || viewPath.isEmpty()) {
+    			LOGGER.error("Node model returned no path to view HTML. Cannot initialize view.");
+    			return;
+    		}
+    		m_driver.navigate().to(new File(viewPath).toURI().toString());
+    		waitForDocumentReady();
+    		REP viewRepresentation = model.getViewRepresentation();
+    		VAL viewValue = model.getViewValue();
+    		String initCall = model.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
+    		((JavascriptExecutor)m_driver).executeScript(initCall);
+    		if (exec != null) {
+    			exec.setProgress(0.66);
+    		}
+    		WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
+    		//TODO wait until what?
+    		wait.until(driver -> ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+    		//wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+
+    		//wait additional specified time to compensate for initial animation, etc.
+    		if (optionalWait != null && optionalWait > 0L) {
+    			int waitInS = (int) (optionalWait/1000);
+    			final double interval = 0.33 / Math.max(1, waitInS);
+    			if (exec != null) {
+    				String pString = "Waiting additional time.";
+    				if (waitInS > 0) {
+    					pString = "Waiting additional " + waitInS + " seconds.";
+    				}
+    				exec.setProgress(pString);
+    			}
+    			Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
+    					.withTimeout(optionalWait, TimeUnit.MILLISECONDS)
+    					.pollingEvery(1, TimeUnit.SECONDS)
+    					.ignoring(NoSuchElementException.class);
+    			try {
+    				timedWait.until(driver -> {
+    					if (exec != null) {
+    						exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
+    					}
+    					return null;
+    				});
+    			} catch (Exception e) { /* do nothing */ }
+    		}
+    		if (exec != null) {
+    			exec.setProgress(1.0);
+    		}
+    	} catch (Exception e) {
+    		cleanup();
+    		throw e;
+    	}
     }
     
     private void waitForDocumentReady()
@@ -235,5 +224,42 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     		}
     	};
     }
+
+    @Override
+	public Object retrieveImage(String methodCall) throws Exception {
+    	try {
+    		if (m_driver instanceof JavascriptExecutor) {
+    			try {
+    				return ((JavascriptExecutor)m_driver).executeScript("return " + methodCall);
+    			} catch (Exception e) {
+    				String errorMessage = e.getMessage();
+    				if (e instanceof WebDriverException) {
+    					errorMessage = errorMessage.substring(0, errorMessage.indexOf('\n'));
+    					try {
+    						ObjectMapper mapper = new ObjectMapper();
+    						JsonNode root = mapper.readTree(errorMessage);
+    						JsonNode errorNode = root.findValue("errorMessage");
+    						if (errorNode != null) {
+    							errorMessage = errorNode.asText();
+    						}
+    					} catch (Exception e1) { /*do nothing*/ }
+    				}
+    				errorMessage = "Error executing JavaScript: " + errorMessage;
+    				throw new IOException(errorMessage, e);
+    			}
+    		}
+    		return null;
+    	} finally {
+    		cleanup();
+    	}
+	}
+
+	@Override
+	public void cleanup() {
+		try {
+			LOCK.unlock();
+		} catch (IllegalMonitorStateException e) { /* already released */ }
+		
+	}
 
 }

@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="webResources" name="Web Resources" schema="schema/webResources.exsd"/>
    <extension-point id="javascriptComponents" name="Javascript Components" schema="schema/javascriptComponents.exsd"/>
+   <extension-point id="headlessBrowsers" name="Headless Browsers" schema="schema/headlessBrowsers.exsd"/>
    <extension
          id="D3-tip-master"
          point="org.knime.js.core.webResources">

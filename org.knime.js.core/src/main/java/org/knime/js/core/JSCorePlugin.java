@@ -76,6 +76,15 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     /** Preference constant: additional cli args for chosen browser. */
     public static final String P_BROWSER_CLI_ARGS = "js.core.browserCliArgs";
 
+    /** Preference constant: headless browser to use for generating images. */
+    public static final String P_HEADLESS_BROWSER = "js.core.headlessBrowser";
+
+    /** Preference constant: path to executable for chosen headless browser. */
+    public static final String P_HEADLESS_BROWSER_PATH = "js.core.headlessBrowserPath";
+
+    /** Preference constant: additional cli args for chosen headless browser. */
+    public static final String P_HEADLESS_BROWSER_CLI_ARGS = "js.core.headlessBrowserCliArgs";
+
     /** Preference constant: if a debug HTML is supposed to be created. */
     public static final String P_DEBUG_HTML = "js.core.createDebugHtml";
 
