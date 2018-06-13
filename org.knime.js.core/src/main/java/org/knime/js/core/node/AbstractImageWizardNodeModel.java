@@ -118,7 +118,7 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
     protected abstract void performExecuteCreateView(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings({"rawtypes"})
     private PortObject renderViewAndCreateImage(final ExecutionContext exec) throws IOException {
         if (!generateImage()) {
             return InactiveBranchPortObject.INSTANCE;
@@ -129,39 +129,45 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
 
         AbstractImageGenerator generator = null;
         try {
-            generator = AbstractImageGenerator.getConfiguredHeadlessBrowser(this);
-            generator.generateView(getOptionalViewWaitTime(), exec.createSubExecutionContext(0.75));
-        } catch (IOException ex) {
-            throw ex;
-        } catch (Exception e) {
-            if (e instanceof TimeoutException) {
-                errorText = "No elements added to body. Possible JavaScript implementation error.";
-            } else {
-                errorText = e.getMessage();
+            try {
+                generator = AbstractImageGenerator.getConfiguredHeadlessBrowser(this);
+                generator.generateView(getOptionalViewWaitTime(), exec.createSubExecutionContext(0.75));
+            } catch (IOException ex) {
+                throw ex;
+            } catch (Exception e) {
+                if (e instanceof TimeoutException) {
+                    errorText = "No elements added to body. Possible JavaScript implementation error.";
+                } else {
+                    errorText = e.getMessage();
+                }
+                LOGGER.error("Initializing view failed: " + e.getMessage(), e);
             }
-            LOGGER.error("Initializing view failed: " + e.getMessage(), e);
-        }
 
-        exec.setProgress(0.75, "Retrieving generated image...");
-        String namespace = getViewNamespace();
-        String methodCall = "";
-        if (namespace != null && !namespace.isEmpty()) {
-            methodCall += namespace + ".";
-        }
-        methodCall += getExtractImageMethodName() + "();";
-        // Retrieve the SVG string from the view.
-        Object imageData;
-        try {
-            if (generator != null) {
-                imageData = generator.retrieveImage(methodCall);
-                if (imageData instanceof String) {
-                    image = (String)imageData;
+            exec.setProgress(0.75, "Retrieving generated image...");
+            String namespace = getViewNamespace();
+            String methodCall = "";
+            if (namespace != null && !namespace.isEmpty()) {
+                methodCall += namespace + ".";
+            }
+            methodCall += getExtractImageMethodName() + "();";
+            // Retrieve the SVG string from the view.
+            Object imageData;
+            try {
+                if (generator != null) {
+                    imageData = generator.retrieveImage(methodCall);
+                    if (imageData instanceof String) {
+                        image = (String)imageData;
+                    }
+                }
+                exec.setProgress(0.9, "Creating image output...");
+            } catch (Exception e) {
+                errorText = e.getMessage();
+                LOGGER.error("Retrieving image from view failed: " + e.getMessage(), e);
+                if (generator != null) {
+                    generator.cleanup();
                 }
             }
-            exec.setProgress(0.9, "Creating image output...");
-        } catch (Exception e) {
-            errorText = e.getMessage();
-            LOGGER.error("Retrieving image from view failed: " + e.getMessage(), e);
+        } finally {
             if (generator != null) {
                 generator.cleanup();
             }
