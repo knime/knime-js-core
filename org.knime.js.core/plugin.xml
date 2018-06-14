@@ -1591,6 +1591,12 @@
       </webResourceBundle>
    </extension>
    <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.knime.js.core.preferences.JavaScriptPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.knime.workbench.ui.preferences"

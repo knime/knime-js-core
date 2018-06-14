@@ -81,10 +81,10 @@ import org.knime.workbench.ui.preferences.HorizontalLineField;
  */
 public class JavaScriptPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    private static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
-    private static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
-    private static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
-    private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
+    static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
+    static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
+    static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
+    static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
 
     private RadioGroupFieldEditor m_browserSelector;
     private FileFieldEditor m_browserExePath;
