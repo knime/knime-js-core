@@ -76,6 +76,10 @@ public class TableSettings {
     public final static String DEFAULT_SELECTION_COLUMN_NAME = "Selected (JavaScript Table View)";
     private String m_selectionColumnName = DEFAULT_SELECTION_COLUMN_NAME;
 
+    private final static String CFG_CUSTOM_CSS = "customCSS";
+    private final static String DEFAULT_CUSTOM_CSS = "";
+    private String m_customCSS = DEFAULT_CUSTOM_CSS;
+
     private TableRepresentationSettings m_representationSettings = new TableRepresentationSettings();
 
     private TableValueSettings m_valueSettings = new TableValueSettings();
@@ -92,6 +96,20 @@ public class TableSettings {
      */
     public void setHideInWizard(final boolean hideInWizard) {
         m_hideInWizard = hideInWizard;
+    }
+
+    /**
+     * @return the custom CSS
+     */
+    public String getCustomCSS() {
+        return m_customCSS;
+    }
+
+    /**
+     * @param customCSS the custom CSS to set
+     */
+    public void setCustomCSS(final String customCSS) {
+        m_customCSS = customCSS;
     }
 
     /**
@@ -158,6 +176,9 @@ public class TableSettings {
         m_columnFilterConfig.saveConfiguration(settings);
         settings.addString(CFG_SELECTION_COLUMN_NAME, m_selectionColumnName);
 
+        //added with 3.6
+        settings.addString(CFG_CUSTOM_CSS, m_customCSS);
+
         // save only those settings which are needed in dialog
         m_representationSettings.saveSettingsFromDialog(settings);
         m_valueSettings.saveSettingsFromDialog(settings);
@@ -172,6 +193,9 @@ public class TableSettings {
         m_columnFilterConfig.loadConfigurationInModel(settings);
         m_selectionColumnName = settings.getString(CFG_SELECTION_COLUMN_NAME);
 
+        //added with 3.6
+        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
+
         // load only those settings which are needed in dialog
         m_representationSettings.loadSettingsForDialog(settings);
         m_valueSettings.loadSettingsForDialog(settings);
@@ -185,6 +209,9 @@ public class TableSettings {
         m_hideInWizard = settings.getBoolean(CFG_HIDE_IN_WIZARD, DEFAULT_HIDE_IN_WIZARD);
         m_columnFilterConfig.loadConfigurationInDialog(settings, spec);
         m_selectionColumnName = settings.getString(CFG_SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME);
+
+        //added with 3.6
+        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
 
         m_representationSettings.loadSettingsForDialog(settings);
         m_valueSettings.loadSettingsForDialog(settings);
