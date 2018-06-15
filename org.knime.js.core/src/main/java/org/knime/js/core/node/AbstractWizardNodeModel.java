@@ -215,7 +215,12 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     private String createViewPath() {
         JavaScriptViewCreator<REP, VAL> viewCreator = new JavaScriptViewCreator<REP, VAL>(getJavascriptObjectID());
         try {
-            return viewCreator.createWebResources(getInteractiveViewName(), getViewRepresentation(), getViewValue());
+            String customCSS = null;
+            if (this instanceof CSSModifiable) {
+                customCSS = ((CSSModifiable)this).getCssStyles();
+            }
+            return viewCreator.createWebResources(getInteractiveViewName(), getViewRepresentation(),
+                getViewValue(), customCSS);
         } catch (IOException e) {
             LOGGER.error("Creating view HTML failed: " + e.getMessage(), e);
             return null;

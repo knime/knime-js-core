@@ -170,8 +170,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      * @throws IOException on IO error
      */
     @Override
-    public String createWebResources(final String viewTitle,
-            final REP viewRepresentation, final VAL viewValue) throws IOException {
+    public String createWebResources(final String viewTitle, final REP viewRepresentation,
+            final VAL viewValue, final String customCSS) throws IOException {
         m_title = viewTitle == null ? "KNIME view" : viewTitle;
         if (!viewTempDirExists()) {
             File tempDir = null;
@@ -190,7 +190,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         }
         m_tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);
         try (BufferedWriter writer = Files.newBufferedWriter(m_tempIndexFile.toPath(), StandardCharsets.UTF_8)) {
-            writer.write(buildHTMLResource(viewRepresentation, viewValue));
+            writer.write(buildHTMLResource(viewRepresentation, viewValue, customCSS));
             writer.flush();
         }
         return m_tempIndexFile.getAbsolutePath();
@@ -246,10 +246,11 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      *
      * @param viewRepresentation the view representation
      * @param viewValue the view value
+     * @param customCSS optional custom css
      * @return an HTML string representing the view page
      * @throws IOException if the debug file cannot be written
      */
-    protected String buildHTMLResource(final REP viewRepresentation, final VAL viewValue)
+    protected String buildHTMLResource(final REP viewRepresentation, final VAL viewValue, final String customCSS)
             throws IOException {
 
         String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";
@@ -257,6 +258,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         /* String debugScript = "<script type=\"text/javascript\" "
                 + "src=\"https://getfirebug.com/firebug-lite.js#startOpened=true\"></script>"; */
         String scriptString = "<script type=\"text/javascript\" src=\"%s\" charset=\"UTF-8\"></script>";
+        String inlineCSS = "<style type=\"text/css\">%s</style>";
         String cssString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">";
 
         StringBuilder pageBuilder = new StringBuilder();
@@ -291,6 +293,9 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
                 default:
                     LOGGER.error("Unrecognized resource type " + resFile.getType());
             }
+        }
+        if (StringUtils.isNotEmpty(customCSS)) {
+            pageBuilder.append(String.format(inlineCSS, customCSS));
         }
         if (isDebug()) {
             String loadScript = "function loadWizardNodeView(){%s};";
