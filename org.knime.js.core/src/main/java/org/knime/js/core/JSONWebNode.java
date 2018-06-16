@@ -75,6 +75,8 @@ public class JSONWebNode {
     private JSONViewContent m_viewRepresentation;
     private JSONViewContent m_viewValue;
 
+    private String m_customCSS;
+
     /**
      * @return the nodeInfo
      */
@@ -236,6 +238,22 @@ public class JSONWebNode {
     }
 
     /**
+     * @return the custom css
+     */
+    @JsonProperty("customCSS")
+    public String getCustomCSS() {
+        return m_customCSS;
+    }
+
+    /**
+     * @param customCSS the custom css to set
+     */
+    @JsonProperty("customCSS")
+    public void setCustomCSS(final String customCSS) {
+        m_customCSS = customCSS;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -261,6 +279,7 @@ public class JSONWebNode {
                 .append(m_getViewValueMethodName, other.m_getViewValueMethodName)
                 .append(m_viewRepresentation, other.m_viewRepresentation)
                 .append(m_viewValue, other.m_viewValue)
+                .append(m_customCSS, other.m_customCSS)
                 .isEquals();
     }
 
@@ -280,6 +299,7 @@ public class JSONWebNode {
                 .append(m_getViewValueMethodName)
                 .append(m_viewRepresentation)
                 .append(m_viewValue)
+                .append(m_customCSS)
                 .toHashCode();
     }
 

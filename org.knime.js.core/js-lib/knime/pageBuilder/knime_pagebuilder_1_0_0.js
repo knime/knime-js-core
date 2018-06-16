@@ -521,10 +521,16 @@ KnimePageLoader = function() {
 				+ 'function initFrame() {\n\trequireLibs(['
 				+ libStrings.join(',')
 				+ '], 0);}\n</script>\n';
+			
+			var customStyles = '';
+			if (webNode.customCSS) {
+				var cleanedCSS = webNode.customCSS.replace(new RegExp('</style>', 'gim'), '');
+				customStyles = '<style type="text/css">' + cleanedCSS + '</style>';
+			}
 
 			// Full HTML content of the iframe
 			var frameHtml = '<!DOCTYPE html>\n<html>\n<head>\n' + styles
-					+ inlineScript + requireJSScript
+					+ inlineScript + requireJSScript + customStyles
 					+ '</head>\n<body>\n</body>\n</html>';
 			// onresize="setTimeout(' + resizeFrameCode + ', 0)"
 

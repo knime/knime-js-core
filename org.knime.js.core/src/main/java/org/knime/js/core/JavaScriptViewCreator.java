@@ -295,7 +295,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             }
         }
         if (StringUtils.isNotEmpty(customCSS)) {
-            pageBuilder.append(String.format(inlineCSS, customCSS));
+            String cleanedCSS = customCSS.replaceAll("(?i)</style>", "");
+            pageBuilder.append(String.format(inlineCSS, cleanedCSS));
         }
         if (isDebug()) {
             String loadScript = "function loadWizardNodeView(){%s};";
