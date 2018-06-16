@@ -213,13 +213,13 @@ function twinlist() {
 	// Init DOM
 
 	element = $('<div>')
-	excludes = $('<select>');
+	excludes = $('<select class="knime-qf-select knime-multi-line">');
 	excludes.css('float', 'left');
 	excludes.prop('multiple', true);
 	excludes.css('border-color', 'red');
 	excludes.attr("aria-label", "Excludes");
 	excludes.attr('data-iframe-height', '');
-	includes = $('<select>');
+	includes = $('<select class="knime-qf-select knime-multi-line">');
 	includes.css('float', 'left');
 	includes.prop('multiple', true);
 	includes.css('border-color', 'green');
@@ -233,16 +233,16 @@ function twinlist() {
 	span.css('float', 'left');
 	var buttonfiller = $('<div>');
 	buttonfiller.css('padding', '5px');
-	var add = $('<button type="button">&gt;</button>');
+	var add = $('<button type="button" class="knime-qf-button">&gt;</button>');
 	add.click(execAdd);
 	add.attr('title', 'Add selected to includes');
-	var addAll = $('<button type="button">&gt;&gt;</button>');
+	var addAll = $('<button type="button" class="knime-qf-button">&gt;&gt;</button>');
 	addAll.click(execAddAll);
 	addAll.attr('title', 'Add all to includes');
-	var remove = $('<button type="button">&lt;</button>');
+	var remove = $('<button type="button" class="knime-qf-button">&lt;</button>');
 	remove.click(execRemove);
 	remove.attr('title', 'Remove selected from includes');
-	var removeAll = $('<button type="button">&lt;&lt;</button>');
+	var removeAll = $('<button type="button" class="knime-qf-button">&lt;&lt;</button>');
 	removeAll.click(execRemoveAll);
 	removeAll.attr('title', 'Remove all from includes');
 	element.append(excludesSpan);
@@ -257,11 +257,11 @@ function twinlist() {
 	span.append(remove);
 	span.append('<br>');
 	span.append(removeAll);
-	var excludesHeader = $('<div>Excludes</div>');
+	var excludesHeader = $('<div class="knime-qf-label">Excludes</div>');
 	excludesHeader.css('padding', '5px');
 	excludesSpan.append(excludesHeader);
 	excludesSpan.append(excludes);
-	var includesHeader = $('<div>Includes</div>');
+	var includesHeader = $('<div class="knime-qf-label">Includes</div>');
 	includesHeader.css('padding', '5px');
 	includesSpan.append(includesHeader);
 	includesSpan.append(includes);
