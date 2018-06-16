@@ -239,3 +239,139 @@ html, body {
     outline: 0;
 }
 
+html {
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	font: normal 12px sans-serif;
+	color: black;
+	fill: black;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.knime-title {
+	color: black;
+	fill: black;	
+	font-size: 24px;
+}
+
+.knime-subtitle {
+	color: black;
+	fill: black;
+	font-size: 12px;
+}
+
+.knime-label {
+	color: black;
+	fill: black;
+	font-size: 12px;
+}
+
+/* we need it to fight with element styles from nvd3 */
+.knime-label text {	
+	color: black !important; 
+	fill: black !important;
+	font-size: 12px !important;
+}
+
+.knime-axis-label {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+/* we need it to fight with element styles from nvd3 */
+text.knime-axis-label {
+	color: black !important;
+	fill: black !important;
+	font-size: 12px !important;
+	font-weight: bold !important;
+}
+
+.knime-tick-label {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+/* we need it to fight with element style from nvd3 */
+text.knime-tick-label {
+	color: black !important;
+	fill: black !important;
+	font-size: 12px !important;
+	font-weight: normal !important;
+}
+
+.knime-legend-label {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+/* we need it to fight with element style from nvd3 */
+text.knime-legend-label {
+	color: black !important;
+	fill: black !important;
+	font-size: 12px !important;
+	font-weight: normal !important;
+}
+
+.knime-tooltip-caption {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.knime-tooltip-key {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.knime-tooltip-value {
+	color: black;
+	fill: black;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.knime-table-control-text {
+	color: black;
+	fill: black;
+	font-size: 14px;
+}
+
+.knime-table-cell {
+	color: black;
+	fill: black;
+	font-size: 14px;
+}
+
+.knime-layout-container {
+	display: block;
+    width: 100%;
+	height: 100%;
+	min-width: 400px;
+    min-height: 300px;
+}
+
+.knime-svg-container {
+	box-sizing: border-box;
+	display: block;
+	overflow: hidden;
+	margin: 0;
+}
+
+.knime-qf-container {
+
+}
