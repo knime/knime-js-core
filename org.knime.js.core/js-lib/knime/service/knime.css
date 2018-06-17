@@ -345,6 +345,52 @@ text.knime-legend-label {
 	font-weight: bold;
 }
 
+span.knime-spinner {
+	background-color: silver;
+}
+
+div.knime-slider-connect {
+	background-color: #3fb8af;
+}
+
+.knime-qf-title {
+	color: black;	
+	font-size: 13px;
+	font-weight: bold;
+	margin: 10px 0 2px 0;
+}
+
+.knime-qf-label {
+	margin: 10px 0 2px 0;
+}
+
+.knime-qf-error {
+	color: red;
+	font-style: italic;
+	font-size: 75%;
+}
+
+.knime-qf-input, .knime-qf-select {
+	padding: 5px;
+	background-color: transparent;
+	border-radius: 5px;
+	border: 1px solid;
+	border-color: silver;	
+	font: 13px sans-serif;
+	color: black;
+}
+
+/* overriding .ui-widget styles */
+input.knime-qf-input {
+	font: 13px sans-serif !important;
+	color: black !important;
+}
+
+.knime-qf-select option {
+	font: 13px sans-serif;
+	color: black;
+}
+
 .knime-table-control-text {
 	color: black;
 	fill: black;
@@ -373,5 +419,6 @@ text.knime-legend-label {
 }
 
 .knime-qf-container {
-
+	font: 13px sans-serif;
+	color: black;
 }
