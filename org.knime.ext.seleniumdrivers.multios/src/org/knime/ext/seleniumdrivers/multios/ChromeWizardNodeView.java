@@ -151,7 +151,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	 * @since 3.5
      */
 	public static boolean isEnabled() {
-	    return MultiOSDriverActivator.getBundledChromeDriverPath().isPresent();
+	    if (!JSCorePlugin.osSupportsChromium()) {
+	        return false;
+	    } else {
+	        return MultiOSDriverActivator.getBundledChromeDriverPath().isPresent();
+	    }
 	}
 
 	@Override

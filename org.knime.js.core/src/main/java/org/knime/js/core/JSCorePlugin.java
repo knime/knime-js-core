@@ -3,10 +3,13 @@ package org.knime.js.core;
 import java.io.File;
 import java.net.URL;
 import java.util.Hashtable;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
 import org.osgi.framework.BundleContext;
@@ -142,6 +145,20 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      */
     public String getPluginRootPath() {
         return m_pluginRootPath;
+    }
+
+    /**
+     * Tests if the operating system which is currently running the application supports Chromium browsers,
+     * esp. CentOS v < 7 and RHEL v < 7 are not supported anymore and might need special treatment
+     * @return true if the os supports Chromium browsers, false otherwise
+     */
+    public static boolean osSupportsChromium() {
+        if (Platform.OS_LINUX.equals(Platform.getOS())) {
+            Pattern pattern = Pattern.compile("^\\s*[CentOS|Red Hat Enterprise Linux].*\\s[0-6]\\..*$",
+                Pattern.CASE_INSENSITIVE);
+            return !pattern.matcher(KNIMEConstants.getOSVariant()).matches();
+        }
+        return true;
     }
 
 }

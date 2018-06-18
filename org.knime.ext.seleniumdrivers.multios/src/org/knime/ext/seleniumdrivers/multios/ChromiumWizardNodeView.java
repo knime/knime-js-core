@@ -51,6 +51,7 @@ package org.knime.ext.seleniumdrivers.multios;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.js.core.JSCorePlugin;
 
 /**
  * @param <T> requires a {@link ViewableModel} implementing {@link WizardNode} as well
@@ -74,7 +75,11 @@ public class ChromiumWizardNodeView<T extends ViewableModel & WizardNode<REP, VA
      * @since 3.5
      */
     public static boolean isEnabled() {
-        return MultiOSDriverActivator.getChromiumPath().isPresent() && ChromeWizardNodeView.isEnabled();
+        if (!JSCorePlugin.osSupportsChromium()) {
+            return false;
+        } else {
+            return MultiOSDriverActivator.getChromiumPath().isPresent() && ChromeWizardNodeView.isEnabled();
+        }
     }
 
     /**

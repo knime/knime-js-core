@@ -68,10 +68,20 @@ public class JavaScriptPreferenceInitializer extends AbstractPreferenceInitializ
     @Override
     public void initializeDefaultPreferences() {
         IPreferenceStore store = JSCorePlugin.getDefault().getPreferenceStore();
-        store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JavaScriptPreferencePage.PHANTOMJS);
         if (Platform.OS_LINUX.equals(Platform.getOS())) {
             store.setDefault(JSCorePlugin.P_BROWSER_CLI_ARGS, "--no-sandbox");
             store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS, "--no-sandbox");
+        }
+        if (JSCorePlugin.osSupportsChromium()) {
+            //use bundled Chromium as default in most cases
+            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JavaScriptPreferencePage.CHROMIUM_BROWSER);
+            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JavaScriptPreferencePage.HEADLESS_CHROMIUM);
+        } else {
+            //some older Linux distributions do not support Chromium anymore, so we need to use:
+            //SWT browser for view...
+            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JavaScriptPreferencePage.INTERNAL_BROWSER);
+            //... and PhantomJS for image generation
+            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JavaScriptPreferencePage.PHANTOMJS);
         }
     }
 
