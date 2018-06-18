@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.node.ExecutionContext;
@@ -86,6 +87,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     VAL extends WebViewContent> extends AbstractImageGenerator<T, REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeImageGenerator.class);
+
+    private static final ReentrantLock LOCK = new ReentrantLock();
 
     private ChromeDriver m_driver;
     private final File m_userDataDir;
@@ -169,6 +172,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     @Override
     public void generateView(final Long optionalWait, final ExecutionContext exec) throws Exception {
         try {
+            LOCK.lock();
             if (exec != null) {
                 exec.setProgress("Initializing view");
             }
@@ -250,6 +254,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             }
             errorMessage = "Error retrieving image: " + errorMessage;
             throw new IOException(errorMessage, e);
+        } finally {
+            cleanup();
         }
     }
 
@@ -258,6 +264,9 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
      */
     @Override
     public void cleanup() {
+        try {
+            LOCK.unlock();
+        } catch (IllegalMonitorStateException e) { /* already released */ }
         if (m_driver != null) {
             m_driver.quit();
             m_driver = null;
