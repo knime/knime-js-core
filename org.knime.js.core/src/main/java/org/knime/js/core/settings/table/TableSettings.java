@@ -176,12 +176,12 @@ public class TableSettings {
         m_columnFilterConfig.saveConfiguration(settings);
         settings.addString(CFG_SELECTION_COLUMN_NAME, m_selectionColumnName);
 
-        //added with 3.6
-        settings.addString(CFG_CUSTOM_CSS, m_customCSS);
-
         // save only those settings which are needed in dialog
         m_representationSettings.saveSettingsFromDialog(settings);
         m_valueSettings.saveSettingsFromDialog(settings);
+
+        //added with 3.6
+        settings.addString(CFG_CUSTOM_CSS, m_customCSS);
     }
 
     /** Loads parameters in NodeModel.
@@ -193,12 +193,12 @@ public class TableSettings {
         m_columnFilterConfig.loadConfigurationInModel(settings);
         m_selectionColumnName = settings.getString(CFG_SELECTION_COLUMN_NAME);
 
-        //added with 3.6
-        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
-
         // load only those settings which are needed in dialog
         m_representationSettings.loadSettingsForDialog(settings);
         m_valueSettings.loadSettingsForDialog(settings);
+
+        //added with 3.6
+        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
     }
 
     /** Loads parameters in Dialog.
@@ -210,10 +210,10 @@ public class TableSettings {
         m_columnFilterConfig.loadConfigurationInDialog(settings, spec);
         m_selectionColumnName = settings.getString(CFG_SELECTION_COLUMN_NAME, DEFAULT_SELECTION_COLUMN_NAME);
 
-        //added with 3.6
-        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
-
         m_representationSettings.loadSettingsForDialog(settings);
         m_valueSettings.loadSettingsForDialog(settings);
+
+        //added with 3.6
+        m_customCSS = settings.getString(CFG_CUSTOM_CSS, DEFAULT_CUSTOM_CSS);
     }
 }
