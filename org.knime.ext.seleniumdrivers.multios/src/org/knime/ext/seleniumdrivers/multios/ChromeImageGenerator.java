@@ -99,7 +99,6 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     public ChromeImageGenerator(final T nodeModel) {
         super(nodeModel);
         m_userDataDir = ChromeWizardNodeView.createUserDataDir();
-        m_driver = initDriver();
     }
 
     public static boolean isEnabled() {
@@ -173,6 +172,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     public void generateView(final Long optionalWait, final ExecutionContext exec) throws Exception {
         try {
             LOCK.lock();
+            m_driver = initDriver();
             if (exec != null) {
                 exec.setProgress("Initializing view");
             }
