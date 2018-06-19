@@ -283,7 +283,7 @@ kt = function() {
 								//missing value, can return false immediately
 								return false;
 							}
-							if (column.type = "numeric") {
+							if (column.type == "numeric") {
 								if (column.minimumInclusive) {
 									included &= (rowValue >= column.minimum);
 								} else {
@@ -294,7 +294,7 @@ kt = function() {
 								} else {
 									included &= (rowValue < column.maximum);
 								}
-							} else if (column.type = "nominal") {
+							} else if (column.type == "nominal") {
 								included &= (column.values.indexOf(rowValue) >= 0);
 							}
 						}
