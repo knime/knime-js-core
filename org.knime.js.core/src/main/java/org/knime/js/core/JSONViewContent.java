@@ -83,10 +83,7 @@ public abstract class JSONViewContent implements WebViewContent {
     @Override
     @JsonIgnore
     public final void loadFromStream(final InputStream viewContentStream) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        ObjectReader reader = mapper.readerForUpdating(this);
+        ObjectReader reader = createObjectMapper().readerForUpdating(this);
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
@@ -107,14 +104,23 @@ public abstract class JSONViewContent implements WebViewContent {
     @Override
     @JsonIgnore
     public final OutputStream saveToStream() throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        String viewContentString = mapper.writeValueAsString(this);
+        String viewContentString = createObjectMapper().writeValueAsString(this);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(viewContentString.getBytes(Charset.forName("UTF-8")));
         out.flush();
         return out;
     }
+
+    /**
+     * @return the object mapper used for de-/serialization of {@link JSONViewContent}-objects.
+     */
+    public static ObjectMapper createObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
+
 
     //Force equals and hashCode
 
