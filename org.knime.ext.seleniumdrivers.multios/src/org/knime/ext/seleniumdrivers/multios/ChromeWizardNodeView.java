@@ -90,7 +90,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.osgi.framework.Bundle;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -132,7 +131,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	private File m_repTempFile;
 	private File m_valTempFile;
 	private File m_bridgeTempFile;
-	private final File m_userDataDir;
+	private File m_userDataDir;
 
 	private String m_viewTitle = "KNIME view";
 
@@ -143,7 +142,6 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	public ChromeWizardNodeView(final T viewableModel) {
 		super(viewableModel);
 		m_service = ChromeViewService.getInstance();
-		m_userDataDir = createUserDataDir();
 	}
 
 	/**
@@ -160,6 +158,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 	@Override
 	protected void closeView() {
+	    if (m_userDataDir != null) {
+	        m_service.unlockUserDataDir(m_userDataDir);
+	    }
 		if (m_driver != null) {
 			try {
 				m_shutdownCometThread.set(true);
@@ -273,40 +274,41 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		if (!chromeDriverPath.isPresent()) {
 			throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
 		}
-		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--app=" + m_bridgeTempFile.toURI().toString());
-		options.addArguments("--window-size=" + width + "," + height);
-		options.addArguments("--window-position=" + left + "," + top);
-		//options.addArguments("--disable-infobars");
-		options.addArguments("--allow-file-access", "--allow-file-access-from-files");
-		IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
-		if (resolveChromium) {
-		    Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
-		    if (!cPath.isPresent()) {
-		        throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
-		    }
-		    options.setBinary(cPath.get());
-		    options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
-		    options.addArguments("--no-first-run", "--no-experiments", "--noerrdialogs", "--bwsi");
-		    options.addArguments("--disable-breakpad", "--disable-infobars", "--disable-session-restore");
-            options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
-		} else {
-		    String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
-		    if (binPath != null && !binPath.isEmpty()) {
-		        options.setBinary(binPath);
-		    }
-		}
-
-		String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
-		if (cliOptions != null && !cliOptions.isEmpty()) {
-		    options.addArguments(cliOptions);
-		}
-
 		try {
+		    ChromeOptions options = new ChromeOptions();
+		    options.addArguments("--app=" + m_bridgeTempFile.toURI().toString());
+		    options.addArguments("--window-size=" + width + "," + height);
+		    options.addArguments("--window-position=" + left + "," + top);
+		    //options.addArguments("--disable-infobars");
+		    options.addArguments("--allow-file-access", "--allow-file-access-from-files");
+		    IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
+		    if (resolveChromium) {
+		        Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
+		        if (!cPath.isPresent()) {
+		            throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
+		        }
+		        options.setBinary(cPath.get());
+		        m_userDataDir = m_service.getAndLockUserDataDir();
+		        options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
+		        options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
+		        options.addArguments("--no-first-run", "--no-experiments", "--noerrdialogs", "--bwsi");
+		        options.addArguments("--disable-breakpad", "--disable-infobars", "--disable-session-restore");
+		    } else {
+		        String binPath = prefs.getString(JSCorePlugin.P_BROWSER_PATH);
+		        if (binPath != null && !binPath.isEmpty()) {
+		            options.setBinary(binPath);
+		        }
+		    }
+
+		    String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
+		    if (cliOptions != null && !cliOptions.isEmpty()) {
+		        options.addArguments(cliOptions);
+		    }
+
 		    m_driver = new ChromeDriver(options);
 		    m_driver.manage().timeouts()
-		        .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-		        .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+		    .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+		    .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
 		    waitForDocumentReady(m_driver);
 		    // Store the current window handle
@@ -327,17 +329,6 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
             return null;
 		}
 	}
-
-    static File createUserDataDir() {
-        /*Make sure that the bundled Chromium instance uses a different user directory and profile, than
-        other potentially installed Chrome/Chromium applications.*/
-        Bundle bundle = Platform.getBundle(MultiOSDriverActivator.getBundleName());
-        File dataDir = new File(Platform.getStateLocation(bundle).toFile(), "chromium_data");
-        if (!dataDir.exists()) {
-            dataDir.mkdir();
-        }
-        return dataDir;
-    }
 
     private static void displayErrorMessage(final Throwable t) {
         Display.getDefault().asyncExec(new Runnable() {
@@ -441,11 +432,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 				// log error but continue
 				LOGGER.error("Temporary view file could not be deleted: " + e.getMessage(), e);
 			}
-			m_repTempFile = FileUtil.createTempFile("rep_" + System.currentTimeMillis(), ".json", tempPath.toFile(), true);
-			m_valTempFile = FileUtil.createTempFile("val_" + System.currentTimeMillis(), ".json", tempPath.toFile(), true);
+			m_repTempFile = FileUtil.createTempFile("rep_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
+			m_valTempFile = FileUtil.createTempFile("val_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
 			m_bridgeTempFile = null;
 			if (bridgePath != null) {
-			    m_bridgeTempFile = FileUtil.createTempFile("selenium-knime-bridge_ " + System.currentTimeMillis(), ".html", tempPath.toFile(), true);
+			    m_bridgeTempFile = FileUtil.createTempFile("selenium-knime-bridge_ " + System.currentTimeMillis() + "_", ".html", tempPath.toFile(), true);
 			}
 			try (BufferedWriter writer = Files.newBufferedWriter(m_repTempFile.toPath(), Charset.forName("UTF-8"))) {
 				writer.write(viewRepString);
@@ -565,7 +556,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 					}
 					try {
 						if (!m_driver.getWindowHandles().contains(m_handle)) {
-							m_driver.quit();
+						    //window has been discarded by user
+							closeView();
 							break;
 						}
 						if (m_driver.getWindowHandle().equals(m_handle)) {

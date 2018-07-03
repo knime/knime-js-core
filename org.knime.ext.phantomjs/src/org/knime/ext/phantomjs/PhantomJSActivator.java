@@ -100,7 +100,7 @@ public class PhantomJSActivator extends Plugin {
         //createPhantomJSDriver();
     }
 
-    private static void createPhantomJSDriver() throws IOException {
+    private static synchronized void createPhantomJSDriver() throws IOException {
         if (m_phantomJSPath != null) {
             DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, m_phantomJSPath);
@@ -142,7 +142,7 @@ public class PhantomJSActivator extends Plugin {
      * executable could not be found
      * @throws IOException if an error occurs while creating the PhantomJS instance
      */
-    public static PhantomJSDriver getConfiguredPhantomJSDriver() throws IOException {
+    public static synchronized PhantomJSDriver getConfiguredPhantomJSDriver() throws IOException {
         if (m_driver == null) {
             createPhantomJSDriver();
         }

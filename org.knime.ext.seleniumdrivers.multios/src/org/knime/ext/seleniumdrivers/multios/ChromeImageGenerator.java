@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.node.ExecutionContext;
@@ -88,17 +87,16 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeImageGenerator.class);
 
-    private static final ReentrantLock LOCK = new ReentrantLock();
-
+    private final ChromeViewService m_service;
     private ChromeDriver m_driver;
-    private final File m_userDataDir;
+    private File m_userDataDir;
 
     /**
      * @param nodeModel
      */
     public ChromeImageGenerator(final T nodeModel) {
         super(nodeModel);
-        m_userDataDir = ChromeWizardNodeView.createUserDataDir();
+        m_service = ChromeViewService.getInstance();
     }
 
     public static boolean isEnabled() {
@@ -110,6 +108,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     }
 
     /**
+     * @param resolveChromium
      * @return
      */
     protected ChromeDriver initDriver(final boolean resolveChromium) {
@@ -117,35 +116,38 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
         if (!chromeDriverPath.isPresent()) {
             throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
         }
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--allow-file-access", "--allow-file-access-from-files");
-        options.addArguments("--headless");
-        IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
-        if (resolveChromium) {
-            Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
-            if (!cPath.isPresent()) {
-                throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
-            }
-            options.setBinary(cPath.get());
-            /*options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
+        try {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--allow-file-access", "--allow-file-access-from-files");
+            options.addArguments("--headless");
+            IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
+            if (resolveChromium) {
+                Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
+                if (!cPath.isPresent()) {
+                    throw new SeleniumViewException("Path to internal Chromium executables could not be retrieved!");
+                }
+                options.setBinary(cPath.get());
+
+                m_userDataDir = m_service.getAndLockUserDataDir(true);
+                options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
+                /*options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
             options.addArguments("--no-first-run", "--no-experiments", "--noerrdialogs", "--bwsi");
             options.addArguments("--disable-breakpad", "--disable-infobars", "--disable-session-restore");*/
-            options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
-        } else {
-            String binPath = prefs.getString(JSCorePlugin.P_HEADLESS_BROWSER_PATH);
-            if (binPath != null && !binPath.isEmpty()) {
-                options.setBinary(binPath);
+            } else {
+                String binPath = prefs.getString(JSCorePlugin.P_HEADLESS_BROWSER_PATH);
+                if (binPath != null && !binPath.isEmpty()) {
+                    options.setBinary(binPath);
+                }
             }
-        }
-        String cliOptions = prefs.getString(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS);
-        if (cliOptions != null && !cliOptions.isEmpty()) {
-            options.addArguments(cliOptions);
-        }
-        try {
+            String cliOptions = prefs.getString(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS);
+            if (cliOptions != null && !cliOptions.isEmpty()) {
+                options.addArguments(cliOptions);
+            }
+
             m_driver = new ChromeDriver(options);
             m_driver.manage().timeouts()
-                .pageLoadTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-                .setScriptTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+            .pageLoadTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            .setScriptTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
             return m_driver;
         } catch (Exception e) {
@@ -171,7 +173,6 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     @Override
     public void generateView(final Long optionalWait, final ExecutionContext exec) throws Exception {
         try {
-            LOCK.lock();
             m_driver = initDriver();
             if (exec != null) {
                 exec.setProgress("Initializing view");
@@ -264,9 +265,10 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
      */
     @Override
     public void cleanup() {
-        try {
-            LOCK.unlock();
-        } catch (IllegalMonitorStateException e) { /* already released */ }
+        if (m_userDataDir != null) {
+            m_service.unlockUserDataDir(m_userDataDir, true);
+            m_userDataDir = null;
+        }
         if (m_driver != null) {
             m_driver.quit();
             m_driver = null;

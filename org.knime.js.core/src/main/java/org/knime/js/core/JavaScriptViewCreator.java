@@ -103,6 +103,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
     private String m_title;
 
+    private static final Object LOCK = new Object();
+
     /**
      * @return true if is running in debug mode, false otherwise
      */
@@ -121,8 +123,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return false;
     }
 
-    private boolean viewTempDirExists() {
-        return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
+    private static boolean viewTempDirExists() {
+        synchronized(LOCK) {
+            return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
+        }
     }
 
     /**
@@ -174,18 +178,20 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             final VAL viewValue, final String customCSS) throws IOException {
         m_title = viewTitle == null ? "KNIME view" : viewTitle;
         if (!viewTempDirExists()) {
-            File tempDir = null;
-            String tempPath = System.getProperty("java.io.tmpdir");
-            if (tempPath != null) {
-                tempDir = new File(tempPath);
-            }
-            tempFolder = FileUtil.createTempDir("knimeViewContainer", tempDir, true);
-            try {
-                copyWebResources();
-            } catch (IOException e) {
-                deleteTempFile(tempFolder);
-                tempFolder = null;
-                throw e;
+            synchronized(LOCK) {
+                File tempDir = null;
+                String tempPath = System.getProperty("java.io.tmpdir");
+                if (tempPath != null) {
+                    tempDir = new File(tempPath);
+                }
+                tempFolder = FileUtil.createTempDir("knimeViewContainer", tempDir, true);
+                try {
+                    copyWebResources();
+                } catch (IOException e) {
+                    deleteTempFile(tempFolder);
+                    tempFolder = null;
+                    throw e;
+                }
             }
         }
         m_tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);

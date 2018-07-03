@@ -48,10 +48,19 @@
  */
 package org.knime.ext.seleniumdrivers.multios;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.knime.core.node.NodeLogger;
+import org.knime.core.util.FileUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 /**
@@ -60,12 +69,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
  */
 public class ChromeViewService {
 
-	private static ChromeViewService INSTANCE = new ChromeViewService();
-
-	private Set<ChromeDriver> m_drivers = new HashSet<ChromeDriver>();
-
-	static final String COMET_THREAD_NAME = "Chrome COMET query thread ";
-	private ThreadGroup m_cometThreadGroup;
+    static final int IMAGE_GENERATION_POOL_SIZE = 10;
+    static final String COMET_THREAD_NAME = "Chrome COMET query thread ";
 
 	// signals for COMET-type request queries (callback emulation)
 	static final String NO_ACTION = "NO_ACTION";
@@ -78,7 +83,19 @@ public class ChromeViewService {
 	static final String APPLY_DEFAULT_BUTTON_PRESSED = "APPLY_DEFAULT_BUTTON_PRESSED";
 	static final String CLOSE_WINDOW = "CLOSE_WINDOW";
 
-	private ChromeViewService() { /* hidden default constructor */ }
+	private static ChromeViewService INSTANCE = new ChromeViewService();
+	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeViewService.class);
+
+    private Set<ChromeDriver> m_drivers = new HashSet<ChromeDriver>();
+    private ThreadGroup m_cometThreadGroup;
+	private final Map<File, AtomicBoolean> m_userDirMap;
+	private final Semaphore m_imageGenerationCounter;
+
+	/* hidden default constructor */
+	private ChromeViewService() {
+	    m_userDirMap = new ConcurrentHashMap<File, AtomicBoolean>();
+	    m_imageGenerationCounter = new Semaphore(IMAGE_GENERATION_POOL_SIZE, true);
+	}
 
 	static ChromeViewService getInstance() {
 		return INSTANCE;
@@ -146,4 +163,50 @@ public class ChromeViewService {
 		}
 		return m_cometThreadGroup;
 	}
+
+	File getAndLockUserDataDir() throws IOException, InterruptedException {
+	    return getAndLockUserDataDir(false);
+	}
+
+	File getAndLockUserDataDir(final boolean imageGeneration) throws IOException, InterruptedException {
+	    if (imageGeneration) {
+	        // only allow a maximum number of folders for image generation
+	        m_imageGenerationCounter.acquire();
+            LOGGER.debug("Acquiring Chromium image generation instance (" + m_imageGenerationCounter.availablePermits()
+                + " left available of " + IMAGE_GENERATION_POOL_SIZE + ").");
+	    }
+	    // try recycling an available existing directory
+	    for (Entry<File, AtomicBoolean> entry : m_userDirMap.entrySet()) {
+	        if (entry.getValue().compareAndSet(false, true)) {
+	            return entry.getKey();
+	        }
+	    }
+
+	    // otherwise create new directory
+	    File dir = createUserDataDir();
+	    m_userDirMap.put(dir, new AtomicBoolean(true));
+	    return dir;
+	}
+
+	void unlockUserDataDir(final File dir) {
+	    unlockUserDataDir(dir, false);
+	}
+
+	void unlockUserDataDir(final File dir, final boolean imageGeneration) {
+	    if (m_userDirMap.containsKey(dir)) {
+	        m_userDirMap.get(dir).set(false);
+	    }
+	    if (imageGeneration) {
+	        m_imageGenerationCounter.release();
+	        LOGGER.debug("Releasing Chromium image generation instance (" + m_imageGenerationCounter.availablePermits()
+	            + " left available of " + IMAGE_GENERATION_POOL_SIZE + ").");
+	    }
+	}
+
+	private static File createUserDataDir() throws IOException {
+        /* Make sure that bundled Chromium instances us a different user directory and profile, than
+        other potentially installed Chrome/Chromium applications. */
+	    //TODO: limit maximum? intermediate cleanup? don't use regular temp dir?
+	    return FileUtil.createTempDir("knime_chromium_data");
+    }
 }

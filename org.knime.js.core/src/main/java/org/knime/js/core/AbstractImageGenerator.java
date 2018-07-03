@@ -79,6 +79,7 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractImageGenerator.class);
     private static final String EXT_POINT_ID = "org.knime.js.core.headlessBrowsers";
     private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
+    private static final String CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     private static final String IMAGE_GENERATOR_CLASS = "imageGeneratorClass";
 
     private final T m_nodeModel;
@@ -140,7 +141,8 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
      * @throws OperationNotSupportedException if no image generator is available
      */
     @SuppressWarnings("rawtypes")
-    public static AbstractImageGenerator getConfiguredHeadlessBrowser(final ViewableModel model) throws InstantiationException, OperationNotSupportedException {
+    public static AbstractImageGenerator getConfiguredHeadlessBrowser(final ViewableModel model)
+            throws InstantiationException, OperationNotSupportedException {
         IExtensionRegistry registry = Platform.getExtensionRegistry();
         IConfigurationElement[] configurationElements =
                 registry.getConfigurationElementsFor(EXT_POINT_ID);
@@ -157,8 +159,13 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
             }
         }
         if (viewClass == null) {
-            // try loading default
-            viewClass = getViewClassByReflection(PHANTOMJS, configurationElements);
+            // try loading defaults
+            viewClass = getViewClassByReflection(CHROMIUM, configurationElements);
+            if (viewClass == null) {
+                LOGGER.error("Headless Chromium could not be initialized as default browser for image "
+                    + "generation. Trying PhantomJS...");
+                viewClass = getViewClassByReflection(PHANTOMJS, configurationElements);
+            }
         }
         if (viewClass != null) {
             try {
