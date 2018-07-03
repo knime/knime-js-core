@@ -48,17 +48,22 @@
  */
 package org.knime.ext.seleniumdrivers.multios;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.util.FileUtil;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -164,7 +169,37 @@ public class ChromeViewService {
 		return m_cometThreadGroup;
 	}
 
-	File getAndLockUserDataDir() throws IOException, InterruptedException {
+    Optional<String> tryRetrieveMissingSystemLibraries(final Optional<String> cPath) {
+        String os = Platform.getOS();
+        String command = null;
+        if (Platform.OS_MACOSX.equals(os)) {
+            command = "otool -L ";
+        } else if (Platform.OS_LINUX.equals(os)) {
+            command = "ldd -r ";
+        }
+        if (!cPath.isPresent() || command == null) {
+            return Optional.empty();
+        }
+        StringBuilder errorBuilder = new StringBuilder();
+        try {
+            Process ldd = Runtime.getRuntime().exec(command + cPath.get());
+            InputStream in = ldd.getInputStream();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.contains("not found")) {
+                        errorBuilder.append(line);
+                    }
+                }
+            }
+            if (errorBuilder.length() > 0) {
+                return Optional.ofNullable(errorBuilder.toString());
+            }
+        } catch (Exception ex) { /* do nothing */ }
+        return Optional.empty();
+    }
+
+    File getAndLockUserDataDir() throws IOException, InterruptedException {
 	    return getAndLockUserDataDir(false);
 	}
 

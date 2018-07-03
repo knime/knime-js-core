@@ -322,9 +322,19 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 		        LOGGER.info(errorMessage + e.getMessage(), e);
 		    }
 		    else {
-                LOGGER.error(errorMessage + e.getMessage(), e);
-                throw new SeleniumViewException(errorMessage
-                    + "Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
+		        LOGGER.error(errorMessage + e.getMessage(), e);
+		        Optional<String> additionalInfo = Optional.empty();
+		        if (resolveChromium) {
+		            additionalInfo = m_service.tryRetrieveMissingSystemLibraries(MultiOSDriverActivator.getChromiumPath());
+		        }
+                StringBuilder displayString = new StringBuilder(errorMessage);
+                if (additionalInfo.isPresent()) {
+                    String addString = "Missing system libraries for executing Chromium: " + additionalInfo.get();
+                    LOGGER.error(addString);
+                    displayString.append(addString + "\n");
+                }
+                displayString.append("Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
+                throw new SeleniumViewException(displayString.toString());
             }
             return null;
 		}
