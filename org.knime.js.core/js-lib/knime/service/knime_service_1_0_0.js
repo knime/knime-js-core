@@ -633,6 +633,22 @@ knimeService = function() {
 		header.appendChild(spacer);
 	}
 	
+	// inline global style declarations for SVG export
+	service.inlineSvgStyles = function(svg) {
+		var before = svg.firstChild;
+		
+		var links = document.getElementsByTagName('link');
+		for (var i = 0; i < links.length; i++) {
+			svg.insertBefore(links[0], before);
+		}
+		
+		var styles = document.getElementsByTagName('style');
+		for (var i = 0; i < styles.length; i++) {
+			styles[0].setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			svg.insertBefore(styles[0], before);
+		}
+	}
+	
 	document.addEventListener('DOMContentLoaded', init, false);
 	
 	return service;
