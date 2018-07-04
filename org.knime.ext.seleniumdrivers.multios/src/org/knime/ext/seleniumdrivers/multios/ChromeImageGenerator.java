@@ -119,7 +119,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
         try {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--allow-file-access", "--allow-file-access-from-files");
-            options.addArguments("--headless");
+            options.setHeadless(true);
             IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
             if (resolveChromium) {
                 Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
