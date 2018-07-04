@@ -112,7 +112,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent>
 		extends AbstractWizardNodeView<T, REP, VAL> {
 
-	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
+	private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
 	private static Boolean CHROME_PRESENT = null;
 	private static int CHROME_THREAD_COUNTER = 1;
 
@@ -341,13 +341,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 	}
 
     private static void displayErrorMessage(final Throwable t) {
+        final String prefix= "The interactive view cannot be opened for the following reason: ";
+        LOGGER.error(prefix + t.getMessage(), t);
         Display.getDefault().asyncExec(new Runnable() {
 
             @Override
             public void run() {
                 final MessageBox mb = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
                 mb.setText("Interactive View cannot be opened");
-                mb.setMessage("The interactive view cannot be opened for the following reason:\n" + t.getMessage());
+                mb.setMessage(prefix +"\n" + t.getMessage());
                 mb.open();
             }
         });
