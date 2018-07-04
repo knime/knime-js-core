@@ -98,10 +98,6 @@ function twinlist() {
 		var listWidthMax = Math.max(excludes.width(), includes.width(), 150);
 		excludes.width(listWidthMax);
 		includes.width(listWidthMax);
-		// Outer element gets overall width and height
-		element.width(excludesSpan.outerWidth(true) + span.outerWidth(true)
-				+ includesSpan.outerWidth(true));
-		element.height(excludesSpan.outerHeight(true));
 	};
 
 	getIncludes = function() {
