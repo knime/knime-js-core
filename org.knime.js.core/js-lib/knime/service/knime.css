@@ -266,50 +266,17 @@ body {
 	font-size: 12px;
 }
 
-.knime-label, .knime-axis-label, .knime-tick-label {
+.knime-label, .knime-axis-label, .knime-tick-label, .knime-label text, text.knime-axis-label, text.knime-tick-label {
 	color: black;
 	fill: black;
 	font-size: 12px;
 }
 
-.knime-axis-label {
-	font-weight: bold;
-}
-
-.knime-tick-label {
-	font-weight: normal;
-}
-
-/* we need the folllowing to fight with element styles from nvd3 */
-
-.knime-label text, text.knime-axis-label, text.knime-tick-label {	
-	color: black !important; 
-	fill: black !important;
-	font-size: 12px !important;
-}
-
-text.knime-axis-label {
-	font-weight: bold !important;
-}
-
-text.knime-tick-label {
-	font-weight: normal !important;
-}
-
-
-.knime-legend-label {
+.knime-legend-label, text.knime-legend-label {
 	color: black;
 	fill: black;
 	font-size: 12px;
 	font-weight: normal;
-}
-
-/* we need it to fight with element style from nvd3 */
-text.knime-legend-label {
-	color: black !important;
-	fill: black !important;
-	font-size: 12px !important;
-	font-weight: normal !important;
 }
 
 .knime-tooltip-caption, .knime-tooltip-key, .knime-tooltip-value {
