@@ -49,10 +49,21 @@
 package org.knime.js.core.node;
 
 /**
+ * Interface to provide view implementations associated with this node model with additional CSS style rules,
+ * which are being fed in from outside of this node.
+ *
  * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
  */
 public interface CSSModifiable {
 
+    /**
+     * @return a string with custom css style rules which are being applied to the view of this node
+     */
     public String getCssStyles();
+
+    /**
+     * @param styles the style rules to set
+     */
+    public void setCssStyles(final String styles);
 
 }

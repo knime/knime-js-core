@@ -168,6 +168,11 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
         return m_config.getSettings().getCustomCSS();
     }
 
+    @Override
+    public void setCssStyles(final String styles) {
+        m_config.getSettings().setCustomCSS(styles);
+    }
+
     /**
      * {@inheritDoc}
      */

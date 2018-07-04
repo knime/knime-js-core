@@ -52,10 +52,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.data.property.filter.FilterHandler;
 import org.knime.core.node.BufferedDataTable;
@@ -365,6 +367,13 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
             // what to do?
             LOGGER.error("Error loading internals: " + e.getMessage(), e);
         }
+        File cssFile = new File(nodeInternDir, "custom.css");
+        if (this instanceof CSSModifiable && cssFile.exists()) {
+            String customCSS = new String(Files.readAllBytes(cssFile.toPath()), "UTF-8");
+            if (StringUtils.isNoneEmpty(customCSS)) {
+                ((CSSModifiable)this).setCssStyles(customCSS);
+            }
+        }
     }
 
     /**
@@ -385,5 +394,12 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
         File valFile = new File(nodeInternDir, "value.xml");
         repSettings.saveToXML(new FileOutputStream(repFile));
         valSettings.saveToXML(new FileOutputStream(valFile));
+        if (this instanceof CSSModifiable) {
+            String customCSS = ((CSSModifiable)this).getCssStyles();
+            if (StringUtils.isNoneEmpty(customCSS)) {
+                File cssFile = new File(nodeInternDir, "custom.css");
+                Files.write(cssFile.toPath(), customCSS.getBytes("UTF-8"));
+            }
+        }
     }
 }
