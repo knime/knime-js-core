@@ -88,10 +88,10 @@ public class ChromeViewService {
 	static final String APPLY_DEFAULT_BUTTON_PRESSED = "APPLY_DEFAULT_BUTTON_PRESSED";
 	static final String CLOSE_WINDOW = "CLOSE_WINDOW";
 
-	private static ChromeViewService INSTANCE = new ChromeViewService();
-	private static NodeLogger LOGGER = NodeLogger.getLogger(ChromeViewService.class);
+	private static final ChromeViewService INSTANCE = new ChromeViewService();
+	private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeViewService.class);
 
-    private Set<ChromeDriver> m_drivers = new HashSet<ChromeDriver>();
+    private final Set<ChromeDriver> m_drivers = new HashSet<ChromeDriver>();
     private ThreadGroup m_cometThreadGroup;
 	private final Map<File, AtomicBoolean> m_userDirMap;
 	private final Semaphore m_imageGenerationCounter;

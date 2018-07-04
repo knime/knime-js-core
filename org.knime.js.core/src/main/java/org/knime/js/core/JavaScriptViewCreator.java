@@ -124,9 +124,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     }
 
     private static boolean viewTempDirExists() {
-        synchronized(LOCK) {
-            return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
-        }
+        return !isDebug() && tempFolder != null && tempFolder.exists() && tempFolder.isDirectory();
     }
 
     /**
@@ -177,8 +175,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     public String createWebResources(final String viewTitle, final REP viewRepresentation,
             final VAL viewValue, final String customCSS) throws IOException {
         m_title = viewTitle == null ? "KNIME view" : viewTitle;
-        if (!viewTempDirExists()) {
-            synchronized(LOCK) {
+        synchronized(LOCK) {
+            if (!viewTempDirExists()) {
                 File tempDir = null;
                 String tempPath = System.getProperty("java.io.tmpdir");
                 if (tempPath != null) {
