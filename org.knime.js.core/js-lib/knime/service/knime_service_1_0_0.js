@@ -633,19 +633,42 @@ knimeService = function() {
 		header.appendChild(spacer);
 	}
 	
-	// inline global style declarations for SVG export
+	/**
+	 * Inline global style declarations for SVG export
+	 * @param {*} svg 
+	 */
 	service.inlineSvgStyles = function(svg) {
 		var before = svg.firstChild;
-		
-		var links = document.getElementsByTagName('link');
-		for (var i = 0; i < links.length; i++) {
-			svg.insertBefore(links[0], before);
+		var styles = document.styleSheets;
+		var newStyles = [];
+		for (var i = 0; i < styles.length; i++) {  
+			if (!styles[i].cssRules && styles[i].rules) {
+				styles[i].cssRules = styles[i].rules;
+			}
+			// empty style declaration
+			if (!styles[i].cssRules) continue;
+
+			var cssText = [];			
+			for (var j = 0; j < styles[i].cssRules.length; j++) {
+				try {
+					var rule = styles[i].cssRules[j];
+					if (svg.querySelector(rule.selectorText)) {
+						// use only those styles which are really needed
+						cssText.push(rule.cssText);
+					}
+				} catch(exception) {
+					continue;
+				}
+			}
+			if (cssText.length > 0) {
+				var styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+				styleElement.type = 'text/css';
+				styleElement.appendChild(document.createTextNode(cssText.join('\n')));
+				newStyles.push(styleElement);
+			}
 		}
-		
-		var styles = document.getElementsByTagName('style');
-		for (var i = 0; i < styles.length; i++) {
-			styles[0].setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-			svg.insertBefore(styles[0], before);
+		for (var i = 0; i < newStyles.length; i++) {
+			svg.insertBefore(newStyles[i], before);
 		}
 	}
 	
