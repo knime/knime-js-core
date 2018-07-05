@@ -48,18 +48,28 @@
  */
 package org.knime.ext.seleniumdrivers.multios;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.util.FileUtil;
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JSCorePlugin;
 import org.openqa.selenium.By;
@@ -87,8 +97,13 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeImageGenerator.class);
 
+    //the timeout to wait for the view to append an element to the body tag
+    static final int VIEW_INIT_TIMEOUT = 60;
+
     private final ChromeViewService m_service;
     private ChromeDriver m_driver;
+    private File m_repTempFile;
+    private File m_valTempFile;
     private File m_userDataDir;
 
     /**
@@ -97,6 +112,10 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     public ChromeImageGenerator(final T nodeModel) {
         super(nodeModel);
         m_service = ChromeViewService.getInstance();
+        final REP viewRepresentation = nodeModel.getViewRepresentation();
+        final VAL viewValue = nodeModel.getViewValue();
+        final WizardViewCreator<REP, VAL> viewCreator = nodeModel.getViewCreator();
+        writeTempViewFiles(viewRepresentation, viewValue, viewCreator);
     }
 
     public static boolean isEnabled() {
@@ -112,6 +131,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
      * @return
      */
     protected ChromeDriver initDriver(final boolean resolveChromium) {
+        String os = Platform.getOS();
         Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
         if (!chromeDriverPath.isPresent()) {
             throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
@@ -119,7 +139,14 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
         try {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--allow-file-access", "--allow-file-access-from-files");
-            options.setHeadless(true);
+            if (Platform.OS_MACOSX.equals(os) || Platform.OS_LINUX.equals(os)) {
+                options.addArguments("--headless");
+            } else {
+                /*this will also disable GPU acceleration, but this is only needed on Windows as per
+                Chromium bugs https://bugs.chromium.org/p/chromium/issues/detail?id=737678
+                and https://bugs.chromium.org/p/chromium/issues/detail?id=729961*/
+                options.setHeadless(true);
+            }
             IPreferenceStore prefs = JSCorePlugin.getDefault().getPreferenceStore();
             if (resolveChromium) {
                 Optional<String> cPath = MultiOSDriverActivator.getChromiumPath();
@@ -145,7 +172,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             }
 
             m_driver = new ChromeDriver(options);
-            m_driver.manage().timeouts()
+            m_driver.manage().timeouts().implicitlyWait(VIEW_INIT_TIMEOUT, TimeUnit.SECONDS)
             .pageLoadTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             .setScriptTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
@@ -182,6 +209,10 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
      */
     @Override
     public void generateView(final Long optionalWait, final ExecutionContext exec) throws Exception {
+        if (m_repTempFile == null || m_valTempFile == null) {
+            throw new SeleniumViewException("One or more mandatory temporary view files not present. "
+                + "View generation not possible.");
+        }
         try {
             m_driver = initDriver();
             if (exec != null) {
@@ -196,16 +227,23 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             }
             m_driver.navigate().to(new File(viewPath).toURI().toString());
             ChromeWizardNodeView.waitForDocumentReady(m_driver);
-            REP viewRepresentation = model.getViewRepresentation();
-            VAL viewValue = model.getViewValue();
-            String initCall = model.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
-            m_driver.executeScript(initCall);
+            embedUtilFileInLoadedPage();
+
+            WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
+            String repURL = m_repTempFile.toURI().toString();
+            String valURL = m_valTempFile.toURI().toString();
+            String initCall = viewCreator.wrapInTryCatch(viewCreator.createInitJSViewMethodCall(false, null, null));
+            m_driver.executeScript("knimeImageUtil.loadView(arguments[0], arguments[1], arguments[2]);",
+                repURL, valURL, initCall);
             if (exec != null) {
                 exec.setProgress(0.66);
             }
             WebDriverWait wait = new WebDriverWait(m_driver, ChromeWizardNodeView.DEFAULT_TIMEOUT);
-            //wait until any element has been appended to body
-            wait.until(driver -> ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
+            //wait until any element has been appended to body, which is not the service header
+            By anyNonKnimeElement = By.cssSelector("body > *:not(#knime-service-header)");
+            wait.until(driver -> ExpectedConditions.presenceOfElementLocated(anyNonKnimeElement));
+            //the wait seems to work unreliably, enforcing element present in implicit wait time
+            m_driver.findElements(anyNonKnimeElement);
 
             //wait additional specified time to compensate for initial animation, etc.
             if (optionalWait != null && optionalWait > 0L) {
@@ -249,7 +287,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             if (m_driver == null) {
                 throw new SeleniumViewException("Chrome driver was not initialized. Could not retrieve image.");
             }
-            return m_driver.executeScript("return " + methodCall);
+            Object image = m_driver.executeScript("return " + methodCall);
+            return image;
         } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (e instanceof WebDriverException) {
@@ -271,10 +310,90 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     }
 
     /**
+     * Writes view representation and value to disk as temporary JSON files. Also copies a JS utility file to
+     * the temporary location.
+     *
+     * @param viewRepresentation the view representation instance to write to disk
+     * @param viewValue the view value instance to write to disk
+     * @param viewCreator the view creator instance used for the view files and method creation
+     */
+    private void writeTempViewFiles(final REP viewRepresentation, final VAL viewValue,
+        final WizardViewCreator<REP, VAL> viewCreator) {
+        // we can't pass data in directly, as Chromium seems to have a 2MB size limit for these calls
+        // see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1026
+        // workaround is writing to disk and passing as URLs to be fetched by AJAX call
+        String viewRepString = viewCreator.getViewRepresentationJSONString(viewRepresentation);
+        String viewValueString = viewCreator.getViewValueJSONString(viewValue);
+        try {
+            // force creation of temp directory, copy resources and create HTML stub and debug output
+            getNodeModel().getViewHTMLPath();
+            Path tempPath = viewCreator.getCurrentLocation();
+            if (tempPath == null) {
+                throw new IllegalArgumentException("Temporary directory for view creation does not exist.");
+            }
+            try {
+                if (m_repTempFile != null) {
+                    Files.deleteIfExists(m_repTempFile.toPath());
+                }
+                if (m_valTempFile != null) {
+                    Files.deleteIfExists(m_valTempFile.toPath());
+                }
+            } catch (IOException | SecurityException e) {
+                // log error but continue
+                LOGGER.error("Temporary view file could not be deleted: " + e.getMessage(), e);
+            }
+            m_repTempFile = FileUtil.createTempFile("imageRep_" + System.currentTimeMillis() + "_", ".json",
+                tempPath.toFile(), true);
+            m_valTempFile = FileUtil.createTempFile("imageVal_" + System.currentTimeMillis() + "_", ".json",
+                tempPath.toFile(), true);
+            try (BufferedWriter writer = Files.newBufferedWriter(m_repTempFile.toPath(), Charset.forName("UTF-8"))) {
+                writer.write(viewRepString);
+                writer.flush();
+            }
+            try (BufferedWriter writer = Files.newBufferedWriter(m_valTempFile.toPath(), Charset.forName("UTF-8"))) {
+                writer.write(viewValueString);
+                writer.flush();
+            }
+        } catch (IOException e) {
+            // handle exception further up
+            throw new SeleniumViewException(e);
+        }
+    }
+
+    private void embedUtilFileInLoadedPage() {
+        if (m_driver == null) {
+            return;
+        }
+        Path utilPath = null;
+        try {
+            URL utilURL = Platform.getBundle(MultiOSDriverActivator.getBundleName())
+                    .getEntry("src-js/selenium-knime-image-util.js");
+            String utilFile = FileLocator.toFileURL(utilURL).getFile();
+            if (Platform.getOS().equals(Platform.OS_WIN32)
+                    && (utilFile.startsWith("/") || utilFile.startsWith("\\"))) {
+                utilFile = utilFile.substring(1);
+            }
+            utilPath = Paths.get(utilFile);
+        } catch (Exception e) {
+            throw new SeleniumViewException("Image generation failed. "
+                + "Could not find selenium-knime-image-util.js: " + e.getMessage());
+        }
+        String embedScript = "";
+        try {
+            embedScript = new String(Files.readAllBytes(utilPath), "UTF-8");
+        } catch (IOException ex) {
+            throw new SeleniumViewException("Reading utility file for image generation failed: "
+                    + ex.getMessage(), ex);
+        }
+        m_driver.executeScript(embedScript);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void cleanup() {
+        tryDeleteTempFiles();
         if (m_userDataDir != null) {
             m_service.unlockUserDataDir(m_userDataDir, true);
             m_userDataDir = null;
@@ -283,6 +402,24 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             m_driver.quit();
             m_driver = null;
         }
+    }
+
+    /**
+     * Tries to delete current temporary files. Potential errors are ignored.
+     */
+    private void tryDeleteTempFiles() {
+        try {
+            if (m_repTempFile != null && m_repTempFile.exists()) {
+                m_repTempFile.delete();
+                m_repTempFile = null;
+            }
+        } catch (Exception e) { /* continue */ }
+        try {
+            if (m_valTempFile != null && m_valTempFile.exists()) {
+                m_valTempFile.delete();
+                m_valTempFile = null;
+            }
+        } catch (Exception e) { /* continue */ }
     }
 
 }

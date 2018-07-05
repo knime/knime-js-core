@@ -213,37 +213,37 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 		Thread openViewThread = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                int x = 0;
-                int y = 0;
-                if (knimeWindowBounds != null) {
-                    x = (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x;
-                    y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
-                }
+		    @Override
+		    public void run() {
+		        int x = 0;
+		        int y = 0;
+		        if (knimeWindowBounds != null) {
+		            x = (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x;
+		            y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
+		        }
 
-                Path bridgePath = null;
-                try {
-                    URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
-                    String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
-                    if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
-                        bridgeFile = bridgeFile.substring(1);
-                    }
-                    bridgePath = Paths.get(bridgeFile);
-                } catch (Exception e) {
-                    displayErrorMessage(new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage()));
-                }
-                writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
+		        Path bridgePath = null;
+		        try {
+		            URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
+		            String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
+		            if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
+		                bridgeFile = bridgeFile.substring(1);
+		            }
+		            bridgePath = Paths.get(bridgeFile);
+		        } catch (Exception e) {
+		            displayErrorMessage(new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage()));
+		        }
+		        writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
 
-                try {
-                    m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-                } catch (Throwable t) {
-                    displayErrorMessage(t);
-                }
-                if (m_windowHandle != null) {
-                    initView(true);
-                }
-            }
+		        try {
+		            m_windowHandle = initDriver(x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		        } catch (Throwable t) {
+		            displayErrorMessage(t);
+		        }
+		        if (m_windowHandle != null) {
+		            initView(true);
+		        }
+		    }
         }, "Chrome view thread " + CHROME_THREAD_COUNTER++);
 		openViewThread.start();
 	}

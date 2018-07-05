@@ -204,7 +204,7 @@
 			showButtons(false);
 		}
 
-		laodJSONFile = function(url, callback) {
+		loadJSONFile = function(url, callback) {
 			var httpRequest = new XMLHttpRequest();
 			httpRequest.onreadystatechange = function() {
 				if (httpRequest.readyState === 4) {
@@ -223,13 +223,13 @@
 			var frame = document.getElementById(FRAME_ID);
 			frame.addEventListener('load', function() {
 				var frameWindow = document.getElementById(FRAME_ID).contentWindow;					
-				laodJSONFile(repURL, function(rep){
+				loadJSONFile(repURL, function(rep){
 					frameWindow.parsedRepresentation = rep;
 					if (frameWindow.parsedValue) {
 						frameWindow.eval(initCall);
 					}
 				});
-				laodJSONFile(valURL, function(val){
+				loadJSONFile(valURL, function(val){
 					frameWindow.parsedValue = val;
 					if (frameWindow.parsedRepresentation) {
 						frameWindow.eval(initCall);
