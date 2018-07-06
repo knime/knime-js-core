@@ -399,8 +399,13 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             m_userDataDir = null;
         }
         if (m_driver != null) {
-            m_driver.quit();
-            m_driver = null;
+            try {
+                m_driver.quit();
+            } catch (Throwable t) {
+                /* continue, the browser might be unavailable or unresponsive */
+            } finally {
+                m_driver = null;
+            }
         }
     }
 
