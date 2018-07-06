@@ -394,19 +394,20 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
     @Override
     public void cleanup() {
         tryDeleteTempFiles();
-        if (m_driver != null) {
-            try {
+        try {
+            if (m_driver != null) {
                 m_driver.quit();
-            } catch (Throwable t) {
-                /* continue, the browser might be unavailable or unresponsive */
-                LOGGER.error("Could not shutdown headless Chromium browser. The process might still be "
-                    + "existing in the system and require manual shutdown.", t);
-            } finally {
-                m_driver = null;
             }
-        }
-        if (m_userDataDir != null) {
-            m_service.unlockUserDataDir(m_userDataDir, true);
+            if (m_userDataDir != null) {
+                m_service.unlockUserDataDir(m_userDataDir, true);
+            }
+        } catch (Throwable t) {
+            /* continue, the browser might be unavailable or unresponsive */
+            LOGGER.error("Could not shutdown headless Chromium browser. The process might still be "
+                    + "existing in the system and require manual shutdown.", t);
+            m_service.tryDeleteUserDataDir(m_userDataDir, true);
+        } finally {
+            m_driver = null;
             m_userDataDir = null;
         }
     }

@@ -63,6 +63,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.Platform;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.util.FileUtil;
@@ -235,6 +236,22 @@ public class ChromeViewService {
 	        m_imageGenerationCounter.release();
 	        LOGGER.debug("Releasing Chromium image generation instance (" + m_imageGenerationCounter.availablePermits()
 	            + " left available of " + IMAGE_GENERATION_POOL_SIZE + ").");
+	    }
+	}
+
+	void tryDeleteUserDataDir(final File dir, final boolean imageGeneration) {
+	    if (m_userDirMap.containsKey(dir)) {
+            m_userDirMap.remove(dir);
+        }
+	    try {
+	        FileUtils.deleteDirectory(dir);
+	    } catch (Exception e) {
+	        /* nothing to do */
+	    }
+	    if (imageGeneration) {
+	        m_imageGenerationCounter.release();
+	        LOGGER.debug("Releasing Chromium image generation instance (" + m_imageGenerationCounter.availablePermits()
+                + " left available of " + IMAGE_GENERATION_POOL_SIZE + ").");
 	    }
 	}
 
