@@ -48,10 +48,6 @@
  */
 package org.knime.ext.seleniumdrivers.multios;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Enumeration;
@@ -125,10 +121,10 @@ public class MultiOSDriverActivator extends Plugin {
             }
             CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
-        if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
+        /*if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
             String appPath = Paths.get(CHROMIUM_PATH).getParent().getParent().getParent().toString();
             disableMacCloseWindowsAlertForApp(appPath);
-        }
+        }*/
 	}
 
     /**
@@ -144,7 +140,7 @@ public class MultiOSDriverActivator extends Plugin {
 
 	}
 
-    private static void disableMacCloseWindowsAlertForApp(final String appPath) {
+    /*private static void disableMacCloseWindowsAlertForApp(final String appPath) {
         String command = "defaults write -app " + appPath.replaceAll(" ", "\\ ") + " NSQuitAlwaysKeepsWindows -bool false";
         String error = "Unable to deactivate 'close windows' alerts from MacOS."
                 + "Chromium view might not behave as expected.";
@@ -164,7 +160,7 @@ public class MultiOSDriverActivator extends Plugin {
         } catch (IOException ex) {
             LOGGER.error(error, ex);
         }
-    }
+    }*/
 
 
     static Optional<String> getBundledChromeDriverPath() {
