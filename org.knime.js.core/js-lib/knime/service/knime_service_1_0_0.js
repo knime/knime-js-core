@@ -653,8 +653,38 @@ knimeService = function() {
 				try {
 					var rule = styles[i].cssRules[j];
 					if (svg.querySelector(rule.selectorText)) {
-						// use only those styles which are really needed
-						cssText.push(rule.cssText);
+						// Split rgba into rgb and oppacity, as Batik is not able to handle rgba
+						if(rule.cssText.includes("rgba")) {
+							var result, rgbaString = [];
+							var stringsToReplace = [];
+							var tempRule = rule.cssText;
+							
+							// RegExp to find rgba values      
+							var findRGBAValues = /(.*?)rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]+\.[0-9]+|\d\s*)\)/g;
+							
+							// Find all rgba values and the according css string to replace it later on
+							while(result = findRGBAValues.exec(rule.cssText)) {
+								stringsToReplace.push(result[0].match(/\w+(?=:\s*rgba):\s*rgba(.*?)\)/g));
+								rgbaString.push([[result[0].match(/\w+(?=:\s*rgba)/g)],
+							                      [result[result.length-4]],
+							                      [result[result.length-3]],
+							                      [result[result.length-2]],
+							                      [result[result.length-1]]]);
+							}
+							// Loop over all found rgba values and replace them
+							for(var i=0; i<rgbaString.length;i++) {
+								var rgbString = rgbaString[i][0] + ": rgb(" + 
+												rgbaString[i][1] + "," + 
+												rgbaString[i][2] + "," + 
+												rgbaString[i][3] + ");";
+								var opacityString = rgbaString[i][0] + "-opacity: " + rgbaString[i][4] +"; ";
+								var tempRule = tempRule.replace(stringsToReplace[i], rgbString + opacityString);	
+							}
+							cssText.push(tempRule);
+						} else {
+							// use only those styles which are really needed and do not contain any rgba values
+							cssText.push(rule.cssText);
+						}
 					}
 				} catch(exception) {
 					continue;
