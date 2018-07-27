@@ -24,6 +24,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TableRepresentationSettings {
     private JSONDataTable m_table;
 
+    final static String CFG_ENABLE_LAZY_LOADING = "enableLazyLoading";
+    private final static boolean DEFAULT_ENABLE_LAZY_LOADING = false;
+    private boolean m_enableLazyLoading = DEFAULT_ENABLE_LAZY_LOADING;
+
     final static String CFG_ENABLE_PAGING = "enablePaging";
     private final static boolean DEFAULT_ENABLE_PAGING = true;
     private boolean m_enablePaging = DEFAULT_ENABLE_PAGING;
@@ -156,6 +160,19 @@ public class TableRepresentationSettings {
         m_table = table;
     }
 
+    /**
+     * @return the enableLazyLoading
+     */
+    public boolean getEnableLazyLoading() {
+        return m_enableLazyLoading;
+    }
+
+    /**
+     * @param enableLazyLoading the enableLazyLoading to set
+     */
+    public void setEnableLazyLoading(final boolean enableLazyLoading) {
+        m_enableLazyLoading = enableLazyLoading;
+    }
 
     /**
      * @return the enablePaging
@@ -644,8 +661,11 @@ public class TableRepresentationSettings {
         m_singleSelection = settings.getBoolean(CFG_SINGLE_SELECTION, DEFAULT_SINGLE_SELECTION);
         m_enableClearSelectionButton = settings.getBoolean(CFG_ENABLE_CLEAR_SELECTION_BUTTON, DEFAULT_ENABLE_CLEAR_SELECTION_BUTTON);
 
-        //added wit 3.6
+        //added with 3.6
         m_maxRows = settings.getInt(CFG_MAX_ROWS, DEFAULT_MAX_ROWS);
+
+        //added with 3.7
+        m_enableLazyLoading = settings.getBoolean(CFG_ENABLE_LAZY_LOADING, DEFAULT_ENABLE_LAZY_LOADING);
     }
 
     /**
@@ -689,6 +709,9 @@ public class TableRepresentationSettings {
 
         //added with 3.6
         settings.addInt(CFG_MAX_ROWS, m_maxRows);
+
+        //added with 3.7
+        settings.addBoolean(CFG_ENABLE_LAZY_LOADING, m_enableLazyLoading);
     }
 
     /**
@@ -742,8 +765,11 @@ public class TableRepresentationSettings {
         m_singleSelection = settings.getBoolean(CFG_SINGLE_SELECTION, DEFAULT_SINGLE_SELECTION);
         m_enableClearSelectionButton = settings.getBoolean(CFG_ENABLE_CLEAR_SELECTION_BUTTON, DEFAULT_ENABLE_CLEAR_SELECTION_BUTTON);
 
-        //added wit 3.6
+        //added with 3.6
         m_maxRows = settings.getInt(CFG_MAX_ROWS, DEFAULT_MAX_ROWS);
+
+        //added with 3.7
+        m_enableLazyLoading = settings.getBoolean(CFG_ENABLE_LAZY_LOADING, DEFAULT_ENABLE_LAZY_LOADING);
     }
 
     /**
@@ -783,6 +809,7 @@ public class TableRepresentationSettings {
                 .append(m_publishFilterId)
                 .append(m_subscriptionFilterIds)
                 .append(m_maxRows)
+                .append(m_enableLazyLoading)
                 .toHashCode();
     }
 
@@ -833,6 +860,7 @@ public class TableRepresentationSettings {
                 .append(m_publishFilterId, other.m_publishFilterId)
                 .append(m_subscriptionFilterIds, other.m_subscriptionFilterIds)
                 .append(m_maxRows, other.m_maxRows)
+                .append(m_enableLazyLoading, other.m_enableLazyLoading)
                 .isEquals();
     }
 }

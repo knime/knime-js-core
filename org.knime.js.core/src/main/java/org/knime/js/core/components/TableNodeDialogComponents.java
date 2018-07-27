@@ -44,6 +44,8 @@ public class TableNodeDialogComponents {
      */
     protected static final int TEXT_FIELD_SIZE = 20;
 
+    private final JCheckBox m_enableLazyLoadingCheckBox;
+    private final JLabel m_maxRowsLabel;
     private final JSpinner m_maxRowsSpinner;
     private final JCheckBox m_enablePagingCheckBox;
     private final JSpinner m_initialPageSizeSpinner;
@@ -112,6 +114,15 @@ public class TableNodeDialogComponents {
     public TableNodeDialogComponents() {
         m_config = new TableSettings();
 
+        m_enableLazyLoadingCheckBox = new JCheckBox("Enable lazy loading");
+        m_enableLazyLoadingCheckBox.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(final ChangeEvent e) {
+                enableLazyLoadingFields();
+            }
+        });
+        m_maxRowsLabel = new JLabel("Maximum number of rows to display: ");
         m_maxRowsSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
         m_enablePagingCheckBox = new JCheckBox("Enable pagination");
         m_enablePagingCheckBox.addChangeListener(new ChangeListener() {
@@ -223,12 +234,16 @@ public class TableNodeDialogComponents {
         JPanel generalPanel = new JPanel(new GridBagLayout());
         generalPanel.setBorder(new TitledBorder("General Options"));
         GridBagConstraints gbcG = createConfiguredGridBagConstraints();
+        gbcG.anchor = GridBagConstraints.CENTER;
         gbcG.fill = GridBagConstraints.HORIZONTAL;
         gbcG.gridwidth = 1;
-        generalPanel.add(new JLabel("No. of rows to display: "), gbcG);
+        generalPanel.add(m_maxRowsLabel, gbcG);
         gbcG.gridx++;
         m_maxRowsSpinner.setPreferredSize(new Dimension(100, TEXT_FIELD_SIZE));
         generalPanel.add(m_maxRowsSpinner, gbcG);
+        gbcG.insets = new Insets(gbcG.insets.top, 40, gbcG.insets.bottom, gbcG.insets.right);
+        gbcG.gridx++;
+        generalPanel.add(m_enableLazyLoadingCheckBox, gbcG);
 
         JPanel titlePanel = new JPanel(new GridBagLayout());
         titlePanel.setBorder(new TitledBorder("Titles"));
@@ -423,6 +438,8 @@ public class TableNodeDialogComponents {
     public void loadFromNodeSettings(final NodeSettingsRO nodeSettings, final PortObjectSpec[] specs) throws NotConfigurableException {
         DataTableSpec inSpec = (DataTableSpec)specs[0];
         m_config.loadSettingsForDialog(nodeSettings, inSpec);
+        //FIXME: use rep and val settings from variable
+        m_enableLazyLoadingCheckBox.setSelected(m_config.getRepresentationSettings().getEnableLazyLoading());
         m_maxRowsSpinner.setValue(m_config.getRepresentationSettings().getMaxRows());
         m_enablePagingCheckBox.setSelected(m_config.getRepresentationSettings().getEnablePaging());
         m_initialPageSizeSpinner.setValue(m_config.getRepresentationSettings().getInitialPageSize());
@@ -458,6 +475,8 @@ public class TableNodeDialogComponents {
         m_enableGlobalNumberFormatCheckbox.setSelected(m_config.getRepresentationSettings().getEnableGlobalNumberFormat());
         m_globalNumberFormatDecimalSpinner.setValue(m_config.getRepresentationSettings().getGlobalNumberFormatDecimals());
         m_displayMissingValueAsQuestionMark.setSelected(m_config.getRepresentationSettings().getDisplayMissingValueAsQuestionMark());
+
+        enableLazyLoadingFields();
         enablePagingFields();
         enableSelectionFields();
         enableSearchFields();
@@ -474,6 +493,8 @@ public class TableNodeDialogComponents {
     public void saveToNodeSettings(final NodeSettingsWO nodeSettings) throws InvalidSettingsException {
         m_dateTimeFormats.validateSettings();
 
+        m_config.getRepresentationSettings().setEnableLazyLoading(m_enableLazyLoadingCheckBox.isSelected());
+        m_config.getRepresentationSettings().setMaxRows((Integer)m_maxRowsSpinner.getValue());
         m_config.getRepresentationSettings().setMaxRows((Integer)m_maxRowsSpinner.getValue());
         m_config.getRepresentationSettings().setEnablePaging(m_enablePagingCheckBox.isSelected());
         m_config.getRepresentationSettings().setInitialPageSize((Integer)m_initialPageSizeSpinner.getValue());
@@ -536,6 +557,12 @@ public class TableNodeDialogComponents {
             throw new InvalidSettingsException(e.getMessage(), e);
         }
         return allowedPageSizes;
+    }
+
+    private void enableLazyLoadingFields() {
+        boolean enable = !m_enableLazyLoadingCheckBox.isSelected();
+        m_maxRowsLabel.setEnabled(enable);
+        m_maxRowsSpinner.setEnabled(enable);
     }
 
     private void enablePagingFields() {
