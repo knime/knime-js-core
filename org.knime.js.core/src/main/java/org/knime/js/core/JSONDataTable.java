@@ -142,6 +142,11 @@ public class JSONDataTable {
     /* serialized members */
     private String m_id;
     private JSONDataTableSpec m_spec;
+    private boolean m_fragment;
+    private boolean m_filtered;
+    private long m_fragmentFirstRowIndex;
+    private long m_totalFilteredRows;
+    private long m_totalRows;
     private JSONDataTableRow[] m_rows;
     private Object[][] m_extensions;
     // This hash takes into account only columns names and types and cells data.
@@ -150,7 +155,7 @@ public class JSONDataTable {
 
     /* builder members */
     private DataTable m_dataTable;
-    private int m_firstRow;
+    private long m_firstRow;
     private int m_maxRows;
     private String[] m_excludeColumns;
     private String[] m_includeColumns;
@@ -666,7 +671,7 @@ public class JSONDataTable {
         return container.getTable();
     }
 
-    private Object getJSONCellValue(final DataCell cell) {
+    private static Object getJSONCellValue(final DataCell cell) {
         JSTypes jsType = JSONDataTableSpec.getJSONType(cell.getType());
         switch (jsType) {
             case BOOLEAN:
@@ -718,6 +723,101 @@ public class JSONDataTable {
      */
     public void setSpec(final JSONDataTableSpec spec) {
         m_spec = spec;
+    }
+
+    /**
+     * @return true if the rows of this table are a fragment of a larger table, false if it represents a
+     * complete table
+     * @since 3.7
+     */
+    public boolean isFragment() {
+        return m_fragment;
+    }
+
+    /**
+     * @param fragment true if the rows of this table are a fragment of a larger table, false if it
+     * represents a complete table
+     * @since 3.7
+     */
+    public void setFragment(final boolean fragment) {
+        m_fragment = fragment;
+    }
+
+    /**
+     * @return true if this table represents a table which is the result on a filtering operation of a larger
+     * table, false otherwise
+     * @since 3.7
+     */
+    public boolean isFiltered() {
+        return m_filtered;
+    }
+
+    /**
+     * @param filtered true if this table represents a table which is the result of a filtering operation on
+     * a larger table, false otherwise
+     * @since 3.7
+     */
+    public void setFiltered(final boolean filtered) {
+        m_filtered = filtered;
+    }
+
+    /**
+     * If this table represents a fragment of a larger table, this number represents the beginning index
+     * of this fragment in the larger table. Returns 0 for complete tables.
+     * @return the index of the first row of this fragment in a larger table
+     * @since 3.7
+     */
+    public long getFragmentFirstRowIndex() {
+        return m_fragmentFirstRowIndex;
+    }
+
+    /**
+     * @param fragmentFirstRowIndex the index of the first row of this fragment in a larger table
+     * @since 3.7
+     */
+    public void setFragmentFirstRowIndex(final long fragmentFirstRowIndex) {
+        m_fragmentFirstRowIndex = fragmentFirstRowIndex;
+    }
+
+    /**
+     * If this table represents the result of a filtering operation on a larger table, this number represents
+     * the total number of rows after the filtering operation. If this table is also a fragment this number
+     * is larger than this table's row size.
+     * @return the total number of filtered rows
+     * @since 3.7
+     */
+    public long getTotalFilteredRows() {
+        return m_totalFilteredRows;
+    }
+
+    /**
+     * If this table represents the result of a filtering operation on a larger table, this number represents
+     * the total number of rows after the filtering operation.
+     * @param totalFilteredRows the total number of filtered rows
+     * @since 3.7
+     */
+    public void setTotalFilteredRows(final long totalFilteredRows) {
+        m_totalFilteredRows = totalFilteredRows;
+    }
+
+    /**
+     * Returns the total number of rows in the table that this JSON table is derived from. If this table is
+     * a complete table it reports it's row size. Otherwise this number is larger than this table's row size.
+     * If this table is also filtered this number represents the number of unfiltered rows.
+     * @return the total number of rows
+     * @since 3.7
+     */
+    public long getTotalRows() {
+        return m_totalRows;
+    }
+
+    /**
+     * Sets the total number of rows
+     * @param totalRows the total rows to set
+     * @since 3.7
+     */
+    public void setTotalRows(final long totalRows) {
+        m_totalRows = totalRows;
     }
 
     /**
@@ -882,8 +982,10 @@ public class JSONDataTable {
 
         private String m_id = null;
         private DataTable m_dataTable = null;
-        private Integer m_firstRow = null;
+        private Long m_firstRow = null;
         private Integer m_maxRows = null;
+        private Long m_filteredRows = null;
+        private Long m_totalRows = null;
         private String[] m_excludeColumns = null;
         private String[] m_includeColumns = null;
         private Boolean m_excludeColumnsWithMissingValues = null;
@@ -916,8 +1018,9 @@ public class JSONDataTable {
         /**
          * @param firstRow the first row number to be included in the result, must be larger than zero
          * @return This builder instance, which can be used for method chaining.
+         * @since 3.7
          */
-        public Builder setFirstRow(final int firstRow) {
+        public Builder setFirstRow(final long firstRow) {
             m_firstRow = firstRow;
             return this;
         }
@@ -928,6 +1031,20 @@ public class JSONDataTable {
          */
         public Builder setMaxRows(final int maxRows) {
             m_maxRows = maxRows;
+            return this;
+        }
+
+        /**
+         * @param totalRows the total number of rows that this JSON table is derived from. In case of the
+         * table to be built being a fragment this represents the total number of unfiltered rows.
+         * @param filteredRows the total number of rows after a filter operation has been applied to the
+         * table that this JSON table is derived from.
+         *  @return This builder instance, which can be used for method chaining.
+         * @since 3.7
+         */
+        public Builder setPartialTableRows(final long totalRows, final long filteredRows) {
+            m_totalRows = totalRows;
+            m_filteredRows = filteredRows;
             return this;
         }
 
@@ -1030,24 +1147,51 @@ public class JSONDataTable {
                 throw new IllegalArgumentException("Must provide non-null data table for JSONDataTable construction.");
             }
             result.m_dataTable = m_dataTable;
+            Long fullTableSize = -1L;
+            if (m_dataTable instanceof BufferedDataTable) {
+                fullTableSize = ((BufferedDataTable)m_dataTable).size();
+            }
             if (m_id != null) {
                 result.m_id = m_id;
             }
             if (m_firstRow == null) {
-                //first row defaults to one
-                m_firstRow = 1;
+                //first row defaults to beginning of the table
+                m_firstRow = 1L;
+            }
+            if (fullTableSize > 0 && m_firstRow > fullTableSize) {
+                throw new IllegalArgumentException("The first row to extract exceeds the size of the given"
+                    + "table.");
             }
             if (m_maxRows == null) {
                 if (m_dataTable instanceof BufferedDataTable) {
-                    //max rows defaults to table size
-                     m_maxRows = Math.toIntExact(Math.min(Integer.MAX_VALUE, ((BufferedDataTable)m_dataTable).size()));
+                    //max rows defaults to include end of table
+                    long tableSizeToExtract = fullTableSize - m_firstRow - 1;
+                    if (tableSizeToExtract > Integer.MAX_VALUE) {
+                        throw new IllegalArgumentException("The size of the chunk of the BufferedDataTable "
+                            + "to extract exceeds the maximum size of the JSON table.");
+                    }
+                     m_maxRows = Math.toIntExact(tableSizeToExtract);
                 } else {
                     // can't determine default, this will result in building error
                     m_maxRows = 0;
                 }
             }
+            if (m_maxRows < 0) {
+                throw new IllegalArgumentException("The number of rows to be extracted needs to be positive.");
+            }
             result.m_firstRow = m_firstRow;
+            result.m_fragmentFirstRowIndex = m_firstRow - 1;
             result.m_maxRows = m_maxRows;
+            if (m_totalRows != null && m_filteredRows != null) {
+                result.m_totalRows = m_totalRows;
+                result.m_totalFilteredRows = m_filteredRows;
+                if (m_totalRows > m_maxRows) {
+                    result.m_fragment = true;
+                }
+                if (m_totalRows > m_filteredRows) {
+                    result.m_filtered = true;
+                }
+            }
             if (m_excludeColumns != null && m_includeColumns != null) {
                 throw new IllegalArgumentException("Exclude and include columns are mutually exclusive and cannot both be set");
             }
@@ -1135,6 +1279,11 @@ public class JSONDataTable {
         return new HashCodeBuilder()
                 .append(m_id)
                 .append(m_spec)
+                .append(m_fragment)
+                .append(m_filtered)
+                .append(m_fragmentFirstRowIndex)
+                .append(m_totalFilteredRows)
+                .append(m_totalRows)
                 .append(m_rows)
                 .append(m_extensions)
                 .toHashCode();
@@ -1158,6 +1307,11 @@ public class JSONDataTable {
         return new EqualsBuilder()
                 .append(m_id, other.m_id)
                 .append(m_spec, other.m_spec)
+                .append(m_fragment, other.m_fragment)
+                .append(m_filtered, other.m_filtered)
+                .append(m_fragmentFirstRowIndex, other.m_fragmentFirstRowIndex)
+                .append(m_totalFilteredRows, other.m_totalFilteredRows)
+                .append(m_totalRows, other.m_totalRows)
                 .append(m_rows, other.m_rows)
                 .append(m_extensions, other.m_extensions)
                 .isEquals();
