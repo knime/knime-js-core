@@ -115,7 +115,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
     private static Boolean CHROME_PRESENT = null;
     private static int CHROME_THREAD_COUNTER = 1;
 
-    private static final int DEFAULT_TIMEOUT = 30;
+    static final int DEFAULT_TIMEOUT = 30;
     private static final int COMET_TIMEOUT = 1000;
     private static final int COMET_TIMEOUT_DURING_REQUEST = 200;
     private static final int DEFAULT_WIDTH = 1024;
@@ -311,7 +311,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
-            waitForDocumentReady();
+            waitForDocumentReady(m_driver);
             // Store the current window handle
             return m_driver.getWindowHandle();
         } catch (Exception e) {
@@ -538,16 +538,16 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             /* do nothing */ }
     }
 
-    private void waitForDocumentReady() {
-        WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
-        wait.until(driver -> documentReady());
+    static void waitForDocumentReady(final ChromeDriver cDriver) {
+        WebDriverWait wait = new WebDriverWait(cDriver, DEFAULT_TIMEOUT);
+        wait.until(driver -> documentReady(cDriver));
     }
 
-    private ExpectedCondition<Boolean> documentReady() {
+    private static ExpectedCondition<Boolean> documentReady(final ChromeDriver cDriver) {
         return new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(final WebDriver driver) {
-                String readyState = ((JavascriptExecutor)m_driver)
+                String readyState = ((JavascriptExecutor)cDriver)
                     .executeScript("if (document.readyState) return document.readyState;").toString();
                 return "complete".equalsIgnoreCase(readyState);
             }
