@@ -29,11 +29,14 @@ import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.JSONDataTable.Builder;
 import org.knime.js.core.layout.LayoutTemplateProvider;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent.ResizeMethod;
 import org.knime.js.core.node.AbstractWizardNodeModel;
+import org.knime.js.core.settings.table.TableRepresentationSettings;
 import org.knime.js.core.settings.table.TableSettings;
+import org.knime.js.core.settings.table.TableValueSettings;
 
 /**
  * Abstract table node model which implements the common functionality for all table-based nodes
@@ -211,8 +214,9 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
      */
     protected JSONDataTable createJSONTableFromBufferedDataTable(final BufferedDataTable table, final ExecutionContext exec) throws CanceledExecutionException {
         JSONDataTable jsonTable = getJsonDataTableBuilder(table).build(exec);
-        int maxRows = m_config.getSettings().getRepresentationSettings().getMaxRows();
-        if (maxRows < table.size()) {
+        TableRepresentationSettings repSettings = m_config.getSettings().getRepresentationSettings();
+        int maxRows = repSettings.getMaxRows();
+        if (!repSettings.getEnableLazyLoading() && maxRows < table.size()) {
             setWarningMessage("Only the first " + maxRows + " rows are displayed.");
         }
         return jsonTable;
@@ -224,24 +228,29 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
      * @return corresponding builder object
      */
     protected JSONDataTable.Builder getJsonDataTableBuilder(final BufferedDataTable table) {
-        return JSONDataTable.newBuilder()
+        FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
+        TableRepresentationSettings repSettings = m_config.getSettings().getRepresentationSettings();
+        TableValueSettings valSettings = m_config.getSettings().getValueSettings();
+        Builder tableBuilder = JSONDataTable.newBuilder()
                 .setDataTable(table)
                 .setId(getTableId(0))
-                .setFirstRow(1)
-                .keepFilterColumns(true)
-                .setMaxRows(m_config.getSettings().getRepresentationSettings().getMaxRows())
-                .setExcludeColumns(this.determineExcludedColumns(table));
-    }
-
-    /**
-     * Get the list of excluded columns from the settings, for use in the JSONDataTable.Builder
-     * @param table
-     * @return list of excluded columns
-     * @since 3.7
-     */
-    protected String[] determineExcludedColumns(final BufferedDataTable table) {
-        FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
-        return filter.getExcludes();
+                .setExcludeColumns(filter.getExcludes());
+        if (repSettings.getEnableLazyLoading()) {
+            //TODO: create filtered and sorted table
+            int page = Math.max(1, valSettings.getCurrentPage());
+            int pageSize = valSettings.getPageSize();
+            if (pageSize <= 0) {
+                pageSize = repSettings.getInitialPageSize();
+            }
+            int firstRow = (page - 1) * pageSize + 1;
+            tableBuilder.setFirstRow(firstRow)
+                .setMaxRows(pageSize)
+                .setPartialTableRows(table.size(), table.size());
+        } else {
+            tableBuilder.setFirstRow(1)
+            .setMaxRows(repSettings.getMaxRows());
+        }
+        return tableBuilder;
     }
 
     /**
@@ -295,6 +304,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
 
     /**
      * {@inheritDoc}
+     * @since 3.8
      */
     @Override
     public JSONLayoutViewContent getLayoutTemplate() {
