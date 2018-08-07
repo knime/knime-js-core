@@ -24,7 +24,19 @@ kt = function() {
 	kt.setDataTableSpec = function(dataTableSpec) {
 		dataTable.spec = dataTableSpec;
 	}
-
+	
+	kt.isFragment = function() {
+		return dataTable.fragment;
+	}
+	
+	kt.isFiltered = function() {
+		return dataTable.filtered;
+	}
+	
+	kt.getFragmentFirstRowIndex = function() {
+		return dataTable.fragmentFirstRowIndex;
+	}
+		
 	kt.getRows = function() {
 		return dataTable.rows;
 	}
@@ -95,7 +107,15 @@ kt = function() {
 	kt.getNumRows = function() {
 		return dataTable.spec.numRows;
 	};
-
+	
+	kt.getTotalRowCount = function() {
+		return dataTable.totalRows;
+	}
+	
+	kt.getTotalFilteredRowCount = function() {
+		return dataTable.totalFilteredRows;
+	}
+	
 	kt.getKnimeColumnTypes = function() {
 		return dataTable.spec.knimeTypes;
 	};
@@ -316,6 +336,17 @@ kt = function() {
 			}
 		}
 		return included;
+	}
+	
+	kt.mergeTables = function(mergeTable) {
+		//TODO: make sure spec etc. validates
+		if (dataTable.fragmentFirstRowIndex + dataTable.spec.numRows == mergeTable.fragmentFirstRowIndex) {
+			dataTable.rows = dataTable.rows.concat(mergeTable.rows);
+			dataTable.spec.rowColorValues = dataTable.spec.rowColorValues.concat(mergeTable.spec.rowColorValues);
+			dataTable.spec.numRows += mergeTable.spec.numRows;
+		} else {
+			dataTable = mergeTable;
+		}
 	}
 
 	return kt;

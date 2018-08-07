@@ -536,6 +536,57 @@ KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function() {
 	}
 }
 
+KnimeBaseTableViewer.prototype._lazyLoadData = function(data, callback, settings) {
+	//TODO: evaluation needs to take into account order, filter, search
+	var win = [data.start, data.start + data.length - 1];
+	if(this._knimeTable) {
+		var cacheStart = this._knimeTable.getFragmentFirstRowIndex();
+		var cached =  [cacheStart, cacheStart + this._knimeTable.getNumRows() - 1];
+		var included = cached[0] <= win[0] && cached[1] >= win[1];
+		if (!included) {
+			var request = {
+					"start": data.start,
+					'length': data.length,
+					'search': data.search,
+					'order': data.order,
+					'columns': data.columns
+			}
+			var tableViewer = this;
+			var promise = knimeService.requestViewUpdate(request);
+			promise.progress(monitor => {
+					if (monitor.progress) {
+						var percent = (monitor.progress * 100).toFixed(0);
+						$('knimePagedTable_processing').text('Processing... (' + percent + '%)');
+					}
+				}).then(response => {
+					if (response.error) {
+						tableViewer._lazyLoadResponse(data, callback, response.error);
+					} else {
+						tableViewer._knimeTable.mergeTables(response.table);
+						tableViewer._lazyLoadResponse(data, callback);
+					}
+				}).catch(error => tableViewer._lazyLoadResponse(data, callback, error));
+		} else {
+			this._lazyLoadResponse(data, callback);
+		}
+	}
+}
+
+KnimeBaseTableViewer.prototype._lazyLoadResponse = function(data, callback, error) {
+	var response = {'draw': data.draw}
+	response.recordsTotal = this._knimeTable.getTotalRowCount();
+	response.recordsFiltered = this._knimeTable.getTotalFilteredRowCount();
+	if (error) {
+		response.error = error;
+		response.data = [];
+	} else {
+		var firstRow = data.start - this._knimeTable.getFragmentFirstRowIndex();
+		var lastRow = data.start + data.length;
+		response.data = this._getDataSlice(firstRow, lastRow);
+	}
+	callback(response);
+}
+
 /**
  * Builds a config object for DataTables
  */
@@ -560,7 +611,12 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 			info: false
 		}
 	};
-
+	
+	if (this._representation.enableLazyLoading) {
+		this._dataTableConfig.serverSide = true;
+		this._dataTableConfig.ajax = this._lazyLoadData.bind(this);
+	}
+	
 	this._buildSelection();
 	this._buildRowComponents();
 	this._buildColumnDefinitions();

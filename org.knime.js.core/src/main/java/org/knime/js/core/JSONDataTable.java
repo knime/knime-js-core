@@ -347,14 +347,14 @@ public class JSONDataTable {
                     // skip all rows until we see the specified first row
                     continue;
                 }
-                if (currentRowNumber + m_firstRow - 1 > m_maxRows) {
+                if (currentRowNumber - m_firstRow + 1 > m_maxRows) {
                     break;
                 }
             }
 
             JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
             // don't add a row if it's not in the window for JSON data table
-            boolean excludeRow = currentRowNumber < m_firstRow || currentRowNumber + m_firstRow - 1 > m_maxRows;
+            boolean excludeRow = currentRowNumber < m_firstRow || currentRowNumber - m_firstRow + 1 > m_maxRows;
 
             // add cells, check min, max values and possible values for each column
             int c = 0;  // index for includeColIndices
