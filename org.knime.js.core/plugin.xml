@@ -1669,6 +1669,22 @@
                type="CSS">
          </importResource>
       </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            description="Progressive rendering for too much data."
+            name="Render Queue"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="renderQueue_1.0.0">
+         <webResource
+               relativePathSource="js-lib/renderQueue/renderQueue.v1.0.0.js"
+               relativePathTarget="js-lib/renderQueue/renderQueue.v1.0.0.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/renderQueue/renderQueue.v1.0.0.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
             <webResourceBundle
             debug="true"
             name="KNIME Layout Editor"
