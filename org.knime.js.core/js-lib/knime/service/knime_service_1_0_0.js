@@ -680,6 +680,32 @@ knimeService = function() {
 			this.progressListeners.forEach(function(onProgress) {
 				onProgress(mon);
 			});
+		},
+		cancel: function(invokeCatch) {
+			if (!this.monitor || !this.monitor.requestSequence) {
+				return;
+			}
+			for (let i = 0; i < viewRequests.length; i++) {
+				let request = viewRequests[i];
+				if (request.sequence == this.monitor.requestSequence) {
+					if (!request.notCancelable) {
+						let id = request.sequence;
+						if (request.monitor && request.monitor.id) {
+							id = request.monitor.id;
+						}
+						id = '' + id;
+						if (interactivityAvailable) {
+							monitor = GLOBAL_SERVICE.cancelViewRequest(window.frameElement.id, id, invokeCatch);
+						} else {
+							knimeCancelRequest(id);
+						}
+						if (!invokeCatch) {
+							viewRequests.splice(i, 1);
+						}
+					}
+					break;
+				}
+			}
 		}
 	}
 	
@@ -862,32 +888,6 @@ knimeService = function() {
 		} catch (exception) {
 			resolvable.reject(exception);
 		}
-	}
-	
-	service.cancelViewRequest = function(sequence, invokeCatch) {
-		for (let i = 0; i < viewRequests.length; i++) {
-			let request = viewRequests[i];
-			if (request.sequence == sequence) {
-				if (!request.notCancelable) {
-					let id = request.sequence;
-					if (request.monitor && request.monitor.id) {
-						id = request.monitor.id;
-					}
-					id = '' + id;
-					if (interactivityAvailable) {
-						monitor = GLOBAL_SERVICE.cancelViewRequest(window.frameElement.id, id, invokeCatch);
-					} else {
-						knimeCancelRequest(id);
-					}
-					if (!invokeCatch) {
-						viewRequests.splice(i, 1);
-					}
-					return true;
-				}
-				break;
-			}
-		}
-		return false;
 	}
 	
 	/**
