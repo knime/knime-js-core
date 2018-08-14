@@ -64,7 +64,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * and serialized to a JSON string.
  *
  * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
- * @since 3.6
+ * @since 3.7
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "method")

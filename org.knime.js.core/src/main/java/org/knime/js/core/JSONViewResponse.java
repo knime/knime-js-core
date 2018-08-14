@@ -64,7 +64,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *
  * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
  * @param <REQ> The concrete subtype of {@link JSONViewRequest}.
- * @since 3.6
+ * @since 3.7
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
