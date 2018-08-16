@@ -162,6 +162,7 @@ public class TableRepresentationSettings {
 
     /**
      * @return the enableLazyLoading
+     * @since 3.7
      */
     public boolean getEnableLazyLoading() {
         return m_enableLazyLoading;
@@ -169,6 +170,7 @@ public class TableRepresentationSettings {
 
     /**
      * @param enableLazyLoading the enableLazyLoading to set
+     * @since 3.7
      */
     public void setEnableLazyLoading(final boolean enableLazyLoading) {
         m_enableLazyLoading = enableLazyLoading;
