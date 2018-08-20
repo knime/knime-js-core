@@ -89,9 +89,8 @@ public abstract class AbstractSVGWizardNodeModel<REP extends JSONViewContent, VA
     @Override
     protected final ImagePortObject createImagePortObjectFromView(final String imageData, final String error) throws IOException {
         String xmlPrimer = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
-        String svgPrimer =
-            xmlPrimer + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" "
-                + "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">";
+        String svgPrimer = xmlPrimer
+            + "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">";
         String image = imageData;
         if (image != null && (image.length() < 4 || !image.substring(0, 4).equalsIgnoreCase("<svg"))) {
             image = null;
