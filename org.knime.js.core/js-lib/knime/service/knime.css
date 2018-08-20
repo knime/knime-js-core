@@ -353,3 +353,7 @@ input.knime-qf-input {
 	font: 13px sans-serif;
 	color: black;
 }
+
+.knime-slider .knime-tick-label {
+	margin-top: 5px;
+}
