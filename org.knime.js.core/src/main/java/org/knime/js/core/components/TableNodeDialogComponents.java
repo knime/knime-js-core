@@ -79,6 +79,8 @@ public class TableNodeDialogComponents {
     private final JSpinner m_globalNumberFormatDecimalSpinner;
     private final JCheckBox m_displayMissingValueAsQuestionMark;
 
+    private final TableSettings m_config;
+
     private final JPanel m_initPanel;
     private final JPanel m_interactivityPanel;
     private final JPanel m_formattersPanel;
@@ -108,6 +110,8 @@ public class TableNodeDialogComponents {
      *
      */
     public TableNodeDialogComponents() {
+        m_config = new TableSettings();
+
         m_maxRowsSpinner = new JSpinner(new SpinnerNumberModel(0, 0, null, 1));
         m_enablePagingCheckBox = new JCheckBox("Enable pagination");
         m_enablePagingCheckBox.addChangeListener(new ChangeListener() {
@@ -417,44 +421,43 @@ public class TableNodeDialogComponents {
      * @throws NotConfigurableException
      */
     public void loadFromNodeSettings(final NodeSettingsRO nodeSettings, final PortObjectSpec[] specs) throws NotConfigurableException {
-        TableSettings config = new TableSettings();
         DataTableSpec inSpec = (DataTableSpec)specs[0];
-        config.loadSettingsForDialog(nodeSettings, inSpec);
-        m_maxRowsSpinner.setValue(config.getRepresentationSettings().getMaxRows());
-        m_enablePagingCheckBox.setSelected(config.getRepresentationSettings().getEnablePaging());
-        m_initialPageSizeSpinner.setValue(config.getRepresentationSettings().getInitialPageSize());
-        m_enablePageSizeChangeCheckBox.setSelected(config.getRepresentationSettings().getEnablePageSizeChange());
-        m_allowedPageSizesField.setText(getAllowedPageSizesString(config.getRepresentationSettings().getAllowedPageSizes()));
-        m_enableShowAllCheckBox.setSelected(config.getRepresentationSettings().getPageSizeShowAll());
-        m_enableJumpToPageCheckBox.setSelected(config.getRepresentationSettings().getEnableJumpToPage());
-        m_displayRowColorsCheckBox.setSelected(config.getRepresentationSettings().getDisplayRowColors());
-        m_displayRowIdsCheckBox.setSelected(config.getRepresentationSettings().getDisplayRowIds());
-        m_displayColumnHeadersCheckBox.setSelected(config.getRepresentationSettings().getDisplayColumnHeaders());
-        m_displayRowIndexCheckBox.setSelected(config.getRepresentationSettings().getDisplayRowIndex());
-        m_displayFullscreenButtonCheckBox.setSelected(config.getRepresentationSettings().getDisplayFullscreenButton());
-        m_titleField.setText(config.getRepresentationSettings().getTitle());
-        m_subtitleField.setText(config.getRepresentationSettings().getSubtitle());
-        m_columnFilterPanel.loadConfiguration(config.getColumnFilterConfig(), inSpec);
-        m_enableSelectionCheckbox.setSelected(config.getRepresentationSettings().getEnableSelection());
-        m_enableClearSelectionButtonCheckbox.setSelected(config.getRepresentationSettings().getEnableClearSelectionButton());
-        boolean single = config.getRepresentationSettings().getSingleSelection();
+        m_config.loadSettingsForDialog(nodeSettings, inSpec);
+        m_maxRowsSpinner.setValue(m_config.getRepresentationSettings().getMaxRows());
+        m_enablePagingCheckBox.setSelected(m_config.getRepresentationSettings().getEnablePaging());
+        m_initialPageSizeSpinner.setValue(m_config.getRepresentationSettings().getInitialPageSize());
+        m_enablePageSizeChangeCheckBox.setSelected(m_config.getRepresentationSettings().getEnablePageSizeChange());
+        m_allowedPageSizesField.setText(getAllowedPageSizesString(m_config.getRepresentationSettings().getAllowedPageSizes()));
+        m_enableShowAllCheckBox.setSelected(m_config.getRepresentationSettings().getPageSizeShowAll());
+        m_enableJumpToPageCheckBox.setSelected(m_config.getRepresentationSettings().getEnableJumpToPage());
+        m_displayRowColorsCheckBox.setSelected(m_config.getRepresentationSettings().getDisplayRowColors());
+        m_displayRowIdsCheckBox.setSelected(m_config.getRepresentationSettings().getDisplayRowIds());
+        m_displayColumnHeadersCheckBox.setSelected(m_config.getRepresentationSettings().getDisplayColumnHeaders());
+        m_displayRowIndexCheckBox.setSelected(m_config.getRepresentationSettings().getDisplayRowIndex());
+        m_displayFullscreenButtonCheckBox.setSelected(m_config.getRepresentationSettings().getDisplayFullscreenButton());
+        m_titleField.setText(m_config.getRepresentationSettings().getTitle());
+        m_subtitleField.setText(m_config.getRepresentationSettings().getSubtitle());
+        m_columnFilterPanel.loadConfiguration(m_config.getColumnFilterConfig(), inSpec);
+        m_enableSelectionCheckbox.setSelected(m_config.getRepresentationSettings().getEnableSelection());
+        m_enableClearSelectionButtonCheckbox.setSelected(m_config.getRepresentationSettings().getEnableClearSelectionButton());
+        boolean single = m_config.getRepresentationSettings().getSingleSelection();
         m_singleSelectionRadioButton.setSelected(single);
         m_multipleSelectionRadioButton.setSelected(!single);
-        m_selectionColumnNameField.setText(config.getSelectionColumnName());
-        m_hideUnselectedCheckbox.setSelected(config.getValueSettings().getHideUnselected());
-        m_enableHideUnselectedCheckbox.setSelected(config.getRepresentationSettings().getEnableHideUnselected());
-        m_publishSelectionCheckBox.setSelected(config.getValueSettings().getPublishSelection());
-        m_subscribeSelectionCheckBox.setSelected(config.getValueSettings().getSubscribeSelection());
-        m_enableSearchCheckbox.setSelected(config.getRepresentationSettings().getEnableSearching());
-        m_enableColumnSearchCheckbox.setSelected(config.getRepresentationSettings().getEnableColumnSearching());
-        m_publishFilterCheckBox.setSelected(config.getValueSettings().getPublishFilter());
-        m_subscribeFilterCheckBox.setSelected(config.getValueSettings().getSubscribeFilter());
-        m_enableSortingCheckBox.setSelected(config.getRepresentationSettings().getEnableSorting());
-        m_enableClearSortButtonCheckBox.setSelected(config.getRepresentationSettings().getEnableClearSortButton());
-        m_dateTimeFormats.loadSettingsFromModel(config.getRepresentationSettings().getDateTimeFormats());
-        m_enableGlobalNumberFormatCheckbox.setSelected(config.getRepresentationSettings().getEnableGlobalNumberFormat());
-        m_globalNumberFormatDecimalSpinner.setValue(config.getRepresentationSettings().getGlobalNumberFormatDecimals());
-        m_displayMissingValueAsQuestionMark.setSelected(config.getRepresentationSettings().getDisplayMissingValueAsQuestionMark());
+        m_selectionColumnNameField.setText(m_config.getSelectionColumnName());
+        m_hideUnselectedCheckbox.setSelected(m_config.getValueSettings().getHideUnselected());
+        m_enableHideUnselectedCheckbox.setSelected(m_config.getRepresentationSettings().getEnableHideUnselected());
+        m_publishSelectionCheckBox.setSelected(m_config.getValueSettings().getPublishSelection());
+        m_subscribeSelectionCheckBox.setSelected(m_config.getValueSettings().getSubscribeSelection());
+        m_enableSearchCheckbox.setSelected(m_config.getRepresentationSettings().getEnableSearching());
+        m_enableColumnSearchCheckbox.setSelected(m_config.getRepresentationSettings().getEnableColumnSearching());
+        m_publishFilterCheckBox.setSelected(m_config.getValueSettings().getPublishFilter());
+        m_subscribeFilterCheckBox.setSelected(m_config.getValueSettings().getSubscribeFilter());
+        m_enableSortingCheckBox.setSelected(m_config.getRepresentationSettings().getEnableSorting());
+        m_enableClearSortButtonCheckBox.setSelected(m_config.getRepresentationSettings().getEnableClearSortButton());
+        m_dateTimeFormats.loadSettingsFromModel(m_config.getRepresentationSettings().getDateTimeFormats());
+        m_enableGlobalNumberFormatCheckbox.setSelected(m_config.getRepresentationSettings().getEnableGlobalNumberFormat());
+        m_globalNumberFormatDecimalSpinner.setValue(m_config.getRepresentationSettings().getGlobalNumberFormatDecimals());
+        m_displayMissingValueAsQuestionMark.setSelected(m_config.getRepresentationSettings().getDisplayMissingValueAsQuestionMark());
         enablePagingFields();
         enableSelectionFields();
         enableSearchFields();
@@ -471,44 +474,43 @@ public class TableNodeDialogComponents {
     public void saveToNodeSettings(final NodeSettingsWO nodeSettings) throws InvalidSettingsException {
         m_dateTimeFormats.validateSettings();
 
-        TableSettings config = new TableSettings();
-        config.getRepresentationSettings().setMaxRows((Integer)m_maxRowsSpinner.getValue());
-        config.getRepresentationSettings().setEnablePaging(m_enablePagingCheckBox.isSelected());
-        config.getRepresentationSettings().setInitialPageSize((Integer)m_initialPageSizeSpinner.getValue());
-        config.getRepresentationSettings().setEnablePageSizeChange(m_enablePageSizeChangeCheckBox.isSelected());
-        config.getRepresentationSettings().setAllowedPageSizes(getAllowedPageSizes());
-        config.getRepresentationSettings().setPageSizeShowAll(m_enableShowAllCheckBox.isSelected());
-        config.getRepresentationSettings().setEnableJumpToPage(m_enableJumpToPageCheckBox.isSelected());
-        config.getRepresentationSettings().setDisplayRowColors(m_displayRowColorsCheckBox.isSelected());
-        config.getRepresentationSettings().setDisplayRowIds(m_displayRowIdsCheckBox.isSelected());
-        config.getRepresentationSettings().setDisplayColumnHeaders(m_displayColumnHeadersCheckBox.isSelected());
-        config.getRepresentationSettings().setDisplayRowIndex(m_displayRowIndexCheckBox.isSelected());
-        config.getRepresentationSettings().setDisplayFullscreenButton(m_displayFullscreenButtonCheckBox.isSelected());
-        config.getRepresentationSettings().setTitle(m_titleField.getText());
-        config.getRepresentationSettings().setSubtitle(m_subtitleField.getText());
+        m_config.getRepresentationSettings().setMaxRows((Integer)m_maxRowsSpinner.getValue());
+        m_config.getRepresentationSettings().setEnablePaging(m_enablePagingCheckBox.isSelected());
+        m_config.getRepresentationSettings().setInitialPageSize((Integer)m_initialPageSizeSpinner.getValue());
+        m_config.getRepresentationSettings().setEnablePageSizeChange(m_enablePageSizeChangeCheckBox.isSelected());
+        m_config.getRepresentationSettings().setAllowedPageSizes(getAllowedPageSizes());
+        m_config.getRepresentationSettings().setPageSizeShowAll(m_enableShowAllCheckBox.isSelected());
+        m_config.getRepresentationSettings().setEnableJumpToPage(m_enableJumpToPageCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDisplayRowColors(m_displayRowColorsCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDisplayRowIds(m_displayRowIdsCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDisplayColumnHeaders(m_displayColumnHeadersCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDisplayRowIndex(m_displayRowIndexCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDisplayFullscreenButton(m_displayFullscreenButtonCheckBox.isSelected());
+        m_config.getRepresentationSettings().setTitle(m_titleField.getText());
+        m_config.getRepresentationSettings().setSubtitle(m_subtitleField.getText());
         DataColumnSpecFilterConfiguration filterConfig = new DataColumnSpecFilterConfiguration(TableSettings.CFG_COLUMN_FILTER);
         m_columnFilterPanel.saveConfiguration(filterConfig);
-        config.setColumnFilterConfig(filterConfig);
-        config.getRepresentationSettings().setEnableSelection(m_enableSelectionCheckbox.isSelected());
-        config.getRepresentationSettings().setEnableClearSelectionButton(m_enableClearSelectionButtonCheckbox.isSelected());
-        config.getRepresentationSettings().setSingleSelection(m_singleSelectionRadioButton.isSelected());
-        config.setSelectionColumnName(m_selectionColumnNameField.getText());
-        config.getValueSettings().setHideUnselected(m_hideUnselectedCheckbox.isSelected());
-        config.getRepresentationSettings().setEnableHideUnselected(m_enableHideUnselectedCheckbox.isSelected());
-        config.getValueSettings().setPublishSelection(m_publishSelectionCheckBox.isSelected());
-        config.getValueSettings().setSubscribeSelection(m_subscribeSelectionCheckBox.isSelected());
-        config.getRepresentationSettings().setEnableSorting(m_enableSortingCheckBox.isSelected());
-        config.getRepresentationSettings().setEnableClearSortButton(m_enableClearSortButtonCheckBox.isSelected());
-        config.getRepresentationSettings().setEnableSearching(m_enableSearchCheckbox.isSelected());
-        config.getRepresentationSettings().setEnableColumnSearching(m_enableColumnSearchCheckbox.isSelected());
-        config.getValueSettings().setPublishFilter(m_publishFilterCheckBox.isSelected());
-        config.getValueSettings().setSubscribeFilter(m_subscribeFilterCheckBox.isSelected());
-        config.getRepresentationSettings().setDateTimeFormats((SettingsModelDateTimeOptions)m_dateTimeFormats.getModel());
-        config.getRepresentationSettings().setEnableGlobalNumberFormat(m_enableGlobalNumberFormatCheckbox.isSelected());
-        config.getRepresentationSettings().setGlobalNumberFormatDecimals((Integer)m_globalNumberFormatDecimalSpinner.getValue());
-        config.getRepresentationSettings().setDisplayMissingValueAsQuestionMark(m_displayMissingValueAsQuestionMark.isSelected());
+        m_config.setColumnFilterConfig(filterConfig);
+        m_config.getRepresentationSettings().setEnableSelection(m_enableSelectionCheckbox.isSelected());
+        m_config.getRepresentationSettings().setEnableClearSelectionButton(m_enableClearSelectionButtonCheckbox.isSelected());
+        m_config.getRepresentationSettings().setSingleSelection(m_singleSelectionRadioButton.isSelected());
+        m_config.setSelectionColumnName(m_selectionColumnNameField.getText());
+        m_config.getValueSettings().setHideUnselected(m_hideUnselectedCheckbox.isSelected());
+        m_config.getRepresentationSettings().setEnableHideUnselected(m_enableHideUnselectedCheckbox.isSelected());
+        m_config.getValueSettings().setPublishSelection(m_publishSelectionCheckBox.isSelected());
+        m_config.getValueSettings().setSubscribeSelection(m_subscribeSelectionCheckBox.isSelected());
+        m_config.getRepresentationSettings().setEnableSorting(m_enableSortingCheckBox.isSelected());
+        m_config.getRepresentationSettings().setEnableClearSortButton(m_enableClearSortButtonCheckBox.isSelected());
+        m_config.getRepresentationSettings().setEnableSearching(m_enableSearchCheckbox.isSelected());
+        m_config.getRepresentationSettings().setEnableColumnSearching(m_enableColumnSearchCheckbox.isSelected());
+        m_config.getValueSettings().setPublishFilter(m_publishFilterCheckBox.isSelected());
+        m_config.getValueSettings().setSubscribeFilter(m_subscribeFilterCheckBox.isSelected());
+        m_config.getRepresentationSettings().setDateTimeFormats((SettingsModelDateTimeOptions)m_dateTimeFormats.getModel());
+        m_config.getRepresentationSettings().setEnableGlobalNumberFormat(m_enableGlobalNumberFormatCheckbox.isSelected());
+        m_config.getRepresentationSettings().setGlobalNumberFormatDecimals((Integer)m_globalNumberFormatDecimalSpinner.getValue());
+        m_config.getRepresentationSettings().setDisplayMissingValueAsQuestionMark(m_displayMissingValueAsQuestionMark.isSelected());
 
-        config.saveSettings(nodeSettings);
+        m_config.saveSettings(nodeSettings);
     }
 
     private String getAllowedPageSizesString(final int[] sizes) {
