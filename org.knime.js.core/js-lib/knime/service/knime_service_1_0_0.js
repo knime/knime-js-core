@@ -681,6 +681,8 @@ knimeService = function() {
 								var tempRule = tempRule.replace(stringsToReplace[i], rgbString + opacityString);	
 							}
 							cssText.push(tempRule);
+						} else if (rule.cssText.includes("transparent")) {
+							cssText.push(rule.cssText.replace(new RegExp("transparent", "g"), "none"));
 						} else {
 							// use only those styles which are really needed and do not contain any rgba values
 							cssText.push(rule.cssText);
