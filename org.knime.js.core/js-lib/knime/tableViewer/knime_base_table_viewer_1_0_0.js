@@ -708,17 +708,18 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
 					}
 					return true;
 				});
+				var boundFilterChanged = self._filterChanged.bind(self);
 				var subFilIcon = knimeService.createStackedIcon('filter', 'angle-double-right', 'faded right sm', 'left bold');
 				var subFilCheckbox = knimeService.createMenuCheckbox('subscribeFilterCheckbox', this._value.subscribeFilter, function() {
 					if (this.checked) {
-						knimeService.subscribeToFilter(self._representation.table.id, self._filterChanged.bind(self), self._representation.subscriptionFilterIds);
+						knimeService.subscribeToFilter(self._representation.table.id, boundFilterChanged, self._representation.subscriptionFilterIds);
 					} else {
-						knimeService.unsubscribeFilter(self._representation.table.id, self._filterChanged.bind(self));
+						knimeService.unsubscribeFilter(self._representation.table.id, boundFilterChanged);
 					}
 				});
 				knimeService.addMenuItem('Subscribe to filter', subFilIcon, subFilCheckbox);
 				if (this._value.subscribeFilter) {
-					knimeService.subscribeToFilter(this._representation.table.id, this._filterChanged.bind(this), this._representation.subscriptionFilterIds);
+					knimeService.subscribeToFilter(this._representation.table.id, boundFilterChanged, this._representation.subscriptionFilterIds);
 				}
 			}
 		}
