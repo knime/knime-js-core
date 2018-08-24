@@ -276,7 +276,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         String bodyText = "";
         if (m_template == null || m_template.getWebResources() == null || m_template.getWebResources().length < 1) {
-            bodyText = "ERROR: No view implementation available!";
+            bodyText = "<p>ERROR: No view implementation available!</p>";
             LOGGER.error("No JavaScript view implementation available for view: " + m_title);
         }
 
@@ -387,11 +387,11 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         StringBuilder pageBuilder = new StringBuilder();
         pageBuilder.append("<!doctype html><html><head>");
         pageBuilder.append(setIEVersion);
-        pageBuilder.append("</head><body>");
+        pageBuilder.append("</head><body><p>");
         // content
         pageBuilder.append(message);
         // content end
-        pageBuilder.append("</body></html>");
+        pageBuilder.append("</p></body></html>");
 
         return pageBuilder.toString();
     }
