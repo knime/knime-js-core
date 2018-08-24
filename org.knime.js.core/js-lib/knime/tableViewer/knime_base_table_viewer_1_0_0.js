@@ -98,7 +98,7 @@ KnimeBaseTableViewer = function() {
  */
 KnimeBaseTableViewer.prototype.init = function(representation, value) {
 	if (!representation || !representation.table || !value) {
-		$('body').append("Error: No data available");
+		$('body').append("<p>Error: No data available</p>");
 		return;
 	}
 	this._representation = representation;
