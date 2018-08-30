@@ -154,55 +154,83 @@
               </select>
             </fieldset> 
 
-            <fieldset class="form-group">
-              <label>Auto Resize:</label>
-              <input type="checkbox" id="autoResize" class="form-control">
-            </fieldset>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-6 col-xs-6"> 
+                <fieldset class="form-group">
+                  <label>Auto Resize:</label>
+                  <input type="checkbox" id="autoResize" class="form-control">
+                </fieldset>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Enable Scrolling:</label>
+                  <input type="checkbox" id="enableScrolling" class="form-control">
+                </fieldset>
+              </div>
+            </div>
 
-            <fieldset class="form-group">
-              <label>Enable Scrolling:</label>
-              <input type="checkbox" id="enableScrolling" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Size Height:</label>
-              <input type="checkbox"  id="sizeHeight" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Size Width:</label>
-              <input type="checkbox" id="sizeWidth" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Resize Interval:</label>
-              <input type="text" id="resizeInterval" class="form-control">
-            </fieldset>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-6 col-xs-6"> 
+                <fieldset class="form-group">
+                  <label>Size Height:</label>
+                  <input type="checkbox"  id="sizeHeight" class="form-control">
+                </fieldset>
+              </div>
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Size Width:</label>
+                  <input type="checkbox" id="sizeWidth" class="form-control">
+                </fieldset>
+              </div>  
+            </div>
             
-            <fieldset class="form-group">
-              <label>Resize Tolerance:</label>
-              <input type="text" id="resizeTolerance" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Minimum Width:</label>
-              <input type="text" id="minimumWidth" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Maximum Width:</label>
-              <input type="text" id="maximumWidth" class="form-control">
-            </fieldset>
-
-            <fieldset class="form-group">
-              <label>Minimum Height:</label>
-              <input type="text" id="minimumHeight" class="form-control">
-            </fieldset>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-6 col-xs-6"> 
+                <fieldset class="form-group">
+                  <label>Resize Interval:</label>
+                  <input type="text" id="resizeInterval" class="form-control">
+                </fieldset>
+              </div>
             
-            <fieldset class="form-group">
-              <label>Maximum Height:</label>
-              <input type="text" id="maximumHeight" class="form-control">
-            </fieldset>            
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Resize Tolerance:</label>
+                  <input type="text" id="resizeTolerance" class="form-control">
+                </fieldset>
+              </div>
+            </div>  
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Minimum Width:</label>
+                  <input type="text" id="minimumWidth" class="form-control">
+                </fieldset>
+               </div>
+
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Maximum Width:</label>
+                  <input type="text" id="maximumWidth" class="form-control">
+                </fieldset>
+              </div>  
+            </div>
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Minimum Height:</label>
+                  <input type="text" id="minimumHeight" class="form-control">
+                </fieldset>
+              </div>  
+            
+              <div class="col-md-6 col-sm-6 col-xs-6">
+                <fieldset class="form-group">
+                  <label>Maximum Height:</label>
+                  <input type="text" id="maximumHeight" class="form-control">
+                </fieldset>
+              </div>  
+            </div>              
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" onclick="saveConfiguration()">OK</button>
