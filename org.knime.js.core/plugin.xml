@@ -321,7 +321,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
-            name="D3"
+            name="D3_4.2.6"
             usesDefine="true"
             version="4.2.6"
             webResourceBundleID="D3_4.2.6">
@@ -336,7 +336,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="D3"
+            name="D3_4.2.6"
             usesDefine="true"
             version="4.2.6"
             webResourceBundleID="D3_4.2.6_Debug">
@@ -346,6 +346,36 @@
          </webResource>
          <importResource
                relativePath="js-lib/d3/4_2_6/d3.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="D3"
+            usesDefine="true"
+            version="4.13.0"
+            webResourceBundleID="D3_4.13.0">
+         <webResource
+               relativePathSource="js-lib/d3/4_13_0/d3.min.js"
+               relativePathTarget="js-lib/d3/4_13_0/d3.min.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/4_13_0/d3.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
+            name="D3"
+            usesDefine="true"
+            version="4.13.0"
+            webResourceBundleID="D3_4.13.0_Debug">
+         <webResource
+               relativePathSource="js-lib/d3/4_13_0/d3.js"
+               relativePathTarget="js-lib/d3/4_13_0/d3.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/d3/4_13_0/d3.js"
                type="JAVASCRIPT">
          </importResource>
       </webResourceBundle>
