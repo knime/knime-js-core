@@ -537,12 +537,19 @@ _buildBSLayout = function(layout, parentContainer) {
 
 		//Adding some informations on the inserted node along with an image (node logo)
 		var frameBody = $('#' + frame.id).contents().find('body');
+		var divBody = document.createElement('div');
+		divBody.setAttribute("align","center");
 		h3 = document.createElement('h3');
 		h3.innerHTML = webNodes[layout.nodeID].nodeType;
-		frameBody.append(h3);
+		divBody.append(h3);
+		img = document.createElement('img');
+		img.setAttribute("src", nodesArray[parseInt(layout.nodeID)].icon);
+		divBody.append(img);
 		h3 = document.createElement('h3');
 		h3.innerHTML = 'Node ' + layout.nodeID;
-		frameBody.append(h3);
+		divBody.append(h3);
+		frameBody.append(divBody);
+
 
 	} else  if (layout.type === "html" || layout.type === "JSONLayoutHTMLContent") {
 		parent.innerHTML = layout.value;
