@@ -1669,6 +1669,25 @@
                type="CSS">
          </importResource>
       </webResourceBundle>
+            <webResourceBundle
+            debug="true"
+            name="KNIME Layout Editor"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimeLayoutEditor_1.0.0">
+         <webResource
+               relativePathSource="js-lib/knime/layoutEditor/"
+               relativePathTarget="js-lib/knime/layoutEditor/">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/layoutEditor/js/layoutEditor.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="bootstrap_3.3.6">
+         </webDependency>
+      </webResourceBundle>
+      
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
