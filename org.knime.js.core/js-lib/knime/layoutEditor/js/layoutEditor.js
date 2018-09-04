@@ -113,7 +113,6 @@ function splitVertically() {
 }
 
 function selectRectangle() {
-	isFirstSelection = true;
 	event.stopPropagation();
 	document.querySelectorAll('.rectangle').forEach(function (rectangle) {
 		rectangle.classList.remove('selected');
@@ -388,22 +387,18 @@ _buildBSLayout = function(layout, parentContainer) {
 		for (var i = 0; i < layout.columns.length; i++) {
 			var col = layout.columns[i];
 			var cEl = document.createElement("div");
-			if (!col.content) {
+			if (col.content && col.content.length === 0) {
 				var spaceBox = document.createElement("div");
 				var height;
 				if (parentRectangleHeight === null) {
-					// height = ( $(window).height() - (62 + 61 + 4 * 48) ) / splitNumber;
 					height = ( $(window).height() - (30 + 3 * 48) ) / splitNumber;
 				} else {
 					if (!splitHorizontalDone) {
-						console.log('splitHorizontalDone: ' + splitHorizontalDone + '\n');
 						height = parentRectangleHeight / splitNumber;
 					} else {
-						console.log('splitHorizontalDone: ' + splitHorizontalDone + '\n');
 						height = parentRectangleHeight;
 					}	
 				}
-				// spaceBox.setAttribute("style", "height: " + height + "px;")
 				spaceBox.setAttribute("style", "height: " + height + "px;")
 				cEl.appendChild(spaceBox);
 			}
