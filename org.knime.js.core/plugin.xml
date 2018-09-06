@@ -1395,6 +1395,22 @@
          </webDependency>
       </webResourceBundle>
       <webResourceBundle
+            debug="true"
+            description="Service/Framework component to be included in every JavaScript view which needs lazy loading support."
+            name="KNIME Lazy Loading Service"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimeLazyLoadingService_1.0">
+         <webResource
+               relativePathSource="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js"
+               relativePathTarget="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js"
+               type="JAVASCRIPT">
+         </importResource>
+      </webResourceBundle>
+      <webResourceBundle
             debug="false"
             name="Font Awesome"
             usesDefine="false"
