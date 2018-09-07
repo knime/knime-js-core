@@ -717,6 +717,17 @@ knimeService = function() {
 		}
 	}
 	
+	service.log = function(message) {
+		if (console && console.log) {
+			console.log(message);
+		}
+	};
+	service.logError = function(err) {
+		if (console && console.error) {
+			console.error(err);
+		}
+	}
+	
 	document.addEventListener('DOMContentLoaded', init, false);
 	
 	return service;

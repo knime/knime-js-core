@@ -258,7 +258,7 @@ initLazyLoading = function() {
 		}
 	}	
 	
-}();
+};
 if (typeof KnimeInteractivity === 'undefined') {
 	KnimeInteractivity = {
 		respondToViewRequest: function(response) {

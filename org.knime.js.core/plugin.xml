@@ -1379,8 +1379,12 @@
             version="1.0.0"
             webResourceBundleID="knimeService_1.0">
          <webResource
-               relativePathSource="js-lib/knime/service/"
-               relativePathTarget="js-lib/knime/service/">
+               relativePathSource="js-lib/knime/service/knime_service_1_0_0.js"
+               relativePathTarget="js-lib/knime/service/knime_service_1_0_0.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/knime/service/knime.css"
+               relativePathTarget="js-lib/knime/service/knime.css">
          </webResource>
          <importResource
                relativePath="js-lib/knime/service/knime_service_1_0_0.js"
@@ -1396,19 +1400,41 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            description="Service extension which allows dynamic loading of additional code/dependencies"
+            name="KNIME Service conditional loading utility"
+            usesDefine="false"
+            version="1.0.0"
+            webResourceBundleID="knimeserviceConditionalLoad_1.0">
+         <webResource
+               relativePathSource="js-lib/knime/service/knime_service_load_conditionally.js"
+               relativePathTarget="js-lib/knime/service/knime_service_load_conditionally.js">
+         </webResource>
+         <importResource
+               relativePath="js-lib/knime/service/knime_service_load_conditionally.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <webDependency
+               webResourceBundleID="RequireJS_2.3.3">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
             description="Service/Framework component to be included in every JavaScript view which needs lazy loading support."
             name="KNIME Lazy Loading Service"
             usesDefine="false"
             version="1.0.0"
             webResourceBundleID="knimeLazyLoadingService_1.0">
          <webResource
-               relativePathSource="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js"
-               relativePathTarget="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js">
+               relativePathSource="js-lib/knime/lazyLoading/"
+               relativePathTarget="js-lib/knime/lazyLoading/">
          </webResource>
          <importResource
-               relativePath="js-lib/knime/service/knime_service_lazy_loading_1_0_0.js"
+               relativePath="js-lib/knime/lazyLoading/knime_service_lazy_loading_loader.js"
                type="JAVASCRIPT">
          </importResource>
+         <webDependency
+               webResourceBundleID="knimeserviceConditionalLoad_1.0">
+         </webDependency>
       </webResourceBundle>
       <webResourceBundle
             debug="false"
