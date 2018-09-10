@@ -113,11 +113,12 @@ function splitVertically() {
 }
 
 function selectRectangle() {
-	event.stopPropagation();
-	document.querySelectorAll('.rectangle').forEach(function (rectangle) {
-		rectangle.classList.remove('selected');
-	});
-	this.classList.add('selected');
+  event.stopPropagation();
+  var rectangles = document.querySelectorAll('.rectangle');
+  for (var i = 0; i < rectangles.length; i++) {
+    rectangles[i].classList.remove('selected');
+  };
+  this.classList.add('selected');
 }
 
 function insertNode() {
@@ -530,20 +531,20 @@ _buildBSLayout = function(layout, parentContainer) {
 		// Add iframe to cell
 		parent.appendChild(frame);
 
-		//Adding some informations on the inserted node along with an image (node logo)
-		var frameBody = $('#' + frame.id).contents().find('body');
-		var divBody = document.createElement('div');
-		divBody.setAttribute("align","center");
-		h3 = document.createElement('h3');
-		h3.innerHTML = webNodes[layout.nodeID].nodeType;
-		divBody.append(h3);
-		img = document.createElement('img');
-		img.setAttribute("src", nodesArray[parseInt(layout.nodeID)].icon);
-		divBody.append(img);
-		h3 = document.createElement('h3');
-		h3.innerHTML = 'Node ' + layout.nodeID;
-		divBody.append(h3);
-		frameBody.append(divBody);
+    //Adding some informations on the inserted node along with an image (node logo)
+    var frameBody = $('#' + frame.id).contents().find('body');
+    var divBody = document.createElement('div');
+    divBody.setAttribute("align","center");
+    var h3 = document.createElement('h3');
+    h3.innerHTML = webNodes[layout.nodeID].nodeType;
+    divBody.appendChild(h3);
+    img = document.createElement('img');
+    img.setAttribute("src", nodesArray[parseInt(layout.nodeID)].icon);
+    divBody.appendChild(img);
+    h3 = document.createElement('h3');
+    h3.innerHTML = 'Node ' + layout.nodeID;
+    divBody.appendChild(h3);
+    frameBody.append(divBody);
 
 
 	} else  if (layout.type === "html" || layout.type === "JSONLayoutHTMLContent") {
