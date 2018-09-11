@@ -1,3 +1,12 @@
+----------ChromeDriver v2.41 (2018-07-27)----------
+Supports Chrome v67-69
+Resolved issue 2458: Chromedriver fails to start with whitelisted-ips option [[Pri-1]]
+Resolved issue 2379: Returned capabilities should include remote debugging port [[Pri-2]]
+Resolved issue 1005: driver.manage().window().getSize() is not implemented on Android [[Pri-2]]
+Resolved issue 2474: desktop launcher error messages are not readable by users [[Pri-]]
+Resolved issue 2496: Fail fast when not able to start binary [[Pri-]]
+Resolved issue 1990: Close Window return value does not conform with spec [[Pri-]]
+
 ----------ChromeDriver v2.40 (2018-06-07)----------
 Supports Chrome v66-68
 Resolved issue 2446: Regression: Chromedriver 2.39 hangs on open when user-data-dir is specified and exists [[Pri-1]]
