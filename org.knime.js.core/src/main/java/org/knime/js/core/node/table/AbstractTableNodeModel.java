@@ -27,9 +27,9 @@ import org.knime.core.node.port.PortObjectSpec;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
+import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.js.core.JSONDataTable;
 import org.knime.js.core.node.AbstractWizardNodeModel;
-import org.knime.js.core.node.CSSModifiable;
 import org.knime.js.core.settings.table.TableSettings;
 
 /**

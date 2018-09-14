@@ -51,9 +51,12 @@ package org.knime.js.core.layout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.core.node.workflow.NodeID;
@@ -77,7 +80,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * {@inheritDoc}
      */
     @Override
-    public String createDefaultLayout(@SuppressWarnings("rawtypes") final Map<NodeIDSuffix, WizardNode> viewNodes) throws IOException {
+    public String createDefaultLayout(final Map<NodeIDSuffix, WizardNode> viewNodes) throws IOException {
         JSONLayoutPage page = createDefaultLayoutStructure(viewNodes);
         ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
         try {
@@ -93,7 +96,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @param viewNodes a map of view nodes to create the layout for
      * @return the new default layout structure
      */
-    public JSONLayoutPage createDefaultLayoutStructure(@SuppressWarnings("rawtypes") final Map<NodeIDSuffix, WizardNode> viewNodes) {
+    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, WizardNode> viewNodes) {
         JSONLayoutPage page = new JSONLayoutPage();
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
@@ -112,14 +115,30 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     }
 
     /**
+     * @since 3.7
+     */
+    //FIXME temp method, remove after changing this to ViewHideable completely
+    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, ViewHideable> viewNodes, final boolean foo) {
+        Map<NodeIDSuffix, WizardNode> orgMap = new LinkedHashMap<NodeIDSuffix, WizardNode>();
+        for (Entry<NodeIDSuffix, ViewHideable> e : viewNodes.entrySet()) {
+            ViewHideable item = e.getValue();
+            if (item instanceof WizardNode) {
+                orgMap.put(e.getKey(), (WizardNode)item);
+            }
+        }
+        return createDefaultLayoutStructure(orgMap);
+    }
+
+    /**
      * Creates the view content element for a given node. If the node implements {@link LayoutTemplateProvider}, the
      * template is used, otherwise the generic defaults.
      *
      * @param suffix the node id suffix as used in the layout definition
      * @param viewNode the node to create the view content for
      * @return a new view content element for a JSON layout
+     * @since 3.7
      */
-    public JSONLayoutViewContent getDefaultViewContentForNode(final NodeIDSuffix suffix, @SuppressWarnings("rawtypes") final WizardNode viewNode) {
+    public static JSONLayoutViewContent getDefaultViewContentForNode(final NodeIDSuffix suffix, final ViewHideable viewNode) {
         NodeID id = NodeID.fromString(suffix.toString());
         JSONLayoutViewContent view = new JSONLayoutViewContent();
         if (viewNode instanceof LayoutTemplateProvider) {

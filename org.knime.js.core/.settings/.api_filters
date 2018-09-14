@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.js.core" version="2">
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.js.core.node.CSSModifiable">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.node.CSSModifiable"/>
+                <message_argument value="org.knime.js.core_3.7.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/main/java/org/knime/js/core/layout/DefaultLayoutCreatorImpl.java" type="org.knime.js.core.layout.DefaultLayoutCreatorImpl">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.layout.DefaultLayoutCreatorImpl"/>
+                <message_argument value="getDefaultViewContentForNode(NodeID.NodeIDSuffix, WizardNode)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421662840">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.layout.DefaultLayoutCreatorImpl"/>
+                <message_argument value="createDefaultLayoutStructure(Map&lt;NodeID.NodeIDSuffix,WizardNode&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421662840">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.layout.DefaultLayoutCreatorImpl"/>
+                <message_argument value="getDefaultViewContentForNode(NodeID.NodeIDSuffix, WizardNode)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
