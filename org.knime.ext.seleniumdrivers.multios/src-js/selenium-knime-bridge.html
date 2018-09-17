@@ -159,6 +159,8 @@
 		
 		bridge.executeOnFrame = function(toExecute) {
 			var frame = document.getElementById(FRAME_ID);
+			//escape possible inner string escapes
+			toExecute = toExecute.replace(/\\/g, '\\\\');
 			return frame.contentWindow.eval('(function() {' + toExecute + '})();');
 		}
 		
