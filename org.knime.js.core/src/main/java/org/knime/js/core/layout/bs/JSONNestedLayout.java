@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -40,79 +41,55 @@
  *  propagated with or for interoperation with KNIME.  The owner of a Node
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
- * ------------------------------------------------------------------------
+ * ---------------------------------------------------------------------
  *
  * History
- *   24.09.2013 (Christian Albrecht, KNIME AG, Zurich, Switzerland): created
+ *   21 Sep 2018 (albrecht): created
  */
 package org.knime.js.core.layout.bs;
-
-import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
  *
- * @author Christian Albrecht, KNIME AG, Zurich, Switzerland, University of Konstanz
+ * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
+ * @since 3.7
  */
 @JsonAutoDetect
-public class JSONLayoutPage {
-    private List<JSONLayoutRow> m_rows;
+public class JSONNestedLayout extends JSONLayoutElement implements JSONLayoutContent {
+
+    private String m_nodeID;
+    private JSONLayoutPage m_layout;
 
     /**
-     * @return the content
+     * @return the nodeID
      */
-    @JsonProperty("rows")
-    public List<JSONLayoutRow> getRows() {
-        return m_rows;
+    public String getNodeID() {
+        return m_nodeID;
     }
 
     /**
-     * @param rows the content to set
+     * @param nodeID the nodeID to set
      */
-    @JsonProperty("rows")
-    public void setRows(final List<JSONLayoutRow> rows) {
-        m_rows = rows;
+    public void setNodeID(final String nodeID) {
+        m_nodeID = nodeID;
     }
 
     /**
-     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes and omitting empty fields
+     * @return the layout
      */
-    public static ObjectMapper getConfiguredObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModules(new Jdk8Module());
-        mapper.setSerializationInclusion(Include.NON_EMPTY);
-        mapper = registerSubtypes(mapper);
-        return mapper;
+    public JSONLayoutPage getLayout() {
+        return m_layout;
     }
 
     /**
-     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes including empty fields
+     * @param layout the layout to set
      */
-    public static ObjectMapper getConfiguredVerboseObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setSerializationInclusion(Include.ALWAYS);
-        mapper.registerModules(new Jdk8Module());
-        mapper = registerSubtypes(mapper);
-        return mapper;
-    }
-
-    private static ObjectMapper registerSubtypes(final ObjectMapper mapper) {
-        mapper.registerSubtypes(
-            new NamedType(JSONLayoutRow.class, "row"),
-            new NamedType(JSONLayoutViewContent.class, "view"),
-            new NamedType(JSONLayoutHTMLContent.class, "html"),
-            new NamedType(JSONNestedLayout.class, "nestedLayout")
-                );
-        return mapper;
+    public void setLayout(final JSONLayoutPage layout) {
+        m_layout = layout;
     }
 
     /**
@@ -129,9 +106,10 @@ public class JSONLayoutPage {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        JSONLayoutPage other = (JSONLayoutPage)obj;
+        JSONNestedLayout other = (JSONNestedLayout)obj;
         return new EqualsBuilder()
-                .append(m_rows, other.m_rows)
+                .append(m_nodeID, other.m_nodeID)
+                .append(m_layout, other.m_layout)
                 .isEquals();
     }
 
@@ -141,7 +119,9 @@ public class JSONLayoutPage {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
-                .append(m_rows)
+                .append(m_nodeID)
+                .append(m_layout)
                 .toHashCode();
     }
+
 }
