@@ -219,6 +219,7 @@ public class JSONDataTableSpec {
     private String[] m_rowColorValues;
     private Double[] m_rowSizeValues;
     private String[] m_filterIds;
+    private String[] m_hiddenColumns;
     private boolean[] m_containsMissingValues;
 
     private JSONColorModel[] m_colorModels;
@@ -600,6 +601,22 @@ public class JSONDataTableSpec {
     }
 
     /**
+     * @return the hidden columns
+     * @since 3.7
+     */
+    public String[] getHiddenColumns() {
+        return m_hiddenColumns;
+    }
+
+    /**
+     * @param hiddenColumns the columns to exclude from rendering
+     * @since 3.7
+     */
+    public void setHiddenColumns(final String[] hiddenColumns) {
+        this.m_hiddenColumns = hiddenColumns;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -620,6 +637,7 @@ public class JSONDataTableSpec {
                 .append(m_filterIds)
                 .append(m_colorModels)
                 .append(m_containsMissingValues)
+                .append(m_hiddenColumns)
                 .toHashCode();
     }
 
@@ -654,6 +672,7 @@ public class JSONDataTableSpec {
                 .append(m_filterIds, other.m_filterIds)
                 .append(m_colorModels, other.m_colorModels)
                 .append(m_containsMissingValues, other.m_containsMissingValues)
+                .append(m_hiddenColumns, other.m_hiddenColumns)
                 .isEquals();
     }
 }

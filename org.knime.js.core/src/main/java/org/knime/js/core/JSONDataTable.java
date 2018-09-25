@@ -260,6 +260,7 @@ public class JSONDataTable {
 
         int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
+        ArrayList<String> hiddenColumns = new ArrayList<String>();
         List<String> excludedColumns = new ArrayList<String>();
         DataTableSpec spec = m_dataTable.getDataTableSpec();
         for (int i = 0; i < spec.getNumColumns(); i++) {
@@ -271,9 +272,16 @@ public class JSONDataTable {
             } else if (m_excludeColumns != null) {
                 include &= !Arrays.asList(m_excludeColumns).contains(colName);
             }
+
+            // We need to always include filterable columns in order to allow view updates when the filter changes
             if (m_keepFilterColumns && colSpec.getFilterHandler().isPresent()) {
+                // Inform the view that this column should not be displayed
+                if (!include) {
+                    hiddenColumns.add(colName);
+                }
                 include = true;
             }
+
             if (include) {
                 includeColIndices.add(i);
                 numOfColumns++;
@@ -435,6 +443,7 @@ public class JSONDataTable {
         Object[][] extensionArray = null;
 
         JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows);
+        jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
         jsonTableSpec.setPossibleValues(possValues);

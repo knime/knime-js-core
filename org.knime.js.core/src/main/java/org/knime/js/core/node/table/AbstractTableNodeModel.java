@@ -225,6 +225,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
                 .setDataTable(table)
                 .setId(getTableId(0))
                 .setFirstRow(1)
+                .keepFilterColumns(true)
                 .setMaxRows(m_config.getSettings().getRepresentationSettings().getMaxRows())
                 .setExcludeColumns(filter.getExcludes());
     }
