@@ -46,10 +46,10 @@
 
 /**
  * Provides a common functionality for table-like views such as Table View, Table Editor, Data Explorer.
- * 
+ *
  * @constructor
  */
-KnimeBaseTableViewer = function() {	
+KnimeBaseTableViewer = function() {
 	// read-only settings coming from backend
 	this._representation = null;
 	// read-and-write settings which come from backend and send back
@@ -75,7 +75,9 @@ KnimeBaseTableViewer = function() {
 	this._nonSelectableColsCount = 0;
 	// index of the RowID column
 	this._rowIdColInd = null;
-	
+	// Map dataTable column indexes to knime table indexes.
+	this._nonHiddenDataIndexes = [];
+
 	// register neutral ordering method for clear selection button
 	$.fn.dataTable.Api.register('order.neutral()', function () {
 	    return this.iterator('table', function (s) {
@@ -92,7 +94,7 @@ KnimeBaseTableViewer = function() {
 
 /**
  * Initialize the table viewer and draw the view. Framework method.
- * 
+ *
  * @param representation  the representation input object from the backend
  * @param value  the value input object from the backend
  */
@@ -179,38 +181,48 @@ KnimeBaseTableViewer.prototype.getComponentValue = function() {
 }
 
 /**
+ * Get dataTable index from column index
+ * @param {Number} colIndex
+ * @return {Number|undefined} data index of the given column. Can be undefined if the column index of synthesized
+ *     columns like RowID or Selection Checkbox Column is passed.
+ */
+KnimeBaseTableViewer.prototype._dataIndexFromColIndex = function(colIndex) {
+	return this._nonHiddenDataIndexes[colIndex - this._infoColsCount];
+};
+
+/**
  * Main function to draw the table view
  */
 KnimeBaseTableViewer.prototype._drawTable = function() {
 	try {
 		this._prepare();
 		this._createHtmlTableContainer();
-		
+
 		this._knimeTable = new kt();
 		this._knimeTable.setDataTable(this._representation.table);
-		
+
 		this._buildColumnSearching();
-		
-		this._buildDataTableConfig();		
+
+		this._buildDataTableConfig();
 		this._dataTable = $('#knimePagedTable').DataTable(this._dataTableConfig);
 
 		this._addTableListeners();
 
 		this._addSortButtons();
-		
+
 		$('#knimePagedTable_paginate').css('display', 'none');
 
 		$('#knimePagedTable_info').html(
 			'<strong>Loading data</strong> - Displaying '
 			+ 1 + ' to ' + Math.min(this._knimeTable.getNumRows(), this._representation.initialPageSize)
 			+ ' of ' + this._knimeTable.getNumRows() + ' entries.');
-		
+
 		this._buildMenu();
 		this._setSelectionHandlers();
 		this._processColumnSearching();
 
 		this._setControlCssStyles();
-		
+
 		// load all data
 		var self = this;
 		setTimeout(function() {
@@ -246,10 +258,10 @@ KnimeBaseTableViewer.prototype._prepare = function() {
 
 
 /**
- * Creates an HTML wrapper for the table view 
+ * Creates an HTML wrapper for the table view
  */
 KnimeBaseTableViewer.prototype._createHtmlTableContainer = function() {
-	var body = $('body');		
+	var body = $('body');
 	var wrapper = $('<div id="knimePagedTableContainer" class="knime-table-container">');
 	body.append(wrapper);
 	if (this._representation.title != null && this._representation.title != '') {
@@ -273,7 +285,7 @@ KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 		}
 		if (this._representation.displayRowIndex) {
-			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');						
+			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 		}
 		if (this._representation.displayRowColors || this._representation.displayRowIds) {
 			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
@@ -288,7 +300,7 @@ KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 				footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 			}
 		}
-		
+
 		$('#knimePagedTable tfoot th').each(function() {
 	        var title = $(this).text();
 	        if (title == '') {
@@ -306,8 +318,8 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 	var self = this;
 	if (this._representation.enableSelection) {
 		if (this._representation.singleSelection) {
-			var titleElement = this._representation.enableClearSelectionButton 
-				? ('<button type="button" id="clear-selection-button" class="btn btn-default btn-xs knime-control-text" title="Clear selection">' 
+			var titleElement = this._representation.enableClearSelectionButton
+				? ('<button type="button" id="clear-selection-button" class="btn btn-default btn-xs knime-control-text" title="Clear selection">'
 					+ '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></button>')
 				: '';
 			this._dataTableConfig.columns.push({'title': titleElement});
@@ -403,7 +415,7 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 				// Check if date is given as ISO-string or time stamp (legacy).
 				if (isNaN(data)) {
 					// ISO-string:
-					// date is parsed and rendered in local time. 
+					// date is parsed and rendered in local time.
 					return moment(data).format(type === 'sort' || type === 'type' ? 'x' : self._representation.dateTimeFormats.globalDateTimeFormat);
 				} else {
 					// time stamp (legacy):
@@ -486,8 +498,9 @@ KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 		if (colType == 'string') {
 			colDef.className += ' knime-string';
 		}
-		
+
 		this._dataTableConfig.columns.push(colDef);
+		this._nonHiddenDataIndexes.push(i);
 	}
 }
 
@@ -502,9 +515,9 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 	if (this._dataTableConfig.searching && !this._representation.enableSearching) {
 		$('#knimePagedTable_filter').remove();
 	}
-	if (this._dataTable) {		
-		this._curCells = this._dataTable.cells(function(ind) { 
-			return ind.column >= self._nonSelectableColsCount; 
+	if (this._dataTable) {
+		this._curCells = this._dataTable.cells(function(ind) {
+			return ind.column >= self._nonSelectableColsCount;
 		}, {page: 'current'}).nodes().flatten().to$();
 		this._curCells.on('mousedown', this._bindCellMouseDownHandler = this._cellMouseDownHandler.bind(this));
 	}
@@ -512,7 +525,7 @@ KnimeBaseTableViewer.prototype._dataTableDrawCallback = function() {
 }
 
 /**
- * Callback funciton before the table has been drawn
+ * Callback function before the table has been drawn
  */
 KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function() {
 	if (this._dataTable) {
@@ -549,15 +562,15 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 			info: false
 		}
 	};
-	
+
 	this._buildSelection();
 	this._buildRowComponents();
 	this._buildColumnDefinitions();
-	
+
 	if (this._value.pageSize) {
 		this._dataTableConfig.pageLength = this._value.pageSize;
 	}
-	
+
 	if (this._representation.pageSizeShowAll) {
 		var first = this._dataTableConfig.lengthMenu.slice(0);
 		first.push(-1);
@@ -565,11 +578,11 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 		second.push("All");
 		this._dataTableConfig.lengthMenu = [first, second];
 	}
-	
+
 	if (this._value.currentOrder) {
 		this._dataTableConfig.order = this._value.currentOrder;
 	}
-	
+
 	if (this._representation.enableSorting && this._representation.enableClearSortButton) {
 		var unsortButton = {
 				'text': "Clear Sorting",
@@ -581,12 +594,12 @@ KnimeBaseTableViewer.prototype._buildDataTableConfig = function() {
 		}
 		this._dataTableConfig.buttons.push(unsortButton);
 	}
-	
+
 	this._dataTableConfig.data = this._getDataSlice(0, this._representation.initialPageSize);  // load only the first chunk
-	
+
 	// search is also used for filtering, so consider all possible options
 	this._dataTableConfig.searching = this._representation.enableSearching || this._representation.enableColumnSearching
-		|| (this._representation.enableSelection && (this._value.hideUnselected || this._representation.enableHideUnselected)) 
+		|| (this._representation.enableSelection && (this._value.hideUnselected || this._representation.enableHideUnselected))
 		|| (knimeService && knimeService.isInteractivityAvailable());
 }
 
@@ -627,11 +640,11 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
 		if (this._representation.enableSearching && !this._representation.title) {
 			knimeService.floatingHeader(false);
 		}
-		
+
 		if (this._representation.displayFullscreenButton) {
 			knimeService.allowFullscreen();
 		}
-		
+
 		if (this._representation.enableSelection) {
 			$.fn.dataTable.ext.search.push(function(settings, searchData, index, rowData, counter) {
 				if (self._value.hideUnselected) {
@@ -653,7 +666,7 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
 				}
 			}
 		}
-		
+
 		if (knimeService.isInteractivityAvailable()) {
 			if (this._representation.enableSelection) {
 				var pubSelIcon = knimeService.createStackedIcon('check-square-o', 'angle-right', 'faded left sm', 'right bold');
@@ -729,88 +742,89 @@ KnimeBaseTableViewer.prototype._buildMenu = function() {
  * Sets rows selection handlers
  */
 KnimeBaseTableViewer.prototype._setSelectionHandlers = function() {
+	if (!this._representation.enableSelection) {
+		return;
+	}
 	var self = this;
-	if (this._representation.enableSelection) {
-		if (this._representation.singleSelection) {
-			// Handle click on clear selection button
-			var clearSelectionButton = $('#clear-selection-button').get(0);
-			if (clearSelectionButton) {
-				clearSelectionButton.addEventListener('click', function() {
-					self._selectAll(false);
-				});
-			}
-			// Handle click on radio button to set selection and publish event
-			$('#knimePagedTable tbody').on('change', 'input[type="radio"]', function() {
-				$('.selection-cell').parent().removeClass('knime-selected');  // set tr style
-				self._selection = {};
-				self._selection[this.value] = this.checked;
-				if (this.checked) {
-					$(this).parent().parent().addClass('knime-selected');  // set tr style
-				}
-				if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
-					if (this.checked) {
-						knimeService.setSelectedRows(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
-					}
-				}
-			});
-		} else {
-			// Handle click on "Select all" control
-			var selectAllCheckbox = $('#checkbox-select-all').get(0);
-			if (selectAllCheckbox) {
-				if (selectAllCheckbox.checked && ('indeterminate' in selectAllCheckbox)) {
-					selectAllCheckbox.indeterminate = this._value.selectAllIndeterminate;
-				}
-				selectAllCheckbox.addEventListener('click', function() {
-					self._selectAll(this.checked);
-				});
-			}
-
-			// Handle click on checkbox to set state of "Select all" control
-			$('#knimePagedTable tbody').on('change', 'input[type="checkbox"]', function() {
-				//var el = $('#checkbox-select-all').get(0);
-				//var selected = el.checked ? !this.checked : this.checked;
-				// we could call delete _value.selection[this.value], but the call is very slow 
-				// and we can assume that a user doesn't click on a lot of checkboxes
-				self._selection[this.value] = this.checked;
-				// in either case the row is not partially selected
-				var partialIndex = self._partialSelectedRows.indexOf(this.value);
-				if (partialIndex > -1) {
-					self._partialSelectedRows.splice(partialIndex, 1);
-				}
-
-				if (this.checked) {
-					if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
-						knimeService.addRowsToSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
-					}
-					$(this).parent().parent().addClass('knime-selected');  // set tr style
-				} else {
-					if (self._value.hideUnselected) {
-						self._dataTable.draw('full-hold');
-					}
-					if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
-						knimeService.removeRowsFromSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
-					}
-					$(this).parent().parent().removeClass('knime-selected');  // set tr style
-				}
-				self._checkSelectAllState();				
-			});
-			if (knimeService && this._representation.enableClearSelectionButton) {
-				knimeService.addButton('pagedTableClearSelectionButton', 'minus-square-o', 'Clear Selection', function() {
-					self._selectAll(false, true);
-				});
-			}
-			this._dataTable.on('search.dt', function () {
-				self._checkSelectAllState();
+	if (this._representation.singleSelection) {
+		// Handle click on clear selection button
+		var clearSelectionButton = $('#clear-selection-button').get(0);
+		if (clearSelectionButton) {
+			clearSelectionButton.addEventListener('click', function() {
+				self._selectAll(false);
 			});
 		}
-		self._dataTable.on('draw.dt', function () {
-			self._setSelectionOnPage();
+		// Handle click on radio button to set selection and publish event
+		$('#knimePagedTable tbody').on('change', 'input[type="radio"]', function() {
+			$('.selection-cell').parent().removeClass('knime-selected');  // set tr style
+			self._selection = {};
+			self._selection[this.value] = this.checked;
+			if (this.checked) {
+				$(this).parent().parent().addClass('knime-selected');  // set tr style
+			}
+			if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
+				if (this.checked) {
+					knimeService.setSelectedRows(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
+				}
+			}
+		});
+	} else {
+		// Handle click on "Select all" control
+		var selectAllCheckbox = $('#checkbox-select-all').get(0);
+		if (selectAllCheckbox) {
+			if (selectAllCheckbox.checked && ('indeterminate' in selectAllCheckbox)) {
+				selectAllCheckbox.indeterminate = this._value.selectAllIndeterminate;
+			}
+			selectAllCheckbox.addEventListener('click', function() {
+				self._selectAll(this.checked);
+			});
+		}
+
+		// Handle click on checkbox to set state of "Select all" control
+		$('#knimePagedTable tbody').on('change', 'input[type="checkbox"]', function() {
+			//var el = $('#checkbox-select-all').get(0);
+			//var selected = el.checked ? !this.checked : this.checked;
+			// we could call delete _value.selection[this.value], but the call is very slow
+			// and we can assume that a user doesn't click on a lot of checkboxes
+			self._selection[this.value] = this.checked;
+			// in either case the row is not partially selected
+			var partialIndex = self._partialSelectedRows.indexOf(this.value);
+			if (partialIndex > -1) {
+				self._partialSelectedRows.splice(partialIndex, 1);
+			}
+
+			if (this.checked) {
+				if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
+					knimeService.addRowsToSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
+				}
+				$(this).parent().parent().addClass('knime-selected');  // set tr style
+			} else {
+				if (self._value.hideUnselected) {
+					self._dataTable.draw('full-hold');
+				}
+				if (knimeService && knimeService.isInteractivityAvailable() && self._value.publishSelection) {
+					knimeService.removeRowsFromSelection(self._representation.table.id, [this.value], self._selectionChanged.bind(self));
+				}
+				$(this).parent().parent().removeClass('knime-selected');  // set tr style
+			}
+			self._checkSelectAllState();
+		});
+		if (knimeService && this._representation.enableClearSelectionButton) {
+			knimeService.addButton('pagedTableClearSelectionButton', 'minus-square-o', 'Clear Selection', function() {
+				self._selectAll(false, true);
+			});
+		}
+		this._dataTable.on('search.dt', function () {
+			self._checkSelectAllState();
 		});
 	}
-}
+	self._dataTable.on('draw.dt', function () {
+		self._setSelectionOnPage();
+	});
+};
 
 /**
- * Adds a handler for column searching and processes the event 
+ * Adds a handler for column searching and processes the event
  */
 KnimeBaseTableViewer.prototype._processColumnSearching = function() {
 	if (this._representation.enableColumnSearching) {
@@ -827,7 +841,7 @@ KnimeBaseTableViewer.prototype._processColumnSearching = function() {
 
 /**
  * Loads data into the table in chunks until everything is loaded
- * 
+ *
  * @param startIndex  index of the first row in the chunk
  * @param chunkSize  number of rows in a chunk
  */
@@ -844,7 +858,7 @@ KnimeBaseTableViewer.prototype._addDataToTable = function(startIndex, chunkSize)
 		$('#knimePagedTable_info').html(
 			'<strong>Loading data ('
 			+ endIndex + ' of ' + tableSize + ' records)</strong> - Displaying '
-			+ 1 + ' to ' + Math.min(tableSize, this._representation.initialPageSize) 
+			+ 1 + ' to ' + Math.min(tableSize, this._representation.initialPageSize)
 			+ ' of ' + tableSize + ' entries.');
 		if (chunkDuration > 300) {
 			newChunkSize = Math.max(1, Math.floor(chunkSize / 2));
@@ -866,7 +880,7 @@ KnimeBaseTableViewer.prototype._addDataToTable = function(startIndex, chunkSize)
 }
 
 /**
- * Gets the rows whose indices are in the interval [start, end) 
+ * Gets the rows whose indices are in the interval [start, end)
  */
 KnimeBaseTableViewer.prototype._getDataSlice = function(start, end) {
 	if (typeof end == 'undefined') {
@@ -936,7 +950,7 @@ KnimeBaseTableViewer.prototype._applyViewValue = function() {
  * Actions which have to be done after the table has been initialized
  */
 KnimeBaseTableViewer.prototype._finishInit = function() {
-	//Used to collect all checkboxes here, 
+	//Used to collect all checkboxes here,
 	//but now keeping selection and checkbox state separate and applying checked state on every call of draw()
 	/*allCheckboxes = dataTable.column(0).nodes().to$().children();*/
 	this._initialized = true;
@@ -944,8 +958,8 @@ KnimeBaseTableViewer.prototype._finishInit = function() {
 
 /**
  * Processes the 'select all rows' action
- * 
- * @param all  
+ *
+ * @param all
  * @param ignoreSearch
  */
 KnimeBaseTableViewer.prototype._selectAll = function(all, ignoreSearch) {
@@ -956,7 +970,7 @@ KnimeBaseTableViewer.prototype._selectAll = function(all, ignoreSearch) {
 			self._selectAll(all);
 		}, 500);
 	}
-	
+
 	if (ignoreSearch) {
 		this._selection = {};
 		this._partialSelectedRows = [];
@@ -973,7 +987,7 @@ KnimeBaseTableViewer.prototype._selectAll = function(all, ignoreSearch) {
 	}
 	this._checkSelectAllState();
 	this._setSelectionOnPage();
-	
+
 	if (this._value.hideUnselected) {
 		this._dataTable.draw();
 	}
@@ -1010,7 +1024,7 @@ KnimeBaseTableViewer.prototype._checkSelectAllState = function() {
     selectAllCheckbox.checked = allSelected;
     selectAllCheckbox.disabled = (selIndices.length < 1);
     var indeterminate = someSelected && !allSelected;
-    
+
     if('indeterminate' in selectAllCheckbox){
 		// Set visual state of "Select all" control as 'indeterminate'
 		selectAllCheckbox.indeterminate = indeterminate;
@@ -1063,7 +1077,7 @@ KnimeBaseTableViewer.prototype._publishCurrentSelection = function() {
 
 /**
  * Handler on the selection change event
- * 
+ *
  * @data data  information of how the selection has been changed
  */
 KnimeBaseTableViewer.prototype._selectionChanged = function(data) {
@@ -1074,7 +1088,7 @@ KnimeBaseTableViewer.prototype._selectionChanged = function(data) {
 			self._selectionChanged(data);
 		}, 500);
 	}
-	
+
 	// apply changeSet
 	if (data.changeSet) {
 		if (data.changeSet.removed) {
@@ -1098,7 +1112,7 @@ KnimeBaseTableViewer.prototype._selectionChanged = function(data) {
 
 /**
  * Handler on the filter changed event
- * 
+ *
  * @data data  info of how the filter has been changed
  */
 KnimeBaseTableViewer.prototype._filterChanged = function(data) {
@@ -1115,7 +1129,7 @@ KnimeBaseTableViewer.prototype._filterChanged = function(data) {
 
 /**
  * Returns whether a column of the specified type is available for sorting
- * 
+ *
  * @param colType  column type
  */
 KnimeBaseTableViewer.prototype._isColumnSortable = function (colType) {
@@ -1125,7 +1139,7 @@ KnimeBaseTableViewer.prototype._isColumnSortable = function (colType) {
 
 /**
  * Returns whether a column of the specified type is available for searching
- * 
+ *
  * @param colType  column type
  */
 KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
@@ -1135,7 +1149,7 @@ KnimeBaseTableViewer.prototype._isColumnSearchable = function (colType) {
 
 /**
  * Mouse down handler for table cell
- * 
+ *
  * @param e event
  */
 KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
@@ -1146,17 +1160,17 @@ KnimeBaseTableViewer.prototype._cellMouseDownHandler = function(e) {
 	if (e.shiftKey && this._firstCorner) {
 		this._selectSecondCorner(cell);
 	} else {
-		this._selectFirstCorner(cell);		
+		this._selectFirstCorner(cell);
 	}
-	this._dataTable.cells(function(ind) { 
-		return ind.column >= self._nonSelectableColsCount; 
+	this._dataTable.cells(function(ind) {
+		return ind.column >= self._nonSelectableColsCount;
 	}, {page: 'current'}).nodes().flatten().to$().on('mouseover', this._bindCellMouseOverHandler = this._cellMouseOverHandler.bind(this));
 	$(document).on('mouseup', this._bindCellMouseUpHandler = this._cellMouseUpHandler.bind(this));
 }
 
 /**
  * Mouse over handler for table cell
- * 
+ *
  * @param e event
  */
 
@@ -1169,23 +1183,27 @@ KnimeBaseTableViewer.prototype._cellMouseOverHandler = function(e) {
 
 /**
  * Mouse up handler for table cell
- * 
+ *
  * @param e event
  */
 
 KnimeBaseTableViewer.prototype._cellMouseUpHandler = function(e) {
 	// stop listening to mouse events for selection
 	var self = this;
-	this._dataTable.cells(function(ind) { 
-		return ind.column >= self._nonSelectableColsCount; 
+	this._dataTable.cells(function(ind) {
+		return ind.column >= self._nonSelectableColsCount;
 	}, {page: 'current'}).nodes().flatten().to$().off('mouseover', this._bindCellMouseOverHandler);
 	$(document).off('mouseup', this._bindCellMouseUpHandler);
 }
 
 
+// -- BEGIN "Selection" (highlighting) of individual cells. This has nothing to do with KNIME's row "selection" and is
+// used internally inside the view for copy and paste operations only.
+
+
 /**
  * Make the cell to be the first corner of rectangular selection.
- * 
+ *
  * @param cell cell to be the first corner
  */
 KnimeBaseTableViewer.prototype._selectFirstCorner = function(cell) {
@@ -1197,12 +1215,12 @@ KnimeBaseTableViewer.prototype._selectFirstCorner = function(cell) {
 /**
  * Make the cell to be the second corner of rectangular selection.
  * And then forms the selection
- * 
+ *
  * @param cell cell to be the second corner
  */
 KnimeBaseTableViewer.prototype._selectSecondCorner = function(cell) {
 	this._deselectCells();
-	this._secondCorner = cell;	
+	this._secondCorner = cell;
 	this._selectRectangle();
 }
 
@@ -1233,7 +1251,7 @@ KnimeBaseTableViewer.prototype._selectRectangle = function() {
 }
 
 /**
- * Unselect currently selected cells, but don't reset the rectangle 
+ * Unselect currently selected cells, but don't reset the rectangle
  */
 KnimeBaseTableViewer.prototype._deselectCells = function() {
 	$('td.selected').removeClass('knime-selected');
@@ -1250,7 +1268,7 @@ KnimeBaseTableViewer.prototype._clearSelection = function() {
 
 /**
  * Key down handler for the table
- * 
+ *
  * @param e event
  */
 KnimeBaseTableViewer.prototype._keyDownHandler = function(e) {
@@ -1261,7 +1279,7 @@ KnimeBaseTableViewer.prototype._keyDownHandler = function(e) {
 
 /**
  * Copy handler for the table
- * 
+ *
  * @param e event
  */
 KnimeBaseTableViewer.prototype._copyHandler = function(e) {
@@ -1271,19 +1289,19 @@ KnimeBaseTableViewer.prototype._copyHandler = function(e) {
 		return;
 	}
 	var cellIndices = this._dataTable.cells({selected: true}).flatten();
-	
+
 	var nCols = Math.abs(this._firstCorner.index().column - this._secondCorner.index().column) + 1;
-	
+
 	var buffer = [];
 	for (var i = 0, col = 1; i < cellIndices.length; i++) {
 		var data = null;
 		if (cellIndices[i].column === this._rowIdColInd) {
 			// we need to filter the content of RowID cell to leave only RowID, but only if it's present, otherwise we skip the cell
 			if (this._representation.displayRowIds) {
-				data = this._knimeTable.getRow(cellIndices[i].row).rowKey;			
+				data = this._knimeTable.getRow(cellIndices[i].row).rowKey;
 			}
 		} else {
-			data = this._dataTable.data()[cellIndices[i].row][cellIndices[i].column];			
+			data = this._dataTable.data()[cellIndices[i].row][cellIndices[i].column];
 		}
 		if (data !== null) {
 			buffer.push(data);
@@ -1293,7 +1311,7 @@ KnimeBaseTableViewer.prototype._copyHandler = function(e) {
 		}
 		if (col % nCols === 0) {
 			// remove tailing \t or \n if there
-			var tail = buffer[buffer.length - 1];  
+			var tail = buffer[buffer.length - 1];
 			if (tail === '\t' || tail === '\n') {
 				buffer.pop();
 			}
@@ -1305,8 +1323,12 @@ KnimeBaseTableViewer.prototype._copyHandler = function(e) {
 	buffer = buffer.join('');
 
 	e.originalEvent.clipboardData.setData('text/plain', buffer);
-    e.preventDefault();	
+    e.preventDefault();
 }
+
+
+// -- END "selection" (highlighting)
+
 
 /**
  * Set CSS styles for table controls
@@ -1328,7 +1350,7 @@ KnimeBaseTableViewer.prototype._setControlCssStyles = function() {
  * Set CSS styles for dynamically loaded objects controls
  */
 KnimeBaseTableViewer.prototype._setDynamicCssStyles = function() {
-	$('#knimePagedTable tr').addClass('knime-table-row');	
+	$('#knimePagedTable tr').addClass('knime-table-row');
 	$('#knimePagedTable_paginate ul').addClass('knime-table-control-text');
 	$('#knimePagedTable thead tr').addClass('knime-table-header');
 	$('#knimePagedTable thead th').addClass('knime-table-header');
