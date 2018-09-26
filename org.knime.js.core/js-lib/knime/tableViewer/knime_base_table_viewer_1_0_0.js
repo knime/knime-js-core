@@ -279,6 +279,9 @@ KnimeBaseTableViewer.prototype._buildColumnSearching = function() {
 			footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
 		}
 		for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
+			if (this._knimeTable.isColumnHidden(i)) {
+				continue;
+			}
 			if (this._isColumnSearchable(this._knimeTable.getColumnTypes()[i])) {
 				footerRow.append('<th class="knime-table-cell knime-table-footer">' + this._knimeTable.getColumnNames()[i] + '</th>')
 			} else {
@@ -358,43 +361,39 @@ KnimeBaseTableViewer.prototype._buildRowComponents = function() {
 		});
 		this._infoColsCount++;
 	}
-	
+
 	if (this._representation.displayRowIds || this._representation.displayRowColors) {
 		var title = this._representation.displayRowIds ? 'RowID' : '';
 		var orderable = this._representation.displayRowIds;
 		this._dataTableConfig.columns.push({
-			'title': title, 
+			'title': title,
 			'orderable': orderable,
 			'className': 'no-break knime-table-cell'
 		});
 		this._rowIdColInd = this._infoColsCount;
 		this._infoColsCount++;
 	}
-}
-
-/**
- * Returns a column name by its index
- * 
- * @param i  column index
- */
-KnimeBaseTableViewer.prototype._getColumnName = function(i) {
-	return this._knimeTable.getColumnNames()[i];
-}
+};
 
 /**
  * Configures columns for DataTables
  */
 KnimeBaseTableViewer.prototype._buildColumnDefinitions = function() {
 	var self = this;
-	for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
+	var columnNames = this._knimeTable.getColumnNames();
+	for (var i = 0; i < columnNames.length; i++) {
+		if (this._knimeTable.isColumnHidden(i)) {
+			continue;
+		}
+		var title = columnNames[i];
 		var colType = this._knimeTable.getColumnTypes()[i];
 		var knimeColType = this._knimeTable.getKnimeColumnTypes()[i];
-		
+
 		var colDef = {
-			'title': this._getColumnName(i),
+			'title': title,
 			'orderable' : this._isColumnSortable(colType),
 			'searchable': this._isColumnSearchable(colType),
-			'className': 'knime-table-cell'			
+			'className': 'knime-table-cell'
 		}
 		if (this._representation.displayMissingValueAsQuestionMark) {
 			colDef.defaultContent = '<span class="knime-missing-value-cell">?</span>';
@@ -896,7 +895,13 @@ KnimeBaseTableViewer.prototype._getDataSlice = function(start, end) {
 			}
 			dataRow.push(string);
 		}
-		var dataRow = dataRow.concat(row.data);
+		var unfilteredData = [];
+		for (var j = 0; j < row.data.length; j++) {
+			if (!this._knimeTable.isColumnHidden(j)) {
+				unfilteredData.push(row.data[j]);
+			}
+		}
+		dataRow = dataRow.concat(unfilteredData);
 		data.push(dataRow);
 	}
 	return data;

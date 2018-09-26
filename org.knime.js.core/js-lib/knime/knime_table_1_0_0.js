@@ -73,7 +73,17 @@ kt = function() {
 	kt.getColumnNames = function() {
 		return dataTable.spec.colNames;
 	};
-	
+
+	kt.isColumnHidden = function (index) {
+		var columnName = this.getColumnNames()[index];
+		var hiddenColumnNames = this.getHiddenColumnNames();
+		return hiddenColumnNames.indexOf(columnName) > -1;
+	};
+
+	kt.getHiddenColumnNames = function () {
+		return dataTable.spec.hiddenColumns || [];
+	};
+
 	kt.getColumnTypes = function() {
 		return dataTable.spec.colTypes;
 	};
