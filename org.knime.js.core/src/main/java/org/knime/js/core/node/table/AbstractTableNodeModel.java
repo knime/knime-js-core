@@ -220,14 +220,23 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
      * @return corresponding builder object
      */
     protected JSONDataTable.Builder getJsonDataTableBuilder(final BufferedDataTable table) {
-        FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
         return JSONDataTable.newBuilder()
                 .setDataTable(table)
                 .setId(getTableId(0))
                 .setFirstRow(1)
                 .keepFilterColumns(true)
                 .setMaxRows(m_config.getSettings().getRepresentationSettings().getMaxRows())
-                .setExcludeColumns(filter.getExcludes());
+                .setExcludeColumns(this.determineExcludedColumns(table));
+    }
+
+    /**
+     * Get the list of excluded columns from the settings, for use in the JSONDataTable.Builder
+     * @param table
+     * @return list of excluded columns
+     */
+    protected String[] determineExcludedColumns(final BufferedDataTable table) {
+        FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
+        return filter.getExcludes();
     }
 
     /**
