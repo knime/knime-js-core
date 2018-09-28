@@ -5,30 +5,30 @@
 
 kt = function() {
 	var kt = { version: "1.0.0" };
-	
+
 	var dataTable = {};
 	var extensions = [];
-		
+
 	kt.setDataTableFromJSON = function(jsonTable) {
 		dataTable = JSON.parse(jsonTable);
 	};
-	
+
 	kt.setDataTable = function(table) {
 		dataTable = table;
 	}
-	
+
 	kt.setDataTableSpecFromJSON = function(jsonTableSpec) {
 		dataTable.spec = JSON.parse(jsonTableSpec);
 	}
-	
+
 	kt.setDataTableSpec = function(dataTableSpec) {
 		dataTable.spec = dataTableSpec;
 	}
-	
+
 	kt.getRows = function() {
 		return dataTable.rows;
 	}
-	
+
 	kt.getRow = function(rowID) {
 		var id = rowID;
 		if (typeof rowID === "string") {
@@ -39,7 +39,7 @@ kt = function() {
 		}
 		return null;
 	}
-	
+
 	kt.getCell = function(rowID, columnID) {
 		var colIndex = columnID;
 		if (typeof columnID === "string") {
@@ -54,7 +54,7 @@ kt = function() {
 		}
 		return null;
 	}
-	
+
 	kt.getColumn = function(columnID) {
 		var id = columnID;
 		if (typeof columnID === "string") {
@@ -62,14 +62,14 @@ kt = function() {
 		}
 		if (id != null && id < dataTable.spec.numColumns) {
 			var col = [];
-			
+
 			for (var i = 0; i < kt.getNumRows(); i++) {
 				col.push(dataTable.rows[i].data[id]);
 			}
 			return col;
 		}
 	};
-	
+
 	kt.getColumnNames = function() {
 		return dataTable.spec.colNames;
 	};
@@ -87,22 +87,22 @@ kt = function() {
 	kt.getColumnTypes = function() {
 		return dataTable.spec.colTypes;
 	};
-	
+
 	kt.getNumColumns = function() {
 		return dataTable.spec.numColumns;
 	};
-	
+
 	kt.getNumRows = function() {
 		return dataTable.spec.numRows;
 	};
-	
+
 	kt.getKnimeColumnTypes = function() {
 		return dataTable.spec.knimeTypes;
 	};
-	
+
 	kt.getPossibleValues = function(columnName) {
 		if (columnName) {
-			var colID = kt_getDataColumnID(columnName); 
+			var colID = kt_getDataColumnID(columnName);
 			if (colID && colID < dataTable.spec.numColumns) {
 				return dataTable.spec.possibleValues[colID];
 			} else {
@@ -112,15 +112,15 @@ kt = function() {
 			return dataTable.spec.possibleValues;
 		}
 	};
-	
+
 	kt.getRowColors = function() {
 		return dataTable.spec.rowColorValues;
 	}
-	
+
 	kt.getTableId = function() {
 		return dataTable.id;
 	}
-	
+
 	kt.getFilterIds = function() {
 		var filters = [];
 		var f = dataTable.spec.filterIds;
@@ -131,13 +131,13 @@ kt = function() {
 		}
 		return filters;
 	}
-	
+
 	kt.registerView = function(view) {
 		for (var i = 0; i < view.extensionNames.length; i++) {
 			kt_registerViewExtension(view, view.extensionNames[i]);
 		}
 	};
-	
+
 	kt.getExtension = function(extensionName) {
 		var extension = {};
 		for (var i = 0; i < extensions.length; i++) {
@@ -148,7 +148,7 @@ kt = function() {
 		};
 		return extension;
 	};
-	
+
 	var kt_registerViewExtension = function(view, extensionName) {
 		var extensionID;
 		for (var i = 0; i < extensions.length; i++) {
@@ -163,13 +163,13 @@ kt = function() {
 		}
 		extensions[extensionID].registerView(view);
 	};
-	
+
 	var kt_createExtension = function(name) {
 		if (name === "hilite") {
 			return kt_createHiliteExtension();
 		}
 	};
-	
+
 	var kt_createHiliteExtension = function() {
 		var defaultValue = false;
 		var hiliteTable = [];
@@ -240,7 +240,7 @@ kt = function() {
 			}
 		};
 	};
-	
+
 	var kt_getDataColumnID = function(columnName) {
 		var colID = null;
 		for (var i = 0; i < dataTable.spec.numColumns; i++) {
@@ -251,7 +251,7 @@ kt = function() {
 		};
 		return colID;
 	};
-	
+
 	var kt_getRowID = function(rowKey) {
 		var rowID = null;
 		for (var i = 0; i < dataTable.spec.numRows; i++) {
@@ -262,7 +262,7 @@ kt = function() {
 		}
 		return rowID;
 	}
-	
+
 	var kt_getExtColumnID = function(columnName) {
 		var colID = null;
 		for (var i = 0; i < dataTable.spec.numExtensions; i++) {
@@ -273,49 +273,49 @@ kt = function() {
 		};
 		return colID;
 	};
-	
+
 	kt.isRowIncludedInFilter = function(rowID, filter) {
-		if (filter && filter.elements) {
-			var included = true;
-			var row = kt.getRow(rowID);
-			if (!row) {
-				return false;
-			}
-			for (var i = 0; i < filter.elements.length; i++) {
-				var filterElement = filter.elements[i];
-				if (filterElement.type == "range" && filterElement.columns) {
-					for (var col = 0; col < filterElement.columns.length; col++) {
-						var column = filterElement.columns[col];
-						var columnIndex = kt_getDataColumnID(column.columnName);
-						if (columnIndex != null) {
-							var rowValue = row.data[columnIndex];
-							if (rowValue == null) {
-								//missing value, can return false immediately
-								return false;
+		if (!filter || !filter.elements) {
+			return true;
+		}
+		var row = kt.getRow(rowID);
+		if (!row) {
+			return false;
+		}
+		var included = true;
+		for (var i = 0; i < filter.elements.length; i++) {
+			var filterElement = filter.elements[i];
+			if (filterElement.type == "range" && filterElement.columns) {
+				for (var col = 0; col < filterElement.columns.length; col++) {
+					var column = filterElement.columns[col];
+					var columnIndex = kt_getDataColumnID(column.columnName);
+					if (columnIndex != null) {
+						var rowValue = row.data[columnIndex];
+						if (rowValue == null) {
+							//missing value, can return false immediately
+							return false;
+						}
+						if (column.type == "numeric") {
+							if (column.minimumInclusive) {
+								included &= (rowValue >= column.minimum);
+							} else {
+								included &= (rowValue > column.minimum);
 							}
-							if (column.type == "numeric") {
-								if (column.minimumInclusive) {
-									included &= (rowValue >= column.minimum);
-								} else {
-									included &= (rowValue > column.minimum);
-								}
-								if (column.maximumInclusive) {
-									included &= (rowValue <= column.maximum);
-								} else {
-									included &= (rowValue < column.maximum);
-								}
-							} else if (column.type == "nominal") {
-								included &= (column.values.indexOf(rowValue) >= 0);
+							if (column.maximumInclusive) {
+								included &= (rowValue <= column.maximum);
+							} else {
+								included &= (rowValue < column.maximum);
 							}
+						} else if (column.type == "nominal") {
+							included &= (column.values.indexOf(rowValue) >= 0);
 						}
 					}
-				} else {
-					// TODO row filter - currently not possible
 				}
+			} else {
+				// TODO row filter - currently not possible
 			}
-			return included;
 		}
-		return true;
+		return included;
 	}
 
 	return kt;
