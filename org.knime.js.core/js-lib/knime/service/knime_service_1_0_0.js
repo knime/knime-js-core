@@ -718,31 +718,34 @@ knimeService = function() {
 	}
 	
 	/**
-	 * Function to measure and truncate the sizes of the given data array.
-	 * In the config object the must be a container element specified. Additionally there are several optional 
-	 * parameters which are explained in the following
+	 * Function to measure and truncate the sizes of the given data array within an SVG.
+	 * In the config object a container element must be specified. Additionally there are several optional 
+	 * parameters which are explained in the following:
 	 * 
-	 * classes: CSS-classes of the created container
-	 * attributes: CSS-attributes of the created container
-	 * tempContainer: A container in which the text elements are created in. If nothing specified a "g" 
-	 * 					is created. If an empty string is provided, it will append the text 
-	 * 					directly to the provided container
-	 * tempContainerClasses: CSS-classes of the created text element
-	 * tempContainerAttributes: CSS-attributes of the created text element
-	 * maxWidth: The maximum width a text array is allowed. If the maxWidth is exceeded, the labels get wrapped.
-	 * maxHeight: The maximum height a text array is allowed. If the maxHeight is exceeded, the labels get wrapped.
-	 * minimalChars: The minimal amount of chars which should still be displayed even when it get wrapped.
+	 * container: Mandatory container object, which needs to be inside the SVG element or the SVG element itself
+	 * classes: CSS-classes of the created text elements (optional)
+	 * attributes: Attributes of the created text elements (optional)
+	 * tempContainer: A temporary container in which the text elements are created in. If undefined a "g" 
+	 * 		element is created. If an empty string is provided, it will append the text directly to the provided 
+	 * 		top-level container.
+	 * tempContainerClasses: CSS-classes of the created temporary container element (optional)
+	 * tempContainerAttributes: CSS-attributes of the created temporary container element (optional)
+	 * maxWidth: The maximum width each text element can occupy. If the maxWidth is exceeded, an ellipsis is applied to  
+	 * 		fit the appropriate space. (optional)
+	 * maxHeight: The maximum height each text element can occupy. If the maxWidth is exceeded, an ellipsis is applied   
+	 * 		to fit the appropriate space. (optional)
+	 * minimalChars: The minimal amount of chars which should still be displayed even when a text element with ellipsis 
+	 * 		is larger than the maximum dimensions specified.
 	 * 
-	 * returns two objects values and max.
+	 * returns an object with the following fields:
 	 * values: 
-	 * 		originalData: The original Data provided
-	 * 		truncated: The truncated labels of the data
-	 * 		widths: Width of every single text element
-	 * 		heights: Height of every single text element
-	 * 
+	 * 		originalData: The original strings provided
+	 * 		truncated: The (potentially) truncated strings of the original data
+	 * 		widths: Measured width of each text element
+	 * 		heights: Measured height of each text element
 	 * max:
-	 * 		maxWidth: maximum width measured
-	 * 		maxHeight: maximum height measured
+	 * 		maxWidth: maximum measured width of all text elements
+	 * 		maxHeight: maximum measured height of all text elements
 	 */
 	service.meassureAndTruncate = function(data, config) {
 		var tempTextList = [];
@@ -758,10 +761,10 @@ knimeService = function() {
 		var maxHeight = 0, maxWidth = 0;
 		if(containerClass !== "") {
 			group = document.createElementNS(SVGNS, containerClass);
-			config.classes ? group.setAttribute("class", config.classes) : void(0);
-			if(config.attributes) {
-				for (key in config.attributes) {
-					group.setAttribute(key,config.attributes[key]);
+			config.tempContainerClasses ? group.setAttribute("class", config.tempContainerClasses) : void(0);
+			if(config.tempContainerAttributes) {
+				for (key in config.tempContainerAttributes) {
+					group.setAttribute(key,config.tempContainerAttributes[key]);
 				}
 			}
 			config.container.appendChild(group);
@@ -771,13 +774,14 @@ knimeService = function() {
 			var tempText = document.createElementNS(SVGNS, "text");
 			tempText.innerHTML = value;
 			tempText.fill = 'transparent';
-			config.tempContainerClasses ? tempText.setAttribute("class", config.tempContainerClasses ) : void(0);
-			if(config.tempContainerAttributes) {
-				for (key in config.tempContainerAttributes) {
-					group.setAttribute(key,config.tempContainerAttributes[key]);
+			config.classes ? tempText.setAttribute("class", config.classes) : void(0);
+			if(config.attributes) {
+				for (key in config.attributes) {
+					group.setAttribute(key,config.attributes[key]);
 				}
 			}
 			group ? group.appendChild(tempText) : config.container.appendChild(tempText);
+			//FIXME convert to if
 			group ? void(0) : tempTextList.push(tempText);
 			var wrapedText = wrapLabels(tempText, config.maxWidth ? config.maxWidth : void(0), 
 					config.maxHeight ? config.maxHeight : void(0), 
@@ -791,6 +795,7 @@ knimeService = function() {
 		});
 		
 		// Delete all texts which where appended to a temp container
+		//FIXME: remove is not defined in IE, convert to if/else
 		group ? group.remove() : void(0);
 		// Delete all texts which where directly appended to the container
 		tempTextList.forEach(function(text) {
@@ -810,12 +815,12 @@ knimeService = function() {
 	 * minimalChars: Minimum amount of characters the text should have 
 	 */
 	wrapLabels = function (textElement, maxWidth, maxHeight, minimalChars) {
+		var ellipsis = '\u2026';
 		var textLength = textElement.getBoundingClientRect(),
 	        text = textElement.innerHTML;
 		if(textLength.width > maxWidth || textLength.height > maxHeight) {
 			var guessFactor = 1;
-			text += '\u2026';
-			// Make sure, that the chart takes at least half of the screen
+			text += ellipsis;
 			while ((textLength.width > maxWidth || textLength.height > maxHeight) && text.length >= minimalChars) {
 				var heightDiff = 0, widthDiff = 0;
 
@@ -828,7 +833,7 @@ knimeService = function() {
 				}
 
 				text = text.slice(0, Math.min(Math.floor(-text.length * guessFactor),-1));
-				textElement.innerHTML = text + '\u2026';
+				textElement.innerHTML = text + ellipsis;
 		        textLength = textElement.getBoundingClientRect();
 		    }
 		}
