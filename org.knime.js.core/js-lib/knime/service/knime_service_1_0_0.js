@@ -1,10 +1,10 @@
 knimeService = function() {
 	
 	/*!
-	* screenfull
-	* v3.0.0 - 2015-11-24
-	* (c) Sindre Sorhus; MIT License
-	*/
+	 * screenfull
+	 * v3.0.0 - 2015-11-24
+	 * (c) Sindre Sorhus; MIT License
+	 */
 	!function(){"use strict";var a="undefined"!=typeof module&&module.exports,b="undefined"!=typeof Element&&"ALLOW_KEYBOARD_INPUT"in Element,c=function(){for(var a,b,c=[["requestFullscreen","exitFullscreen","fullscreenElement","fullscreenEnabled","fullscreenchange","fullscreenerror"],["webkitRequestFullscreen","webkitExitFullscreen","webkitFullscreenElement","webkitFullscreenEnabled","webkitfullscreenchange","webkitfullscreenerror"],["webkitRequestFullScreen","webkitCancelFullScreen","webkitCurrentFullScreenElement","webkitCancelFullScreen","webkitfullscreenchange","webkitfullscreenerror"],["mozRequestFullScreen","mozCancelFullScreen","mozFullScreenElement","mozFullScreenEnabled","mozfullscreenchange","mozfullscreenerror"],["msRequestFullscreen","msExitFullscreen","msFullscreenElement","msFullscreenEnabled","MSFullscreenChange","MSFullscreenError"]],d=0,e=c.length,f={};e>d;d++)if(a=c[d],a&&a[1]in document){for(d=0,b=a.length;b>d;d++)f[c[0][d]]=a[d];return f}return!1}(),d={request:function(a){var d=c.requestFullscreen;a=a||document.documentElement,/5\.1[\.\d]* Safari/.test(navigator.userAgent)?a[d]():a[d](b&&Element.ALLOW_KEYBOARD_INPUT)},exit:function(){document[c.exitFullscreen]()},toggle:function(a){this.isFullscreen?this.exit():this.request(a)},raw:c};return c?(Object.defineProperties(d,{isFullscreen:{get:function(){return Boolean(document[c.fullscreenElement])}},element:{enumerable:!0,get:function(){return document[c.fullscreenElement]}},enabled:{enumerable:!0,get:function(){return Boolean(document[c.fullscreenEnabled])}}}),void(a?module.exports=d:window.screenfull=d)):void(a?module.exports=!1:window.screenfull=!1)}();
 	
 	/*! modernizr 3.6.0 (Custom Build) | MIT *
@@ -28,6 +28,7 @@ knimeService = function() {
 	var warnings = {};
 	var viewRequests = [], requestSequence = 0, responseBuffer = [], pushSupported;
 	var GLOBAL_SERVICE = this;
+	var SVGNS = "http://www.w3.org/2000/svg";
 	
 	init = function() {
 		if (parent && parent.KnimePageLoader) {
@@ -648,7 +649,7 @@ knimeService = function() {
 	
 	/**
 	 * Inline global style declarations for SVG export
-	 * @param {*} svg 
+	 * @param {*} svg
 	 */
 	service.inlineSvgStyles = function(svg) {
 		var before = svg.firstChild;
@@ -671,8 +672,7 @@ knimeService = function() {
 							var result, rgbaString = [];
 							var stringsToReplace = [];
 							var tempRule = rule.cssText;
-							
-							// RegExp to find rgba values      
+							// RegExp to find rgba values
 							var findRGBAValues = /(.*?)rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9]+\.[0-9]+|\d\s*)\)/g;
 							
 							// Find all rgba values and the according css string to replace it later on
@@ -706,7 +706,7 @@ knimeService = function() {
 				}
 			}
 			if (cssText.length > 0) {
-				var styleElement = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+				var styleElement = document.createElementNS(SVGNS, 'style');
 				styleElement.type = 'text/css';
 				styleElement.appendChild(document.createTextNode(cssText.join('\n')));
 				newStyles.push(styleElement);
@@ -717,6 +717,124 @@ knimeService = function() {
 		}
 	}
 	
+	/**
+	 * Function to measure and truncate the sizes of the given data array.
+	 * In the config object the must be a container element specified. Additionally there are several optional 
+	 * parameters which are explained in the following
+	 * 
+	 * classes: CSS-classes of the created container
+	 * attributes: CSS-attributes of the created container
+	 * tempContainer: A container in which the text elements are created in. If nothing specified a "g" 
+	 * 					is created. If an empty string is provided, it will append the text 
+	 * 					directly to the provided container
+	 * tempContainerClasses: CSS-classes of the created text element
+	 * tempContainerAttributes: CSS-attributes of the created text element
+	 * maxWidth: The maximum width a text array is allowed. If the maxWidth is exceeded, the labels get wrapped.
+	 * maxHeight: The maximum height a text array is allowed. If the maxHeight is exceeded, the labels get wrapped.
+	 * minimalChars: The minimal amount of chars which should still be displayed even when it get wrapped.
+	 * 
+	 * returns two objects values and max.
+	 * values: 
+	 * 		originalData: The original Data provided
+	 * 		truncated: The truncated labels of the data
+	 * 		widths: Width of every single text element
+	 * 		heights: Height of every single text element
+	 * 
+	 * max:
+	 * 		maxWidth: maximum width measured
+	 * 		maxHeight: maximum height measured
+	 */
+	service.meassureAndTruncate = function(data, config) {
+		var tempTextList = [];
+		var values = [];
+
+		var containerClass;
+		if (typeof(config.tempContainer) == "undefined" && config.tempContainer == null) {
+			containerClass = "g";
+		} else {
+			containerClass = config.tempContainer;
+		}
+		var group = undefined;
+		var maxHeight = 0, maxWidth = 0;
+		if(containerClass !== "") {
+			group = document.createElementNS(SVGNS, containerClass);
+			config.classes ? group.setAttribute("class", config.classes) : void(0);
+			if(config.attributes) {
+				for (key in config.attributes) {
+					group.setAttribute(key,config.attributes[key]);
+				}
+			}
+			config.container.appendChild(group);
+		}
+		
+		data.forEach(function(value) {
+			var tempText = document.createElementNS(SVGNS, "text");
+			tempText.innerHTML = value;
+			tempText.fill = 'transparent';
+			config.tempContainerClasses ? tempText.setAttribute("class", config.tempContainerClasses ) : void(0);
+			if(config.tempContainerAttributes) {
+				for (key in config.tempContainerAttributes) {
+					group.setAttribute(key,config.tempContainerAttributes[key]);
+				}
+			}
+			group ? group.appendChild(tempText) : config.container.appendChild(tempText);
+			group ? void(0) : tempTextList.push(tempText);
+			var wrapedText = wrapLabels(tempText, config.maxWidth ? config.maxWidth : void(0), 
+					config.maxHeight ? config.maxHeight : void(0), 
+							config.minimalChars ? config.minimalChars : 1);
+			var tempWidth = tempText.getBoundingClientRect().width;
+			var tempHeight = tempText.getBoundingClientRect().height;
+			
+			maxWidth = tempWidth > maxWidth ? tempWidth : maxWidth;
+			maxHeight = tempHeight > maxHeight ? tempHeight : maxHeight;
+			values.push({originalData: value, truncated: wrapedText, width: tempWidth, height: tempHeight})
+		});
+		
+		// Delete all texts which where appended to a temp container
+		group ? group.remove() : void(0);
+		// Delete all texts which where directly appended to the container
+		tempTextList.forEach(function(text) {
+			text.remove();
+		});
+		return {values: values, max: {maxWidth: maxWidth, maxHeight: maxHeight}};
+	}
+	
+	/**
+	 * Function to wrap text after it exceeds a calculated size. The size
+	 * depends on the provided maxWidth and maxHeight. Returns the calculated
+	 * wrapped string.
+	 * 
+	 * textElement: The text element which should be wrapped
+	 * maxWidth: The maximum width the text can have before it gets wrapped
+	 * maxHeight: The maximum height the text can have before it gets wrapped
+	 * minimalChars: Minimum amount of characters the text should have 
+	 */
+	wrapLabels = function (textElement, maxWidth, maxHeight, minimalChars) {
+		var textLength = textElement.getBoundingClientRect(),
+	        text = textElement.innerHTML;
+		if(textLength.width > maxWidth || textLength.height > maxHeight) {
+			var guessFactor = 1;
+			text += '\u2026';
+			// Make sure, that the chart takes at least half of the screen
+			while ((textLength.width > maxWidth || textLength.height > maxHeight) && text.length >= minimalChars) {
+				var heightDiff = 0, widthDiff = 0;
+
+				if(textLength.width > maxWidth) widthDiff = textLength.width - maxWidth;
+				if(textLength.height > maxHeight) heighthDiff = textLength.height - maxHeight;
+				if(widthDiff > heightDiff) {
+					guessFactor =  (widthDiff / textLength.width);
+				} else {
+					guessFactor = (heighthDiff / textLength.height);
+				}
+
+				text = text.slice(0, Math.min(Math.floor(-text.length * guessFactor),-1));
+				textElement.innerHTML = text + '\u2026';
+		        textLength = textElement.getBoundingClientRect();
+		    }
+		}
+		text = textElement.innerHTML;
+		return text;
+	}
 	service.log = function(message) {
 		if (console && console.log) {
 			console.log(message);
@@ -731,5 +849,4 @@ knimeService = function() {
 	document.addEventListener('DOMContentLoaded', init, false);
 	
 	return service;
-	
 }();
