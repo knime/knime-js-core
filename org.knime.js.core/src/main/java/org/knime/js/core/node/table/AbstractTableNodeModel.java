@@ -233,6 +233,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
      * Get the list of excluded columns from the settings, for use in the JSONDataTable.Builder
      * @param table
      * @return list of excluded columns
+     * @since 3.7
      */
     protected String[] determineExcludedColumns(final BufferedDataTable table) {
         FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
