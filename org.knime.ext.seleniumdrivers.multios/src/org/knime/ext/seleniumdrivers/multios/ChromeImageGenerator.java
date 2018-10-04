@@ -168,7 +168,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             }
             String cliOptions = prefs.getString(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS);
             if (cliOptions != null && !cliOptions.isEmpty()) {
-                options.addArguments(cliOptions);
+                options.addArguments(cliOptions.split("\\s+"));
             }
 
             m_driver = new ChromeDriver(options);

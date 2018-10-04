@@ -302,7 +302,7 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
 
 		    String cliOptions = prefs.getString(JSCorePlugin.P_BROWSER_CLI_ARGS);
 		    if (cliOptions != null && !cliOptions.isEmpty()) {
-		        options.addArguments(cliOptions);
+		        options.addArguments(cliOptions.split("\\s+"));
 		    }
 
 		    m_driver = new ChromeDriver(options);
