@@ -322,9 +322,8 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 				? ('<button type="button" id="clear-selection-button" class="btn btn-default btn-xs knime-control-text" title="Clear selection">'
 					+ '<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></button>')
 				: '';
-			this._dataTableConfig.columns.push({'title': titleElement});
-			this._dataTableConfig.columnDefs.push({
-				'targets': 0,
+			this._dataTableConfig.columns.push({
+				'title': titleElement,
 				'searchable': false,
 				'orderable': false,
 				'className': 'dt-body-center selection-cell knime-table-cell',
@@ -336,9 +335,8 @@ KnimeBaseTableViewer.prototype._buildSelection = function() {
 			});
 		} else {
 			var all = this._value.selectAll;
-			this._dataTableConfig.columns.push({'title': '<input name="select_all" value="1" id="checkbox-select-all" type="checkbox" class="knime-boolean"' + (all ? ' checked' : '')  + ' />'});
-			this._dataTableConfig.columnDefs.push({
-				'targets': 0,
+			this._dataTableConfig.columns.push({
+				'title': '<input name="select_all" value="1" id="checkbox-select-all" type="checkbox" class="knime-boolean"' + (all ? ' checked' : '')  + ' />',
 				'searchable': false,
 				'orderable': false,
 				'className': 'dt-body-center selection-cell knime-table-cell',
