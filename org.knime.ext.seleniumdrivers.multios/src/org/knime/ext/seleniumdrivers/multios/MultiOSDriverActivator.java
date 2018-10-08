@@ -121,10 +121,6 @@ public class MultiOSDriverActivator extends Plugin {
             }
             CHROMIUM_PATH = Paths.get(CHROMIUM_PATH).normalize().toString();
         }
-        /*if (CHROMIUM_PATH != null && Platform.OS_MACOSX.equals(os)) {
-            String appPath = Paths.get(CHROMIUM_PATH).getParent().getParent().getParent().toString();
-            disableMacCloseWindowsAlertForApp(appPath);
-        }*/
 	}
 
     /**
@@ -139,29 +135,6 @@ public class MultiOSDriverActivator extends Plugin {
     	CHROMIUM_PATH = null;
 
 	}
-
-    /*private static void disableMacCloseWindowsAlertForApp(final String appPath) {
-        String command = "defaults write -app " + appPath.replaceAll(" ", "\\ ") + " NSQuitAlwaysKeepsWindows -bool false";
-        String error = "Unable to deactivate 'close windows' alerts from MacOS."
-                + "Chromium view might not behave as expected.";
-        StringBuilder errorBuilder = new StringBuilder();
-        try {
-            Process pr = Runtime.getRuntime().exec(command);
-            InputStream in = pr.getErrorStream();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    errorBuilder.append(line + "\n");
-                }
-            }
-            if (errorBuilder.length() > 0) {
-                LOGGER.error(error + " Error message from process: " + errorBuilder.toString());
-            }
-        } catch (IOException ex) {
-            LOGGER.error(error, ex);
-        }
-    }*/
-
 
     static Optional<String> getBundledChromeDriverPath() {
     	return Optional.ofNullable(CHROME_DRIVER_PATH);
