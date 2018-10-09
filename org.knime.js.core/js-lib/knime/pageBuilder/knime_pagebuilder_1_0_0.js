@@ -153,17 +153,21 @@ KnimePageLoader = function() {
 				wrapperContainer.style.padding = 0;
 			}
 			_getContainerElement().appendChild(wrapperContainer);
-			if (layout.rows) {
-				for (var i = 0; i < layout.rows.length; i++) {
-					_buildBSLayout(layout.rows[i], wrapperContainer);
-				}
+			parent = wrapperContainer;
+		}
+		if (layout.rows) {
+			for (var i = 0; i < layout.rows.length; i++) {
+				_buildBSLayout(layout.rows[i], parent);
 			}
 		}
 		if (!layout.type) {
 			return;
 		}
 		
-		if (layout.type === "row" || layout.type === "JSONLayoutRow") {
+		if (layout.type === "nestedLayout" || layout.type === "JSONNestedLayout") {
+			parent.id = "node" + layout.nodeID.replace(/:/g, "-");
+			_buildBSLayout(layout.layout, parent);
+		} else if (layout.type === "row" || layout.type === "JSONLayoutRow") {
 			var row = document.createElement("div");
 			var rowClass = "row";
 			if (layout.additionalClasses) {
@@ -213,7 +217,6 @@ KnimePageLoader = function() {
 					}
 				}
 			}
-			
 		} else if (layout.type === "view" || layout.type === "JSONLayoutViewContent") {
 			var wn = webNodes[layout.nodeID];
 			if (!wn || (wn.nodeInfo && !wn.nodeInfo.displayPossible)) {
