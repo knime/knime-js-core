@@ -810,7 +810,7 @@ knimeService = function() {
 		if (textRect.width > maxWidth || textRect.height > maxHeight) {
 			var guessFactor = 1;
 			text += ellipsis;
-			while ((textRect.width > maxWidth || textRect.height > maxHeight) && text.length >= minimalChars) {
+			while ((textRect.width > maxWidth || textRect.height > maxHeight) && text.length > minimalChars) {
 				var heightDiff = 0, widthDiff = 0;
 				if (textRect.width > maxWidth) {
 					widthDiff = textRect.width - maxWidth;
@@ -825,7 +825,12 @@ knimeService = function() {
 				}
 
 				text = text.slice(0, Math.min(Math.floor(-text.length * guessFactor), -1));
-				textElement.textContent = text + ellipsis;
+				if(text.length >= minimalChars){
+					textElement.textContent = text + ellipsis;
+				} else {
+					text = textElement.textContent.substring(0,minimalChars);
+					textElement.textContent = text + ellipsis;
+				}
 				textRect = textElement.getBoundingClientRect();
 		    }
 		}
