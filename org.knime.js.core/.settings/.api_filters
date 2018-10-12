@@ -21,10 +21,18 @@
                 <message_argument value="createDefaultLayoutStructure(Map&lt;NodeID.NodeIDSuffix,WizardNode&gt;)"/>
             </message_arguments>
         </filter>
-        <filter id="421662840">
+        <filter id="640712815">
             <message_arguments>
-                <message_argument value="org.knime.js.core.layout.DefaultLayoutCreatorImpl"/>
-                <message_argument value="getDefaultViewContentForNode(NodeID.NodeIDSuffix, WizardNode)"/>
+                <message_argument value="SubNodeContainer"/>
+                <message_argument value="DefaultLayoutCreatorImpl"/>
+                <message_argument value="getLayoutJSONString()"/>
+            </message_arguments>
+        </filter>
+        <filter id="640712815">
+            <message_arguments>
+                <message_argument value="SubNodeContainer"/>
+                <message_argument value="DefaultLayoutCreatorImpl"/>
+                <message_argument value="getWorkflowManager()"/>
             </message_arguments>
         </filter>
     </resource>

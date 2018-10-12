@@ -51,10 +51,10 @@ package org.knime.js.core.layout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
@@ -64,7 +64,9 @@ import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
+import org.knime.core.node.workflow.SinglePageWebResourceController;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
@@ -90,7 +92,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * {@inheritDoc}
      */
     @Override
-    public String createDefaultLayout(final Map<NodeIDSuffix, WizardNode> viewNodes) throws IOException {
+    public String createDefaultLayout(final Map<NodeIDSuffix, ViewHideable> viewNodes) throws IOException {
         JSONLayoutPage page = createDefaultLayoutStructure(viewNodes);
         ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
         try {
@@ -106,15 +108,24 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @param viewNodes a map of view nodes to create the layout for
      * @return the new default layout structure
      */
-    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, WizardNode> viewNodes) {
+    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, ViewHideable> viewNodes) {
         JSONLayoutPage page = new JSONLayoutPage();
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
         for (NodeIDSuffix suffix : viewNodes.keySet()) {
             JSONLayoutRow row = new JSONLayoutRow();
             JSONLayoutColumn col = new JSONLayoutColumn();
-            JSONLayoutViewContent view = getDefaultViewContentForNode(suffix, viewNodes.get(suffix));
-            col.setContent(Arrays.asList(new JSONLayoutViewContent[]{view}));
+            ViewHideable viewNode = viewNodes.get(suffix);
+            JSONLayoutContent colContent;
+            if (viewNode instanceof SubNodeContainer) {
+                JSONNestedLayout nestedLayout = new JSONNestedLayout();
+                NodeID id = NodeID.fromString(suffix.toString());
+                nestedLayout.setNodeID(Integer.toString(id.getIndex()));
+                colContent = nestedLayout;
+            } else {
+                colContent = getDefaultViewContentForNode(suffix, viewNodes.get(suffix));
+            }
+            col.setContent(Arrays.asList(new JSONLayoutContent[]{colContent}));
             try {
                 col.setWidthMD(12);
             } catch (JsonMappingException e) { /* do nothing */ }
@@ -122,21 +133,6 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             rows.add(row);
         }
         return page;
-    }
-
-    /**
-     * @since 3.7
-     */
-    //FIXME temp method, remove after changing this to ViewHideable completely
-    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, ViewHideable> viewNodes, final boolean foo) {
-        Map<NodeIDSuffix, WizardNode> orgMap = new LinkedHashMap<NodeIDSuffix, WizardNode>();
-        for (Entry<NodeIDSuffix, ViewHideable> e : viewNodes.entrySet()) {
-            ViewHideable item = e.getValue();
-            if (item instanceof WizardNode) {
-                orgMap.put(e.getKey(), (WizardNode)item);
-            }
-        }
-        return createDefaultLayoutStructure(orgMap);
     }
 
     /**
@@ -173,7 +169,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         }
         try {
             JSONLayoutPage parentPage = deserializeLayout(originalLayout);
-            parentPage = expandNestedLayout(parentPage, wfm);
+            parentPage = expandNestedLayout(parentPage, wfm, wfm);
             return serializeLayout(parentPage);
         } catch (IOException ex) {
             LOGGER.error("Could not expand a potentially nested layout: " + ex.getMessage(), ex);
@@ -194,19 +190,19 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return mapper.writeValueAsString(layout);
     }
 
-    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage originalLayout, final WorkflowManager wfm)
-        throws JsonProcessingException, IOException {
+    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage originalLayout, final WorkflowManager wfm,
+        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
         List<JSONLayoutRow> rows = originalLayout.getRows();
         if (rows != null) {
             for (JSONLayoutRow row : originalLayout.getRows()) {
-                expandNestedRow(row, wfm);
+                expandNestedRow(row, wfm, parentWfm);
             }
         }
         return originalLayout;
     }
 
-    private JSONLayoutRow expandNestedRow(final JSONLayoutRow originalRow, final WorkflowManager wfm)
-        throws JsonProcessingException, IOException {
+    private JSONLayoutRow expandNestedRow(final JSONLayoutRow originalRow, final WorkflowManager wfm,
+        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
         for (JSONLayoutColumn col : originalRow.getColumns()) {
             List<JSONLayoutContent> replacedContent = new ArrayList<JSONLayoutContent>(col.getContent().size());
             for (JSONLayoutContent content : col.getContent()) {
@@ -216,7 +212,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                     NodeID nodeID = suffix.prependParent(wfm.getID());
                     NodeContainer nodeContainer = wfm.getNodeContainer(nodeID);
                     if (nodeContainer instanceof SubNodeContainer) {
-                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer);
+                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer, parentWfm);
                     }
                     replacedContent.add(nestedLayout);
                 } else if (content instanceof JSONLayoutViewContent) {
@@ -229,7 +225,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                             + "Consider updating your layout for node " + wfm.getID());
                         JSONNestedLayout nestedLayout = new JSONNestedLayout();
                         nestedLayout.setNodeID(viewContent.getNodeID());
-                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer);
+                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer, parentWfm);
                         replacedContent.add(nestedLayout);
                     } else {
                         replacedContent.add(viewContent);
@@ -241,13 +237,32 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return originalRow;
     }
 
-    private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub)
-        throws JsonProcessingException, IOException {
+    private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub,
+        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
+        WorkflowManager wfm = sub.getWorkflowManager();
         String nestedLayoutString = sub.getLayoutJSONString();
         if (StringUtils.isNotEmpty(nestedLayoutString)) {
             JSONLayoutPage nestedPage = deserializeLayout(nestedLayoutString);
-            expandNestedLayout(nestedPage, sub.getWorkflowManager());
+            expandNestedLayout(nestedPage, wfm, parentWfm);
             nestedLayout.setLayout(nestedPage);
+        } else {
+            // create default layout also for nested subnodes, if there is no layout defined
+            @SuppressWarnings("rawtypes")
+            Map<NodeID, WizardNode> nestedNodes =
+                wfm.findNodes(WizardNode.class, WebResourceController.NOT_HIDDEN_FILTER, false);
+            if (nestedNodes.size() > 0) {
+                Map<NodeIDSuffix, ViewHideable> nestedViews = nestedNodes.entrySet().stream().collect(Collectors
+                    .toMap(e -> NodeIDSuffix.create(wfm.getID(), e.getKey()), v -> (ViewHideable)v.getValue()));
+                Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.findSubnodeContainers(wfm);
+                for (Entry<NodeID, SubNodeContainer> entry : nestedSubnodes.entrySet()) {
+                    SinglePageWebResourceController controller =
+                        new SinglePageWebResourceController(wfm, entry.getKey());
+                    if (controller.isSubnodeViewAvailable()) {
+                        nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
+                    }
+                }
+                nestedLayout.setLayout(createDefaultLayoutStructure(nestedViews));
+            }
         }
     }
 
