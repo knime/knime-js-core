@@ -253,7 +253,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             if (nestedNodes.size() > 0) {
                 Map<NodeIDSuffix, ViewHideable> nestedViews = nestedNodes.entrySet().stream().collect(Collectors
                     .toMap(e -> NodeIDSuffix.create(wfm.getID(), e.getKey()), v -> (ViewHideable)v.getValue()));
-                Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.findSubnodeContainers(wfm);
+                Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.getSubnodeContainers(wfm);
                 for (Entry<NodeID, SubNodeContainer> entry : nestedSubnodes.entrySet()) {
                     SinglePageWebResourceController controller =
                         new SinglePageWebResourceController(wfm, entry.getKey());
