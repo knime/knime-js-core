@@ -210,8 +210,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                     JSONNestedLayout nestedLayout = (JSONNestedLayout)content;
                     NodeIDSuffix suffix = NodeIDSuffix.fromString(nestedLayout.getNodeID());
                     NodeID nodeID = suffix.prependParent(wfm.getID());
-                    NodeContainer nodeContainer = wfm.getNodeContainer(nodeID);
-                    if (nodeContainer instanceof SubNodeContainer) {
+                    NodeContainer nodeContainer = null;
+                    try {
+                        nodeContainer = wfm.getNodeContainer(nodeID);
+                    } catch (IllegalArgumentException e) {
+                        //node probably deleted from workflow
+                        continue;
+                    }
+                    if (nodeContainer != null && nodeContainer instanceof SubNodeContainer) {
                         expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer, parentWfm);
                     }
                     replacedContent.add(nestedLayout);
@@ -219,8 +225,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                     JSONLayoutViewContent viewContent = (JSONLayoutViewContent)content;
                     NodeIDSuffix suffix = NodeIDSuffix.fromString(viewContent.getNodeID());
                     NodeID nodeID = suffix.prependParent(wfm.getID());
-                    NodeContainer nodeContainer = wfm.getNodeContainer(nodeID);
-                    if (nodeContainer instanceof SubNodeContainer) {
+                    NodeContainer nodeContainer = null;
+                    try {
+                        nodeContainer = wfm.getNodeContainer(nodeID);
+                    } catch (IllegalArgumentException e) {
+                        //node probably deleted from workflow
+                        continue;
+                    }
+                    if (nodeContainer != null && nodeContainer instanceof SubNodeContainer) {
                         LOGGER.info("Node " + nodeID + " was defined as a view but will be treated as nested layout. "
                             + "Consider updating your layout for node " + wfm.getID());
                         JSONNestedLayout nestedLayout = new JSONNestedLayout();
