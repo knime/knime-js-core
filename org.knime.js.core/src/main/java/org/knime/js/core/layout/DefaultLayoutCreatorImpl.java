@@ -169,7 +169,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         }
         try {
             JSONLayoutPage parentPage = deserializeLayout(originalLayout);
-            parentPage = expandNestedLayout(parentPage, wfm, wfm);
+            parentPage = expandNestedLayout(parentPage, wfm);
             return serializeLayout(parentPage);
         } catch (IOException ex) {
             LOGGER.error("Could not expand a potentially nested layout: " + ex.getMessage(), ex);
@@ -190,19 +190,17 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return mapper.writeValueAsString(layout);
     }
 
-    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage originalLayout, final WorkflowManager wfm,
-        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
+    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage originalLayout, final WorkflowManager wfm) throws JsonProcessingException, IOException {
         List<JSONLayoutRow> rows = originalLayout.getRows();
         if (rows != null) {
             for (JSONLayoutRow row : originalLayout.getRows()) {
-                expandNestedRow(row, wfm, parentWfm);
+                expandNestedRow(row, wfm);
             }
         }
         return originalLayout;
     }
 
-    private JSONLayoutRow expandNestedRow(final JSONLayoutRow originalRow, final WorkflowManager wfm,
-        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
+    private JSONLayoutRow expandNestedRow(final JSONLayoutRow originalRow, final WorkflowManager wfm) throws JsonProcessingException, IOException {
         for (JSONLayoutColumn col : originalRow.getColumns()) {
             List<JSONLayoutContent> replacedContent = new ArrayList<JSONLayoutContent>(col.getContent().size());
             for (JSONLayoutContent content : col.getContent()) {
@@ -218,7 +216,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                         continue;
                     }
                     if (nodeContainer != null && nodeContainer instanceof SubNodeContainer) {
-                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer, parentWfm);
+                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer);
                     }
                     replacedContent.add(nestedLayout);
                 } else if (content instanceof JSONLayoutViewContent) {
@@ -237,11 +235,18 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                             + "Consider updating your layout for node " + wfm.getID());
                         JSONNestedLayout nestedLayout = new JSONNestedLayout();
                         nestedLayout.setNodeID(viewContent.getNodeID());
-                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer, parentWfm);
+                        expandSubnode(nestedLayout, (SubNodeContainer)nodeContainer);
                         replacedContent.add(nestedLayout);
                     } else {
                         replacedContent.add(viewContent);
                     }
+                } else if (content instanceof JSONLayoutRow) {
+                    JSONLayoutRow rowContent = (JSONLayoutRow)content;
+                    rowContent = expandNestedRow(rowContent, wfm);
+                    replacedContent.add(rowContent);
+                } else {
+                    // html content
+                    replacedContent.add(content);
                 }
             }
             col.setContent(replacedContent);
@@ -249,13 +254,12 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return originalRow;
     }
 
-    private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub,
-        final WorkflowManager parentWfm) throws JsonProcessingException, IOException {
+    private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub) throws JsonProcessingException, IOException {
         WorkflowManager wfm = sub.getWorkflowManager();
         String nestedLayoutString = sub.getLayoutJSONString();
         if (StringUtils.isNotEmpty(nestedLayoutString)) {
             JSONLayoutPage nestedPage = deserializeLayout(nestedLayoutString);
-            expandNestedLayout(nestedPage, wfm, parentWfm);
+            expandNestedLayout(nestedPage, wfm);
             nestedLayout.setLayout(nestedPage);
         } else {
             // create default layout also for nested subnodes, if there is no layout defined
@@ -273,7 +277,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                         nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
                     }
                 }
-                nestedLayout.setLayout(createDefaultLayoutStructure(nestedViews));
+                JSONLayoutPage nestedPage = createDefaultLayoutStructure(nestedViews);
+                expandNestedLayout(nestedPage, wfm);
+                nestedLayout.setLayout(nestedPage);
             }
         }
     }
