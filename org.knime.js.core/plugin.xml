@@ -1734,11 +1734,11 @@
             version="1.0.0"
             webResourceBundleID="knimeLayoutEditor_1.0.0">
          <webResource
-               relativePathSource="js-lib/knime/layoutEditor/"
-               relativePathTarget="js-lib/knime/layoutEditor/">
+               relativePathSource="js-lib/knime/layoutEditor/dist/js"
+               relativePathTarget="js-lib/knime/layoutEditor/dist/js">
          </webResource>
          <importResource
-               relativePath="js-lib/knime/layoutEditor/js/layoutEditor.js"
+               relativePath="js-lib/knime/layoutEditor/dist/js/app.js"
                type="JAVASCRIPT">
          </importResource>
          <webDependency

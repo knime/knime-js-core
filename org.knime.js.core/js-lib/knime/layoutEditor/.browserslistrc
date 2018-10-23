@@ -1,0 +1,6 @@
+> 1%
+last 2 versions
+Firefox ESR
+not ie <= 10
+not op_mini all
+not op_mob > 0

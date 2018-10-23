@@ -1,0 +1,28 @@
+{
+  "name": "knimelayouteditor",
+  "version": "0.1.0",
+  "description": "Layout editor for KNIME meta nodes",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "eslint \"**/*.{js,vue}\""
+  },
+  "dependencies": {
+    "vue": "^2.5.17",
+    "vuedraggable": "^2.16.0",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.0.5",
+    "@vue/cli-service": "^3.0.5",
+    "eslint": "5.7.0",
+    "eslint-plugin-vue": "5.0.x || 5.0.0-beta.3",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.1",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "engines": {
+    "node": "10.x"
+  }
+}

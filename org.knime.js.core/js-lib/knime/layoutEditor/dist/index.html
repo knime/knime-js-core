@@ -1,0 +1,318 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1"><link rel=stylesheet href=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css><title>KNIME Layout Editor</title><script>// load nodes and layout like AP will do
+    document.addEventListener('DOMContentLoaded', function () {
+
+      loadNodes(JSON.stringify([{
+        nodeID: '1',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAABB0lEQVQ4jaWTO26FMBBFL1EkChdUuGYBsAYKehZAAxT0ZgXshM8a2ADboEIWDR2fBho0KaKHZPFICLmdRz7HGmtGA0BEhKf5eAI1TQPLso4z3c04jhSGIQGgF3dbUBQFGYZxwLcFXdeR67oKyDknIcTvgizLFJAxRkEQUF3XVNc1ERF9Xn1SFEWQUh41z/OQJAkYY8pdRTBNE4QQqKrqqDmOAyEEOOcK2Pe9KijLEkIIzPMMAOCcI01T2LZ9Atu2xbquqiCOYwAAYwxJksDzvB/Bty0EQQDf95U+r8CTIM9z6LqOfd+xLAuGYYCUEtu2vQVPAtM0b714Kfgr+IqGf26jhu8pe5wvP5Uh6wYf5FQAAAAASUVORK5CYII=',
+        type: 'view',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'aspectRatio16by9',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Line Chart (JavaScript)'
+      }, {
+        nodeID: '2',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAABB0lEQVQ4jaWTO26FMBBFL1EkChdUuGYBsAYKehZAAxT0ZgXshM8a2ADboEIWDR2fBho0KaKHZPFICLmdRz7HGmtGA0BEhKf5eAI1TQPLso4z3c04jhSGIQGgF3dbUBQFGYZxwLcFXdeR67oKyDknIcTvgizLFJAxRkEQUF3XVNc1ERF9Xn1SFEWQUh41z/OQJAkYY8pdRTBNE4QQqKrqqDmOAyEEOOcK2Pe9KijLEkIIzPMMAOCcI01T2LZ9Atu2xbquqiCOYwAAYwxJksDzvB/Bty0EQQDf95U+r8CTIM9z6LqOfd+xLAuGYYCUEtu2vQVPAtM0b714Kfgr+IqGf26jhu8pe5wvP5Uh6wYf5FQAAAAASUVORK5CYII=',
+        type: 'view',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'aspectRatio16by9',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Heatmap (JavaScript)'
+      }, {
+        nodeID: '3',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAABB0lEQVQ4jaWTO26FMBBFL1EkChdUuGYBsAYKehZAAxT0ZgXshM8a2ADboEIWDR2fBho0KaKHZPFICLmdRz7HGmtGA0BEhKf5eAI1TQPLso4z3c04jhSGIQGgF3dbUBQFGYZxwLcFXdeR67oKyDknIcTvgizLFJAxRkEQUF3XVNc1ERF9Xn1SFEWQUh41z/OQJAkYY8pdRTBNE4QQqKrqqDmOAyEEOOcK2Pe9KijLEkIIzPMMAOCcI01T2LZ9Atu2xbquqiCOYwAAYwxJksDzvB/Bty0EQQDf95U+r8CTIM9z6LqOfd+xLAuGYYCUEtu2vQVPAtM0b714Kfgr+IqGf26jhu8pe5wvP5Uh6wYf5FQAAAAASUVORK5CYII=',
+        type: 'view',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'aspectRatio16by9',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Hierachical Cluster Assigner (JavaScript)'
+      }, {
+        nodeID: '4',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAsSAAALEgHS3X78AAABB0lEQVQ4jaWTO26FMBBFL1EkChdUuGYBsAYKehZAAxT0ZgXshM8a2ADboEIWDR2fBho0KaKHZPFICLmdRz7HGmtGA0BEhKf5eAI1TQPLso4z3c04jhSGIQGgF3dbUBQFGYZxwLcFXdeR67oKyDknIcTvgizLFJAxRkEQUF3XVNc1ERF9Xn1SFEWQUh41z/OQJAkYY8pdRTBNE4QQqKrqqDmOAyEEOOcK2Pe9KijLEkIIzPMMAOCcI01T2LZ9Atu2xbquqiCOYwAAYwxJksDzvB/Bty0EQQDf95U+r8CTIM9z6LqOfd+xLAuGYYCUEtu2vQVPAtM0b714Kfgr+IqGf26jhu8pe5wvP5Uh6wYf5FQAAAAASUVORK5CYII=',
+        type: 'view',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'aspectRatio16by9',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Stacked Area Chart (JavaScript)'
+      }, {
+        nodeID: '7',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAFo9M/3AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NjAwRUJFNjcwRTFDMTFFNkE3NkZCQjA2REE3QjhBQ0IiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NjAwRUJFNjgwRTFDMTFFNkE3NkZCQjA2REE3QjhBQ0IiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxMzY0M0M1MDBFMTAxMUU2QTc2RkJCMDZEQTdCOEFDQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo2MDBFQkU2NjBFMUMxMUU2QTc2RkJCMDZEQTdCOEFDQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpSP8JMAAAKoSURBVHjaYpCWljJWV1d9zMQABHbTLGQAAogBKPI/bKbPQwb/Prf/QMAAEEBgkZsPbv4/cHL/f78O5xwGkCgMP/YP/A8QQGAVIOzf48oC1nL/2X2Q3v+Zh+LAZjDZmFozZByIY3h68jknyCpGsDIguKJs8FBAV0kOIIDAZiCDR48e/g+d4f0maXsU2AgWkOqW1fUMT8UfMMQJpDPMfzyFgZGZiX2ux1JGFCNBIHiy56l/f//vrKy80s4lJXL9z7fvl1AUwMAFSfXNIubaPn+//WQACCBGDQ31p58/f5ZCkjcxLdFtZGRkeL0uf0ci065du6SePHnKAMPcchxnJIzEvRn+/ecFqWZiYmJmOHThAEJ7jj7D11ff/q0r3BkCVvDv31+GZe/mMSQsC2ZYf2gdA78sL8P72+8NYRoY1dRUHjFJMsjaVVsAvcfI8OLy67sb8rerwI2EhbxXs6Ns8HTvRyD2eQm1zZeV9B+e5JDmwurNJwFBYMEPl+89YmLAAkD+BwFQQAEEGCgcnkRFRUknJCQwgHyEDEAeWLBgAcPChQsf6GQo9/Mr8ndxiXKxv7n69tXqzC3iYE+AIvPkyVPASJXGZhnD06dPGZJmRDHI28oyMLExMby7+fbp90+/TDaX7n4BkmeBKSxZks/wXuQNw593vxjyDCsYjDWNGX78/M7QubeFQdFFnuH/r/8MLy+82ru+YIcLsgWMKirKD+Pi4uR8Ar0ZFl6Yy/BN4jMDCysjw7eXP4CeZGLglGFn+Pbm2/8Pdz9Ubyzd3Y7uQoxQ9G5xUuES5NwhpCagzMTOwvDuzvt3315+ddtcufcsNi9ijQZsAJQCBXVVfJi52OEx8f7ynS1MDEQCFi5OPZhmEACxQWJEu+AUpwwXmwD3SpAmWBr49eFrOABu3kNaCuHSIAAAAABJRU5ErkJggg==',
+        type: 'quickform',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'viewLowestElement',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Boolean Input'
+      }, {
+        nodeID: '8',
+        preview: null,
+        availableInView: false,
+        description: null,
+        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH3gMNDwYK7Pl8VwAAAN1JREFUOMvVkj0KwkAQhb9ZNQb8gYA5goUnECy9ggew9AiexdJ72FiJnZ1gYZELKBJko5ixMCYK/kRSOc3ug7cz770dUVWKVDkPSZZCs9pERFBVDtEB7Wr+BnWnTr/dxyk5nC4nZpvZZwUi8oRbixZ+zU+xG7kpx3x7/JJlXmQgIwEPGCQED3Ry89lYNQj2ARVT4RyfsY7lHn5mwQOGQBWIgGk2JTyGzLdzDIaYGGttpiCVPAY6j8llV+29/2pDwTKqmvphDWyTM/x1kXaJbwPECc6zZEVXuXgG/9/gCm3SQpkbJEazAAAAAElFTkSuQmCC',
+        type: 'nestedLayout',
+        layout: {
+          type: 'JSONLayoutViewContent',
+          resizeMethod: 'viewLowestElement',
+          resizeInterval: null,
+          resizeTolerance: null,
+          autoResize: true,
+          scrolling: false,
+          sizeHeight: true,
+          sizeWidth: false,
+          maxHeight: null,
+          maxWidth: null,
+          minHeight: null,
+          minWidth: null,
+          nodeID: null,
+          additionalClasses: [],
+          additionalStyles: []
+        },
+        name: 'Inner Views'
+      }]));
+
+      loadLayout(JSON.stringify({
+        rows: [{
+          type: 'row',
+          columns: [{
+            content: [{
+              type: 'view',
+              scrolling: false,
+              nodeID: '1',
+              resizeMethod: 'aspectRatio4by3',
+              autoResize: true,
+              sizeHeight: true,
+              sizeWidth: false
+            }, {
+              type: 'row',
+              columns: [{
+                content: [{
+                  type: 'view',
+                  scrolling: false,
+                  nodeID: '2',
+                  resizeMethod: 'aspectRatio16by9',
+                  autoResize: true,
+                  sizeHeight: true,
+                  sizeWidth: false
+                }, {
+                  type: 'view',
+                  scrolling: false,
+                  nodeID: '3',
+                  resizeMethod: 'aspectRatio16by9',
+                  autoResize: true,
+                  sizeHeight: true,
+                  sizeWidth: false
+                }, {
+                  type: 'view',
+                  scrolling: false,
+                  nodeID: '4',
+                  resizeMethod: 'viewLowestElement',
+                  autoResize: true,
+                  sizeHeight: true,
+                  sizeWidth: false
+                }],
+                widthMD: 6,
+                widthLG: 6,
+                widthXS: 6,
+                widthXL: 6,
+                widthSM: 6
+              }, {
+                content: [{
+                  type: 'row',
+                  columns: [{
+                    content: [{
+                      type: 'view',
+                      scrolling: false,
+                      nodeID: '7',
+                      resizeMethod: 'viewLowestElement',
+                      autoResize: true,
+                      sizeHeight: true,
+                      sizeWidth: false
+                    }],
+                    widthMD: 12,
+                    widthLG: 12,
+                    widthXS: 12,
+                    widthXL: 12,
+                    widthSM: 12
+                  }, {
+                    content: [{
+                      type: 'view',
+                      scrolling: false,
+                      nodeID: '4',
+                      resizeMethod: 'aspectRatio16by9',
+                      autoResize: true,
+                      sizeHeight: true,
+                      sizeWidth: false
+                    }],
+                    widthMD: 12,
+                    widthLG: 12,
+                    widthXS: 12,
+                    widthXL: 12,
+                    widthSM: 12
+                  }]
+                }, {
+                  type: 'row',
+                  columns: [{
+                    content: [{
+                      type: 'view',
+                      scrolling: false,
+                      nodeID: '3',
+                      resizeMethod: 'aspectRatio16by9',
+                      autoResize: true,
+                      sizeHeight: true,
+                      sizeWidth: false
+                    }],
+                    widthMD: 6,
+                    widthLG: 6,
+                    widthXS: 6,
+                    widthXL: 6,
+                    widthSM: 6
+                  }, {
+                    content: [{
+                      type: 'view',
+                      scrolling: false,
+                      nodeID: '2',
+                      resizeMethod: 'aspectRatio16by9',
+                      autoResize: true,
+                      sizeHeight: true,
+                      sizeWidth: false
+                    }],
+                    widthMD: 6,
+                    widthLG: 6,
+                    widthXS: 6,
+                    widthXL: 6,
+                    widthSM: 6
+                  }]
+                }],
+                widthMD: 6,
+                widthLG: 6,
+                widthXS: 6,
+                widthXL: 6,
+                widthSM: 6
+              }]
+            }],
+            widthMD: 6,
+            widthLG: 6,
+            widthXS: 6,
+            widthXL: 6,
+            widthSM: 6
+          }, {
+            content: [{
+              type: 'view',
+              scrolling: false,
+              nodeID: '1',
+              resizeMethod: 'aspectRatio16by9',
+              autoResize: true,
+              sizeHeight: true,
+              sizeWidth: false
+            }],
+            widthMD: 6,
+            widthLG: 6,
+            widthXS: 6,
+            widthXL: 6,
+            widthSM: 6
+          }]
+        }, {
+          type: 'row',
+          columns: [{
+            content: [{
+              type: 'view',
+              scrolling: false,
+              nodeID: '1',
+              resizeMethod: 'aspectRatio16by9',
+              autoResize: true,
+              sizeHeight: true,
+              sizeWidth: false
+            }],
+            widthMD: 12,
+            widthLG: 12,
+            widthXS: 12,
+            widthXL: 12,
+            widthSM: 12
+          }]
+        }]
+      }));
+
+    });</script><link href=js/app.js rel=preload as=script></head><body><script src=js/app.js></script></body></html>
