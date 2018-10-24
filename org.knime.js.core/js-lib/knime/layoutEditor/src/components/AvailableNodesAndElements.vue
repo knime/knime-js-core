@@ -96,6 +96,7 @@ export default {
   padding: 0;
 
   .item {
+    cursor: move; // for IE11
     cursor: grab;
     border: 1px solid grey;
     padding: 2px 5px;

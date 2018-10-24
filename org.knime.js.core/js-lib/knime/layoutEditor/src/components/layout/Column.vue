@@ -2,7 +2,7 @@
   <Draggable
     v-model="content"
     :options="{group: 'content', draggable: '.draggable'}"
-    :class="['col', 'col-md-' + column.widthMD]"
+    :class="columnClasses"
     :move="onMove"
   >
     <ColumnContent
@@ -57,6 +57,17 @@ export default {
         deletable: { default: false, type: Boolean }
     },
     computed: {
+        columnClasses() {
+            // actually we don't support responsive layouts yet; but we apply all classes in case the user modified via JSON layout editor
+            return [
+                'col',
+                `col-xs-${this.column.widthXS}`,
+                `col-sm-${this.column.widthSM}`,
+                `col-md-${this.column.widthMD}`,
+                `col-lg-${this.column.widthLG}`,
+                `col-xl-${this.column.widthXL}`
+            ];
+        },
         content: {
             get() {
                 return this.column.content;

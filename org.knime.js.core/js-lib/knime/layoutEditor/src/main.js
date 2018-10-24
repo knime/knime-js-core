@@ -5,37 +5,47 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
-new Vue({
-    el: document.body.appendChild(document.createElement('div')),
+const app = new Vue({
     store,
     created() {
-        window.loadNodes = nodes => {
-            console.log(`loadNodes ${nodes}`);
-            this.$store.commit('loadNodes', JSON.parse(nodes));
+        // global methods to be called by AP
+        window.setNodes = nodes => {
+            console.log(`setNodes ${nodes}`);
+            this.$store.commit('setNodes', JSON.parse(nodes));
         };
-        window.loadLayout = layout => {
-            console.log(`loadLayout ${layout}`);
+        window.setLayout = layout => {
+            console.log(`setLayout ${layout}`);
             try {
-                this.$store.commit('loadLayout', JSON.parse(layout));
+                this.$store.commit('setLayout', JSON.parse(layout));
             } catch (e) {
                 // e.g. wasn't valid JSON
             }
         };
-        window.sendLayout = () => {
-            console.log(`sendLayout`);
-            return JSON.stringify(this.$store.state.layout);
-        };
+
+        // push layout changes to AP
+        this.$store.watch(state => state.layout, (newLayout, oldLayout) => {
+            console.warn(`pushLayout ${JSON.stringify(newLayout)}`);
+            if (typeof window.pushLayout === 'function') {
+                window.pushLayout(JSON.stringify(newLayout));
+            }
+        }, { deep: true });
     },
     render: render => render(App)
 });
 
-// only for debugging
-console.log = function (message) {
-    let el = document.getElementById('console');
-    if (!el) {
-        el = document.body.appendChild(document.createElement('pre'));
-        el.setAttribute('id', 'console');
-        el.setAttribute('style', 'font-size: 10px; overflow: scroll; white-space: pre;');
-    }
-    el.innerHTML += `${message}\n\n`;
-};
+// wait until DOM is ready because AP will load this app in the HTML head
+document.addEventListener('DOMContentLoaded', () => {
+    app.$mount(document.body.appendChild(document.createElement('div')));
+
+    // only for debugging
+    console.log = function (message) {
+        let el = document.getElementById('console');
+        if (!el) {
+            el = document.body.appendChild(document.createElement('pre'));
+            el.setAttribute('id', 'console');
+            el.setAttribute('style', 'font-size: 10px; overflow: scroll; white-space: pre;');
+        }
+        el.innerHTML += `${message}\n\n`;
+    };
+
+});

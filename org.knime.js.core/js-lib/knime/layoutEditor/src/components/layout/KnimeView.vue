@@ -1,20 +1,22 @@
 <template>
-  <div :class="['view', resizeClass]">
-    <template v-if="$store.state.livePreview">
-      <iframe src="knime-view1/debug.html" />
-    </template>
-    <template v-else>
-      <div :title="node.name">
-        <img :src="node.icon"> {{ node.name }}
-        <small>Node {{ view.nodeID }}</small>
-        <div
-          v-if="node.description && node.description.length"
-          class="description"
-        >
-          {{ node.description }}
-        </div>
+  <div :class="['view', resizeClass, {'missing': !node}]">
+    <div
+      v-if="node"
+      :title="node.name"
+    >
+      <img :src="node.icon"> {{ node.name }}
+      <small>Node {{ view.nodeID }}</small>
+      <div
+        v-if="node && node.description && node.description.length"
+        class="description"
+      >
+        {{ node.description }}
       </div>
-    </template>
+    </div>
+
+    <div v-else>
+      Node {{ view.nodeID }} (missing)
+    </div>
   </div>
 </template>
 
@@ -43,6 +45,10 @@ export default {
 .editMode {
   .view {
     border: 1px solid black;
+
+    &.missing {
+      opacity: 0.4;
+    }
   }
 }
 
@@ -70,10 +76,6 @@ export default {
 
   &.aspectRatio4by3 {
     padding-bottom: calc(100% / (4 / 3));
-  }
-
-  iframe {
-    border: 0;
   }
 }
 </style>

@@ -11,7 +11,7 @@
     // load nodes and layout like AP will do
     document.addEventListener('DOMContentLoaded', function () {
 
-      loadNodes(JSON.stringify([{
+      setNodes(JSON.stringify([{
         nodeID: '1',
         preview: null,
         availableInView: false,
@@ -163,7 +163,7 @@
         name: 'Inner Views'
       }]));
 
-      loadLayout(JSON.stringify({
+      setLayout(JSON.stringify({
         rows: [{
           type: 'row',
           columns: [{
@@ -311,6 +311,14 @@
               type: 'view',
               scrolling: false,
               nodeID: '1',
+              resizeMethod: 'aspectRatio16by9',
+              autoResize: true,
+              sizeHeight: true,
+              sizeWidth: false
+            }, {
+              type: 'view',
+              scrolling: false,
+              nodeID: '100',
               resizeMethod: 'aspectRatio16by9',
               autoResize: true,
               sizeHeight: true,

@@ -8,12 +8,6 @@
     </label>
     <label>
       <input
-        v-model="$store.state.livePreview"
-        type="checkbox"
-      > live preview
-    </label>
-    <label>
-      <input
         v-model="$store.state.selectionMode"
         type="checkbox"
       > selection
@@ -41,7 +35,7 @@ export default {
     methods: {
         onTextareaInput(e) {
             try {
-                this.$store.commit('loadLayout', JSON.parse(e.target.value));
+                this.$store.commit('setLayout', JSON.parse(e.target.value));
             } catch (e) {
                 // nothing to do if JSON isn't valid
             }
