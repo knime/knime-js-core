@@ -1,10 +1,13 @@
 <template>
-  <div :class="['view', resizeClass, {'missing': !node}]">
+  <div :class="['view', resizeClass, {'missing': disabledOrMissing}]">
     <div
       v-if="node"
       :title="node.name"
     >
       <img :src="node.icon"> {{ node.name }}
+      <span v-if="!node.availableInView">
+        (disabled in node usage)
+      </span>
       <small>Node {{ view.nodeID }}</small>
       <div
         v-if="node && node.description && node.description.length"
@@ -15,7 +18,7 @@
     </div>
 
     <div v-else>
-      Node {{ view.nodeID }} (missing)
+      Node {{ view.nodeID }} (missing in workflow)
     </div>
   </div>
 </template>
@@ -27,6 +30,9 @@ export default {
         view: { default: () => [], type: Object }
     },
     computed: {
+        disabledOrMissing() {
+            return !this.node || !this.node.availableInView;
+        },
         node() {
             return this.$store.state.nodes.find(node => node.nodeID === this.view.nodeID);
         },
@@ -41,19 +47,14 @@ export default {
 </script>
 
 
-<style lang="scss">
-.editMode {
-  .view {
-    border: 1px solid black;
-
-    &.missing {
-      opacity: 0.4;
-    }
-  }
-}
-
+<style lang="scss" scoped>
 .view {
+  border: 1px solid black;
   overflow: hidden;
+
+  &.missing {
+    opacity: 0.4;
+  }
 
   &.aspectRatio16by9,
   &.aspectRatio4by3 {

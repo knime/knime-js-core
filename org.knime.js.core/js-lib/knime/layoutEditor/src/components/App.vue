@@ -8,20 +8,10 @@
             type="checkbox"
           > debug mode
         </label>
+
         <br>
         <button @click="onClear">clear layout</button>&nbsp;
-        <button @click="onReset">reset layout</button>&nbsp;
-
-        <template v-if="$store.state.selectionMode">
-          <br>
-          <button
-            :disabled="!($store.state.selectedItem && $store.state.selectedItem.type === 'row')"
-            @click="onSplitVertical"
-          >
-            split |
-          </button>
-        </template>
-
+        <button @click="onReset">reset layout</button>
         <br><br>
 
         <AvailableNodesAndElements />
@@ -31,7 +21,7 @@
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
-          :class="[{ editMode: $store.state.editMode}, 'container-fluid']"
+          class="container-fluid layoutPreview"
         >
           <Row
             v-for="(row, index) in rows"
@@ -42,7 +32,7 @@
       </div>
       <AdvancedEditor
         v-if="debugMode"
-        class="col-xs-3"
+        class="col-xs-3 debug"
       />
     </div>
   </div>
@@ -96,11 +86,8 @@ export default {
 
 .controls {
   overflow: auto;
-
-  label {
-    margin-right: 10px;
-  }
 }
+
 .layout {
   overflow-y: scroll;
   height: 100vh;
@@ -108,35 +95,30 @@ export default {
   min-height: 100px;
 }
 
-.editMode {
-  padding: 30px; // needed for drag & drop
+.layoutPreview {
+  min-height: 100%; // fill height to be a drag zone on first level
+  padding-bottom: 20px;
 
-  li {
+  // when dragging from available nodes/elements over layout, this list element will temporarily be added to the layout
+  li.sortable-ghost {
     list-style: none;
     border: 1px solid black;
   }
 
-  .row {
-    border: 4px solid pink;
-    min-height: 30px;
-    position: relative; // only for right delete handle position
+  .editHandle {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    color: #fff;
+    line-height: 7px;
+    text-align: center;
 
-    .deleteHandle {
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      position: absolute;
-      right: 0;
-      top: 0;
-      cursor: pointer;
-      color: #fff;
-      line-height: 7px;
-      text-align: center;
-
-      &:hover,
-      &.active {
-        background-color: orange;
-      }
+    &:hover {
+      background-color: orange;
     }
   }
 }

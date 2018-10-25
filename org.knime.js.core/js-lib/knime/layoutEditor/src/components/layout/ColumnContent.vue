@@ -23,7 +23,7 @@
 
     <template v-if="isDeletable">
       <div
-        class="deleteHandle"
+        class="editHandle"
         title="Delete"
         @click.prevent.stop="onContentItemDelete"
       >
@@ -32,7 +32,7 @@
     </template>
     <div
       v-if="item.type === 'view'"
-      class="configHandle"
+      class="editHandle configHandle"
       title="Configure"
       @click.prevent.stop="onContentItemConfigure"
     >
@@ -55,10 +55,6 @@ export default {
     },
     computed: {
         isDeletable() {
-            if (!this.$store.state.editMode) {
-                return false;
-            }
-
             if (this.item.type === 'row') {
                 // make sure only empty rows can be deleted
                 const firstColumnWithContent = this.item.columns.find(column => column.content.length > 0);
@@ -84,29 +80,15 @@ export default {
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .item {
-  position: relative;
+  position: relative; // needed for handle positioning
   min-height: 20px;
 
   .configHandle {
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    position: absolute;
     right: 15px;
-    top: 0;
-    cursor: pointer;
-    color: #fff;
     line-height: 10px;
-    text-align: center;
     font-size: 6px;
-    z-index: 1000;
-
-    &:hover,
-    &.active {
-      background-color: orange;
-    }
   }
 }
 </style>

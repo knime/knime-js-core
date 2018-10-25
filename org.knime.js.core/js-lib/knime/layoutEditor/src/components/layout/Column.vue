@@ -12,31 +12,27 @@
       class="draggable"
     />
     
-    <template
-      v-if="$store.state.editMode"
+    <div
+      v-if="resizable"
+      :class="['resizeHandle', {'active': isCurrentColumnResizing}]"
+      title="Drag to resize"
+      @mousedown.prevent.stop="onColumnResizeMouseDown"
+    />
+    <div
+      v-if="deletable"
+      class="editHandle"
+      title="Delete column"
+      @click.prevent.stop="onColumnDelete"
     >
-      <div
-        v-if="resizable"
-        :class="['resizeHandle', {'active': isCurrentColumnResizing}]"
-        title="Drag to resize"
-        @mousedown.prevent.stop="onColumnResizeMouseDown"
-      />
-      <div
-        v-if="deletable"
-        class="deleteHandle"
-        title="Delete column"
-        @click.prevent.stop="onColumnDelete"
-      >
-        ×
-      </div>
-      <div
-        v-if="isCurrentColumnResizing"
-        class="resizeOverlay"
-        @mouseup="onColumnResizeMouseUp"
-        @mouseout="onColumnResizeMouseUp"
-        @mousemove.stop="onColumnResizeMouseMove"
-      />
-    </template>
+      ×
+    </div>
+    <div
+      v-if="isCurrentColumnResizing"
+      class="resizeOverlay"
+      @mouseup="onColumnResizeMouseUp"
+      @mouseout="onColumnResizeMouseUp"
+      @mousemove.stop="onColumnResizeMouseMove"
+    />
   </Draggable>
 </template>
 
@@ -115,48 +111,45 @@ export default {
 </script>
 
 
-<style lang="scss">
-.editMode {
-  .row {
-    .col {
-      border: 1px solid green;
-      background-color: #fff;
-      min-height: 50px;
+<style lang="scss" scoped>
+.col {
+  border: 1px solid green;
+  background-color: #fff;
+  min-height: 50px;
 
-      &.selected {
-        outline: 2px solid yellow;
-      }
+  .draggable {
+    cursor: move; // for IE11
+    cursor: grab;
+  }
 
-      .resizeHandle {
-        width: 5px;
-        height: 100%;
-        background-color: green;
-        position: absolute;
-        right: 0;
-        bottom: 0;
+  .resizeHandle {
+    width: 5px;
+    height: 100%;
+    background-color: green;
+    position: absolute;
+    right: 0;
+    bottom: 0;
 
-        &:hover,
-        &.active {
-          background-color: rgb(0, 184, 0);
-        }
-      }
-
-      /* full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns */
-      .resizeOverlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 1000;
-      }
-
-      /* also we use the overlay to keep resize cursor while resizing */
-      .resizeHandle,
-      .resizeOverlay {
-        cursor: col-resize;
-      }
+    &:hover,
+    &.active {
+      background-color: rgb(0, 184, 0);
     }
+  }
+
+  // full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns
+  .resizeOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+  }
+
+  // also we use the overlay to keep resize cursor while resizing
+  .resizeHandle,
+  .resizeOverlay {
+    cursor: col-resize;
   }
 }
 </style>

@@ -73,9 +73,6 @@ const generateRowTemplates = function () {
 export default new Vuex.Store({
     strict: Boolean(window.webpackHotUpdate), // warn on state mutations outside mutation handlers when in dev mode
     state: {
-        editMode: true,
-        selectionMode: false,
-        selectedItem: null,
         resizeColumnInfo: null,
         layout: getEmptyLayout(),
         initialLayout: null,
@@ -96,6 +93,11 @@ export default new Vuex.Store({
 
             // save as initial layout
             state.initialLayout = layoutAsString;
+        },
+
+        setLayoutByTextarea(state, layout) {
+            // replace current layout with new one
+            state.layout = JSON.parse(JSON.stringify(layout));
         },
 
         setNodes(state, nodes) {
@@ -241,26 +243,6 @@ export default new Vuex.Store({
             row.columns[row.columns.length - 1].content.push(utils.createViewFromNode(node));
         },
 
-        // TODO remove these, just implemented for demonstration of selection mode
-        setSelection(state, item) {
-            state.selectedItem = item;
-        },
-        splitVertical(state) {
-            if (state.selectedItem && state.selectedItem.type === 'row') {
-                if (state.selectedItem.columns.length === config.gridSize) {
-                    return;
-                }
-
-                const width = Math.round(config.gridSize / (state.selectedItem.columns.length + 1));
-                state.selectedItem.columns.push({
-                    content: []
-                });
-
-                state.selectedItem.columns.forEach(column => {
-                    utils.setColumnWidths(column, width);
-                });
-            }
-        },
         initialLayout(state) {
             const content = [];
 

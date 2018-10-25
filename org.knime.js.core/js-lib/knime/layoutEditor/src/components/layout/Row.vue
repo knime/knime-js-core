@@ -1,7 +1,6 @@
 <template>
   <div
-    :class="['row', {'selected': isSelected}]"
-    @click.stop="onRowClick"
+    class="row"
   >
     <Column
       v-for="(column, index) in columns"
@@ -13,7 +12,7 @@
 
     <div
       v-if="canAddColumn"
-      class="addColumnHandle"
+      class="editHandle addColumnHandle"
       title="Add column"
       @click.prevent.stop="onAddColumn"
     >
@@ -33,9 +32,6 @@ export default {
         row: { default: () => {}, type: Object }
     },
     computed: {
-        isSelected() {
-            return this.$store.state.selectedItem === this.row;
-        },
         canAddColumn() {
             return this.columns.length < config.gridSize;
         },
@@ -49,11 +45,6 @@ export default {
         }
     },
     methods: {
-        onRowClick() {
-            if (this.$store.state.selectionMode) {
-                this.$store.commit('setSelection', this.row);
-            }
-        },
         onAddColumn() {
             this.$store.commit('addColumn', this.row);
         },
@@ -71,33 +62,14 @@ export default {
 </script>
 
 
-<style lang="scss">
-.editMode {
-  .row {
-    border: 4px solid pink;
-    min-height: 30px;
+<style lang="scss" scoped>
+.row {
+  border: 4px solid pink;
+  min-height: 30px;
+  position: relative; // needed for delete handle positioning
 
-    &.selected {
-      outline: 2px solid yellow;
-    }
-
-    .addColumnHandle {
-      width: 10px;
-      height: 10px;
-      background-color: red;
-      position: absolute;
-      right: 0;
-      top: 15px;
-      cursor: pointer;
-      color: #fff;
-      line-height: 7px;
-      text-align: center;
-
-      &:hover,
-      &.active {
-        background-color: orange;
-      }
-    }
+  .addColumnHandle {
+    top: 15px;
   }
 }
 </style>

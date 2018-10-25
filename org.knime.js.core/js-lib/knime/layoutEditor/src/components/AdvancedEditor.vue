@@ -1,20 +1,7 @@
 <template>
-  <div class="debug">
-    <label>
-      <input
-        v-model="$store.state.editMode"
-        type="checkbox"
-      > edit mode
-    </label>
-    <label>
-      <input
-        v-model="$store.state.selectionMode"
-        type="checkbox"
-      > selection
-    </label>
+  <div>
     <button @click="onInitialLayout">generate initial layout</button>
     <br>
-    Debug (or advanced layout)<br>
     <textarea
       :value="layoutAsString"
       @input="onTextareaInput"
@@ -35,7 +22,7 @@ export default {
     methods: {
         onTextareaInput(e) {
             try {
-                this.$store.commit('setLayout', JSON.parse(e.target.value));
+                this.$store.commit('setLayoutByTextarea', JSON.parse(e.target.value));
             } catch (e) {
                 // nothing to do if JSON isn't valid
             }
@@ -48,19 +35,17 @@ export default {
 </script>
 
 
-<style lang="scss">
-.debug {
-  textarea {
-    width: 100%;
-    height: 90vh;
-    resize: none;
-    font-size: 12px;
-    font-family: courier;
-    overflow: auto;
-    white-space: pre;
-    word-break: unset;
-    word-wrap: unset;
-    overflow-wrap: unset;
-  }
+<style lang="scss" scoped>
+textarea {
+  width: 100%;
+  height: 90vh;
+  resize: none;
+  font-size: 12px;
+  font-family: courier;
+  overflow: auto;
+  white-space: pre;
+  word-break: unset;
+  word-wrap: unset;
+  overflow-wrap: unset;
 }
 </style>

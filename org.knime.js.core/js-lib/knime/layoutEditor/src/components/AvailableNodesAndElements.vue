@@ -66,7 +66,8 @@ export default {
     computed: {
         availableNodes() {
             const nodeIdsInLayout = this.$store.getters.getAllNodeIdsInLayout;
-            return this.$store.state.nodes.filter(node => !nodeIdsInLayout.includes(node.nodeID));
+            return this.$store.state.nodes.filter(node => node.availableInView &&
+                !nodeIdsInLayout.includes(node.nodeID));
         }
     },
     methods: {
@@ -90,7 +91,7 @@ export default {
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 .availableNodes,
 .availableElements {
   list-style: none;
