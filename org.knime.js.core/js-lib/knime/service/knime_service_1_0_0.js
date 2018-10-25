@@ -751,10 +751,10 @@ knimeService = function() {
 	 * 		maxWidth: maximum measured width of all text elements
 	 * 		maxHeight: maximum measured height of all text elements
 	 */
-	service.measureAndTruncate = function(data, config) {	
-		var tempTextList = [], values = [],	containerClass;
+	service.measureAndTruncate = function(data, config) {
+		var tempTextList = [], values = [], containerClass;
 		var minChars = config.minimalChars ? config.minimalChars : 1
-		if (typeof(config.tempContainer) == "undefined" && config.tempContainer == null) {
+		if (typeof config.tempContainer  === "undefined" || config.tempContainer === null) {
 			containerClass = "g";
 		} else {
 			containerClass = config.tempContainer;
