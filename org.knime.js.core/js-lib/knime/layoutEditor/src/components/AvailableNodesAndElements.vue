@@ -33,9 +33,10 @@
           {{ node.description }}
         </div>
       </li>
+      <small v-if="availableNodes.length === 0">(all views are used in the layout)</small>
     </Draggable>
 
-    <h4>Elements <small>drag into layout or click</small></h4>
+    <h4>Rows <small>drag into layout or click</small></h4>
     <Draggable
       v-model="$store.state.elements"
       :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
@@ -94,6 +95,7 @@ export default {
 .availableElements {
   list-style: none;
   padding: 0;
+  min-height: 30px;
 
   .item {
     cursor: move; // for IE11

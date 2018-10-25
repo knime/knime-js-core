@@ -24,7 +24,7 @@ const app = new Vue({
 
         // push layout changes to AP
         this.$store.watch(state => state.layout, (newLayout, oldLayout) => {
-            console.warn(`pushLayout ${JSON.stringify(newLayout)}`);
+            console.log(`pushLayout ${JSON.stringify(newLayout)}`);
             if (typeof window.pushLayout === 'function') {
                 window.pushLayout(JSON.stringify(newLayout));
             }

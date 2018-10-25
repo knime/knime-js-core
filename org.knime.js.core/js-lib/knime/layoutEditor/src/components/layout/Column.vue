@@ -33,6 +33,7 @@
         v-if="isCurrentColumnResizing"
         class="resizeOverlay"
         @mouseup="onColumnResizeMouseUp"
+        @mouseout="onColumnResizeMouseUp"
         @mousemove.stop="onColumnResizeMouseMove"
       />
     </template>
@@ -73,7 +74,7 @@ export default {
                 return this.column.content;
             },
             set(newContent) {
-                this.$store.commit('updateContent', { column: this.column, newContent });
+                this.$store.commit('updateColumnContent', { column: this.column, newContent });
             }
         },
         isCurrentColumnResizing() {
@@ -89,11 +90,12 @@ export default {
             this.$store.commit('deleteColumn', this.column);
         },
         onColumnResizeMouseDown(e) {
+            const containerWidth = e.target.parentNode.parentNode.offsetWidth;
             this.$store.commit('setResizeColumnInfo', {
                 column: this.column,
                 clientX: e.clientX,
-                containerWidth: e.target.parentNode.parentNode.offsetWidth,
-                originalWidthMD: this.column.widthMD // currently we don't support responsive layouts
+                gridStepWidth: containerWidth / config.gridSize,
+                originalWidthMD: this.column.widthMD // currently we don't support responsive layouts, only using widthMD
             });
         },
         onColumnResizeMouseUp(e) {
@@ -102,21 +104,10 @@ export default {
         onColumnResizeMouseMove(e) {
             const resizeColumnInfo = this.$store.state.resizeColumnInfo;
             if (resizeColumnInfo) {
-                const gridSize = config.gridSize;
-                const gridStepWidth = resizeColumnInfo.containerWidth / gridSize;
                 const moveDelta = e.clientX - resizeColumnInfo.clientX;
-                const gridDelta = Math.round(moveDelta / gridStepWidth);
+                const gridDelta = Math.round(moveDelta / resizeColumnInfo.gridStepWidth);
                 let newWidth = resizeColumnInfo.originalWidthMD + gridDelta;
-                if (newWidth <= 0) {
-                    newWidth = 1;
-                } else if (newWidth > gridSize) {
-                    newWidth = gridSize;
-                }
-
-                this.$store.commit('resizeColumn', {
-                    column: this.column,
-                    newWidth
-                });
+                this.$store.commit('resizeColumn', newWidth);
             }
         }
     }

@@ -44,7 +44,7 @@ export default {
                 return this.row.columns;
             },
             set(newColumns) {
-                this.$store.commit('updateColumns', { row: this.row, newColumns });
+                this.$store.commit('updateRowColumns', { row: this.row, newColumns });
             }
         }
     },
@@ -78,7 +78,7 @@ export default {
     min-height: 30px;
 
     &.selected {
-      outline: 2px solid red;
+      outline: 2px solid yellow;
     }
 
     .addColumnHandle {
@@ -92,6 +92,11 @@ export default {
       color: #fff;
       line-height: 7px;
       text-align: center;
+
+      &:hover,
+      &.active {
+        background-color: orange;
+      }
     }
   }
 }

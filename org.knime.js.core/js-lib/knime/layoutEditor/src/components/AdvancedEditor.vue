@@ -12,7 +12,7 @@
         type="checkbox"
       > selection
     </label>
-    <button @click="onInitialLayout">initial layout</button>
+    <button @click="onInitialLayout">generate initial layout</button>
     <br>
     Debug (or advanced layout)<br>
     <textarea

@@ -60,7 +60,7 @@ const generateRowTemplates = function () {
             columns.push(utils.setColumnWidths({ content: [] }, config.gridSize / numberOfColumns));
         }
         return {
-            name: `Row ${numberOfColumns}-column`,
+            name: `${numberOfColumns}-column`,
             data: {
                 type: 'row',
                 columns
@@ -78,6 +78,7 @@ export default new Vuex.Store({
         selectedItem: null,
         resizeColumnInfo: null,
         layout: getEmptyLayout(),
+        initialLayout: null,
         nodes: [],
         elements: generateRowTemplates()
     },
@@ -89,56 +90,72 @@ export default new Vuex.Store({
     },
     mutations: {
         setLayout(state, layout) {
+            const layoutAsString = JSON.stringify(layout);
             // replace current layout with new one
-            state.layout = JSON.parse(JSON.stringify(layout));
+            state.layout = JSON.parse(layoutAsString);
+
+            // save as initial layout
+            state.initialLayout = layoutAsString;
         },
+
         setNodes(state, nodes) {
             state.nodes = JSON.parse(JSON.stringify(nodes));
         },
-        initialLayout(state) {
-            const content = [];
 
-            state.nodes.forEach(node => {
-                content.push(utils.createViewFromNode(node));
-            });
-
-            const rows = [{
-                type: 'row',
-                columns: [utils.setColumnWidths({ content }, config.gridSize)]
-            }];
-
-            state.layout = {
-                rows
-            };
+        resetLayout(state) {
+            if (state.initialLayout) {
+                // reset to initial layout
+                state.layout = JSON.parse(state.initialLayout);
+            }
         },
+
         clearLayout(state) {
-            // remove all rows and columns and add one row
+            // reset to empty layout
             state.layout = getEmptyLayout();
         },
 
+        // called on column resize start and end
         setResizeColumnInfo(state, resizeColumnInfo) {
-            state.resizeColumnInfo = resizeColumnInfo;
-        },
-
-        resizeColumn(state, info) {
-            const oldWidth = info.column.widthMD;
-            const delta = oldWidth - info.newWidth;
-
-            const allColumnArrays = getAllColumnArrays(state.layout.rows);
-            for (let columnArray of allColumnArrays) {
-                let index = columnArray.indexOf(info.column);
-                if (index >= 0) {
-                    // resize siblings
-                    const sibling = columnArray[index + 1];
-                    if (sibling) {
-                        utils.setColumnWidths(sibling, sibling.widthMD + delta);
-                    }
-                    break;
-                }
+            if (resizeColumnInfo === null) {
+                state.resizeColumnInfo = null;
+                return;
             }
 
-            // currently we don't support responsive layouts, so set all sizes
-            utils.setColumnWidths(info.column, info.newWidth);
+            // to prevent wrapping we need to resize the next sibling as well...
+            const resizingColumn = resizeColumnInfo.column;
+            const columns = getAllColumnArrays(state.layout.rows)
+                .find(columnArray => columnArray.includes(resizingColumn));
+            const nextSibling = columns[columns.indexOf(resizingColumn) + 1];
+            const allOtherSiblings = columns.filter(column => ![resizingColumn, nextSibling].includes(column));
+            const widthOfOtherSiblings = allOtherSiblings.reduce((total, column) => total + column.widthMD, 0);
+
+            // ...therefore we save further information about the siblings to be used in resizeColumn()
+            state.resizeColumnInfo = { ...resizeColumnInfo, columns, nextSibling, widthOfOtherSiblings };
+        },
+
+        resizeColumn(state, newWidth) {
+            const resizeInfo = state.resizeColumnInfo;
+
+            // min size for column
+            if (newWidth < 1) {
+                newWidth = 1;
+            }
+
+            // calc size of next sibling to prevent wrapping
+            const currentWidth = resizeInfo.column.widthMD;
+            let delta = currentWidth - newWidth;
+            let newSiblingWidth = resizeInfo.nextSibling.widthMD + delta;
+            if (newSiblingWidth < 1) {
+                newSiblingWidth = 1;
+            }
+
+            // also make sure the total width doesn't exceed the gridSize
+            const totalWidth = resizeInfo.widthOfOtherSiblings + newWidth + newSiblingWidth;
+            if (totalWidth <= config.gridSize) {
+                // currently we don't support responsive layouts, so set all sizes
+                utils.setColumnWidths(resizeInfo.nextSibling, newSiblingWidth);
+                utils.setColumnWidths(resizeInfo.column, newWidth);
+            }
         },
 
         deleteColumn(state, columnToDelete) {
@@ -147,7 +164,7 @@ export default new Vuex.Store({
             for (let columnArray of allColumnArrays) {
                 let index = columnArray.indexOf(columnToDelete);
                 if (index >= 0) {
-                    // resize siblings to fill up space
+                    // resize siblings to fill total grid width
                     const lostWidth = columnToDelete.widthMD;
                     const sibling1 = columnArray[index - 1];
                     const sibling2 = columnArray[index + 1];
@@ -187,36 +204,16 @@ export default new Vuex.Store({
             }
         },
 
-        updateColumns(state, data) {
+        updateRowColumns(state, data) {
             data.row.columns = data.newColumns;
         },
 
-        updateContent(state, data) {
+        updateColumnContent(state, data) {
             data.column.content = data.newContent;
         },
 
         updateFirstLevelRows(state, rows) {
             state.layout.rows = rows;
-        },
-
-        setSelection(state, item) {
-            state.selectedItem = item;
-        },
-        splitVertical(state) {
-            if (state.selectedItem && state.selectedItem.type === 'row') {
-                if (state.selectedItem.columns.length === config.gridSize) {
-                    return;
-                }
-
-                const width = Math.round(config.gridSize / (state.selectedItem.columns.length + 1));
-                state.selectedItem.columns.push({
-                    content: []
-                });
-
-                state.selectedItem.columns.forEach(column => {
-                    utils.setColumnWidths(column, width);
-                });
-            }
         },
 
         addColumn(state, row) {
@@ -236,14 +233,49 @@ export default new Vuex.Store({
                 const column = row.columns[row.columns.length - 1];
                 utils.setColumnWidths(column, column.widthMD + delta);
             }
-
-            row.columns = JSON.parse(JSON.stringify(row.columns)); // why needed?
         },
 
         addNode(state, node) {
             // add node to last column in last row
             const row = state.layout.rows[state.layout.rows.length - 1];
             row.columns[row.columns.length - 1].content.push(utils.createViewFromNode(node));
+        },
+
+        // TODO remove these, just implemented for demonstration of selection mode
+        setSelection(state, item) {
+            state.selectedItem = item;
+        },
+        splitVertical(state) {
+            if (state.selectedItem && state.selectedItem.type === 'row') {
+                if (state.selectedItem.columns.length === config.gridSize) {
+                    return;
+                }
+
+                const width = Math.round(config.gridSize / (state.selectedItem.columns.length + 1));
+                state.selectedItem.columns.push({
+                    content: []
+                });
+
+                state.selectedItem.columns.forEach(column => {
+                    utils.setColumnWidths(column, width);
+                });
+            }
+        },
+        initialLayout(state) {
+            const content = [];
+
+            state.nodes.forEach(node => {
+                content.push(utils.createViewFromNode(node));
+            });
+
+            const rows = [{
+                type: 'row',
+                columns: [utils.setColumnWidths({ content }, config.gridSize)]
+            }];
+
+            state.layout = {
+                rows
+            };
         }
     }
 });

@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xs-2 controls">
+      <div class="col-xs-3 controls">
         <label>
           <input
             v-model="debugMode"
@@ -10,6 +10,7 @@
         </label>
         <br>
         <button @click="onClear">clear layout</button>&nbsp;
+        <button @click="onReset">reset layout</button>&nbsp;
 
         <template v-if="$store.state.selectionMode">
           <br>
@@ -26,7 +27,7 @@
         <AvailableNodesAndElements />
       </div>
 
-      <div :class="[debugMode ? 'col-xs-7' : 'col-xs-10', 'layout']">
+      <div :class="[debugMode ? 'col-xs-6' : 'col-xs-9', 'layout']">
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
@@ -75,6 +76,9 @@ export default {
         onClear(e) {
             this.$store.commit('clearLayout');
         },
+        onReset(e) {
+            this.$store.commit('resetLayout');
+        },
         onSplitVertical() {
             this.$store.commit('splitVertical');
         }
@@ -84,9 +88,13 @@ export default {
 
 
 <style lang="scss">
-.controls {
-  background-color: rgb(240, 240, 240);
+.controls,
+.debug {
+  background-color: #f5f5f5;
   height: 100vh;
+}
+
+.controls {
   overflow: auto;
 
   label {
@@ -94,18 +102,19 @@ export default {
   }
 }
 .layout {
-  overflow: scroll;
+  overflow-y: scroll;
   height: 100vh;
   padding-top: 20px;
   min-height: 100px;
 }
-.debug {
-  background-color: rgb(240, 240, 240);
-  height: 100vh;
-}
 
 .editMode {
   padding: 30px; // needed for drag & drop
+
+  li {
+    list-style: none;
+    border: 1px solid black;
+  }
 
   .row {
     border: 4px solid pink;
@@ -123,6 +132,11 @@ export default {
       color: #fff;
       line-height: 7px;
       text-align: center;
+
+      &:hover,
+      &.active {
+        background-color: orange;
+      }
     }
   }
 }

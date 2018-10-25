@@ -30,6 +30,14 @@
         ×
       </div>
     </template>
+    <div
+      v-if="item.type === 'view'"
+      class="configHandle"
+      title="Configure"
+      @click.prevent.stop="onContentItemConfigure"
+    >
+      ⚒
+    </div>
   </div>
 </template>
 
@@ -67,6 +75,9 @@ export default {
     methods: {
         onContentItemDelete() {
             this.$store.commit('deleteContentItem', this.item);
+        },
+        onContentItemConfigure() {
+            alert('not implemented yet');
         }
     }
 };
@@ -77,5 +88,25 @@ export default {
 .item {
   position: relative;
   min-height: 20px;
+
+  .configHandle {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    position: absolute;
+    right: 15px;
+    top: 0;
+    cursor: pointer;
+    color: #fff;
+    line-height: 10px;
+    text-align: center;
+    font-size: 6px;
+    z-index: 1000;
+
+    &:hover,
+    &.active {
+      background-color: orange;
+    }
+  }
 }
 </style>
