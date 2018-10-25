@@ -98,7 +98,7 @@ KnimePageLoader = function() {
 			pageConfig = webNodePage.webNodePageConfiguration;
 			if (pageConfig && pageConfig.selectionTranslators) {
 				for (var i = 0; i < pageConfig.selectionTranslators.length; i++) {
-					_registerSelectionTranslator(pageConfig.selectionTranslators[i], i);
+					pageLoader.registerSelectionTranslator(pageConfig.selectionTranslators[i], i);
 				}
 			}
 			webNodes = webNodePage.webNodes;
@@ -1040,7 +1040,7 @@ KnimePageLoader = function() {
 		return element;
 	}
 	
-	_registerSelectionTranslator = function(translator, translatorID) {
+	pageLoader.registerSelectionTranslator = function(translator, translatorID) {
 		// check non-existing IDs
 		if (!translator.sourceID || !translator.targetIDs) {
 			return;

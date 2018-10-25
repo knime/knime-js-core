@@ -241,6 +241,10 @@ knimeService = function() {
 	service.publishSelection = function(tableId, selection, skip) {
 		return publishInteractivityEvent(SELECTION + SEPARATOR + tableId, selection, skip);
 	}
+	service.registerSelectionTranslator = function(translator, translatorID, callback) {
+		parent.KnimePageLoader.registerSelectionTranslator(translator, translatorID);
+		return subscribeToInteractivityEvent(SELECTION + SEPARATOR + translatorID, callback);
+	}
 	
 	service.subscribeToSelection = function(tableId, callback) {
 		return subscribeToInteractivityEvent(SELECTION + SEPARATOR + tableId, callback);
