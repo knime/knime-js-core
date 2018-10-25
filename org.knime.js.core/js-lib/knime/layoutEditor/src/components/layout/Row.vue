@@ -18,6 +18,14 @@
     >
       +
     </div>
+    <div
+      v-if="isRowDeletable"
+      class="editHandle"
+      title="Delete row"
+      @click.prevent.stop="onRowDelete"
+    >
+      ×
+    </div>
   </div>
 </template>
 
@@ -29,11 +37,16 @@ import config from '../../config';
 export default {
     components: { Column },
     props: {
-        row: { default: () => {}, type: Object }
+        row: { default: () => {}, type: Object },
+        deletable: { default: true, type: Boolean } // only used to prevent deleting the last row in the layout
     },
     computed: {
         canAddColumn() {
             return this.columns.length < config.gridSize;
+        },
+        isRowDeletable() {
+            // make sure only empty rows can be deleted
+            return this.deletable && this.columns.length === 1;
         },
         columns: {
             get() {
@@ -47,6 +60,9 @@ export default {
     methods: {
         onAddColumn() {
             this.$store.commit('addColumn', this.row);
+        },
+        onRowDelete() {
+            this.$store.commit('deleteContentItem', this.row);
         },
         isColumnDeletable(column) {
             // make sure the only column in a row can't be deleted

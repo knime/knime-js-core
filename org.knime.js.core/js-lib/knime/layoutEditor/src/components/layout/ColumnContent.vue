@@ -21,15 +21,15 @@
       html
     </div>
 
-    <template v-if="isDeletable">
-      <div
-        class="editHandle"
-        title="Delete"
-        @click.prevent.stop="onContentItemDelete"
-      >
-        ×
-      </div>
-    </template>
+
+    <div
+      v-if="item.type !== 'row'"
+      class="editHandle"
+      title="Delete"
+      @click.prevent.stop="onContentItemDelete"
+    >
+      ×
+    </div>
     <div
       v-if="item.type === 'view'"
       class="editHandle configHandle"
@@ -52,17 +52,6 @@ export default {
     },
     props: {
         item: { default: () => {}, type: Object }
-    },
-    computed: {
-        isDeletable() {
-            if (this.item.type === 'row') {
-                // make sure only empty rows can be deleted
-                const firstColumnWithContent = this.item.columns.find(column => column.content.length > 0);
-                return !firstColumnWithContent;
-            } else {
-                return true;
-            }
-        }
     },
     beforeCreate() {
         // dynamic import because of recursive components (see https://vuejs.org/v2/guide/components-edge-cases.html#Circular-References-Between-Components)

@@ -27,6 +27,7 @@
             v-for="(row, index) in rows"
             :key="index"
             :row="row"
+            :deletable="rows.length > 1"
           />
         </Draggable>
       </div>
