@@ -94,13 +94,19 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
     @Override
     protected final PortObject[] performExecute(final PortObject[] inObjects, final ExecutionContext exec)
         throws Exception {
-        exec.setProgress(0.0, "Creating view model...");
-        performExecuteCreateView(inObjects, exec.createSubExecutionContext(0.25));
-        exec.setProgress(1.0 / 3.0, "Rendering image...");
-        PortObject imagePortObject = renderViewAndCreateImage(exec.createSubExecutionContext(0.5));
-        exec.setProgress(2.0 / 3.0, "Creating output...");
+        exec.setProgress("Creating view model...");
+        final ExecutionContext modelExec = exec.createSubExecutionContext(0.4);
+        performExecuteCreateView(inObjects, modelExec);
+        modelExec.setProgress(1.0);
+        exec.setProgress("Rendering image...");
+        final ExecutionContext imageExec = exec.createSubExecutionContext(0.2);
+        PortObject imagePortObject = renderViewAndCreateImage(imageExec);
+        imageExec.setProgress(1.0);
+        exec.setProgress("Creating output...");
+        final ExecutionContext outputExec = exec.createSubExecutionContext(0.4);
         PortObject[] output =
-            performExecuteCreatePortObjects(imagePortObject, inObjects, exec.createSubExecutionContext(0.25));
+            performExecuteCreatePortObjects(imagePortObject, inObjects, outputExec);
+        outputExec.setProgress(1.0);
         exec.setProgress(1.0);
         return output;
     }
