@@ -1,7 +1,7 @@
 <template>
   <div class="item">
     <KnimeView
-      v-if="item.type === 'view'"
+      v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
       :view="item"
     />
     <Row
@@ -9,16 +9,9 @@
       :row="item"
     />
     <div
-      v-else-if="item.type === 'nestedLayout'"
-      :row="item"
-    >
-      nestedLayout
-    </div>
-    <div
       v-else-if="item.type === 'html'"
-      :row="item"
     >
-      html
+      HTML
     </div>
 
 
@@ -31,7 +24,7 @@
       ×
     </div>
     <div
-      v-if="item.type === 'view'"
+      v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
       class="editHandle configHandle"
       title="Configure"
       @click.prevent.stop="onContentItemConfigure"
@@ -75,9 +68,9 @@ export default {
   min-height: 20px;
 
   .configHandle {
-    right: 15px;
-    line-height: 10px;
-    font-size: 6px;
+    right: 20px;
+    line-height: 15px;
+    font-size: 10px;
   }
 }
 </style>

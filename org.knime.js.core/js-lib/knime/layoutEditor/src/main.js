@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     app.$mount(document.body.appendChild(document.createElement('div')));
 
     // only for debugging
+    // TODO remove
     console.log = function (message) {
         let el = document.getElementById('console');
         if (!el) {

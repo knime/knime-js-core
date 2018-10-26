@@ -85,7 +85,7 @@ export default {
   position: relative; // needed for delete handle positioning
 
   .addColumnHandle {
-    top: 15px;
+    top: 20px;
   }
 }
 </style>

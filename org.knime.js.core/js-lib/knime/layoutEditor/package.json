@@ -6,7 +6,10 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "eslint \"**/*.{js,vue}\""
+    "lint": "eslint \"**/*.{js,vue}\"",
+    "_test:unit": "mocha-webpack --webpack-config config/mocha-webpack.config.js --require test/unit/mocha-setup.js test/**/*.test.js",
+    "test:unit": "cross-env NODE_ENV=test npm run _test:unit",
+    "coverage": "cross-env NODE_ENV=coverage nyc --reporter=lcov --reporter=text --reporter text-summary npm run _test:unit"
   },
   "dependencies": {
     "vue": "^2.5.17",
@@ -16,11 +19,18 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.0.5",
     "@vue/cli-service": "^3.0.5",
+    "browser-env": "3.2.x",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
     "eslint": "5.7.0",
     "eslint-plugin-vue": "5.0.x || 5.0.0-beta.3",
+    "mocha": "5.2.x",
+    "mocha-webpack": "2.0.x || 2.0.0-beta.0",
     "node-sass": "^4.9.0",
+    "nyc": "13.0.x",
     "sass-loader": "^7.0.1",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.5.17",
+    "webpack-node-externals": "^1.7.2"
   },
   "engines": {
     "node": "10.x"

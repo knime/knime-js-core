@@ -66,8 +66,7 @@ export default {
     computed: {
         availableNodes() {
             const nodeIdsInLayout = this.$store.getters.getAllNodeIdsInLayout;
-            return this.$store.state.nodes.filter(node => node.availableInView &&
-                !nodeIdsInLayout.includes(node.nodeID));
+            return this.$store.state.nodes.filter(node => !nodeIdsInLayout.includes(node.nodeID));
         }
     },
     methods: {
@@ -77,8 +76,8 @@ export default {
         onCloneElement(element) {
             return JSON.parse(JSON.stringify(element.data));
         },
-        onAvailableElementClick(node) {
-            this.$store.commit('addElement', node);
+        onAvailableElementClick(element) {
+            this.$store.commit('addElement', this.onCloneElement(element));
         },
         onCloneNode(node) {
             return utils.createViewFromNode(node);

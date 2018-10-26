@@ -69,6 +69,52 @@ const generateRowTemplates = function () {
     });
 };
 
+// clean up the layout:
+// - remove columns without a 'content' property
+// - remove rows without a 'columns' property
+// - remove multiple nodes with the same nodeID
+const cleanLayout = function (layout) {
+    const nodeIDs = [];
+
+    const recursiveClean = function (layout) {
+        const newLayout = layout.filter(item => {
+            if (item.type === 'row') {
+                if (Array.isArray(item.columns)) {
+                    item.columns = item.columns.filter(column => {
+                        if (Array.isArray(column.content)) {
+                            column.content = recursiveClean(column.content);
+                            return true;
+                        } else {
+                            // remove column without 'content' array
+                            return false;
+                        }
+                    });
+                    return true;
+                } else {
+                    // remove rows without 'columns' array
+                    return false;
+                }
+            } else if (item.hasOwnProperty('nodeID')) {
+                if (nodeIDs.includes(item.nodeID)) {
+                    // remove duplicate nodes
+                    return false;
+                } else {
+                    nodeIDs.push(item.nodeID);
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        });
+
+        return newLayout;
+    };
+
+    return {
+        rows: recursiveClean(layout.rows)
+    };
+};
+
 
 export default new Vuex.Store({
     strict: Boolean(window.webpackHotUpdate), // warn on state mutations outside mutation handlers when in dev mode
@@ -82,12 +128,17 @@ export default new Vuex.Store({
     getters: {
         getAllNodeIdsInLayout(state) {
             const allContentArrays = getAllContentArrays(state.layout.rows);
-            return [].concat(...allContentArrays).filter(item => item.type === 'view').map(item => item.nodeID);
+            return [].concat(...allContentArrays)
+                .filter(item => item.hasOwnProperty('nodeID'))
+                .map(item => item.nodeID);
         }
     },
     mutations: {
         setLayout(state, layout) {
-            const layoutAsString = JSON.stringify(layout);
+            const cleanedLayout = cleanLayout(layout);
+
+            const layoutAsString = JSON.stringify(cleanedLayout);
+
             // replace current layout with new one
             state.layout = JSON.parse(layoutAsString);
 
@@ -96,12 +147,14 @@ export default new Vuex.Store({
         },
 
         setLayoutByTextarea(state, layout) {
+            const cleanedLayout = cleanLayout(layout);
+
             // replace current layout with new one
-            state.layout = JSON.parse(JSON.stringify(layout));
+            state.layout = JSON.parse(JSON.stringify(cleanedLayout));
         },
 
         setNodes(state, nodes) {
-            state.nodes = JSON.parse(JSON.stringify(nodes));
+            state.nodes = nodes;
         },
 
         resetLayout(state) {
@@ -171,6 +224,7 @@ export default new Vuex.Store({
                     const sibling1 = columnArray[index - 1];
                     const sibling2 = columnArray[index + 1];
                     if (sibling1 && sibling2) {
+                        // there is a left and right sibling, so split width to fill, if divisible by 2
                         const numberOfColumnsToSplit = 2;
                         if (lostWidth % numberOfColumnsToSplit === 0) {
                             const lostWidthSplit = lostWidth / numberOfColumnsToSplit;
@@ -180,12 +234,14 @@ export default new Vuex.Store({
                             utils.setColumnWidths(sibling1, sibling1.widthMD + lostWidth);
                         }
                     } else if (sibling1) {
+                        // only left sibling, so increase width
                         utils.setColumnWidths(sibling1, sibling1.widthMD + lostWidth);
                     } else {
+                        // only right sibling, so increase width
                         utils.setColumnWidths(sibling2, sibling2.widthMD + lostWidth);
                     }
 
-                    // remove column
+                    // finally remove the column
                     columnArray.splice(index, 1);
 
                     break;
@@ -206,14 +262,17 @@ export default new Vuex.Store({
             }
         },
 
+        // used by vuedraggable on drag&drop or reorder
         updateRowColumns(state, data) {
             data.row.columns = data.newColumns;
         },
 
+        // used by vuedraggable on drag&drop or reorder
         updateColumnContent(state, data) {
             data.column.content = data.newContent;
         },
 
+        // used by vuedraggable on drag&drop or reorder
         updateFirstLevelRows(state, rows) {
             state.layout.rows = rows;
         },
@@ -241,6 +300,10 @@ export default new Vuex.Store({
             // add node to last column in last row
             const row = state.layout.rows[state.layout.rows.length - 1];
             row.columns[row.columns.length - 1].content.push(utils.createViewFromNode(node));
+        },
+
+        addElement(state, element) {
+            state.layout.rows.push(element);
         },
 
         initialLayout(state) {

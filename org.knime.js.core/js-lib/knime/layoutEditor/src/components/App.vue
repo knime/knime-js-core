@@ -10,8 +10,18 @@
         </label>
 
         <br>
-        <button @click="onClear">clear layout</button>&nbsp;
-        <button @click="onReset">reset layout</button>
+        <button
+          title="remove all views and rows"
+          @click="onClear"
+        >
+          clear layout
+        </button>&nbsp;
+        <button
+          title="revert to initial state"
+          @click="onReset"
+        >
+          reset layout
+        </button>
         <br><br>
 
         <AvailableNodesAndElements />
@@ -107,15 +117,15 @@ export default {
   }
 
   .editHandle {
-    width: 10px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     background-color: red;
     position: absolute;
     right: 0;
     top: 0;
     cursor: pointer;
     color: #fff;
-    line-height: 7px;
+    line-height: 11px;
     text-align: center;
 
     &:hover {

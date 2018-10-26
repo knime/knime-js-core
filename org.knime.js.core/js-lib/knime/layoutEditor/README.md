@@ -19,6 +19,21 @@ npm run serve
 npm run lint
 ```
 
+### Running tests
+Unit tests are run with:
+```
+npm run test:unit
+```
+
+You can generate a coverage report with
+```
+npm run coverage
+```
+
+The output can be found in the `coverage` folder. It contains a browsable html report as well as raw coverage data in
+[LCOV](https://github.com/linux-test-project/lcov) format, which can be used in analysis software.
+
+
 ### Compile and minify for production
 Always run build and commit the build (files in `/dist`) after changes because KNIME AP is going to load the built files.
 

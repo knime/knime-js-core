@@ -8,14 +8,11 @@ export default {
         Vue.set(column, 'widthSM', width);
         Vue.set(column, 'widthMD', width);
         Vue.set(column, 'widthLG', width);
-        Vue.set(column, 'widthXL', width); // TODO remove because not available in Bootstrap 3?
+        Vue.set(column, 'widthXL', width);
         return column;
     },
     createViewFromNode(node) {
-        const view = Object.assign({}, node.layout);
-        view.type = 'view';
-        view.nodeID = node.nodeID;
-        return view;
+        return JSON.parse(JSON.stringify(node.layout));
     },
     checkMove(e) {
         // only allow rows to be dropped in first level
