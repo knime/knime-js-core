@@ -3,7 +3,7 @@
     <h4>Views <small>drag into layout or click</small></h4>
     <Draggable
       v-model="availableNodes"
-      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
+      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false, draggable: '.item'}"
       :clone="onCloneNode"
       :move="onMoveNode"
       element="ul"
@@ -29,11 +29,17 @@
         <div
           v-if="node.description && node.description.length"
           class="description"
+          :title="node.description"
         >
           {{ node.description }}
         </div>
       </li>
-      <small v-if="availableNodes.length === 0">(all views are used in the layout)</small>
+      <small
+        v-if="availableNodes.length === 0"
+        slot="footer"
+      >
+        (all views are used in the layout)
+      </small>
     </Draggable>
 
     <h4>Rows <small>drag into layout or click</small></h4>
@@ -127,6 +133,9 @@ export default {
 
     .description {
       margin-left: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }

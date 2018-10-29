@@ -18,3 +18,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+
+# code coverage
+coverage
+.nyc_output

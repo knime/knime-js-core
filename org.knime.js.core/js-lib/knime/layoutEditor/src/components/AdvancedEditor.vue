@@ -1,7 +1,5 @@
 <template>
   <div>
-    <button @click="onInitialLayout">generate initial layout</button>
-    <br>
     <textarea
       :value="layoutAsString"
       @input="onTextareaInput"
@@ -26,9 +24,6 @@ export default {
             } catch (e) {
                 // nothing to do if JSON isn't valid
             }
-        },
-        onInitialLayout(e) {
-            this.$store.commit('initialLayout');
         }
     }
 };
@@ -36,9 +31,12 @@ export default {
 
 
 <style lang="scss" scoped>
+div {
+  padding: 0;
+}
 textarea {
   width: 100%;
-  height: 90vh;
+  height: 100vh;
   resize: none;
   font-size: 12px;
   font-family: courier;
@@ -47,5 +45,7 @@ textarea {
   word-break: unset;
   word-wrap: unset;
   overflow-wrap: unset;
+  outline: 0;
+  border: 0;
 }
 </style>

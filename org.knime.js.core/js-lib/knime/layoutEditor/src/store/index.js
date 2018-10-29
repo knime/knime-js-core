@@ -304,23 +304,6 @@ export default new Vuex.Store({
 
         addElement(state, element) {
             state.layout.rows.push(element);
-        },
-
-        initialLayout(state) {
-            const content = [];
-
-            state.nodes.forEach(node => {
-                content.push(utils.createViewFromNode(node));
-            });
-
-            const rows = [{
-                type: 'row',
-                columns: [utils.setColumnWidths({ content }, config.gridSize)]
-            }];
-
-            state.layout = {
-                rows
-            };
         }
     }
 });

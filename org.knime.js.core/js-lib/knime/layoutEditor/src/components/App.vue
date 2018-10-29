@@ -89,6 +89,10 @@ export default {
 
 
 <style lang="scss">
+body {
+  overflow: hidden; // prevent scrolling
+}
+
 .controls,
 .debug {
   background-color: #f5f5f5;
