@@ -21,11 +21,13 @@ npm run lint
 
 ### Running tests
 Unit tests are run with:
+
 ```
 npm run test:unit
 ```
 
 You can generate a coverage report with
+
 ```
 npm run coverage
 ```

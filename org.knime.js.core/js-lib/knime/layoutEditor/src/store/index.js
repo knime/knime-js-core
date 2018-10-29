@@ -263,11 +263,6 @@ export default new Vuex.Store({
         },
 
         // used by vuedraggable on drag&drop or reorder
-        updateRowColumns(state, data) {
-            data.row.columns = data.newColumns;
-        },
-
-        // used by vuedraggable on drag&drop or reorder
         updateColumnContent(state, data) {
             data.column.content = data.newContent;
         },

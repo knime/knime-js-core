@@ -46,15 +46,11 @@ export default {
         },
         isRowDeletable() {
             // make sure only empty rows can be deleted
+            // FIXME: if the one remaining column has content, the row should also not be deletable
             return this.deletable && this.columns.length === 1;
         },
-        columns: {
-            get() {
-                return this.row.columns;
-            },
-            set(newColumns) {
-                this.$store.commit('updateRowColumns', { row: this.row, newColumns });
-            }
+        columns() {
+            return this.row.columns;
         }
     },
     methods: {
