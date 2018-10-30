@@ -45,9 +45,9 @@ export default {
             return this.columns.length < config.gridSize;
         },
         isRowDeletable() {
-            // make sure only empty rows can be deleted
-            // FIXME: if the one remaining column has content, the row should also not be deletable
-            return this.deletable && this.columns.length === 1;
+            // make sure only empty rows (= 1 empty column) can be deleted
+            const isEmpty = this.columns.length === 1 && this.columns[0].content.length === 0;
+            return this.deletable && isEmpty;
         },
         columns() {
             return this.row.columns;
