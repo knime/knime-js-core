@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-xs-3 controls">
+      <div class="col-3 controls">
         <label>
           <input
             v-model="debugMode"
@@ -27,7 +27,7 @@
         <AvailableNodesAndElements />
       </div>
 
-      <div :class="[debugMode ? 'col-xs-6' : 'col-xs-9', 'layout']">
+      <div :class="[debugMode ? 'col-6' : 'col-9', 'layout']">
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
@@ -43,7 +43,7 @@
       </div>
       <AdvancedEditor
         v-if="debugMode"
-        class="col-xs-3 debug"
+        class="col-3 debug"
       />
     </div>
   </div>
@@ -121,6 +121,10 @@ body {
   }
 
   .editHandle {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
     width: 15px;
     height: 15px;
     background-color: red;

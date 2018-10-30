@@ -10,22 +10,22 @@
       :column="column"
     />
 
-    <div
+    <button
       v-if="canAddColumn"
       class="editHandle addColumnHandle"
       title="Add column"
       @click.prevent.stop="onAddColumn"
     >
       +
-    </div>
-    <div
+    </button>
+    <button
       v-if="isRowDeletable"
       class="editHandle"
       title="Delete row"
       @click.prevent.stop="onRowDelete"
     >
       ×
-    </div>
+    </button>
   </div>
 </template>
 
@@ -77,8 +77,12 @@ export default {
 <style lang="scss" scoped>
 .row {
   border: 4px solid pink;
-  min-height: 30px;
+  min-height: 50px;
   position: relative; // needed for delete handle positioning
+
+  &:not(:last-of-type) {
+    margin-bottom: 5px;
+  }
 
   .addColumnHandle {
     top: 20px;

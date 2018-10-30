@@ -12,21 +12,21 @@
       class="draggable"
     />
     
-    <div
+    <button
       v-if="resizable"
       :class="['resizeHandle', {'active': isCurrentColumnResizing}]"
       title="Drag to resize"
       @mousedown.prevent.stop="onColumnResizeMouseDown"
     />
-    <div
+    <button
       v-if="deletable"
       class="editHandle"
       title="Delete column"
       @click.prevent.stop="onColumnDelete"
     >
       ×
-    </div>
-    <div
+    </button>
+    <button
       v-if="isCurrentColumnResizing"
       class="resizeOverlay"
       @mouseup="onColumnResizeMouseUp"
@@ -58,7 +58,7 @@ export default {
             // actually we don't support responsive layouts yet; but we apply all classes in case the user modified via JSON layout editor
             return [
                 'col',
-                `col-xs-${this.column.widthXS}`,
+                `col-${this.column.widthXS}`,
                 `col-sm-${this.column.widthSM}`,
                 `col-md-${this.column.widthMD}`,
                 `col-lg-${this.column.widthLG}`,
@@ -113,9 +113,7 @@ export default {
 
 <style lang="scss" scoped>
 .col {
-  border: 1px solid green;
   background-color: #fff;
-  min-height: 50px;
 
   .draggable {
     cursor: move; // for IE11
@@ -123,6 +121,10 @@ export default {
   }
 
   .resizeHandle {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
     width: 5px;
     height: 100%;
     background-color: green;
@@ -138,6 +140,11 @@ export default {
 
   // full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns
   .resizeOverlay {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
     position: fixed;
     top: 0;
     left: 0;

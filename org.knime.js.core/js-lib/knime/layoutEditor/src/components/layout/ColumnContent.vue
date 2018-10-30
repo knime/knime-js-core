@@ -15,22 +15,22 @@
     </div>
 
 
-    <div
+    <button
       v-if="item.type !== 'row'"
       class="editHandle"
       title="Delete"
       @click.prevent.stop="onContentItemDelete"
     >
       ×
-    </div>
-    <div
+    </button>
+    <button
       v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
       class="editHandle configHandle"
       title="Configure"
       @click.prevent.stop="onContentItemConfigure"
     >
       ⚒
-    </div>
+    </button>
   </div>
 </template>
 
@@ -66,6 +66,10 @@ export default {
 .item {
   position: relative; // needed for handle positioning
   min-height: 20px;
+
+  &:not(:last-of-type) {
+    margin-bottom: 5px;
+  }
 
   .configHandle {
     right: 20px;

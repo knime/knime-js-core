@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4>Views <small>drag into layout or click</small></h4>
+    <h4>Views <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="availableNodes"
       :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false, draggable: '.item'}"
@@ -24,7 +24,7 @@
           >
             {{ node.name }}
           </div>
-          <small>Node {{ node.nodeID }}</small>
+          <small class="text-muted">Node {{ node.nodeID }}</small>
         </div>
         <div
           v-if="node.description && node.description.length"
@@ -42,7 +42,7 @@
       </small>
     </Draggable>
 
-    <h4>Rows <small>drag into layout or click</small></h4>
+    <h4>Rows <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="$store.state.elements"
       :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
@@ -126,7 +126,6 @@ export default {
         margin-right: 4px;
       }
       small {
-        color: #777;
         white-space: nowrap;
       }
     }
