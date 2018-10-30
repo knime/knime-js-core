@@ -62,7 +62,7 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 .item {
   position: relative; // needed for handle positioning
   min-height: 20px;
@@ -71,7 +71,7 @@ export default {
     margin-bottom: 5px;
   }
 
-  .configHandle {
+  & .configHandle {
     right: 20px;
     line-height: 15px;
     font-size: 10px;

@@ -88,9 +88,15 @@ export default {
 </script>
 
 
-<style lang="scss">
+<style lang="postcss">
+@import "../style/variables.css";
+
 body {
-  overflow: hidden; // prevent scrolling
+  overflow: hidden; /* prevent scrolling */
+}
+
+* {
+  box-sizing: border-box;
 }
 
 .controls,
@@ -111,33 +117,28 @@ body {
 }
 
 .layoutPreview {
-  min-height: 100%; // fill height to be a drag zone on first level
+  min-height: 100%; /* fill height to be a drag zone on first level */
   padding-bottom: 20px;
 
-  // when dragging from available nodes/elements over layout, this list element will temporarily be added to the layout
-  li.sortable-ghost {
-    list-style: none;
-    border: 1px solid black;
-  }
-
-  .editHandle {
+  & .editHandle {
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     width: 15px;
     height: 15px;
-    background-color: red;
+    background-color: var(--knime-gray-ultra-light);
     position: absolute;
     right: 0;
     top: 0;
     cursor: pointer;
-    color: #fff;
-    line-height: 11px;
+    color: #000;
+    font-size: 15px;
+    line-height: 15px;
     text-align: center;
 
     &:hover {
-      background-color: orange;
+      background-color: var(--knime-yellow-sec-server);
     }
   }
 }

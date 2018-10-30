@@ -3,22 +3,28 @@
     <div
       v-if="node"
       :title="node.name"
+      class="d-inline-flex align-items-center justify-content-center"
     >
-      <img :src="node.icon"> {{ node.name }}
-      <span v-if="!node.availableInView">
-        (disabled in node usage)
-      </span>
-      <small>Node {{ view.nodeID }}</small>
-      <div
-        v-if="node && node.description && node.description.length"
-        class="description"
-      >
-        {{ node.description }}
-      </div>
+      <main>
+        <img :src="node.icon"><br> {{ node.name }}
+        <small
+          v-if="!node.availableInView"
+          class="text-muted"
+        >
+          (disabled in node usage)
+        </small>
+        <small class="text-muted">Node {{ view.nodeID }}</small>
+        <div
+          v-if="node && node.description && node.description.length"
+          class="description"
+        >
+          <small>{{ node.description }}</small>
+        </div>
+      </main>
     </div>
 
     <div v-else>
-      Node {{ view.nodeID }} (missing in workflow)
+      <main>Node {{ view.nodeID }} (missing in workflow)</main>
     </div>
   </div>
 </template>
@@ -46,11 +52,27 @@ export default {
 };
 </script>
 
+<style lang="postcss">
+@import "../../style/variables.css";
 
-<style lang="scss" scoped>
+/* when dragging from available nodes/elements over layout,
+  this list element will temporarily be added to the layout */
+.layoutPreview li.sortable-ghost {
+  list-style: none;
+  background-color: var(--knime-view-preview);
+  border-radius: 3px;
+  margin: 5px 0;
+}
+</style>
+
+<style lang="postcss" scoped>
+@import "../../style/variables.css";
+
 .view {
-  border: 1px solid black;
+  background-color: var(--knime-view-preview);
+  border-radius: 3px;
   overflow: hidden;
+  text-align: center;
 
   &.missing {
     opacity: 0.4;
@@ -77,6 +99,14 @@ export default {
 
   &.aspectRatio4by3 {
     padding-bottom: calc(100% / (4 / 3));
+  }
+
+  & main {
+    padding: 0 10px;
+
+    & .description {
+      line-height: 100%;
+    }
   }
 }
 </style>

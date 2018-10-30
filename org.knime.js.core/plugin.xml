@@ -1742,7 +1742,7 @@
                type="JAVASCRIPT">
          </importResource>
          <webDependency
-               webResourceBundleID="bootstrap_3.3.6">
+               webResourceBundleID="bootstrap_4.1.3">
          </webDependency>
       </webResourceBundle>
       <webResourceBundle

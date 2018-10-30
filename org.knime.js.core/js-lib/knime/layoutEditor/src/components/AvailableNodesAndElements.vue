@@ -96,41 +96,48 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
+@import "../style/variables.css";
+
 .availableNodes,
 .availableElements {
   list-style: none;
   padding: 0;
   min-height: 30px;
 
-  .item {
-    cursor: move; // for IE11
+  & .item {
+    cursor: move; /* for IE11 */
     cursor: grab;
-    border: 1px solid grey;
+    background-color: var(--knime-view-preview);
+    border-radius: 3px;
     padding: 2px 5px;
     margin-bottom: 2px;
 
-    .name {
+    &:hover {
+      background-color: var(--knime-view-preview-active);
+    }
+
+    & .name {
       display: flex;
 
-      div {
+      & div {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         flex: 1;
         margin-right: 8px;
       }
-      img {
+      & img {
         width: 16px;
         height: 16px;
         margin-right: 4px;
       }
-      small {
+      & small {
         white-space: nowrap;
       }
     }
 
-    .description {
+    & .description {
       margin-left: 20px;
       white-space: nowrap;
       overflow: hidden;

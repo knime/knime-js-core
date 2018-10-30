@@ -30,7 +30,7 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
 div {
   padding: 0;
 }

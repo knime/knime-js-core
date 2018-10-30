@@ -20,7 +20,7 @@
     />
     <button
       v-if="deletable"
-      class="editHandle"
+      class="editHandle delete"
       title="Delete column"
       @click.prevent.stop="onColumnDelete"
     >
@@ -110,36 +110,85 @@ export default {
 };
 </script>
 
+<style lang="postcss" scoped>
+@import "../../style/variables.css";
 
-<style lang="scss" scoped>
 .col {
-  background-color: #fff;
+  --resize-color: var(--knime-gray-ultra-light);
+  --resize-color-active: var(--knime-yellow-sec-server);
+  --resize-arrow-width: 4px;
+  --resize-arrow-height: 4px;
 
-  .draggable {
-    cursor: move; // for IE11
+  background-color: #fff;
+  padding: 5px 10px 5px 5px;
+
+  & .draggable {
+    cursor: move; /* for IE11 */
     cursor: grab;
   }
 
-  .resizeHandle {
+  & .resizeHandle {
     margin: 0;
     padding: 0;
-    border: 0;
     outline: 0;
-    width: 5px;
+    width: 6px; /* quite thick to be easily clickable */
     height: 100%;
-    background-color: green;
+    background-color: var(--resize-color);
     position: absolute;
     right: 0;
     bottom: 0;
+    border-style: solid;
+    border-width: 10px 2px 10px 2px; /* but adding a border to reduce the line thinkness */
+    border-color: #fff;
+
+    &:before,
+    &:after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-style: solid;
+      z-index: 1;
+      display: block;
+      position: absolute;
+      top: calc(50% - var(--resize-arrow-height));
+      left: 0px;
+      pointer-events: none;
+    }
+
+    &:before {
+      left: calc((var(--resize-arrow-width) * -1) - 1px);
+      border-width: var(--resize-arrow-height) var(--resize-arrow-width)
+        var(--resize-arrow-height) 0;
+      border-color: transparent var(--resize-color) transparent transparent;
+    }
+    &:after {
+      left: 3px;
+      border-width: var(--resize-arrow-height) 0 var(--resize-arrow-height)
+        var(--resize-arrow-width);
+      border-color: transparent transparent transparent var(--resize-color);
+    }
 
     &:hover,
     &.active {
-      background-color: rgb(0, 184, 0);
+      background-color: var(--resize-color-active);
+
+      &:before {
+        border-color: transparent var(--resize-color-active) transparent
+          transparent;
+      }
+      &:after {
+        border-color: transparent transparent transparent
+          var(--resize-color-active);
+      }
     }
   }
 
-  // full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns
-  .resizeOverlay {
+  & .editHandle.delete {
+    right: 5px;
+  }
+
+  /* full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns */
+  & .resizeOverlay {
     margin: 0;
     padding: 0;
     border: 0;
@@ -153,9 +202,9 @@ export default {
     z-index: 1000;
   }
 
-  // also we use the overlay to keep resize cursor while resizing
-  .resizeHandle,
-  .resizeOverlay {
+  /* also we use the overlay to keep resize cursor while resizing */
+  & .resizeHandle,
+  & .resizeOverlay {
     cursor: col-resize;
   }
 }

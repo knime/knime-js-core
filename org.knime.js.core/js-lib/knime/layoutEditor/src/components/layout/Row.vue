@@ -1,6 +1,6 @@
 <template>
   <div
-    class="row"
+    class="row no-gutters"
   >
     <Column
       v-for="(column, index) in columns"
@@ -74,17 +74,20 @@ export default {
 </script>
 
 
-<style lang="scss" scoped>
+<style lang="postcss" scoped>
+@import "../../style/variables.css";
+
 .row {
-  border: 4px solid pink;
-  min-height: 50px;
-  position: relative; // needed for delete handle positioning
+  border: 4px solid var(--knime-gray-ultra-light);
+  border-radius: 3px;
+  min-height: 70px;
+  position: relative; /* needed for delete handle positioning */
 
   &:not(:last-of-type) {
     margin-bottom: 5px;
   }
 
-  .addColumnHandle {
+  & .addColumnHandle {
     top: 20px;
   }
 }

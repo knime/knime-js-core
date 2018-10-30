@@ -26,9 +26,10 @@
     "eslint-plugin-vue": "5.0.x || 5.0.0-beta.3",
     "mocha": "5.2.x",
     "mocha-webpack": "2.0.x || 2.0.0-beta.0",
-    "node-sass": "^4.9.0",
     "nyc": "13.0.x",
-    "sass-loader": "^7.0.1",
+    "postcss-css-variables": "^0.11.0",
+    "postcss-import": "^12.0.1",
+    "postcss-preset-env": "^6.3.0",
     "vue-template-compiler": "^2.5.17",
     "webpack-node-externals": "^1.7.2"
   },
