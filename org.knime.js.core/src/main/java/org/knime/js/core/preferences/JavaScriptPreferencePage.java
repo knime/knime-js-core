@@ -56,16 +56,20 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
@@ -73,7 +77,6 @@ import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.AbstractImageGenerator.HeadlessBrowserExtension;
 import org.knime.js.core.JSCorePlugin;
-import org.knime.workbench.ui.preferences.HorizontalLineField;
 
 /**
  *
@@ -260,6 +263,81 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         boolean isChromium = HEADLESS_CHROMIUM.equals(view);
         m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
         m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
+    }
+
+    /**
+     * A simple field editor which just creates a horizontal line
+     */
+    private class HorizontalLineField extends FieldEditor {
+
+        private Label m_line;
+
+        /**
+         * @param parent the parent of the field editor's control
+         */
+        public HorizontalLineField(final Composite parent) {
+            super("HOR_LINE", "", parent);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void createControl(final Composite parent) {
+            m_line = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+            super.createControl(parent); // calls doFillIntoGrid!
+        }
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void adjustForNumColumns(final int numColumns) {
+            Object o = m_line.getLayoutData();
+            if (o instanceof GridData) {
+                ((GridData)o).horizontalSpan = numColumns;
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void doFillIntoGrid(final Composite parent, final int numColumns) {
+            m_line.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, numColumns, 1));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void doLoad() {
+            // nothing to load
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void doLoadDefault() {
+            // nothing to do
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        protected void doStore() {
+            // nothing to store
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public int getNumberOfControls() {
+            return 1;
+        }
+
     }
 
 }
