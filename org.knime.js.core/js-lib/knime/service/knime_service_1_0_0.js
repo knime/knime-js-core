@@ -20,7 +20,7 @@ knimeService = function() {
 	var SELECTION = 'selection', FILTER = 'filter', SEPARATOR = '-';
 	
 	var header, menu;
-	var initialized = false, interactivityAvailable = false, runningInWebportal = false;
+	var initialized = false, interactivityAvailable = false, runningInWebportal = false, runningInSeleniumBrowser = false;
 	var warnings = {};
 	var viewRequests = [], requestSequence = 0, responseBuffer = [], pushSupported;
 	var GLOBAL_SERVICE = this;
@@ -37,6 +37,9 @@ knimeService = function() {
 				interactivityAvailable = true;
 				GLOBAL_SERVICE = parent.KnimePageLoader;
 			}
+			runningInSeleniumBrowser = parent.KnimePageLoader.isRunningInSeleniumBrowser();
+		} else {
+			runningInSeleniumBrowser = typeof parent.seleniumKnimeBridge !== 'undefined';
 		}
 		viewRequests = [], requestSequence = 0;
 		
@@ -72,6 +75,11 @@ knimeService = function() {
 	service.isRunningInWebportal = function() {
 		initialized || init();
 		return runningInWebportal;
+	}
+	
+	service.isRunningInSeleniumBrowser = function() {
+		initialized || init();
+		return runningInSeleniumBrowser;
 	}
 	
 	enableNav = function() {
@@ -622,7 +630,7 @@ knimeService = function() {
 	
 	service.allowFullscreen = function(element) {
 		initialized || init();
-		return interactivityAvailable && runningInWebportal && screenfull.enabled 
+		return interactivityAvailable && screenfull.enabled && (runningInSeleniumBrowser || runningInWebportal) 
 			&& addButton('knime-service-fullscreen-button', 'arrows-alt', 'Toggle Fullscreen', function() {
 			if (screenfull.enabled) {
 				screenfull.toggle(element);

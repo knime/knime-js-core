@@ -743,6 +743,15 @@ KnimePageLoader = function() {
 		}
 	}
 	
+	pageLoader.isRunningInSeleniumBrowser = function() {
+		try {
+			return typeof parent.seleniumKnimeBridge !== 'undefined';
+		} catch (err) {
+			LOGGER.error(err);
+			return false;
+		}
+	}
+	
 	pageLoader.autoResize = function(id, width, height){
 		if (!isGridBasedLayout && !manualSizing[id]) {
 			// more elaborate way of handling sizes
