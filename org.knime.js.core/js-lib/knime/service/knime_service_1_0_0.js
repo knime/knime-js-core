@@ -242,8 +242,9 @@ knimeService = function() {
 		return publishInteractivityEvent(SELECTION + SEPARATOR + tableId, selection, skip);
 	}
 	service.registerSelectionTranslator = function(translator, translatorID, callback) {
-		parent.KnimePageLoader.registerSelectionTranslator(translator, translatorID);
-		return subscribeToInteractivityEvent(SELECTION + SEPARATOR + translatorID, callback);
+		if(parent.KnimePageLoader) {
+			parent.KnimePageLoader.registerSelectionTranslator(translator, translatorID);
+		}
 	}
 	
 	service.subscribeToSelection = function(tableId, callback) {

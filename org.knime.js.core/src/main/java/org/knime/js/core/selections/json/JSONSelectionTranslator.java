@@ -91,6 +91,14 @@ public class JSONSelectionTranslator {
     }
 
     /**
+     * @since 3.7
+     * Empty serialization constructor. Don't use.
+     */
+    public JSONSelectionTranslator() {
+
+    }
+
+    /**
      * Creates a new {@link JSONSelectionTranslator} instance from a given {@link HiLiteTranslator}.
      * Source and target IDs are retrieved and, if present, a mapping is provided.
      * @param hiliteTranslator the {@link HiLiteTranslator} to create the selection translator from
@@ -134,10 +142,26 @@ public class JSONSelectionTranslator {
     }
 
     /**
+     * @param sourceID of the translator
+     * @since 3.7
+     */
+    public void setSourceID(final String sourceID) {
+        m_sourceID = sourceID;
+    }
+
+    /**
      * @return the targetIDs
      */
     public List<String> getTargetIDs() {
         return m_targetIDs;
+    }
+
+    /**
+     * @param targetIDs of the translator
+     * @since 3.7
+     */
+    public void setTargetIDs(final List<String> targetIDs) {
+        m_targetIDs = targetIDs;
     }
 
     /**
@@ -152,6 +176,14 @@ public class JSONSelectionTranslator {
      */
     public Map<String, List<String>> getMapping() {
         return m_mapping;
+    }
+
+    /**
+     * @param mapping of translator
+     * @since 3.7
+     */
+    public void setMapping(final Map<String, List<String>> mapping) {
+        m_mapping = mapping;
     }
 
     /**
