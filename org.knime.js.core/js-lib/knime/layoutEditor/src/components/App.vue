@@ -40,7 +40,9 @@
             :deletable="rows.length > 1"
           />
         </Draggable>
+        <p class="hint text-muted text-center"><small>Views not added into the layout and not disabled in 'Node Usage' will be shown below layout.</small></p>
       </div>
+
       <AdvancedEditor
         v-if="debugMode"
         class="col-3 debug"
@@ -114,10 +116,15 @@ body {
   height: 100vh;
   padding-top: 20px;
   min-height: 100px;
+
+  & > .hint {
+    line-height: 100%;
+  }
 }
 
 .layoutPreview {
-  min-height: 100%; /* fill height to be a drag zone on first level */
+  /* fill height to be a drag zone on first level */
+  min-height: calc(100% - 40px);
   padding-bottom: 20px;
 }
 </style>
