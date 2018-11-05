@@ -292,9 +292,19 @@ export default new Vuex.Store({
         },
 
         addNode(state, node) {
-            // add node to last column in last row
-            const row = state.layout.rows[state.layout.rows.length - 1];
-            row.columns[row.columns.length - 1].content.push(utils.createViewFromNode(node));
+            const view = utils.createViewFromNode(node);
+
+            // find last row
+            const lastRow = state.layout.rows[state.layout.rows.length - 1];
+
+            // find and add to first empty column (currently without supporting nesting)
+            const emptyColumn = lastRow.columns.find(column => column.content.length === 0);
+            if (emptyColumn) {
+                emptyColumn.content.push(view);
+            } else {
+                // or last column, if no empty column exists
+                lastRow.columns[lastRow.columns.length - 1].content.push(view);
+            }
         },
 
         addElement(state, element) {
