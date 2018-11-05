@@ -118,13 +118,18 @@ export default {
 @import "../../style/variables.css";
 
 .col {
+  --resize-width: 14px;
+  --resize-line-width: 2px;
+  --resize-border-width: calc(
+    (var(--resize-width) - var(--resize-line-width)) / 2
+  );
   --resize-color: var(--knime-gray-ultra-light);
   --resize-color-active: var(--knime-yellow-sec-server);
   --resize-arrow-width: 4px;
   --resize-arrow-height: 4px;
 
   background-color: #fff;
-  padding: 5px 10px 5px 5px;
+  padding: calc(var(--resize-width) / 2);
   min-height: 60px;
 
   & .draggable {
@@ -136,14 +141,16 @@ export default {
     margin: 0;
     padding: 0;
     outline: 0;
-    width: 6px; /* quite thick to be easily clickable */
+    width: var(--resize-width); /* quite thick to be easily clickable */
     height: 100%;
     background-color: var(--resize-color);
     position: absolute;
-    right: 0;
+    right: calc(var(--resize-width) / 2 * -1);
+    z-index: 100;
     bottom: 0;
     border-style: solid;
-    border-width: 10px 2px 10px 2px; /* but adding a border to reduce the line thinkness */
+    border-width: 10px var(--resize-border-width) 10px
+      var(--resize-border-width); /* but adding a border to reduce the line thinkness */
     border-color: #fff;
 
     &:before,
@@ -156,7 +163,6 @@ export default {
       display: block;
       position: absolute;
       top: calc(50% - var(--resize-arrow-height));
-      left: 0px;
       pointer-events: none;
     }
 
@@ -167,7 +173,7 @@ export default {
       border-color: transparent var(--resize-color) transparent transparent;
     }
     &:after {
-      left: 3px;
+      right: calc((var(--resize-arrow-width) * -1) - 1px);
       border-width: var(--resize-arrow-height) 0 var(--resize-arrow-height)
         var(--resize-arrow-width);
       border-color: transparent transparent transparent var(--resize-color);
