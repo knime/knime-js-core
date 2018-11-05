@@ -15,32 +15,37 @@
     </div>
 
 
-    <button
+    <EditButton
       v-if="item.type !== 'row'"
-      class="editHandle"
       title="Delete"
       @click.prevent.stop="onContentItemDelete"
     >
-      ×
-    </button>
-    <button
+      <DeleteIcon />
+    </EditButton>
+    <EditButton
       v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
-      class="editHandle configHandle"
+      class="configButton"
       title="Configure"
       @click.prevent.stop="onContentItemConfigure"
     >
-      ⚒
-    </button>
+      <ConfigIcon />
+    </EditButton>
   </div>
 </template>
 
 
 <script>
 import KnimeView from './KnimeView';
+import EditButton from './EditButton';
+import DeleteIcon from 'open-iconic/svg/trash.svg';
+import ConfigIcon from 'open-iconic/svg/cog.svg';
 
 export default {
     components: {
-        KnimeView
+        KnimeView,
+        EditButton,
+        DeleteIcon,
+        ConfigIcon
         // Row compontent is added dynamically in beforeCreate() method, see below
     },
     props: {
@@ -71,10 +76,8 @@ export default {
     margin-bottom: 5px;
   }
 
-  & .configHandle {
+  & .configButton {
     right: 20px;
-    line-height: 15px;
-    font-size: 10px;
   }
 }
 </style>

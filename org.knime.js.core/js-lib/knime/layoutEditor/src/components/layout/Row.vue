@@ -10,22 +10,21 @@
       :column="column"
     />
 
-    <button
+    <EditButton
       v-if="canAddColumn"
-      class="editHandle addColumnHandle"
+      class="addColumnButton"
       title="Add column"
       @click.prevent.stop="onAddColumn"
     >
-      +
-    </button>
-    <button
+      <AddIcon />
+    </EditButton>
+    <EditButton
       v-if="isRowDeletable"
-      class="editHandle"
       title="Delete row"
       @click.prevent.stop="onRowDelete"
     >
-      ×
-    </button>
+      <DeleteIcon />
+    </EditButton>
   </div>
 </template>
 
@@ -33,9 +32,12 @@
 <script>
 import Column from './Column';
 import config from '../../config';
+import EditButton from './EditButton';
+import AddIcon from 'open-iconic/svg/plus.svg';
+import DeleteIcon from 'open-iconic/svg/trash.svg';
 
 export default {
-    components: { Column },
+    components: { Column, EditButton, AddIcon, DeleteIcon },
     props: {
         row: { default: () => {}, type: Object },
         deletable: { default: true, type: Boolean } // only used to prevent deleting the last row in the layout
@@ -80,14 +82,13 @@ export default {
 .row {
   border: 4px solid var(--knime-gray-ultra-light);
   border-radius: 3px;
-  min-height: 70px;
   position: relative; /* needed for delete handle positioning */
 
   &:not(:last-of-type) {
     margin-bottom: 5px;
   }
 
-  & .addColumnHandle {
+  & .addColumnButton {
     top: 20px;
   }
 }

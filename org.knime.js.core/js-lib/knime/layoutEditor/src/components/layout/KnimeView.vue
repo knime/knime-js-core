@@ -6,14 +6,14 @@
       class="d-inline-flex align-items-center justify-content-center"
     >
       <main>
-        <img :src="node.icon"><br> {{ node.name }}
+        <img :src="node.icon"><br>{{ node.name }}
+        <small class="text-muted">Node {{ view.nodeID }}</small>
         <small
           v-if="!node.availableInView"
           class="text-muted"
         >
           (disabled in node usage)
         </small>
-        <small class="text-muted">Node {{ view.nodeID }}</small>
         <div
           v-if="node && node.description && node.description.length"
           class="description"

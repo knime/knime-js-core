@@ -119,27 +119,5 @@ body {
 .layoutPreview {
   min-height: 100%; /* fill height to be a drag zone on first level */
   padding-bottom: 20px;
-
-  & .editHandle {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    outline: 0;
-    width: 15px;
-    height: 15px;
-    background-color: var(--knime-gray-ultra-light);
-    position: absolute;
-    right: 0;
-    top: 0;
-    cursor: pointer;
-    color: #000;
-    font-size: 15px;
-    line-height: 15px;
-    text-align: center;
-
-    &:hover {
-      background-color: var(--knime-yellow-sec-server);
-    }
-  }
 }
 </style>

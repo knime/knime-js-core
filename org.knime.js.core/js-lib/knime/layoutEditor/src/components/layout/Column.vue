@@ -18,14 +18,14 @@
       title="Drag to resize"
       @mousedown.prevent.stop="onColumnResizeMouseDown"
     />
-    <button
+    <EditButton
       v-if="deletable"
-      class="editHandle delete"
+      class="deleteButton"
       title="Delete column"
       @click.prevent.stop="onColumnDelete"
     >
-      ×
-    </button>
+      <DeleteIcon />
+    </EditButton>
     <button
       v-if="isCurrentColumnResizing"
       class="resizeOverlay"
@@ -42,11 +42,15 @@ import config from '../../config';
 import utils from '../../utils';
 import ColumnContent from './ColumnContent';
 import Draggable from 'vuedraggable';
+import EditButton from './EditButton';
+import DeleteIcon from 'open-iconic/svg/trash.svg';
 
 export default {
     components: {
         ColumnContent,
-        Draggable
+        Draggable,
+        EditButton,
+        DeleteIcon
     },
     props: {
         column: { default: () => {}, type: Object },
@@ -121,6 +125,7 @@ export default {
 
   background-color: #fff;
   padding: 5px 10px 5px 5px;
+  min-height: 60px;
 
   & .draggable {
     cursor: move; /* for IE11 */
@@ -183,7 +188,7 @@ export default {
     }
   }
 
-  & .editHandle.delete {
+  & .deleteButton {
     right: 5px;
   }
 
