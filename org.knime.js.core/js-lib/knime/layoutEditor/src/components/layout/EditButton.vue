@@ -19,8 +19,8 @@ button {
   padding: 0;
   border: 0;
   outline: 0;
-  width: 14px;
-  height: 14px;
+  width: var(--button-size);
+  height: var(--button-size);
   background-color: var(--knime-gray-ultra-light);
   position: absolute;
   right: 0;

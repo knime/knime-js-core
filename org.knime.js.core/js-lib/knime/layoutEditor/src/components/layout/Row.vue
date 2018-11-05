@@ -89,7 +89,7 @@ export default {
   }
 
   & .addColumnButton {
-    top: 20px;
+    top: calc((var(--column-min-height) / 2) - var(--button-size) / 2);
   }
 }
 </style>

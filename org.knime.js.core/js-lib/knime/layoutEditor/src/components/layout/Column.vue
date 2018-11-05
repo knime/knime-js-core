@@ -2,7 +2,7 @@
   <Draggable
     v-model="content"
     :options="{group: 'content', draggable: '.draggable'}"
-    :class="columnClasses"
+    :class="[columnClasses, {resizable}]"
     :move="onMove"
   >
     <ColumnContent
@@ -188,8 +188,9 @@ export default {
     }
   }
 
-  & .deleteButton {
-    right: 5px;
+  /* align delete button to resize handle */
+  &.resizable > .deleteButton {
+    right: 8px;
   }
 
   /* full window overlay while resizing to prevent loosing mouse events e.g. due to iframes in columns */

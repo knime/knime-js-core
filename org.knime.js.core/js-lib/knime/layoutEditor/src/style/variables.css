@@ -11,4 +11,7 @@
 
     --knime-view-preview: #c2e2ed;
     --knime-view-preview-active: #ddf5fd;
+
+    --column-min-height: 60px;
+    --button-size: 14px;
 }

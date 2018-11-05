@@ -17,6 +17,7 @@
 
     <EditButton
       v-if="item.type !== 'row'"
+      class="deleteButton"
       title="Delete"
       @click.prevent.stop="onContentItemDelete"
     >
@@ -74,6 +75,10 @@ export default {
 
   &:not(:last-of-type) {
     margin-bottom: 5px;
+  }
+
+  & .deleteButton {
+    border-radius: 0 3px 0 0;
   }
 
   & .configButton {
