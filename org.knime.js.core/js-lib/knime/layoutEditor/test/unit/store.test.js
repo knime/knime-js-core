@@ -22,19 +22,15 @@ const validLayout = {
                         columns: [
                             {
                                 content: [],
-                                widthXS: 12,
-                                widthSM: 12,
-                                widthMD: 12,
-                                widthLG: 12,
-                                widthXL: 12
+                                widthXS: 6
+                            },
+                            {
+                                content: [],
+                                widthXS: 6
                             }
                         ]
                     }],
-                    widthXS: 12,
-                    widthSM: 12,
-                    widthMD: 12,
-                    widthLG: 12,
-                    widthXL: 12
+                    widthXS: 12
                 }
             ]
         }
@@ -42,12 +38,14 @@ const validLayout = {
 };
 
 describe('store', () => {
-    it('loads valid layout', () => {
+
+    it('loads valid columns and rows', () => {
         store.commit('setLayout', validLayout);
         assert.deepEqual(store.state.layout, validLayout);
     });
 
-    it('cleans invalid layout', () => {
+
+    it('cleans invalid columns and rows', () => {
         const invalidLayout = {
             rows: [
                 { type: 'row' }, // invalid
@@ -92,19 +90,15 @@ describe('store', () => {
                                             sizeHeight: true,
                                             sizeWidth: false
                                         }],
-                                        widthXS: 12,
-                                        widthSM: 12,
-                                        widthMD: 12,
-                                        widthLG: 12,
-                                        widthXL: 12
+                                        widthXS: 6
+                                    },
+                                    {
+                                        content: [],
+                                        widthXS: 6
                                     }
                                 ]
                             }],
-                            widthXS: 12,
-                            widthSM: 12,
-                            widthMD: 12,
-                            widthLG: 12,
-                            widthXL: 12
+                            widthXS: 12
                         },
                         {}, // invalid
                         {} // invalid
@@ -118,8 +112,192 @@ describe('store', () => {
         assert.deepEqual(store.state.layout, validLayout);
     });
 
+
+    it('cleans invalid column widths', () => {
+        const invalidColumns = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [{
+                                type: 'row',
+                                columns: [
+                                    {
+                                        content: [],
+                                        widthMD: 6 // invalid because no widthXS exists
+                                    },
+                                    {
+                                        content: [],
+                                        widthXL: 10 // invalid because no widthXS exists
+                                    }
+                                ]
+                            }],
+                            // widthXS missing
+                            widthMD: 12, // invalid because equal
+                            widthLG: 12, // invalid because equal
+                            widthXL: 12 // invalid because equal
+                        },
+                        {
+                            content: [],
+                            // widthXS missing
+                            widthMD: 6,
+                            widthLG: 7,
+                            widthXL: 8
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const validColumns = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [{
+                                type: 'row',
+                                columns: [
+                                    {
+                                        content: [],
+                                        widthXS: 6
+                                    },
+                                    {
+                                        content: [],
+                                        widthXS: 10
+                                    }
+                                ]
+                            }],
+                            widthXS: 12
+                        },
+                        {
+                            content: [],
+                            widthXS: 6,
+                            widthLG: 7,
+                            widthXL: 8
+                        }
+                    ]
+                }
+            ]
+        };
+
+        store.commit('setLayout', invalidColumns);
+        assert.deepEqual(store.state.layout, validColumns);
+    });
+
+
     it('gets all nodeIds used in the layout', () => {
         store.commit('setLayout', validLayout);
-        assert.deepEqual(store.getters.getAllNodeIdsInLayout, ['1']);
+        assert.deepEqual(store.getters.nodeIdsInLayout, ['1']);
     });
+
+
+    it('detects responsive layout', () => {
+        const staticLayout = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [{
+                                type: 'row',
+                                columns: [
+                                    {
+                                        content: [],
+                                        widthXS: 6
+                                    },
+                                    {
+                                        content: [],
+                                        widthXS: 6
+                                    }
+                                ]
+                            }],
+                            widthXS: 12
+                        }
+                    ]
+                }
+            ]
+        };
+        const responsiveLayout = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [{
+                                type: 'row',
+                                columns: [
+                                    {
+                                        content: [],
+                                        widthXS: 6
+                                    },
+                                    {
+                                        content: [],
+                                        widthXS: 6,
+                                        widthSM: 7,
+                                        widthMD: 8,
+                                        widthLG: 9,
+                                        widthXL: 10
+                                    }
+                                ]
+                            }],
+                            widthXS: 12
+                        }
+                    ]
+                }
+            ]
+        };
+
+        store.commit('setLayout', staticLayout);
+        assert.isFalse(store.getters.isResponsiveLayout);
+
+        store.commit('setLayout', responsiveLayout);
+        assert.isTrue(store.getters.isResponsiveLayout);
+    });
+
+
+    it('detects wrapping layout', () => {
+        const normalLayout = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [],
+                            widthXS: 6
+                        },
+                        {
+                            content: [],
+                            widthXS: 6
+                        }
+                    ]
+                }
+            ]
+        };
+        const wrappingLayout = {
+            rows: [
+                {
+                    type: 'row',
+                    columns: [
+                        {
+                            content: [],
+                            widthXS: 6
+                        },
+                        {
+                            content: [],
+                            widthXS: 7
+                        }
+                    ]
+                }
+            ]
+        };
+
+        store.commit('setLayout', normalLayout);
+        assert.isFalse(store.getters.isWrappingLayout);
+
+        store.commit('setLayout', wrappingLayout);
+        assert.isTrue(store.getters.isWrappingLayout);
+    });
+
 });

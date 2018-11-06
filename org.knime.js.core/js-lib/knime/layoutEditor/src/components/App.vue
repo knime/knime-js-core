@@ -28,6 +28,23 @@
       </div>
 
       <div :class="[debugMode ? 'col-6' : 'col-9', 'layout']">
+        <div
+          v-if="isResponsiveLayout"
+          class="alert alert-warning"
+          role="alert"
+        >
+          The visual editor doesn’t support responsive layouts yet.
+          Please use advanced editor or responsive settings will get lost.
+        </div>
+        <div
+          v-if="isWrappingLayout"
+          class="alert alert-warning"
+          role="alert"
+        >
+          Your layout has rows with a total column width larger than {{ gridSize }}, therefore the columns will wrap.
+          The visual editor doesn’t support wrapping layouts yet. Please use advanced editor instead.
+        </div>
+
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
@@ -40,7 +57,13 @@
             :deletable="rows.length > 1"
           />
         </Draggable>
-        <p class="hint text-muted text-center"><small>Views not added into the layout and not disabled in 'Node Usage' will be shown below layout.</small></p>
+
+        <p
+          v-if="availableNodes.length"
+          class="hint text-muted text-center"
+        >
+          <small>Views not added into the layout and not disabled in 'Node Usage' will be shown below layout.</small>
+        </p>
       </div>
 
       <AdvancedEditor
@@ -57,6 +80,7 @@ import Draggable from 'vuedraggable';
 import Row from './layout/Row';
 import AvailableNodesAndElements from './AvailableNodesAndElements';
 import AdvancedEditor from './AdvancedEditor';
+import config from '../config';
 
 export default {
     components: { Draggable, Row, AvailableNodesAndElements, AdvancedEditor },
@@ -66,6 +90,18 @@ export default {
         };
     },
     computed: {
+        isResponsiveLayout() {
+            return this.$store.getters.isResponsiveLayout;
+        },
+        isWrappingLayout() {
+            return this.$store.getters.isWrappingLayout;
+        },
+        gridSize() {
+            return config.gridSize;
+        },
+        availableNodes() {
+            return this.$store.getters.availableNodes;
+        },
         rows: {
             get() {
                 return this.$store.state.layout.rows;
@@ -99,6 +135,7 @@ body {
 
 * {
   box-sizing: border-box;
+  user-select: none; /* disable selection everywhere */
 }
 
 .controls,

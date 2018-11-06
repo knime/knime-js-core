@@ -59,14 +59,10 @@ export default {
     },
     computed: {
         columnClasses() {
-            // actually we don't support responsive layouts yet; but we apply all classes in case the user modified via JSON layout editor
+            // we don't support responsive layouts yet
             return [
                 'col',
-                `col-${this.column.widthXS}`,
-                `col-sm-${this.column.widthSM}`,
-                `col-md-${this.column.widthMD}`,
-                `col-lg-${this.column.widthLG}`,
-                `col-xl-${this.column.widthXL}`
+                `col-${this.column.widthXS}`
             ];
         },
         content: {
@@ -95,7 +91,7 @@ export default {
                 column: this.column,
                 clientX: e.clientX,
                 gridStepWidth: containerWidth / config.gridSize,
-                originalWidthMD: this.column.widthMD // currently we don't support responsive layouts, only using widthMD
+                originalWidthXS: this.column.widthXS // currently we don't support responsive layouts, only using widthXS
             });
         },
         onColumnResizeMouseUp(e) {
@@ -106,7 +102,7 @@ export default {
             if (resizeColumnInfo) {
                 const moveDelta = e.clientX - resizeColumnInfo.clientX;
                 const gridDelta = Math.round(moveDelta / resizeColumnInfo.gridStepWidth);
-                let newWidth = resizeColumnInfo.originalWidthMD + gridDelta;
+                let newWidth = resizeColumnInfo.originalWidthXS + gridDelta;
                 this.$store.commit('resizeColumn', newWidth);
             }
         }

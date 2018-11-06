@@ -71,8 +71,7 @@ export default {
     components: { Draggable },
     computed: {
         availableNodes() {
-            const nodeIdsInLayout = this.$store.getters.getAllNodeIdsInLayout;
-            return this.$store.state.nodes.filter(node => !nodeIdsInLayout.includes(node.nodeID));
+            return this.$store.getters.availableNodes;
         }
     },
     methods: {

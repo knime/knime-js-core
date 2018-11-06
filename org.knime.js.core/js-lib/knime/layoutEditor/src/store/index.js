@@ -73,6 +73,8 @@ const generateRowTemplates = function () {
 // - remove columns without a 'content' property
 // - remove rows without a 'columns' property
 // - remove multiple nodes with the same nodeID
+// - add missing widthXS
+// - remove duplicate widths if equal
 const cleanLayout = function (layout) {
     const nodeIDs = [];
 
@@ -83,6 +85,31 @@ const cleanLayout = function (layout) {
                     item.columns = item.columns.filter(column => {
                         if (Array.isArray(column.content)) {
                             column.content = recursiveClean(column.content);
+
+                            // add widthXS if not existing
+                            if (!column.hasOwnProperty('widthXS')) {
+                                column.widthXS = column.widthSM || column.widthMD || column.widthLG ||
+                                    column.widthXL || config.gridSize;
+                            }
+
+                            // remove all other widths if equal
+                            const widthProps = ['widthXL', 'widthLG', 'widthMD', 'widthSM', 'widthXS'];
+                            widthProps.forEach((prop, index) => {
+                                // skip last item
+                                if (index === widthProps.length - 1) {
+                                    return;
+                                }
+
+                                if (column.hasOwnProperty(prop)) {
+                                    const nextAvailableWidth = widthProps.slice(index + 1)
+                                        .find(prop => column.hasOwnProperty(prop));
+
+                                    if (column[prop] === column[nextAvailableWidth]) {
+                                        delete column[prop];
+                                    }
+                                }
+                            });
+
                             return true;
                         } else {
                             // remove column without 'content' array
@@ -126,11 +153,35 @@ export default new Vuex.Store({
         elements: generateRowTemplates()
     },
     getters: {
-        getAllNodeIdsInLayout(state) {
+        nodeIdsInLayout(state) {
             const allContentArrays = getAllContentArrays(state.layout.rows);
             return [].concat(...allContentArrays)
                 .filter(item => item.hasOwnProperty('nodeID'))
                 .map(item => item.nodeID);
+        },
+        availableNodes(state, getters) {
+            const nodeIdsInLayout = getters.nodeIdsInLayout;
+            return state.nodes.filter(node => !nodeIdsInLayout.includes(node.nodeID));
+        },
+        isResponsiveLayout(state) {
+            const allColumnArrays = getAllColumnArrays(state.layout.rows);
+            const columWithResponsiveWidths = [].concat(...allColumnArrays).find(column => {
+                if (column.hasOwnProperty('widthSM') || column.hasOwnProperty('widthMD') ||
+                    column.hasOwnProperty('widthLG') || column.hasOwnProperty('widthXL')) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+            return Boolean(columWithResponsiveWidths);
+        },
+        isWrappingLayout(state) {
+            const allColumnArrays = getAllColumnArrays(state.layout.rows);
+            const firstWrappingRow = allColumnArrays.find(columns => {
+                const totalWidth = columns.reduce((total, column) => total + column.widthXS, 0);
+                return totalWidth > config.gridSize;
+            });
+            return Boolean(firstWrappingRow);
         }
     },
     mutations: {
@@ -182,7 +233,7 @@ export default new Vuex.Store({
                 .find(columnArray => columnArray.includes(resizingColumn));
             const nextSibling = columns[columns.indexOf(resizingColumn) + 1];
             const allOtherSiblings = columns.filter(column => ![resizingColumn, nextSibling].includes(column));
-            const widthOfOtherSiblings = allOtherSiblings.reduce((total, column) => total + column.widthMD, 0);
+            const widthOfOtherSiblings = allOtherSiblings.reduce((total, column) => total + column.widthXS, 0);
 
             // ...therefore we save further information about the siblings to be used in resizeColumn()
             state.resizeColumnInfo = { ...resizeColumnInfo, columns, nextSibling, widthOfOtherSiblings };
@@ -197,9 +248,9 @@ export default new Vuex.Store({
             }
 
             // calc size of next sibling to prevent wrapping
-            const currentWidth = resizeInfo.column.widthMD;
+            const currentWidth = resizeInfo.column.widthXS;
             let delta = currentWidth - newWidth;
-            let newSiblingWidth = resizeInfo.nextSibling.widthMD + delta;
+            let newSiblingWidth = resizeInfo.nextSibling.widthXS + delta;
             if (newSiblingWidth < 1) {
                 newSiblingWidth = 1;
             }
@@ -220,7 +271,7 @@ export default new Vuex.Store({
                 let index = columnArray.indexOf(columnToDelete);
                 if (index >= 0) {
                     // resize siblings to fill total grid width
-                    const lostWidth = columnToDelete.widthMD;
+                    const lostWidth = columnToDelete.widthXS;
                     const sibling1 = columnArray[index - 1];
                     const sibling2 = columnArray[index + 1];
                     if (sibling1 && sibling2) {
@@ -228,17 +279,17 @@ export default new Vuex.Store({
                         const numberOfColumnsToSplit = 2;
                         if (lostWidth % numberOfColumnsToSplit === 0) {
                             const lostWidthSplit = lostWidth / numberOfColumnsToSplit;
-                            utils.setColumnWidths(sibling1, sibling1.widthMD + lostWidthSplit);
-                            utils.setColumnWidths(sibling2, sibling2.widthMD + lostWidthSplit);
+                            utils.setColumnWidths(sibling1, sibling1.widthXS + lostWidthSplit);
+                            utils.setColumnWidths(sibling2, sibling2.widthXS + lostWidthSplit);
                         } else {
-                            utils.setColumnWidths(sibling1, sibling1.widthMD + lostWidth);
+                            utils.setColumnWidths(sibling1, sibling1.widthXS + lostWidth);
                         }
                     } else if (sibling1) {
                         // only left sibling, so increase width
-                        utils.setColumnWidths(sibling1, sibling1.widthMD + lostWidth);
+                        utils.setColumnWidths(sibling1, sibling1.widthXS + lostWidth);
                     } else {
                         // only right sibling, so increase width
-                        utils.setColumnWidths(sibling2, sibling2.widthMD + lostWidth);
+                        utils.setColumnWidths(sibling2, sibling2.widthXS + lostWidth);
                     }
 
                     // finally remove the column
@@ -287,7 +338,7 @@ export default new Vuex.Store({
             if (totalWidth < config.gridSize) {
                 const delta = config.gridSize - totalWidth;
                 const column = row.columns[row.columns.length - 1];
-                utils.setColumnWidths(column, column.widthMD + delta);
+                utils.setColumnWidths(column, column.widthXS + delta);
             }
         },
 
