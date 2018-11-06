@@ -1,6 +1,6 @@
 <template>
   <div
-    class="row no-gutters"
+    :class="['row', 'no-gutters', {'droppable': $store.state.dragging}]"
   >
     <Column
       v-for="(column, index) in columns"
@@ -90,6 +90,10 @@ export default {
 
   & .addColumnButton {
     top: calc((var(--column-min-height) / 2) - var(--button-size) / 2);
+  }
+
+  &.droppable button {
+    opacity: 0;
   }
 }
 </style>

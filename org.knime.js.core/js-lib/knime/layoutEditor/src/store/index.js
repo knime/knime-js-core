@@ -146,6 +146,7 @@ const cleanLayout = function (layout) {
 export default new Vuex.Store({
     strict: Boolean(window.webpackHotUpdate), // warn on state mutations outside mutation handlers when in dev mode
     state: {
+        dragging: null,
         resizeColumnInfo: null,
         layout: getEmptyLayout(),
         initialLayout: null,
@@ -218,6 +219,10 @@ export default new Vuex.Store({
         clearLayout(state) {
             // reset to empty layout
             state.layout = getEmptyLayout();
+        },
+
+        setDragging(state, dragging) {
+            state.dragging = dragging;
         },
 
         // called on column resize start and end

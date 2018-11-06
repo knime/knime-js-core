@@ -2,8 +2,10 @@
   <Draggable
     v-model="content"
     :options="{group: 'content', draggable: '.draggable'}"
-    :class="[columnClasses, {resizable}]"
+    :class="[columnClasses, {resizable}, {'droppable': $store.state.dragging}]"
     :move="onMove"
+    @start="$store.commit('setDragging', true)"
+    @end="$store.commit('setDragging', false)"
   >
     <ColumnContent
       v-for="(item, index) in content"
@@ -128,6 +130,20 @@ export default {
   padding: calc(var(--resize-width) / 2);
   min-height: 60px;
 
+  outline-width: 2px;
+  outline-style: dashed;
+  outline-offset: -4px;
+  outline-color: transparent;
+  transition: outline-color 0.3s;
+
+  &.droppable {
+    outline-color: var(--knime-yellow-sec-server);
+
+    & button {
+      opacity: 0;
+    }
+  }
+
   & .draggable {
     cursor: move; /* for IE11 */
     cursor: grab;
@@ -148,6 +164,9 @@ export default {
     border-width: 10px var(--resize-border-width) 10px
       var(--resize-border-width); /* but adding a border to reduce the line thinkness */
     border-color: #fff;
+
+    opacity: 1;
+    transition: opacity 0.3s;
 
     &:before,
     &:after {

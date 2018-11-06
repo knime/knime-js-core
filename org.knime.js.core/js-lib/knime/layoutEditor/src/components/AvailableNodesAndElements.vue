@@ -8,6 +8,8 @@
       :move="onMoveNode"
       element="ul"
       class="availableNodes"
+      @start="$store.commit('setDragging', true)"
+      @end="$store.commit('setDragging', false)"
     >
       <li
         v-for="(node, index) in availableNodes"
@@ -49,6 +51,8 @@
       :clone="onCloneElement"
       element="ul"
       class="availableElements"
+      @start="$store.commit('setDragging', 'row')"
+      @end="$store.commit('setDragging', false)"
     >
       <li
         v-for="(element, index) in $store.state.elements"
@@ -75,6 +79,12 @@ export default {
         }
     },
     methods: {
+        onDragStart(e) {
+            return utils.dragStart(e);
+        },
+        onDragEnd(e) {
+            return utils.dragEnd(e);
+        },
         onMoveNode(e) {
             return utils.checkMove(e);
         },

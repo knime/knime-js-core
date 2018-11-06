@@ -26,6 +26,8 @@ button {
   right: 0;
   top: 0;
   cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.3s;
 
   &:hover {
     background-color: var(--knime-yellow-sec-server);

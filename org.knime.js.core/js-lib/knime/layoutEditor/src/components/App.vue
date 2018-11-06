@@ -48,7 +48,9 @@
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
-          class="container-fluid layoutPreview"
+          :class="['container-fluid', 'layoutPreview', {'droppable': $store.state.dragging === 'row'}]"
+          @start="$store.commit('setDragging', true)"
+          @end="$store.commit('setDragging', false)"
         >
           <Row
             v-for="(row, index) in rows"
@@ -163,5 +165,15 @@ body {
   /* fill height to be a drag zone on first level */
   min-height: calc(100% - 40px);
   padding-bottom: 20px;
+
+  outline-width: 2px;
+  outline-style: dashed;
+  outline-offset: 2px;
+  outline-color: transparent;
+  transition: outline-color 0.3s;
+
+  &.droppable {
+    outline-color: var(--knime-yellow-sec-server);
+  }
 }
 </style>
