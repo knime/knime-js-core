@@ -21,7 +21,7 @@ button {
   outline: 0;
   width: var(--button-size);
   height: var(--button-size);
-  background-color: var(--knime-gray-ultra-light);
+  background-color: var(--button-color);
   position: absolute;
   right: 0;
   top: 0;
@@ -30,7 +30,7 @@ button {
   transition: opacity 0.3s;
 
   &:hover {
-    background-color: var(--knime-yellow-sec-server);
+    background-color: var(--button-color-highlight);
   }
 
   & > * {

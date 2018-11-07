@@ -4,12 +4,14 @@
       <div class="col-3 controls">
         <button
           title="remove all views and rows"
+          class="btn btn-light mr-2"
           @click="onClear"
         >
           clear layout
-        </button>&nbsp;
+        </button>
         <button
           title="revert to initial state"
+          class="btn btn-light"
           @click="onReset"
         >
           reset layout
@@ -153,6 +155,17 @@ body {
 
 .controls {
   overflow: auto;
+
+  & button {
+    background-color: var(--button-color);
+    transition: none;
+    border: none;
+
+    &:hover {
+      background-color: var(--button-color-hover);
+      box-shadow: none;
+    }
+  }
 }
 
 .layout {
@@ -178,7 +191,7 @@ body {
   transition: outline-color 0.3s;
 
   &.droppable {
-    outline-color: var(--knime-yellow-sec-server);
+    outline-color: var(--button-color-highlight);
   }
 }
 </style>

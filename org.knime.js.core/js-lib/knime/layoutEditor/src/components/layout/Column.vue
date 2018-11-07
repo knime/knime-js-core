@@ -122,7 +122,7 @@ export default {
     (var(--resize-width) - var(--resize-line-width)) / 2
   );
   --resize-color: var(--knime-gray-ultra-light);
-  --resize-color-active: var(--knime-yellow-sec-server);
+  --resize-color-active: var(--button-color-highlight);
   --resize-arrow-width: 4px;
   --resize-arrow-height: 4px;
 
@@ -137,7 +137,7 @@ export default {
   transition: outline-color 0.3s;
 
   &.droppable {
-    outline-color: var(--knime-yellow-sec-server);
+    outline-color: var(--button-color-highlight);
 
     & button {
       opacity: 0;
