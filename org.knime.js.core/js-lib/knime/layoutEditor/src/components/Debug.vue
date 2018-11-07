@@ -33,10 +33,10 @@ export default {
 <style lang="postcss" scoped>
 div {
   padding: 0;
+  display: flex;
 }
 textarea {
-  width: 100%;
-  height: 100vh;
+  flex: 1;
   resize: none;
   font-size: 12px;
   font-family: courier;

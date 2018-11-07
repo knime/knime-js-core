@@ -42,3 +42,6 @@ Always run build and commit the build (files in `/dist`) after changes because K
 ```
 npm run build
 ```
+
+### Debugging inside KNIME AP
+Since there are no native development tools available inside the SWT browser, we use Firebug Lite for basic debugging. To enable it, start KNIME AP in debug mode from Eclipse or activate the setting 'Create debug HTML for JavaScript views' in a production build. Now press the Firebug Lite button in the layout editor.

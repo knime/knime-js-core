@@ -2,14 +2,6 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-3 controls">
-        <label>
-          <input
-            v-model="debugMode"
-            type="checkbox"
-          > debug mode
-        </label>
-
-        <br>
         <button
           title="remove all views and rows"
           @click="onClear"
@@ -25,9 +17,19 @@
         <br><br>
 
         <AvailableNodesAndElements />
+
+        <div v-if="$debug">
+          <br>
+          <label>
+            <input
+              v-model="showDebugInfo"
+              type="checkbox"
+            > show JSON
+          </label>
+        </div>
       </div>
 
-      <div :class="[debugMode ? 'col-6' : 'col-9', 'layout']">
+      <div class="col layout">
         <div
           v-if="isResponsiveLayout"
           class="alert alert-warning"
@@ -68,8 +70,8 @@
         </p>
       </div>
 
-      <AdvancedEditor
-        v-if="debugMode"
+      <Debug
+        v-if="showDebugInfo"
         class="col-3 debug"
       />
     </div>
@@ -81,14 +83,14 @@
 import Draggable from 'vuedraggable';
 import Row from './layout/Row';
 import AvailableNodesAndElements from './AvailableNodesAndElements';
-import AdvancedEditor from './AdvancedEditor';
+import Debug from './Debug';
 import config from '../config';
 
 export default {
-    components: { Draggable, Row, AvailableNodesAndElements, AdvancedEditor },
+    components: { Draggable, Row, AvailableNodesAndElements, Debug },
     data() {
         return {
-            debugMode: false
+            showDebugInfo: false
         };
     },
     computed: {
@@ -137,6 +139,9 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+*:not(input, textarea) {
   user-select: none; /* disable selection everywhere */
 }
 

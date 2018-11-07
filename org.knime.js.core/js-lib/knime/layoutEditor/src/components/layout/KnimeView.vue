@@ -7,7 +7,7 @@
     >
       <main>
         <img :src="node.icon"><br>{{ node.name }}
-        <small class="text-muted">Node {{ view.nodeID }}</small>
+        <small class="text-muted">Node&nbsp;{{ view.nodeID }}</small>
         <small
           v-if="!node.availableInView"
           class="text-muted"
@@ -24,7 +24,7 @@
     </div>
 
     <div v-else>
-      <main>Node {{ view.nodeID }} (missing in workflow)</main>
+      <main>Node&nbsp;{{ view.nodeID }} (missing in workflow)</main>
     </div>
   </div>
 </template>
@@ -62,6 +62,20 @@ export default {
   background-color: var(--knime-view-preview);
   border-radius: 3px;
   margin: 5px 0;
+  width: 100%;
+  height: 50px;
+  color: transparent;
+
+  & * {
+    display: none; /* for now we just hide the content, maybe there is a better way to render the ghost */
+  }
+}
+
+.layoutPreview .sortable-ghost,
+.layoutPreview .sortable-drag {
+  & > button {
+    display: none;
+  }
 }
 </style>
 
