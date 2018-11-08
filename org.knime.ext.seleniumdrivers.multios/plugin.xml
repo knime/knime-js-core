@@ -22,7 +22,7 @@
       </headlessBrowser>
       <headlessBrowser
             imageGeneratorClass="org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator"
-            name="Bundled Headless Chromium (version 71)">
+            name="Bundled Headless Chromium (version 70)">
       </headlessBrowser>
    </extension>
 
