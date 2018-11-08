@@ -51,6 +51,7 @@ package org.knime.js.core.layout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -113,26 +114,32 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
         for (NodeIDSuffix suffix : viewNodes.keySet()) {
-            JSONLayoutRow row = new JSONLayoutRow();
-            JSONLayoutColumn col = new JSONLayoutColumn();
             ViewHideable viewNode = viewNodes.get(suffix);
-            JSONLayoutContent colContent;
-            if (viewNode instanceof SubNodeContainer) {
-                JSONNestedLayout nestedLayout = new JSONNestedLayout();
-                NodeID id = NodeID.fromString(suffix.toString());
-                nestedLayout.setNodeID(Integer.toString(id.getIndex()));
-                colContent = nestedLayout;
-            } else {
-                colContent = getDefaultViewContentForNode(suffix, viewNodes.get(suffix));
-            }
-            col.setContent(Arrays.asList(new JSONLayoutContent[]{colContent}));
-            try {
-                col.setWidthMD(12);
-            } catch (JsonMappingException e) { /* do nothing */ }
-            row.addColumn(col);
+            JSONLayoutRow row = createDefaultRowForViewContent(suffix, viewNode);
             rows.add(row);
         }
         return page;
+    }
+
+    private static JSONLayoutRow createDefaultRowForViewContent(final NodeIDSuffix suffix, final ViewHideable viewNode) {
+        JSONLayoutRow row = new JSONLayoutRow();
+        JSONLayoutColumn col = new JSONLayoutColumn();
+        JSONLayoutContent colContent;
+        if (viewNode instanceof SubNodeContainer) {
+            JSONNestedLayout nestedLayout = new JSONNestedLayout();
+            NodeID id = NodeID.fromString(suffix.toString());
+            nestedLayout.setNodeID(Integer.toString(id.getIndex()));
+            colContent = nestedLayout;
+        } else {
+            colContent = getDefaultViewContentForNode(suffix, viewNode);
+        }
+        col.setContent(Arrays.asList(new JSONLayoutContent[]{colContent}));
+        try {
+            col.setWidthXS(12);
+        } catch (JsonMappingException e) {
+            /* do nothing */ }
+        row.addColumn(col);
+        return row;
     }
 
     /**
@@ -282,6 +289,122 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                 nestedLayout.setLayout(nestedPage);
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @since 3.7
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public String addUnreferencedViews(final String originalLayout, final Map<NodeIDSuffix, WizardNode> allNodes,
+        final Map<NodeIDSuffix, SubNodeContainer> allNestedViews, final NodeID containerID) {
+        JSONLayoutPage finalLayout;
+        if (originalLayout == null || originalLayout.isEmpty()) {
+            finalLayout = new JSONLayoutPage();
+            finalLayout.setRows(new ArrayList<JSONLayoutRow>(0));
+        } else {
+            try {
+                finalLayout = deserializeLayout(originalLayout);
+            } catch (IOException ex) {
+                LOGGER.error("Could not add unreferenced views to a layout: " + ex.getMessage(), ex);
+                return originalLayout;
+            }
+        }
+        try {
+            finalLayout = addUnreferencedViews(containerID, finalLayout, allNodes, allNestedViews);
+            return serializeLayout(finalLayout);
+        } catch (Exception ex) {
+            LOGGER.error("Could not deserialize amended layout, returning original: " + ex.getMessage(), ex);
+        }
+        return originalLayout;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private JSONLayoutPage addUnreferencedViews(final NodeID containerID, final JSONLayoutPage layout,
+        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
+        List<NodeIDSuffix> containedNodes = new ArrayList<NodeIDSuffix>();
+        layout.getRows().stream().forEach(row -> {
+            addNodesFromRow(row, containedNodes);
+        });
+        Map<NodeIDSuffix, ViewHideable> allViews =
+            getAllCurrentSNCViews(containerID, allNodes, allNestedViews);
+        Map<NodeIDSuffix, ViewHideable> missingViews = allViews.entrySet().stream()
+            .filter(e -> {
+                final NodeID nodeID = NodeID.fromString(e.getKey().toString());
+                return !containedNodes.contains(NodeIDSuffix.create(containerID, nodeID));
+            }).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+        missingViews.entrySet().stream().forEach(e -> {
+            JSONLayoutRow newRow = createDefaultRowForViewContent(e.getKey(), e.getValue());
+            layout.getRows().add(newRow);
+            if (e.getValue() instanceof SubNodeContainer) {
+                try {
+                    expandSubnode((JSONNestedLayout)newRow.getColumns().get(0).getContent().get(0),
+                        (SubNodeContainer)e.getValue());
+                } catch (IOException ex) {
+                    LOGGER.error("Could not expand nested layout: " + ex.getMessage(), ex);
+                }
+            }
+        });
+        Map<NodeIDSuffix, JSONNestedLayout> nestedLayouts = new LinkedHashMap<NodeIDSuffix, JSONNestedLayout>();
+        layout.getRows().stream().forEach(row -> {
+           getNestedLayoutsFromRow(row, nestedLayouts);
+        });
+        nestedLayouts.entrySet().stream().forEach(e -> {
+            JSONLayoutPage nLP = e.getValue().getLayout();
+            NodeID sncID = e.getKey().prependParent(containerID);
+            SubNodeContainer nestedSNC = allNestedViews.get(NodeIDSuffix.fromString(sncID.toString()));
+            NodeID sncContainerID = sncID.createChild(nestedSNC.getWorkflowManager().getID().getIndex());
+            addUnreferencedViews(sncContainerID, nLP, allNodes, allNestedViews);
+        });
+        return layout;
+    }
+
+    private void addNodesFromRow(final JSONLayoutRow row, final List<NodeIDSuffix> nodes) {
+        row.getColumns().stream().forEach(col -> {
+            col.getContent().stream().forEach(content -> {
+                if (content instanceof JSONLayoutViewContent) {
+                    nodes.add(NodeIDSuffix.fromString(((JSONLayoutViewContent)content).getNodeID()));
+                } else if (content instanceof JSONLayoutRow) {
+                    addNodesFromRow((JSONLayoutRow)content, nodes);
+                } else if (content instanceof JSONNestedLayout) {
+                    nodes.add(NodeIDSuffix.fromString(((JSONNestedLayout)content).getNodeID()));
+                }
+            });
+        });
+    }
+
+    private void getNestedLayoutsFromRow(final JSONLayoutRow row, final Map<NodeIDSuffix, JSONNestedLayout> layoutMap) {
+        row.getColumns().stream().forEach(col -> {
+            col.getContent().stream().forEach(content -> {
+                if (content instanceof JSONLayoutRow) {
+                    getNestedLayoutsFromRow((JSONLayoutRow)content, layoutMap);
+                } else if (content instanceof JSONNestedLayout) {
+                    JSONNestedLayout nL = (JSONNestedLayout)content;
+                    layoutMap.put(NodeIDSuffix.fromString(nL.getNodeID()), nL);
+                }
+            });
+        });
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static Map<NodeIDSuffix, ViewHideable> getAllCurrentSNCViews(final NodeID containerID,
+        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
+        Map<NodeIDSuffix, ViewHideable> allViews = new LinkedHashMap<NodeIDSuffix, ViewHideable>();
+        allNodes.entrySet().stream().filter(e -> isInCurrentSNC(containerID, e.getKey()))
+            .forEach(e -> allViews.put(e.getKey(), e.getValue()));
+        allNestedViews.entrySet().stream().filter(e -> isInCurrentSNC(containerID, e.getKey()))
+            .forEach(e -> allViews.put(e.getKey(), e.getValue()));
+        return allViews;
+    }
+
+    private static boolean isInCurrentSNC(final NodeID containerID, final NodeIDSuffix viewSuffix) {
+        NodeID viewID = NodeID.fromString(viewSuffix.toString());
+        if (!viewID.hasPrefix(containerID)) {
+            return false;
+        }
+        NodeIDSuffix shortenedViewSuffix = NodeIDSuffix.create(containerID, viewID);
+        return shortenedViewSuffix.getSuffixArray().length == 1;
     }
 
 }

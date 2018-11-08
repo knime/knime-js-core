@@ -201,7 +201,7 @@ KnimePageLoader = function() {
 					wString += "col-xl-" + col.widthXL;
 				}
 				if (wString.length == 0) {
-					wString = "col-md-12";
+					wString = "col-xs-12";
 				}
 				if (col.additionalClasses) {
 					wString += " " + col.additionalClasses.join(" ");
@@ -267,16 +267,17 @@ KnimePageLoader = function() {
 					method = isOldIE ? 'max' : 'lowestElement';
 				}
 				var layoutSettings = {
-						log : isDebug,
-						enablePublicMethods : true,
-						checkOrigin : false,
-						resizeFrom : "child",
+						log: isDebug,
+						enablePublicMethods: true,
+						checkOrigin: false,
+						resizeFrom: "child",
 						
-						autoResize : layout.autoResize,
-						scrolling : layout.scrolling,
+						autoResize: layout.autoResize,
+						scrolling: layout.scrolling,
 						heightCalculationMethod : method,
-						sizeHeight : layout.sizeHeight,
-						sizeWidth : layout.sizeWidth
+						sizeHeight: layout.sizeHeight,
+						sizeWidth: layout.sizeWidth,
+						tolerance: 5
 				}
 				if (layout.minWidth) {
 					layoutSettings.minWidth = layout.minWidth;
@@ -442,11 +443,12 @@ KnimePageLoader = function() {
 				frame.setAttribute("allowfullscreen", "");
 				frame.id = frameID;
 				layoutValues[frameID] = {
-					log : isDebug,
-					enablePublicMethods : true,
-					checkOrigin : false,
-					resizeFrom : "child",
-					scrolling : true
+					log: isDebug,
+					enablePublicMethods: true,
+					checkOrigin: false,
+					resizeFrom: "child",
+					scrolling: true,
+					tolerance: 5
 				}
 				// Add iframe to container
 				_getContainerElement().appendChild(frame);

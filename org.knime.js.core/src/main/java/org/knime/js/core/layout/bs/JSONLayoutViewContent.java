@@ -174,6 +174,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
         m_scrolling = false;
         m_sizeHeight = true;
         m_sizeWidth = false;
+        m_resizeTolerance = 5;
     }
 
     /**
