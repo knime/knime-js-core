@@ -155,17 +155,6 @@ body {
 
 .controls {
   overflow: auto;
-
-  & button {
-    background-color: var(--button-color);
-    transition: none;
-    border: none;
-
-    &:hover {
-      background-color: var(--button-color-hover);
-      box-shadow: none;
-    }
-  }
 }
 
 .layout {
@@ -192,6 +181,26 @@ body {
 
   &.droppable {
     outline-color: var(--button-color-highlight);
+  }
+}
+
+/* overwrite bootstrap button styling */
+.btn {
+  transition: none;
+  border: none;
+  box-shadow: none;
+}
+
+.btn-light {
+  background-color: var(--button-color);
+
+  &:hover {
+    background-color: var(--button-color-hover);
+  }
+
+  &.btn-light:not(:disabled):not(.disabled).active,
+  &.btn-light:not(:disabled):not(.disabled):active {
+    background-color: var(--button-color-hover);
   }
 }
 </style>

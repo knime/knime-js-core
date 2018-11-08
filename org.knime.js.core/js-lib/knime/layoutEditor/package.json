@@ -14,6 +14,7 @@
   "dependencies": {
     "open-iconic": "^1.1.1",
     "vue": "^2.5.17",
+    "vue-popperjs": "^1.6.1",
     "vuedraggable": "^2.16.0",
     "vuex": "^3.0.1"
   },

@@ -1,5 +1,8 @@
 <template>
-  <div :class="['view', resizeClass, {'missing': disabledOrMissing}]">
+  <div
+    :class="['view', resizeClass, {'missing': disabledOrMissing}]"
+    :style="style"
+  >
     <div
       v-if="node"
       :title="node.name"
@@ -47,6 +50,24 @@ export default {
                 return null;
             }
             return this.view.resizeMethod;
+        },
+        style() {
+            const styleProps = ['minWidth', 'maxWidth', 'minHeight', 'maxHeight'];
+
+            // extract style props
+            const style = {};
+            for (let prop in this.view) {
+                if (styleProps.includes(prop)) {
+                    let value = this.view[prop];
+                    if (value) {
+                        if (!value.toString().includes('px')) {
+                            value = `${value}px`;
+                        }
+                        style[prop] = value;
+                    }
+                }
+            }
+            return style;
         }
     }
 };
@@ -93,7 +114,8 @@ export default {
   }
 
   &.aspectRatio16by9,
-  &.aspectRatio4by3 {
+  &.aspectRatio4by3,
+  &.aspectRatio1by1 {
     position: relative;
     width: 100%;
     height: 0;
@@ -113,6 +135,10 @@ export default {
 
   &.aspectRatio4by3 {
     padding-bottom: calc(100% / (4 / 3));
+  }
+
+  &.aspectRatio1by1 {
+    padding-bottom: 100%;
   }
 
   & main {

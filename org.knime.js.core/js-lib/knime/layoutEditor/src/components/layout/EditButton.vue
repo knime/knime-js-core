@@ -29,7 +29,8 @@ button {
   opacity: 1;
   transition: opacity 0.3s;
 
-  &:hover {
+  &:hover,
+  &.active {
     background-color: var(--button-color-highlight);
   }
 

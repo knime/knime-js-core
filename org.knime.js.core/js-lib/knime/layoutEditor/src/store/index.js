@@ -318,6 +318,26 @@ export default new Vuex.Store({
             }
         },
 
+        updateContentItemConfig(state, data) {
+            const item = data.item;
+
+            // if set to auto, get default resizeMethod from node
+            if (data.config.resizeMethod === 'auto') {
+                const defaultNode = state.nodes.find(node => node.nodeID === data.item.nodeID);
+                data.config.resizeMethod = defaultNode ? defaultNode.layout.resizeMethod : 'aspectRatio16by9';
+            }
+
+            // apply new config; delete unset props
+            for (let prop in data.config) {
+                const value = data.config[prop];
+                if (value) {
+                    Vue.set(item, prop, value);
+                } else {
+                    Vue.delete(item, prop);
+                }
+            }
+        },
+
         // used by vuedraggable on drag&drop or reorder
         updateColumnContent(state, data) {
             data.column.content = data.newContent;

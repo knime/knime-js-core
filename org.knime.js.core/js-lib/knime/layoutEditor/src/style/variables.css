@@ -13,7 +13,7 @@
     --knime-view-preview-active: #ddf5fd;
 
     --button-color: var(--knime-gray-ultra-light);
-    --button-color-hover: rgb(255, 255, 255);
+    --button-color-hover: rgb(202, 202, 202);
     --button-color-highlight: var(--knime-yellow-sec-server);
 
     --column-min-height: 60px;
