@@ -324,7 +324,9 @@ export default new Vuex.Store({
             // if set to auto, get default resizeMethod from node
             if (data.config.resizeMethod === 'auto') {
                 const defaultNode = state.nodes.find(node => node.nodeID === data.item.nodeID);
-                data.config.resizeMethod = defaultNode ? defaultNode.layout.resizeMethod : 'aspectRatio16by9';
+                data.config.resizeMethod = defaultNode && defaultNode.layout.resizeMethod.indexOf('view') === 0
+                    ? defaultNode.layout.resizeMethod
+                    : 'viewLowestElement';
             }
 
             // apply new config; delete unset props

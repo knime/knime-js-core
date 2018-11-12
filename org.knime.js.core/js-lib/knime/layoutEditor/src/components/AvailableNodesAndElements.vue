@@ -51,16 +51,21 @@
       :clone="onCloneElement"
       element="ul"
       class="availableElements"
-      @start="$store.commit('setDragging', 'row')"
+      @start="$store.commit('setDragging', true)"
       @end="$store.commit('setDragging', false)"
     >
       <li
         v-for="(element, index) in $store.state.elements"
         :key="index"
-        class="item"
+        :title="element.name"
+        class="item row preview no-gutters align-items-center"
         @click.prevent="onAvailableElementClick(element)"
       >
-        {{ element.name }}
+        <div
+          v-for="(column, colIndex) in element.data.columns"
+          :key="colIndex"
+          class="col"
+        />
       </li>
     </Draggable>
   </div>
@@ -117,14 +122,19 @@ export default {
   & .item {
     cursor: move; /* for IE11 */
     cursor: grab;
-    background-color: var(--knime-view-preview);
     border-radius: 3px;
     padding: 2px 5px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
 
     &:hover {
       background-color: var(--knime-view-preview-active);
     }
+  }
+}
+
+.availableNodes {
+  & .item {
+    background-color: var(--knime-view-preview);
 
     & .name {
       display: flex;
@@ -152,6 +162,25 @@ export default {
       overflow: hidden;
       text-overflow: ellipsis;
     }
+  }
+}
+
+.availableElements {
+  & .item {
+    background-color: #fff;
+  }
+
+  & .row {
+    border: 2px solid var(--knime-gray-ultra-light);
+    height: 30px;
+  }
+
+  & .col {
+    height: 70%;
+  }
+
+  & .col:not(:last-of-type) {
+    border-right: 2px solid var(--knime-gray-ultra-light);
   }
 }
 </style>

@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col col-auto">
         <div
-          class="btn-group btn-group-toggle mb-3"
+          class="btn-group btn-group-sm btn-group-toggle"
         >
           <label :class="['btn', 'btn-light', {active: resizeMode === 'aspectRatio'}]">
             <input
@@ -26,7 +26,7 @@
       <div class="col">
         <div
           v-if="resizeMode === 'aspectRatio'"
-          class="btn-group btn-group-toggle"
+          class="btn-group btn-group-sm btn-group-toggle"
         >
           <label :class="['btn', 'btn-light', {active: itemConfig.resizeMethod === 'aspectRatio16by9'}]">
             <input
@@ -56,82 +56,75 @@
 
         <small
           v-if="resizeMode === 'auto'"
-          class="form-row mb-2 text-muted"
+          class="form-row text-muted"
         >
-          The height will be dynamically calculated depending on the content (if supported).
+          Height dynamically calculated depending on content.
         </small>
       </div>
     </div>
 
-
-    <div class="form-row mb-2">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text bg-transparent border-0">Minimal</span>
+    <template v-if="resizeMode === 'auto'">
+      <div class="form-row mt-2">
+        <label class="col offset-2 col-form-label-sm pb-0">Width</label>
+        <label class="col col-form-label-sm pb-0">Height</label>
+      </div>
+      <div class="form-row mb-2">
+        <label class="col-2 col-form-label col-form-label-sm">Min</label>
+        <div class="col">
+          <div class="input-group input-group-sm">
+            <input
+              v-model.number="itemConfig.minWidth"
+              type="number"
+              step="1"
+              min="0"
+              class="form-control"
+            >
+            <div class="input-group-append">
+              <span class="input-group-text">px</span>
+            </div>
+          </div>
         </div>
-        <input
-          v-model.number="itemConfig.minWidth"
-          type="number"
-          step="1"
-          min="0"
-          class="form-control"
-          placeholder="width"
-          title="width"
-          @mousedown.stop=""
-        >
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
-          <span class="input-group-text bg-transparent border-0">×</span>
-        </div>
-        <input
-          v-model.number="itemConfig.minHeight"
-          type="number"
-          step="1"
-          min="0"
-          class="form-control"
-          placeholder="height"
-          title="height"
-          @mousedown.stop=""
-        >
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
+        <div class="col input-group input-group-sm">
+          <input
+            v-model.number="itemConfig.minHeight"
+            type="number"
+            step="1"
+            min="0"
+            class="form-control"
+          >
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="form-row">
-      <div class="input-group">
-        <div class="input-group-prepend">
-          <span class="input-group-text bg-transparent border-0">Maximal</span>
+      <div class="form-row">
+        <label class="col-2 col-form-label col-form-label-sm">Max</label>
+        <div class="col input-group input-group-sm">
+          <input
+            v-model.number="itemConfig.maxWidth"
+            type="number"
+            step="1"
+            min="0"
+            class="form-control"
+          >
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
         </div>
-        <input
-          v-model.number="itemConfig.maxWidth"
-          type="number"
-          step="1"
-          min="0"
-          class="form-control"
-          placeholder="width"
-          title="width"
-          @mousedown.stop=""
-        >
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
-          <span class="input-group-text bg-transparent border-0">×</span>
-        </div>
-        <input
-          v-model.number="itemConfig.maxHeight"
-          type="number"
-          step="1"
-          min="0"
-          class="form-control"
-          placeholder="height"
-          title="height"
-          @mousedown.stop=""
-        >
-        <div class="input-group-append">
-          <span class="input-group-text">px</span>
+        <div class="col input-group input-group-sm">
+          <input
+            v-model.number="itemConfig.maxHeight"
+            type="number"
+            step="1"
+            min="0"
+            class="form-control"
+          >
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -143,7 +136,13 @@ export default {
     },
     data() {
         // copy config values from item
-        const itemConfig = (({ resizeMethod, minWidth, maxWidth, minHeight, maxHeight }) => ({ resizeMethod, minWidth, maxWidth, minHeight, maxHeight }))(this.item);
+        const itemConfig = {
+            resizeMethod: this.item.resizeMethod,
+            minWidth: this.item.minWidth,
+            maxWidth: this.item.maxWidth,
+            minHeight: this.item.minHeight,
+            maxHeight: this.item.maxHeight
+        };
         return {
             itemConfig,
             resizeMode: itemConfig.resizeMethod.includes('aspectRatio') ? 'aspectRatio' : 'auto'
@@ -154,11 +153,21 @@ export default {
             switch (resizeMode) {
             case 'aspectRatio':
                 this.itemConfig.resizeMethod = 'aspectRatio16by9';
+
+                // aspect ratio currently doesn't support min/max sizes
+                this.itemConfig.minWidth = null;
+                this.itemConfig.maxWidth = null;
+                this.itemConfig.minHeight = null;
+                this.itemConfig.maxHeight = null;
+                
                 break;
             case 'auto':
                 this.itemConfig.resizeMethod = 'auto';
                 break;
             }
+
+            // hack to fix popper positioning
+            this.$parent.updatePopper();
         },
         itemConfig: {
             handler() {
@@ -184,11 +193,3 @@ export default {
 };
 </script>
 
-
-<style lang="postcss" scoped>
-@import "../../style/variables.css";
-
-.configDialog {
-  min-width: 430px;
-}
-</style>

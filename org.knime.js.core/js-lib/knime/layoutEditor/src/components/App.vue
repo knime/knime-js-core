@@ -52,7 +52,7 @@
         <Draggable
           v-model="rows"
           :options="{group: 'content', isFirstLevel: true}"
-          :class="['container-fluid', 'layoutPreview', {'droppable': $store.state.dragging === 'row'}]"
+          class="container-fluid layoutPreview"
           @start="$store.commit('setDragging', true)"
           @end="$store.commit('setDragging', false)"
         >
@@ -143,6 +143,11 @@ body {
   box-sizing: border-box;
 }
 
+html,
+body {
+  font-size: 12px;
+}
+
 *:not(input, textarea) {
   user-select: none; /* disable selection everywhere */
 }
@@ -170,17 +175,13 @@ body {
 
 .layoutPreview {
   /* fill height to be a drag zone on first level */
-  min-height: calc(100% - 40px);
+  min-height: calc(100% - 50px);
   padding-bottom: 20px;
+  margin-bottom: 10px;
 
-  outline-width: 2px;
-  outline-style: dashed;
-  outline-offset: 2px;
-  outline-color: transparent;
-  transition: outline-color 0.3s;
-
-  &.droppable {
-    outline-color: var(--button-color-highlight);
+  /* hide buttons of dragging element and it's children */
+  & .sortable-drag button:not(.resizeHandle) {
+    visibility: hidden;
   }
 }
 

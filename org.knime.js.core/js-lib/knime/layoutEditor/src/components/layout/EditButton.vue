@@ -1,5 +1,8 @@
 <template>
-  <button v-on="$listeners">
+  <button
+    :class="{hidden: $store.state.dragging}"
+    v-on="$listeners"
+  >
     <slot />
   </button>
 </template>
@@ -27,11 +30,14 @@ button {
   top: 0;
   cursor: pointer;
   opacity: 1;
-  transition: opacity 0.3s;
-
+  transition: opacity 0.2s;
   &:hover,
   &.active {
     background-color: var(--button-color-highlight);
+  }
+
+  &.hidden {
+    opacity: 0;
   }
 
   & > * {

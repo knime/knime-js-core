@@ -91,13 +91,6 @@ export default {
     display: none; /* for now we just hide the content, maybe there is a better way to render the ghost */
   }
 }
-
-.layoutPreview .sortable-ghost,
-.layoutPreview .sortable-drag {
-  & > button {
-    display: none;
-  }
-}
 </style>
 
 <style lang="postcss" scoped>

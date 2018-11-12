@@ -25,9 +25,9 @@
     </EditButton>
 
     <Popper
-      v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
+      v-if="item.type === 'view' || item.type === 'quickform'"
       trigger="click"
-      :options="{placement: 'top'}"
+      :options="{placement: 'top-start'}"
       :append-to-body="true"
       :force-show="showConfigDialog"
       @show="showConfigDialog = true"
@@ -51,7 +51,7 @@
     </Popper>
     <button
       v-if="showConfigDialog"
-      class="popperBackdrop"
+      class="popperOverlay"
       @click.self.stop.prevent="showConfigDialog = false"
       @mousedown.prevent
     />
@@ -117,7 +117,7 @@ export default {
 }
 
 /* full window overlay to prevent other actions while popover is open */
-.popperBackdrop {
+.popperOverlay {
   margin: 0;
   padding: 0;
   border: 0;
@@ -141,6 +141,6 @@ export default {
   border: none;
   padding: 0;
   font-size: inherit;
-  max-width: 430px;
+  width: 275px;
 }
 </style>
