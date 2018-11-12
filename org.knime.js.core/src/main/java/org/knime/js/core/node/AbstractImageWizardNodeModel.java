@@ -71,7 +71,8 @@ import org.openqa.selenium.TimeoutException;
  * @param <VAL> The concrete class of the {@link JSONViewContent} acting as value of the view.
  * @since 3.4
  */
-public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent> extends AbstractWizardNodeModel<REP, VAL> {
+public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, VAL extends JSONViewContent>
+    extends AbstractWizardNodeModel<REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractImageWizardNodeModel.class);
 
