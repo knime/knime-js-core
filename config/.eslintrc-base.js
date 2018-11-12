@@ -76,7 +76,7 @@ module.exports = {
         'no-extend-native': 'warn',
         'no-extra-boolean-cast': 'warn',
         'no-extra-label': 'error',
-        'no-extra-parens': ['warn', 'all', { 'nestedBinaryExpressions': false }],
+        'no-extra-parens': ['warn', 'all', { nestedBinaryExpressions: false }],
         'no-implicit-coercion': 'warn',
         'no-implied-eval': 'error',
         'no-invalid-this': 'warn',
@@ -84,7 +84,7 @@ module.exports = {
         'no-lone-blocks': 'warn',
         'no-lonely-if': 'warn',
         'no-magic-numbers': ['warn', {
-            ignore: [-1, 0, 1, 1000],
+            ignore: [-1, 0, 1, 2, 100, 1000],
             ignoreArrayIndexes: true,
             enforceConst: true
         }],
