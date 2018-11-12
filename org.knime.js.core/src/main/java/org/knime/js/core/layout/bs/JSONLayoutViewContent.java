@@ -113,6 +113,9 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
         ASPECT_RATIO_16by9,
         /** Resize according to available space in layout and keeping a 4:3 aspect ratio. */
         ASPECT_RATIO_4by3,
+        /** Resize according to available space in layout and keeping a square aspect ratio.
+         * @since 3.7*/
+        ASPECT_RATIO_1by1,
 
         /* Manual resize method */
         /** No automatic resizing. Resize calls need to be made manually from the view. */
@@ -133,6 +136,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
             namesMap.put("viewLowestElementIEMax", ResizeMethod.VIEW_LOWEST_ELEMENT_IE_MAX);
             namesMap.put("aspectRatio16by9", ASPECT_RATIO_16by9);
             namesMap.put("aspectRatio4by3", ASPECT_RATIO_4by3);
+            namesMap.put("aspectRatio1by1", ASPECT_RATIO_1by1);
             namesMap.put("manual", MANUAL);
         }
 
@@ -150,6 +154,9 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
             return method;
         }
 
+        /**
+         * @return the string representation of this enum instance
+         */
         @JsonValue
         public String toValue() {
             for (Entry<String, ResizeMethod> entry : namesMap.entrySet()) {
@@ -409,14 +416,14 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
     public JSONLayoutViewContent clone() {
         JSONLayoutViewContent clone = new JSONLayoutViewContent();
         clone.m_autoResize = m_autoResize;
-        clone.m_maxHeight = m_maxHeight == null ? null : new Integer(m_maxHeight);
-        clone.m_maxWidth = m_maxWidth == null ? null : new Integer(m_maxWidth);
-        clone.m_minHeight = m_minHeight == null ? null : new Integer(m_minHeight);
-        clone.m_minWidth = m_minWidth == null ? null : new Integer(m_minWidth);
+        clone.m_maxHeight = m_maxHeight == null ? null : Integer.valueOf(m_maxHeight);
+        clone.m_maxWidth = m_maxWidth == null ? null : Integer.valueOf(m_maxWidth);
+        clone.m_minHeight = m_minHeight == null ? null : Integer.valueOf(m_minHeight);
+        clone.m_minWidth = m_minWidth == null ? null : Integer.valueOf(m_minWidth);
         clone.m_nodeID = m_nodeID;
-        clone.m_resizeInterval = m_resizeInterval == null ? null : new Integer(m_resizeInterval);
+        clone.m_resizeInterval = m_resizeInterval == null ? null : Integer.valueOf(m_resizeInterval);
         clone.m_resizeMethod = m_resizeMethod;
-        clone.m_resizeTolerance = m_resizeTolerance == null ? null : new Integer(m_resizeTolerance);
+        clone.m_resizeTolerance = m_resizeTolerance == null ? null : Integer.valueOf(m_resizeTolerance);
         clone.m_scrolling = m_scrolling;
         clone.m_sizeHeight = m_sizeHeight;
         clone.m_sizeWidth = m_sizeWidth;
