@@ -64,7 +64,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonAutoDetect
 public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutContent {
 
-    private List<JSONLayoutColumn> m_columns = new ArrayList<JSONLayoutColumn>();
+    private List<JSONLayoutColumn> m_columns = new ArrayList<JSONLayoutColumn>(0);
 
     /**
      * @return the columns

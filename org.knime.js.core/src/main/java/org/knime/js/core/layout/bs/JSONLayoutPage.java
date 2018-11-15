@@ -47,6 +47,7 @@
  */
 package org.knime.js.core.layout.bs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -65,7 +66,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
  */
 @JsonAutoDetect
 public class JSONLayoutPage {
-    private List<JSONLayoutRow> m_rows;
+    private List<JSONLayoutRow> m_rows = new ArrayList<JSONLayoutRow>(0);
 
     /**
      * @return the content
