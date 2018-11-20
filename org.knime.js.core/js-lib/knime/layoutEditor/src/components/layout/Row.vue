@@ -83,6 +83,8 @@ export default {
   border: 4px solid var(--knime-gray-ultra-light);
   border-radius: 3px;
   position: relative; /* needed for delete handle positioning */
+  cursor: move; /* for IE11 */
+  cursor: grab;
 
   &:not(:last-of-type) {
     margin-bottom: 5px;

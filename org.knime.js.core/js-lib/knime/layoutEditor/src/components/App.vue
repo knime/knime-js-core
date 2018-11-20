@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-3 controls">
+      <div class="col-3 controls pt-3">
         <button
           title="remove all views and rows"
           class="btn btn-light mr-2"
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="col layout">
+      <div class="col layout pt-3">
         <div
           v-if="isResponsiveLayout"
           class="alert alert-warning"
@@ -165,7 +165,6 @@ body {
 .layout {
   overflow-y: scroll;
   height: 100vh;
-  padding-top: 20px;
   min-height: 100px;
 
   & > .hint {
