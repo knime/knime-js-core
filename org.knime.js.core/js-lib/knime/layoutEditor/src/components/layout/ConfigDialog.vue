@@ -193,3 +193,12 @@ export default {
 };
 </script>
 
+<style lang="postcss" scoped>
+/* hide number field spinner buttons because they are huge under linux, see AP-10805 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
+}
+</style>
