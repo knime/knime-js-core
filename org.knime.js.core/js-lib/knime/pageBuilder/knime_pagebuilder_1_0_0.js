@@ -861,7 +861,8 @@ KnimePageLoader = function() {
 		// row-based changeSet handling
 		if (data.changeSet) {
 			if (!exists) {
-				if ((data.changeSet.added && data.changeSet.added.length > 0) || (data.changeSet.partialAdded && data.changeSet.partialAdded.length > 0)) {
+				if ((data.changeSet.added && data.changeSet.added.length > 0) 
+				        || (data.changeSet.partialAdded && data.changeSet.partialAdded.length > 0)) {
 					// no element exists but something to add
 					interactivityMap[id] = {'selectionMethod': data.selectionMethod, 'elements': []};
 					if (data.changeSet.partialAdded && data.changeSet.partialAdded.length > 0) {
@@ -1127,6 +1128,9 @@ KnimePageLoader = function() {
 		var removedRows = [];
 		if (data.changeSet && data.changeSet.removed) {
 			removedRows = data.changeSet.removed;
+		}
+		if (data.changeSet && data.changeSet.partialRemoved) {
+		    removedRows = removedRows.concat(data.changeSet.partialRemoved);
 		}
 		var mappedAdded = [], mappedRemoved = [];
 		var partialAdded = [], partialRemoved = [];

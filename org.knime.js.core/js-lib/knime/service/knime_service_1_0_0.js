@@ -349,6 +349,7 @@ knimeService = function() {
 			updateSelection.changeSet.removed = curRows.filter(function(row) {
 				return rowKeys.indexOf(row) < 0;
 			});
+			updateSelection.changeSet.partialRemoved = curElement.partial;
 		} else {
 			updateSelection.changeSet.added = rowKeys;
 		}
@@ -366,12 +367,21 @@ knimeService = function() {
 	
 	removeRowsFromInteractivityEvent = function(type, tableId, rowKeys, skip, elementId) {
 		var selection = getInteractivityElement(type + SEPARATOR + tableId);
-		if (!selection || !selection.elements) {
+		if (!selection || (!selection.elements && !selection.partial)) {
 			// nothing to remove
 			return false;
 		}
 		// only send changeSet
-		var updateSelection = {'selectionMethod': type, 'changeSet': {'removed': rowKeys}};
+		var toRemove = [], partialRemove = [];
+		for (var i = 0; i < rowKeys.length; i++) {
+		    if (selection.partial && selection.partial.indexOf(rowKeys[i]) > -1) {
+		        partialRemove.push(rowKeys[i]);
+		    } else {
+		        toRemove.push(rowKeys[i]);
+		    }
+		}
+		var updateSelection = {'selectionMethod': type, 
+		        'changeSet': {'removed': toRemove, 'partialRemoved': partialRemove}};
 		return publishInteractivityEvent(type + SEPARATOR + tableId, updateSelection, skip);
 	}
 	
