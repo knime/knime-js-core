@@ -1130,7 +1130,11 @@ KnimePageLoader = function() {
 			removedRows = data.changeSet.removed;
 		}
 		if (data.changeSet && data.changeSet.partialRemoved) {
-		    removedRows = removedRows.concat(data.changeSet.partialRemoved);
+		    for (var i = 0; i < data.changeSet.partialRemoved.length; i++) {
+		        if (addedRows.indexOf(data.changeSet.partialRemoved[i]) < 0) {
+		            removedRows.push(data.changeSet.partialRemoved[i]);
+		        }
+		    }
 		}
 		var mappedAdded = [], mappedRemoved = [];
 		var partialAdded = [], partialRemoved = [];
