@@ -241,6 +241,7 @@ knimeService = function() {
 	service.publishSelection = function(tableId, selection, skip) {
 		return publishInteractivityEvent(SELECTION + SEPARATOR + tableId, selection, skip);
 	}
+	
 	service.registerSelectionTranslator = function(translator, translatorID, callback) {
 		if(parent.KnimePageLoader) {
 			parent.KnimePageLoader.registerSelectionTranslator(translator, translatorID);
