@@ -635,8 +635,17 @@ KnimeBaseTableViewer.prototype._addSortButtons = function() {
 KnimeBaseTableViewer.prototype._buildMenu = function() {
 	var self = this;
 	if (knimeService) {
-		if (this._representation.enableSearching && !this._representation.title) {
+	    var paging = this._representation.enablePaging;
+	    var sizeChange = this._representation.enablePageSizeChange;
+	    var searching = this._representation.enableSearching;
+	    var title = this._representation.title;
+	    var hasTitle = typeof title !== 'undefined' && title !== null && title !== '';
+	    var subtitle = this._representation.subtitle;
+	    var hasSubtitle = typeof subtitle !== 'undefined' && subtitle !== null && subtitle !== '';
+	    
+		if ((searching && !hasTitle) || (!hasTitle && !hasSubtitle && !searching && (!paging || !sizeChange))) {
 			knimeService.floatingHeader(false);
+			$('#knimePagedTableContainer').css('padding-top', '0');
 		}
 
 		if (this._representation.displayFullscreenButton) {

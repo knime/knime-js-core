@@ -125,9 +125,10 @@ h2 {
 	width: auto;
 }
 
-#knimePagedTable {
+table#knimePagedTable {
     user-select: none;
     -moz-user-select: none;
+    margin-top: 0 !important;
 }
 
 #knimePagedTable:focus {
