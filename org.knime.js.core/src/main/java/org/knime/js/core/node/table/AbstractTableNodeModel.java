@@ -29,6 +29,9 @@ import org.knime.core.node.util.filter.NameFilterConfiguration.FilterResult;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.js.core.JSONDataTable;
+import org.knime.js.core.layout.LayoutTemplateProvider;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent.ResizeMethod;
 import org.knime.js.core.node.AbstractWizardNodeModel;
 import org.knime.js.core.settings.table.TableSettings;
 
@@ -43,7 +46,8 @@ import org.knime.js.core.settings.table.TableSettings;
  *
  */
 public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresentation, VAL extends AbstractTableValue>
-    extends AbstractWizardNodeModel<REP, VAL> implements BufferedDataTableHolder, CSSModifiable  {
+    extends AbstractWizardNodeModel<REP, VAL>
+    implements BufferedDataTableHolder, CSSModifiable, LayoutTemplateProvider {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractTableNodeModel.class);
 
@@ -287,5 +291,16 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
     @Override
     protected void loadValidatedSettingsFrom(final NodeSettingsRO settings) throws InvalidSettingsException {
         m_config.loadSettings(settings);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONLayoutViewContent getLayoutTemplate() {
+        JSONLayoutViewContent layout = new JSONLayoutViewContent();
+        layout.setMinHeight(200);
+        layout.setResizeMethod(ResizeMethod.VIEW_TAGGED_ELEMENT);
+        return layout;
     }
 }
