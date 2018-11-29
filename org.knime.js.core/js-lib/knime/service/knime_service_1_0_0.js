@@ -68,7 +68,6 @@ knimeService = function() {
 	
 	service.isInteractivityAvailable = function() {
 		initialized || init();
-		//TODO: check if somebody is subscribed?
 		return interactivityAvailable;
 	}
 	
