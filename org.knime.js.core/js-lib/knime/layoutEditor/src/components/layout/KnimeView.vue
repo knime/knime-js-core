@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="['view', resizeClass, {'missing': disabledOrMissing}]"
+    :class="['knimeView', typeClass, resizeClass, 'd-flex align-items-center justify-content-center', {'missing': disabledOrMissing}]"
     :style="style"
   >
     <div
@@ -45,6 +45,9 @@ export default {
         node() {
             return this.$store.state.nodes.find(node => node.nodeID === this.view.nodeID);
         },
+        typeClass() {
+            return this.node && this.node.type;
+        },
         resizeClass() {
             if (!this.view.resizeMethod) {
                 return null;
@@ -56,8 +59,8 @@ export default {
 
             // extract style props
             const style = {};
-            for (let prop in this.view) {
-                if (styleProps.includes(prop)) {
+            styleProps.forEach(prop => {
+                if (this.view.hasOwnProperty(prop)) {
                     let value = this.view[prop];
                     if (value) {
                         if (!value.toString().includes('px')) {
@@ -66,7 +69,7 @@ export default {
                         style[prop] = value;
                     }
                 }
-            }
+            });
             return style;
         }
     }
@@ -96,7 +99,7 @@ export default {
 <style lang="postcss" scoped>
 @import "../../style/variables.css";
 
-.view {
+.knimeView {
   background-color: var(--knime-view-preview);
   border-radius: 3px;
   overflow: hidden;
@@ -104,6 +107,11 @@ export default {
 
   &.missing {
     opacity: 0.4;
+  }
+
+  &.view,
+  &.nestedLayout {
+    min-height: 150px;
   }
 
   &.aspectRatio16by9,
