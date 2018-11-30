@@ -664,7 +664,20 @@ knimeService = function() {
 		return Modernizr.promises && Modernizr.es6object;
 	}
 	
-	
+	/**
+     * Escape special characters in a string which results in a valid DOM element id
+     * @param {*} id
+     */
+	service.cssEscapeId = function(id) {
+	    var string = id.toString();
+        var matchesBeginning = /^[a-z]+/i; 
+        if (!matchesBeginning.test(str)) {
+            //if ID doesn't start with letter add prefix
+            string = 'knid_' + str;
+        }
+        // replace all special characters by underscores
+        return string.replace(/^[^a-z]+|[^\w:-]+/gi, '___');
+	}
 	
 	/**
 	 * Inline global style declarations for SVG export
