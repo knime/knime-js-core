@@ -670,13 +670,13 @@ knimeService = function() {
      */
 	service.cssEscapeId = function(id) {
 	    var string = id.toString();
-        var matchesBeginning = /^[a-z]+/i; 
-        if (!matchesBeginning.test(str)) {
-            //if ID doesn't start with letter add prefix
-            string = 'knid_' + str;
-        }
-        // replace all special characters by underscores
-        return string.replace(/^[^a-z]+|[^\w:-]+/gi, '___');
+			var matchesBeginning = /^[a-z]+/i; 
+			if (!matchesBeginning.test(string)) {
+					//if ID doesn't start with letter add prefix
+					string = 'knid_' + string;
+			}
+			// replace all special characters by underscores
+			return string.replace(/^[^a-z]+|[^\w:-]+/gi, '___');
 	}
 	
 	/**
