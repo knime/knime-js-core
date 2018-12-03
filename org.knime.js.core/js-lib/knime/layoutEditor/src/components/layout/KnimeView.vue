@@ -1,6 +1,8 @@
 <template>
   <div
-    :class="['knimeView', typeClass, resizeClass, 'd-flex align-items-center justify-content-center', {'missing': disabledOrMissing}]"
+    :class="['knimeView', typeClass, resizeClass, 'd-flex align-items-center justify-content-center',
+             {'missing': disabledOrMissing}
+    ]"
     :style="style"
   >
     <div

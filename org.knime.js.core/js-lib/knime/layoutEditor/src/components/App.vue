@@ -117,6 +117,24 @@ export default {
             }
         }
     },
+    mounted() {
+        // warn if browser doesn't support flexbox
+        // feature detection by https://gist.github.com/davidhund/b995353fdf9ce387b8a2
+        const f = 'flex';
+        const e = document.createElement('b');
+        e.style.display = f;
+        const isFlexboxSupported = e.style.display === f;
+
+        if (!isFlexboxSupported) {
+            let msg = 'Your operating system is using an outdated browser,';
+            msg += ' therefore the visual layout editor is not available.';
+            msg += ' Please try to install the latest updates for your operating system.';
+            if (/linux/i.test(navigator.userAgent)) {
+                msg += ' Or try to manually update the libwebkit* packages.';
+            }
+            alert(msg);
+        }
+    },
     methods: {
         onClear(e) {
             this.$store.commit('clearLayout');
