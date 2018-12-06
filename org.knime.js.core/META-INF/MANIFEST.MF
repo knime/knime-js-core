@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME JavaScript Core API
 Bundle-SymbolicName: org.knime.js.core;singleton:=true
-Bundle-Version: 3.7.0.qualifier
+Bundle-Version: 3.8.0.qualifier
 Bundle-ClassPath: js-core.jar
 Bundle-Activator: org.knime.js.core.JSCorePlugin
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
@@ -23,17 +23,17 @@ Export-Package: org.knime.js.core,
   org.knime.js.core.settings.table,
   org.knime.js.core.warnings
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)",
- org.eclipse.ui;bundle-version="[3.7.0,4.0.0)",
- org.knime.core;bundle-version="[3.0.0,4.0.0)",
- org.knime.time;bundle-version="[3.3.0,4.0.0)",
- org.apache.commons.codec;bundle-version="[1.3.0,2.0.0)",
- org.apache.commons.lang3;bundle-version="[3.2.1,4.0.0)",
- org.knime.ext.svg;bundle-version="[3.0.0,4.0.0)",
- com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.7.1,3.0.0)",
- com.fasterxml.jackson.core.jackson-core;bundle-version="[2.7.1,3.0.0)",
- com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.7.1,3.0.0)",
- org.openqa.selenium;bundle-version="[3.0.0,4.0.0)",
- com.google.guava;bundle-version="19.0.0",
- com.fasterxml.jackson.datatype.jackson-datatype-jdk8;bundle-version="[2.7.1,3.0.0)"
+  org.eclipse.ui;bundle-version="[3.7.0,4.0.0)",
+  org.knime.core;bundle-version="[3.0.0,4.0.0)",
+  org.knime.time;bundle-version="[3.3.0,4.0.0)",
+  org.apache.commons.codec;bundle-version="[1.3.0,2.0.0)",
+  org.apache.commons.lang3;bundle-version="[3.2.1,4.0.0)",
+  org.knime.ext.svg;bundle-version="[3.0.0,4.0.0)",
+  com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.7.1,3.0.0)",
+  com.fasterxml.jackson.core.jackson-core;bundle-version="[2.7.1,3.0.0)",
+  com.fasterxml.jackson.core.jackson-databind;bundle-version="[2.7.1,3.0.0)",
+  org.openqa.selenium;bundle-version="[3.0.0,4.0.0)",
+  com.google.guava;bundle-version="19.0.0",
+  com.fasterxml.jackson.datatype.jackson-datatype-jdk8;bundle-version="[2.7.1,3.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
