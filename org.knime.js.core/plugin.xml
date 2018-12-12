@@ -1531,7 +1531,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
-            name="noUISlider"
+            name="noUISlider 9"
             usesDefine="false"
             version="9.0.0"
             webResourceBundleID="noUISlider_9_0_0_Debug">
@@ -1573,7 +1573,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
-            name="noUISlider"
+            name="noUISlider 9"
             usesDefine="false"
             version="9.0.0"
             webResourceBundleID="noUISlider_9_0_0">
@@ -1599,10 +1599,62 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            name="noUISlider 12"
+            usesDefine="false"
+            version="12.1.0"
+            webResourceBundleID="noUISlider_12_1_0_Debug">
+         <webResource
+               relativePathSource="js-lib/noUiSlider/12_1_0/nouislider.js"
+               relativePathTarget="js-lib/noUiSlider/12_1_0/nouislider.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/12_1_0/nouislider.css"
+               relativePathTarget="js-lib/noUiSlider/12_1_0/nouislider.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/12_1_0/nouislider.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/12_1_0/nouislider.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="wNumb">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="false"
+            name="noUISlider 12"
+            usesDefine="false"
+            version="12.1.0"
+            webResourceBundleID="noUISlider_12_1_0">
+         <webResource
+               relativePathSource="js-lib/noUiSlider/12_1_0/nouislider.min.js"
+               relativePathTarget="js-lib/noUiSlider/12_1_0/nouislider.min.js">
+         </webResource>
+         <webResource
+               relativePathSource="js-lib/noUiSlider/12_1_0/nouislider.min.css"
+               relativePathTarget="js-lib/noUiSlider/12_1_0/nouislider.min.css">
+         </webResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/12_1_0/nouislider.min.js"
+               type="JAVASCRIPT">
+         </importResource>
+         <importResource
+               relativePath="js-lib/noUiSlider/12_1_0/nouislider.min.css"
+               type="CSS">
+         </importResource>
+         <webDependency
+               webResourceBundleID="wNumb">
+         </webDependency>
+      </webResourceBundle>
+      <webResourceBundle
+            debug="true"
             exports="wNumb"
             name="wNumb Number Formatter"
             usesDefine="false"
-            version="1.0.0"
+            version="1.1.0"
             webResourceBundleID="wNumb">
          <webResource
                relativePathSource="js-lib/wNumb/wNumb.js"
