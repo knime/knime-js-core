@@ -119,7 +119,7 @@ public class RangeSelection extends SelectionElement {
                     filterValues.add(new StringCell(value));
                 }
             }
-            FilterModel.newNominalModel(filterValues);
+            model = FilterModel.newNominalModel(filterValues);
         } else {
             throw new OperationNotSupportedException(m_columns[0].getClass().getSimpleName() + " is not supported.");
         }
