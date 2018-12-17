@@ -72,7 +72,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * Settings for a slider control to be used for node config settings, dialog and for inclusion in JSON serialized objects.
+ * Settings for a slider control to be used for node config settings, dialog and for inclusion in JSON serialized
+ * objects.
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  * @since 3.3
@@ -84,6 +85,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Enumerates all possible orientations of a slider.
+     *
      * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
      * @since 3.3
      */
@@ -102,6 +104,7 @@ public class SliderSettings implements Cloneable {
 
         /**
          * JsonCreator method to create enum value for a given string.
+         *
          * @param value the string to convert into an Orientation value.
          * @return the Orientation value for the given string
          */
@@ -112,6 +115,7 @@ public class SliderSettings implements Cloneable {
 
         /**
          * JsonValue method to create the string (JSON) representation of the Orientation value
+         *
          * @return the string representation of this Orientation value
          */
         @JsonValue
@@ -128,6 +132,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Enumerates all possible directions of a slider.
+     *
      * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
      * @since 3.3
      */
@@ -146,6 +151,7 @@ public class SliderSettings implements Cloneable {
 
         /**
          * JsonCreator method to create enum value for a given string.
+         *
          * @param value the string to convert into an Direction value.
          * @return the Direction value for the given string
          */
@@ -156,6 +162,7 @@ public class SliderSettings implements Cloneable {
 
         /**
          * JsonValue method to create the string (JSON) representation of the Direction value
+         *
          * @return the string representation of this Direction value
          */
         @JsonValue
@@ -171,55 +178,80 @@ public class SliderSettings implements Cloneable {
     }
 
     private static final String RANGE_MIN = "min";
+
     private static final String RANGE_MAX = "max";
 
     private static final String CFG_RANGE = "range";
+
     private static final String NUM_SETTINGS = "numSettings";
+
     private LinkedHashMap<String, double[]> m_range = new LinkedHashMap<String, double[]>();
 
     private static final String CFG_START = "start";
+
     private double[] m_start;
 
     private static final String CFG_CONNECT = "connect";
+
     private boolean[] m_connect;
 
+    private static final String CFG_FIX = "fix";
+
+    private boolean[] m_fix;
+
     private static final String CFG_CONNECT_COLOR = "connectColor";
+
     private static final String DEFAULT_CONNECT_COLOR = "#3FB8AF";
+
     private String m_connectColor = DEFAULT_CONNECT_COLOR;
 
     private static final String CFG_STEP = "step";
+
     private Double m_step;
 
     private static final String CFG_SNAP = "snap";
+
     private Boolean m_snap;
 
     private static final String CFG_MARGIN = "margin";
+
     private Double m_margin;
 
     private static final String CFG_LIMIT = "limit";
+
     private Double m_limit;
 
     private static final String CFG_ORIENTATION = "orientation";
+
     private Orientation m_orientation;
 
     private static final String CFG_DIRECTION = "direction";
+
     private Direction m_direction;
 
     private static final String CFG_TOOLTIPS = "tooltips";
+
     private Object[] m_tooltips;
 
     private static final String CFG_ANIMATE = "animate";
+
     private Boolean m_animate;
 
     private static final String CFG_ANIMATION_DURATION = "animationDuration";
+
     private Integer m_animationDuration;
 
     private static final String CFG_BEHAVIOUR = "behaviour";
+
     private String m_behaviour;
 
     private static final String CFG_PIPS = "pips";
+
     private static final String CFG_PIPS_DEFINED = "pipsDefined";
+
     private SliderPipsSettings m_pips;
+
+    private static final boolean[] DEFAULT_FIX_ARRAY = {false, true, false};
 
     /**
      * @return the range
@@ -227,162 +259,205 @@ public class SliderSettings implements Cloneable {
     public LinkedHashMap<String, double[]> getRange() {
         return m_range;
     }
+
     /**
      * @param range the range to set
      */
     public void setRange(final LinkedHashMap<String, double[]> range) {
         m_range = range;
     }
+
     /**
      * @return the start
      */
     public double[] getStart() {
         return m_start;
     }
+
     /**
      * @param start the start to set
      */
     public void setStart(final double[] start) {
         m_start = start;
     }
+
     /**
      * @return the connect
      */
     public boolean[] getConnect() {
         return m_connect;
     }
+
     /**
      * @param connect the connect to set
      */
     public void setConnect(final boolean[] connect) {
         m_connect = connect;
     }
+
+    /**
+     * @return the fix
+     * @since 3.8
+     */
+    public boolean[] getFix() {
+        return m_fix;
+    }
+
+    /**
+     * @param fix the fix to set
+     * @since 3.8
+     */
+    public void setFix(final boolean[] fix) {
+        m_fix = fix;
+    }
+
     /**
      * @return the step
      */
     public Double getStep() {
         return m_step;
     }
+
     /**
      * @param step the step to set
      */
     public void setStep(final Double step) {
         m_step = step;
     }
+
     /**
      * @return the snap
      */
     public Boolean getSnap() {
         return m_snap;
     }
+
     /**
      * @param snap the snap to set
      */
     public void setSnap(final Boolean snap) {
         m_snap = snap;
     }
+
     /**
      * @return the margin
      */
     public Double getMargin() {
         return m_margin;
     }
+
     /**
      * @param margin the margin to set
      */
     public void setMargin(final Double margin) {
         m_margin = margin;
     }
+
     /**
      * @return the limit
      */
     public Double getLimit() {
         return m_limit;
     }
+
     /**
      * @param limit the limit to set
      */
     public void setLimit(final Double limit) {
         m_limit = limit;
     }
+
     /**
      * @return the orientation
      */
     public Orientation getOrientation() {
         return m_orientation;
     }
+
     /**
      * @param orientation the orientation to set
      */
     public void setOrientation(final Orientation orientation) {
         m_orientation = orientation;
     }
+
     /**
      * @return the diretion
      */
     public Direction getDirection() {
         return m_direction;
     }
+
     /**
      * @param diretion the diretion to set
      */
     public void setDirection(final Direction diretion) {
         m_direction = diretion;
     }
+
     /**
      * @return the tooltips
      */
     public Object[] getTooltips() {
         return m_tooltips;
     }
+
     /**
      * @param tooltips the tooltips to set
      */
     public void setTooltips(final Object[] tooltips) {
         m_tooltips = tooltips;
     }
+
     /**
      * @return the animate
      */
     public Boolean getAnimate() {
         return m_animate;
     }
+
     /**
      * @param animate the animate to set
      */
     public void setAnimate(final Boolean animate) {
         m_animate = animate;
     }
+
     /**
      * @return the animationDuration
      */
     public Integer getAnimationDuration() {
         return m_animationDuration;
     }
+
     /**
      * @param animationDuration the animationDuration to set
      */
     public void setAnimationDuration(final Integer animationDuration) {
         m_animationDuration = animationDuration;
     }
+
     /**
      * @return the behaviour
      */
     public String getBehaviour() {
         return m_behaviour;
     }
+
     /**
      * @param behaviour the behaviour to set
      */
     public void setBehaviour(final String behaviour) {
         m_behaviour = behaviour;
     }
+
     /**
      * @return the pips
      */
     public SliderPipsSettings getPips() {
         return m_pips;
     }
+
     /**
      * @param pips the pips to set
      */
@@ -392,6 +467,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Returns the minimum value for the configured slider range.
+     *
      * @return The minimum value for the range, or null if no minimum is set.
      */
     @JsonIgnore
@@ -407,6 +483,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Sets the minimum value for the configured slider range.
+     *
      * @param min the new minimum value
      * @return the previous minimum value, or null if there was no minimum value set.
      */
@@ -420,6 +497,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Returns the maximum value for the configured slider range.
+     *
      * @return The maximum value for the range, or null if no maximum is set.
      */
     @JsonIgnore
@@ -435,6 +513,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Sets the maximum value for the configured slider range.
+     *
      * @param max the new maximum value
      * @return the previous maximum value, or null if there was no maximum value set.
      */
@@ -447,9 +526,9 @@ public class SliderSettings implements Cloneable {
     }
 
     /**
-     * Checks if the configured slider will only produce integer values.
-     * Specifically the step and start values are checked. If any of the values is not set
-     * the method will also return false;
+     * Checks if the configured slider will only produce integer values. Specifically the step and start values are
+     * checked. If any of the values is not set the method will also return false;
+     *
      * @return true, if the slider settings only produce integer values, false otherwise
      */
     @JsonIgnore
@@ -470,6 +549,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Validates the current settings.
+     *
      * @throws InvalidSettingsException If validation fails.
      */
     @JsonIgnore
@@ -491,12 +571,19 @@ public class SliderSettings implements Cloneable {
             throw new InvalidSettingsException("At least one start value needs to be specified.");
         }
         for (double start : m_start) {
-            if (start < getRangeMinValue() || start > getRangeMaxValue()) {
+            if (getFix()[0] && start > getRangeMaxValue()) {
+                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+            } else if (getFix()[2] && start < getRangeMinValue()) {
+                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+            } else if (getFix()[1] && (start < getRangeMinValue() || start > getRangeMaxValue())) {
                 throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
             }
         }
         if (m_connect != null && m_connect.length != (m_start.length + 1)) {
             throw new InvalidSettingsException("The connect array length needs to be start array length + 1");
+        }
+        if (m_fix != null && m_fix.length != (m_start.length + 1)) {
+            throw new InvalidSettingsException("The fix array length needs to be start array length + 1");
         }
         if (m_tooltips != null) {
             if (m_tooltips.length != m_start.length) {
@@ -504,11 +591,12 @@ public class SliderSettings implements Cloneable {
             }
             for (Object tip : m_tooltips) {
                 if (tip instanceof NumberFormatSettings) {
-                    if(deepValidate) {
+                    if (deepValidate) {
                         ((NumberFormatSettings)tip).validateSettings();
                     }
                 } else if (!(tip instanceof Boolean)) {
-                    throw new InvalidSettingsException("Tooltip needs to be either Boolean or NumberFormatSettings object.");
+                    throw new InvalidSettingsException(
+                        "Tooltip needs to be either Boolean or NumberFormatSettings object.");
                 }
             }
         }
@@ -519,6 +607,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Saves the current state to the given node settings object.
+     *
      * @param settings The settings object to save to.
      */
     @JsonIgnore
@@ -536,6 +625,7 @@ public class SliderSettings implements Cloneable {
         }
         settings.addDoubleArray(CFG_START, m_start);
         settings.addBooleanArray(CFG_CONNECT, m_connect);
+        settings.addBooleanArray(CFG_FIX, m_fix);
         settings.addDoubleArray(CFG_STEP, m_step == null ? null : new double[]{m_step});
         settings.addBooleanArray(CFG_SNAP, m_snap == null ? null : new boolean[]{m_snap});
         settings.addDoubleArray(CFG_MARGIN, m_margin == null ? null : new double[]{m_margin});
@@ -559,7 +649,8 @@ public class SliderSettings implements Cloneable {
             tipsSettings.addString("type_" + t, type);
         }
         settings.addBooleanArray(CFG_ANIMATE, m_animate == null ? null : new boolean[]{m_animate});
-        settings.addIntArray(CFG_ANIMATION_DURATION, m_animationDuration == null ? null : new int[]{m_animationDuration});
+        settings.addIntArray(CFG_ANIMATION_DURATION,
+            m_animationDuration == null ? null : new int[]{m_animationDuration});
         settings.addString(CFG_BEHAVIOUR, m_behaviour);
         NodeSettingsWO pipSettings = settings.addNodeSettings(CFG_PIPS);
         boolean pipsDefined = m_pips != null;
@@ -570,8 +661,9 @@ public class SliderSettings implements Cloneable {
     }
 
     /**
-     * Populates the object by loading from the NodeSettings object.
-     * The values are validated before being applied. On error this object stays unchanged.
+     * Populates the object by loading from the NodeSettings object. The values are validated before being applied. On
+     * error this object stays unchanged.
+     *
      * @param settings The settings to load from
      * @throws InvalidSettingsException on load or validation error
      */
@@ -596,6 +688,7 @@ public class SliderSettings implements Cloneable {
         }
         m_start = settings.getDoubleArray(CFG_START);
         m_connect = settings.getBooleanArray(CFG_CONNECT);
+        m_fix = settings.getBooleanArray(CFG_FIX, DEFAULT_FIX_ARRAY);
         double[] stepTemp = settings.getDoubleArray(CFG_STEP);
         m_step = stepTemp == null ? null : stepTemp[0];
         boolean[] snapTemp = settings.getBooleanArray(CFG_SNAP);
@@ -646,6 +739,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * Loading from NodeSettings object with defaults fallback.
+     *
      * @param settings the settings object to load from.
      */
     @JsonIgnore
@@ -666,6 +760,7 @@ public class SliderSettings implements Cloneable {
         }
         m_start = settings.getDoubleArray(CFG_START, null);
         m_connect = settings.getBooleanArray(CFG_CONNECT, null);
+        m_fix = settings.getBooleanArray(CFG_FIX, DEFAULT_FIX_ARRAY);
         double[] stepTemp = settings.getDoubleArray(CFG_STEP, null);
         m_step = stepTemp == null ? null : stepTemp[0];
         boolean[] snapTemp = settings.getBooleanArray(CFG_SNAP, null);
@@ -754,6 +849,7 @@ public class SliderSettings implements Cloneable {
                 .append(m_range)
                 .append(m_start)
                 .append(m_connect)
+                .append(m_fix)
                 .append(m_step)
                 .append(m_snap)
                 .append(m_margin)
@@ -788,6 +884,7 @@ public class SliderSettings implements Cloneable {
                 .append(m_range, other.m_range)
                 .append(m_start, other.m_start)
                 .append(m_connect, other.m_connect)
+                .append(m_fix, other.m_fix)
                 .append(m_step, other.m_step)
                 .append(m_snap, other.m_snap)
                 .append(m_margin, other.m_margin)
@@ -818,7 +915,7 @@ public class SliderSettings implements Cloneable {
         settingsTo.m_range = settingsFrom.m_range == null ? null : new LinkedHashMap<String, double[]>();
         if (settingsFrom.m_range != null) {
             Iterator<Entry<String, double[]>> i = settingsFrom.m_range.entrySet().iterator();
-            while(i.hasNext()) {
+            while (i.hasNext()) {
                 Entry<String, double[]> entry = i.next();
                 double[] valueFrom = entry.getValue();
                 double[] value = valueFrom == null ? null : Arrays.copyOf(valueFrom, valueFrom.length);
@@ -826,15 +923,20 @@ public class SliderSettings implements Cloneable {
             }
         }
         settingsTo.m_range = (LinkedHashMap<String, double[]>)settingsFrom.m_range.clone();
-        settingsTo.m_start = settingsFrom.m_start == null ? null : Arrays.copyOf(settingsFrom.m_start, settingsFrom.m_start.length);
-        settingsTo.m_connect = settingsFrom.m_connect == null ? null : Arrays.copyOf(settingsFrom.m_connect, settingsFrom.m_connect.length);
+        settingsTo.m_start =
+            settingsFrom.m_start == null ? null : Arrays.copyOf(settingsFrom.m_start, settingsFrom.m_start.length);
+        settingsTo.m_connect = settingsFrom.m_connect == null ? null
+            : Arrays.copyOf(settingsFrom.m_connect, settingsFrom.m_connect.length);
+        settingsTo.m_fix = settingsFrom.m_fix == null ? null
+            : Arrays.copyOf(settingsFrom.m_fix, settingsFrom.m_fix.length);
         settingsTo.m_step = settingsFrom.m_step;
         settingsTo.m_snap = settingsFrom.m_snap;
         settingsTo.m_margin = settingsFrom.m_margin;
         settingsTo.m_limit = settingsFrom.m_limit;
         settingsTo.m_orientation = settingsFrom.m_orientation;
         settingsTo.m_direction = settingsFrom.m_direction;
-        settingsTo.m_tooltips = settingsFrom.m_tooltips == null ? null : Arrays.copyOf(settingsFrom.m_tooltips, settingsFrom.m_tooltips.length);
+        settingsTo.m_tooltips = settingsFrom.m_tooltips == null ? null
+            : Arrays.copyOf(settingsFrom.m_tooltips, settingsFrom.m_tooltips.length);
         if (settingsTo.m_tooltips != null) {
             for (int i = 0; i < settingsTo.m_tooltips.length; i++) {
                 if (settingsTo.m_tooltips[i] instanceof NumberFormatSettings) {

@@ -99,7 +99,7 @@ public class SliderNodeDialogUI {
     public static final String CFG_DOMAIN_COLUMN = "DOMAIN_COLUMN";
 
     private static final int DEFAULT_SPINNER_WIDTH = 20;
-    private static final String[] CONNECT_NAMES = new String[]{"Connect Lower", "Connect Middle", "Connect Upper"};
+    private static final String[] FIX_NAMES = new String[]{"Maximum", "Both", "Minimum"};
     private static final String[] HANDLE_NAMES = new String[]{"Minimum", "Middle", "Maximum"};
     private static final double DEFAULT_MINIMUM = 0;
     private static final double DEFAULT_MAXIMUM = 100;
@@ -125,7 +125,7 @@ public class SliderNodeDialogUI {
     /*Slider panel*/
     private final JCheckBox m_useStepCheckbox;
     private final JSpinner m_stepSpinner;
-    private final JCheckBox[] m_connectCheckboxes;
+    private final JRadioButton[] m_fixRadioButtons;
     private final JRadioButton m_orientationHorizontalButton;
     private final JRadioButton m_orientationVerticalButton;
     private final JRadioButton m_directionLTRButton;
@@ -225,15 +225,20 @@ public class SliderNodeDialogUI {
         });
         m_stepSpinner = new JSpinner(new SpinnerNumberModel(1, 0, Double.POSITIVE_INFINITY, 1));
         setSpinnerWidth(m_stepSpinner);
-        m_connectCheckboxes = new JCheckBox[numHandles+1];
+
+        m_fixRadioButtons = new JRadioButton[numHandles+1];
         for (int i = 0; i <= numHandles; i++) {
-            StringBuilder connectLabel = new StringBuilder(i == 0 ? CONNECT_NAMES[0] : i == numHandles ? CONNECT_NAMES[2] : CONNECT_NAMES[1]);
+            final int fI = i;
+            StringBuilder fixLabel = new StringBuilder(i == 0 ? FIX_NAMES[0] : i == numHandles ? FIX_NAMES[2] : FIX_NAMES[1]);
             if (numHandles > 2 && i != 0 && i != numHandles) {
-                connectLabel.append(" ");
-                connectLabel.append(i);
+                fixLabel.append(" ");
+                fixLabel.append(i);
             }
-            m_connectCheckboxes[i] = new JCheckBox(connectLabel.toString());
+            m_fixRadioButtons[i] = new JRadioButton(fixLabel.toString());
+            m_fixRadioButtons[i].addActionListener(arg0 -> setDomainValueOnFixValue(fI));
         }
+
+
         m_orientationHorizontalButton = new JRadioButton("Horizontal");
         m_orientationHorizontalButton.addChangeListener(new ChangeListener() {
             @Override
@@ -294,12 +299,7 @@ public class SliderNodeDialogUI {
 
         /*Pips panel*/
         m_ticksEnableCheckbox = new JCheckBox("Enable Labels and Ticks");
-        m_ticksEnableCheckbox.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(final ChangeEvent e) {
-                enablePipFields(false);
-            }
-        });
+        m_ticksEnableCheckbox.addChangeListener(e -> enablePipFields(false));
         m_ticksModeComboBox = new JComboBox<>(PipMode.values());
         m_ticksModeComboBox.addActionListener(new ActionListener() {
             @Override
@@ -346,11 +346,37 @@ public class SliderNodeDialogUI {
 
     private void setDomainExtendOnStartValue(final int i) {
         boolean calcDomain = m_startDomainExtendsCheckboxes[i].isSelected();
-        m_startValueSpinners[i].setEnabled(!calcDomain);
+        if(i == 0 && !m_fixRadioButtons[0].isSelected()) {
+            m_startValueSpinners[i].setEnabled(!calcDomain);
+        }
+        if(i == 1 && !m_fixRadioButtons[2].isSelected()) {
+            m_startValueSpinners[i].setEnabled(!calcDomain);
+        }
         if (calcDomain) {
             double min = (double)m_rangeMinValueSpinner.getValue();
             double max = (double)m_rangeMaxValueSpinner.getValue();
             m_startValueSpinners[i].setValue(calculateDomainExtendsStartValue(min, max, m_numHandles, i));
+        }
+    }
+
+    private void setDomainValueOnFixValue(final int i) {
+        switch (i) {
+            case 0:
+                m_startValueSpinners[0].setEnabled(false);
+                m_startDomainExtendsCheckboxes[0].setEnabled(false);
+                m_startDomainExtendsCheckboxes[1].setEnabled(true);
+                break;
+            case 1:
+                m_startDomainExtendsCheckboxes[0].setEnabled(true);
+                m_startDomainExtendsCheckboxes[1].setEnabled(true);
+                break;
+            case 2:
+                m_startDomainExtendsCheckboxes[0].setEnabled(true);
+                m_startValueSpinners[1].setEnabled(false);
+                m_startDomainExtendsCheckboxes[1].setEnabled(false);
+                break;
+            default:
+                break;
         }
     }
 
@@ -632,21 +658,22 @@ public class SliderNodeDialogUI {
         DialogUtil.addPairToPanel("", m_useStepCheckbox, panel, gbc);
         DialogUtil.addPairToPanel("Step Size", m_stepSpinner, panel, gbc);
 
-        JPanel connectPanel = new JPanel(new GridBagLayout());
+        ButtonGroup fixGroup = new ButtonGroup();
+        JPanel fixPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc2 = new GridBagConstraints();
         gbc2.anchor = GridBagConstraints.NORTHWEST;
         gbc2.fill = GridBagConstraints.HORIZONTAL;
         gbc2.gridx = gbc2.gridy = 0;
         gbc2.weightx = 0;
-        for (int i = 0; i < m_connectCheckboxes.length; i++) {
-        connectPanel.add(m_connectCheckboxes[i], gbc2);
+        for (int i = 0; i < m_fixRadioButtons.length; i++) {
+            fixPanel.add(m_fixRadioButtons[i], gbc2);
+            fixGroup.add(m_fixRadioButtons[i]);
             gbc2.gridx++;
-            if (i == m_connectCheckboxes.length - 1) {
+            if (i == m_fixRadioButtons.length - 1) {
                 gbc2.weightx = 1;
             }
         }
-
-        DialogUtil.addPairToPanel("Connect", connectPanel, panel, gbc);
+        DialogUtil.addPairToPanel("Set handle position:", fixPanel, panel, gbc);
 
         ButtonGroup orientationGroup = new ButtonGroup();
         orientationGroup.add(m_orientationHorizontalButton);
@@ -772,19 +799,20 @@ public class SliderNodeDialogUI {
             } else {
                 m_useStepCheckbox.setSelected(false);
             }
-            boolean[] connect = settings.getConnect();
-            if (connect != null) {
-                for (int i = 0; i < connect.length; i++) {
-                    m_connectCheckboxes[i].setSelected(connect[i]);
+
+            boolean[] fix = settings.getFix();
+            if (fix != null) {
+                for (int i = 0; i < fix.length; i++) {
+                    m_fixRadioButtons[i].setSelected(fix[i]);
                 }
             } else {
-                // enable connect for all odd numbers of connect fields
-                if (m_connectCheckboxes.length % 2 == 1) {
-                    for (int i = 0; i < m_connectCheckboxes.length; i++) {
-                        m_connectCheckboxes[i].setSelected(i % 2 == 1);
+                // enable fix for all odd numbers of fix fields
+                if (m_fixRadioButtons.length % 2 == 1) {
+                    for (int i = 0; i < m_fixRadioButtons.length; i++) {
+                        m_fixRadioButtons[i].setSelected(i % 2 == 1);
                     }
                 }
-                // no sensible default for even number of connect fields -> leave all unchecked
+                // no sensible default for even number of fix fields -> leave all unchecked
             }
 
             boolean vertical = settings.getOrientation() == Orientation.VERTICAL;
@@ -900,11 +928,13 @@ public class SliderNodeDialogUI {
             if (m_useStepCheckbox.isSelected()) {
                 settings.setStep((Double)m_stepSpinner.getValue());
             }
-            boolean[] connectArray = new boolean[m_connectCheckboxes.length];
-            for (int i = 0; i < m_connectCheckboxes.length; i++) {
-                connectArray[i] = m_connectCheckboxes[i].isSelected();
+
+            boolean[] fixArray = new boolean[m_fixRadioButtons.length];
+            for (int i = 0; i < m_fixRadioButtons.length; i++) {
+                fixArray[i] = m_fixRadioButtons[i].isSelected();
             }
-            settings.setConnect(connectArray);
+            settings.setFix(fixArray);
+
             settings.setOrientation(m_orientationVerticalButton.isSelected() ? Orientation.VERTICAL : Orientation.HORIZONTAL);
             settings.setDirection(m_directionRTLButton.isSelected() ? Direction.RTL : Direction.LTR);
             Object[] tooltipArray = new Object[m_tooltipsCheckboxes.length];
