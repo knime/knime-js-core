@@ -31,6 +31,7 @@ module.exports = {
         'computed-property-spacing': 'error',
         'consistent-return': 'warn',
         'consistent-this': ['warn', 'self'],
+        curly: 'error',
         'dot-notation': ['warn'],
         'eol-last': 'error',
         eqeqeq: 'error',
