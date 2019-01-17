@@ -5,7 +5,7 @@
         "es6": false
     },
     "parserOptions": {
-        "ecmaVersion": 5,
+        "ecmaVersion": 7,
         "sourceType": "script"
     },
     "globals": {
@@ -91,6 +91,7 @@
         "new-parens": "error",
         "no-array-constructor": "warn",
         "no-bitwise": "warn",
+        "no-console": "warn",
         "no-empty-function": [
             "error",
             {

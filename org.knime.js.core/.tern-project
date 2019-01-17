@@ -1,10 +1,36 @@
 {
   "ecmaVersion": 5,
+  "ide": {
+    "scriptPaths": [
+      {
+        "type": "FOLDER",
+        "path": "js-lib/knime/lazyLoading"
+      },
+      {
+        "type": "FOLDER",
+        "path": "js-lib/knime/pageBuilder"
+      },
+      {
+        "type": "FOLDER",
+        "path": "js-lib/knime/service"
+      },
+      {
+        "type": "FOLDER",
+        "path": "js-lib/knime/tableViewer"
+      }
+    ]
+  },
   "plugins": {
     "guess-types": {
       
     },
     "outline": {
+      
+    },
+    "eslint": {
+      "configFile": "eslint.json"
+    },
+    "requirejs": {
       
     },
     "bootstrap": {
