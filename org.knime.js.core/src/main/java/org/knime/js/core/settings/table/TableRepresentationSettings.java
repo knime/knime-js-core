@@ -666,7 +666,7 @@ public class TableRepresentationSettings {
         //added with 3.6
         m_maxRows = settings.getInt(CFG_MAX_ROWS, DEFAULT_MAX_ROWS);
 
-        //added with 3.7
+        //added with 3.8
         m_enableLazyLoading = settings.getBoolean(CFG_ENABLE_LAZY_LOADING, DEFAULT_ENABLE_LAZY_LOADING);
     }
 
@@ -712,7 +712,7 @@ public class TableRepresentationSettings {
         //added with 3.6
         settings.addInt(CFG_MAX_ROWS, m_maxRows);
 
-        //added with 3.7
+        //added with 3.8
         settings.addBoolean(CFG_ENABLE_LAZY_LOADING, m_enableLazyLoading);
     }
 
@@ -770,7 +770,7 @@ public class TableRepresentationSettings {
         //added with 3.6
         m_maxRows = settings.getInt(CFG_MAX_ROWS, DEFAULT_MAX_ROWS);
 
-        //added with 3.7
+        //added with 3.8
         m_enableLazyLoading = settings.getBoolean(CFG_ENABLE_LAZY_LOADING, DEFAULT_ENABLE_LAZY_LOADING);
     }
 
