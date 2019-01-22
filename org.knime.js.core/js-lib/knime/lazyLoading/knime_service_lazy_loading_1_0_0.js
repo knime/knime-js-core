@@ -11,7 +11,7 @@ window.initLazyLoading = function () {
     // const responseBuffer = [];
 
     let requestSequence = 0;
-    let pushSupported = false;
+    let pushSupported;
     
     if (!knimeService) {
         throw new Error('KNIME service is not defined.');
@@ -158,7 +158,10 @@ window.initLazyLoading = function () {
         }
     };
 
-    async function _requestViewUpdate(request, resolvable) {
+    const _requestViewUpdate = function (request, resolvable) {
+        if (typeof pushSupported === 'undefined') {
+            initPushSupported();
+        }
         try {
             let monitor;
             if (knimeService.isInteractivityAvailable()) {
@@ -180,9 +183,6 @@ window.initLazyLoading = function () {
             if (resolvable.promise) {
                 resolvable.promise.updateProgress(monitor);
             }
-            if (typeof pushSupported === 'undefined') {
-                initPushSupported();
-            }
             if (!pushSupported) {
                 initUpdateMonitorPolling(resolvable);
             }
@@ -197,7 +197,7 @@ window.initLazyLoading = function () {
                 resolvable.reject(exception);
             }
         }
-    }
+    };
 
     knimeService.requestViewUpdate = function (request, preserveOrder, notCancelable) {
         // let prevSequence = requestSequence;
@@ -214,7 +214,9 @@ window.initLazyLoading = function () {
         });
         resolvable.promise = promise;
         viewRequests.push(resolvable);
-        _requestViewUpdate(request, resolvable);
+        setTimeout(function () {
+            _requestViewUpdate(request, resolvable);
+        }, 0);
         return promise;
     };
 
