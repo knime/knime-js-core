@@ -1165,7 +1165,7 @@ public class JSONDataTable {
             if (m_maxRows == null) {
                 if (m_dataTable instanceof BufferedDataTable) {
                     //max rows defaults to include end of table
-                    long tableSizeToExtract = fullTableSize - m_firstRow - 1;
+                    long tableSizeToExtract = fullTableSize - (m_firstRow - 1);
                     if (tableSizeToExtract > Integer.MAX_VALUE) {
                         throw new IllegalArgumentException("The size of the chunk of the BufferedDataTable "
                             + "to extract exceeds the maximum size of the JSON table.");
