@@ -571,19 +571,18 @@ public class SliderSettings implements Cloneable {
             throw new InvalidSettingsException("At least one start value needs to be specified.");
         }
         for (double start : m_start) {
-            if (getFix()[0] && start > getRangeMaxValue()) {
-                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
-            } else if (getFix()[2] && start < getRangeMinValue()) {
-                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
-            } else if (getFix()[1] && (start < getRangeMinValue() || start > getRangeMaxValue())) {
-                throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+            if(getFix() != null) {
+                if (getFix()[0] && start > getRangeMaxValue()) {
+                    throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+                } else if (getFix()[2] && start < getRangeMinValue()) {
+                    throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+                } else if (getFix()[1] && (start < getRangeMinValue() || start > getRangeMaxValue())) {
+                    throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
+                }
             }
         }
         if (m_connect != null && m_connect.length != (m_start.length + 1)) {
             throw new InvalidSettingsException("The connect array length needs to be start array length + 1");
-        }
-        if (m_fix != null && m_fix.length != (m_start.length + 1)) {
-            throw new InvalidSettingsException("The fix array length needs to be start array length + 1");
         }
         if (m_tooltips != null) {
             if (m_tooltips.length != m_start.length) {
