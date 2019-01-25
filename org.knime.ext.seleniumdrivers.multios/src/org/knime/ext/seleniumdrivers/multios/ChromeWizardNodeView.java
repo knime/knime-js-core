@@ -395,6 +395,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
     }
 
     private void initView(final boolean forceFocus) {
+        initializeCometQuery();
         WizardViewCreator<REP, VAL> viewCreator = getModel().getViewCreator();
         String viewURL = new File(getModel().getViewHTMLPath()).toURI().toString();
         String repURL = m_repTempFile.toURI().toString();
@@ -407,7 +408,6 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         if (forceFocus) {
             m_driver.switchTo().window(m_windowHandle);
         }
-        initializeCometQuery();
     }
 
     /**
