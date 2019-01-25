@@ -80,6 +80,9 @@ window.KnimeBaseTableViewer = function () {
     this._rowIdColInd = null;
     // Map dataTable column indexes to knime table indexes.
     this._nonHiddenDataIndexes = [];
+    
+    this.DEFAULT_TIMEOUT = 500;
+    this.CHUNK_DURATION = 300;
 
     // register neutral ordering method for clear selection button
     $.fn.dataTable.Api.register('order.neutral()', function () {
@@ -95,6 +98,17 @@ window.KnimeBaseTableViewer = function () {
     });
 };
 
+window.KnimeBaseTableViewer.prototype._init = function () {
+    if (knimeService.isInteractivityAvailable()) {
+        this._drawTable();
+    } else {
+        var self = this;
+        $(document).ready(function () {
+            self._drawTable();
+        });
+    }
+};
+
 /**
  * Initialize the table viewer and draw the view. Framework method.
  *
@@ -108,14 +122,14 @@ window.KnimeBaseTableViewer.prototype.init = function (representation, value) {
     }
     this._representation = representation;
     this._value = value;
-
-    if (parent && parent.KnimePageLoader) {
-        this._drawTable();
-    } else {
+    
+    if (representation.enableLazyLoading && knimeService.isViewRequestsSupported()) {
         var self = this;
-        $(document).ready(function () {
-            self._drawTable();
+        knimeService.loadConditionally(['js-lib/knime/tableViewer/knime_base_table_viewer_lazy_load'], function () {
+            self._init();
         });
+    } else {
+        this._init();
     }
 };
 
@@ -563,75 +577,22 @@ window.KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function () {
     }
 };
 
-window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, settings) {
-    // TODO: evaluation needs to take into account order, filter, search
-    var win = [data.start, data.start + data.length - 1];
-    if (this._knimeTable) {
-        var cacheStart = this._knimeTable.getFragmentFirstRowIndex();
-        var cached = [cacheStart, cacheStart + this._knimeTable.getNumRows() - 1];
-        var included = cached[0] <= win[0] && cached[1] >= win[1];
-        if (included) {
-            this._lazyLoadResponse(data, callback);
-        } else {
-            var request = {
-                start: data.start,
-                length: data.length,
-                search: data.search,
-                order: data.order,
-                columns: data.columns
-            };
-            var tableViewer = this;
-            var promise = knimeService.requestViewUpdate(request);
-            
-            // TODO: this is ES6 syntax, needs to move to own file
-            promise.progress(monitor => {
-                if (monitor.progress) {
-                    var percent = (monitor.progress * 100).toFixed(0);
-                    $('knimePagedTable_processing').text('Processing... (' + percent + '%)');
-                }
-            }).then(response => {
-                if (response.error) {
-                    tableViewer._lazyLoadResponse(data, callback, response.error);
-                } else {
-                    tableViewer._knimeTable.mergeTables(response.table); tableViewer._lazyLoadResponse(data, callback);
-                }
-            }).catch(error => tableViewer._lazyLoadResponse(data, callback, error));
-        }
-    }
-};
-
-window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callback, error) {
-    var response = {
-        draw: data.draw
-    };
-    response.recordsTotal = this._knimeTable.getTotalRowCount();
-    response.recordsFiltered = this._knimeTable.getTotalFilteredRowCount();
-    if (error) {
-        response.error = error;
-        response.data = [];
-    } else {
-        var firstRow = data.start - this._knimeTable.getFragmentFirstRowIndex();
-        var lastRow = data.start + data.length;
-        response.data = this._getDataSlice(firstRow, lastRow);
-    }
-    callback(response);
-};
-
 /**
  * Builds a config object for DataTables
  */
 window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
+    var rep = this._representation;
     this._dataTableConfig = {
         columns: [],
         columnDefs: [],
         order: [],
-        paging: this._representation.enablePaging,
-        pageLength: this._representation.initialPageSize,
-        lengthMenu: this._representation.allowedPageSizes,
-        lengthChange: this._representation.enablePageSizeChange,
-        ordering: this._representation.enableSorting,
+        paging: rep.enablePaging,
+        pageLength: rep.initialPageSize,
+        lengthMenu: rep.allowedPageSizes,
+        lengthChange: rep.enablePageSizeChange,
+        ordering: rep.enableSorting,
         processing: true,
-        deferRender: !this._representation.enableSelection,
+        deferRender: !rep.enableSelection,
         buttons: [],
         fnDrawCallback: this._dataTableDrawCallback.bind(this),
         preDrawCallback: this._dataTablePreDrawCallback.bind(this),
@@ -642,9 +603,14 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
         }
     };
 
-    if (this._representation.enableLazyLoading) {
-        this._dataTableConfig.serverSide = true;
-        this._dataTableConfig.ajax = this._lazyLoadData.bind(this);
+    if (rep.enableLazyLoading) {
+        if (knimeService.isViewRequestsSupported()) {
+            this._dataTableConfig.serverSide = true;
+            this._dataTableConfig.ajax = this._lazyLoadData.bind(this);
+        } else {
+            alert('Table was set to load data lazily but current browser does not support this feature. ' +
+                'Only one page available');
+        }
     }
 
     this._buildSelection();
@@ -655,7 +621,7 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
         this._dataTableConfig.pageLength = this._value.pageSize;
     }
 
-    if (this._representation.pageSizeShowAll) {
+    if (rep.pageSizeShowAll) {
         var first = this._dataTableConfig.lengthMenu.slice(0);
         first.push(-1);
         var second = this._dataTableConfig.lengthMenu.slice(0);
@@ -667,7 +633,7 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
         this._dataTableConfig.order = this._value.currentOrder;
     }
 
-    if (this._representation.enableSorting && this._representation.enableClearSortButton) {
+    if (rep.enableSorting && rep.enableClearSortButton) {
         var unsortButton = {
             text: 'Clear Sorting',
             action: function (e, dt, node, config) {
@@ -683,10 +649,11 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
     // chunk
 
     // search is also used for filtering, so consider all possible options
-    this._dataTableConfig.searching = this._representation.enableSearching ||
-        this._representation.enableColumnSearching ||
-        (this._representation.enableSelection && (this._value.hideUnselected || this._representation.enableHideUnselected)) ||
-        (knimeService && knimeService.isInteractivityAvailable());
+    this._dataTableConfig.searching =
+        rep.enableSearching ||
+        rep.enableColumnSearching ||
+        rep.enableSelection && (this._value.hideUnselected || rep.enableHideUnselected) ||
+        knimeService && knimeService.isInteractivityAvailable();
 };
 
 /**
@@ -733,8 +700,9 @@ window.KnimeBaseTableViewer.prototype._buildMenu = function () {
         var hasTitle = typeof title !== 'undefined' && title !== null && title !== '';
         var subtitle = this._representation.subtitle;
         var hasSubtitle = typeof subtitle !== 'undefined' && subtitle !== null && subtitle !== '';
-
-        if ((searching && !hasTitle) || (!hasTitle && !hasSubtitle && !searching && (!paging || !sizeChange))) {
+        var justSearching = searching && !hasTitle;
+        var noHeaderComponents = !hasTitle && !hasSubtitle && !searching && (!paging || !sizeChange);
+        if (justSearching || noHeaderComponents) {
             knimeService.floatingHeader(false);
         }
 
@@ -883,7 +851,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
         // Handle click on "Select all" control
         var selectAllCheckbox = $('#checkbox-select-all').get(0);
         if (selectAllCheckbox) {
-            if (selectAllCheckbox.checked && ('indeterminate' in selectAllCheckbox)) {
+            if (selectAllCheckbox.checked && 'indeterminate' in selectAllCheckbox) {
                 selectAllCheckbox.indeterminate = this._value.selectAllIndeterminate;
             }
             selectAllCheckbox.addEventListener('click', function () {
@@ -976,7 +944,7 @@ window.KnimeBaseTableViewer.prototype._addDataToTable = function (startIndex, ch
             '<strong>Loading data (' + endIndex + ' of ' + tableSize + ' records)</strong> - Displaying ' + 1 + ' to ' +
                 Math.min(tableSize, this._representation.initialPageSize) + ' of ' + tableSize + ' entries.'
         );
-        if (chunkDuration > 300) {
+        if (chunkDuration > this.CHUNK_DURATION) {
             newChunkSize = Math.max(1, Math.floor(chunkSize / 2));
         } else if (chunkDuration < 100) {
             newChunkSize = chunkSize * 2;
@@ -1083,7 +1051,7 @@ window.KnimeBaseTableViewer.prototype._selectAll = function (all, ignoreSearch) 
         var self = this;
         setTimeout(function () {
             self._selectAll(all);
-        }, 500);
+        }, this.DEFAULT_TIMEOUT);
     }
 
     if (ignoreSearch) {
@@ -1209,7 +1177,7 @@ window.KnimeBaseTableViewer.prototype._selectionChanged = function (data) {
         var self = this;
         setTimeout(function () {
             self._selectionChanged(data);
-        }, 500);
+        }, this.DEFAULT_TIMEOUT);
     }
 
     // apply changeSet
@@ -1244,7 +1212,7 @@ window.KnimeBaseTableViewer.prototype._filterChanged = function (data) {
         var self = this;
         setTimeout(function () {
             self._filterChanged(data);
-        }, 500);
+        }, this.DEFAULT_TIMEOUT);
     }
     this._currentFilter = data;
     this._dataTable.draw();
