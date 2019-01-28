@@ -345,6 +345,10 @@ public class JSONDataTable {
                 // if we don't calculate the hash, then we don't need to process the rows which won't go into the json data table
                 if (currentRowNumber < m_firstRow) {
                     // skip all rows until we see the specified first row
+                    if (execMon != null) {
+                        execMon.setProgress(((double)currentRowNumber) / (m_firstRow + numOfRows),
+                            "Creating JSON table. Skipping row " + currentRowNumber + " of " + (m_firstRow - 1));
+                    }
                     continue;
                 }
                 if (currentRowNumber - m_firstRow + 1 > m_maxRows) {
@@ -439,7 +443,7 @@ public class JSONDataTable {
             }
 
             if (execMon != null) {
-                execMon.setProgress(((double)currentRowNumber - m_firstRow) / numOfRows,
+                execMon.setProgress(((double)currentRowNumber) / (m_firstRow + numOfRows),
                     "Creating JSON table. Processing row " + (currentRowNumber - m_firstRow) + " of " + numOfRows);
             }
         }
