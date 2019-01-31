@@ -83,6 +83,7 @@ import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JSCorePlugin;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
@@ -169,6 +170,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 m_driver = null;
             } catch (Exception e) { /* continue shutdown */ }
         }
+        cancelOutstandingViewRequests();
         if (getViewableModel() instanceof SubnodeViewableModel) {
             ((SubnodeViewableModel)getViewableModel()).discard();
         }
@@ -185,7 +187,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         // delete current representation and value files
         tryDeleteTempFiles(false);
         // force reload of bridge in view
-        m_driver.executeScript("seleniumKnimeBridge.clearView()");
+        executeScript("seleniumKnimeBridge.clearView()");
         WizardNode<REP,VAL> model = getModel();
         // write potentially changed representation and value to disk (leave bridge file in place)
         writeTempViewFiles(model.getViewRepresentation(), model.getViewValue(), model.getViewCreator(), null);
@@ -402,7 +404,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         String valURL = m_valTempFile.toURI().toString();
         String initCall = viewCreator.wrapInTryCatch(viewCreator.createInitJSViewMethodCall(false, null, null));
         // pass arguments 'nicely' to init method
-        m_driver.executeScript(
+        executeScript(
             "seleniumKnimeBridge.initView(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);",
             viewURL, repURL, valURL, m_viewTitle, initCall);
         if (forceFocus) {
@@ -529,7 +531,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             /* continue */ }
     }
 
-    private void tryDeleteTempFile(final File fileToDelete) {
+    private static void tryDeleteTempFile(final File fileToDelete) {
         try {
             if (fileToDelete != null && fileToDelete.exists()) {
                 fileToDelete.delete();
@@ -572,10 +574,25 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 } catch (Exception ignore) {
                     /* nothing to do at this point */ }
                 m_driver = null;
+                cancelOutstandingViewRequests();
                 return false;
             }
         }
         return false;
+    }
+
+    private synchronized Object executeScript(final String script, final Object... args) {
+        boolean alive = testAlive();
+        if (alive && m_driver != null) {
+            try {
+                return m_driver.executeScript(script, args);
+            } catch (Exception e) {
+                if (!(e instanceof NoSuchSessionException)) {
+                    LOGGER.error("Error executing script in view: " + e.getMessage(), e);
+                }
+            }
+        }
+        return null;
     }
 
     private void initializeCometQuery() {
@@ -635,17 +652,14 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                                         showCloseDialog();
                                     } else {
                                         closeView();
-                                        //m_shutdownCometThread.set(true);
                                     }
                                 } else if (ChromeViewService.CLOSE_APPLY_BUTTON_PRESSED.equals(action)) {
                                     if (applyTriggered(false)) {
                                         closeView();
-                                        //m_shutdownCometThread.set(true);
                                     }
                                 } else if (ChromeViewService.CLOSE_APPLY_DEFAULT_BUTTON_PRESSED.equals(action)) {
                                     if (applyTriggered(true)) {
                                         closeView();
-                                        //m_shutdownCometThread.set(true);
                                     }
                                 } else if (ChromeViewService.CLOSE_DISCARD_BUTTON_PRESSED.equals(action)) {
                                     closeView();
@@ -718,7 +732,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             String evalCode = creator
                 .wrapInTryCatch("return JSON.stringify(" + creator.getNamespacePrefix() + validateMethod + "());");
             String validString =
-                (String)m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
+                (String)executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
             valid = Boolean.parseBoolean(validString);
         }
         return valid;
@@ -737,8 +751,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         if (ns != null && !ns.isEmpty() && pullMethod != null && !pullMethod.isEmpty()) {
             String evalCode = creator.wrapInTryCatch("if (typeof " + ns.substring(0, ns.length() - 1)
                 + " != 'undefined') { return JSON.stringify(" + ns + pullMethod + "());}");
-            jsonString =
-                (String)m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
+            jsonString = (String)executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
         }
         return jsonString;
     }
@@ -754,7 +767,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
         String showErrorCall =
             creator.wrapInTryCatch(creator.getNamespacePrefix() + showErrorMethod + "('" + escapedError + "');");
-        m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", showErrorCall);
+        executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", showErrorCall);
     }
 
     /**
@@ -785,13 +798,13 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 // in case of large responses write temp file and load that
                 File responseFile = writeTempFileForViewResponse(toBeUpdated, creator);
                 String responseURL = responseFile.toURI().toString();
-                m_driver.executeScript("return seleniumKnimeBridge." + methodCall + "(arguments[0])", responseURL);
+                executeScript("return seleniumKnimeBridge." + methodCall + "(arguments[0])", responseURL);
                 m_lastResponseTempFile = responseFile;
             } else {
                 // small responses can be handled directly in an execute call
                 String call = "KnimeInteractivity." + methodCall + "(JSON.parse('" + toBeUpdated + "'));";
                 call = creator.wrapInTryCatch(call);
-                m_driver.executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", call);
+                executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", call);
             }
         }
     }
@@ -816,11 +829,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String optionsString = mapper.writeValueAsString(options);
-            testAlive();
-            if (m_driver != null) {
-                m_driver.executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);",
-                    title, message, optionsString);
-            }
+            executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);",
+                title, message, optionsString);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Could not trigger confirm close dialog: " + ex.getMessage(), ex);
         }
