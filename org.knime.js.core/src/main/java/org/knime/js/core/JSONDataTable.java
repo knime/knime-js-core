@@ -78,6 +78,7 @@ import org.knime.core.data.IntValue;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.NominalValue;
 import org.knime.core.data.RowIterator;
+import org.knime.core.data.RowIteratorBuilder;
 import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.date.DateAndTimeCellFactory;
@@ -325,7 +326,9 @@ public class JSONDataTable {
             }
         }
 
-        RowIterator rIter = m_dataTable.iterator();
+        RowIteratorBuilder<? extends RowIterator> iterBuilder = m_dataTable.iteratorBuilder();
+        iterBuilder.filterColumns(includeColIndices.stream().mapToInt(Integer::intValue).toArray());
+        RowIterator rIter = iterBuilder.build();
         int currentRowNumber = 0;
         int numRows = 0;
 
@@ -337,6 +340,9 @@ public class JSONDataTable {
             // get the next row
             DataRow row = rIter.next();
             currentRowNumber++;
+            if (execMon != null) {
+                execMon.checkCanceled();
+            }
 
             String rowKey = row.getKey().getString();
             if (m_calculateDataHash) {
@@ -390,7 +396,7 @@ public class JSONDataTable {
 
                 if (includeColumn && !excludeRow) {
                     // do only for those values which will go into the json data table
-
+                    //DataCell cell = row.getCell(col);
                     currentRow.getData()[c] = cellValue;
 
                     if (cellValue != null) {
@@ -448,9 +454,6 @@ public class JSONDataTable {
             }
         }
 
-        // TODO: remove extensions?
-        Object[][] extensionArray = null;
-
         JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows);
         jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
@@ -467,7 +470,6 @@ public class JSONDataTable {
 
         setSpec(jsonTableSpec);
         setRows(rowList.toArray(new JSONDataTableRow[0]));
-        setExtensions(extensionArray);
 
         if(m_excludeColumnsWithMissingValues) {
             removeMissingValueColumns();
@@ -838,20 +840,6 @@ public class JSONDataTable {
      */
     public void setRows(final JSONDataTableRow[] rows) {
         m_rows = rows;
-    }
-
-    /**
-     * @return the extension defined on the table
-     */
-    public Object[][] getExtensions() {
-        return m_extensions;
-    }
-
-    /**
-     * @param extensions the extensions to set on the table
-     */
-    public void setExtensions(final Object[][] extensions) {
-        m_extensions = extensions;
     }
 
     /**

@@ -8,6 +8,20 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/main/java/org/knime/js/core/JSONDataTable.java" type="org.knime.js.core.JSONDataTable">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.JSONDataTable"/>
+                <message_argument value="getExtensions()"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.JSONDataTable"/>
+                <message_argument value="setExtensions(Object[][])"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/main/java/org/knime/js/core/JSONDataTable.java" type="org.knime.js.core.JSONDataTable$Builder">
         <filter id="338792546">
             <message_arguments>
