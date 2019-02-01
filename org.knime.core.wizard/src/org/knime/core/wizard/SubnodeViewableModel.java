@@ -382,14 +382,24 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
          */
     }
 
-    private static class SubnodeWizardViewCreator extends JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> {
+    /**
+     * {@link JavaScriptViewCreator} for wrapped metanodes (i.e. composite views).
+     *
+     * @noreference This class is not intended to be referenced by clients.
+     *
+     * @since 3.8
+     */
+    public static final class SubnodeWizardViewCreator extends JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> {
 
-        public SubnodeWizardViewCreator() {
+        private SubnodeWizardViewCreator() {
             super(null);
             setWebTemplate(createSubnodeWebTemplate());
         }
 
-        private static WebTemplate createSubnodeWebTemplate() {
+        /**
+         * @return the template for the composite view of a wrapped metanode
+         */
+        public static WebTemplate createSubnodeWebTemplate() {
             List<WebResourceLocator> locators = new ArrayList<WebResourceLocator>();
             String pluginName = "org.knime.js.core";
             boolean isDebug = isDebug();
