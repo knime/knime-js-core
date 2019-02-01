@@ -180,6 +180,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
     @Override
     protected void modelChanged() {
         m_shutdownCometThread.set(true);
+        cancelOutstandingViewRequests();
         if (m_driver == null || !testAlive()) {
             // view most likely disposed
             return;
