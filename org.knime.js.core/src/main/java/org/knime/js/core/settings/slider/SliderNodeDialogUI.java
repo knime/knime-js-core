@@ -874,12 +874,17 @@ public class SliderNodeDialogUI {
         }
         if (m_startValuePanelUsed) {
             Double previousValue = null;
+            boolean[] fixArray = new boolean[m_fixRadioButtons.length];
+            for (int i = 0; i < m_fixRadioButtons.length; i++) {
+                fixArray[i] = m_fixRadioButtons[i].isSelected();
+            }
+
             for (int i = 0; i < m_startValueSpinners.length; i++) {
                 double currentValue = (double)m_startValueSpinners[i].getValue();
-                if (rangeMin != null && currentValue < rangeMin) {
+                if (rangeMin != null && currentValue < rangeMin && !fixArray[0]) {
                     throw new InvalidSettingsException("Default value can not be smaller than range minimum.");
                 }
-                if (rangeMax != null && currentValue > rangeMax) {
+                if (rangeMin != null && currentValue < rangeMin && !fixArray[0]) {
                     throw new InvalidSettingsException("Default value can not be larger than range maximum");
                 }
                 if (previousValue != null && currentValue < previousValue) {
