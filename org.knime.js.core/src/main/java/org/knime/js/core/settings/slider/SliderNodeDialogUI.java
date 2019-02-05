@@ -365,15 +365,21 @@ public class SliderNodeDialogUI {
                 m_startValueSpinners[0].setEnabled(false);
                 m_startDomainExtendsCheckboxes[0].setEnabled(false);
                 m_startDomainExtendsCheckboxes[1].setEnabled(true);
+                m_startValueSpinners[1].setValue(m_rangeMaxValueSpinner.getValue());
+                m_startValueSpinners[0].setValue(Double.NEGATIVE_INFINITY);
                 break;
             case 1:
                 m_startDomainExtendsCheckboxes[0].setEnabled(true);
                 m_startDomainExtendsCheckboxes[1].setEnabled(true);
+                m_startValueSpinners[0].setValue(m_rangeMinValueSpinner.getValue());
+                m_startValueSpinners[1].setValue(m_rangeMaxValueSpinner.getValue());
                 break;
             case 2:
                 m_startDomainExtendsCheckboxes[0].setEnabled(true);
                 m_startValueSpinners[1].setEnabled(false);
                 m_startDomainExtendsCheckboxes[1].setEnabled(false);
+                m_startValueSpinners[0].setValue(m_rangeMinValueSpinner.getValue());
+                m_startValueSpinners[1].setValue(Double.POSITIVE_INFINITY);
                 break;
             default:
                 break;
@@ -884,7 +890,7 @@ public class SliderNodeDialogUI {
                 if (rangeMin != null && currentValue < rangeMin && !fixArray[0]) {
                     throw new InvalidSettingsException("Default value can not be smaller than range minimum.");
                 }
-                if (rangeMin != null && currentValue < rangeMin && !fixArray[0]) {
+                if (rangeMax != null && currentValue > rangeMax && !fixArray[2]) {
                     throw new InvalidSettingsException("Default value can not be larger than range maximum");
                 }
                 if (previousValue != null && currentValue < previousValue) {
