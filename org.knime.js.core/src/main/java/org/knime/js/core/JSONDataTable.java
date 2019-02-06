@@ -248,7 +248,8 @@ public class JSONDataTable {
         buildJSONTable(execMon);
     }
 
-    private void buildJSONTable(final ExecutionMonitor execMon) throws CanceledExecutionException, IllegalArgumentException {
+    private void buildJSONTable(final ExecutionMonitor execMon)
+        throws CanceledExecutionException, IllegalArgumentException {
         if (m_dataTable == null) {
             throw new NullPointerException("Must provide non-null data table"
                     + " for DataArray");
@@ -327,7 +328,9 @@ public class JSONDataTable {
         }
 
         RowIteratorBuilder<? extends RowIterator> iterBuilder = m_dataTable.iteratorBuilder();
-        iterBuilder.filterColumns(includeColIndices.stream().mapToInt(Integer::intValue).toArray());
+        if (!m_calculateDataHash) {
+            iterBuilder.filterColumns(includeColIndices.stream().mapToInt(Integer::intValue).toArray());
+        }
         RowIterator rIter = iterBuilder.build();
         int currentRowNumber = 0;
         int numRows = 0;
@@ -369,12 +372,12 @@ public class JSONDataTable {
             // add cells, check min, max values and possible values for each column
             int c = 0;  // index for includeColIndices
             for (int col = 0; col < spec.getNumColumns(); col++) {
-                DataCell cell = row.getCell(col);
                 // whether the current column is included into JSON data table
                 boolean includeColumn = c < includeColIndices.size() ? includeColIndices.get(c) == col : false;
 
                 Object cellValue = null;
                 if (includeColumn || m_calculateDataHash) {
+                    DataCell cell = row.getCell(col);
                     // if we don't calculate the hash, then we don't need to process the columns which won't
                     // go into the json data table
                     if (cell.isMissing()) {
@@ -395,6 +398,7 @@ public class JSONDataTable {
                 }
 
                 if (includeColumn && !excludeRow) {
+                    DataCell cell = row.getCell(col);
                     // do only for those values which will go into the json data table
                     //DataCell cell = row.getCell(col);
                     currentRow.getData()[c] = cellValue;
@@ -506,6 +510,11 @@ public class JSONDataTable {
                 m_spec.removeColumn(colToRemove);
             }
         }
+    }
+
+    private void buildJSONTableFromCache(final DataRow[] cachedRows, final DataTableSpec tableSpec,
+        final ExecutionMonitor exec) throws CanceledExecutionException, IllegalArgumentException {
+
     }
 
     /**
@@ -973,7 +982,9 @@ public class JSONDataTable {
     public static class Builder {
 
         private String m_id = null;
+        private DataTableSpec m_tableSpec = null;
         private DataTable m_dataTable = null;
+        private DataRow[] m_dataRows = null;
         private Long m_firstRow = null;
         private Integer m_maxRows = null;
         private Long m_filteredRows = null;
@@ -1004,6 +1015,22 @@ public class JSONDataTable {
          */
         public Builder setDataTable(final DataTable dataTable) {
             m_dataTable = dataTable;
+            m_tableSpec = dataTable.getDataTableSpec();
+            return this;
+        }
+
+        /**
+         * Sets an array of already accessed in-memory data rows. This should be used in conjunction with a row cache
+         * to not iterate over a whole table when building. Setting this option will lead to not considering a possibly
+         * present data table.
+         * @param dataRows the array of rows (possibly retrieved from a cache)
+         * @param tableSpec the table spec that corresponds to the array of rows
+         * @return This builder instance, which can be used for method chaining.
+         * @since 3.8
+         */
+        public Builder setDataRows(final DataRow[] dataRows, final DataTableSpec tableSpec) {
+            m_dataRows = dataRows;
+            m_tableSpec = tableSpec;
             return this;
         }
 
@@ -1135,7 +1162,7 @@ public class JSONDataTable {
          */
         public JSONDataTable build(final ExecutionMonitor exec) throws CanceledExecutionException, IllegalArgumentException {
             JSONDataTable result = new JSONDataTable();
-            if (m_dataTable == null) {
+            if (m_dataTable == null  && m_dataRows == null) {
                 throw new IllegalArgumentException("Must provide non-null data table for JSONDataTable construction.");
             }
             result.m_dataTable = m_dataTable;
