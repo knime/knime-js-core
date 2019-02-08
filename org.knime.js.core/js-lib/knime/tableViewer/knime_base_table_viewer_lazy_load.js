@@ -18,9 +18,14 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 columns: data.columns
             };
             const self = this;
-            $('#knimePagedTable_processing').text('Processing...');
+            $('#knimePagedTable_processing').text('Processing...').prop('title', '');
+            if (this._runningRequest) {
+                this._runningRequest.cancel();
+            }
             let promise = knimeService.requestViewUpdate(request);
+            this._runningRequest = promise;
             promise.progress(monitor => {
+                $('#knimePagedTable_processing').prop('title', monitor.progressMessage ? monitor.progressMessage : '');
                 if (monitor.progress) {
                     let percent = (monitor.progress * 100).toFixed(0);
                     $('#knimePagedTable_processing').text('Processing... (' + percent + '%)');
@@ -32,12 +37,17 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                     self._knimeTable.mergeTables(response.table);
                     self._lazyLoadResponse(data, callback);
                 }
-            }).catch(error => self._lazyLoadResponse(data, callback, error));
+            }).catch(error => {
+                knimeService.logError(error);
+                alert('Could not load data: ' + error);
+                self._lazyLoadResponse(data, callback, error);
+            });
         }
     }
 };
 
 window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callback, error) {
+    this._runningRequest = null;
     let response = {
         draw: data.draw
     };
