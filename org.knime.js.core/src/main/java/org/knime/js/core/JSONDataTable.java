@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -63,10 +64,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.knime.base.data.xml.SvgCell;
+import org.knime.base.data.xml.SvgCellFactory;
 import org.knime.base.data.xml.SvgValue;
 import org.knime.core.data.BooleanValue;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.DataColumnDomain;
 import org.knime.core.data.DataColumnSpec;
 import org.knime.core.data.DataRow;
 import org.knime.core.data.DataTable;
@@ -83,7 +85,7 @@ import org.knime.core.data.StringValue;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.date.DateAndTimeCellFactory;
 import org.knime.core.data.date.DateAndTimeValue;
-import org.knime.core.data.def.BooleanCell;
+import org.knime.core.data.def.BooleanCell.BooleanCellFactory;
 import org.knime.core.data.def.DefaultRow;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.def.IntCell;
@@ -265,41 +267,11 @@ public class JSONDataTable {
 
         MessageDigest md5Digest = m_calculateDataHash ? DigestUtils.getMd5Digest() : null;
 
-        int numOfColumns = 0;
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
         ArrayList<String> hiddenColumns = new ArrayList<String>();
         List<String> excludedColumns = new ArrayList<String>();
         DataTableSpec spec = m_dataTable.getDataTableSpec();
-        for (int i = 0; i < spec.getNumColumns(); i++) {
-            final DataColumnSpec colSpec = spec.getColumnSpec(i);
-            final String colName = colSpec.getName();
-            boolean include = true;
-            if (m_includeColumns != null) {
-                include &= Arrays.asList(m_includeColumns).contains(colName);
-            } else if (m_excludeColumns != null) {
-                include &= !Arrays.asList(m_excludeColumns).contains(colName);
-            }
-
-            // We need to always include filterable columns in order to allow view updates when the filter changes
-            if (m_keepFilterColumns && colSpec.getFilterHandler().isPresent()) {
-                // Inform the view that this column should not be displayed
-                if (!include) {
-                    hiddenColumns.add(colName);
-                }
-                include = true;
-            }
-
-            if (include) {
-                includeColIndices.add(i);
-                numOfColumns++;
-            } else {
-                excludedColumns.add(colName);
-            }
-            if (m_calculateDataHash) {
-                DigestUtils.updateDigest(md5Digest, colName);
-                DigestUtils.updateDigest(md5Digest, colSpec.getType().toString());
-            }
-        }
+        int numOfColumns = determineColumns(includeColIndices, hiddenColumns, excludedColumns, spec, md5Digest);
         m_columnsRemoved = excludedColumns.toArray(new String[0]);
         long numOfRows = m_maxRows;
         if (m_dataTable instanceof BufferedDataTable) {
@@ -479,9 +451,45 @@ public class JSONDataTable {
             removeMissingValueColumns();
         }
 
-        if (m_calculateDataHash) {
+        if (m_calculateDataHash && md5Digest != null) {
             m_dataHash = Optional.of(Hex.encodeHexString(md5Digest.digest()));
         }
+    }
+
+    private int determineColumns(final ArrayList<Integer> includeColIndices, final ArrayList<String> hiddenColumns,
+        final List<String> excludedColumns, final DataTableSpec spec, final MessageDigest md5Digest) {
+        int numOfColumns = 0;
+        for (int i = 0; i < spec.getNumColumns(); i++) {
+            final DataColumnSpec colSpec = spec.getColumnSpec(i);
+            final String colName = colSpec.getName();
+            boolean include = true;
+            if (m_includeColumns != null) {
+                include &= Arrays.asList(m_includeColumns).contains(colName);
+            } else if (m_excludeColumns != null) {
+                include &= !Arrays.asList(m_excludeColumns).contains(colName);
+            }
+
+            // We need to always include filterable columns in order to allow view updates when the filter changes
+            if (m_keepFilterColumns && colSpec.getFilterHandler().isPresent()) {
+                // Inform the view that this column should not be displayed
+                if (!include) {
+                    hiddenColumns.add(colName);
+                }
+                include = true;
+            }
+
+            if (include) {
+                includeColIndices.add(i);
+                numOfColumns++;
+            } else {
+                excludedColumns.add(colName);
+            }
+            if (m_calculateDataHash) {
+                DigestUtils.updateDigest(md5Digest, colName);
+                DigestUtils.updateDigest(md5Digest, colSpec.getType().toString());
+            }
+        }
+        return numOfColumns;
     }
 
     private synchronized void removeMissingValueColumns() {
@@ -512,9 +520,105 @@ public class JSONDataTable {
         }
     }
 
-    private void buildJSONTableFromCache(final DataRow[] cachedRows, final DataTableSpec tableSpec,
-        final ExecutionMonitor exec) throws CanceledExecutionException, IllegalArgumentException {
+    private void buildJSONTableFromCache(final DataRow[] cachedRows, final ExecutionMonitor exec)
+            throws CanceledExecutionException, IllegalArgumentException {
+        if (m_dataTable == null) {
+            throw new NullPointerException("Must provide non-null data table");
+        }
+        DataTableSpec spec = m_dataTable.getDataTableSpec();
+        if (m_firstRow < 1) {
+            throw new IllegalArgumentException("Starting row must be greater than zero");
+        }
+        if (m_maxRows < 0) {
+            throw new IllegalArgumentException("Number of rows to read must be greater than or equal zero");
+        }
+        //TODO add cache checks
 
+        ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
+        ArrayList<String> hiddenColumns = new ArrayList<String>();
+        List<String> excludedColumns = new ArrayList<String>();
+        int numOfColumns = determineColumns(includeColIndices, hiddenColumns, excludedColumns, spec, null);
+        m_columnsRemoved = excludedColumns.toArray(new String[0]);
+
+        String[] rowColors = new String[cachedRows.length];
+        Double[] rowSizes = new Double[cachedRows.length];
+        JSONDataTableRow[] rows = new JSONDataTableRow[cachedRows.length];
+
+        Object[] minJSONValues = new Object[numOfColumns];
+        Object[] maxJSONValues = new Object[numOfColumns];
+        Vector<LinkedHashSet<Object>> possValues = new Vector<LinkedHashSet<Object>>();
+        possValues.setSize(numOfColumns);
+        String[] filterIds = new String[numOfColumns];
+        boolean[] containsMissingValues = new boolean[numOfColumns];
+
+        for (int c = 0; c < numOfColumns; c++) {
+            DataColumnSpec columnSpec = spec.getColumnSpec(includeColIndices.get(c));
+            DataColumnDomain domain = columnSpec.getDomain();
+            if (domain != null) {
+                if (columnSpec.getType().isCompatible(NominalValue.class)) {
+                    possValues.set(c, new LinkedHashSet<Object>());
+                    if (domain.getValues() != null) {
+                        possValues.get(c).addAll(columnSpec.getDomain().getValues().stream()
+                            .map(cell -> getJSONCellValue(cell)).collect(Collectors.toSet()));
+                    }
+                }
+                if (domain.hasLowerBound()) {
+                    minJSONValues[c] = getJSONCellValue(domain.getLowerBound());
+                }
+                if (domain.hasUpperBound()) {
+                    maxJSONValues[c] = getJSONCellValue(domain.getUpperBound());
+                }
+            }
+            if (columnSpec.getFilterHandler().isPresent()) {
+                filterIds[c] = columnSpec.getFilterHandler().get().getModel().getFilterUUID().toString();
+            }
+        }
+
+        for (int currentRow = 0; currentRow < cachedRows.length; currentRow++) {
+            DataRow row = cachedRows[currentRow];
+            if (exec != null) {
+                exec.checkCanceled();
+                exec.setProgress(currentRow/Math.max(1.0, cachedRows.length));
+            }
+
+            String rowKey = row.getKey().getString();
+            JSONDataTableRow jsonRow = new JSONDataTableRow(rowKey, numOfColumns);
+
+            int c = 0;
+            for (int col : includeColIndices) {
+                // this assumes that the cache was retrieved from the underlying DataTable with the same columns
+                DataCell cell = row.getCell(col);
+                jsonRow.getData()[c++] = getJSONCellValue(cell);
+            }
+            rows[currentRow] = jsonRow;
+            if (m_extractRowColors) {
+                rowColors[currentRow] = CSSUtils.cssHexStringFromColor(spec.getRowColor(row).getColor());
+            }
+            if (m_extractRowSizes) {
+                rowSizes[currentRow] = spec.getRowSizeFactor(row);
+            }
+        }
+
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), rows.length);
+        jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
+        jsonTableSpec.setMinValues(minJSONValues);
+        jsonTableSpec.setMaxValues(maxJSONValues);
+        jsonTableSpec.setPossibleValues(possValues);
+        if (m_extractRowColors) {
+            jsonTableSpec.setRowColorValues(rowColors);
+        }
+        if (m_extractRowSizes) {
+            jsonTableSpec.setRowSizeValues(rowSizes);
+        }
+        jsonTableSpec.setFilterIds(filterIds);
+        jsonTableSpec.setContainsMissingValues(containsMissingValues);
+
+        setSpec(jsonTableSpec);
+        setRows(rows);
+
+        if (exec != null) {
+            exec.setProgress(1.0);
+        }
     }
 
     /**
@@ -532,7 +636,7 @@ public class JSONDataTable {
                 DataType type = spec.getColumnSpec(colId).getType();
                 if (type.isCompatible(SvgValue.class)) {
                     try {
-                        dataCells[colId] = new SvgCell(value.toString());
+                        dataCells[colId] = SvgCellFactory.create(value.toString());
                     } catch (IOException e) {
                         dataCells[colId] = new MissingCell(e.getMessage());
                     }
@@ -549,7 +653,7 @@ public class JSONDataTable {
                     if (bVal == null) {
                         dataCells[colId] = new MissingCell("Value " + value + "could not be parsed as boolean.");
                     } else {
-                        dataCells[colId] = BooleanCell.get(bVal);
+                        dataCells[colId] = BooleanCellFactory.create(bVal);
                     }
                 } else if (type.isCompatible(DateAndTimeValue.class)) {
                     Long lVal = null;
@@ -897,11 +1001,21 @@ public class JSONDataTable {
         /** Empty serialization constructor. Don't use.*/
         public JSONDataTableRow() { }
 
+        /**
+         * Creates a new table row
+         * @param rowKey the row key (not null)
+         * @param numColumns number of columns in this row (not negative)
+         */
         public JSONDataTableRow(final String rowKey, final int numColumns) {
             m_rowKey = rowKey;
             m_data = new Object[numColumns];
         }
 
+        /**
+         * Creates a new table row
+         * @param rowKey the row key (not null)
+         * @param data the JSON serializable cell data for this row
+         */
         public JSONDataTableRow(final String rowKey, final Object[] data) {
             m_rowKey = rowKey;
             m_data = data;
@@ -982,7 +1096,6 @@ public class JSONDataTable {
     public static class Builder {
 
         private String m_id = null;
-        private DataTableSpec m_tableSpec = null;
         private DataTable m_dataTable = null;
         private DataRow[] m_dataRows = null;
         private Long m_firstRow = null;
@@ -1015,22 +1128,20 @@ public class JSONDataTable {
          */
         public Builder setDataTable(final DataTable dataTable) {
             m_dataTable = dataTable;
-            m_tableSpec = dataTable.getDataTableSpec();
             return this;
         }
 
         /**
          * Sets an array of already accessed in-memory data rows. This should be used in conjunction with a row cache
-         * to not iterate over a whole table when building. Setting this option will lead to not considering a possibly
-         * present data table.
+         * to not iterate over a whole table when building. Setting this option will lead to not extracting the JSON
+         * data from the set DataTable directly.
+         *
          * @param dataRows the array of rows (possibly retrieved from a cache)
-         * @param tableSpec the table spec that corresponds to the array of rows
          * @return This builder instance, which can be used for method chaining.
          * @since 3.8
          */
-        public Builder setDataRows(final DataRow[] dataRows, final DataTableSpec tableSpec) {
+        public Builder setDataRows(final DataRow[] dataRows) {
             m_dataRows = dataRows;
-            m_tableSpec = tableSpec;
             return this;
         }
 
@@ -1238,7 +1349,11 @@ public class JSONDataTable {
             if (m_calculateDataHash != null) {
                 result.m_calculateDataHash = m_calculateDataHash;
             }
-            result.buildJSONTable(exec);
+            if (m_dataRows != null) {
+                result.buildJSONTableFromCache(m_dataRows, exec);
+            } else {
+                result.buildJSONTable(exec);
+            }
             return result;
         }
 
