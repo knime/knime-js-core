@@ -791,6 +791,9 @@ public class JSONDataTable {
     }
 
     private static Object getJSONCellValue(final DataCell cell) {
+        if (cell.isMissing()) {
+            return null;
+        }
         JSTypes jsType = JSONDataTableSpec.getJSONType(cell.getType());
         switch (jsType) {
             case BOOLEAN:
