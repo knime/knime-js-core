@@ -58,7 +58,7 @@ window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callba
         response.data = [];
     } else {
         let firstRow = data.start - this._knimeTable.getFragmentFirstRowIndex();
-        let lastRow = data.start + data.length;
+        let lastRow = firstRow + data.length;
         response.data = this._getDataSlice(firstRow, lastRow);
     }
     callback(response);
