@@ -228,6 +228,11 @@ window.kt = function () {
             dataTable.rows = dataTable.rows.concat(mergeTable.rows);
             dataTable.spec.rowColorValues = dataTable.spec.rowColorValues.concat(mergeTable.spec.rowColorValues);
             dataTable.spec.numRows += mergeTable.spec.numRows;
+        } else if (mergeTable.fragmentFirstRowIndex + mergeTable.spec.numRows === dataTable.fragmentFirstRowIndex) {
+            mergeTable.rows = mergeTable.rows.concat(dataTable.rows);
+            mergeTable.spec.rowColorValues = mergeTable.spec.rowColorValues.concat(dataTable.spec.rowColorValues);
+            mergeTable.spec.numRows += dataTable.spec.numRows;
+            this.setDataTable(mergeTable);
         } else {
             dataTable = mergeTable;
         }
