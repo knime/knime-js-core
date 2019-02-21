@@ -79,7 +79,8 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
     @Override
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
-        if (m_config.getSettings().getRepresentationSettings().getEnableSelection()) {
+        TableRepresentationSettings settings = m_config.getSettings().getRepresentationSettings();
+        if (settings.getEnableSelection() && !settings.getEnableLazyLoading()) {
             ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
             tableSpec = rearranger.createSpec();
         }
@@ -272,6 +273,18 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
         synchronized(getLock()) {
             REP viewRepresentation = getViewRepresentation();
             viewRepresentation.setSettingsFromDialog(m_config.getSettings().getRepresentationSettings());
+
+            /* temporary disable interactivity options when lazy loading is active */
+            if (m_config.getSettings().getRepresentationSettings().getEnableLazyLoading()) {
+                TableRepresentationSettings settings = viewRepresentation.getSettings();
+                settings.setEnablePaging(true);
+                settings.setPageSizeShowAll(false);
+                settings.setEnableSelection(false);
+                settings.setEnableSorting(false);
+                settings.setEnableSearching(false);
+                settings.setEnableColumnSearching(false);
+                settings.setEnableHideUnselected(false);
+            }
 
             VAL viewValue = getViewValue();
             if (isViewValueEmpty()) {

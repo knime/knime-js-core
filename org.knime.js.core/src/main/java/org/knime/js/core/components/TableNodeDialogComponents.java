@@ -435,7 +435,8 @@ public class TableNodeDialogComponents {
      * @param specs
      * @throws NotConfigurableException
      */
-    public void loadFromNodeSettings(final NodeSettingsRO nodeSettings, final PortObjectSpec[] specs) throws NotConfigurableException {
+    public void loadFromNodeSettings(final NodeSettingsRO nodeSettings, final PortObjectSpec[] specs)
+        throws NotConfigurableException {
         DataTableSpec inSpec = (DataTableSpec)specs[0];
         m_config.loadSettingsForDialog(nodeSettings, inSpec);
         //FIXME: use rep and val settings from variable
@@ -563,20 +564,52 @@ public class TableNodeDialogComponents {
         boolean enable = !m_enableLazyLoadingCheckBox.isSelected();
         m_maxRowsLabel.setEnabled(enable);
         m_maxRowsSpinner.setEnabled(enable);
+
+        // lazy loading requires pagination to be on and show all to be unavailable
+        if (!enable) {
+            m_enablePagingCheckBox.setSelected(true);
+        }
+        m_enablePagingCheckBox.setEnabled(enable);
+        m_enableShowAllCheckBox.setEnabled(enable);
+
+        // temporary disable all selection fields for lazy loading
+        m_enableSelectionCheckbox.setEnabled(enable);
+        m_enableClearSelectionButtonCheckbox.setEnabled(enable);
+        m_singleSelectionRadioButton.setEnabled(enable);
+        m_multipleSelectionRadioButton.setEnabled(enable);
+        m_hideUnselectedCheckbox.setEnabled(enable);
+        m_enableHideUnselectedCheckbox.setEnabled(enable);
+        m_publishSelectionCheckBox.setEnabled(enable);
+        m_subscribeSelectionCheckBox.setEnabled(enable);
+        m_selectionColumnNameField.setEnabled(enable);
+
+        // temporary disable all search and filter fields for lazy loading
+        m_enableSearchCheckbox.setEnabled(enable);
+        m_enableColumnSearchCheckbox.setEnabled(enable);
+        m_subscribeFilterCheckBox.setEnabled(enable);
+        m_publishFilterCheckBox.setEnabled(enable);
+
+        // temporary disable all sorting fields for lazy loading
+        m_enableSortingCheckBox.setEnabled(enable);
+        m_enableClearSortButtonCheckBox.setEnabled(enable);
+
     }
 
     private void enablePagingFields() {
         boolean enableGlobal = m_enablePagingCheckBox.isSelected();
+        if (m_enableLazyLoadingCheckBox.isSelected()) {
+            enableGlobal = true;
+        }
         boolean enableSizeChange = m_enablePageSizeChangeCheckBox.isSelected();
         m_initialPageSizeSpinner.setEnabled(enableGlobal);
         m_enablePageSizeChangeCheckBox.setEnabled(enableGlobal);
         m_allowedPageSizesField.setEnabled(enableGlobal && enableSizeChange);
-        m_enableShowAllCheckBox.setEnabled(enableGlobal && enableSizeChange);
+        m_enableShowAllCheckBox.setEnabled(enableGlobal && enableSizeChange && !m_enableLazyLoadingCheckBox.isSelected());
         m_enableJumpToPageCheckBox.setEnabled(enableGlobal);
     }
 
     private void enableSelectionFields() {
-        boolean enable = m_enableSelectionCheckbox.isSelected();
+        boolean enable = m_enableSelectionCheckbox.isSelected() && !m_enableLazyLoadingCheckBox.isSelected();
         boolean single = m_singleSelectionRadioButton.isSelected();
 
         m_enableClearSelectionButtonCheckbox.setEnabled(enable);
@@ -600,7 +633,7 @@ public class TableNodeDialogComponents {
     }
 
     private void enableSortingFields() {
-        boolean enableFields = m_displayColumnHeadersCheckBox.isSelected();
+        boolean enableFields = m_displayColumnHeadersCheckBox.isSelected() && !m_enableLazyLoadingCheckBox.isSelected();
         m_enableSortingCheckBox.setEnabled(enableFields);
         m_enableClearSortButtonCheckBox.setEnabled(enableFields && m_enableSortingCheckBox.isSelected());
     }
