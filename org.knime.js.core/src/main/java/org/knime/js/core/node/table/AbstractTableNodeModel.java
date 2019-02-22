@@ -234,6 +234,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
         Builder tableBuilder = JSONDataTable.newBuilder()
                 .setDataTable(table)
                 .setId(getTableId(0))
+                .keepFilterColumns(true)
                 .setExcludeColumns(this.determineExcludedColumns(table));
         if (repSettings.getEnableLazyLoading()) {
             //TODO: create filtered and sorted table
