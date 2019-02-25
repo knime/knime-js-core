@@ -370,9 +370,8 @@ public class JSONDataTable {
                 }
 
                 if (includeColumn && !excludeRow) {
-                    DataCell cell = row.getCell(col);
                     // do only for those values which will go into the json data table
-                    //DataCell cell = row.getCell(col);
+                    DataCell cell = row.getCell(col);
                     currentRow.getData()[c] = cellValue;
 
                     if (cellValue != null) {
