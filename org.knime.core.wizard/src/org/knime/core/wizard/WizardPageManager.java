@@ -189,11 +189,10 @@ public final class WizardPageManager extends AbstractPageManager implements View
      */
     public String applyViewValuesToCurrentPage(final Map<String, String> valueMap) throws IOException {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
-            Map<String, String> viewContentMap = validateValueMap(valueMap);
             Map<String, ValidationError> validationResults = null;
             if (!valueMap.isEmpty()) {
                 WizardExecutionController wec = getWizardExecutionController();
-                validationResults = wec.loadValuesIntoCurrentPage(viewContentMap);
+                validationResults = wec.loadValuesIntoCurrentPage(valueMap);
             }
             return serializeValidationResult(validationResults);
         }

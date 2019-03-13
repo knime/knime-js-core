@@ -299,23 +299,6 @@ public abstract class AbstractPageManager {
     }
 
     /**
-     * Validates a value map using a JSON mapper.
-     * @param valueMap the map to validate
-     * @return a validated map of view values
-     * @throws IOException on serialization error
-     */
-    protected Map<String, String> validateValueMap(final Map<String, String> valueMap) throws IOException{
-        try (WorkflowLock lock = m_wfm.lock()) {
-            ObjectMapper mapper = new ObjectMapper();
-            for (String key : valueMap.keySet()) {
-                String content = mapper.writeValueAsString(valueMap.get(key));
-                valueMap.put(key, content);
-            }
-            return valueMap;
-        }
-    }
-
-    /**
      * Serializes a map of validation errors into a single JSON string.
      * @param validationResults the map of errors to serialize
      * @return the JSON serialized string
