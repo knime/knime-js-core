@@ -570,12 +570,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 return true;
             } catch (WebDriverException e) {
                 m_shutdownCometThread.set(true);
-                try {
-                    m_driver.quit();
-                } catch (Exception ignore) {
-                    /* nothing to do at this point */ }
-                m_driver = null;
-                cancelOutstandingViewRequests();
+                closeView();
                 return false;
             }
         }
@@ -627,7 +622,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                     }
                     try {
                         if (!m_driver.getWindowHandles().contains(m_handle)) {
-                            m_driver.quit();
+                            closeView();
                             break;
                         }
                         if (m_driver.getWindowHandle().equals(m_handle)) {

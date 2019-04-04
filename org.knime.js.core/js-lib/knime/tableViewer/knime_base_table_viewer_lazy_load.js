@@ -127,7 +127,9 @@ window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callba
         // at this point we only know that there is at least one more record than was requested
         let minimumRecords = this._knimeTable.getFragmentFirstRowIndex() + this._knimeTable.getNumRows() + 1;
         response.recordsFiltered = minimumRecords;
-        this._issueRowCountRequest();
+        if (!this._rowCountRequest) {
+            this._issueRowCountRequest();
+        }
     }
     if (error) {
         response.error = error;
