@@ -223,7 +223,7 @@ window.kt = function () {
     };
 
     kt.mergeTables = function (mergeTable) {
-        // TODO: make sure spec etc. validates
+        // it is assumed here that the caller assures specs of this table and mergeTable match
         if (dataTable.fragmentFirstRowIndex + dataTable.spec.numRows === mergeTable.fragmentFirstRowIndex) {
             dataTable.rows = dataTable.rows.concat(mergeTable.rows);
             dataTable.spec.rowColorValues = dataTable.spec.rowColorValues.concat(mergeTable.spec.rowColorValues);
@@ -242,8 +242,10 @@ window.kt = function () {
     
     kt.clear = function () {
         dataTable.rows = [];
-        dataTable.spec.numRows = 0;
         dataTable.fragmentFirstRowIndex = 0;
+        dataTable.spec.numRows = 0;
+        dataTable.spec.rowColorValues = [];
+        dataTable.spec.rowSizeValues = [];
     };
 
     return kt;
