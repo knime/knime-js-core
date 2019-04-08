@@ -1,17 +1,30 @@
 /* eslint-env es6, jquery */
 /* eslint no-var: "error" */
 window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, settings) {
-    // TODO: evaluation needs to take into account filter, search
+    // TODO: evaluation needs to take into account filter
     const win = [data.start, data.start + data.length - 1];
     if (this._knimeTable) {
+        console.log('%cFilter: ' + JSON.stringify(this._currentFilter), 'color: pink;');
         if (typeof this._knimeTable.order === 'undefined') {
             this._knimeTable.order = [];
+        }
+        if (typeof this._knimeTable.search === 'undefined') {
+            this._knimeTable.search = { value: '', regex: false };
+        }
+        if (typeof this._knimeTable.currentFilter === 'undefined') {
+            this._knimeTable.currentFilter = null;
         }
         let api = new $.fn.dataTable.Api(settings);
         data.order.forEach(o => {
             o.column = api.column(o.column).header().textContent;
         });
         if (JSON.stringify(data.order) !== JSON.stringify(this._knimeTable.order)) {
+            this._knimeTable.clear();
+        }
+        if (JSON.stringify(data.search) !== JSON.stringify(this._knimeTable.search)) {
+            this._knimeTable.clear();
+        }
+        if (JSON.stringify(this._currentFilter) !== JSON.stringify(this._knimeTable.currentFilter)) {
             this._knimeTable.clear();
         }
         const cacheStart = this._knimeTable.getFragmentFirstRowIndex();
@@ -25,7 +38,8 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 length: data.length,
                 search: data.search,
                 order: data.order,
-                columns: data.columns
+                columns: data.columns,
+                filter: this._currentFilter
             };
             const self = this;
             $('#knimePagedTable_processing').text('Processing...').prop('title', '');
@@ -46,6 +60,11 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 } else {
                     self._knimeTable.order = data.order;
                     response.table.order = data.order;
+                    self._knimeTable.search = data.search;
+                    response.table.search = data.search;
+                    let curFilter = JSON.parse(JSON.stringify(self._currentFilter));
+                    self._knimeTable.currentFilter = curFilter;
+                    response.table.currentFilter = curFilter;
                     self._knimeTable.mergeTables(response.table);
                     self._lazyLoadResponse(data, callback);
                 }

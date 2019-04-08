@@ -784,13 +784,15 @@ window.KnimeBaseTableViewer.prototype._buildMenu = function () {
                  * //publishFilter = false; } }); knimeService.addMenuItem('Publish filter', pubFilIcon,
                  * pubFilCheckbox); if (_value.publishFilter) { //TODO }
                  */
-                // eslint-disable-next-line max-params
-                $.fn.dataTable.ext.search.push(function (settings, searchData, index, rowData, counter) {
-                    if (self._currentFilter) {
-                        return self._knimeTable.isRowIncludedInFilter(index, self._currentFilter);
-                    }
-                    return true;
-                });
+                if (!this._representation.enableLazyLoading) {
+                    // eslint-disable-next-line max-params
+                    $.fn.dataTable.ext.search.push(function (settings, searchData, index, rowData, counter) {
+                        if (self._currentFilter) {
+                            return self._knimeTable.isRowIncludedInFilter(index, self._currentFilter);
+                        }
+                        return true;
+                    });
+                }
                 var boundFilterChanged = self._filterChanged.bind(self);
                 var subFilIcon = knimeService.createStackedIcon('filter', 'angle-double-right', 'faded right sm',
                     'left bold');
@@ -915,10 +917,10 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
 window.KnimeBaseTableViewer.prototype._processColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
         this._dataTable.columns().every(function () { // eslint-disable-line array-callback-return
-            var that = this;
+            var self = this;
             $('input', this.footer()).on('keyup change', function () {
-                if (that.search() !== this.value) {
-                    that.search(this.value).draw();
+                if (self.search() !== this.value) {
+                    self.search(this.value).draw();
                 }
             });
         });

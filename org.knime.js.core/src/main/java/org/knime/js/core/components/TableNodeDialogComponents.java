@@ -582,12 +582,6 @@ public class TableNodeDialogComponents {
         m_publishSelectionCheckBox.setEnabled(enable);
         m_subscribeSelectionCheckBox.setEnabled(enable);
         m_selectionColumnNameField.setEnabled(enable);
-
-        // TODO temporary disable all search and filter fields for lazy loading
-        m_enableSearchCheckbox.setEnabled(enable);
-        m_enableColumnSearchCheckbox.setEnabled(enable);
-        m_subscribeFilterCheckBox.setEnabled(enable);
-        m_publishFilterCheckBox.setEnabled(enable);
     }
 
     private void enablePagingFields() {
