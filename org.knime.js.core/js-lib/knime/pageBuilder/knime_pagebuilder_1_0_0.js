@@ -979,9 +979,9 @@ KnimePageLoader = function() {
 				if (changedIds.length < 1) {
 					return;
 				}
-				interactivityMap[id] = data;
-				_notifySubscribers(id, data, skip, changedIds);
 			}
+			interactivityMap[id] = data;
+			_notifySubscribers(id, data, skip, changedIds);
 		}
 	}
 	

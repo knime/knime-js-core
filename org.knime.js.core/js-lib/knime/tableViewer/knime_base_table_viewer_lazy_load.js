@@ -4,7 +4,6 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
     // TODO: evaluation needs to take into account filter
     const win = [data.start, data.start + data.length - 1];
     if (this._knimeTable) {
-        console.log('%cFilter: ' + JSON.stringify(this._currentFilter), 'color: pink;');
         if (typeof this._knimeTable.order === 'undefined') {
             this._knimeTable.order = [];
         }
