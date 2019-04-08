@@ -578,6 +578,23 @@ window.KnimeBaseTableViewer.prototype._dataTablePreDrawCallback = function () {
 };
 
 /**
+ * Callback function when info string needs to be updated
+ */
+window.KnimeBaseTableViewer.prototype._dataTableInfoCallback = function (settings, start, end, max, total, pre) { //eslint-disable-line
+    if (this._representation.enableLazyLoading && this._knimeTable.getTotalFilteredRowCount() < 0) {
+        var formatter = settings.fnFormatNumber;
+        var startF = formatter.call(settings, start);
+        var endF = formatter.call(settings, end);
+        var maxF = formatter.call(settings, max);
+        var totalF = formatter.call(settings, this._knimeTable.getFragmentFirstRowIndex() +
+            this._knimeTable.getNumRows());
+        return 'Showing ' + startF + ' to ' + endF + ' of more than ' + totalF + ' entries (filtered from ' + maxF +
+            ' entries)';
+    }
+    return pre;
+};
+
+/**
  * Builds a config object for DataTables
  */
 window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
@@ -596,6 +613,7 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
         buttons: [],
         fnDrawCallback: this._dataTableDrawCallback.bind(this),
         preDrawCallback: this._dataTablePreDrawCallback.bind(this),
+        infoCallback: this._dataTableInfoCallback.bind(this),
         select: {
             items: 'cell',
             style: 'api',
@@ -662,6 +680,25 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
  */
 window.KnimeBaseTableViewer.prototype._addTableListeners = function () {
     var $table = $('#knimePagedTable');
+    if (this._representation.enableLazyLoading) {
+        var self = this;
+        $table.on('draw.dt', function () {
+            if (self._knimeTable.getTotalFilteredRowCount() < 0) {
+                // make sure that at this point '...' is displayed as the last page item to suggest that more pages
+                // are available, although we don't know how many
+                var lastPage = $('#knimePagedTable_paginate ul li:nth-last-child(2)');
+                if ($('#knimePagedTable_paginate ul li#knimePagedTable_ellipsis').size() > 1) {
+                    lastPage.hide();
+                } else {
+                    lastPage.addClass('disabled');
+                    lastPage.find('a').text('...');
+                }
+            }
+        });
+        $table.on('processing.dt', function (e, settings, processing) {
+            $('#knimePagedTable tbody').css('opacity', processing ? '0.2' : '1');
+        });
+    }
     $table.attr('tabindex', 0);
     $table.on('keydown', this._keyDownHandler.bind(this));
     // we need to listen to copy event on body level as user-select:none prevents copy event

@@ -1,7 +1,6 @@
 /* eslint-env es6, jquery */
 /* eslint no-var: "error" */
 window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, settings) {
-    // TODO: evaluation needs to take into account show selection only
     const win = [data.start, data.start + data.length - 1];
     if (this._knimeTable) {
         if (typeof this._lastRequest === 'undefined') {
@@ -21,27 +20,8 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
         data.order.forEach(o => {
             o.column = api.column(o.column).header().textContent;
         });
-        if (JSON.stringify(data.order) !== JSON.stringify(this._lastRequest.order)) {
-            this._knimeTable.clear();
-        }
-        if (JSON.stringify(data.search) !== JSON.stringify(this._lastRequest.search)) {
-            this._knimeTable.clear();
-        }
-        if (JSON.stringify(this._currentFilter) !== JSON.stringify(this._lastRequest.filter)) {
-            this._knimeTable.clear();
-        }
-        if (this._lastRequest.columns === null) {
-            this._lastRequest.columns = data.columns;
-            for (let col = 0; col < data.columns.length; col++) {
-                if (data.columns[col].searchable && data.columns[col].search.value !== '') {
-                    this._knimeTable.clear();
-                    break;
-                }
-            }
-        }
-        if (JSON.stringify(data.columns) !== JSON.stringify(this._lastRequest.columns)) {
-            this._knimeTable.clear();
-        }
+        this._invalidateCache(data);
+        
         const cacheStart = this._knimeTable.getFragmentFirstRowIndex();
         const cached = [cacheStart, cacheStart + this._knimeTable.getNumRows() - 1];
         const included = cached[0] <= win[0] && cached[1] >= win[1];
@@ -86,6 +66,56 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
     }
 };
 
+window.KnimeBaseTableViewer.prototype._invalidateCache = function (data) {
+    if (JSON.stringify(data.order) !== JSON.stringify(this._lastRequest.order)) {
+        this._clearCache();
+        return;
+    }
+    if (JSON.stringify(data.search) !== JSON.stringify(this._lastRequest.search)) {
+        this._clearCache();
+        return;
+    }
+    if (this._lastRequest.columns === null) {
+        this._lastRequest.columns = data.columns;
+        for (let col = 0; col < data.columns.length; col++) {
+            if (data.columns[col].searchable && data.columns[col].search.value !== '') {
+                this._clearCache();
+                return;
+            }
+        }
+    }
+    if (JSON.stringify(data.columns) !== JSON.stringify(this._lastRequest.columns)) {
+        this._clearCache();
+        return;
+    }
+    if (JSON.stringify(this._currentFilter) !== JSON.stringify(this._lastRequest.filter)) {
+        this._clearCache();
+        return;
+    }
+    // TODO: evaluation needs to take into account 'show selection only' filter
+};
+
+window.KnimeBaseTableViewer.prototype._clearCache = function () {
+    if (this._knimeTable) {
+        this._knimeTable.clear();
+    }
+    if (this._rowCountRequest) {
+        this._rowCountRequest.cancel();
+        this._rowCountRequest = null;
+    }
+};
+
+window.KnimeBaseTableViewer.prototype._issueRowCountRequest = function () {
+    if (this._rowCountRequest) {
+        this._rowCountRequest.cancel();
+    }
+    let request = {
+        countRows: true
+    };
+    this._rowCountRequest = knimeService.requestViewUpdate(request);
+    // we don't do anything with the result of the request in the view, just issue the request so it can be cancelled
+};
+
 window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callback, error) {
     this._runningRequest = null;
     let response = {
@@ -93,6 +123,12 @@ window.KnimeBaseTableViewer.prototype._lazyLoadResponse = function (data, callba
     };
     response.recordsTotal = this._knimeTable.getTotalRowCount();
     response.recordsFiltered = this._knimeTable.getTotalFilteredRowCount();
+    if (response.recordsFiltered < 0) {
+        // at this point we only know that there is at least one more record than was requested
+        let minimumRecords = this._knimeTable.getFragmentFirstRowIndex() + this._knimeTable.getNumRows() + 1;
+        response.recordsFiltered = minimumRecords;
+        this._issueRowCountRequest();
+    }
     if (error) {
         response.error = error;
         response.data = [];

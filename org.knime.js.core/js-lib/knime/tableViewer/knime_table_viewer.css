@@ -127,6 +127,16 @@ h2 {
 	width: auto;
 }
 
+#knimePagedTable_wrapper .pagination > .disabled > span,
+#knimePagedTable_wrapper .pagination > .disabled > span:hover,
+#knimePagedTable_wrapper .pagination > .disabled > span:focus,
+#knimePagedTable_wrapper .pagination > .disabled > a,
+#knimePagedTable_wrapper .pagination > .disabled > a:hover,
+#knimePagedTable_wrapper .pagination > .disabled > a:focus {
+	color: #aaa;
+	outline: none;
+}
+
 table#knimePagedTable {
     user-select: none;
     -moz-user-select: none;
