@@ -229,7 +229,6 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
      * @return corresponding builder object
      */
     protected JSONDataTable.Builder getJsonDataTableBuilder(final BufferedDataTable table) {
-        FilterResult filter = m_config.getSettings().getColumnFilterConfig().applyTo(table.getDataTableSpec());
         TableRepresentationSettings repSettings = m_config.getSettings().getRepresentationSettings();
         TableValueSettings valSettings = m_config.getSettings().getValueSettings();
         Builder tableBuilder = JSONDataTable.newBuilder()
@@ -238,7 +237,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
                 .keepFilterColumns(true)
                 .setExcludeColumns(this.determineExcludedColumns(table));
         if (repSettings.getEnableLazyLoading()) {
-            //TODO: create filtered and sorted table
+            //TODO: create filtered and sorted table?
             int page = Math.max(1, valSettings.getCurrentPage());
             int pageSize = valSettings.getPageSize();
             if (pageSize <= 0) {

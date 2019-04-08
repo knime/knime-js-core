@@ -51,10 +51,12 @@ import java.security.MessageDigest;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -301,7 +303,7 @@ public class JSONDataTable {
 
         RowIteratorBuilder<? extends RowIterator> iterBuilder = m_dataTable.iteratorBuilder();
         if (!m_calculateDataHash) {
-            iterBuilder.filterColumns(includeColIndices.stream().mapToInt(Integer::intValue).toArray());
+            iterBuilder.filterColumns(determineIteratorColumns(includeColIndices));
         }
         RowIterator rIter = iterBuilder.build();
         int currentRowNumber = 0;
@@ -489,6 +491,30 @@ public class JSONDataTable {
             }
         }
         return numOfColumns;
+    }
+
+    /**
+     * Determines the columns needed for the row iterator builder, which potentially needs to include e.g. color or size
+     * columns if those need to be accessed later.
+     *
+     * @param includeColIndices the previously determined includedColumnIndices for columns which will be present in the
+     *            JSON table.
+     * @param spec
+     * @return
+     */
+    private int[] determineIteratorColumns(final List<Integer> includeColIndices) {
+        Set<Integer> includedMap = new HashSet<Integer>();
+        includedMap.addAll(includeColIndices);
+        DataTableSpec spec = m_dataTable.getDataTableSpec();
+        for (int i = 0; i < spec.getNumColumns(); i++) {
+            DataColumnSpec colSpec = spec.getColumnSpec(i);
+            if ((m_extractRowColors && colSpec.getColorHandler() != null)
+                    || (m_extractRowSizes && colSpec.getSizeHandler() != null)
+                    || (m_keepFilterColumns && colSpec.getFilterHandler().isPresent())) {
+                includedMap.add(i);
+            }
+        }
+        return includedMap.stream().mapToInt(Integer::intValue).toArray();
     }
 
     private synchronized void removeMissingValueColumns() {
