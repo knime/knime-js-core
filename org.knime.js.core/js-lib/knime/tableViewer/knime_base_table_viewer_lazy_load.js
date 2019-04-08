@@ -1,9 +1,19 @@
 /* eslint-env es6, jquery */
 /* eslint no-var: "error" */
 window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, settings) {
-    // TODO: evaluation needs to take into account order, filter, search
+    // TODO: evaluation needs to take into account filter, search
     const win = [data.start, data.start + data.length - 1];
     if (this._knimeTable) {
+        if (typeof this._knimeTable.order === 'undefined') {
+            this._knimeTable.order = [];
+        }
+        let api = new $.fn.dataTable.Api(settings);
+        data.order.forEach(o => {
+            o.column = api.column(o.column).header().textContent;
+        });
+        if (JSON.stringify(data.order) !== JSON.stringify(this._knimeTable.order)) {
+            this._knimeTable.clear();
+        }
         const cacheStart = this._knimeTable.getFragmentFirstRowIndex();
         const cached = [cacheStart, cacheStart + this._knimeTable.getNumRows() - 1];
         const included = cached[0] <= win[0] && cached[1] >= win[1];
@@ -34,6 +44,8 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 if (response.error) {
                     self._lazyLoadResponse(data, callback, response.error);
                 } else {
+                    self._knimeTable.order = data.order;
+                    response.table.order = data.order;
                     self._knimeTable.mergeTables(response.table);
                     self._lazyLoadResponse(data, callback);
                 }

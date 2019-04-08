@@ -237,6 +237,12 @@ window.kt = function () {
             dataTable = mergeTable;
         }
     };
+    
+    kt.clear = function () {
+        dataTable.rows = [];
+        dataTable.spec.numRows = 0;
+        dataTable.fragmentFirstRowIndex = 0;
+    };
 
     return kt;
 };
