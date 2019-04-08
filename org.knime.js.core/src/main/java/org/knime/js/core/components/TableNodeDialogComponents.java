@@ -571,34 +571,24 @@ public class TableNodeDialogComponents {
         }
         m_enablePagingCheckBox.setEnabled(enable);
         m_enableShowAllCheckBox.setEnabled(enable);
-
-        // TODO temporary disable all selection fields for lazy loading
-        m_enableSelectionCheckbox.setEnabled(enable);
-        m_enableClearSelectionButtonCheckbox.setEnabled(enable);
-        m_singleSelectionRadioButton.setEnabled(enable);
-        m_multipleSelectionRadioButton.setEnabled(enable);
-        m_hideUnselectedCheckbox.setEnabled(enable);
-        m_enableHideUnselectedCheckbox.setEnabled(enable);
-        m_publishSelectionCheckBox.setEnabled(enable);
-        m_subscribeSelectionCheckBox.setEnabled(enable);
-        m_selectionColumnNameField.setEnabled(enable);
     }
 
     private void enablePagingFields() {
         boolean enableGlobal = m_enablePagingCheckBox.isSelected();
-        if (m_enableLazyLoadingCheckBox.isSelected()) {
+        boolean lazyLoading = m_enableLazyLoadingCheckBox.isSelected();
+        if (lazyLoading) {
             enableGlobal = true;
         }
         boolean enableSizeChange = m_enablePageSizeChangeCheckBox.isSelected();
         m_initialPageSizeSpinner.setEnabled(enableGlobal);
         m_enablePageSizeChangeCheckBox.setEnabled(enableGlobal);
         m_allowedPageSizesField.setEnabled(enableGlobal && enableSizeChange);
-        m_enableShowAllCheckBox.setEnabled(enableGlobal && enableSizeChange && !m_enableLazyLoadingCheckBox.isSelected());
+        m_enableShowAllCheckBox.setEnabled(enableGlobal && enableSizeChange && !lazyLoading);
         m_enableJumpToPageCheckBox.setEnabled(enableGlobal);
     }
 
     private void enableSelectionFields() {
-        boolean enable = m_enableSelectionCheckbox.isSelected() && !m_enableLazyLoadingCheckBox.isSelected();
+        boolean enable = m_enableSelectionCheckbox.isSelected();
         boolean single = m_singleSelectionRadioButton.isSelected();
 
         m_enableClearSelectionButtonCheckbox.setEnabled(enable);

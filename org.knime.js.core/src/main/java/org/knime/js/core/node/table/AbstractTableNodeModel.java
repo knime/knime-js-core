@@ -273,13 +273,10 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
             REP viewRepresentation = getViewRepresentation();
             viewRepresentation.setSettingsFromDialog(m_config.getSettings().getRepresentationSettings());
 
-            /* TODO temporary disable selection options when lazy loading is active */
             if (m_config.getSettings().getRepresentationSettings().getEnableLazyLoading()) {
                 TableRepresentationSettings settings = viewRepresentation.getSettings();
                 settings.setEnablePaging(true);
                 settings.setPageSizeShowAll(false);
-                settings.setEnableSelection(false);
-                settings.setEnableHideUnselected(false);
             }
 
             VAL viewValue = getViewValue();
