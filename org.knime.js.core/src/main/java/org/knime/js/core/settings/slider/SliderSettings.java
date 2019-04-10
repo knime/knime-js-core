@@ -572,11 +572,14 @@ public class SliderSettings implements Cloneable {
         }
         for (double start : m_start) {
             if(getFix() != null) {
-                if (getFix()[0] && start > getRangeMaxValue()) {
+            	// Round range values to 7 decimals, as the framework is only able to handle inputs with 7 decimals.
+            	Double roundedMax = (double)Math.round(getRangeMaxValue()*10000000)/10000000;
+            	Double roundedMin = Math.floor(getRangeMinValue()*10000000)/10000000;
+            	if (getFix()[0] && start > roundedMax) {
                     throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
-                } else if (getFix()[2] && start < getRangeMinValue()) {
+            	} else if (getFix()[2] && start < roundedMin) {
                     throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
-                } else if (getFix()[1] && (start < getRangeMinValue() || start > getRangeMaxValue())) {
+            	} else if (getFix()[1] && (start < roundedMin || start > roundedMax)) {
                     throw new InvalidSettingsException("Slider value needs to be inside range bounds.");
                 }
             }

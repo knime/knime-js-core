@@ -679,7 +679,7 @@ public class SliderNodeDialogUI {
                 gbc2.weightx = 1;
             }
         }
-        DialogUtil.addPairToPanel("Set handle position:", fixPanel, panel, gbc);
+        DialogUtil.addPairToPanel("Use slider to define:", fixPanel, panel, gbc);
 
         ButtonGroup orientationGroup = new ButtonGroup();
         orientationGroup.add(m_orientationHorizontalButton);
