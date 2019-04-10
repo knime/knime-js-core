@@ -80,7 +80,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
     protected PortObjectSpec[] configure(final PortObjectSpec[] inSpecs) throws InvalidSettingsException {
         DataTableSpec tableSpec = (DataTableSpec)inSpecs[0];
         TableRepresentationSettings settings = m_config.getSettings().getRepresentationSettings();
-        if (settings.getEnableSelection() && !settings.getEnableLazyLoading()) {
+        if (settings.getEnableSelection() /* && !settings.getEnableLazyLoading() */) {
             ColumnRearranger rearranger = createColumnAppender(tableSpec, null);
             tableSpec = rearranger.createSpec();
         }
@@ -105,21 +105,20 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
         CellFactory fac = new SingleCellFactory(outColumnSpec) {
 
             private int m_rowIndex = 0;
+            final TableRepresentationSettings rep = m_config.getSettings().getRepresentationSettings();
 
             @Override
             public DataCell getCell(final DataRow row) {
-                if (++m_rowIndex > m_config.getSettings().getRepresentationSettings().getMaxRows()) {
+                if (!rep.getEnableLazyLoading() && ++m_rowIndex > rep.getMaxRows()) {
                     return DataType.getMissingCell();
                 }
                 if (selectionList != null) {
                     if (selectionList.contains(row.getKey().toString())) {
-                            /*return selectAll ? BooleanCell.FALSE : BooleanCell.TRUE;*/
                         return BooleanCell.TRUE;
                     } else {
                         return BooleanCell.FALSE;
                     }
                 }
-                /*return selectAll ? BooleanCell.TRUE : BooleanCell.FALSE;*/
                 return BooleanCell.FALSE;
             }
         };

@@ -10,7 +10,8 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 search: { value: '', regex: false },
                 order: [],
                 columns: null,
-                filter: null
+                filter: null,
+                selection: null
             };
         }
         let api = new $.fn.dataTable.Api(settings);
@@ -28,7 +29,7 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
         if (included) {
             this._lazyLoadResponse(data, callback);
         } else {
-            const request = {
+            let request = {
                 start: data.start,
                 length: data.length,
                 search: data.search,
@@ -36,6 +37,15 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 columns: data.columns,
                 filter: JSON.parse(JSON.stringify(this._currentFilter))
             };
+            if (this._value.hideUnselected) {
+                request.selection = [];
+                for (let id in this._selection) {
+                    if (this._selection[id]) {
+                        request.selection.push(id);
+                    }
+                }
+                request.selection = request.selection.concat(this._partialSelectedRows);
+            }
             const self = this;
             $('#knimePagedTable_processing').text('Processing...').prop('title', '');
             if (this._runningRequest) {
@@ -92,7 +102,24 @@ window.KnimeBaseTableViewer.prototype._invalidateCache = function (data) {
         this._clearCache();
         return;
     }
-    // TODO: evaluation needs to take into account 'show selection only' filter
+    let previousSelectedOnly = Boolean(this._lastRequest.selection);
+    if (this._value.hideUnselected !== previousSelectedOnly) {
+        this._clearCache();
+        return;
+    }
+    if (this._value.hideUnselected) {
+        let selection = [];
+        for (let id in this._selection) {
+            if (this._selection[id]) {
+                selection.push(id);
+            }
+        }
+        selection = selection.concat(this._partialSelectedRows);
+        if (JSON.stringify(selection) !== JSON.stringify(this._lastRequest.selection)) {
+            this._clearCache();
+            return;
+        }
+    }
 };
 
 window.KnimeBaseTableViewer.prototype._clearCache = function () {

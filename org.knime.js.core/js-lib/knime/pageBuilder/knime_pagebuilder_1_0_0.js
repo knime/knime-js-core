@@ -855,7 +855,11 @@ KnimePageLoader = function() {
 	
 	pageLoader.publish = function(id, data, skip) {
 		if (isDebug) {
-			LOGGER.log('Publishing interactivity event (' + id + '): ' + JSON.stringify(data));
+		    var str = JSON.stringify(data);
+		    if (str.length > 1000) {
+		        str = str.substring(0, 1000) + '...';
+		    }
+			LOGGER.log('Publishing interactivity event (' + id + '): ' + str);
 		}
 		var exists = interactivityMap.hasOwnProperty(id);
 		// row-based changeSet handling

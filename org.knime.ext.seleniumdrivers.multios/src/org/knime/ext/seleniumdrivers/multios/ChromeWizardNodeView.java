@@ -593,10 +593,12 @@ extends AbstractWizardNodeView<T, REP, VAL> {
 
     private void initializeCometQuery() {
         m_shutdownCometThread.set(false);
-        String handle = m_driver.getWindowHandle();
-        m_cometThread = new Thread(m_service.getCometThreadGroup(), new CometRunnable(handle),
-            ChromeViewService.COMET_THREAD_NAME + handle);
-        m_cometThread.start();
+        if (m_driver != null) {
+            String handle = m_driver.getWindowHandle();
+            m_cometThread = new Thread(m_service.getCometThreadGroup(), new CometRunnable(handle),
+                ChromeViewService.COMET_THREAD_NAME + handle);
+            m_cometThread.start();
+        }
     }
 
     private class CometRunnable implements Runnable {
