@@ -79,9 +79,8 @@ import org.knime.core.data.DoubleValue;
 import org.knime.core.data.IntValue;
 import org.knime.core.data.MissingCell;
 import org.knime.core.data.NominalValue;
-import org.knime.core.data.RowIterator;
-import org.knime.core.data.RowIteratorBuilder;
 import org.knime.core.data.StringValue;
+import org.knime.core.data.container.filter.TableFilter;
 import org.knime.core.data.date.DateAndTimeCell;
 import org.knime.core.data.date.DateAndTimeCellFactory;
 import org.knime.core.data.date.DateAndTimeValue;
@@ -299,11 +298,13 @@ public class JSONDataTable {
             }
         }
 
-        RowIteratorBuilder<? extends RowIterator> iterBuilder = m_dataTable.iteratorBuilder();
-        if (!m_calculateDataHash) {
-            iterBuilder.filterColumns(includeColIndices.stream().mapToInt(Integer::intValue).toArray());
+        Iterable<DataRow> iterable = m_dataTable;
+
+        if (!m_calculateDataHash && m_dataTable instanceof BufferedDataTable) {
+            final BufferedDataTable bdt = (BufferedDataTable)m_dataTable;
+            final int[] includeArray = includeColIndices.stream().mapToInt(Integer::intValue).toArray();
+            iterable = bdt.filter(TableFilter.materializeCols(includeArray));
         }
-        RowIterator rIter = iterBuilder.build();
         int currentRowNumber = 0;
         int numRows = 0;
 
@@ -311,9 +312,7 @@ public class JSONDataTable {
         ArrayList<Double> rowSizeList = new ArrayList<Double>();
         ArrayList<JSONDataTableRow> rowList = new ArrayList<JSONDataTableRow>();
 
-        while (rIter.hasNext()) {
-            // get the next row
-            DataRow row = rIter.next();
+        for (final DataRow row : iterable) {
             currentRowNumber++;
             if (execMon != null) {
                 execMon.checkCanceled();
