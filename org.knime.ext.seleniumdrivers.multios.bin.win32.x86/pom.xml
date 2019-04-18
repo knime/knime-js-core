@@ -8,11 +8,11 @@
 	<parent>
 		<groupId>org.knime</groupId>
 		<artifactId>knime-js-core</artifactId>
-		<version>3.8.0-SNAPSHOT</version>
+		<version>${revision}${changelist}</version>
       <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</artifactId>
-  <version>2.43.0-SNAPSHOT</version>
+  <version>75.0.3770-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
   <build>
     <plugins>

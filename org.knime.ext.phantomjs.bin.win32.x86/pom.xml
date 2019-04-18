@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>org.knime</groupId>
 		<artifactId>knime-js-core</artifactId>
-		<version>3.8.0-SNAPSHOT</version>
+		<version>${revision}${changelist}</version>
       <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.knime.ext.phantomjs.bin.win32.x86</artifactId>

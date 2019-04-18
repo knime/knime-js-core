@@ -6,3 +6,4 @@ Bundle-Version: 2.1.1.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Fragment-Host: org.knime.ext.phantomjs;bundle-version="3.0.0"
 Eclipse-PlatformFilter: (&(osgi.os=linux)(osgi.arch=x86_64))
+Eclipse-BundleShape: dir

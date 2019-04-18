@@ -1,4 +1,6 @@
 */bin/
-*/target/
+**/target/
 */build/
 org.knime.dynamic.js/src/xmlbeans
+**/.flattened-pom.xml
+**/.polyglot.build.properties
