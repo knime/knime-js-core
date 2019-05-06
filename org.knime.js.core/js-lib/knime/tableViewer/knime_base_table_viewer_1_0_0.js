@@ -600,7 +600,8 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
             items: 'cell',
             style: 'api',
             info: false
-        }
+        },
+        "scrollX": true
     };
 
     if (rep.enableLazyLoading) {

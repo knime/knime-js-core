@@ -335,7 +335,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
     public JSONLayoutViewContent getLayoutTemplate() {
         JSONLayoutViewContent layout = new JSONLayoutViewContent();
         layout.setMinHeight(200);
-        layout.setResizeMethod(ResizeMethod.VIEW_TAGGED_ELEMENT);
+        layout.setResizeMethod(ResizeMethod.VIEW_LOWEST_ELEMENT);
         return layout;
     }
 }
