@@ -547,7 +547,7 @@ window.KnimeBaseTableViewer.prototype._buildColumnDefinitions = function () {
 window.KnimeBaseTableViewer.prototype._dataTableDrawCallback = function () {
     var self = this;
     if (!this._representation.displayColumnHeaders) {
-        $('#knimePagedTable thead').remove();
+        $('#knimePagedTableContainer thead').remove();
     }
     if (this._dataTableConfig.searching && !this._representation.enableSearching) {
         $('#knimePagedTable_filter').remove();
@@ -1449,6 +1449,6 @@ window.KnimeBaseTableViewer.prototype._setControlCssStyles = function () {
 window.KnimeBaseTableViewer.prototype._setDynamicCssStyles = function () {
     $('#knimePagedTable tr').addClass('knime-table-row');
     $('#knimePagedTable_paginate ul').addClass('knime-table-control-text');
-    $('#knimePagedTable thead tr').addClass('knime-table-header');
-    $('#knimePagedTable thead th').addClass('knime-table-header');
+    $('#knimePagedTableContainer thead tr').addClass('knime-table-header');
+    $('#knimePagedTableContainer thead th').addClass('knime-table-header');
 };
