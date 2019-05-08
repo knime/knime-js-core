@@ -601,7 +601,7 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
             style: 'api',
             info: false
         },
-        "scrollX": true
+        scrollX: true
     };
 
     if (rep.enableLazyLoading) {
