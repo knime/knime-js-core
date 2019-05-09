@@ -329,13 +329,15 @@ window.seleniumKnimeBridge = (function () {
 
     bridge.respondToViewRequest = function (responseURL) {
         loadJSONFile(responseURL, function (response) {
-            bridge.executeOnFrame('KnimeInteractivity.respondToViewRequest(JSON.parse(\'' + response + '\'));');
+            bridge.executeOnFrame('if (KnimeInteractivity) {KnimeInteractivity.respondToViewRequest(JSON.parse(\'' +
+                response + '\'));}');
         }, false);
     };
 
     bridge.updateResponseMonitor = function (monitorURL) {
         loadJSONFile(monitorURL, function (monitor) {
-            bridge.executeOnFrame('KnimeInteractivity.updateResponseMonitor(JSON.parse(\'' + monitor + '\'));');
+            bridge.executeOnFrame('if (KnimeInteractivity) {KnimeInteractivity.updateResponseMonitor(JSON.parse(\'' +
+                monitor + '\'));}');
         }, false);
     };
 
