@@ -1892,6 +1892,36 @@
                      webResourceBundleID="bootstrap_4.1.3">
                </webDependency>
             </webResourceBundle>
+            <webResourceBundle
+                  debug="true"
+                  name="Plotly.js 1.47"
+                  usesDefine="true"
+                  version="1.47.4"
+                  webResourceBundleID="plotly.js-1.47.4_Debug">
+               <webResource
+                     relativePathSource="js-lib/plotly/1.47.4/plotly.js"
+                     relativePathTarget="js-lib/plotly/1.47.4/plotly.js">
+               </webResource>
+               <importResource
+                     relativePath="js-lib/plotly/1.47.4/plotly.js"
+                     type="JAVASCRIPT">
+               </importResource>
+            </webResourceBundle>
+            <webResourceBundle
+                  debug="false"
+                  name="Plotly.js 1.47"
+                  usesDefine="true"
+                  version="1.47.4"
+                  webResourceBundleID="plotly.js-1.47.4">
+               <webResource
+                     relativePathSource="js-lib/plotly/1.47.4/plotly.min.js"
+                     relativePathTarget="js-lib/plotly/1.47.4/plotly.min.js">
+               </webResource>
+               <importResource
+                     relativePath="js-lib/plotly/1.47.4/plotly.min.js"
+                     type="JAVASCRIPT">
+               </importResource>
+            </webResourceBundle>
 
    </extension>
    <extension
