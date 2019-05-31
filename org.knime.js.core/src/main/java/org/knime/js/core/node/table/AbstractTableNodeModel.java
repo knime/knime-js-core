@@ -329,7 +329,7 @@ public abstract class AbstractTableNodeModel<REP extends AbstractTableRepresenta
 
     /**
      * {@inheritDoc}
-     * @since 3.8
+     * @since 4.0
      */
     @Override
     public JSONLayoutViewContent getLayoutTemplate() {

@@ -297,7 +297,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * @return the fix
-     * @since 3.8
+     * @since 4.0
      */
     public boolean[] getFix() {
         return m_fix;
@@ -305,7 +305,7 @@ public class SliderSettings implements Cloneable {
 
     /**
      * @param fix the fix to set
-     * @since 3.8
+     * @since 4.0
      */
     public void setFix(final boolean[] fix) {
         m_fix = fix;

@@ -848,7 +848,7 @@ public class JSONDataTable {
     /**
      * @return true if the rows of this table are a fragment of a larger table, false if it represents a
      * complete table
-     * @since 3.8
+     * @since 4.0
      */
     public boolean isFragment() {
         return m_fragment;
@@ -857,7 +857,7 @@ public class JSONDataTable {
     /**
      * @param fragment true if the rows of this table are a fragment of a larger table, false if it
      * represents a complete table
-     * @since 3.8
+     * @since 4.0
      */
     public void setFragment(final boolean fragment) {
         m_fragment = fragment;
@@ -866,7 +866,7 @@ public class JSONDataTable {
     /**
      * @return true if this table represents a table which is the result on a filtering operation of a larger
      * table, false otherwise
-     * @since 3.8
+     * @since 4.0
      */
     public boolean isFiltered() {
         return m_filtered;
@@ -875,7 +875,7 @@ public class JSONDataTable {
     /**
      * @param filtered true if this table represents a table which is the result of a filtering operation on
      * a larger table, false otherwise
-     * @since 3.8
+     * @since 4.0
      */
     public void setFiltered(final boolean filtered) {
         m_filtered = filtered;
@@ -885,7 +885,7 @@ public class JSONDataTable {
      * If this table represents a fragment of a larger table, this number represents the beginning index
      * of this fragment in the larger table. Returns 0 for complete tables.
      * @return the index of the first row of this fragment in a larger table
-     * @since 3.8
+     * @since 4.0
      */
     public long getFragmentFirstRowIndex() {
         return m_fragmentFirstRowIndex;
@@ -893,7 +893,7 @@ public class JSONDataTable {
 
     /**
      * @param fragmentFirstRowIndex the index of the first row of this fragment in a larger table
-     * @since 3.8
+     * @since 4.0
      */
     public void setFragmentFirstRowIndex(final long fragmentFirstRowIndex) {
         m_fragmentFirstRowIndex = fragmentFirstRowIndex;
@@ -904,7 +904,7 @@ public class JSONDataTable {
      * the total number of rows after the filtering operation. If this table is also a fragment this number
      * is larger than this table's row size.
      * @return the total number of filtered rows
-     * @since 3.8
+     * @since 4.0
      */
     public long getTotalFilteredRows() {
         return m_totalFilteredRows;
@@ -914,7 +914,7 @@ public class JSONDataTable {
      * If this table represents the result of a filtering operation on a larger table, this number represents
      * the total number of rows after the filtering operation.
      * @param totalFilteredRows the total number of filtered rows
-     * @since 3.8
+     * @since 4.0
      */
     public void setTotalFilteredRows(final long totalFilteredRows) {
         m_totalFilteredRows = totalFilteredRows;
@@ -925,7 +925,7 @@ public class JSONDataTable {
      * a complete table it reports it's row size. Otherwise this number is larger than this table's row size.
      * If this table is also filtered this number represents the number of unfiltered rows.
      * @return the total number of rows
-     * @since 3.8
+     * @since 4.0
      */
     public long getTotalRows() {
         return m_totalRows;
@@ -934,7 +934,7 @@ public class JSONDataTable {
     /**
      * Sets the total number of rows
      * @param totalRows the total rows to set
-     * @since 3.8
+     * @since 4.0
      */
     public void setTotalRows(final long totalRows) {
         m_totalRows = totalRows;
@@ -1139,7 +1139,7 @@ public class JSONDataTable {
          *
          * @param dataRows the array of rows (possibly retrieved from a cache)
          * @return This builder instance, which can be used for method chaining.
-         * @since 3.8
+         * @since 4.0
          */
         public Builder setDataRows(final DataRow[] dataRows) {
             m_dataRows = dataRows;
@@ -1149,7 +1149,7 @@ public class JSONDataTable {
         /**
          * @param firstRow the first row number to be included in the result, must be larger than zero
          * @return This builder instance, which can be used for method chaining.
-         * @since 3.8
+         * @since 4.0
          */
         public Builder setFirstRow(final long firstRow) {
             m_firstRow = firstRow;
@@ -1171,7 +1171,7 @@ public class JSONDataTable {
          * @param filteredRows the total number of rows after a filter operation has been applied to the
          * table that this JSON table is derived from.
          *  @return This builder instance, which can be used for method chaining.
-         * @since 3.8
+         * @since 4.0
          */
         public Builder setPartialTableRows(final long totalRows, final long filteredRows) {
             m_totalRows = totalRows;

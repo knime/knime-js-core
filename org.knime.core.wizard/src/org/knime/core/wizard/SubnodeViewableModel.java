@@ -387,7 +387,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      *
      * @noreference This class is not intended to be referenced by clients.
      *
-     * @since 3.8
+     * @since 4.0
      */
     public static final class SubnodeWizardViewCreator extends JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> {
 
