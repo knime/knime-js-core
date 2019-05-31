@@ -10,7 +10,7 @@ Export-Package: org.knime.ext.phantomjs
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
   com.google.guava;bundle-version="[19.0.0,20.0.0)",
   org.openqa.selenium;bundle-version="[3.4.0,4.0.0)",
-  org.knime.core;bundle-version="[3.0.0,4.0.0)",
+  org.knime.core;bundle-version="[4.0.0,5.0.0)",
   org.knime.js.core;bundle-version="3.6.0",
   com.fasterxml.jackson.core.jackson-annotations;bundle-version="[2.4.3,3.0.0)",
   com.fasterxml.jackson.core.jackson-core;bundle-version="[2.4.3,3.0.0)",
