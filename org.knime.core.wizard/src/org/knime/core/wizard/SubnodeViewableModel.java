@@ -383,7 +383,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
-     * {@link JavaScriptViewCreator} for wrapped metanodes (i.e. composite views).
+     * {@link JavaScriptViewCreator} for components (i.e. composite views).
      *
      * @noreference This class is not intended to be referenced by clients.
      *
@@ -397,7 +397,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         }
 
         /**
-         * @return the template for the composite view of a wrapped metanode
+         * @return the template for the composite view of a component
          */
         public static WebTemplate createSubnodeWebTemplate() {
             List<WebResourceLocator> locators = new ArrayList<WebResourceLocator>();
