@@ -321,6 +321,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            exports="d3"
             name="D3_3.5.5_Debug"
             usesDefine="true"
             version="3.5.5"
@@ -336,6 +337,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
+            exports="d3"
             name="D3_3.5.5"
             usesDefine="true"
             version="3.5.5"
@@ -351,6 +353,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="false"
+            exports="d3"
             name="D3_4.2.6"
             usesDefine="true"
             version="4.2.6"
@@ -366,6 +369,7 @@
       </webResourceBundle>
       <webResourceBundle
             debug="true"
+            exports="d3"
             name="D3_4.2.6"
             usesDefine="true"
             version="4.2.6"
@@ -1894,6 +1898,7 @@
             </webResourceBundle>
             <webResourceBundle
                   debug="true"
+                  exports="Plotly"
                   name="Plotly.js 1.47"
                   usesDefine="true"
                   version="1.47.4"
@@ -1909,6 +1914,7 @@
             </webResourceBundle>
             <webResourceBundle
                   debug="false"
+                  exports="Plotly"
                   name="Plotly.js 1.47"
                   usesDefine="true"
                   version="1.47.4"
