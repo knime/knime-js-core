@@ -1,3 +1,84 @@
+---------ChromeDriver 75.0.3770.8 (2019-04-29)---------
+Supports Chrome version 75
+Resolved issue 2622: Clear Element command raises blur event twice [Pri-2]
+Resolved issue 2803: Capability name loggingPrefs is not spec compliant [Pri-2]
+Resolved issue 2536: Make standards mode (goog:chromeOptions.w3c:true) the default [Pri-2]
+Resolved issue 2836: Error handling in W3C mode [Pri-2]
+Resolved issue 2414: Creating cookies without leading dot in the domain results in host-only cookies [Pri-2]
+Resolved issue 2796: ChromeDriver should allow null for script timeout [Pri-2]
+Resolved issue 2721: Element Send Keys to file input with 'multiple' attribute should append file list [Pri-3]
+Resolved issue 2850: Get Active Element should return "no such element" error when no active element exists [Pri-3]
+Resolved issue 2851: Navigate to malformed URL should raise "invalid argument" error [Pri-3]
+Resolved issue 2857: ChromeDriver returns wrong HTTP status code when invalid session id is received [Pri-3]
+Resolved issue 2719: When input parameter is missing or malformed, ChromeDriver response is not spec compliant [Pri-3]
+Resolved issue 2746: Execute Script does not handle line-oriented JavaScript comment [Pri-3]
+
+----------ChromeDriver v74.0.3729.6 (2019-03-14)----------
+Supports Chrome v74
+Resolved issue 2799: Recent change to WebDriver Tests causes ChromeDriver to fail W3C Tests [[Pri-]]
+Resolved issue 2798: GET /sessions is not working if at least one of the sessions is in W3C mode [[Pri-3]]
+Resolved issue 2783: Improper UTF-8 encoding for CSS child selectors (driver.page_source) [[Pri-]]
+Resolved issue 2782: ChromeDriver can't connect to Chrome when /dev/shm is not available on Linux [[Pri-2]]
+Resolved issue 2773: Raise a standard exception when element is overlay by another element [[Pri-2]]
+Resolved issue 2768: 2.46 produces unexpected debug.log file if verbose logging is enabled [[Pri-1]]
+Resolved issue 2749: Update Switch To Frame error checks to match latest W3C spec [[Pri-3]]
+Resolved issue  755: /session/:sessionId/doubleclick only generates one set of mousedown/mouseup/click events [[Pri-2]]
+Resolved issue  427: Clicking div with SVG image causes "cannot read property 'length' of undefined" error. [[Pri-2]]
+
+----------ChromeDriver 73.0.3683.68 (2019-03-06)----------
+Supports Chrome version 73
+Resolved issue 2768: ChromeDriver produces unexpected debug.log file if verbose logging is enabled [[Pri-1]]
+Resolved issue 2728: Is Element Displayed command does not work correctly with v0 shadow DOM inserts [[Pri-1]]
+Resolved issue 2799: Recent change to WebDriver Tests causes ChromeDriver to fail W3C Tests [[Pri-2]]
+Resolved issue 2744: Execute Script returns wrong error code when JavaScript returns a cyclic data structure [[Pri-2]]
+Resolved issue 1529: OnResponse behavior can lead to port exhaustion [[Pri-2]]
+Resolved issue 2736: Close Window command should handle user prompts based on session capabilities [[Pri-2]]
+Resolved issue 1963: Sending keys to disabled element should throw Element Not interactable error [[Pri-2]]
+Resolved issue 2679: Timeout value handling is not spec compliant [[Pri-2]]
+Resolved issue 2002: Add Cookie is not spec compliant [[Pri-2]]
+Resolved issue 2716: Clearing Text Boxes [[Pri-3]]
+Resolved issue 2714: ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:15756. Could not start driver. [[Pri-3]]
+Resolved issue 2722: Execute Script does not correctly convert document.all into JSON format [[Pri-3]]
+Resolved issue 2681: ChromeDriver doesn't differentiate "no such element" and "stale element reference" [[Pri-3]]
+
+----------ChromeDriver v2.46 (2019-02-01)----------
+Supports Chrome v71-73
+Resolved issue 2728: Is Element Displayed command does not work correctly with v0 shadow DOM inserts [[Pri-1]]
+Resolved issue  755: /session/:sessionId/doubleclick only generates one set of mousedown/mouseup/click events [[Pri-2]]
+Resolved issue 2744: Execute Script returns wrong error code when JavaScript returns a cyclic data structure [[Pri-2]]
+Resolved issue 1529: OnResponse behavior can lead to port exhaustion [[Pri-2]]
+Resolved issue 2736: Close Window command should handle user prompts based on session capabilities [[Pri-2]]
+Resolved issue 1963: Sending keys to disabled element should throw Element Not interactable error [[Pri-2]]
+Resolved issue 2679: Timeout value handling is not spec compliant [[Pri-2]]
+Resolved issue 2002: Add Cookie is not spec compliant [[Pri-2]]
+Resolved issue 2749: Update Switch To Frame error checks to match latest W3C spec [[Pri-3]]
+Resolved issue 2716: Clearing Text Boxes [[Pri-3]]
+Resolved issue 2714: ConnectException: Failed to connect to localhost/0:0:0:0:0:0:0:1:15756. Could not start driver. [[Pri-3]]
+Resolved issue 2722: Execute Script does not correctly convert document.all into JSON format [[Pri-3]]
+Resolved issue 2681: ChromeDriver doesn't differentiate "no such element" and "stale element reference" [[Pri-3]]
+
+----------ChromeDriver v2.45 (2018-12-10)----------
+Supports Chrome v70-72
+Resolved issue 1997: New Session is not spec compliant [[Pri-1]]
+Resolved issue 2685: Should Assert that the chrome version is compatible [[Pri-2]]
+Resolved issue 2677: Find Element command returns wrong error code when an invalid locator is used [[Pri-2]]
+Resolved issue 2676: Some ChromeDriver status codes are wrong [[Pri-2]]
+Resolved issue 2665: compile error in JS inside of WebViewImpl::DispatchTouchEventsForMouseEvents [[Pri-2]]
+Resolved issue 2658: Window size commands should handle user prompts [[Pri-2]]
+Resolved issue 2684: ChromeDriver doesn't start Chrome correctly with options.addArguments("user-data-dir=") [[Pri-3]]
+Resolved issue 2688: Status command is not spec compliant [[Pri-3]]
+Resolved issue 2654: Add support for strictFileInteractability [[Pri-]]
+
+----------ChromeDriver v2.44 (2018-11-19)----------
+Supports Chrome v69-71
+Resolved issue 2522: Test ChromeDriverTest.testWindowMaximize is failing on Mac build bot on Waterfall [[Pri-2]]
+Resolved issue 2615: Incorrect 'alert open error' for window handle call [[Pri-2]]
+Resolved issue 2649: Element Send Keys should get "text" property in W3C mode [[Pri-2]]
+Resolved issue 1995: XML special case of Is Element Enabled is not handled as per spec [[Pri-2]]
+Resolved issue 1994: XML special case of Get Element CSS Value is not handled as per spec [[Pri-2]]
+Resolved issue 2655: Set Window Rect needs to check for invalid input [[Pri-3]]
+Resolved issue 2597: Support new unhandledPromptBehavior modes [[Pri-3]]
+
 ----------ChromeDriver v2.43 (2018-10-16)----------
 Supports Chrome v69-71
 Resolved issue 2537: Parsing of proxy configuration is not standard compliant [[Pri-1]]
