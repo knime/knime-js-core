@@ -85,11 +85,13 @@ import org.knime.js.core.JSCorePlugin;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -308,6 +310,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             if (cliOptions != null && !cliOptions.isEmpty()) {
                 options.addArguments(cliOptions.split("\\s+"));
             }
+            options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
 
             m_driver = new ChromeDriver(options);
             m_driver.manage().timeouts()
