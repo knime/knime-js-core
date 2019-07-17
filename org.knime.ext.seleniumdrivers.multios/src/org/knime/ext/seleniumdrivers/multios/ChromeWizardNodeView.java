@@ -64,7 +64,9 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -112,31 +114,47 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @since 3.4
  */
 public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent>
-extends AbstractWizardNodeView<T, REP, VAL> {
+    extends AbstractWizardNodeView<T, REP, VAL> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeWizardNodeView.class);
+
     private static Boolean CHROME_PRESENT = null;
+
     private static int CHROME_THREAD_COUNTER = 1;
 
     static final int DEFAULT_TIMEOUT = 30;
+
     private static final int COMET_TIMEOUT = 1000;
+
     private static final int COMET_TIMEOUT_DURING_REQUEST = 200;
+
     private static final int DEFAULT_WIDTH = 1024;
+
     private static final int DEFAULT_HEIGHT = 768;
 
     private final Object LOCK = new Object();
+
     private final ChromeViewService m_service;
 
     private ChromeDriver m_driver;
+
     private String m_windowHandle;
+
     private Thread m_cometThread;
+
     private AtomicBoolean m_shutdownCometThread = new AtomicBoolean(false);
+
     private File m_repTempFile;
+
     private File m_valTempFile;
+
     private File m_bridgeTempFile;
+
     private File m_lastResponseTempFile;
+
     private File m_userDataDir;
-    private String m_viewTitle = "KNIME view";
+
+    private String m_viewTitle = "KNIME View";
 
     /**
      * Instantiates a new view instance
@@ -170,7 +188,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 m_shutdownCometThread.set(true);
                 m_driver.quit();
                 m_driver = null;
-            } catch (Exception e) { /* continue shutdown */ }
+            } catch (Exception e) {
+                /* continue shutdown */ }
         }
         cancelOutstandingViewRequests();
         if (getViewableModel() instanceof SubnodeViewableModel) {
@@ -191,7 +210,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         tryDeleteTempFiles(false);
         // force reload of bridge in view
         executeScript("seleniumKnimeBridge.clearView()");
-        WizardNode<REP,VAL> model = getModel();
+        WizardNode<REP, VAL> model = getModel();
         // write potentially changed representation and value to disk (leave bridge file in place)
         writeTempViewFiles(model.getViewRepresentation(), model.getViewValue(), model.getViewCreator(), null);
         // initialize view without forcing focus of window
@@ -230,14 +249,17 @@ extends AbstractWizardNodeView<T, REP, VAL> {
 
                 Path bridgePath = null;
                 try {
-                    URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName()).getEntry("src-js/selenium-knime-bridge.html");
+                    URL bridgeURL = Platform.getBundle(MultiOSDriverActivator.getBundleName())
+                        .getEntry("src-js/selenium-knime-bridge.html");
                     String bridgeFile = FileLocator.toFileURL(bridgeURL).getFile();
-                    if (Platform.getOS().equals(Platform.OS_WIN32) && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
+                    if (Platform.getOS().equals(Platform.OS_WIN32)
+                        && (bridgeFile.startsWith("/") || bridgeFile.startsWith("\\"))) {
                         bridgeFile = bridgeFile.substring(1);
                     }
                     bridgePath = Paths.get(bridgeFile);
                 } catch (Exception e) {
-                    displayErrorMessage(new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage()));
+                    displayErrorMessage(
+                        new SeleniumViewException("Could not find selenium-knime-bridge.html: " + e.getMessage()));
                 }
                 writeTempViewFiles(viewRepresentation, viewValue, viewCreator, bridgePath);
 
@@ -275,7 +297,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
      * @return window handle as string to the newly created Chromium instance, or null
      * @since 3.5
      */
-    protected String initDriver(final int left, final int top, final int width, final int height, final boolean resolveChromium) {
+    protected String initDriver(final int left, final int top, final int width, final int height,
+        final boolean resolveChromium) {
         Optional<String> chromeDriverPath = MultiOSDriverActivator.getBundledChromeDriverPath();
         if (!chromeDriverPath.isPresent()) {
             throw new SeleniumViewException("Path to Chrome driver could not be retrieved!");
@@ -295,7 +318,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 }
                 options.setBinary(cPath.get());
                 m_userDataDir = m_service.getAndLockUserDataDir();
-                options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(), "--profile-directory=Default");
+                options.addArguments("--user-data-dir=" + m_userDataDir.getAbsolutePath(),
+                    "--profile-directory=Default");
                 options.addArguments("--no-default-browser-check", "--profiling-flush=1", "--no-session-id");
                 options.addArguments("--no-first-run", "--no-experiments", "--noerrdialogs", "--bwsi");
                 options.addArguments("--disable-breakpad", "--disable-infobars", "--disable-session-restore");
@@ -313,9 +337,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             options.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
 
             m_driver = new ChromeDriver(options);
-            m_driver.manage().timeouts()
-            .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-            .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+            m_driver.manage().timeouts().pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+                .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
             waitForDocumentReady(m_driver);
             // Store the current window handle
@@ -327,12 +350,12 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 but might also occur in other cases.
                 Message is only displayed as info, as to not confuse users.*/
                 LOGGER.info(errorMessage + e.getMessage(), e);
-            }
-            else {
+            } else {
                 LOGGER.error(errorMessage + e.getMessage(), e);
                 Optional<String> additionalInfo = Optional.empty();
                 if (resolveChromium) {
-                    additionalInfo = m_service.tryRetrieveMissingSystemLibraries(MultiOSDriverActivator.getChromiumPath());
+                    additionalInfo =
+                        m_service.tryRetrieveMissingSystemLibraries(MultiOSDriverActivator.getChromiumPath());
                 }
                 StringBuilder displayString = new StringBuilder(errorMessage);
                 if (additionalInfo.isPresent()) {
@@ -340,7 +363,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                     LOGGER.error(addString);
                     displayString.append(addString + "\n");
                 }
-                displayString.append("Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
+                displayString.append(
+                    "Check log for more details. \n\nThe browser can be configured in Preferences -> KNIME -> JavaScript Views");
                 throw new SeleniumViewException(displayString.toString());
             }
             return null;
@@ -348,7 +372,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
     }
 
     private static void displayErrorMessage(final Throwable t) {
-        final String prefix= "The interactive view cannot be opened for the following reason: ";
+        final String prefix = "The interactive view cannot be opened for the following reason: ";
         LOGGER.error(prefix + t.getMessage(), t);
         Display.getDefault().asyncExec(new Runnable() {
 
@@ -356,7 +380,7 @@ extends AbstractWizardNodeView<T, REP, VAL> {
             public void run() {
                 final MessageBox mb = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_ERROR | SWT.OK);
                 mb.setText("Interactive View cannot be opened");
-                mb.setMessage(prefix +"\n" + t.getMessage());
+                mb.setMessage(prefix + "\n" + t.getMessage());
                 mb.open();
             }
         });
@@ -451,11 +475,28 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 // log error but continue
                 LOGGER.error("Temporary view file could not be deleted: " + e.getMessage(), e);
             }
-            m_repTempFile = FileUtil.createTempFile("rep_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
-            m_valTempFile = FileUtil.createTempFile("val_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
+            m_repTempFile =
+                FileUtil.createTempFile("rep_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
+            m_valTempFile =
+                FileUtil.createTempFile("val_" + System.currentTimeMillis() + "_", ".json", tempPath.toFile(), true);
             m_bridgeTempFile = null;
+            List<Path> favIconFiles = new ArrayList<Path>(0);
             if (bridgePath != null) {
-                m_bridgeTempFile = FileUtil.createTempFile("selenium-knime-bridge_ " + System.currentTimeMillis() + "_", ".html", tempPath.toFile(), true);
+                m_bridgeTempFile = FileUtil.createTempFile("selenium-knime-bridge_ " + System.currentTimeMillis() + "_",
+                    ".html", tempPath.toFile(), true);
+                favIconFiles = Files.list(bridgePath.getParent()).filter(file -> {
+                   return file.getFileName().toString().startsWith("favicon");
+                }).collect(Collectors.toList());
+
+                favIconFiles.forEach(file -> {
+                    try {
+                        String fileName = file.toString();
+                        FileUtil.createTempFile(FilenameUtils.getBaseName(fileName),
+                            FilenameUtils.getExtension(fileName), tempPath.toFile(), true);
+                    } catch (IOException e) {
+                        /* no worries */
+                    }
+                });
             }
             try (BufferedWriter writer = Files.newBufferedWriter(m_repTempFile.toPath(), Charset.forName("UTF-8"))) {
                 writer.write(viewRepString);
@@ -469,6 +510,15 @@ extends AbstractWizardNodeView<T, REP, VAL> {
                 try {
                     Files.copy(bridgePath, m_bridgeTempFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
                         StandardCopyOption.COPY_ATTRIBUTES);
+                    favIconFiles.forEach(file -> {
+                        try {
+                            Files.copy(bridgePath.resolveSibling(file.getFileName()),
+                                m_bridgeTempFile.toPath().resolveSibling(file.getFileName()),
+                                StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+                        } catch (IOException ex) {
+                            // still not worried
+                        }
+                    });
                 } catch (Exception e) {
                     throw new SeleniumViewException("Error while copying KNIME-Selenium-Bridge: " + e.getMessage(), e);
                 }
@@ -501,8 +551,9 @@ extends AbstractWizardNodeView<T, REP, VAL> {
 
     /**
      * Tries to delete current temporary files. Potential errors are ignored.
-     * @param deleteBridgeFile true if the KNIME-Selenium-Bridge file and user data directory
-     * is supposed to be deleted, false otherwise
+     *
+     * @param deleteBridgeFile true if the KNIME-Selenium-Bridge file and user data directory is supposed to be deleted,
+     *            false otherwise
      */
     private void tryDeleteTempFiles(final boolean deleteBridgeFile) {
         try {
@@ -837,8 +888,8 @@ extends AbstractWizardNodeView<T, REP, VAL> {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String optionsString = mapper.writeValueAsString(options);
-            executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);",
-                title, message, optionsString);
+            executeScript("seleniumKnimeBridge.showModal(arguments[0], arguments[1], arguments[2]);", title, message,
+                optionsString);
         } catch (JsonProcessingException ex) {
             LOGGER.error("Could not trigger confirm close dialog: " + ex.getMessage(), ex);
         }
