@@ -167,3 +167,25 @@ table#knimePagedTable {
     display: block;
     padding-bottom: 3px;
 }
+
+@media screen and (max-width: 300px) {
+	li.paginate_button.previous {
+		display: inline !important;
+	}
+	li.paginate_button.next {
+		display: inline !important;
+	}
+	li.paginate_button {
+		display: none !important;
+	}
+	input.knime-filter {
+		display: block !important;
+		width: 100% !important;
+	}
+	select.knime-table-control-text {
+		display: block !important;
+	}
+	div#knimePagedTable_info {
+		white-space: normal;
+	}
+}
