@@ -3,10 +3,10 @@
 ### Content
 This repository contains the source code of the [KNIME Analytics Platform](http://www.knime.org) JavaScript-Core components. The code is organized as follows:
 
-* _org.knime.core.wizard.*_: Defines the component view.
-* _org.knime.ext.phantomjs.*_: PhantomJS ([phantomjs.org](http://phantomjs.org)) is a headless WebKit scriptable with JavaScript.  The latest [stable release](http://phantomjs.org/release-2.1.html) is version 2.1.
-* _org.knime.ext.selenium.*_: Includes the chromedriver and defines the selenium KNIME bridge.
-* _org.knime.js.core*_: Core components of the KNIME JavaScrpt integration.
+* _org.knime.js.core*_: Core components of the KNIME JavaScript integration.
+* _org.knime.ext.selenium.*_: Includes the Chromedriver and defines the Selenium-KNIME-bridge to display JavaScript enabled views of appropriate KNIME nodes in a Chromium browser.
+* _org.knime.core.wizard.*_: Defines combined views on components.
+
 
 ### Development
 Instructions for how to develop extensions for KNIME Analytics Platform can be found in the _knime-sdk-setup_ repository on [BitBucket](https://bitbucket.org/KNIME/knime-sdk-setup) or [GitHub](http://github.com/knime/knime-sdk-setup).
