@@ -48,7 +48,7 @@
 /* global kt:false, moment:false */
 /* eslint-disable valid-jsdoc */
 /**
- * Provides a common functionality for table-like views such as Table View, Table Editor, Data Explorer.
+ * Provides a common functionality for table-like views such as Table View, Table Editor, Tile View, etc.
  *
  * @constructor
  */
@@ -224,15 +224,15 @@ window.KnimeBaseTableViewer.prototype._drawTable = function () {
         this._buildColumnSearching();
 
         this._buildDataTableConfig();
-        this._dataTable = $('#knimePagedTable').DataTable(this._dataTableConfig);
+        this._dataTable = this._getJQueryTable().DataTable(this._dataTableConfig);
 
         this._addTableListeners();
 
         this._addSortButtons();
 
-        $('#knimePagedTable_paginate').css('display', 'none');
+        this._getJQueryTableContainer().find('.dataTables_paginate').css('display', 'none');
 
-        $('#knimePagedTable_info').html(
+        this._getJQueryTableContainer().find('.dataTables_info').html(
             '<strong>Loading data</strong> - Displaying ' + 1 + ' to ' +
                 Math.min(this._knimeTable.getNumRows(), this._representation.initialPageSize) + ' of ' +
                 this._knimeTable.getNumRows() + ' entries.'
@@ -280,18 +280,43 @@ window.KnimeBaseTableViewer.prototype._prepare = function () {
  * Creates an HTML wrapper for the table view
  */
 window.KnimeBaseTableViewer.prototype._createHtmlTableContainer = function () {
-    var body = $('body');
-    var wrapper = $('<div id="knimePagedTableContainer" class="knime-table-container" data-iframe-height ' +
-        'data-iframe-width>');
-    body.append(wrapper);
+    var container = $('body');
+    var customContainer = false;
+    if (this._representation.containerElement && this._representation.containerElement instanceof Element) {
+        container = $(this._representation.containerElement);
+        customContainer = true;
+    }
+    var wrapper = $('<div class="knime-table-container" data-iframe-height data-iframe-width>');
+    if (!customContainer) {
+        wrapper.attr('id', 'knimePagedTableContainer');
+    }
+    container.append(wrapper);
     if (this._representation.title !== null && this._representation.title !== '') {
         wrapper.append('<h1 class="knime-title">' + this._representation.title + '</h1>');
     }
     if (this._representation.subtitle !== null && this._representation.subtitle !== '') {
         wrapper.append('<h2 class="knime-subtitle">' + this._representation.subtitle + '</h2>');
     }
-    var table = $('<table id="knimePagedTable" class="table table-striped table-bordered knime-table" width="100%">');
+    var table = $('<table class="table table-striped table-bordered knime-table" width="100%">');
+    if (!customContainer) {
+        table.attr('id', 'knimePagedTable');
+    }
     wrapper.append(table);
+};
+
+window.KnimeBaseTableViewer.prototype._getJQueryTableContainer = function () {
+    if (this._representation.containerElement && this._representation.containerElement instanceof Element) {
+        return $(this._representation.containerElement);
+    }
+    return $('#knimePagedTableContainer');
+};
+
+window.KnimeBaseTableViewer.prototype._getJQueryTable = function () {
+    if (this._representation.containerElement && this._representation.containerElement instanceof Element) {
+        var container = this._getJQueryTableContainer();
+        return container.find('.knime-table');
+    }
+    return $('#knimePagedTable');
 };
 
 /**
@@ -299,9 +324,9 @@ window.KnimeBaseTableViewer.prototype._createHtmlTableContainer = function () {
  */
 window.KnimeBaseTableViewer.prototype._buildColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        $('#knimePagedTable').append('<tfoot class="knime-table-footer">' +
+        this._getJQueryTable().append('<tfoot class="knime-table-footer">' +
             '<tr class="knime-table-row knime-table-footer"></tr></tfoot>');
-        var footerRow = $('#knimePagedTable tfoot tr');
+        var footerRow = this._getJQueryTable().find('tfoot tr');
         if (this._representation.enableSelection) {
             footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
         }
@@ -323,7 +348,7 @@ window.KnimeBaseTableViewer.prototype._buildColumnSearching = function () {
             }
         }
 
-        $('#knimePagedTable tfoot th').each(function () {
+        this._getJQueryTable().find('tfoot th').each(function () {
             var title = $(this).text();
             if (title === '') {
                 return;
@@ -547,10 +572,10 @@ window.KnimeBaseTableViewer.prototype._buildColumnDefinitions = function () {
 window.KnimeBaseTableViewer.prototype._dataTableDrawCallback = function () {
     var self = this;
     if (!this._representation.displayColumnHeaders) {
-        $('#knimePagedTableContainer thead').remove();
+        this._getJQueryTableContainer().find('thead').remove();
     }
     if (this._dataTableConfig.searching && !this._representation.enableSearching) {
-        $('#knimePagedTable_filter').remove();
+        this._getJQueryTableContainer().find('.dataTables_filter').remove();
     }
     if (this._dataTable) {
         this._curCells = this._dataTable.cells(function (ind) {
@@ -661,7 +686,7 @@ window.KnimeBaseTableViewer.prototype._buildDataTableConfig = function () {
  * Registers table listeners
  */
 window.KnimeBaseTableViewer.prototype._addTableListeners = function () {
-    var $table = $('#knimePagedTable');
+    var $table = this._getJQueryTable();
     $table.attr('tabindex', 0);
     $table.on('keydown', this._keyDownHandler.bind(this));
     // we need to listen to copy event on body level as user-select:none prevents copy event
@@ -675,8 +700,9 @@ window.KnimeBaseTableViewer.prototype._addTableListeners = function () {
 window.KnimeBaseTableViewer.prototype._addSortButtons = function () {
     // Clear sorting button placement and enable/disable on order change
     if (this._representation.enableSorting && this._representation.enableClearSortButton) {
+        //TODO set breakpoint and remove id
         this._dataTable.buttons().container().appendTo('#knimePagedTable_wrapper .col-sm-6:eq(0)');
-        $('#knimePagedTable_length').css({
+        this._getJQueryTable().find('.dataTables_length').css({
             display: 'inline-block',
             'margin-right': '10px'
         });
@@ -823,6 +849,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
     var self = this;
     if (this._representation.singleSelection) {
         // Handle click on clear selection button
+        //TODO: how to remove id here?
         var clearSelectionButton = $('#clear-selection-button').get(0);
         if (clearSelectionButton) {
             clearSelectionButton.addEventListener('click', function () {
@@ -830,7 +857,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
             });
         }
         // Handle click on radio button to set selection and publish event
-        $('#knimePagedTable tbody').on(
+        this._getJQueryTable().find('tbody').on(
             'change',
             'input[type="radio"]',
             function () {
@@ -850,6 +877,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
         );
     } else {
         // Handle click on "Select all" control
+        //TODO: how to remove id here?
         var selectAllCheckbox = $('#checkbox-select-all').get(0);
         if (selectAllCheckbox) {
             if (selectAllCheckbox.checked && 'indeterminate' in selectAllCheckbox) {
@@ -861,7 +889,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
         }
 
         // Handle click on checkbox to set state of "Select all" control
-        $('#knimePagedTable tbody').on(
+        this._getJQueryTable().find('tbody').on(
             'change',
             'input[type="checkbox"]',
             function () {
@@ -941,7 +969,7 @@ window.KnimeBaseTableViewer.prototype._addDataToTable = function (startIndex, ch
     var chunkDuration = endTime - startTime;
     var newChunkSize = chunkSize;
     if (startIndex + chunkSize < tableSize) {
-        $('#knimePagedTable_info').html(
+        this._getJQueryTableContainer().find('.dataTables_info').html(
             '<strong>Loading data (' + endIndex + ' of ' + tableSize + ' records)</strong> - Displaying ' + 1 + ' to ' +
                 Math.min(tableSize, this._representation.initialPageSize) + ' of ' + tableSize + ' entries.'
         );
@@ -957,7 +985,7 @@ window.KnimeBaseTableViewer.prototype._addDataToTable = function (startIndex, ch
             };
         })(startIndex + chunkSize, newChunkSize), chunkDuration);
     } else {
-        $('#knimePagedTable_paginate').css('display', 'block');
+        this._getJQueryTableContainer().find('.dataTables_paginate').css('display', 'block');
         this._applyViewValue();
         this._dataTable.draw();
         this._finishInit();
@@ -1084,6 +1112,7 @@ window.KnimeBaseTableViewer.prototype._selectAll = function (all, ignoreSearch) 
  * Checks whether all the rows have been selected
  */
 window.KnimeBaseTableViewer.prototype._checkSelectAllState = function () {
+    //TODO: remove id
     var selectAllCheckbox = $('#checkbox-select-all').get(0);
     if (!selectAllCheckbox) {
         return;
@@ -1379,7 +1408,7 @@ window.KnimeBaseTableViewer.prototype._keyDownHandler = function (e) {
  * @param e event
  */
 window.KnimeBaseTableViewer.prototype._copyHandler = function (e) {
-    if (!$('#knimePagedTable').is(':focus')) {
+    if (!this._getJQueryTable().is(':focus')) {
         // since we trigger copy event on the body level, then copy event happens from the table only when it's in focus
         // check comment in _addTableListeners method
         return;
@@ -1431,24 +1460,26 @@ window.KnimeBaseTableViewer.prototype._copyHandler = function (e) {
  * Set CSS styles for table controls
  */
 window.KnimeBaseTableViewer.prototype._setControlCssStyles = function () {
-    $('#knimePagedTable_length').addClass('knime-table-length');
-    $('#knimePagedTable_length label').addClass('knime-table-control-text');
-    $('#knimePagedTable_length select').addClass('knime-table-control-text knime-single-line');
+    var cont = this._getJQueryTableContainer();
+    cont.find('.dataTables_length').addClass('knime-table-length');
+    cont.find('.dataTables_length label').addClass('knime-table-control-text');
+    cont.find('.dataTables_length select').addClass('knime-table-control-text knime-single-line');
     $('.dt-buttons').addClass('knime-table-buttons');
     $('.dt-buttons span').addClass('knime-table-control-text');
-    $('#knimePagedTable_filter').addClass('knime-table-search');
-    $('#knimePagedTable_filter label').addClass('knime-table-control-text');
-    $('#knimePagedTable_filter input').addClass('knime-filter knime-single-line');
-    $('#knimePagedTable_paginate').addClass('knime-table-paging');
-    $('#knimePagedTable_info').addClass('knime-table-info knime-table-control-text');
+    cont.find('.dataTables_filter').addClass('knime-table-search');
+    cont.find('.dataTables_filter label').addClass('knime-table-control-text');
+    cont.find('.dataTables_filter input').addClass('knime-filter knime-single-line');
+    cont.find('.dataTables_paginate').addClass('knime-table-paging');
+    cont.find('.dataTables_info').addClass('knime-table-info knime-table-control-text');
 };
 
 /**
  * Set CSS styles for dynamically loaded objects controls
  */
 window.KnimeBaseTableViewer.prototype._setDynamicCssStyles = function () {
-    $('#knimePagedTable tr').addClass('knime-table-row');
-    $('#knimePagedTable_paginate ul').addClass('knime-table-control-text');
-    $('#knimePagedTableContainer thead tr').addClass('knime-table-header');
-    $('#knimePagedTableContainer thead th').addClass('knime-table-header');
+    this._getJQueryTable().find('tr').addClass('knime-table-row');
+    var cont = this._getJQueryTableContainer();
+    cont.find('.dataTables_paginate ul').addClass('knime-table-control-text');
+    cont.find('thead tr').addClass('knime-table-header');
+    cont.find('thead th').addClass('knime-table-header');
 };
