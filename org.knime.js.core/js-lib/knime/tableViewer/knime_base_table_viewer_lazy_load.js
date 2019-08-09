@@ -18,17 +18,18 @@ window.KnimeBaseTableViewer.prototype._lazyLoadData = function (data, callback, 
                 columns: data.columns
             };
             const self = this;
-            $('#knimePagedTable_processing').text('Processing...').prop('title', '');
+            let processingPanel = this._getJQueryTableContainer().find('.dataTables_processing');
+            processingPanel.text('Processing...').prop('title', '');
             if (this._runningRequest) {
                 this._runningRequest.cancel();
             }
             let promise = knimeService.requestViewUpdate(request);
             this._runningRequest = promise;
             promise.progress(monitor => {
-                $('#knimePagedTable_processing').prop('title', monitor.progressMessage ? monitor.progressMessage : '');
+                processingPanel.prop('title', monitor.progressMessage ? monitor.progressMessage : '');
                 if (monitor.progress) {
                     let percent = (monitor.progress * 100).toFixed(0);
-                    $('#knimePagedTable_processing').text('Processing... (' + percent + '%)');
+                    processingPanel.text('Processing... (' + percent + '%)');
                 }
             }).then(response => {
                 if (response.error) {
