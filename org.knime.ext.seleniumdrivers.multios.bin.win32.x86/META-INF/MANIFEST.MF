@@ -5,3 +5,4 @@ Bundle-SymbolicName: org.knime.ext.seleniumdrivers.multios.bin.win32.x86;singlet
 Bundle-Version: 75.0.3770.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Fragment-Host: org.knime.ext.seleniumdrivers.multios;bundle-version="[4.0.0,5.0.0)"
+Eclipse-BundleShape: dir
