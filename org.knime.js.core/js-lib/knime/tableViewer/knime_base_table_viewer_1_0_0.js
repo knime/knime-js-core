@@ -306,7 +306,7 @@ window.KnimeBaseTableViewer.prototype._createHtmlTableContainer = function () {
 
 window.KnimeBaseTableViewer.prototype._getJQueryTableContainer = function () {
     if (this._representation.containerElement && this._representation.containerElement instanceof Element) {
-        return $(this._representation.containerElement);
+        return $(this._representation.containerElement).find('.knime-table-container');
     }
     return $('#knimePagedTableContainer');
 };
