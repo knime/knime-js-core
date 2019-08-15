@@ -368,7 +368,7 @@ window.KnimeBaseTableViewer.prototype._buildSelection = function () {
         if (this._representation.singleSelection) {
             var titleElement = '';
             if (this._representation.enableClearSelectionButton) {
-                titleElement = '<button type="button" id="clear-selection-button" class="btn btn-default btn-xs ' +
+                titleElement = '<button type="button" class="btn btn-default btn-xs knime-clear-selection-button ' +
                     'knime-control-text" title="Clear selection"><span class="glyphicon glyphicon-remove-circle" ' +
                     'aria-hidden="true"></span></button>';
             }
@@ -386,8 +386,8 @@ window.KnimeBaseTableViewer.prototype._buildSelection = function () {
             var all = this._value.selectAll;
             this._dataTableConfig.columns
                 .push({
-                    title: '<input name="select_all" value="1" id="checkbox-select-all" type="checkbox" ' +
-                        'class="knime-boolean"' + (all ? ' checked' : '') + ' />',
+                    title: '<input name="select_all" value="1" type="checkbox" ' +
+                        'class="knime-boolean knime-checkbox-select-all"' + (all ? ' checked' : '') + ' />',
                     searchable: false,
                     orderable: false,
                     className: 'dt-body-center selection-cell knime-table-cell',
@@ -700,9 +700,10 @@ window.KnimeBaseTableViewer.prototype._addTableListeners = function () {
 window.KnimeBaseTableViewer.prototype._addSortButtons = function () {
     // Clear sorting button placement and enable/disable on order change
     if (this._representation.enableSorting && this._representation.enableClearSortButton) {
-        //TODO set breakpoint and remove id
-        this._dataTable.buttons().container().appendTo('#knimePagedTable_wrapper .col-sm-6:eq(0)');
-        this._getJQueryTable().find('.dataTables_length').css({
+        var cont = this._getJQueryTableContainer();
+        var buttonCont = cont.find('.dataTables_wrapper .col-sm-6:eq(0)')[0];
+        this._dataTable.buttons().container().appendTo(buttonCont);
+        cont.find('.dataTables_length').css({
             display: 'inline-block',
             'margin-right': '10px'
         });
@@ -849,8 +850,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
     var self = this;
     if (this._representation.singleSelection) {
         // Handle click on clear selection button
-        //TODO: how to remove id here?
-        var clearSelectionButton = $('#clear-selection-button').get(0);
+        var clearSelectionButton = this._getJQueryTable().find('.knime-clear-selection-button').get(0);
         if (clearSelectionButton) {
             clearSelectionButton.addEventListener('click', function () {
                 self._selectAll(false);
@@ -877,8 +877,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
         );
     } else {
         // Handle click on "Select all" control
-        //TODO: how to remove id here?
-        var selectAllCheckbox = $('#checkbox-select-all').get(0);
+        var selectAllCheckbox = this._getJQueryTable().find('.knime-checkbox-select-all').get(0);
         if (selectAllCheckbox) {
             if (selectAllCheckbox.checked && 'indeterminate' in selectAllCheckbox) {
                 selectAllCheckbox.indeterminate = this._value.selectAllIndeterminate;
@@ -1112,8 +1111,7 @@ window.KnimeBaseTableViewer.prototype._selectAll = function (all, ignoreSearch) 
  * Checks whether all the rows have been selected
  */
 window.KnimeBaseTableViewer.prototype._checkSelectAllState = function () {
-    //TODO: remove id
-    var selectAllCheckbox = $('#checkbox-select-all').get(0);
+    var selectAllCheckbox = this._getJQueryTable().find('.knime-checkbox-select-all').get(0);
     if (!selectAllCheckbox) {
         return;
     }

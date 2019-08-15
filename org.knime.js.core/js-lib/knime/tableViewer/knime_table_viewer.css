@@ -149,8 +149,8 @@ table.knime-table {
 	color: #d9534f;
 }
 
-.knime-table #checkbox-select-all,
-.knime-table #clear-selection-button,
+.knime-table .knime-checkbox-select-all,
+.knime-table .knime-clear-selection-button,
 .knime-table td.selection-cell input[type=checkbox], 
 .knime-table td.selection-cell input[type=radio] {
 	display: block;
@@ -158,12 +158,12 @@ table.knime-table {
 	margin-right: auto;
 }
 
-.knime-table #clear-selection-button {
+.knime-table .knime-clear-selection-button {
 	border: none;
     font-size: 14px;
 }
 
-.knime-table #clear-selection-button span.glyphicon{
+.knime-table .knime-clear-selection-button span.glyphicon{
     display: block;
     padding-bottom: 3px;
 }
