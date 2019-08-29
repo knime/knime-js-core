@@ -850,12 +850,10 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
     var self = this;
     if (this._representation.singleSelection) {
         // Handle click on clear selection button
-        var clearSelectionButton = this._getJQueryTable().find('.knime-clear-selection-button').get(0);
-        if (clearSelectionButton) {
-            clearSelectionButton.addEventListener('click', function () {
-                self._selectAll(false);
-            });
-        }
+        var clearSelectionButton = this._getJQueryTableContainer().find('.knime-clear-selection-button');
+        clearSelectionButton.click(function () {
+            self._selectAll(false);
+        });
         // Handle click on radio button to set selection and publish event
         this._getJQueryTable().find('tbody').on(
             'change',
@@ -877,7 +875,7 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
         );
     } else {
         // Handle click on "Select all" control
-        var selectAllCheckbox = this._getJQueryTable().find('.knime-checkbox-select-all').get(0);
+        var selectAllCheckbox = this._getJQueryTableContainer().find('.knime-checkbox-select-all').get(0);
         if (selectAllCheckbox) {
             if (selectAllCheckbox.checked && 'indeterminate' in selectAllCheckbox) {
                 selectAllCheckbox.indeterminate = this._value.selectAllIndeterminate;
@@ -1111,7 +1109,7 @@ window.KnimeBaseTableViewer.prototype._selectAll = function (all, ignoreSearch) 
  * Checks whether all the rows have been selected
  */
 window.KnimeBaseTableViewer.prototype._checkSelectAllState = function () {
-    var selectAllCheckbox = this._getJQueryTable().find('.knime-checkbox-select-all').get(0);
+    var selectAllCheckbox = this._getJQueryTableContainer().find('.knime-checkbox-select-all').get(0);
     if (!selectAllCheckbox) {
         return;
     }
