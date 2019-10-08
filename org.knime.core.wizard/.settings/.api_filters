@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.core.wizard" version="2">
     <resource path="src/org/knime/core/wizard/AbstractPageManager.java" type="org.knime.core.wizard.AbstractPageManager">
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.AbstractPageManager"/>
-                <message_argument value="validateValueMap(Map&lt;String,String&gt;)"/>
-            </message_arguments>
-        </filter>
         <filter id="623939596">
             <message_arguments>
                 <message_argument value="Type"/>
