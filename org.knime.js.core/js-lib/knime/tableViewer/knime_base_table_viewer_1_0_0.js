@@ -221,10 +221,10 @@ window.KnimeBaseTableViewer.prototype._drawTable = function () {
         this._knimeTable = new kt();
         this._knimeTable.setDataTable(this._representation.table);
 
-        this._buildColumnSearching();
-
         this._buildDataTableConfig();
         this._dataTable = this._getJQueryTable().DataTable(this._dataTableConfig);
+
+        this._buildColumnSearching();
 
         this._addTableListeners();
 
@@ -324,37 +324,51 @@ window.KnimeBaseTableViewer.prototype._getJQueryTable = function () {
  */
 window.KnimeBaseTableViewer.prototype._buildColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        this._getJQueryTable().append('<tfoot class="knime-table-footer">' +
-            '<tr class="knime-table-row knime-table-footer"></tr></tfoot>');
-        var footerRow = this._getJQueryTable().find('tfoot tr');
+        var footerRow = document.createElement('tr');
+        footerRow.setAttribute('role', 'row');
+        footerRow.classList = ['knime-table-column-search'];
+
+        this._getJQueryTableContainer()[0]
+            .querySelector('div.dataTables_scrollHead thead')
+            .appendChild(footerRow);
         if (this._representation.enableSelection) {
-            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
+            var enableSelectionEl = document.createElement('th');
+            enableSelectionEl.classList = ['knime-table-cell', 'knime-table-footer'];
+            footerRow.appendChild(enableSelectionEl);
         }
         if (this._representation.displayRowIndex) {
-            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
+            var displayRowIndEl = document.createElement('th');
+            displayRowIndEl.classList = ['knime-table-cell', 'knime-table-footer'];
+            footerRow.appendChild(displayRowIndEl);
         }
         if (this._representation.displayRowColors || this._representation.displayRowIds) {
-            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
+            var rowIdandColorEl = document.createElement('th');
+            rowIdandColorEl.classList = ['knime-table-cell', 'knime-table-footer'];
+            footerRow.appendChild(rowIdandColorEl);
         }
         for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
             if (this._knimeTable.isColumnHidden(i)) {
                 continue;
             }
+            var columnEl = document.createElement('th');
+            columnEl.classList = ['knime-table-cell', 'knime-table-footer'];
             if (this._isColumnSearchable(this._knimeTable.getColumnTypes()[i])) {
-                footerRow.append('<th class="knime-table-cell knime-table-footer">' +
-                    this._knimeTable.getColumnNames()[i] + '</th>');
-            } else {
-                footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
+                columnEl.innerHTML = this._knimeTable.getColumnNames()[i];
             }
+            footerRow.appendChild(columnEl);
         }
-
-        this._getJQueryTable().find('tfoot th').each(function () {
-            var title = $(this).text();
-            if (title === '') {
+        console.log(footerRow.childNodes);
+        footerRow.childNodes.forEach(function (el, elInd) {
+            var colName = el.innerText;
+            if (colName === '') {
                 return;
             }
-            $(this).html('<input class="knime-table-control-text knime-filter knime-single-line" type="text" ' +
-                'placeholder="Search ' + title + '" />');
+            el.innerHTML = '';
+            var columnSearchInput = document.createElement('input');
+            columnSearchInput.classList = ['knime-table-control-text', 'knime-filter', 'knime-single-line'];
+            columnSearchInput.setAttribute('type', 'text');
+            columnSearchInput.setAttribute('placeholder', 'Search ' + colName);
+            el.appendChild(columnSearchInput);
         });
     }
 };
@@ -939,13 +953,20 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
  */
 window.KnimeBaseTableViewer.prototype._processColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        this._dataTable.columns().every(function () { // eslint-disable-line array-callback-return
-            var that = this;
-            $('input', this.footer()).on('keyup change', function () {
-                if (that.search() !== this.value) {
-                    that.search(this.value).draw();
+        var inputFields = document
+            .querySelector('div.dataTables_scrollHead thead .knime-table-column-search').childNodes;
+
+        this._dataTable.columns().every(function (col) { // eslint-disable-line array-callback-return
+            var self = this;
+            var searchFunction = function (event) {
+                if (self.search() !== event.firstChild.value) {
+                    self.search(event.firstChild.value).draw();
                 }
-            });
+            };
+
+            var inputEl = inputFields[col];
+            inputEl.addEventListener('keyup', function () { searchFunction(inputEl); });
+            inputEl.addEventListener('change', function () { searchFunction(inputEl); });
         });
     }
 };
