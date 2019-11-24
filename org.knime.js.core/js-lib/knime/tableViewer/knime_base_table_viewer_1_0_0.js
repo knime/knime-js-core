@@ -324,41 +324,40 @@ window.KnimeBaseTableViewer.prototype._getJQueryTable = function () {
  */
 window.KnimeBaseTableViewer.prototype._buildColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        var footerRow = document.createElement('tr');
-        footerRow.setAttribute('role', 'row');
-        footerRow.classList = ['knime-table-column-search'];
+        var columnSearchHeaderRow = document.createElement('tr');
+        columnSearchHeaderRow.setAttribute('role', 'row');
+        columnSearchHeaderRow.classList = ['knime-table-column-search'];
 
         this._getJQueryTableContainer()[0]
             .querySelector('div.dataTables_scrollHead thead')
-            .appendChild(footerRow);
+            .appendChild(columnSearchHeaderRow);
         if (this._representation.enableSelection) {
             var enableSelectionEl = document.createElement('th');
-            enableSelectionEl.classList = ['knime-table-cell', 'knime-table-footer'];
-            footerRow.appendChild(enableSelectionEl);
+            enableSelectionEl.classList = ['knime-table-cell', 'knime-table-header'];
+            columnSearchHeaderRow.appendChild(enableSelectionEl);
         }
         if (this._representation.displayRowIndex) {
             var displayRowIndEl = document.createElement('th');
-            displayRowIndEl.classList = ['knime-table-cell', 'knime-table-footer'];
-            footerRow.appendChild(displayRowIndEl);
+            displayRowIndEl.classList = ['knime-table-cell', 'knime-table-header'];
+            columnSearchHeaderRow.appendChild(displayRowIndEl);
         }
         if (this._representation.displayRowColors || this._representation.displayRowIds) {
             var rowIdandColorEl = document.createElement('th');
-            rowIdandColorEl.classList = ['knime-table-cell', 'knime-table-footer'];
-            footerRow.appendChild(rowIdandColorEl);
+            rowIdandColorEl.classList = ['knime-table-cell', 'knime-table-header'];
+            columnSearchHeaderRow.appendChild(rowIdandColorEl);
         }
         for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
             if (this._knimeTable.isColumnHidden(i)) {
                 continue;
             }
             var columnEl = document.createElement('th');
-            columnEl.classList = ['knime-table-cell', 'knime-table-footer'];
+            columnEl.classList = ['knime-table-cell', 'knime-table-header'];
             if (this._isColumnSearchable(this._knimeTable.getColumnTypes()[i])) {
                 columnEl.innerHTML = this._knimeTable.getColumnNames()[i];
             }
-            footerRow.appendChild(columnEl);
+            columnSearchHeaderRow.appendChild(columnEl);
         }
-        console.log(footerRow.childNodes);
-        footerRow.childNodes.forEach(function (el, elInd) {
+        columnSearchHeaderRow.childNodes.forEach(function (el, elInd) {
             var colName = el.innerText;
             if (colName === '') {
                 return;
