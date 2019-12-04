@@ -221,10 +221,10 @@ window.KnimeBaseTableViewer.prototype._drawTable = function () {
         this._knimeTable = new kt();
         this._knimeTable.setDataTable(this._representation.table);
 
+        this._buildColumnSearching();
+
         this._buildDataTableConfig();
         this._dataTable = this._getJQueryTable().DataTable(this._dataTableConfig);
-
-        this._buildColumnSearching();
 
         this._addTableListeners();
 
@@ -324,50 +324,37 @@ window.KnimeBaseTableViewer.prototype._getJQueryTable = function () {
  */
 window.KnimeBaseTableViewer.prototype._buildColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        var columnSearchHeaderRow = document.createElement('tr');
-        columnSearchHeaderRow.setAttribute('role', 'row');
-        columnSearchHeaderRow.classList = ['knime-table-column-search'];
-
-        this._getJQueryTableContainer()[0]
-            .querySelector('div.dataTables_scrollHead thead')
-            .appendChild(columnSearchHeaderRow);
+        this._getJQueryTable().append('<tfoot class="knime-table-footer">' +
+            '<tr class="knime-table-row knime-table-footer"></tr></tfoot>');
+        var footerRow = this._getJQueryTable().find('tfoot tr');
         if (this._representation.enableSelection) {
-            var enableSelectionEl = document.createElement('th');
-            enableSelectionEl.classList = ['knime-table-cell', 'knime-table-header'];
-            columnSearchHeaderRow.appendChild(enableSelectionEl);
+            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
         }
         if (this._representation.displayRowIndex) {
-            var displayRowIndEl = document.createElement('th');
-            displayRowIndEl.classList = ['knime-table-cell', 'knime-table-header'];
-            columnSearchHeaderRow.appendChild(displayRowIndEl);
+            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
         }
         if (this._representation.displayRowColors || this._representation.displayRowIds) {
-            var rowIdandColorEl = document.createElement('th');
-            rowIdandColorEl.classList = ['knime-table-cell', 'knime-table-header'];
-            columnSearchHeaderRow.appendChild(rowIdandColorEl);
+            footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
         }
         for (var i = 0; i < this._knimeTable.getColumnNames().length; i++) {
             if (this._knimeTable.isColumnHidden(i)) {
                 continue;
             }
-            var columnEl = document.createElement('th');
-            columnEl.classList = ['knime-table-cell', 'knime-table-header'];
             if (this._isColumnSearchable(this._knimeTable.getColumnTypes()[i])) {
-                columnEl.innerHTML = this._knimeTable.getColumnNames()[i];
+                footerRow.append('<th class="knime-table-cell knime-table-footer">' +
+                    this._knimeTable.getColumnNames()[i] + '</th>');
+            } else {
+                footerRow.append('<th class="knime-table-cell knime-table-footer"></th>');
             }
-            columnSearchHeaderRow.appendChild(columnEl);
         }
-        columnSearchHeaderRow.childNodes.forEach(function (el, elInd) {
-            var colName = el.innerText;
-            if (colName === '') {
+
+        this._getJQueryTable().find('tfoot th').each(function () {
+            var title = $(this).text();
+            if (title === '') {
                 return;
             }
-            el.innerHTML = '';
-            var columnSearchInput = document.createElement('input');
-            columnSearchInput.classList = ['knime-table-control-text', 'knime-filter', 'knime-single-line'];
-            columnSearchInput.setAttribute('type', 'text');
-            columnSearchInput.setAttribute('placeholder', 'Search ' + colName);
-            el.appendChild(columnSearchInput);
+            $(this).html('<input class="knime-table-control-text knime-filter knime-single-line" type="text" ' +
+                'placeholder="Search ' + title + '" />');
         });
     }
 };
@@ -952,20 +939,13 @@ window.KnimeBaseTableViewer.prototype._setSelectionHandlers = function () {
  */
 window.KnimeBaseTableViewer.prototype._processColumnSearching = function () {
     if (this._representation.enableColumnSearching) {
-        var inputFields = document
-            .querySelector('div.dataTables_scrollHead thead .knime-table-column-search').childNodes;
-
-        this._dataTable.columns().every(function (col) { // eslint-disable-line array-callback-return
-            var self = this;
-            var searchFunction = function (event) {
-                if (self.search() !== event.firstChild.value) {
-                    self.search(event.firstChild.value).draw();
+        this._dataTable.columns().every(function () { // eslint-disable-line array-callback-return
+            var that = this;
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that.search(this.value).draw();
                 }
-            };
-
-            var inputEl = inputFields[col];
-            inputEl.addEventListener('keyup', function () { searchFunction(inputEl); });
-            inputEl.addEventListener('change', function () { searchFunction(inputEl); });
+            });
         });
     }
 };
