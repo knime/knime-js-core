@@ -1,3 +1,4 @@
+/* eslint-disable */
 LOGGER = function() {
 	var logger = {};
 	
@@ -1039,6 +1040,10 @@ KnimePageLoader = function() {
 			//delete element.partial;
 		}
 		return element;
+	}
+	
+	pageLoader.getPublishedData = function(id) {
+	    return pageLoader.getPublishedElement(id);
 	}
 	
 	pageLoader.registerSelectionTranslator = function(translator, translatorID) {

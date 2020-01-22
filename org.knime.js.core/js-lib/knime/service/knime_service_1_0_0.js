@@ -33,9 +33,86 @@ window.knimeService = (function () {
     var GLOBAL_SERVICE = null;
     var SVGNS = 'http://www.w3.org/2000/svg';
     var KEY_ENTER = 13;
+    
+    var messagePageBuilder = function (data) {
+        data.nodeId = service.nodeId;
+        parent.postMessage(data, window.origin);
+    };
+    
+    var initGlobalService = function () {
+        
+        var api = 'KnimePageBuilderAPI';
+        
+        GLOBAL_SERVICE = {
+            interactivityCallbacks: {}
+        };
+        
+        GLOBAL_SERVICE.subscribe = function (id, callback, elementFilter) {
+            GLOBAL_SERVICE.interactivityCallbacks[id] = callback;
+            messagePageBuilder({
+                type: 'interactivitySubscribe',
+                id: id,
+                elementFilter: elementFilter
+            });
+        };
+        
+        GLOBAL_SERVICE.unsubscribe = function (id) {
+            delete GLOBAL_SERVICE.interactivityCallbacks[id];
+            messagePageBuilder({
+                type: 'interactivityUnsubscribe',
+                id: id
+            });
+        };
+        
+        GLOBAL_SERVICE.publish = function (id, data) {
+            messagePageBuilder({
+                type: 'interactivityPublish',
+                id: id,
+                payload: data
+            });
+        };
+
+        GLOBAL_SERVICE.registerSelectionTranslator = function (translator, translatorID) {
+            messagePageBuilder({
+                type: 'interactivityRegisterSelectionTranslator',
+                id: translatorID,
+                translator: translator
+            });
+        };
+        
+        GLOBAL_SERVICE.getPublishedData = function (id) {
+            if (parent[api] && parent[api].interactivityGetPublishedData) {
+                var element = parent[api].interactivityGetPublishedData(id);
+                return element;
+            } else {
+                throw Error('PageBuilder API not available.');
+            }
+        };
+                
+        GLOBAL_SERVICE.messageFromPageBuilder = function (event) {
+            if (event.origin !== window.origin) {
+                return;
+            }
+            
+            if (event.data.type === 'interactivityEvent' && typeof event.data.id !== 'undefined') {
+                var callback = GLOBAL_SERVICE.interactivityCallbacks[event.data.id];
+                if (callback) {
+                    callback(event.data.payload);
+                }
+            }
+        };
+              
+        window.addEventListener('message', GLOBAL_SERVICE.messageFromPageBuilder);
+    };
 
     var init = function () {
-        if (parent && parent.KnimePageLoader) {
+        
+        if (service.pageBuilderPresent) {
+            // new pageBuilder
+            interactivityAvailable = true;
+            initGlobalService();
+        } else if (parent && parent.KnimePageLoader) {
+            // legacy pageBuilder
             try {
                 runningInWebportal = parent.KnimePageLoader.isRunningInWebportal();
             } catch (err) {
@@ -57,7 +134,7 @@ window.knimeService = (function () {
         body.insertBefore(header, body.firstChild);
         initialized = true;
     };
-
+    
     service.getGlobalService = function () {
         if (!initialized) {
             init();
@@ -247,15 +324,15 @@ window.knimeService = (function () {
         return interactivityAvailable && GLOBAL_SERVICE && GLOBAL_SERVICE.unsubscribe(id, callback);
     };
 
-    var getInteractivityElement = function (id) {
+    var getInteractivityData = function (id) {
         if (!initialized) {
             init();
         }
         if (!interactivityAvailable || !GLOBAL_SERVICE) {
             return null;
         }
-        var element = GLOBAL_SERVICE.getPublishedElement(id);
-        if (typeof element === 'undefined') {
+        var element = GLOBAL_SERVICE.getPublishedData(id);
+        if (!element) {
             element = {};
         }
         if (typeof element.elements === 'undefined') {
@@ -269,8 +346,8 @@ window.knimeService = (function () {
     };
 
     service.registerSelectionTranslator = function (translator, translatorID, callback) {
-        if (parent.KnimePageLoader) {
-            parent.KnimePageLoader.registerSelectionTranslator(translator, translatorID);
+        if (interactivityAvailable && GLOBAL_SERVICE && GLOBAL_SERVICE.registerSelectionTranslator) {
+            GLOBAL_SERVICE.registerSelectionTranslator(translator, translatorID);
         }
     };
 
@@ -298,7 +375,7 @@ window.knimeService = (function () {
         if (!filterElement || !filterElement.id) {
             return false;
         }
-        var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
+        var filter = getInteractivityData(FILTER + SEPARATOR + tableId);
         if (!filter) {
             return false;
         }
@@ -317,7 +394,7 @@ window.knimeService = (function () {
     };
 
     service.removeFromFilter = function (tableId, elementId, skip) {
-        var filter = getInteractivityElement(FILTER + SEPARATOR + tableId);
+        var filter = getInteractivityData(FILTER + SEPARATOR + tableId);
         if (!filter) {
             return false;
         }
@@ -335,7 +412,7 @@ window.knimeService = (function () {
     var addRowsForInteractivityEvent = function (type, tableId, rowKeys, skip, elementId, forceNew) {
         var selection;
         // get or create interactivity element
-        var curElement = getInteractivityElement(type + SEPARATOR + tableId);
+        var curElement = getInteractivityData(type + SEPARATOR + tableId);
         if (!forceNew) {
             selection = curElement;
         }
@@ -387,7 +464,7 @@ window.knimeService = (function () {
     
     // eslint-disable-next-line max-params
     var removeRowsFromInteractivityEvent = function (type, tableId, rowKeys, skip, elementId) {
-        var selection = getInteractivityElement(type + SEPARATOR + tableId);
+        var selection = getInteractivityData(type + SEPARATOR + tableId);
         if (!selection || !selection.elements && !selection.partial) {
             // nothing to remove
             return false;
@@ -421,7 +498,7 @@ window.knimeService = (function () {
         var rows = [];
         var selection = selectionElement;
         if (!selection) {
-            selection = getInteractivityElement(SELECTION + SEPARATOR + tableId);
+            selection = getInteractivityData(SELECTION + SEPARATOR + tableId);
         }
         if (selection && selection.elements) {
             for (var i = 0; i < selection.elements.length; i++) {
@@ -434,7 +511,7 @@ window.knimeService = (function () {
     };
 
     service.getAllPartiallySelectedRows = function (tableId) {
-        var selection = getInteractivityElement(SELECTION + SEPARATOR + tableId);
+        var selection = getInteractivityData(SELECTION + SEPARATOR + tableId);
         return selection.partial || [];
     };
 
@@ -692,7 +769,8 @@ window.knimeService = (function () {
         if (!initialized) {
             init();
         }
-        return interactivityAvailable && screenfull.enabled && (runningInSeleniumBrowser || runningInWebportal) &&
+        var fullScreenAvailable = runningInSeleniumBrowser || runningInWebportal || service.pageBuilderPresent;
+        return interactivityAvailable && screenfull.enabled && fullScreenAvailable &&
             addButton('knime-service-fullscreen-button', 'arrows-alt', 'Toggle Fullscreen', function () {
                 if (screenfull.enabled) {
                     screenfull.toggle(element);
