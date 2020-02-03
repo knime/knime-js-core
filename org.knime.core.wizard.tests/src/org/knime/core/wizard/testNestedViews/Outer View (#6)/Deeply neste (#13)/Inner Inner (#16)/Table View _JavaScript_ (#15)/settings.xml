@@ -99,6 +99,7 @@
 <entry key="singleSelection" type="xboolean" value="false"/>
 <entry key="enableClearSelectionButton" type="xboolean" value="true"/>
 <entry key="maxRows" type="xint" value="100000"/>
+<entry key="enableLazyLoading" type="xboolean" value="false"/>
 <entry key="publishSelection" type="xboolean" value="true"/>
 <entry key="subscribeSelection" type="xboolean" value="true"/>
 <entry key="publishFilter" type="xboolean" value="true"/>
@@ -109,17 +110,17 @@
 <entry key="customDescription" type="xstring" isnull="true" value=""/>
 <entry key="state" type="xstring" value="IDLE"/>
 <entry key="factory" type="xstring" value="org.knime.js.base.node.viz.pagedTable.PagedTableViewNodeFactory"/>
-<entry key="node-name" type="xstring" value="Table View (JavaScript)"/>
+<entry key="node-name" type="xstring" value="Table View"/>
 <entry key="node-bundle-name" type="xstring" value="KNIME JavaScript Base Views"/>
 <entry key="node-bundle-symbolic-name" type="xstring" value="org.knime.js.views"/>
 <entry key="node-bundle-vendor" type="xstring" value="KNIME AG, Zurich, Switzerland"/>
-<entry key="node-bundle-version" type="xstring" value="3.7.0.qualifier"/>
-<entry key="node-feature-name" type="xstring" isnull="true" value=""/>
-<entry key="node-feature-symbolic-name" type="xstring" isnull="true" value=""/>
-<entry key="node-feature-vendor" type="xstring" isnull="true" value=""/>
-<entry key="node-feature-version" type="xstring" value="0.0.0"/>
+<entry key="node-bundle-version" type="xstring" value="4.1.0.v201912041458"/>
+<entry key="node-feature-name" type="xstring" value="KNIME JavaScript Views"/>
+<entry key="node-feature-symbolic-name" type="xstring" value="org.knime.features.js.views.feature.group"/>
+<entry key="node-feature-vendor" type="xstring" value="KNIME AG, Zurich, Switzerland"/>
+<entry key="node-feature-version" type="xstring" value="4.1.0.v201912041458"/>
 <config key="factory_settings"/>
-<entry key="name" type="xstring" value="Table View (JavaScript)"/>
+<entry key="name" type="xstring" value="Table View"/>
 <entry key="hasContent" type="xboolean" value="false"/>
 <entry key="isInactive" type="xboolean" value="false"/>
 <config key="ports">
