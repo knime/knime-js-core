@@ -204,6 +204,8 @@ window.seleniumKnimeBridge = (function () {
         let frame = document.getElementById(FRAME_ID);
         frame.addEventListener('load', function () {
             let frameWindow = document.getElementById(FRAME_ID).contentWindow;
+            frameWindow.representationLoaded = false;
+            frameWindow.valueLoaded = false;
 
             // registering view request functions to forward these to the bridge
             frameWindow.eval('function knimeViewRequest(request)' +
@@ -219,13 +221,15 @@ window.seleniumKnimeBridge = (function () {
             // loading representation and value
             loadJSONFile(repURL, function (rep) {
                 frameWindow.parsedRepresentation = rep;
-                if (frameWindow.parsedValue) {
+                frameWindow.representationLoaded = true;
+                if (frameWindow.valueLoaded) {
                     frameWindow.eval(initCall);
                 }
             }, true);
             loadJSONFile(valURL, function (val) {
                 frameWindow.parsedValue = val;
-                if (frameWindow.parsedRepresentation) {
+                frameWindow.valueLoaded = true;
+                if (frameWindow.representationLoaded) {
                     frameWindow.eval(initCall);
                 }
             }, true);
