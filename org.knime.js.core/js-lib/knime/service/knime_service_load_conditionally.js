@@ -1,6 +1,14 @@
 /* global require:false, requirejs:false */
 if (require && knimeService) {
     knimeService.loadConditionally = function (paths, success, failure, config) {
+        if (window.knimeResourceBaseUrl || knimeService.resourceBaseUrl) {
+            if (!config) {
+                config = {};
+            }
+            if (!config.baseUrl) {
+                config.baseUrl = window.knimeResourceBaseUrl || knimeService.resourceBaseUrl;
+            }
+        }
         if (config) {
             requirejs.config(config);
         }
