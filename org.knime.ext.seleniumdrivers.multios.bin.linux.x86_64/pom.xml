@@ -12,7 +12,7 @@
       <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</artifactId>
-  <version>75.0.3770-SNAPSHOT</version>
+  <version>78.0.3904.70</version>
   <packaging>eclipse-plugin</packaging>
   <build>
     <plugins>
