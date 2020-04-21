@@ -1,113 +1,163 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.knime.maven</groupId>
-		<artifactId>ap.parent</artifactId>
-		<version>1.0.0</version>
-	</parent>
+    <parent>
+        <groupId>org.knime.maven</groupId>
+        <artifactId>ap.parent</artifactId>
+        <version>1.0.0</version>
+    </parent>
 
-	<groupId>org.knime</groupId>
-	<artifactId>knime-js-core</artifactId>
+    <groupId>org.knime</groupId>
+    <artifactId>knime-js-core</artifactId>
     <version>${revision}${changelist}</version>
-	<packaging>pom</packaging>
+    <packaging>pom</packaging>
 
     <properties>
-        <revision>4.1.0</revision>
+        <revision>4.2.0</revision>
         <changelist>-SNAPSHOT</changelist>
         <feature-branch-extension.branchListProperty>git.branch</feature-branch-extension.branchListProperty>
         <feature-branch-extension.appendArtifactoryProperties>false</feature-branch-extension.appendArtifactoryProperties>
     </properties>
 
-    <modules>
-        <module>org.knime.core.wizard</module>
-        <module>org.knime.ext.phantomjs</module>
-        <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
-        <module>org.knime.ext.phantomjs.bin.macosx.x86_64</module>
-        <module>org.knime.ext.phantomjs.bin.win32.x86</module>
-        <module>org.knime.ext.seleniumdrivers.multios</module>
-        <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
-        <module>org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64</module>
-        <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
-        <module>org.knime.features.js.core</module>
-        <module>org.knime.js.core</module>
-        <module>org.knime.update.js.core</module>
-    </modules>
+    <profiles>
+        <profile>
+            <id>build</id>
+            <modules>
+                <module>org.knime.core.wizard</module>
+                <module>org.knime.ext.phantomjs</module>
+                <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
+                <module>org.knime.ext.phantomjs.bin.macosx.x86_64</module>
+                <module>org.knime.ext.phantomjs.bin.win32.x86</module>
+                <module>org.knime.ext.seleniumdrivers.multios</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
+                <module>org.knime.features.js.core</module>
+                <module>org.knime.js.core</module>
+                <module>org.knime.update.js.core</module>
+            </modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
 
-	<repositories>
-		<repository>
-			<id>p2-knime-core</id>
-			<layout>p2</layout>
-			<url>${knime.core.p2}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-base</id>
-			<layout>p2</layout>
-			<url>${knime.base.p2}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-expressions</id>
-			<layout>p2</layout>
-			<url>${knime.expressions.p2}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-shared</id>
-			<layout>p2</layout>
-			<url>${knime.shared.p2}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-svg</id>
-			<layout>p2</layout>
-			<url>${knime.svg.p2}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-js-pagebuilder</id>
-			<layout>p2</layout>
-            <url>${knime.p2.repo}/knime-js-pagebuilder/${git.branch}</url>
-		</repository>
-		<repository>
-			<id>p2-knime-tp</id>
-			<layout>p2</layout>
-			<url>${knime.tp.p2}</url>
-		</repository>
-	</repositories>
+        <profile>
+            <id>test</id>
+            <modules>
+                <module>org.knime.core.wizard</module>
+                <module>org.knime.core.wizard.tests</module>
+                <module>org.knime.ext.phantomjs</module>
+                <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
+                <module>org.knime.ext.phantomjs.bin.macosx.x86_64</module>
+                <module>org.knime.ext.phantomjs.bin.win32.x86</module>
+                <module>org.knime.ext.seleniumdrivers.multios</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64</module>
+                <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
+                <module>org.knime.features.js.core</module>
+                <module>org.knime.js.core</module>
+            </modules>
 
-	<!-- This whole block is only needed if the repository contains plug-ins 
-		that don't have any sources. If it is omitted Tycho will complain. -->
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho.extras</groupId>
-				<artifactId>tycho-source-feature-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>source-feature</id>
-						<phase>package</phase>
-						<goals>
-							<goal>source-feature</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<excludes>
-						<!-- List all plug-in that do NOT contain sources here. -->
-						<plugin id="org.knime.ext.phantomjs.bin.macosx.x86_64" />
-						<plugin id="org.knime.ext.phantomjs.bin.linux.x86_64" />
-						<plugin id="org.knime.ext.phantomjs.bin.win32.x86_64" />
-						<plugin id="org.knime.ext.phantomjs.bin.win32.x86" />
-						<plugin id="org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64" />
-						<plugin id="org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64" />
-						<plugin id="org.knime.ext.seleniumdrivers.multios.bin.win32.x86_64" />
-						<plugin id="org.knime.ext.seleniumdrivers.multios.bin.win32.x86" />
-						<plugin id="org.knime.js.pagebuilder" />
-					</excludes>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+            <repositories>
+                <repository>
+                    <id>p2-knime-js-base</id>
+                    <layout>p2</layout>
+                    <url>${knime.js.base.p2}</url>
+                </repository>
+                <repository>
+                    <id>p2-knime-workbench</id>
+                    <layout>p2</layout>
+                    <url>${knime.workbench.p2}</url>
+                </repository>
+            </repositories>
+
+        </profile>
+
+    </profiles>
+
+    <repositories>
+        <repository>
+            <id>p2-knime-core</id>
+            <layout>p2</layout>
+            <url>${knime.core.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-base</id>
+            <layout>p2</layout>
+            <url>${knime.base.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-expressions</id>
+            <layout>p2</layout>
+            <url>${knime.expressions.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-shared</id>
+            <layout>p2</layout>
+            <url>${knime.shared.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-svg</id>
+            <layout>p2</layout>
+            <url>${knime.svg.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-js-pagebuilder</id>
+            <layout>p2</layout>
+            <url>${knime.js.pagebuilder.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-server-client</id>
+            <layout>p2</layout>
+            <url>${knime.server.client.p2}</url>
+        </repository>
+        <repository>
+            <id>p2-knime-tp</id>
+            <layout>p2</layout>
+            <url>${knime.tp.p2}</url>
+        </repository>
+    </repositories>
+
+    <!-- This whole block is only needed if the repository contains plug-ins 
+        that don't have any sources. If it is omitted Tycho will complain. -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho.extras</groupId>
+                <artifactId>tycho-source-feature-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>source-feature</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>source-feature</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludes>
+                        <!-- List all plug-in that do NOT contain sources here. -->
+                        <plugin id="org.knime.ext.phantomjs.bin.macosx.x86_64" />
+                        <plugin id="org.knime.ext.phantomjs.bin.linux.x86_64" />
+                        <plugin id="org.knime.ext.phantomjs.bin.win32.x86_64" />
+                        <plugin id="org.knime.ext.phantomjs.bin.win32.x86" />
+                        <plugin
+                            id="org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64" />
+                        <plugin
+                            id="org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64" />
+                        <plugin
+                            id="org.knime.ext.seleniumdrivers.multios.bin.win32.x86_64" />
+                        <plugin
+                            id="org.knime.ext.seleniumdrivers.multios.bin.win32.x86" />
+                        <plugin id="org.knime.js.pagebuilder" />
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
