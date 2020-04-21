@@ -15,23 +15,14 @@ properties([
 try {
 	knimetools.defaultTychoBuild('org.knime.update.js.core')
 
-//	workflowTests.runTests(
-//		"org.knime.features.js.core.testing.feature.group",
-//		false,
-//		["knime-core", "knime-svg", "knime-shared", "knime-expressions", "knime-base", "knime-tp"],
-//	)
-
-//	stage('Sonarqube analysis') {
-//		env.lastStage = env.STAGE_NAME
-//		// passing the test configuration is optional but must be done when they are
-//		// used above in the workflow tests
-//		workflowTests.runSonar(testConfigurations)
-//	}
- } catch (ex) {
-	 currentBuild.result = 'FAILED'
-	 throw ex
- } finally {
-	 notifications.notifyBuild(currentBuild.result);
- }
-
-/* vim: set ts=4: */
+	stage('Sonarqube analysis') {
+		env.lastStage = env.STAGE_NAME
+		workflowTests.runSonar([])
+	}
+} catch (ex) {
+	currentBuild.result = 'FAILURE'
+	throw ex
+} finally {
+	notifications.notifyBuild(currentBuild.result);
+}
+/* vim: set shiftwidth=4 expandtab smarttab: */
