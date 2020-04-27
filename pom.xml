@@ -111,11 +111,6 @@
             <url>${knime.js.pagebuilder.p2}</url>
         </repository>
         <repository>
-            <id>p2-knime-server-client</id>
-            <layout>p2</layout>
-            <url>${knime.server.client.p2}</url>
-        </repository>
-        <repository>
             <id>p2-knime-tp</id>
             <layout>p2</layout>
             <url>${knime.tp.p2}</url>
