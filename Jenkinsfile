@@ -13,9 +13,16 @@ properties([
 ])
 
 try {
-	knimetools.defaultTychoBuild('org.knime.update.js.core')
+    buildConfigurations = [
+        Tycho: {
+	        knimetools.defaultTychoBuild('org.knime.update.js.core')
+        },
+        Testing: {
+	        runIntegratedWorkflowTests('workflow-tests && ubuntu18.04')
+        },
+    ]
 
-	runIntegratedWorkflowTests('workflow-tests && ubuntu18.04')
+    parallel buildConfigurations
 
 	stage('Sonarqube analysis') {
 		env.lastStage = env.STAGE_NAME
@@ -33,32 +40,9 @@ def runIntegratedWorkflowTests(String image){
         stage('Platform specific testing'){
             env.lastStage = env.STAGE_NAME
             checkout scm
-            withMavenJarsignerCredentials(options: [artifactsPublisher(disabled: true)]) {
-                withCredentials([usernamePassword(credentialsId: 'ARTIFACTORY_CREDENTIALS', passwordVariable: 'ARTIFACTORY_PASSWORD', usernameVariable: 'ARTIFACTORY_LOGIN')]) {
-                    sh '''
-                        export TEMP="${WORKSPACE}/tmp"
-                        rm -rf "${TEMP}"; mkdir "${TEMP}"
-                        
-                        XVFB=$(which Xvfb) || true
-                        if [[ -x "$XVFB" ]]; then
-                            Xvfb :$$ -pixdepths 24 -screen 0 1280x1024x24 +extension RANDR &
-                            XVFB_PID=$!
-                            export DISPLAY=:$$
-                        fi
 
-                        mvn -Dmaven.test.failure.ignore=true -Dknime.p2.repo=${P2_REPO} clean verify -P test
-                        rm -rf "${TEMP}"
-                        if [[ -n "$XVFB_PID" ]]; then
-                            kill $XVFB_PID
-                        fi
-                    '''
-                }
-            }
-            junit allowEmptyResults: true, testResults: '**/target/surefire-reports/TEST-*.xml'
+            knimetools.runIntegratedWorkflowTests(profile: 'test')
         }
     }
 }
-
-
-
 /* vim: set shiftwidth=4 expandtab smarttab: */
