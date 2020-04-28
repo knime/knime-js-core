@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Collection of Selenium Drivers for multiple OS
 Bundle-SymbolicName: org.knime.ext.seleniumdrivers.multios;singleton:=true
-Bundle-Version: 4.1.0.qualifier
+Bundle-Version: 4.2.0.qualifier
 Bundle-ClassPath: knime-selenium.jar
 Bundle-Activator: org.knime.ext.seleniumdrivers.multios.MultiOSDriverActivator
 Bundle-Vendor: KNIME AG, Zurich, Switzerland

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Windows32 binaries for multi OS Selenium Drivers
 Bundle-SymbolicName: org.knime.ext.seleniumdrivers.multios.bin.win32.x86;singleton:=true
-Bundle-Version: 78.0.3904.70
+Bundle-Version: 78.0.3904.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Fragment-Host: org.knime.ext.seleniumdrivers.multios;bundle-version="[4.0.0,5.0.0)"
 Eclipse-BundleShape: dir
