@@ -20,8 +20,25 @@
 
         <AvailableNodesAndElements />
 
+        <label
+          title="Enable legacy styling for supported views"
+        >
+          <input
+            :checked="useLegacyMode"
+            type="checkbox"
+            @click="onUseLegacyModeToggle"
+          > Use legacy mode
+        </label>
+        <button
+          v-if="isLegacyModeOutOfSync"
+          title="Legacy mode for some view may not match this setting"
+          class="legacy-info"
+          disabled="true"
+        >
+          <InfoIcon />
+        </button>
+
         <div v-if="$debug">
-          <br>
           <label>
             <input
               v-model="showDebugInfo"
@@ -47,6 +64,15 @@
         >
           Your layout has rows with a total column width larger than {{ gridSize }}, therefore the columns will wrap.
           The visual editor doesn’t support wrapping layouts yet. Please use advanced editor instead.
+        </div>
+        <div
+          v-if="isLegacyModeOutOfSync"
+          class="alert alert-warning"
+          role="alert"
+        >
+          The legacy mode setting of some views in the layout do not match parent layout legacy mode setting. This may
+          have been caused by changes made in the advanced layout editor. If this was intentional, you can ignore this
+          warning. Otherwise, toggle the "Use legacy mode" option to synchronize the settings.
         </div>
 
         <Draggable
@@ -87,9 +113,10 @@ import Row from './layout/Row';
 import AvailableNodesAndElements from './AvailableNodesAndElements';
 import Debug from './Debug';
 import config from '../config';
+import InfoIcon from 'open-iconic/svg/info.svg';
 
 export default {
-    components: { Draggable, Row, AvailableNodesAndElements, Debug },
+    components: { Draggable, Row, AvailableNodesAndElements, Debug, InfoIcon },
     data() {
         return {
             showDebugInfo: false
@@ -115,6 +142,12 @@ export default {
             set(value) {
                 this.$store.commit('updateFirstLevelRows', value);
             }
+        },
+        isLegacyModeOutOfSync() {
+            return this.$store.getters.isLegacyModeOutOfSync;
+        },
+        useLegacyMode() {
+            return this.$store.state.layout.parentLayoutLegacyMode;
         }
     },
     mounted() {
@@ -144,6 +177,9 @@ export default {
         },
         onSplitVertical() {
             this.$store.commit('splitVertical');
+        },
+        onUseLegacyModeToggle(e) {
+            this.$store.commit('setUseLegacyMode', { useLegacyMode: e.target.checked });
         }
     }
 };
@@ -219,6 +255,24 @@ body {
   &.btn-light:not(:disabled):not(.disabled).active,
   &.btn-light:not(:disabled):not(.disabled):active {
     background-color: var(--button-color-hover);
+  }
+}
+
+.legacy-info {
+  border: none;
+  background-color: #ed900f;
+  height: 13px;
+  width: 13px;
+  margin-left: 5px;
+  border-radius: 26px;
+  padding: 0;
+  position: relative;
+  top: 2px;
+
+  & svg {
+    fill: white;
+    position: relative;
+    bottom: 3px;
   }
 }
 </style>

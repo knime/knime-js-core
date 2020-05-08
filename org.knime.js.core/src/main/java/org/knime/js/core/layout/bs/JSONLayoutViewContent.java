@@ -85,6 +85,16 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
     private boolean m_sizeWidth;
     private Integer m_resizeTolerance;
 
+    /**
+     * Node layout legacy mode flag set from the Visual Layout Editor. Can be modified
+     * directly in the Advanced Layout Editor. Controls legacy rendering mode. Used for
+     * re-written views and toggles iFrame rendering. Default value provided for backwards
+     * compatibility.
+     *
+     * @since 4.2
+     */
+    private boolean m_useLegacyMode = true;
+
     public static enum ResizeMethod {
         /* Iframe Resizer methods */
         /** calculates offset height of body element */
@@ -353,6 +363,22 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
     }
 
     /**
+     * @return useLegacyMode
+     * @since 4.2
+     */
+    public boolean getUseLegacyMode() {
+        return m_useLegacyMode;
+    }
+
+    /**
+     * @param useLegacyMode the useLegacyMode to set
+     * @since 4.2
+     */
+    public void setUseLegacyMode(final boolean useLegacyMode) {
+        m_useLegacyMode = useLegacyMode;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -382,6 +408,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
                 .append(m_scrolling, other.m_scrolling)
                 .append(m_sizeWidth, other.m_sizeWidth)
                 .append(m_sizeHeight, other.m_sizeHeight)
+                .append(m_useLegacyMode, other.m_useLegacyMode)
                 .isEquals();
     }
 
@@ -405,6 +432,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
                 .append(m_scrolling)
                 .append(m_sizeWidth)
                 .append(m_sizeHeight)
+                .append(m_useLegacyMode)
                 .toHashCode();
     }
 
@@ -427,6 +455,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
         clone.m_scrolling = m_scrolling;
         clone.m_sizeHeight = m_sizeHeight;
         clone.m_sizeWidth = m_sizeWidth;
+        clone.m_useLegacyMode = m_useLegacyMode;
         ArrayList<String> additionalClasses = null;
         if (getAdditionalClasses() != null) {
             additionalClasses = new ArrayList<String>();

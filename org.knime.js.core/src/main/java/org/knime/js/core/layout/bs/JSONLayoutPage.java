@@ -67,6 +67,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 @JsonAutoDetect
 public class JSONLayoutPage {
     private List<JSONLayoutRow> m_rows = new ArrayList<JSONLayoutRow>(0);
+    /**
+     * Parent layout legacy mode flag for Visual Layout Editor. Can be modified on a
+     * node-by-node basis in {@link JSONLayoutViewContent} via the Advanced Layout Editor.
+     * Controls legacy rendering mode. Used for re-written views and toggles iFrame
+     * rendering. Default value provided for backwards compatibility.
+     *
+     * @since 4.2
+     */
+    private boolean m_parentLayoutLegacyMode = true;
 
     /**
      * @return the content
@@ -82,6 +91,23 @@ public class JSONLayoutPage {
     @JsonProperty("rows")
     public void setRows(final List<JSONLayoutRow> rows) {
         m_rows = rows;
+    }
+
+
+    /**
+     * @return parentLayoutLegacyMode
+     * @since 4.2
+     */
+    public boolean getParentLayoutLegacyMode() {
+        return m_parentLayoutLegacyMode;
+    }
+
+    /**
+     * @param parentLayoutLegacyMode the parentLayoutLegacyMode to set
+     * @since 4.2
+     */
+    public void setParentLayoutLegacyMode(final boolean parentLayoutLegacyMode) {
+        m_parentLayoutLegacyMode = parentLayoutLegacyMode;
     }
 
     /**
@@ -133,6 +159,7 @@ public class JSONLayoutPage {
         JSONLayoutPage other = (JSONLayoutPage)obj;
         return new EqualsBuilder()
                 .append(m_rows, other.m_rows)
+                .append(m_parentLayoutLegacyMode, other.m_parentLayoutLegacyMode)
                 .isEquals();
     }
 
@@ -143,6 +170,7 @@ public class JSONLayoutPage {
     public int hashCode() {
         return new HashCodeBuilder()
                 .append(m_rows)
+                .append(m_parentLayoutLegacyMode)
                 .toHashCode();
     }
 }

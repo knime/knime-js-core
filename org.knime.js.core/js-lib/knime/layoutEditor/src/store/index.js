@@ -138,7 +138,8 @@ const cleanLayout = function (layout) {
     };
 
     return {
-        rows: recursiveClean(layout.rows)
+        rows: recursiveClean(layout.rows),
+        parentLayoutLegacyMode: layout.parentLayoutLegacyMode
     };
 };
 
@@ -183,6 +184,14 @@ export default new Vuex.Store({
                 return totalWidth > config.gridSize;
             });
             return Boolean(firstWrappingRow);
+        },
+        isLegacyModeOutOfSync(state) {
+            return getAllContentArrays(state.layout.rows).some(contentArray => contentArray.some(content => {
+                if (content.type !== 'nestedLayout' && typeof content.useLegacyMode !== 'undefined') {
+                    return content.useLegacyMode !== state.layout.parentLayoutLegacyMode;
+                }
+                return false;
+            }));
         }
     },
     mutations: {
@@ -387,6 +396,19 @@ export default new Vuex.Store({
 
         addElement(state, element) {
             state.layout.rows.push(element);
+        },
+
+        setUseLegacyMode(state, { useLegacyMode }) {
+            // set parent layout legacy mode
+            state.layout.parentLayoutLegacyMode = useLegacyMode;
+            // set view legacy mode
+            getAllContentArrays(state.layout.rows).forEach(contentArray => {
+                contentArray.forEach(content => {
+                    if (content.type !== 'nestedLayout' && typeof content.useLegacyMode !== 'undefined') {
+                        content.useLegacyMode = useLegacyMode;
+                    }
+                });
+            });
         }
     }
 });
