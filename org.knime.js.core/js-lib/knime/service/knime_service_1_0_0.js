@@ -36,15 +36,36 @@ window.knimeService = (function () {
     
     var messagePageBuilder = function (data) {
         data.nodeId = service.nodeId;
-        parent.postMessage(data, window.origin);
+        var messageTarget = window.origin;
+        if (typeof messageTarget === 'undefined') {
+            messageTarget = window.location.origin;
+        } else if (messageTarget === 'null') {
+            messageTarget = window;
+        }
+        parent.postMessage(data, messageTarget);
     };
     
     var initGlobalService = function () {
+
+        var pageBuilder2 = parent.KnimePageLoader;
+
+        if (!pageBuilder2) {
+            throw Error('Page loading failed. PageBuilder API not available.');
+        }
+
+        interactivityAvailable = true;
+        runningInWebportal = pageBuilder2.isRunningInWebportal();
+        runningInSeleniumBrowser = pageBuilder2.isRunningInSeleniumBrowser();
         
         var api = 'KnimePageBuilderAPI';
-        
+
+        // provide access to the KnimePageLoader
         GLOBAL_SERVICE = {
-            interactivityCallbacks: {}
+            interactivityCallbacks: {},
+            isPushSupported: pageBuilder2.isPushSupported,
+            requestViewUpdate: pageBuilder2.requestViewUpdate,
+            cancelViewRequest: pageBuilder2.cancelViewRequest,
+            updateRequestStatus: pageBuilder2.updateRequestStatus,
         };
         
         GLOBAL_SERVICE.subscribe = function (id, callback, elementFilter) {
@@ -90,7 +111,9 @@ window.knimeService = (function () {
         };
                 
         GLOBAL_SERVICE.messageFromPageBuilder = function (event) {
-            if (event.origin !== window.origin) {
+            var dest = !window.origin ? window.location.origin : window.origin;
+            
+            if (event.origin !== dest) {
                 return;
             }
             
@@ -107,25 +130,8 @@ window.knimeService = (function () {
 
     var init = function () {
         
-        if (service.pageBuilderPresent) {
-            // new pageBuilder
-            interactivityAvailable = true;
-            initGlobalService();
-        } else if (parent && parent.KnimePageLoader) {
-            // legacy pageBuilder
-            try {
-                runningInWebportal = parent.KnimePageLoader.isRunningInWebportal();
-            } catch (err) {
-                runningInWebportal = false;
-            }
-            if (parent.KnimePageLoader.publish) {
-                interactivityAvailable = true;
-                GLOBAL_SERVICE = parent.KnimePageLoader;
-            }
-            runningInSeleniumBrowser = parent.KnimePageLoader.isRunningInSeleniumBrowser();
-        } else {
-            runningInSeleniumBrowser = typeof parent.seleniumKnimeBridge !== 'undefined';
-        }
+        // PageBuilder is always present since 4.2
+        initGlobalService();
 
         var body = document.getElementsByTagName('body')[0];
         header = document.createElement('nav');
@@ -786,7 +792,7 @@ window.knimeService = (function () {
     };
 
     service.isViewRequestsSupported = function () {
-        return Modernizr.promises && Modernizr.es6object;
+        return Modernizr.promises && Modernizr.es6object && parent.KnimePageLoader.isPushSupported();
     };
 
     /**

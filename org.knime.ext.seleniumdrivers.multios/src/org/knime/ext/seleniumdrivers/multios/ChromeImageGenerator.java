@@ -72,6 +72,7 @@ import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.util.FileUtil;
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JSCorePlugin;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -290,8 +291,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             if (m_driver == null) {
                 throw new SeleniumViewException("Chrome driver was not initialized. Could not retrieve image.");
             }
-            Object image = m_driver.executeScript("return " + methodCall);
-            return image;
+            m_driver.switchTo().frame(m_driver.findElementById("node-SINGLE"));
+            return m_driver.executeScript("return " + methodCall);
         } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (e instanceof WebDriverException) {
@@ -325,7 +326,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
         // we can't pass data in directly, as Chromium seems to have a 2MB size limit for these calls
         // see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1026
         // workaround is writing to disk and passing as URLs to be fetched by AJAX call
-        String viewRepString = viewCreator.getViewRepresentationJSONString(viewRepresentation);
+        String viewRepString = ((JavaScriptViewCreator<REP, VAL>)viewCreator)
+                .getPageContentJSONString(viewRepresentation, viewValue);
         String viewValueString = viewCreator.getViewValueJSONString(viewValue);
         try {
             // force creation of temp directory, copy resources and create HTML stub and debug output

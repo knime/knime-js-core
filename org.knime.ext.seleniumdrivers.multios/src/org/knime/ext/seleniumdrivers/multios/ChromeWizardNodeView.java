@@ -76,7 +76,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
@@ -84,6 +83,7 @@ import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JSCorePlugin;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchSessionException;
 import org.openqa.selenium.SessionNotCreatedException;
@@ -131,6 +131,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     private static final int DEFAULT_WIDTH = 1024;
 
     private static final int DEFAULT_HEIGHT = 768;
+
+    private static final String BRIDGE_EXECUTE_CALL = "return seleniumKnimeBridge.executeOnFrame(arguments[0]);";
 
     private final Object LOCK = new Object();
 
@@ -455,7 +457,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         // we can't pass data in directly, as chrome seems to have a 2MB size limit for these calls
         // see https://bugs.chromium.org/p/chromedriver/issues/detail?id=1026
         // workaround is writing to disk and passing as urls to be fetched by AJAX call
-        String viewRepString = viewCreator.getViewRepresentationJSONString(viewRepresentation);
+        String viewRepString = ((JavaScriptViewCreator<REP, VAL>)viewCreator)
+                .getPageContentJSONString(viewRepresentation, viewValue);
         String viewValueString = viewCreator.getViewValueJSONString(viewValue);
         try {
             // force creation of temp directory, copy resources and create HTML stub and debug output
@@ -770,6 +773,12 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
         }
     }
 
+    private static String createPageLoaderCall(final String method, final String arguments) {
+        StringBuilder callBuilder = new StringBuilder("let response = await window.KnimePageLoader.");
+        callBuilder.append(method).append("(").append(arguments).append(");return response;");
+        return callBuilder.toString();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -783,16 +792,12 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
      */
     @Override
     protected boolean validateCurrentValueInView() {
-        boolean valid = true;
         WizardViewCreator<REP, VAL> creator = getViewCreator();
-        WebTemplate template = creator.getWebTemplate();
-        String validateMethod = template.getValidateMethodName();
-        if (validateMethod != null && !validateMethod.isEmpty()) {
-            String evalCode = creator
-                .wrapInTryCatch("return JSON.stringify(" + creator.getNamespacePrefix() + validateMethod + "());");
-            String validString =
-                (String)executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
-            valid = Boolean.parseBoolean(validString);
+        String evalCode = creator.wrapInTryCatch(createPageLoaderCall("validate", ""));
+        String validString = (String)executeScript(BRIDGE_EXECUTE_CALL, evalCode);
+        Boolean valid = Boolean.parseBoolean(validString);
+        if (!Boolean.TRUE.equals(valid)) {
+            LOGGER.warn("Current view value is invalid");
         }
         return valid;
     }
@@ -803,14 +808,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     @Override
     protected String retrieveCurrentValueFromView() {
         WizardViewCreator<REP, VAL> creator = getViewCreator();
-        WebTemplate template = creator.getWebTemplate();
-        String pullMethod = template.getPullViewContentMethodName();
-        String ns = creator.getNamespacePrefix();
-        String jsonString = null;
-        if (ns != null && !ns.isEmpty() && pullMethod != null && !pullMethod.isEmpty()) {
-            String evalCode = creator.wrapInTryCatch("if (typeof " + ns.substring(0, ns.length() - 1)
-                + " != 'undefined') { return JSON.stringify(" + ns + pullMethod + "());}");
-            jsonString = (String)executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", evalCode);
+        String evalCode = creator.wrapInTryCatch(createPageLoaderCall("getPageValues", ""));
+        String jsonString = (String)executeScript(BRIDGE_EXECUTE_CALL, evalCode);
+        if (jsonString == null || jsonString.equals("{}")) {
+            LOGGER.warn("Unable to retrieve value from view");
         }
         return jsonString;
     }
@@ -821,12 +822,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     @Override
     protected void showValidationErrorInView(final String error) {
         WizardViewCreator<REP, VAL> creator = getViewCreator();
-        WebTemplate template = creator.getWebTemplate();
-        String showErrorMethod = template.getSetValidationErrorMethodName();
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
-        String showErrorCall =
-            creator.wrapInTryCatch(creator.getNamespacePrefix() + showErrorMethod + "('" + escapedError + "');");
-        executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", showErrorCall);
+        String showErrorCall = creator.wrapInTryCatch(createPageLoaderCall("setValidationError", escapedError));
+        executeScript(BRIDGE_EXECUTE_CALL, showErrorCall);
     }
 
     /**
@@ -861,9 +859,9 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
                 m_lastResponseTempFile = responseFile;
             } else {
                 // small responses can be handled directly in an execute call
-                String call = "KnimeInteractivity." + methodCall + "(JSON.parse('" + toBeUpdated + "'));";
+                String call = "window.KnimeInteractivity." + methodCall + "(" + toBeUpdated + ");";
                 call = creator.wrapInTryCatch(call);
-                executeScript("return seleniumKnimeBridge.executeOnFrame(arguments[0]);", call);
+                executeScript(BRIDGE_EXECUTE_CALL, call);
             }
         }
     }

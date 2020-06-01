@@ -124,19 +124,21 @@ window.initLazyLoading = function () {
         } else {
             updatedMonitor = knimeUpdateRequestStatus(id);
         }
-        if (typeof updatedMonitor === 'string') {
-            updatedMonitor = JSON.parse(updatedMonitor);
-        }
-        if (!compareResponseMonitor(resolvable.monitor, updatedMonitor)) {
-            knimeService.updateResponseMonitor(updatedMonitor);
-        }
+        if (updatedMonitor) {
+            if (typeof updatedMonitor === 'string') {
+                updatedMonitor = JSON.parse(updatedMonitor);
+            }
+            if (!compareResponseMonitor(resolvable.monitor, updatedMonitor)) {
+                knimeService.updateResponseMonitor(updatedMonitor);
+            }
 
-        if (!(updatedMonitor.executionFinished && updatedMonitor.responseAvailable || updatedMonitor.executionFailed ||
-            updatedMonitor.cancelled)) {
-            // slightly increase timeout every time up to a maximum of 5s, long running requests will
-            // have fewer update calls
-            const newTime = Math.min(POLLING_INTERVALL_MAX, POLLING_FACTOR * time);
-            setTimeout(pollMonitorUpdate, newTime, resolvable, newTime);
+            if (!(updatedMonitor.executionFinished && updatedMonitor.responseAvailable || updatedMonitor.executionFailed ||
+                updatedMonitor.cancelled)) {
+                // slightly increase timeout every time up to a maximum of 5s, long running requests will
+                // have fewer update calls
+                const newTime = Math.min(POLLING_INTERVALL_MAX, POLLING_FACTOR * time);
+                setTimeout(pollMonitorUpdate, newTime, resolvable, newTime);
+            }
         }
     };
     
@@ -225,7 +227,7 @@ window.initLazyLoading = function () {
         if (typeof sequence === 'undefined') {
             return;
         }
-        if (updatedMonitor.executionFinished && updatedMonitor.responseAvailable) {
+        if (updatedMonitor.executionFinished && updatedMonitor.responseAvailable && updatedMonitor.response) {
             knimeService.respondToViewRequest(updatedMonitor.response);
         }
         for (let i = 0; i < viewRequests.length; i++) {

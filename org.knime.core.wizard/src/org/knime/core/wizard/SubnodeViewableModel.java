@@ -400,23 +400,10 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
          * @return the template for the composite view of a component
          */
         public static WebTemplate createSubnodeWebTemplate() {
-            List<WebResourceLocator> locators = new ArrayList<WebResourceLocator>();
-            String pluginName = "org.knime.js.core";
-            boolean isDebug = isDebug();
-            String requireJS = isDebug ? "org/knime/debug/require.js" : "org/knime/core/require.js";
-            String jQuery = isDebug ? "js-lib/jQuery/jquery-1.11.3.js" : "js-lib/jQuery/jquery-1.11.3.min.js";
-            String bsJS = isDebug ? "js-lib/bootstrap/3_3_6/debug/js/bootstrap.js" : "js-lib/bootstrap/3_3_6/min/js/bootstrap.min.js";
-            String bsCSS = isDebug ? "js-lib/bootstrap/3_3_6/debug/css/bootstrap.css" : "js-lib/bootstrap/3_3_6/min/css/bootstrap.min.css";
-            String iframeResizer = isDebug ? "org/knime/debug/iframeResizer/iframeResizer.js" : "org/knime/core/iframeResizer/iframeResizer.js";
-            String pageBuilder = isDebug ? "org/knime/debug/knime_pagebuilder.js" : "org/knime/core/knime_pagebuilder.js";
-
-            locators.add(new WebResourceLocator(pluginName, requireJS, WebResourceType.JAVASCRIPT));
-            locators.add(new WebResourceLocator(pluginName, jQuery, WebResourceType.JAVASCRIPT));
-            locators.add(new WebResourceLocator(pluginName, bsJS, WebResourceType.JAVASCRIPT));
-            locators.add(new WebResourceLocator(pluginName, bsCSS, WebResourceType.CSS));
-            locators.add(new WebResourceLocator(pluginName, iframeResizer, WebResourceType.JAVASCRIPT));
-            locators.add(new WebResourceLocator(pluginName, pageBuilder, WebResourceType.JAVASCRIPT));
-            String namespace = "KnimePageLoader";
+            List<WebResourceLocator> locators = new ArrayList<>();
+            String pageBuilder = "org/knime/core/knime-pagebuilder2-ap.js";
+            locators.add(new WebResourceLocator("org.knime.js.core", pageBuilder, WebResourceType.JAVASCRIPT));
+            String namespace = "window.KnimePageLoader";
             return new DefaultWebTemplate(locators.toArray(new WebResourceLocator[0]), namespace, "init", "validate",
                 "getPageValues", "setValidationError");
         }
@@ -437,6 +424,24 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
             String initCall = getNamespacePrefix() + initMethod + "(parsedRepresentation, null, null, " + isDebug() + ");";
             builder.append(initCall);
             return builder.toString();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public String getPageContentJSONString(final JSONWebNodePage viewRepresentation, final SubnodeViewValue viewValue) {
+            return getViewRepresentationJSONString(viewRepresentation);
+        }
+
+        /**
+         * Passing around the ViewValue string is not needed as it's not used anywhere (all information for the view is
+         * stored in the ViewReprentation). Return an empty JSON object string instead.
+         * @since 4.2
+         */
+        @Override
+        public String getViewValueJSONString(final SubnodeViewValue viewValue) {
+            return "{}";
         }
     }
 

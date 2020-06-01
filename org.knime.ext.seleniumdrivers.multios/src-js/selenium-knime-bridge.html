@@ -282,11 +282,10 @@ window.seleniumKnimeBridge = (function () {
         signalNext();
     };
 
-    bridge.executeOnFrame = function (toExecute) {
+    bridge.executeOnFrame = async function (toExecute) {
         let frame = document.getElementById(FRAME_ID);
-        // escape possible inner string escapes
-        toExecute = toExecute.replace(/\\/g, '\\\\');
-        return frame.contentWindow.eval('(function() {' + toExecute + '})();');
+        let response = await frame.contentWindow.eval('(async function() {' + toExecute + '})();');
+        return JSON.stringify(response);
     };
 
     bridge.showModal = function (title, description, choicesString) {

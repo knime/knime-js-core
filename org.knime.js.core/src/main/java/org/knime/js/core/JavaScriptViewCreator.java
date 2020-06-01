@@ -61,6 +61,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -82,7 +83,17 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.util.FileUtil;
+import org.knime.js.core.layout.bs.JSONLayoutColumn;
+import org.knime.js.core.layout.bs.JSONLayoutContent;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
+import org.knime.js.core.layout.bs.JSONLayoutRow;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 import org.osgi.framework.Bundle;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  *
@@ -104,6 +115,8 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     private String m_title;
 
     private static final Object LOCK = new Object();
+
+    private String m_customCSS;
 
     /**
      * @return true if is running in debug mode, false otherwise
@@ -174,6 +187,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     @Override
     public String createWebResources(final String viewTitle, final REP viewRepresentation,
             final VAL viewValue, final String customCSS) throws IOException {
+        m_customCSS = customCSS;
         m_title = viewTitle == null ? "KNIME view" : viewTitle;
         synchronized(LOCK) {
             if (!viewTempDirExists()) {
@@ -214,7 +228,6 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         } catch (Exception e) {
             throw new IllegalArgumentException("No view representation available!", e);
         }
-
     }
 
     /**
@@ -231,6 +244,21 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         } catch (Exception e) {
             throw new IllegalArgumentException("No view value available!", e);
         }
+    }
+
+    /**
+     * With the PageBuilder v.2, all JavaScript views now get a single node page
+     * representation created for them (as if they were a single node component
+     * view).
+     *
+     * @param rep the WebViewContent representation for the view representation
+     * @param val the WebViewContent value for the view value
+     * @return a String of the correct JSON-formatted page content
+     * @since 4.2
+     */
+    public String getPageContentJSONString(final REP rep, final VAL val) {
+        JSONSingleNodePage page = new JSONSingleNodePage(rep, val);
+        return getViewRepresentationJSONString((REP)page);
     }
 
     private void copyWebResources() throws IOException {
@@ -257,10 +285,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     protected String buildHTMLResource(final REP viewRepresentation, final VAL viewValue, final String customCSS)
             throws IOException {
 
+        m_customCSS = customCSS;
+
         String setIEVersion = "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">";
         String inlineScript = "<script type=\"text/javascript\" charset=\"UTF-8\">%s</script>";
-        /* String debugScript = "<script type=\"text/javascript\" "
-                + "src=\"https://getfirebug.com/firebug-lite.js#startOpened=true\"></script>"; */
         String scriptString = "<script type=\"text/javascript\" src=\"%s\" charset=\"UTF-8\"></script>";
         String inlineCSS = "<style type=\"text/css\">%s</style>";
         String cssString = "<link rel=\"stylesheet\" type=\"text/css\" href=\"%s\">";
@@ -274,36 +302,45 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         //pageBuilder.append(String.format(inlineScript, "BASE_DIR = " + m_tempFolder));
         //pageBuilder.append(debugScript);
 
+        //  uncomment if testing SWT
+        //  pageBuilder.append(String.format(scriptString, "js-lib/firebug-lite/firebug-lite.js"));
+
         String bodyText = "";
         if (m_template == null || m_template.getWebResources() == null || m_template.getWebResources().length < 1) {
             bodyText = "<p>ERROR: No view implementation available!</p>";
             LOGGER.error("No JavaScript view implementation available for view: " + m_title);
         }
 
-        for (WebResourceLocator resFile : getResourceFileList()) {
-            String path = resFile.getRelativePathTarget();
-            if (path.startsWith("/")) {
-                path = path.substring(1);
+        if (isVisualLayoutEditor()) {
+            for (WebResourceLocator resFile : getResourceFileList()) {
+                String path = resFile.getRelativePathTarget();
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                switch (resFile.getType()) {
+                    case CSS:
+                        pageBuilder.append(String.format(cssString, path));
+                        break;
+                    case JAVASCRIPT:
+                        pageBuilder.append(String.format(scriptString, path));
+                        break;
+                    case FILE:
+                        break;
+                    default:
+                        LOGGER.error("Unrecognized resource type " + resFile.getType());
+                }
             }
-            switch (resFile.getType()) {
-                case CSS:
-                    pageBuilder.append(String.format(cssString, path));
-                    break;
-                case JAVASCRIPT:
-                    pageBuilder.append(String.format(scriptString, path));
-                    break;
-                case FILE:
-                    break;
-                default:
-                    LOGGER.error("Unrecognized resource type " + resFile.getType());
-            }
+        } else {
+            // PageBuilder always included in pages (except layout editor) @since 4.2
+            pageBuilder.append(String.format(scriptString, "org/knime/core/knime-pagebuilder2-ap.js"));
         }
+
         if (StringUtils.isNotEmpty(customCSS)) {
             String cleanedCSS = customCSS.replaceAll("(?i)</style>", "");
             pageBuilder.append(String.format(inlineCSS, cleanedCSS));
         }
         if (isDebug()) {
-            String loadScript = "function loadWizardNodeView(){%s};";
+            String loadScript = "function loadWizardNodeView(){window.debugHTML = true;%s};";
             loadScript =
                 String.format(loadScript, wrapInTryCatch(createInitJSViewMethodCall(viewRepresentation, viewValue)));
             StringBuilder debugBuilder = new StringBuilder(pageBuilder.toString());
@@ -339,24 +376,31 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return builder.toString();
     }
 
+    private boolean isVisualLayoutEditor() {
+        final String LAYOUT_EDITOR_CREATOR_CLASS = "VisualLayoutViewCreator";
+        String className = this.getClass().getName();
+        String innerClassCreatorName = className.substring(className.indexOf('$') + 1);
+        return LAYOUT_EDITOR_CREATOR_CLASS.equals(innerClassCreatorName);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public String createInitJSViewMethodCall(final boolean parseArguments, final REP viewRepresentation, final VAL viewValue) {
         StringBuilder builder = new StringBuilder();
+        String initCall = "";
+        if (isVisualLayoutEditor()) {
+            return initCall;
+        }
         if (parseArguments) {
-            String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
-            String jsonViewValue = getViewValueJSONString(viewValue);
+            // create page container for single node
+            String jsonViewRepresentation = getPageContentJSONString(viewRepresentation, viewValue);
             String escapedRepresentation = jsonViewRepresentation.replace("\\", "\\\\").replace("'", "\\'");
-            String escapedValue = jsonViewValue.replace("\\", "\\\\").replace("'", "\\'");
             String repParseCall = "var parsedRepresentation = JSON.parse('" + escapedRepresentation + "');";
             builder.append(repParseCall);
-            String valParseCall = "var parsedValue = JSON.parse('" + escapedValue + "');";
-            builder.append(valParseCall);
         }
-        String initMethod = m_template.getInitMethodName();
-        String initCall = getNamespacePrefix() + initMethod + "(parsedRepresentation, parsedValue);";
+        initCall = "window.KnimePageLoader.init(parsedRepresentation, null, null, " + isDebug() + ");";
         builder.append(initCall);
         return builder.toString();
     }
@@ -448,6 +492,13 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             IConfigurationElement[] bundleElements = ext.getConfigurationElements();
             for (IConfigurationElement bundleElem : bundleElements) {
                 assert bundleElem.getName().equals(ELEM_BUNDLE);
+                String exports = bundleElem.getAttribute("exports");
+                String isDebugRes = bundleElem.getAttribute("debug");
+                // only copy source *.js.map files if in debug mode
+                if (exports != null && exports.equals("KnimePageLoader") &&
+                        isDebugRes != null && isDebugRes.equals("true") && !isDebug()) {
+                    continue;
+                }
                 for (IConfigurationElement resElement : bundleElem.getChildren(ELEM_RES)) {
                     String relSource = resElement.getAttribute(ATTR_SOURCE);
 
@@ -492,4 +543,134 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return tempFolder.toPath();
     }
 
+    /**
+    * Serializable JSON container object wrapper which configures a single node page to use with the
+    * PageBuilder v.2.
+    *
+    * @author benlaney
+    * @since 4.2
+    */
+    @JsonAutoDetect
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+    private final class JSONSingleNodePage extends JSONWebNodePage {
+
+        private static final boolean m_isSingleView = true;
+
+        @JsonCreator
+        private JSONSingleNodePage(final REP viewRep, final VAL viewVal) {
+            super(new JSONWebNodePageConfiguration(), new HashMap<String, JSONWebNode>());
+            setWebNodePageConfiguration(createJSONPageConfig());
+            setWebNodes(createNodesMap(createJsonWebNode(viewRep, viewVal)));
+        }
+
+        private JSONWebNode createJsonWebNode(final WebViewContent viewRep, final WebViewContent viewVal) {
+            JSONWebNode node = new JSONWebNode();
+            setMethodNames(node);
+            setResources(node);
+            setInternals(node, viewRep, viewVal);
+            setNodeInfo(node);
+            setCustomCSS(node);
+            return node;
+        }
+
+        private Map<String, JSONWebNode> createNodesMap(final JSONWebNode node) {
+            Map<String, JSONWebNode> nodesMap = new HashMap<String, JSONWebNode>();
+            nodesMap.put("SINGLE", node);
+            return nodesMap;
+        }
+
+        /**
+        * @return the isSingleView
+        */
+        @JsonProperty("isSingleView")
+        public boolean getIsSingleView() {
+            return m_isSingleView;
+        }
+
+        private void setMethodNames(final JSONWebNode node) {
+            node.setNamespace(m_template.getNamespace());
+            node.setInitMethodName(m_template.getInitMethodName());
+            node.setValidateMethodName(m_template.getValidateMethodName());
+            node.setGetViewValueMethodName(m_template.getPullViewContentMethodName());
+            node.setSetValidationErrorMethodName(m_template.getSetValidationErrorMethodName());
+        }
+
+        private void setResources( final JSONWebNode node) {
+            WebResourceLocator[] resources = m_template.getWebResources();
+            List<String> jsLibraries = new ArrayList<>();
+            List<String> styleSheets = new ArrayList<>();
+
+            for (WebResourceLocator resFile : resources) {
+                String path = resFile.getRelativePathTarget();
+                if (path.startsWith("/")) {
+                    path = path.substring(1);
+                }
+                switch (resFile.getType()) {
+                    case CSS:
+                        styleSheets.add(path);
+                        break;
+                    case JAVASCRIPT:
+                        jsLibraries.add(path);
+                        break;
+                    case FILE:
+                        break;
+                    default:
+                        LOGGER.error("Unrecognized resource type " + resFile.getType());
+                }
+            }
+
+            node.setJavascriptLibraries(jsLibraries);
+            node.setStylesheets(styleSheets);
+        }
+
+        private void setInternals( final JSONWebNode node, final WebViewContent rep, final WebViewContent val) {
+            node.setViewRepresentation((JSONViewContent)rep);
+            node.setViewValue((JSONViewContent)val);
+        }
+
+        private void setNodeInfo( final JSONWebNode node) {
+            JSONWebNodeInfo info = new JSONWebNodeInfo();
+            info.setNodeName("Single Node Page");
+            info.setDisplayPossible(true);
+            node.setNodeInfo(info);
+        }
+
+        private void setCustomCSS( final JSONWebNode node) {
+            node.setCustomCSS(m_customCSS);
+        }
+
+        private JSONWebNodePageConfiguration createJSONPageConfig() {
+            return new JSONWebNodePageConfiguration(createJSONLayoutPage(), null, null);
+        }
+
+        private JSONLayoutPage createJSONLayoutPage() {
+            JSONLayoutPage page = new JSONLayoutPage();
+            page.setParentLayoutLegacyMode(false);
+            page.setRows(createJSONRow());
+            return page;
+        }
+
+        private List<JSONLayoutRow> createJSONRow() {
+            JSONLayoutRow row = new JSONLayoutRow();
+            row.addColumn(createJSONColumn());
+            List<JSONLayoutRow> list = new ArrayList<>();
+            list.add(row);
+            return list;
+        }
+
+        private JSONLayoutColumn createJSONColumn() {
+            JSONLayoutColumn column = new JSONLayoutColumn();
+            column.setContent(createJSONContent());
+            return column;
+        }
+
+        private List<JSONLayoutContent> createJSONContent() {
+            JSONLayoutViewContent content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID("SINGLE");
+            List<JSONLayoutContent> list = new ArrayList<>();
+            list.add(content);
+            return list;
+        }
+    }
 }
