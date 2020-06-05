@@ -71,7 +71,16 @@ export default {
             get() {
                 return this.column.content;
             },
-            set(newContent) {
+            set(newContent, e) {
+                let changedItem = false;
+                // ensure newly added nodes respect the current legacy mode settings
+                newContent.filter(item => item.type === 'view')
+                    .forEach((item, itemInd) => {
+                        if (!changedItem && JSON.stringify(item) !== JSON.stringify(this.content[itemInd])) {
+                            changedItem = true;
+                            item.useLegacyMode = this.$store.state.layout.parentLayoutLegacyMode;
+                        }
+                    });
                 this.$store.commit('updateColumnContent', { column: this.column, newContent });
             }
         },

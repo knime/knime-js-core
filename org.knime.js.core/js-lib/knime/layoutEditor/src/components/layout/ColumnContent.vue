@@ -49,10 +49,38 @@
         />
       </div>
     </Popper>
+    <Popper
+      v-if="item.type === 'nestedLayout' && componentLegacyModeEnabled"
+      trigger="click"
+      :options="{placement: 'top-start'}"
+      :append-to-body="true"
+      :force-show="showLegacyFlagDialog"
+      @show="showLegacyFlagDialog = true"
+      @hide="showLegacyFlagDialog = false"
+    >
+      <EditButton
+        slot="reference"
+        title="Legacy mode is enabled for this nested component view"
+        :class="['legacyButton', {active: showLegacyFlagDialog}]"
+      >
+        <InfoIcon />
+      </EditButton>
+
+      <div class="popper config">
+        <div
+          v-if="showLegacyFlagDialog"
+          class="legacyInfo"
+          @close="showLegacyFlagDialog = false"
+        >
+          Legacy mode is enabled for this nested component view. You can change these
+          settings by editing the layout within this nested component.
+        </div>
+      </div>
+    </Popper>
     <button
-      v-if="showConfigDialog"
+      v-if="showConfigDialog || showLegacyFlagDialog"
       class="popperOverlay"
-      @click.self.stop.prevent="showConfigDialog = false"
+      @click.self.stop.prevent="closeDialogs"
       @mousedown.prevent
     />
   </div>
@@ -66,6 +94,7 @@ import Popper from 'vue-popperjs';
 import ConfigDialog from './ConfigDialog';
 import DeleteIcon from 'open-iconic/svg/trash.svg';
 import ConfigIcon from 'open-iconic/svg/cog.svg';
+import InfoIcon from 'open-iconic/svg/info.svg';
 
 export default {
     components: {
@@ -74,7 +103,8 @@ export default {
         Popper,
         ConfigDialog,
         DeleteIcon,
-        ConfigIcon
+        ConfigIcon,
+        InfoIcon
         // Row compontent is added dynamically in beforeCreate() method, see below
     },
     props: {
@@ -82,8 +112,15 @@ export default {
     },
     data() {
         return {
-            showConfigDialog: false
+            showConfigDialog: false,
+            showLegacyFlagDialog: false
         };
+    },
+    computed: {
+        componentLegacyModeEnabled() {
+            return this.$store.state.nodes
+                .some(node => node.nodeID === this.item.nodeID && node.containerLegacyModeEnabled);
+        }
     },
     beforeCreate() {
         // dynamic import because of recursive components (see https://vuejs.org/v2/guide/components-edge-cases.html#Circular-References-Between-Components)
@@ -92,6 +129,10 @@ export default {
     methods: {
         onContentItemDelete() {
             this.$store.commit('deleteContentItem', this.item);
+        },
+        closeDialogs() {
+            this.showConfigDialog = false;
+            this.showLegacyFlagDialog = false;
         }
     }
 };
@@ -114,6 +155,27 @@ export default {
   & .configButton {
     right: 20px;
   }
+
+  & .legacyButton {
+    left: 0px;
+    top: 2px;
+    border: none;
+    background-color: #ed900f;
+    height: 13px;
+    width: 13px;
+    margin-left: 5px;
+    border-radius: 26px;
+
+    & svg {
+      fill: white;
+      position: relative;
+      right: 1px;
+    }
+  }
+}
+
+.legacyInfo {
+  padding: 2px;
 }
 
 /* full window overlay to prevent other actions while popover is open */

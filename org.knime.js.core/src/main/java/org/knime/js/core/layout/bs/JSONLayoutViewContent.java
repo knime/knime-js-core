@@ -93,7 +93,7 @@ public class JSONLayoutViewContent extends JSONLayoutElement implements JSONLayo
      *
      * @since 4.2
      */
-    private boolean m_useLegacyMode = true;
+    private boolean m_useLegacyMode = false;
 
     public static enum ResizeMethod {
         /* Iframe Resizer methods */

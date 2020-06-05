@@ -75,7 +75,7 @@ public class JSONLayoutPage {
      *
      * @since 4.2
      */
-    private boolean m_parentLayoutLegacyMode = true;
+    private boolean m_parentLayoutLegacyMode = false;
 
     /**
      * @return the content

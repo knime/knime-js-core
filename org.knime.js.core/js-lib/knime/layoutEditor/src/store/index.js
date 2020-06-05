@@ -15,7 +15,9 @@ const getEmptyLayout = function () {
         rows: [{
             type: 'row',
             columns: [column]
-        }]
+        }],
+        // when the layout is cleared, disable legacy mode by default
+        parentLayoutLegacyMode: false
     };
 };
 
@@ -122,6 +124,10 @@ const cleanLayout = function (layout) {
                     return false;
                 }
             } else if (item.hasOwnProperty('nodeID')) {
+                // if nodes are loaded without legacy mode, ensure they respect the current settings
+                if (item.type === 'view' && typeof item.useLegacyMode === 'undefined') {
+                    item.useLegacyMode = layout.parentLayoutLegacyMode;
+                }
                 if (nodeIDs.includes(item.nodeID)) {
                     // remove duplicate nodes
                     return false;

@@ -19,11 +19,16 @@ const app = new Vue({
             this.$store.commit('setNodes', JSON.parse(nodes));
         };
         window.setLayout = layout => {
-            if (this.$debug) {
-                console.log('setLayout', layout); // eslint-disable-line no-console
-            }
             try {
-                this.$store.commit('setLayout', JSON.parse(layout));
+                let parsedLayout = JSON.parse(layout);
+                // if we don't have a legacy mode set for whatever reason, it must be legacy
+                if (typeof parsedLayout.parentLayoutLegacyMode === 'undefined') {
+                    parsedLayout.parentLayoutLegacyMode = true;
+                }
+                if (this.$debug) {
+                    console.log('setLayout', parsedLayout); // eslint-disable-line no-console
+                }
+                this.$store.commit('setLayout', parsedLayout);
             } catch (e) {
                 // e.g. wasn't valid JSON
             }
