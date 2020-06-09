@@ -47,26 +47,25 @@ window.knimeService = (function () {
     
     var initGlobalService = function () {
 
-        var pageBuilder2 = parent.KnimePageLoader;
-
-        if (!pageBuilder2) {
-            throw Error('Page loading failed. PageBuilder API not available.');
-        }
-
-        interactivityAvailable = true;
-        runningInWebportal = pageBuilder2.isRunningInWebportal();
-        runningInSeleniumBrowser = pageBuilder2.isRunningInSeleniumBrowser();
-        
-        var api = 'KnimePageBuilderAPI';
-
-        // provide access to the KnimePageLoader
         GLOBAL_SERVICE = {
-            interactivityCallbacks: {},
-            isPushSupported: pageBuilder2.isPushSupported,
-            requestViewUpdate: pageBuilder2.requestViewUpdate,
-            cancelViewRequest: pageBuilder2.cancelViewRequest,
-            updateRequestStatus: pageBuilder2.updateRequestStatus,
+            interactivityCallbacks: {}
         };
+
+        var api = 'KnimePageBuilderAPI';
+        var pageBuilderWrapper = parent.KnimePageLoader;
+        var runningInAP = Boolean(pageBuilderWrapper);
+        runningInWebportal = !runningInAP;
+        runningInSeleniumBrowser = pageBuilderWrapper ? pageBuilderWrapper.isRunningInSeleniumBrowser() : false;
+
+        GLOBAL_SERVICE.isPushSupported = pageBuilderWrapper ? pageBuilderWrapper.isPushSupported : function () {
+            return false;
+        };
+
+        if (runningInAP) { // lazy loading support
+            GLOBAL_SERVICE.requestViewUpdate = pageBuilderWrapper.requestViewUpdate;
+            GLOBAL_SERVICE.cancelViewRequest = pageBuilderWrapper.cancelViewRequest;
+            GLOBAL_SERVICE.updateRequestStatus = pageBuilderWrapper.updateRequestStatus;
+        }
         
         GLOBAL_SERVICE.subscribe = function (id, callback, elementFilter) {
             GLOBAL_SERVICE.interactivityCallbacks[id] = callback;
@@ -130,8 +129,14 @@ window.knimeService = (function () {
 
     var init = function () {
         
-        // PageBuilder is always present since 4.2
-        initGlobalService();
+        if (service.pageBuilderPresent) { // present in AP and new WebPortal since 4.2
+            initGlobalService();
+        } else { // running in old webportal
+            interactivityAvailable = Boolean(parent.KnimePageLoader.publish);
+            runningInWebportal = true;
+            runningInSeleniumBrowser = false;
+            GLOBAL_SERVICE = parent.KnimePageLoader;
+        }
 
         var body = document.getElementsByTagName('body')[0];
         header = document.createElement('nav');
