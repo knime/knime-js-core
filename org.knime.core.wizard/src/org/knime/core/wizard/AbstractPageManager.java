@@ -93,6 +93,7 @@ import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 import org.knime.js.core.layout.bs.JSONNestedLayout;
 import org.knime.js.core.selections.json.JSONSelectionTranslator;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 
@@ -228,6 +229,7 @@ public abstract class AbstractPageManager {
     private JSONLayoutPage getJSONLayoutFromSubnode(final NodeIDSuffix pageID, final String layoutInfo)
             throws IOException {
         ObjectMapper mapper = JSONLayoutPage.getConfiguredVerboseObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         ObjectReader reader = mapper.readerForUpdating(new JSONLayoutPage());
         JSONLayoutPage page = reader.readValue(layoutInfo);
         SubNodeContainer subNodeContainer =
