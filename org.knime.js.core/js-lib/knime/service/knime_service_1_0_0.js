@@ -56,6 +56,13 @@ window.knimeService = (function () {
         var runningInAP = Boolean(pageBuilderWrapper);
         runningInWebportal = !runningInAP;
         runningInSeleniumBrowser = pageBuilderWrapper ? pageBuilderWrapper.isRunningInSeleniumBrowser() : false;
+        
+        /* This is always set to true @since 4.2 because some views use this field not just to check for interactivity,
+        but also to check for the presence of the PageBuilder. In the AP and new WebPortal, the "new" PageBuilder is
+        always present and only other case is if the view is running in the old WebPortal, in which case the old
+        PageBuilder will also be present. This should be simplified and reworked in the future it provide separate
+        checks for interactivity and other functionality, such as lazy loading, etc. */
+        interactivityAvailable = true;
 
         GLOBAL_SERVICE.isPushSupported = pageBuilderWrapper ? pageBuilderWrapper.isPushSupported : function () {
             return false;
@@ -128,7 +135,7 @@ window.knimeService = (function () {
     };
 
     var init = function () {
-        
+
         if (service.pageBuilderPresent) { // present in AP and new WebPortal since 4.2
             initGlobalService();
         } else { // running in old webportal
