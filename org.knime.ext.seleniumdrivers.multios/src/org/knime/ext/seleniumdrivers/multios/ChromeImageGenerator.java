@@ -100,9 +100,6 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(ChromeImageGenerator.class);
 
-    //the timeout to wait for the view to append an element to the body tag
-    static final int VIEW_INIT_TIMEOUT = 60;
-
     private final ChromeViewService m_service;
     private ChromeDriver m_driver;
     private File m_repTempFile;
@@ -177,8 +174,8 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
 
             m_driver = new ChromeDriver(options);
             m_driver.manage().timeouts().implicitlyWait(VIEW_INIT_TIMEOUT, TimeUnit.SECONDS)
-            .pageLoadTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS)
-            .setScriptTimeout(ChromeWizardNodeView.DEFAULT_TIMEOUT, TimeUnit.SECONDS);
+            .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
 
             return m_driver;
         } catch (Exception e) {
@@ -231,6 +228,7 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             }
             m_driver.navigate().to(new File(viewPath).toURI().toString());
             ChromeWizardNodeView.waitForDocumentReady(m_driver);
+            m_driver.executeScript("window.headless = true;");
             embedUtilFileInLoadedPage();
 
             WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
@@ -242,12 +240,15 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             if (exec != null) {
                 exec.setProgress(0.66);
             }
-            WebDriverWait wait = new WebDriverWait(m_driver, ChromeWizardNodeView.DEFAULT_TIMEOUT);
+            m_driver.findElement(By.id(SINGLE_NODE_FRAME_ID));
+            m_driver.switchTo().frame(m_driver.findElementById(SINGLE_NODE_FRAME_ID));
+            WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
             //wait until any element has been appended to body, which is not the service header
             By anyNonKnimeElement = By.cssSelector("body > *:not(#knime-service-header)");
             wait.until(driver -> ExpectedConditions.presenceOfElementLocated(anyNonKnimeElement));
             //the wait seems to work unreliably, enforcing element present in implicit wait time
             m_driver.findElements(anyNonKnimeElement);
+            m_driver.switchTo().parentFrame();
 
             //wait additional specified time to compensate for initial animation, etc.
             if (optionalWait != null && optionalWait > 0L) {
@@ -291,8 +292,10 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
             if (m_driver == null) {
                 throw new SeleniumViewException("Chrome driver was not initialized. Could not retrieve image.");
             }
-            m_driver.switchTo().frame(m_driver.findElementById("node-SINGLE"));
-            return m_driver.executeScript("return " + methodCall);
+            m_driver.switchTo().frame(m_driver.findElementById(SINGLE_NODE_FRAME_ID));
+            Object image = m_driver.executeScript("return " + methodCall);
+            m_driver.switchTo().parentFrame();
+            return image;
         } catch (Exception e) {
             String errorMessage = e.getMessage();
             if (e instanceof WebDriverException) {

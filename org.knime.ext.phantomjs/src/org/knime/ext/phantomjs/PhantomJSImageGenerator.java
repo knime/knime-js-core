@@ -50,10 +50,10 @@ package org.knime.ext.phantomjs;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
@@ -65,6 +65,8 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -110,6 +112,9 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
         	exec.setProgress("Starting PhantomJS");
         }
         m_driver = PhantomJSActivator.getConfiguredPhantomJSDriver();
+        m_driver.manage().timeouts().implicitlyWait(VIEW_INIT_TIMEOUT, TimeUnit.SECONDS)
+        .pageLoadTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+        .setScriptTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS);
         if (exec != null) {
         	exec.setProgress(0.25);
         }
@@ -135,7 +140,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
      * @throws IOException on script execution exception
      */
 
-    public void generateView(final Long optionalWait, final ExecutionContext exec) {
+    public void generateView(Long optionalWait, final ExecutionContext exec) {
     	try {
     		//currently only one instance possible at a time
     		//TODO: introduce PhantomJS pool
@@ -156,6 +161,7 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     		}
     		m_driver.navigate().to(new File(viewPath).toURI().toString());
     		waitForDocumentReady();
+    		((JavascriptExecutor)m_driver).executeScript("window.headless = true;");
     		REP viewRepresentation = model.getViewRepresentation();
     		VAL viewValue = model.getViewValue();
     		String initCall = model.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
@@ -163,35 +169,40 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     		if (exec != null) {
     			exec.setProgress(0.66);
     		}
+    		WebElement frame = m_driver.findElement(By.id(SINGLE_NODE_FRAME_ID));
+    		m_driver.switchTo().frame(frame);
     		WebDriverWait wait = new WebDriverWait(m_driver, DEFAULT_TIMEOUT);
-    		//TODO wait until what?
-    		wait.until(driver -> ExpectedConditions.presenceOfElementLocated(By.xpath("//body[./* or ./text()]")));
-    		//wait.until(ExpectedConditions.presenceOfElementLocated(By.id("layoutContainer")));
+            //wait until any element has been appended to body, which is not the service header
+            By anyNonKnimeElement = By.cssSelector("body > *:not(#knime-service-header)");
+            wait.until(driver -> ExpectedConditions.presenceOfElementLocated(anyNonKnimeElement));
+            //the wait seems to work unreliably, enforcing element present in implicit wait time
+            m_driver.findElements(anyNonKnimeElement);
+            m_driver.switchTo().defaultContent();
 
-    		//wait additional specified time to compensate for initial animation, etc.
-    		if (optionalWait != null && optionalWait > 0L) {
-    			int waitInS = (int) (optionalWait/1000);
-    			final double interval = 0.33 / Math.max(1, waitInS);
-    			if (exec != null) {
-    				String pString = "Waiting additional time.";
-    				if (waitInS > 0) {
-    					pString = "Waiting additional " + waitInS + " seconds.";
-    				}
-    				exec.setProgress(pString);
-    			}
-    			Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
-    					.withTimeout(optionalWait, TimeUnit.MILLISECONDS)
-    					.pollingEvery(1, TimeUnit.SECONDS)
-    					.ignoring(NoSuchElementException.class);
-    			try {
-    				timedWait.until(driver -> {
-    					if (exec != null) {
-    						exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
-    					}
-    					return null;
-    				});
-    			} catch (Exception e) { /* do nothing */ }
-    		}
+            //wait additional specified time to compensate for initial animation, etc.
+            if (optionalWait != null && optionalWait > 0L) {
+                int waitInS = (int) (optionalWait/1000);
+                final double interval = 0.33 / Math.max(1, waitInS);
+                if (exec != null) {
+                    String pString = "Waiting additional time.";
+                    if (waitInS > 0) {
+                        pString = "Waiting additional " + waitInS + " seconds.";
+                    }
+                    exec.setProgress(pString);
+                }
+                Wait<WebDriver> timedWait = new FluentWait<WebDriver>(m_driver)
+                        .withTimeout(Duration.ofMillis(optionalWait))
+                        .pollingEvery(Duration.ofSeconds(1))
+                        .ignoring(NoSuchElementException.class);
+                try {
+                    timedWait.until(driver -> {
+                        if (exec != null) {
+                            exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
+                        }
+                        return null;
+                    });
+                } catch (Exception e) { /* do nothing */ }
+            }
     		if (exec != null) {
     			exec.setProgress(1.0);
     		}
@@ -230,7 +241,10 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     	try {
     		if (m_driver instanceof JavascriptExecutor) {
     			try {
-    				return ((JavascriptExecutor)m_driver).executeScript("return " + methodCall);
+    				m_driver.switchTo().frame(((PhantomJSDriver)m_driver).findElementById(SINGLE_NODE_FRAME_ID));
+    	            Object image = ((JavascriptExecutor) m_driver).executeScript("return " + methodCall);
+    	            m_driver.switchTo().defaultContent();
+    	            return image;
     			} catch (Exception e) {
     				String errorMessage = e.getMessage();
     				if (e instanceof WebDriverException) {

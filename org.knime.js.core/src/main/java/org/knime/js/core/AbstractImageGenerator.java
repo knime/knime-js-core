@@ -74,13 +74,31 @@ import org.knime.core.node.wizard.WizardNode;
  * @param <REP> the view content serving as view representation
  * @param <VAL> the view content serving as view value
 */
-public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent> {
+public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
+        REP extends WebViewContent, VAL extends WebViewContent> {
+
+    /**
+     * ID of iframe used when a single node view is displayed.
+     * @since 4.2
+     */
+    protected static final String SINGLE_NODE_FRAME_ID = "node-SINGLE";
+
+    /**
+     * @since 4.2
+     */
+    protected static final int DEFAULT_TIMEOUT = 30;
+
+    /**
+     * @since 4.2
+     */
+    protected static final int VIEW_INIT_TIMEOUT = 60;
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractImageGenerator.class);
     private static final String EXT_POINT_ID = "org.knime.js.core.headlessBrowsers";
     private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
     private static final String CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     private static final String IMAGE_GENERATOR_CLASS = "imageGeneratorClass";
+
 
     private final T m_nodeModel;
 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.js.core" version="2">
+    <resource path="src/main/java/org/knime/js/core/AbstractImageGenerator.java" type="org.knime.js.core.AbstractImageGenerator">
+        <filter id="336658481">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.AbstractImageGenerator"/>
+                <message_argument value="DEFAULT_TIMEOUT"/>
+            </message_arguments>
+        </filter>
+        <filter id="336658481">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.AbstractImageGenerator"/>
+                <message_argument value="SINGLE_NODE_FRAME_ID"/>
+            </message_arguments>
+        </filter>
+        <filter id="336658481">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.AbstractImageGenerator"/>
+                <message_argument value="VIEW_INIT_TIMEOUT"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
