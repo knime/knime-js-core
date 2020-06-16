@@ -29,6 +29,7 @@ window.knimeService = (function () {
     var interactivityAvailable = false;
     var runningInWebportal = false;
     var runningInSeleniumBrowser = false;
+    var runningInAPWrapper = false;
     var warnings = {};
     var GLOBAL_SERVICE = null;
     var SVGNS = 'http://www.w3.org/2000/svg';
@@ -53,9 +54,9 @@ window.knimeService = (function () {
 
         var api = 'KnimePageBuilderAPI';
         var pageBuilderWrapper = parent.KnimePageLoader;
-        var runningInAP = Boolean(pageBuilderWrapper);
-        runningInWebportal = !runningInAP;
-        runningInSeleniumBrowser = pageBuilderWrapper ? pageBuilderWrapper.isRunningInSeleniumBrowser() : false;
+        runningInAPWrapper = Boolean(pageBuilderWrapper);
+        runningInWebportal = !runningInAPWrapper;
+        runningInSeleniumBrowser = runningInAPWrapper ? pageBuilderWrapper.isRunningInSeleniumBrowser() : false;
         
         /* This is always set to true @since 4.2 because some views use this field not just to check for interactivity,
         but also to check for the presence of the PageBuilder. In the AP and new WebPortal, the "new" PageBuilder is
@@ -64,11 +65,11 @@ window.knimeService = (function () {
         checks for interactivity and other functionality, such as lazy loading, etc. */
         interactivityAvailable = true;
 
-        GLOBAL_SERVICE.isPushSupported = pageBuilderWrapper ? pageBuilderWrapper.isPushSupported : function () {
+        GLOBAL_SERVICE.isPushSupported = runningInAPWrapper ? pageBuilderWrapper.isPushSupported : function () {
             return false;
         };
 
-        if (runningInAP) { // lazy loading support
+        if (runningInAPWrapper) { // lazy loading support
             GLOBAL_SERVICE.requestViewUpdate = pageBuilderWrapper.requestViewUpdate;
             GLOBAL_SERVICE.cancelViewRequest = pageBuilderWrapper.cancelViewRequest;
             GLOBAL_SERVICE.updateRequestStatus = pageBuilderWrapper.updateRequestStatus;
@@ -191,6 +192,15 @@ window.knimeService = (function () {
             init();
         }
         return runningInSeleniumBrowser;
+    };
+
+    /**
+     * @returns {Boolean} - if the view is running in the AP with the new PageBuilder.
+     * @since 4.2
+     */
+    service.isRunningInAPWrapper = function () {
+        if (!initialized) { init(); }
+        return runningInAPWrapper;
     };
 
     var enableNav = function () {
