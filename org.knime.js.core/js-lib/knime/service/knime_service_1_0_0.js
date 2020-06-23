@@ -814,7 +814,7 @@ window.knimeService = (function () {
     };
 
     service.isViewRequestsSupported = function () {
-        return Modernizr.promises && Modernizr.es6object && parent.KnimePageLoader.isPushSupported();
+        return Modernizr.promises && Modernizr.es6object && GLOBAL_SERVICE.isPushSupported();
     };
 
     /**
