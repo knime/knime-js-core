@@ -407,4 +407,42 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return shortenedViewSuffix.getSuffixArray().length == 1;
     }
 
+    /**
+     * {@inheritDoc}
+     * @since 4.2
+     */
+    @Override
+    public String updateLegacyLayout(final String originalLayout) {
+        JSONLayoutPage finalLayout;
+        try {
+            finalLayout = deserializeLayout(originalLayout);
+            setMissingLegacyFlag(finalLayout);
+        } catch (IOException ex) {
+            LOGGER.error("Could not add update and enable legacy flag for layout: " + ex.getMessage(), ex);
+            return originalLayout;
+        }
+        try {
+            return serializeLayout(finalLayout);
+        } catch (Exception ex) {
+            LOGGER.error("Could not deserialize updated legacy layout, returning original: " + ex.getMessage(), ex);
+        }
+        return originalLayout;
+    }
+
+    private static void setMissingLegacyFlag(final JSONLayoutPage page) {
+        page.setParentLayoutLegacyMode(true);
+        page.getRows().forEach(row -> updateMissingLegacyFlagRow(row));
+    }
+
+    private static void updateMissingLegacyFlagRow(final JSONLayoutRow row) {
+        row.getColumns().forEach(col -> {
+            col.getContent().forEach(item -> {
+                if (item instanceof JSONLayoutViewContent) {
+                    ((JSONLayoutViewContent)item).setUseLegacyMode(true);
+                } else if (item instanceof JSONLayoutRow) {
+                    updateMissingLegacyFlagRow((JSONLayoutRow)item);
+                }
+            });
+        });
+    }
 }
