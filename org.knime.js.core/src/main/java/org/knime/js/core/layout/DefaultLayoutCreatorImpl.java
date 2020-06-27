@@ -90,6 +90,11 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     private final static NodeLogger LOGGER = NodeLogger.getLogger(DefaultLayoutCreatorImpl.class);
 
     /**
+     * @since 4.2
+     */
+    public static final LayoutVersion LEGACY_FLAG_VERSION = LayoutVersion.V4020;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -170,17 +175,17 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 3.7
      */
     @Override
-    public String expandNestedLayout(final String originalLayout, final WorkflowManager wfm) {
-        if (originalLayout == null || originalLayout.isEmpty()) {
-            return originalLayout;
+    public String expandNestedLayout(final String currentLayout, final WorkflowManager wfm) {
+        if (currentLayout == null || currentLayout.isEmpty()) {
+            return currentLayout;
         }
         try {
-            JSONLayoutPage parentPage = deserializeLayout(originalLayout);
+            JSONLayoutPage parentPage = deserializeLayout(currentLayout);
             parentPage = expandNestedLayout(parentPage, wfm);
             return serializeLayout(parentPage);
         } catch (IOException ex) {
             LOGGER.error("Could not expand a potentially nested layout: " + ex.getMessage(), ex);
-            return originalLayout;
+            return currentLayout;
         }
     }
 
@@ -197,14 +202,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         return mapper.writeValueAsString(layout);
     }
 
-    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage originalLayout, final WorkflowManager wfm) throws JsonProcessingException, IOException {
-        List<JSONLayoutRow> rows = originalLayout.getRows();
+    private JSONLayoutPage expandNestedLayout(final JSONLayoutPage currentLayout, final WorkflowManager wfm) throws JsonProcessingException, IOException {
+        List<JSONLayoutRow> rows = currentLayout.getRows();
         if (rows != null) {
-            for (JSONLayoutRow row : originalLayout.getRows()) {
+            for (JSONLayoutRow row : currentLayout.getRows()) {
                 expandNestedRow(row, wfm);
             }
         }
-        return originalLayout;
+        return currentLayout;
     }
 
     private JSONLayoutRow expandNestedRow(final JSONLayoutRow originalRow, final WorkflowManager wfm) throws JsonProcessingException, IOException {
@@ -297,18 +302,18 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public String addUnreferencedViews(final String originalLayout, final Map<NodeIDSuffix, WizardNode> allNodes,
+    public String addUnreferencedViews(final String currentLayout, final Map<NodeIDSuffix, WizardNode> allNodes,
         final Map<NodeIDSuffix, SubNodeContainer> allNestedViews, final NodeID containerID) {
         JSONLayoutPage finalLayout;
-        if (originalLayout == null || originalLayout.isEmpty()) {
+        if (currentLayout == null || currentLayout.isEmpty()) {
             finalLayout = new JSONLayoutPage();
             finalLayout.setRows(new ArrayList<JSONLayoutRow>(0));
         } else {
             try {
-                finalLayout = deserializeLayout(originalLayout);
+                finalLayout = deserializeLayout(currentLayout);
             } catch (IOException ex) {
                 LOGGER.error("Could not add unreferenced views to a layout: " + ex.getMessage(), ex);
-                return originalLayout;
+                return currentLayout;
             }
         }
         try {
@@ -317,7 +322,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize amended layout, returning original: " + ex.getMessage(), ex);
         }
-        return originalLayout;
+        return currentLayout;
     }
 
     @SuppressWarnings("rawtypes")
@@ -412,37 +417,53 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 4.2
      */
     @Override
-    public String updateLegacyLayout(final String originalLayout) {
+    public String updateLayout(final String currentLayout, final String originalLayout, final String layoutVersion) {
         JSONLayoutPage finalLayout;
         try {
-            finalLayout = deserializeLayout(originalLayout);
-            setMissingLegacyFlag(finalLayout);
+            finalLayout = deserializeLayout(currentLayout);
         } catch (IOException ex) {
-            LOGGER.error("Could not add update and enable legacy flag for layout: " + ex.getMessage(), ex);
-            return originalLayout;
+            LOGGER.error("Could not update layout: " + ex.getMessage(), ex);
+            return currentLayout;
         }
+        // v4.2.0 layout processing
+        if (LayoutVersion.get(layoutVersion).orElse(LayoutVersion.FUTURE).isOlderThan(LayoutVersion.V4020)) {
+            if (isMissingLegacyFlag(originalLayout)) {
+                try {
+                    enableLayoutPageLegacyMode(finalLayout);
+                } catch (Exception ex) {
+                    LOGGER.error("Could not enable legacy mode for layout: " + ex.getMessage(), ex);
+                }
+            }
+        }
+        // <-- include future layout version changes here -->
         try {
             return serializeLayout(finalLayout);
         } catch (Exception ex) {
-            LOGGER.error("Could not deserialize updated legacy layout, returning original: " + ex.getMessage(), ex);
+            LOGGER.error("Could not deserialize updated layout, returning original: " + ex.getMessage(), ex);
         }
-        return originalLayout;
+        return currentLayout;
     }
 
-    private static void setMissingLegacyFlag(final JSONLayoutPage page) {
+    private static void enableLayoutPageLegacyMode(final JSONLayoutPage page) {
         page.setParentLayoutLegacyMode(true);
-        page.getRows().forEach(row -> updateMissingLegacyFlagRow(row));
+        page.getRows().forEach(row -> enableLayoutRowLegacyMode(row));
     }
 
-    private static void updateMissingLegacyFlagRow(final JSONLayoutRow row) {
+    private static void enableLayoutRowLegacyMode(final JSONLayoutRow row) {
         row.getColumns().forEach(col -> {
             col.getContent().forEach(item -> {
                 if (item instanceof JSONLayoutViewContent) {
                     ((JSONLayoutViewContent)item).setUseLegacyMode(true);
                 } else if (item instanceof JSONLayoutRow) {
-                    updateMissingLegacyFlagRow((JSONLayoutRow)item);
+                    enableLayoutRowLegacyMode((JSONLayoutRow)item);
+                } else if (item instanceof JSONNestedLayout) {
+                    enableLayoutPageLegacyMode(((JSONNestedLayout)item).getLayout());
                 }
             });
         });
+    }
+
+    private static boolean isMissingLegacyFlag(final String layout) {
+        return !StringUtils.contains(layout, "parentLayoutLegacyMode");
     }
 }
