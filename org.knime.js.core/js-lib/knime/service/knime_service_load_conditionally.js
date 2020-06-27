@@ -10,6 +10,7 @@ if (require && knimeService) {
             }
         }
         if (config) {
+            config.waitSeconds = 30; // added 4.2
             requirejs.config(config);
         }
         require(paths, function () {
