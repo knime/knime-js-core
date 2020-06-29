@@ -463,7 +463,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         });
     }
 
-    private static boolean isMissingLegacyFlag(final String layout) {
+    /**
+     * Utility method to check a layout for the presence of legacy mode settings.
+     *
+     * @param layout the string representation of the layout to check.
+     * @return if the layout string contains existing legacy mode settings.
+     * @since 4.2
+     */
+    public static boolean isMissingLegacyFlag(final String layout) {
         return !StringUtils.contains(layout, "parentLayoutLegacyMode");
     }
 }
