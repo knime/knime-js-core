@@ -104,7 +104,8 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     public JavaScriptPreferencePage() {
         super("KNIME JavaScript View Settings", null, GRID);
         try {
-            URL jsIcon = FileLocator.resolve(FileLocator.find(JSCorePlugin.getDefault().getBundle(), new Path("icons/js.png"), null));
+            URL jsIcon = FileLocator.resolve(FileLocator.find(JSCorePlugin.getDefault().getBundle(),
+                new Path("icons/js.png"), null));
             setImageDescriptor(ImageDescriptor.createFromURL(jsIcon));
         } catch (IOException e) { /* do nothing, it's just a picture */ }
         setDescription("Setup display options for nodes utilizing JavaScript views.");
