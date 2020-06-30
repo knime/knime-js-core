@@ -62,6 +62,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
+import org.knime.core.node.wizard.util.LayoutUtil;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
@@ -88,11 +89,6 @@ import com.fasterxml.jackson.databind.ObjectReader;
 public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
 
     private final static NodeLogger LOGGER = NodeLogger.getLogger(DefaultLayoutCreatorImpl.class);
-
-    /**
-     * @since 4.2
-     */
-    public static final LayoutVersion LEGACY_FLAG_VERSION = LayoutVersion.V4020;
 
     /**
      * {@inheritDoc}
@@ -417,7 +413,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 4.2
      */
     @Override
-    public String updateLayout(final String currentLayout, final String originalLayout, final String layoutVersion) {
+    public String updateLayout(final String currentLayout, final String originalLayout) {
         JSONLayoutPage finalLayout;
         try {
             finalLayout = deserializeLayout(currentLayout);
@@ -425,17 +421,13 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             LOGGER.error("Could not update layout: " + ex.getMessage(), ex);
             return currentLayout;
         }
-        // v4.2.0 layout processing
-        if (LayoutVersion.get(layoutVersion).orElse(LayoutVersion.FUTURE).isOlderThan(LayoutVersion.V4020)) {
-            if (isMissingLegacyFlag(originalLayout)) {
-                try {
-                    enableLayoutPageLegacyMode(finalLayout);
-                } catch (Exception ex) {
-                    LOGGER.error("Could not enable legacy mode for layout: " + ex.getMessage(), ex);
-                }
+        if (isMissingLegacyFlag(originalLayout)) {
+            try {
+                enableLayoutPageLegacyMode(finalLayout);
+            } catch (Exception ex) {
+                LOGGER.error("Could not enable legacy mode for layout: " + ex.getMessage(), ex);
             }
         }
-        // <-- include future layout version changes here -->
         try {
             return serializeLayout(finalLayout);
         } catch (Exception ex) {
@@ -464,13 +456,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     }
 
     /**
-     * Utility method to check a layout for the presence of legacy mode settings.
+     * Utility method to check if an original layout needs the legacy flag updated.
      *
      * @param layout the string representation of the layout to check.
      * @return if the layout string contains existing legacy mode settings.
      * @since 4.2
      */
-    public static boolean isMissingLegacyFlag(final String layout) {
-        return !StringUtils.contains(layout, "parentLayoutLegacyMode");
+    private static boolean isMissingLegacyFlag(final String originalLayout) {
+        return LayoutUtil.requiresLayout(originalLayout) ? originalLayout.contains("=false")
+            : !StringUtils.contains(originalLayout, "parentLayoutLegacyMode");
     }
 }
