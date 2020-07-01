@@ -54,17 +54,18 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.knime.core.node.wizard.util.LayoutUtil;
+import org.knime.core.node.workflow.JSONLayoutStringProvider;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
 
 /**
- * Check SubNodeContainer layout new vs. old layout detection and default layout creation methods.
+ * Check SubNodeContainer layout v4.2.0 vs. pre4.2.0 detection and default layout creation methods.
  *
  * @author benlaney
  */
 public class TestDefaultLayoutBehavior extends WorkflowTestCase {
+
+    private static final String POST_42_SEARCH_TERM = "parentLayoutLegacyMode";
 
     private NodeID m_subNode1; // saved pre-changes layout
     private NodeID m_subNode2; // saved pre-changes no layout
@@ -100,9 +101,9 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testOldEmptyLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode1);
         assertNotNull(container);
-        String originalLayout = container.getLayoutJSONString();
-        assertTrue(DefaultLayoutCreatorImpl.isMissingLegacyFlag(originalLayout));
-        assertTrue(LayoutUtil.requiresLayout(originalLayout));
+        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        assertFalse(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
+        assertFalse(layoutProvider.isValidLayout());
     }
 
     /**
@@ -115,14 +116,13 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testOldSavedLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode2);
         assertNotNull(container);
-        String originalLayout = container.getLayoutJSONString();
-        assertTrue(DefaultLayoutCreatorImpl.isMissingLegacyFlag(originalLayout));
-        assertFalse(LayoutUtil.requiresLayout(originalLayout));
+        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        assertFalse(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
+        assertTrue(layoutProvider.isValidLayout());
     }
 
     /**
-     * Test the new default layout for a saved component. It should require a new layout but *not* be missing the
-     * required legacy flag.
+     * Test the new default layout for a saved component. It should not require a new layout or be missing the legacy flag.
      *
      * @throws Exception
      */
@@ -130,9 +130,9 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testNewDefaultLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode3);
         assertNotNull(container);
-        String originalLayout = container.getLayoutJSONString();
-        assertFalse(DefaultLayoutCreatorImpl.isMissingLegacyFlag(originalLayout));
-        assertTrue(LayoutUtil.requiresLayout(originalLayout));
+        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        assertTrue(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
+        assertTrue(layoutProvider.isValidLayout());
     }
 
     /**
@@ -144,8 +144,8 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testNewSavedLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode4);
         assertNotNull(container);
-        String originalLayout = container.getLayoutJSONString();
-        assertFalse(DefaultLayoutCreatorImpl.isMissingLegacyFlag(originalLayout));
-        assertFalse(LayoutUtil.requiresLayout(originalLayout));
+        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        assertTrue(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
+        assertTrue(layoutProvider.isValidLayout());
     }
 }

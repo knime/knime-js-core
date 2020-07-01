@@ -57,12 +57,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
-import org.knime.core.node.wizard.util.LayoutUtil;
+import org.knime.core.node.workflow.JSONLayoutStringProvider;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
@@ -89,6 +88,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
 
     private final static NodeLogger LOGGER = NodeLogger.getLogger(DefaultLayoutCreatorImpl.class);
+
+    private final static String LEGACY_FLAG_UID = "parentLayoutLegacyMode";
 
     /**
      * {@inheritDoc}
@@ -171,17 +172,15 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 3.7
      */
     @Override
-    public String expandNestedLayout(final String currentLayout, final WorkflowManager wfm) {
-        if (currentLayout == null || currentLayout.isEmpty()) {
-            return currentLayout;
-        }
-        try {
-            JSONLayoutPage parentPage = deserializeLayout(currentLayout);
-            parentPage = expandNestedLayout(parentPage, wfm);
-            return serializeLayout(parentPage);
-        } catch (IOException ex) {
-            LOGGER.error("Could not expand a potentially nested layout: " + ex.getMessage(), ex);
-            return currentLayout;
+    public void expandNestedLayout(final JSONLayoutStringProvider layoutStringProvider, final WorkflowManager wfm) {
+        if (!layoutStringProvider.isEmptyLayout()) {
+            try {
+                JSONLayoutPage parentPage = deserializeLayout(layoutStringProvider.getLayoutString());
+                parentPage = expandNestedLayout(parentPage, wfm);
+                layoutStringProvider.setLayoutString(serializeLayout(parentPage));
+            } catch (IOException ex) {
+                LOGGER.error("Could not expand a potentially nested layout: " + ex.getMessage(), ex);
+            }
         }
     }
 
@@ -264,23 +263,19 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
 
     private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub) throws JsonProcessingException, IOException {
         WorkflowManager wfm = sub.getWorkflowManager();
-        String nestedLayoutString = sub.getLayoutJSONString();
-        if (StringUtils.isNotEmpty(nestedLayoutString)) {
-            JSONLayoutPage nestedPage = deserializeLayout(nestedLayoutString);
-            expandNestedLayout(nestedPage, wfm);
-            nestedLayout.setLayout(nestedPage);
-        } else {
+        JSONLayoutStringProvider layoutStringProvider = sub.getJSONLayoutStringProvider();
+        if (layoutStringProvider.isEmptyLayout()) {
             // create default layout also for nested subnodes, if there is no layout defined
             @SuppressWarnings("rawtypes")
             Map<NodeID, WizardNode> nestedNodes =
-                wfm.findNodes(WizardNode.class, WebResourceController.NOT_HIDDEN_FILTER, false);
+            wfm.findNodes(WizardNode.class, WebResourceController.NOT_HIDDEN_FILTER, false);
             if (nestedNodes.size() > 0) {
                 Map<NodeIDSuffix, ViewHideable> nestedViews = nestedNodes.entrySet().stream().collect(Collectors
                     .toMap(e -> NodeIDSuffix.create(wfm.getID(), e.getKey()), v -> (ViewHideable)v.getValue()));
                 Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.getSubnodeContainers(wfm);
                 for (Entry<NodeID, SubNodeContainer> entry : nestedSubnodes.entrySet()) {
                     SinglePageWebResourceController controller =
-                        new SinglePageWebResourceController(wfm, entry.getKey());
+                            new SinglePageWebResourceController(wfm, entry.getKey());
                     if (controller.isSubnodeViewAvailable()) {
                         nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
                     }
@@ -289,36 +284,39 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                 expandNestedLayout(nestedPage, wfm);
                 nestedLayout.setLayout(nestedPage);
             }
+        } else {
+            JSONLayoutPage nestedPage = deserializeLayout(layoutStringProvider.getLayoutString());
+            expandNestedLayout(nestedPage, wfm);
+            nestedLayout.setLayout(nestedPage);
         }
     }
 
     /**
      * {@inheritDoc}
-     * @since 3.7
+     * @since 4.2
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public String addUnreferencedViews(final String currentLayout, final Map<NodeIDSuffix, WizardNode> allNodes,
+    public void addUnreferencedViews(final JSONLayoutStringProvider layoutStringProvider, final Map<NodeIDSuffix, WizardNode> allNodes,
         final Map<NodeIDSuffix, SubNodeContainer> allNestedViews, final NodeID containerID) {
         JSONLayoutPage finalLayout;
-        if (currentLayout == null || currentLayout.isEmpty()) {
+        if (layoutStringProvider.isEmptyLayout()) {
             finalLayout = new JSONLayoutPage();
             finalLayout.setRows(new ArrayList<JSONLayoutRow>(0));
         } else {
             try {
-                finalLayout = deserializeLayout(currentLayout);
+                finalLayout = deserializeLayout(layoutStringProvider.getLayoutString());
             } catch (IOException ex) {
                 LOGGER.error("Could not add unreferenced views to a layout: " + ex.getMessage(), ex);
-                return currentLayout;
+                return;
             }
         }
         try {
             finalLayout = addUnreferencedViews(containerID, finalLayout, allNodes, allNestedViews);
-            return serializeLayout(finalLayout);
+            layoutStringProvider.setLayoutString(serializeLayout(finalLayout));
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize amended layout, returning original: " + ex.getMessage(), ex);
         }
-        return currentLayout;
     }
 
     @SuppressWarnings("rawtypes")
@@ -413,27 +411,27 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 4.2
      */
     @Override
-    public String updateLayout(final String currentLayout, final String originalLayout) {
+    public void updateLayout(final JSONLayoutStringProvider layoutStringProvider) {
         JSONLayoutPage finalLayout;
         try {
-            finalLayout = deserializeLayout(currentLayout);
+            finalLayout = deserializeLayout(layoutStringProvider.getLayoutString());
         } catch (IOException ex) {
             LOGGER.error("Could not update layout: " + ex.getMessage(), ex);
-            return currentLayout;
+            return;
         }
-        if (isMissingLegacyFlag(originalLayout)) {
+        if (layoutStringProvider.isLayoutPreV42() || !layoutStringProvider.checkOriginalContains(LEGACY_FLAG_UID)) {
             try {
                 enableLayoutPageLegacyMode(finalLayout);
             } catch (Exception ex) {
                 LOGGER.error("Could not enable legacy mode for layout: " + ex.getMessage(), ex);
+                return;
             }
         }
         try {
-            return serializeLayout(finalLayout);
+            layoutStringProvider.setLayoutString(serializeLayout(finalLayout));
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize updated layout, returning original: " + ex.getMessage(), ex);
         }
-        return currentLayout;
     }
 
     private static void enableLayoutPageLegacyMode(final JSONLayoutPage page) {
@@ -453,17 +451,5 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                 }
             });
         });
-    }
-
-    /**
-     * Utility method to check if an original layout needs the legacy flag updated.
-     *
-     * @param layout the string representation of the layout to check.
-     * @return if the layout string contains existing legacy mode settings.
-     * @since 4.2
-     */
-    public static boolean isMissingLegacyFlag(final String originalLayout) {
-        return LayoutUtil.requiresLayout(originalLayout) ? originalLayout.contains("=false")
-            : !StringUtils.contains(originalLayout, "parentLayoutLegacyMode");
     }
 }
