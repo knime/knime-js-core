@@ -38,6 +38,7 @@
                 <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
                 <module>org.knime.features.js.core</module>
                 <module>org.knime.js.core</module>
+                <module>org.knime.js.cef</module>
                 <module>org.knime.update.js.core</module>
             </modules>
             <activation>
