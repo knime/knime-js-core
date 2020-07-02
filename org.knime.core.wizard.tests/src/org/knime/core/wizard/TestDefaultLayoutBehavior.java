@@ -54,9 +54,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.knime.core.node.workflow.JSONLayoutStringProvider;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 
 /**
  * Check SubNodeContainer layout v4.2.0 vs. pre4.2.0 detection and default layout creation methods.
@@ -101,9 +101,9 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testOldEmptyLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode1);
         assertNotNull(container);
-        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        SubnodeContainerLayoutStringProvider layoutProvider = container.getSubnodeLayoutStringProvider();
         assertFalse(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
-        assertFalse(layoutProvider.isValidLayout());
+        assertTrue(layoutProvider.isPlaceholderLayout());
     }
 
     /**
@@ -116,13 +116,14 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testOldSavedLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode2);
         assertNotNull(container);
-        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        SubnodeContainerLayoutStringProvider layoutProvider = container.getSubnodeLayoutStringProvider();
         assertFalse(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
-        assertTrue(layoutProvider.isValidLayout());
+        assertFalse(layoutProvider.isPlaceholderLayout());
     }
 
     /**
-     * Test the new default layout for a saved component. It should not require a new layout or be missing the legacy flag.
+     * Test the new default layout for a saved component. It should not require a new layout or be missing the legacy
+     * flag.
      *
      * @throws Exception
      */
@@ -130,9 +131,9 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testNewDefaultLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode3);
         assertNotNull(container);
-        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        SubnodeContainerLayoutStringProvider layoutProvider = container.getSubnodeLayoutStringProvider();
         assertTrue(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
-        assertTrue(layoutProvider.isValidLayout());
+        assertFalse(layoutProvider.isPlaceholderLayout());
     }
 
     /**
@@ -144,8 +145,8 @@ public class TestDefaultLayoutBehavior extends WorkflowTestCase {
     public void testNewSavedLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subNode4);
         assertNotNull(container);
-        JSONLayoutStringProvider layoutProvider = container.getJSONLayoutStringProvider();
+        SubnodeContainerLayoutStringProvider layoutProvider = container.getSubnodeLayoutStringProvider();
         assertTrue(layoutProvider.checkOriginalContains(POST_42_SEARCH_TERM));
-        assertTrue(layoutProvider.isValidLayout());
+        assertFalse(layoutProvider.isPlaceholderLayout());
     }
 }

@@ -61,12 +61,12 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
-import org.knime.core.node.workflow.JSONLayoutStringProvider;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SinglePageWebResourceController;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
@@ -172,7 +172,8 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 3.7
      */
     @Override
-    public void expandNestedLayout(final JSONLayoutStringProvider layoutStringProvider, final WorkflowManager wfm) {
+    public void expandNestedLayout(final SubnodeContainerLayoutStringProvider layoutStringProvider,
+        final WorkflowManager wfm) {
         if (!layoutStringProvider.isEmptyLayout()) {
             try {
                 JSONLayoutPage parentPage = deserializeLayout(layoutStringProvider.getLayoutString());
@@ -263,7 +264,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
 
     private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub) throws JsonProcessingException, IOException {
         WorkflowManager wfm = sub.getWorkflowManager();
-        JSONLayoutStringProvider layoutStringProvider = sub.getJSONLayoutStringProvider();
+        SubnodeContainerLayoutStringProvider layoutStringProvider = sub.getSubnodeLayoutStringProvider();
         if (layoutStringProvider.isEmptyLayout()) {
             // create default layout also for nested subnodes, if there is no layout defined
             @SuppressWarnings("rawtypes")
@@ -297,8 +298,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void addUnreferencedViews(final JSONLayoutStringProvider layoutStringProvider, final Map<NodeIDSuffix, WizardNode> allNodes,
-        final Map<NodeIDSuffix, SubNodeContainer> allNestedViews, final NodeID containerID) {
+    public void addUnreferencedViews(final SubnodeContainerLayoutStringProvider layoutStringProvider,
+        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews,
+        final NodeID containerID) {
         JSONLayoutPage finalLayout;
         if (layoutStringProvider.isEmptyLayout()) {
             finalLayout = new JSONLayoutPage();
@@ -411,7 +413,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @since 4.2
      */
     @Override
-    public void updateLayout(final JSONLayoutStringProvider layoutStringProvider) {
+    public void updateLayout(final SubnodeContainerLayoutStringProvider layoutStringProvider) {
         JSONLayoutPage finalLayout;
         try {
             finalLayout = deserializeLayout(layoutStringProvider.getLayoutString());
@@ -419,7 +421,8 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             LOGGER.error("Could not update layout: " + ex.getMessage(), ex);
             return;
         }
-        if (layoutStringProvider.isLayoutPreV42() || !layoutStringProvider.checkOriginalContains(LEGACY_FLAG_UID)) {
+        if (layoutStringProvider.wasLoadedEmptyPreV42Layout() ||
+                !layoutStringProvider.checkOriginalContains(LEGACY_FLAG_UID)) {
             try {
                 enableLayoutPageLegacyMode(finalLayout);
             } catch (Exception ex) {
