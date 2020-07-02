@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.knime.core.WizardNodeView">
+      <wizardNodeView
+            description="This browser uses the native system browser that SWT can use. In a typical environment this should be Internet Explorer on Windows and WebKit on Linux and Mac."
+            name="Internal SWT Browser"
+            viewClass="org.knime.js.swt.wizardnodeview.WizardNodeView">
+      </wizardNodeView>
+   </extension>   
+</plugin>

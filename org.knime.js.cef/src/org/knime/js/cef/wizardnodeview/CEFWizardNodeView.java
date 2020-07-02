@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
-import org.knime.workbench.editor2.WizardNodeView;
+import org.knime.js.swt.wizardnodeview.WizardNodeView;
 
 /**
  * Wizard node view implementation using the Chromium Embedded Framework (CEF) as browser.
