@@ -814,6 +814,9 @@ window.knimeService = (function () {
     };
 
     service.isViewRequestsSupported = function () {
+        if (!initialized) {
+            init();
+        }
         return Modernizr.promises && Modernizr.es6object && GLOBAL_SERVICE.isPushSupported();
     };
 
