@@ -610,6 +610,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * @param warnMessage a warning message in case the async call is not successful or only the default value is retrieved
      * @return the retrieved value from the async call, may be null in case of an error
      */
+    @SuppressWarnings("null")
     private <O> O evaluateAsync(final String evalCode, final String referenceObject, final O defaultValue,
         final String warnMessage) {
         Display display = getDisplay();
@@ -636,7 +637,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (localValue.equals(defaultValue)) {
             LOGGER.warn(warnMessage);
         }
-        return localValue;
+        return localValue == null ? defaultValue : localValue;
     }
 
     /**
@@ -646,8 +647,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     protected void showValidationErrorInView(final String error) {
         WizardViewCreator<REP, VAL> creator = getViewCreator();
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
-        String showErrorCall = "window.KnimePageLoader.setValidationError(" + escapedError + ")";
-        showErrorCall = creator.wrapInTryCatch("let response = await " + showErrorCall + ";return response;");
+        String showErrorCall = creator.wrapInTryCatch("window.KnimePageLoader.setValidationError(" + escapedError + ")");
         m_browserWrapper.execute(showErrorCall);
     }
 
