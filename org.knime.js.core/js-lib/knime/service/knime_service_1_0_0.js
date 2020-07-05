@@ -69,6 +69,17 @@ window.knimeService = (function () {
             return false;
         };
 
+        GLOBAL_SERVICE.isSingleView = function () {
+            if (runningInAPWrapper) {
+                return pageBuilderWrapper.isSingleView;
+            }
+            try {
+                return service && service.nodeId && service.nodeId.includes('SINGLE');
+            } catch (e) {
+                return false;
+            }
+        };
+
         if (runningInAPWrapper) { // lazy loading support
             GLOBAL_SERVICE.requestViewUpdate = pageBuilderWrapper.requestViewUpdate;
             GLOBAL_SERVICE.cancelViewRequest = pageBuilderWrapper.cancelViewRequest;
