@@ -30,6 +30,7 @@ window.knimeService = (function () {
     var runningInWebportal = false;
     var runningInSeleniumBrowser = false;
     var runningInAPWrapper = false;
+    var isSingleView = false;
     var warnings = {};
     var GLOBAL_SERVICE = null;
     var SVGNS = 'http://www.w3.org/2000/svg';
@@ -64,20 +65,10 @@ window.knimeService = (function () {
         PageBuilder will also be present. This should be simplified and reworked in the future it provide separate
         checks for interactivity and other functionality, such as lazy loading, etc. */
         interactivityAvailable = true;
+        isSingleView = runningInAPWrapper && pageBuilderWrapper.isSingleView;
 
         GLOBAL_SERVICE.isPushSupported = runningInAPWrapper ? pageBuilderWrapper.isPushSupported : function () {
             return false;
-        };
-
-        GLOBAL_SERVICE.isSingleView = function () {
-            if (runningInAPWrapper) {
-                return pageBuilderWrapper.isSingleView;
-            }
-            try {
-                return service && service.nodeId && service.nodeId.includes('SINGLE');
-            } catch (e) {
-                return false;
-            }
         };
 
         if (runningInAPWrapper) { // lazy loading support
@@ -187,6 +178,13 @@ window.knimeService = (function () {
             init();
         }
         return header.offsetHeight;
+    };
+
+    service.isSingleView = function () {
+        if (!initialized) {
+            init();
+        }
+        return isSingleView;
     };
 
     service.isInteractivityAvailable = function () {
