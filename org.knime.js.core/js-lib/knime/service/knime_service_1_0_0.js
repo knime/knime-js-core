@@ -153,6 +153,9 @@ window.knimeService = (function () {
         body.insertBefore(header, body.firstChild);
         initialized = true;
     };
+
+    // added 4.2; set in the new PageBuilder script loader
+    service.pageBuilderPresent = window.pageBuilderPresent;
     
     service.getGlobalService = function () {
         if (!initialized) {
