@@ -2,10 +2,12 @@ package org.knime.js.core;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -94,6 +96,13 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     /** Preference constant: show context menu entry for legacy Quickform execution. */
     public static final String P_SHOW_LEGACY_QUICKFORM_EXECUTION = "js.core.enableLegacyQuickformExecution";
 
+    /**
+     * Name of the chromium feature.
+     *
+     * @since 4.2
+     */
+    public static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
+
     // The shared instance.
     private static JSCorePlugin PLUGIN;
 
@@ -161,4 +170,19 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         return true;
     }
 
+    /**
+     * Checks whether the chromium feature is already installed or not.
+     *
+     * @return {@code true} if the feature is already installed, {@code false} otherwise
+     * @since 4.2
+     */
+    public static boolean isChromiumInstalled() {
+        for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
+            if (Arrays.stream(provider.getBundleGroups())
+                .anyMatch(e -> e.getIdentifier().equals(CHROME_FEATURE_NAME))) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

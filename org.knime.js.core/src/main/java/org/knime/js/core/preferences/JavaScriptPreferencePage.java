@@ -52,12 +52,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -116,8 +114,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
     static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
-
-    private static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
 
     private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
 
@@ -215,7 +211,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
         addField(m_enableLegacyQuickformExecution);
 
-        if (KNIMEConstants.getOSVariant().toLowerCase().contains("mac") && !isChromiumInstalled() || true) {
+        if (KNIMEConstants.getOSVariant().toLowerCase().contains("mac") && !JSCorePlugin.isChromiumInstalled() || true) {
             enableBrowserFields(INTERNAL_BROWSER, parent);
             enableHeadlessFields(PHANTOMJS, parent);
 
@@ -225,35 +221,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             enableBrowserFields(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
             enableHeadlessFields(getPreferenceStore().getString(JSCorePlugin.P_HEADLESS_BROWSER), parent);
         }
-    }
-
-    private static void addInstallChromiumButton(final Composite parent) {
-        final Composite comp = new Composite(parent, SWT.NONE);
-        comp.setLayout(new GridLayout(2, false));
-        comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-
-        final Label label = new Label(comp, SWT.NONE);
-        label.setText("Bundled Chromium Browser not installed. It is recommended to install it.");
-        final FontData data = label.getFont().getFontData()[0];
-        final Font font = new Font(label.getDisplay(), new FontData(data.getName(), data.getHeight(), SWT.BOLD));
-        label.setFont(font);
-        label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
-
-        final Button button = new Button(comp, SWT.NONE);
-        button.setText("Install Chromium");
-
-        button.addSelectionListener(new SelectionListener() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                installChromiumExtension();
-            }
-
-            @Override
-            public void widgetDefaultSelected(final SelectionEvent e) {
-                installChromiumExtension();
-            }
-        });
     }
 
     private static String[][] retrieveAllBrowsers() {
@@ -410,19 +377,33 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     }
 
-    /**
-     * Checks whether the chromium feature is already installed or not.
-     *
-     * @return {@code true} if the feature is already installed, {@code false} otherwise
-     */
-    private static boolean isChromiumInstalled() {
-        for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
-            if (Arrays.stream(provider.getBundleGroups())
-                .anyMatch(e -> e.getIdentifier().equals(CHROME_FEATURE_NAME))) {
-                return true;
+    private static void addInstallChromiumButton(final Composite parent) {
+        final Composite comp = new Composite(parent, SWT.NONE);
+        comp.setLayout(new GridLayout(2, false));
+        comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+        final Label label = new Label(comp, SWT.NONE);
+        label.setText("Bundled Chromium Browser not installed. It is recommended to install it.");
+        final FontData data = label.getFont().getFontData()[0];
+        final Font font = new Font(label.getDisplay(), new FontData(data.getName(), data.getHeight(), SWT.BOLD));
+        label.setFont(font);
+        label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
+
+        final Button button = new Button(comp, SWT.NONE);
+        button.setText("Install Chromium");
+
+        button.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                installChromiumExtension();
             }
-        }
-        return false;
+
+            @Override
+            public void widgetDefaultSelected(final SelectionEvent e) {
+                installChromiumExtension();
+            }
+        });
     }
 
     /**
@@ -442,9 +423,9 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             }
 
             if (featuresToInstall.isEmpty()) {
-                Display.getDefault().syncExec(
-                    () -> MessageDialog.openWarning(Display.getDefault().getActiveShell(), "No extension found",
-                        "No extension with name '" + CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
+                Display.getDefault().syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
+                    "No extension found",
+                    "No extension with name '" + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
             } else {
                 startInstallChromium(featuresToInstall);
             }
@@ -452,12 +433,12 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         } catch (ProvisionException ex) {
             Display.getDefault()
                 .syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
-                    "Error while installing extension", "Error while installign extension '" + CHROME_FEATURE_NAME
-                        + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
+                    "Error while installing extension", "Error while installign extension '"
+                        + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
 
             NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
-                .error("Error while installign extension '" + CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': "
-                    + ex.getMessage(), ex);
+                .error("Error while installign extension '" + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX
+                    + "': " + ex.getMessage(), ex);
         }
     }
 
@@ -470,8 +451,8 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
      */
     private static void searchInRepository(final IMetadataRepository repository,
         final Set<IInstallableUnit> featuresToInstall) throws ProvisionException {
-        final IQuery<IInstallableUnit> query =
-            QueryUtil.createLatestQuery(QueryUtil.createIUQuery(CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
+        final IQuery<IInstallableUnit> query = QueryUtil
+            .createLatestQuery(QueryUtil.createIUQuery(JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
         final IQueryResult<IInstallableUnit> result = repository.query(query, null);
 
         result.forEach(i -> featuresToInstall.add(i));
