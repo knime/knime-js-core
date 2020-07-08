@@ -50,11 +50,32 @@ package org.knime.js.core.preferences;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.equinox.p2.core.ProvisionException;
+import org.eclipse.equinox.p2.metadata.IInstallableUnit;
+import org.eclipse.equinox.p2.operations.InstallOperation;
+import org.eclipse.equinox.p2.operations.ProvisioningSession;
+import org.eclipse.equinox.p2.query.IQuery;
+import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
+import org.eclipse.equinox.p2.repository.IRepositoryManager;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
+import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
+import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
+import org.eclipse.equinox.p2.ui.ProvisioningUI;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -65,13 +86,20 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
+import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension;
 import org.knime.js.core.AbstractImageGenerator;
@@ -88,6 +116,10 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
     static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
+
+    private static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
+
+    private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
 
     private RadioGroupFieldEditor m_browserSelector;
     private FileFieldEditor m_browserExePath;
@@ -183,8 +215,45 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
         addField(m_enableLegacyQuickformExecution);
 
-        enableBrowserFields(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
-        enableHeadlessFields(getPreferenceStore().getString(JSCorePlugin.P_HEADLESS_BROWSER), parent);
+        if (KNIMEConstants.getOSVariant().toLowerCase().contains("mac") && !isChromiumInstalled() || true) {
+            enableBrowserFields(INTERNAL_BROWSER, parent);
+            enableHeadlessFields(PHANTOMJS, parent);
+
+            addField(new HorizontalLineField(parent));
+            addInstallChromiumButton(parent);
+        } else {
+            enableBrowserFields(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
+            enableHeadlessFields(getPreferenceStore().getString(JSCorePlugin.P_HEADLESS_BROWSER), parent);
+        }
+    }
+
+    private static void addInstallChromiumButton(final Composite parent) {
+        final Composite comp = new Composite(parent, SWT.NONE);
+        comp.setLayout(new GridLayout(2, false));
+        comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
+        final Label label = new Label(comp, SWT.NONE);
+        label.setText("Bundled Chromium Browser not installed. It is recommended to install it.");
+        final FontData data = label.getFont().getFontData()[0];
+        final Font font = new Font(label.getDisplay(), new FontData(data.getName(), data.getHeight(), SWT.BOLD));
+        label.setFont(font);
+        label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
+
+        final Button button = new Button(comp, SWT.NONE);
+        button.setText("Install Chromium");
+
+        button.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                installChromiumExtension();
+            }
+
+            @Override
+            public void widgetDefaultSelected(final SelectionEvent e) {
+                installChromiumExtension();
+            }
+        });
     }
 
     private static String[][] retrieveAllBrowsers() {
@@ -341,4 +410,105 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     }
 
+    /**
+     * Checks whether the chromium feature is already installed or not.
+     *
+     * @return {@code true} if the feature is already installed, {@code false} otherwise
+     */
+    private static boolean isChromiumInstalled() {
+        for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
+            if (Arrays.stream(provider.getBundleGroups())
+                .anyMatch(e -> e.getIdentifier().equals(CHROME_FEATURE_NAME))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Installes the chromium extension.
+     */
+    private static void installChromiumExtension() {
+        final ProvisioningSession session = ProvisioningUI.getDefaultUI().getSession();
+
+        try {
+            final IMetadataRepositoryManager metadataManager = (IMetadataRepositoryManager)session
+                .getProvisioningAgent().getService(IMetadataRepositoryManager.SERVICE_NAME);
+            final Set<IInstallableUnit> featuresToInstall = new HashSet<>();
+
+            for (URI uri : metadataManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_ALL)) {
+                IMetadataRepository repo = metadataManager.loadRepository(uri, null);
+                searchInRepository(repo, featuresToInstall);
+            }
+
+            if (featuresToInstall.isEmpty()) {
+                Display.getDefault().syncExec(
+                    () -> MessageDialog.openWarning(Display.getDefault().getActiveShell(), "No extension found",
+                        "No extension with name '" + CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
+            } else {
+                startInstallChromium(featuresToInstall);
+            }
+
+        } catch (ProvisionException ex) {
+            Display.getDefault()
+                .syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
+                    "Error while installing extension", "Error while installign extension '" + CHROME_FEATURE_NAME
+                        + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
+
+            NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
+                .error("Error while installign extension '" + CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': "
+                    + ex.getMessage(), ex);
+        }
+    }
+
+    /**
+     * Searches the chromium feature in the provided repository.
+     *
+     * @param repository the repository to search
+     * @param featuresToInstall a set that will be filled with the features to be installed
+     * @throws ProvisionException if an error occurs
+     */
+    private static void searchInRepository(final IMetadataRepository repository,
+        final Set<IInstallableUnit> featuresToInstall) throws ProvisionException {
+        final IQuery<IInstallableUnit> query =
+            QueryUtil.createLatestQuery(QueryUtil.createIUQuery(CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
+        final IQueryResult<IInstallableUnit> result = repository.query(query, null);
+
+        result.forEach(i -> featuresToInstall.add(i));
+    }
+
+    /**
+     * Starts installing the chromium feature.
+     *
+     * @param featuresToInstall the features that have to be installed.
+     */
+    private static void startInstallChromium(final Set<IInstallableUnit> featuresToInstall) {
+        final ProvisioningUI provUI = ProvisioningUI.getDefaultUI();
+        Job.getJobManager().cancel(LoadMetadataRepositoryJob.LOAD_FAMILY);
+        final LoadMetadataRepositoryJob loadJob = new LoadMetadataRepositoryJob(provUI);
+        loadJob.setProperty(LoadMetadataRepositoryJob.ACCUMULATE_LOAD_ERRORS, Boolean.toString(true));
+
+        loadJob.addJobChangeListener(new JobChangeAdapter() {
+            @Override
+            public void done(final IJobChangeEvent event) {
+                if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
+                    Display.getDefault().asyncExec(() -> {
+                        if (Display.getDefault().isDisposed()) {
+                            NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
+                                .debug("Display disposed, aborting install action");
+                            return;
+                        }
+
+                        provUI.getPolicy().setRepositoriesVisible(false);
+                        provUI.openInstallWizard(featuresToInstall,
+                            new InstallOperation(provUI.getSession(), featuresToInstall), loadJob);
+                        provUI.getPolicy().setRepositoriesVisible(true);
+                    });
+                }
+            }
+        });
+
+        loadJob.setUser(true);
+        loadJob.schedule();
+    }
 }
