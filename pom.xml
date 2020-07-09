@@ -30,7 +30,6 @@
                 <module>org.knime.core.wizard</module>
                 <module>org.knime.ext.phantomjs</module>
                 <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
-                <module>org.knime.ext.phantomjs.bin.macosx.x86_64</module>
                 <module>org.knime.ext.phantomjs.bin.win32.x86</module>
                 <module>org.knime.ext.seleniumdrivers.multios</module>
                 <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
@@ -54,7 +53,6 @@
                 <module>org.knime.core.wizard.tests</module>
                 <module>org.knime.ext.phantomjs</module>
                 <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
-                <module>org.knime.ext.phantomjs.bin.macosx.x86_64</module>
                 <module>org.knime.ext.phantomjs.bin.win32.x86</module>
                 <module>org.knime.ext.seleniumdrivers.multios</module>
                 <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
@@ -140,7 +138,6 @@
                 <configuration>
                     <excludes>
                         <!-- List all plug-in that do NOT contain sources here. -->
-                        <plugin id="org.knime.ext.phantomjs.bin.macosx.x86_64" />
                         <plugin id="org.knime.ext.phantomjs.bin.linux.x86_64" />
                         <plugin id="org.knime.ext.phantomjs.bin.win32.x86_64" />
                         <plugin id="org.knime.ext.phantomjs.bin.win32.x86" />

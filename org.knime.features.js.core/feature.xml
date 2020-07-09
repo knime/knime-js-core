@@ -748,6 +748,7 @@ propagated with or for interoperation with KNIME.
 
    <plugin
          id="org.knime.ext.phantomjs"
+         os="linux,win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -756,15 +757,6 @@ propagated with or for interoperation with KNIME.
    <plugin
          id="org.knime.ext.phantomjs.bin.linux.x86_64"
          os="linux"
-         arch="x86_64"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"/>
-
-   <plugin
-         id="org.knime.ext.phantomjs.bin.macosx.x86_64"
-         os="macosx"
          arch="x86_64"
          download-size="0"
          install-size="0"

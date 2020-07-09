@@ -50,6 +50,8 @@ package org.knime.js.core.node;
 
 import java.io.IOException;
 
+import javax.naming.OperationNotSupportedException;
+
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
@@ -138,7 +140,15 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
         try {
             try {
                 generator = AbstractImageGenerator.getConfiguredHeadlessBrowser(this);
+                if (generator.getClass().getName().contains("PhantomJSImageGenerator")) {
+                    setWarningMessage("PhantomJS was used to create the node image, which is no longer supported. "
+                            + "It is recommended to use Headless Chromium. You can configure the used browser in "
+                            + "Preferences->KNIME->JavaScript Views");
+                }
                 generator.generateView(getOptionalViewWaitTime(), exec.createSubExecutionContext(0.75));
+            } catch (InstantiationException | OperationNotSupportedException noOpEx) {
+                throw new IOException(noOpEx.getMessage() + " You can configure the used browser in "
+                        + "Preferences->KNIME->JavaScript Views", noOpEx);
             } catch (IOException ex) {
                 throw ex;
             } catch (Exception e) {

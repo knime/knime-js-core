@@ -96,7 +96,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension;
@@ -153,6 +152,12 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
+
+        if (!JSCorePlugin.isChromiumInstalled()) {
+            addField(new HorizontalLineField(parent));
+            addInstallChromiumButton(parent);
+        }
+
         m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
             "Please choose the browser to use for displaying JavaScript views:", 1,
             retrieveAllBrowsers(), parent);
@@ -179,9 +184,10 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         addField(m_browserCLIArgs);
         addField(new HorizontalLineField(parent));
 
+        String[][] headlessBrowsers = retrieveHeadlessBrowsers();
         m_headlessBrowserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER,
             "Please choose the headless browser to use for generating images from JavaScript views:"
-            , 1, retrieveHeadlessBrowsers(), parent);
+            , 1, headlessBrowsers, parent);
         for (Control radioButton : m_headlessBrowserSelector.getRadioBoxControl(parent).getChildren()) {
             ((Button)radioButton).addSelectionListener(new SelectionListener() {
 
@@ -197,12 +203,21 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             });
         }
         addField(m_headlessBrowserSelector);
-        m_headlessBrowserExePath = new FileFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_PATH,
-            "Path to headless browser executable\n(leave empty for default):", true, parent);
-        addField(m_headlessBrowserExePath);
-        m_headlesBrowserCLIArgs = new StringFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS,
-            "Additional command\nline arguments for chosen headless browser:", parent);
-        addField(m_headlesBrowserCLIArgs);
+        if (headlessBrowsers.length > 0) {
+            m_headlessBrowserExePath = new FileFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_PATH,
+                "Path to headless browser executable\n(leave empty for default):", true, parent);
+            addField(m_headlessBrowserExePath);
+            m_headlesBrowserCLIArgs = new StringFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS,
+                "Additional command\nline arguments for chosen headless browser:", parent);
+            addField(m_headlesBrowserCLIArgs);
+        } else {
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText("No headless browser installed. Image generation will be unavailable!");
+            final FontData data = label.getFont().getFontData()[0];
+            final Font font = new Font(label.getDisplay(), new FontData(data.getName(), data.getHeight(), SWT.BOLD));
+            label.setFont(font);
+            label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
+        }
         addField(new HorizontalLineField(parent));
 
         m_createDebugHtml = new BooleanFieldEditor(JSCorePlugin.P_DEBUG_HTML, "Create debug HTML for JavaScript views", BooleanFieldEditor.DEFAULT, parent);
@@ -210,17 +225,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
         m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
         addField(m_enableLegacyQuickformExecution);
-
-        if (KNIMEConstants.getOSVariant().toLowerCase().contains("mac") && !JSCorePlugin.isChromiumInstalled() || true) {
-            enableBrowserFields(INTERNAL_BROWSER, parent);
-            enableHeadlessFields(PHANTOMJS, parent);
-
-            addField(new HorizontalLineField(parent));
-            addInstallChromiumButton(parent);
-        } else {
-            enableBrowserFields(getPreferenceStore().getString(JSCorePlugin.P_VIEW_BROWSER), parent);
-            enableHeadlessFields(getPreferenceStore().getString(JSCorePlugin.P_HEADLESS_BROWSER), parent);
-        }
     }
 
     private static String[][] retrieveAllBrowsers() {
@@ -296,10 +300,12 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     private void enableHeadlessFields(final String view, final Composite parent) {
-        boolean isPhantom = PHANTOMJS.equals(view);
-        boolean isChromium = HEADLESS_CHROMIUM.equals(view);
-        m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
-        m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
+        if (m_headlessBrowserExePath != null && m_headlesBrowserCLIArgs != null) {
+            boolean isPhantom = PHANTOMJS.equals(view);
+            boolean isChromium = HEADLESS_CHROMIUM.equals(view);
+            m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
+            m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
+        }
     }
 
     /**
@@ -407,7 +413,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     /**
-     * Installes the chromium extension.
+     * Installs the Chromium extension.
      */
     private static void installChromiumExtension() {
         final ProvisioningSession session = ProvisioningUI.getDefaultUI().getSession();

@@ -97,7 +97,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public static final String P_SHOW_LEGACY_QUICKFORM_EXECUTION = "js.core.enableLegacyQuickformExecution";
 
     /**
-     * Name of the chromium feature.
+     * Name of the Chromium feature.
      *
      * @since 4.2
      */
@@ -171,7 +171,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Checks whether the chromium feature is already installed or not.
+     * Checks whether the Chromium feature is already installed or not.
      *
      * @return {@code true} if the feature is already installed, {@code false} otherwise
      * @since 4.2
