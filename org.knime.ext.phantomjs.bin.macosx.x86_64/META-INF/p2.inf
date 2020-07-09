@@ -1,3 +1,0 @@
-instructions.install=\
-    org.eclipse.equinox.p2.touchpoint.eclipse.chmod(targetDir:@artifact,\
-    targetFile:macosx/x86_64/phantomjs,permissions:755);
