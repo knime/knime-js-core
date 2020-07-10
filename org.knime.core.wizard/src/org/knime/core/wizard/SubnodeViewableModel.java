@@ -70,6 +70,7 @@ import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebResourceLocator.WebResourceType;
 import org.knime.core.node.web.WebTemplate;
+import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
@@ -122,7 +123,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName) throws IOException {
         m_viewName = viewName;
-        m_viewCreator = new SubnodeWizardViewCreator();
+        m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
         m_spm = SinglePageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
         createPageAndValue();
@@ -385,13 +386,19 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     /**
      * {@link JavaScriptViewCreator} for components (i.e. composite views).
      *
+     * @param <REP>
+     * @param <VAL>
      * @noreference This class is not intended to be referenced by clients.
      *
      * @since 4.0
      */
-    public static final class SubnodeWizardViewCreator extends JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> {
+    public static final class SubnodeWizardViewCreator<REP extends WebViewContent, VAL extends WebViewContent>
+        extends JavaScriptViewCreator<REP, VAL> {
 
-        private SubnodeWizardViewCreator() {
+        /**
+         * A new wizard view creator.
+         */
+        public SubnodeWizardViewCreator() {
             super(null);
             setWebTemplate(createSubnodeWebTemplate());
         }
@@ -399,7 +406,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         /**
          * @return the template for the composite view of a component
          */
-        public static WebTemplate createSubnodeWebTemplate() {
+        private static WebTemplate createSubnodeWebTemplate() {
             List<WebResourceLocator> locators = new ArrayList<>();
             String pageBuilder = "org/knime/core/knime-pagebuilder2-ap.js";
             locators.add(new WebResourceLocator("org.knime.js.core", pageBuilder, WebResourceType.JAVASCRIPT));
@@ -412,7 +419,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
          * {@inheritDoc}
          */
         @Override
-        public String createInitJSViewMethodCall(final boolean parseArguments, final JSONWebNodePage viewRepresentation, final SubnodeViewValue viewValue) {
+        public String createInitJSViewMethodCall(final boolean parseArguments, final REP viewRepresentation,
+            final VAL viewValue) {
             StringBuilder builder = new StringBuilder();
             if (parseArguments) {
                 String jsonViewRepresentation = getViewRepresentationJSONString(viewRepresentation);
@@ -421,7 +429,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                 builder.append(repParseCall);
             }
             String initMethod = getWebTemplate().getInitMethodName();
-            String initCall = getNamespacePrefix() + initMethod + "(parsedRepresentation, null, null, " + isDebug() + ");";
+            String initCall =
+                getNamespacePrefix() + initMethod + "(parsedRepresentation, null, null, " + isDebug() + ");";
             builder.append(initCall);
             return builder.toString();
         }
@@ -430,7 +439,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
          * {@inheritDoc}
          */
         @Override
-        public String getPageContentJSONString(final JSONWebNodePage viewRepresentation, final SubnodeViewValue viewValue) {
+        public String getPageContentJSONString(final REP viewRepresentation, final VAL viewValue) {
             return getViewRepresentationJSONString(viewRepresentation);
         }
 
@@ -440,7 +449,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
          * @since 4.2
          */
         @Override
-        public String getViewValueJSONString(final SubnodeViewValue viewValue) {
+        public String getViewValueJSONString(final VAL viewValue) {
             return "{}";
         }
     }

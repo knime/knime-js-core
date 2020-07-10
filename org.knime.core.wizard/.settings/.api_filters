@@ -104,6 +104,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/SubnodeViewableModel.java" type="org.knime.core.wizard.SubnodeViewableModel$SubnodeWizardViewCreator">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.SubnodeViewableModel.SubnodeWizardViewCreator"/>
+                <message_argument value="createInitJSViewMethodCall(boolean, JSONWebNodePage, SubnodeViewValue)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/ViewRequestRegistry.java" type="org.knime.core.wizard.ViewRequestRegistry">
         <filter id="640712815">
             <message_arguments>
