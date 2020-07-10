@@ -86,16 +86,17 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
     /**
      * @since 4.2
      */
-    protected static final int DEFAULT_TIMEOUT = 30;
+    protected static final int DEFAULT_TIMEOUT = 60;
 
     /**
      * @since 4.2
      */
-    protected static final int VIEW_INIT_TIMEOUT = 60;
+    protected static final int VIEW_INIT_TIMEOUT = 90;
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractImageGenerator.class);
     private static final String EXT_POINT_ID = "org.knime.js.core.headlessBrowsers";
     private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
+    private static final String CHROME = "org.knime.ext.seleniumdrivers.multios.ChromeImageGenerator";
     private static final String CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
     private static final String IMAGE_GENERATOR_CLASS = "imageGeneratorClass";
 
@@ -168,6 +169,10 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
         Class<?> viewClass = null;
         String classString = JSCorePlugin.getDefault().getPreferenceStore()
                 .getString(JSCorePlugin.P_HEADLESS_BROWSER);
+        // disable chrome image generation from previous workflows where this was still an option
+        if (classString.equals(CHROME)) {
+            classString = null;
+        }
         if (StringUtils.isNotEmpty(classString)) {
          // try loading selected view
             viewClass = getViewClassByReflection(classString, configurationElements);
