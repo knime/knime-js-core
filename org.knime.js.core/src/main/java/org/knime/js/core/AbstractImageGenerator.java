@@ -169,8 +169,8 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
         Class<?> viewClass = null;
         String classString = JSCorePlugin.getDefault().getPreferenceStore()
                 .getString(JSCorePlugin.P_HEADLESS_BROWSER);
-        // disable chrome image generation from previous workflows where this was still an option
-        if (classString.equals(CHROME)) {
+        // disable Chrome image generation in general or Chromium image generation if the binaries are not installed
+        if (classString.equals(CHROME) || (classString.equals(CHROMIUM) && !JSCorePlugin.isChromiumInstalled())) {
             classString = null;
         }
         if (StringUtils.isNotEmpty(classString)) {
@@ -183,7 +183,9 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
         }
         if (viewClass == null) {
             // try loading defaults
-            viewClass = getViewClassByReflection(CHROMIUM, configurationElements);
+            if (JSCorePlugin.isChromiumInstalled()) {
+                viewClass = getViewClassByReflection(CHROMIUM, configurationElements);
+            }
             if (viewClass == null) {
                 LOGGER.error("Headless Chromium could not be initialized as default browser for image "
                     + "generation. Trying PhantomJS...");
