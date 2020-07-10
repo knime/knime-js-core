@@ -7,13 +7,13 @@ import java.util.Hashtable;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.IBundleGroupProvider;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 
@@ -177,11 +177,10 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      * @since 4.2
      */
     public static boolean isChromiumInstalled() {
-        for (IBundleGroupProvider provider : Platform.getBundleGroupProviders()) {
-            if (Arrays.stream(provider.getBundleGroups())
-                .anyMatch(e -> e.getIdentifier().equals(CHROME_FEATURE_NAME))) {
-                return true;
-            }
+        Bundle b = Platform.getBundle("org.knime.ext.seleniumdrivers.multios");
+        if (b != null) {
+            return Arrays.stream(Platform.getFragments(b)).map(Bundle::getSymbolicName)
+                    .anyMatch(n -> n.startsWith("org.knime.ext.chromium.bin"));
         }
         return false;
     }
