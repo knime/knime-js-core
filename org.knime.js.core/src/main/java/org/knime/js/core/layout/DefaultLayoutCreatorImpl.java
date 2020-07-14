@@ -438,6 +438,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     }
 
     private static void enableLayoutPageLegacyMode(final JSONLayoutPage page) {
+        if (page == null) {
+            return;
+        }
         page.setParentLayoutLegacyMode(true);
         page.getRows().forEach(row -> enableLayoutRowLegacyMode(row));
     }
