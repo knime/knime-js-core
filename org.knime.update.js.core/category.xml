@@ -6,6 +6,10 @@
    <feature id="org.knime.features.js.core.source" version="0.0.0">
            <category name="knime-js-core" />
     </feature>
+    
+    <!-- Can probably removed as soon as the js-views based on CEF are available by default
+    (and thus part of org.knime.features.js.core) -->
+    <bundle id="org.knime.js.cef" />
    
   <category-def name="knime-js-core" label="Build artifacts from knime-js-core">
        <description>Build artifacts from knime-js-core</description>
