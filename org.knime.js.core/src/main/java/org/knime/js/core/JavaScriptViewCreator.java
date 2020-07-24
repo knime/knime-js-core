@@ -261,6 +261,16 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         return getViewRepresentationJSONString((REP)page);
     }
 
+    /**
+     * Explicitly set the customCSS to be used with the view.
+     *
+     * @param customCSS the customCSS string to set
+     * @since 4.2
+     */
+    public void setCustomCSS(final String customCSS) {
+        m_customCSS = customCSS;
+    }
+
     private void copyWebResources() throws IOException {
         for (Entry<File, String> copyEntry : getAllWebResources().entrySet()) {
             File src = copyEntry.getKey();
