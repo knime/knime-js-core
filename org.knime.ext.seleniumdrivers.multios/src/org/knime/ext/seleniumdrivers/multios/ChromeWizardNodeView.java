@@ -78,6 +78,7 @@ import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
+import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.util.FileUtil;
@@ -234,9 +235,13 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     public final void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_viewTitle = title;
         final T model = getViewableModel();
+        final WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
+        if (viewCreator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+            String customCSS = ((CSSModifiable)model).getCssStyles();
+            ((JavaScriptViewCreator<?, ?>)viewCreator).setCustomCSS(customCSS);
+        }
         final REP viewRepresentation = model.getViewRepresentation();
         final VAL viewValue = model.getViewValue();
-        final WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
 
         Thread openViewThread = new Thread(new Runnable() {
 

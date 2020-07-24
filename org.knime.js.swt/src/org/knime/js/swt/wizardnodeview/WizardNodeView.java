@@ -80,9 +80,11 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
+import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
 
 /**
@@ -329,7 +331,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     public void completed(final ProgressEvent event) {
                         if (m_viewSet && !m_initialized) {
                             WizardNode<REP, VAL> model = getModel();
-                            WizardViewCreator<REP, VAL> creator = getViewCreator();
+                            WizardViewCreator<REP, VAL> creator = model.getViewCreator();
+                            if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+                                String customCSS = ((CSSModifiable)model).getCssStyles();
+                                ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
+                            }
                             String initCall =
                                 creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
                             initCall = creator.wrapInTryCatch(initCall);
