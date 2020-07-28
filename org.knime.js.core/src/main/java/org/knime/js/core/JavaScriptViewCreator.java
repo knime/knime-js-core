@@ -265,7 +265,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      * Explicitly set the customCSS to be used with the view.
      *
      * @param customCSS the customCSS string to set
-     * @since 4.2
+     * @since 4.3
      */
     public void setCustomCSS(final String customCSS) {
         m_customCSS = customCSS;
