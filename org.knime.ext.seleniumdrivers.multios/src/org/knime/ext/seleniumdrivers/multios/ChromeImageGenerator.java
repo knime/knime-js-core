@@ -67,6 +67,7 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.util.FileUtil;
@@ -111,10 +112,15 @@ public class ChromeImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, RE
      */
     public ChromeImageGenerator(final T nodeModel) {
         super(nodeModel);
+        WizardViewCreator<REP, VAL> viewCreator = nodeModel.getViewCreator();
+        if (viewCreator instanceof JavaScriptViewCreator<?, ?> && nodeModel instanceof CSSModifiable) {
+            String customCSS = ((CSSModifiable)nodeModel).getCssStyles();
+            ((JavaScriptViewCreator<?, ?>)viewCreator).setCustomCSS(customCSS);
+
+        }
         m_service = ChromeViewService.getInstance();
         final REP viewRepresentation = nodeModel.getViewRepresentation();
         final VAL viewValue = nodeModel.getViewValue();
-        final WizardViewCreator<REP, VAL> viewCreator = nodeModel.getViewCreator();
         writeTempViewFiles(viewRepresentation, viewValue, viewCreator);
     }
 

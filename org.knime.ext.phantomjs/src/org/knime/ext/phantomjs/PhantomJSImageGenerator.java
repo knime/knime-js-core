@@ -58,8 +58,11 @@ import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.AbstractImageGenerator;
+import org.knime.js.core.JavaScriptViewCreator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
@@ -159,12 +162,18 @@ public class PhantomJSImageGenerator<T extends NodeModel & WizardNode<REP, VAL>,
     			LOGGER.error("Node model returned no path to view HTML. Cannot initialize view.");
     			return;
     		}
+            WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
+            if (viewCreator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+                String customCSS = ((CSSModifiable)model).getCssStyles();
+                ((JavaScriptViewCreator<?, ?>)viewCreator).setCustomCSS(customCSS);
+
+            }
     		m_driver.navigate().to(new File(viewPath).toURI().toString());
     		waitForDocumentReady();
     		((JavascriptExecutor)m_driver).executeScript("window.headless = true;");
     		REP viewRepresentation = model.getViewRepresentation();
     		VAL viewValue = model.getViewValue();
-    		String initCall = model.getViewCreator().createInitJSViewMethodCall(viewRepresentation, viewValue);
+    		String initCall = viewCreator.createInitJSViewMethodCall(viewRepresentation, viewValue);
     		((JavascriptExecutor)m_driver).executeScript(initCall);
     		if (exec != null) {
     			exec.setProgress(0.66);
