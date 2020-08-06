@@ -5,6 +5,7 @@ library "knime-pipeline@$BN"
 
 properties([
 	pipelineTriggers([
+		upstream('knime-js-pagebuilder/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
 		upstream('knime-expressions/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
 		upstream('knime-svg/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
 	]),
