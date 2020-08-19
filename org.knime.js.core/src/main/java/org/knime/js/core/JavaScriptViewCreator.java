@@ -345,10 +345,6 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             pageBuilder.append(String.format(scriptString, "org/knime/core/knime-pagebuilder2-ap.js"));
         }
 
-        if (StringUtils.isNotEmpty(customCSS)) {
-            String cleanedCSS = customCSS.replaceAll("(?i)</style>", "");
-            pageBuilder.append(String.format(inlineCSS, cleanedCSS));
-        }
         if (isDebug()) {
             String loadScript = "function loadWizardNodeView(){window.debugHTML = true;%s};";
             loadScript =
