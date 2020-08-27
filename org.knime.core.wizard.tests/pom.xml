@@ -14,8 +14,10 @@
 	<artifactId>org.knime.core.wizard.tests</artifactId>
 	<version>${revision}${changelist}</version>
 	<packaging>eclipse-test-plugin</packaging>
-
-
+  
+    <properties>
+        <revision>4.3.0</revision>
+    </properties>
 
 	<build>
 		<plugins>
