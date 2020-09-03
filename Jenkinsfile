@@ -4,11 +4,11 @@ def BN = BRANCH_NAME == "master" || BRANCH_NAME.startsWith("releases/") ? BRANCH
 library "knime-pipeline@$BN"
 
 properties([
-	pipelineTriggers([
-		upstream('knime-js-pagebuilder/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
-		upstream('knime-expressions/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
-		upstream('knime-svg/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
-	]),
+    pipelineTriggers([upstream(
+        'knime-expressions/' + env.BRANCH_NAME.replaceAll('/', '%2F') + ',' +
+        'knime-js-pagebuilder/' + env.BRANCH_NAME.replaceAll('/', '%2F') + ',' +
+        'knime-svg/' + env.BRANCH_NAME.replaceAll('/', '%2F')),
+    ]),
     parameters(workflowTests.getConfigurationsAsParameters()),
 	buildDiscarder(logRotator(numToKeepStr: '5')),
 	disableConcurrentBuilds()
