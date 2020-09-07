@@ -20,7 +20,7 @@ try {
 	        knimetools.defaultTychoBuild('org.knime.update.js.core')
         },
         Testing: {
-	        runIntegratedWorkflowTests('workflow-tests && ubuntu18.04')
+            workflowTests.runIntegratedWorkflowTests(profile: 'test')
         },
     ]
 
@@ -37,14 +37,4 @@ try {
 	notifications.notifyBuild(currentBuild.result);
 }
 
-def runIntegratedWorkflowTests(String image){
-    node(image) { 
-        stage('Platform specific testing'){
-            env.lastStage = env.STAGE_NAME
-            checkout scm
-
-            knimetools.runIntegratedWorkflowTests(profile: 'test')
-        }
-    }
-}
 /* vim: set shiftwidth=4 expandtab smarttab: */
