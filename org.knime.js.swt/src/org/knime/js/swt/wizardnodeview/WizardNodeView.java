@@ -653,6 +653,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     protected void showValidationErrorInView(final String error) {
         WizardViewCreator<REP, VAL> creator = getViewCreator();
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+        // If single node (non-component), update to valid JS string.
+        if (getModel() instanceof NodeModel) {
+            escapedError = "'" + escapedError + "'";
+        }
         String showErrorCall = creator.wrapInTryCatch("window.KnimePageLoader.setValidationError(" + escapedError + ")");
         m_browserWrapper.execute(showErrorCall);
     }

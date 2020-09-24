@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.NodeModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
@@ -828,6 +829,10 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     protected void showValidationErrorInView(final String error) {
         WizardViewCreator<REP, VAL> creator = getViewCreator();
         String escapedError = error.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ");
+        // If single node (non-component), update to valid JS string.
+        if (getModel() instanceof NodeModel) {
+            escapedError = "'" + escapedError + "'";
+        }
         String showErrorCall = creator.wrapInTryCatch(createPageLoaderCall("setValidationError", escapedError));
         executeScript(BRIDGE_EXECUTE_CALL, showErrorCall);
     }
