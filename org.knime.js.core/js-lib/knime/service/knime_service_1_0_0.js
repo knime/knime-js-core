@@ -39,10 +39,8 @@ window.knimeService = (function () {
     var messagePageBuilder = function (data) {
         data.nodeId = service.nodeId;
         var messageTarget = window.origin;
-        if (typeof messageTarget === 'undefined') {
+        if (!messageTarget || messageTarget === 'null') {
             messageTarget = window.location.origin;
-        } else if (messageTarget === 'null') {
-            messageTarget = window;
         }
         parent.postMessage(data, messageTarget);
     };
@@ -120,9 +118,12 @@ window.knimeService = (function () {
         };
                 
         GLOBAL_SERVICE.messageFromPageBuilder = function (event) {
-            var dest = !window.origin ? window.location.origin : window.origin;
+            var messageTarget = window.origin;
+            if (!messageTarget || messageTarget === 'null') {
+                messageTarget = window.location.origin;
+            }
             
-            if (event.origin !== dest) {
+            if (event.origin !== messageTarget) {
                 return;
             }
             
