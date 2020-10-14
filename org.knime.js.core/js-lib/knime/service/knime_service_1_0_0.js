@@ -42,6 +42,9 @@ window.knimeService = (function () {
         if (!messageTarget || messageTarget === 'null') {
             messageTarget = window.location.origin;
         }
+        if (messageTarget.indexOf('file:') > -1) {
+            messageTarget = '*';
+        }
         parent.postMessage(data, messageTarget);
     };
     
@@ -118,12 +121,17 @@ window.knimeService = (function () {
         };
                 
         GLOBAL_SERVICE.messageFromPageBuilder = function (event) {
+            if (!event || !event.origin) {
+                return;
+            }
             var messageTarget = window.origin;
             if (!messageTarget || messageTarget === 'null') {
                 messageTarget = window.location.origin;
             }
-            
-            if (event.origin !== messageTarget) {
+            var originMatch = event.origin === messageTarget ||
+                event.origin === '*' ||
+                event.origin.indexOf('file:') > -1;
+            if (!originMatch) {
                 return;
             }
             
