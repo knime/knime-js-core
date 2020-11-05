@@ -1,15 +1,17 @@
 import Vue from 'vue';
+import Vuex from 'vuex';
 
 import App from './components/App';
-import store from './store';
+import * as storeConfig from './store';
 
 Vue.config.productionTip = false;
+Vue.use(Vuex);
 
 // detect KNIME AP debug mode and make it available in all components
 Vue.prototype.$debug = Boolean(window.Firebug);
 
 const app = new Vue({
-    store,
+    store: new Vuex.Store(storeConfig),
     created() {
         // global methods to be called by AP
         window.setNodes = nodes => {

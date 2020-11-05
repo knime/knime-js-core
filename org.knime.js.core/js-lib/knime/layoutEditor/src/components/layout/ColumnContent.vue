@@ -141,7 +141,7 @@ export default {
 
 <style lang="postcss" scoped>
 .item {
-  position: relative; // needed for handle positioning
+  position: relative; /* needed for handle positioning */
   min-height: 20px;
 
   &:not(:last-of-type) {
@@ -195,6 +195,8 @@ export default {
 </style>
 
 <style lang="postcss">
+@import "vue-popperjs/dist/vue-popper.css";
+
 /* overwrite some global vue-popperjs styles */
 .popper.config {
   color: inherit;

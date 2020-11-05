@@ -1,6 +1,7 @@
-import { assert } from 'chai';
+import { createLocalVue } from '@vue/test-utils';
+import Vuex from 'vuex';
 
-import store from '~/src/store';
+import * as storeConfig from '../../src/store';
 
 const validLayout = {
     rows: [
@@ -38,10 +39,20 @@ const validLayout = {
 };
 
 describe('store', () => {
+    let store, localVue;
+
+    beforeAll(() => {
+        localVue = createLocalVue();
+        localVue.use(Vuex);
+    });
+
+    beforeEach(() => {
+        store = new Vuex.Store(storeConfig);
+    });
 
     it('loads valid columns and rows', () => {
         store.commit('setLayout', validLayout);
-        assert.deepEqual(store.state.layout, validLayout);
+        expect(store.state.layout).toEqual(validLayout);
     });
 
 
@@ -109,7 +120,7 @@ describe('store', () => {
         };
 
         store.commit('setLayout', invalidLayout);
-        assert.deepEqual(store.state.layout, validLayout);
+        expect(store.state.layout).toEqual(validLayout);
     });
 
 
@@ -183,15 +194,14 @@ describe('store', () => {
         };
 
         store.commit('setLayout', invalidColumns);
-        assert.deepEqual(store.state.layout, validColumns);
+        expect(store.state.layout).toEqual(validColumns);
     });
 
 
     it('gets all nodeIds used in the layout', () => {
         store.commit('setLayout', validLayout);
-        assert.deepEqual(store.getters.nodeIdsInLayout, ['1']);
+        expect(store.getters.nodeIdsInLayout).toEqual(['1']);
     });
-
 
     it('detects responsive layout', () => {
         const staticLayout = {
@@ -250,12 +260,11 @@ describe('store', () => {
         };
 
         store.commit('setLayout', staticLayout);
-        assert.isFalse(store.getters.isResponsiveLayout);
+        expect(store.getters.isResponsiveLayout).toBeFalsy();
 
         store.commit('setLayout', responsiveLayout);
-        assert.isTrue(store.getters.isResponsiveLayout);
+        expect(store.getters.isResponsiveLayout).toBeTruthy();
     });
-
 
     it('detects wrapping layout', () => {
         const normalLayout = {
@@ -294,10 +303,10 @@ describe('store', () => {
         };
 
         store.commit('setLayout', normalLayout);
-        assert.isFalse(store.getters.isWrappingLayout);
+        expect(store.getters.isWrappingLayout).toBeFalsy();
 
         store.commit('setLayout', wrappingLayout);
-        assert.isTrue(store.getters.isWrappingLayout);
+        expect(store.getters.isWrappingLayout).toBeTruthy();
     });
 
 });

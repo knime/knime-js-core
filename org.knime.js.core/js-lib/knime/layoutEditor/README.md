@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-Install [Node.js version 10](https://nodejs.org/en/download/current/).
+Install [Node.js version 14](https://nodejs.org/en/download/current/).
 
 ## Install all dependencies
 ```
@@ -11,7 +11,7 @@ npm install
 
 ### Launch development server including hot-reload
 ```
-npm run serve
+npm run dev
 ```
 
 ### Code linting

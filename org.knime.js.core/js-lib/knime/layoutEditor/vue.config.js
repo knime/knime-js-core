@@ -14,5 +14,5 @@ module.exports = {
     },
     filenameHashing: false, // also disabled for KNIME AP integration
     productionSourceMap: false,
-    baseUrl: ''
+    publicPath: ''
 };

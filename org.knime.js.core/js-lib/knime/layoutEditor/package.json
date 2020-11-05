@@ -1,42 +1,40 @@
 {
   "name": "knimelayouteditor",
   "version": "0.1.0",
-  "description": "Layout editor for KNIME meta nodes",
   "private": true,
+  "description": "Layout editor for KNIME meta nodes",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "eslint \"**/*.{js,vue}\"",
-    "_test:unit": "mocha-webpack --webpack-config config/mocha-webpack.config.js --require test/unit/mocha-setup.js test/**/*.test.js",
-    "test:unit": "cross-env NODE_ENV=test npm run _test:unit",
-    "coverage": "cross-env NODE_ENV=coverage nyc --reporter=lcov --reporter=text --reporter text-summary npm run _test:unit"
+    "test:unit": "jest",
+    "coverage": "jest --coverage"
   },
   "dependencies": {
-    "open-iconic": "^1.1.1",
-    "vue": "^2.5.17",
-    "vue-popperjs": "^1.6.1",
-    "vuedraggable": "^2.16.0",
-    "vuex": "^3.0.1"
+    "core-js": "3.6.5",
+    "open-iconic": "1.1.1",
+    "vue": "2.6.12",
+    "vue-popperjs": "2.3.0",
+    "vuedraggable": "2.24.3",
+    "vuex": "3.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.0.5",
-    "@vue/cli-service": "^3.0.5",
+    "@vue/cli-plugin-babel": "4.5.8",
+    "@vue/cli-service": "4.5.8",
+    "@vue/test-utils": "1.0.0-beta.29",
     "browser-env": "3.3.0",
-    "chai": "^4.2.0",
-    "cross-env": "^5.2.0",
-    "eslint": "5.7.0",
-    "eslint-plugin-vue": "5.0.x || 5.0.0-beta.3",
-    "mocha": "5.2.x",
-    "mocha-webpack": "2.0.x || 2.0.0-beta.0",
-    "nyc": "13.0.x",
-    "postcss-css-variables": "^0.11.0",
-    "postcss-import": "^12.0.1",
-    "postcss-preset-env": "^6.3.0",
-    "vue-svg-loader": "^0.11.0",
-    "vue-template-compiler": "^2.5.17",
-    "webpack-node-externals": "^1.7.2"
+    "eslint": "5.16.0",
+    "eslint-plugin-vue": "5.2.3",
+    "jest": "24.9.0",
+    "jest-junit": "6.4.0",
+    "jest-transform-stub": "2.0.0",
+    "postcss-css-variables": "0.17.0",
+    "postcss-import": "12.0.0",
+    "postcss-preset-env": "6.7.0",
+    "vue-svg-loader": "0.16.0",
+    "vue-template-compiler": "2.6.12"
   },
   "engines": {
-    "node": "10.x"
+    "node": "14.x"
   }
 }
