@@ -14,5 +14,15 @@ module.exports = {
     },
     filenameHashing: false, // also disabled for KNIME AP integration
     productionSourceMap: false,
-    publicPath: ''
+    publicPath: '',
+    pages: {
+        layoutEditor: {
+            entry: 'src/mainLayoutEditor.js',
+            template: 'public/layoutEditor.html'
+        },
+        nodeSorter: {
+            entry: 'src/mainNodeSorter.js',
+            template: 'public/nodeSorter.html'
+        }
+    }
 };

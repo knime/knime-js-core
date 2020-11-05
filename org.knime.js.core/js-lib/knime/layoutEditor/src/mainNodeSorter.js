@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import App from './components/App';
-import * as storeConfig from './store';
+import App from './components/AppNodeSorter';
+import * as storeConfig from './store/nodeSorter';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
@@ -23,10 +23,6 @@ const app = new Vue({
         window.setLayout = layout => {
             try {
                 let parsedLayout = JSON.parse(layout);
-                // if we don't have a legacy mode set for whatever reason, it must be legacy
-                if (typeof parsedLayout.parentLayoutLegacyMode === 'undefined') {
-                    parsedLayout.parentLayoutLegacyMode = true;
-                }
                 if (this.$debug) {
                     console.log('setLayout', parsedLayout); // eslint-disable-line no-console
                 }

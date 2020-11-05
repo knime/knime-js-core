@@ -1,7 +1,7 @@
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 
-import * as storeConfig from '../../src/store';
+import * as storeConfig from '../../src/store/layoutEditor';
 
 const validLayout = {
     rows: [
