@@ -30,7 +30,7 @@ export default {
     <KnimeView
       v-for="(view, index) in content"
       :key="index"
-      :view="view"
+      :view="view[0]"
       class="view"
     />
   </Draggable>

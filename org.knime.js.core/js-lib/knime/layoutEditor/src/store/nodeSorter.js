@@ -32,12 +32,17 @@ export const mutations = {
 
     // called by vuedraggable on reorder
     updateColumnContent(state, newContent) {
-        state.layout.rows[0].columns[0].content = newContent;
+        newContent.forEach((ele, index) =>
+            state.layout.rows[index].columns[0].content = ele);
     }
 };
 
 export const getters = {
     getColumnContent(state) {
-        return state.layout.rows[0].columns[0].content;
+        let contentArray = [];
+        state.layout.rows.forEach(function(ele) {
+           contentArray.push(ele.columns[0].content);
+        });
+        return contentArray;
     }
 };

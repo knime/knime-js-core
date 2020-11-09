@@ -14,7 +14,7 @@
         <img :src="node.icon"><br>{{ node.name }}
         <small class="text-muted">Node&nbsp;{{ view.nodeID }}</small>
         <small
-          v-if="!node.availableInView"
+          v-if="!node.availableInView && !node.availableInDialog"
           class="text-muted"
         >
           (disabled in node usage)
@@ -42,7 +42,7 @@ export default {
     },
     computed: {
         disabledOrMissing() {
-            return !this.node || !this.node.availableInView;
+            return !this.node || (!this.node.availableInView && !this.node.availableInDialog);
         },
         node() {
             return this.$store.state.nodes.find(node => node.nodeID === this.view.nodeID);
