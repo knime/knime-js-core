@@ -14,7 +14,7 @@
         <img :src="node.icon"><br>{{ node.name }}
         <small class="text-muted">Node&nbsp;{{ view.nodeID }}</small>
         <small
-          v-if="!node.availableInView && !node.availableInDialog"
+          v-if="disabledOrMissing"
           class="text-muted"
         >
           (disabled in node usage)
@@ -42,7 +42,16 @@ export default {
     },
     computed: {
         disabledOrMissing() {
-            return !this.node || (!this.node.availableInView && !this.node.availableInDialog);
+            if (this.node) {
+                if (this.node.hasOwnProperty('availableInView')) {
+                    return !this.node.availableInView;
+                } else if (this.node.hasOwnProperty('availableInDialog')) {
+                    return !this.node.availableInDialog;
+                }
+                return true;
+            } else {
+                return true;
+            }
         },
         node() {
             return this.$store.state.nodes.find(node => node.nodeID === this.view.nodeID);
@@ -114,6 +123,11 @@ export default {
   &.view,
   &.nestedLayout {
     min-height: 150px;
+  }
+
+  &.quickform,
+  &.configuration {
+    background-color: var(--knime-configuration-preview);
   }
 
   &.aspectRatio16by9,

@@ -9,13 +9,13 @@ export default {
         KnimeView
     },
     computed: {
-        ...mapGetters(['getColumnContent', 'getNodeDetails']),
-        content: {
+        ...mapGetters(['getRows', 'getNodeDetails']),
+        rows: {
             get() {
-                return this.getColumnContent;
+                return this.getRows;
             },
             set(value) {
-                this.$store.commit('updateColumnContent', value);
+                this.$store.commit('updateRows', value);
             }
         }
     }
@@ -24,14 +24,14 @@ export default {
 
 <template>
   <Draggable
-    v-model="content"
+    v-model="rows"
     class="container-fluid layout"
   >
     <KnimeView
-      v-for="(view, index) in content"
+      v-for="(row, index) in rows"
       :key="index"
-      :view="view[0]"
-      class="view"
+      :view="row.columns[0].content[0]"
+      class="item"
     />
   </Draggable>
 </template>
@@ -68,12 +68,12 @@ body {
       display: none; /* for now we just hide the content, maybe there is a better way to render the ghost */
     }
   }
-}
 
-.view {
-  cursor: move;
-  margin: 5px 0;
-  min-height: 60px !important;
-  max-height: 60px;
+  & .item {
+    cursor: move;
+    margin: 5px 0;
+    min-height: 60px !important;
+    max-height: 60px;
+  }
 }
 </style>
