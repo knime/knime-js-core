@@ -77,7 +77,8 @@
 
         <Draggable
           v-model="rows"
-          :options="{group: 'content', isFirstLevel: true}"
+          group="content"
+          :is-first-level="true"
           class="container-fluid layoutPreview"
           @start="$store.commit('setDragging', true)"
           @end="$store.commit('setDragging', false)"

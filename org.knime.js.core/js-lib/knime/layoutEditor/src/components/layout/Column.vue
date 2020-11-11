@@ -1,7 +1,8 @@
 <template>
   <Draggable
     v-model="content"
-    :options="{group: 'content', draggable: '.draggable'}"
+    group="content"
+    draggable=".draggable"
     :class="[columnClasses, {resizable}]"
     :move="onMove"
     @start="$store.commit('setDragging', true)"

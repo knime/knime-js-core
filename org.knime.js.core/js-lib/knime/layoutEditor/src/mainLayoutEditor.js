@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import App from './components/App';
+import App from './components/AppLayoutEditor';
 import * as storeConfig from './store/layoutEditor';
 
 Vue.config.productionTip = false;
