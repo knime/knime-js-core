@@ -15,7 +15,7 @@
     --knime-configuration-preview: #cbd9a9;
     --knime-configuration-preview-semi: #cbd9a9b9;
 
-    --button-color: var;
+    --button-color: var(--knime-gray-ultra-light);
     --button-color-hover: rgb(202, 202, 202);
     --button-color-highlight: var(--knime-yellow-sec-server);
 
