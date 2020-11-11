@@ -125,9 +125,17 @@ export default {
     min-height: 150px;
   }
 
+  &.sortable-drag {
+    background-color: var(--knime-view-preview-semi);
+  }
+
   &.quickform,
   &.configuration {
     background-color: var(--knime-configuration-preview);
+
+    &.sortable-drag {
+      background-color: var(--knime-configuration-preview-semi);
+    }
   }
 
   &.aspectRatio16by9,

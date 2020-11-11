@@ -61,7 +61,7 @@ body {
   min-height: calc(100vh - 50px);
 
   & .sortable-ghost {
-    background-color: transparent;
+    background-color: transparent !important;
     height: 60px;
 
     & * {
