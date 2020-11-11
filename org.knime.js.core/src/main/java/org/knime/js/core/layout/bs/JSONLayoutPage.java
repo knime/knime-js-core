@@ -137,7 +137,9 @@ public class JSONLayoutPage {
             new NamedType(JSONLayoutRow.class, "row"),
             new NamedType(JSONLayoutViewContent.class, "view"),
             new NamedType(JSONLayoutHTMLContent.class, "html"),
-            new NamedType(JSONNestedLayout.class, "nestedLayout")
+            new NamedType(JSONNestedLayout.class, "nestedLayout"),
+            // Added 4.3
+            new NamedType(JSONLayoutConfigurationContent.class, "configuration")
                 );
         return mapper;
     }

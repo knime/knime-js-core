@@ -11,7 +11,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.dialog.util.DefaultConfigurationLayoutCreator;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
+import org.knime.js.core.layout.DefaultConfigurationCreatorImpl;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -108,6 +110,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
 
     private String m_pluginRootPath;
     private ServiceRegistration<?> m_defaultLayoutCreatorService;
+    private ServiceRegistration<?> m_defaultConfigurationLayoutCreatorService;
 
     /** Plugin constructor */
     public JSCorePlugin() {
@@ -127,6 +130,9 @@ public final class JSCorePlugin extends AbstractUIPlugin {
 
         m_defaultLayoutCreatorService = context.registerService(DefaultLayoutCreator.class.getName(),
             new DefaultLayoutCreatorImpl(), new Hashtable<String, String>());
+
+        m_defaultConfigurationLayoutCreatorService = context.registerService(DefaultConfigurationLayoutCreator.class.getName(),
+            new DefaultConfigurationCreatorImpl(), new Hashtable<String, String>());
 
     }
 

@@ -58,6 +58,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.config.base.JSONConfig;
 import org.knime.core.node.property.hilite.HiLiteManager;
 import org.knime.core.node.property.hilite.HiLiteTranslator;
 import org.knime.core.node.util.CheckUtils;
@@ -86,6 +87,7 @@ import org.knime.js.core.JSONWebNodeInfo.JSONNodeState;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
+import org.knime.js.core.layout.bs.JSONLayoutConfigurationContent;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;
@@ -259,6 +261,10 @@ public abstract class AbstractPageManager {
             }
         } else if (content instanceof JSONLayoutViewContent) {
             JSONLayoutViewContent view = (JSONLayoutViewContent)content;
+            String nodeIDString = view.getNodeID();
+            view.setNodeID(prependParentNodeID(subNodeManager, nodeIDString));
+        } else if (content instanceof JSONLayoutConfigurationContent) {
+            JSONLayoutConfigurationContent view = (JSONLayoutConfigurationContent)content;
             String nodeIDString = view.getNodeID();
             view.setNodeID(prependParentNodeID(subNodeManager, nodeIDString));
         } else if (content instanceof JSONNestedLayout) {
