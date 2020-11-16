@@ -48,7 +48,7 @@ export default {
                 } else if (this.node.hasOwnProperty('availableInDialog')) {
                     return !this.node.availableInDialog;
                 }
-                return true;
+                return false;
             } else {
                 return true;
             }
