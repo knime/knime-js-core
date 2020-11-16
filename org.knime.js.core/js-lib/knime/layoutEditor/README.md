@@ -1,6 +1,6 @@
-# KNIME Layout Editor & Node Sorter
+# KNIME LayoutEditor & ConfigurationLayoutEditor
 
-This folder contains two Vue apps: Layout Editor and Node Sorter. Both share the same Vue setup and some components but will be built and used in KNIME Analytics Platform separately.
+This folder contains two Vue apps: the LayoutEditor for composite views and the ConfigurationLayoutEditor for configuration dialogs. Both share the same Vue setup and some components but will be built and used in KNIME Analytics Platform separately.
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ npm install
 ```
 npm run dev
 ```
-Now open http://localhost:8080/layoutEditor.html or http://localhost:8080/nodeSorter.html in your browser.
+Now open http://localhost:8080/layoutEditor.html or http://localhost:8080/configurationLayoutEditor.html in your browser.
 
 ### Code linting
 ```

@@ -20,9 +20,9 @@ module.exports = {
             entry: 'src/mainLayoutEditor.js',
             template: 'public/layoutEditor.html'
         },
-        nodeSorter: {
-            entry: 'src/mainNodeSorter.js',
-            template: 'public/nodeSorter.html'
+        configurationLayoutEditor: {
+            entry: 'src/mainConfigurationLayoutEditor.js',
+            template: 'public/configurationLayoutEditor.html'
         }
     }
 };

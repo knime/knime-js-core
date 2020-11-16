@@ -1,8 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
-import App from './components/AppNodeSorter';
-import * as storeConfig from './store/nodeSorter';
+import App from './components/AppConfigurationLayoutEditor';
+import * as storeConfig from './store/configurationLayoutEditor';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);

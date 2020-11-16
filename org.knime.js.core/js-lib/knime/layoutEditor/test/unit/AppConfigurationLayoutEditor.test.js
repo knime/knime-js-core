@@ -1,11 +1,11 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
-import AppNodeSorter from '~/src/components/AppNodeSorter';
+import AppConfigurationLayoutEditor from '~/src/components/AppConfigurationLayoutEditor';
 import Vuex from 'vuex';
-import * as workflowStoreConfig from '~/src/store/nodeSorter';
+import * as workflowStoreConfig from '~/src/store/configurationLayoutEditor';
 import Draggable from 'vuedraggable';
 import KnimeView from '~/src/components/layout/KnimeView';
 
-describe('AppNodeSorter.vue', () => {
+describe('AppConfigurationLayoutEditor.vue', () => {
 
     let localVue, store, mocks;
 
@@ -44,7 +44,7 @@ describe('AppNodeSorter.vue', () => {
     });
 
     it('renders', () => {
-        const wrapper = shallowMount(AppNodeSorter, {
+        const wrapper = shallowMount(AppConfigurationLayoutEditor, {
             mocks
         });
 

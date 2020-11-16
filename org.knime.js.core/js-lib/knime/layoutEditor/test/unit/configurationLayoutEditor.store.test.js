@@ -1,7 +1,7 @@
 import { createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 
-import * as storeConfig from '../../src/store/nodeSorter';
+import * as storeConfig from '../../src/store/configurationLayoutEditor';
 
 describe('store', () => {
     let store, localVue;

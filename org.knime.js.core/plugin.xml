@@ -1955,7 +1955,7 @@
                   name="KNIME Node Sorter"
                   usesDefine="false"
                   version="1.0.0"
-                  webResourceBundleID="knimeNodeSorter_1.0.0_Debug">
+                  webResourceBundleID="knimeConfigurationLayoutEditor_1.0.0_Debug">
                <webDependency
                      webResourceBundleID="firebug-lite">
                </webDependency>
@@ -1964,7 +1964,7 @@
                      relativePathTarget="js-lib/knime/layoutEditor/dist/js">
                </webResource>
                <importResource
-                     relativePath="js-lib/knime/layoutEditor/dist/js/nodeSorter.js"
+                     relativePath="js-lib/knime/layoutEditor/dist/js/configurationLayoutEditor.js"
                      type="JAVASCRIPT">
                </importResource>
                <webDependency
@@ -1976,13 +1976,13 @@
                   name="KNIME Node Sorter"
                   usesDefine="false"
                   version="1.0.0"
-                  webResourceBundleID="knimeNodeSorter_1.0.0">
+                  webResourceBundleID="knimeConfigurationLayoutEditor_1.0.0">
                <webResource
                      relativePathSource="js-lib/knime/layoutEditor/dist/js"
                      relativePathTarget="js-lib/knime/layoutEditor/dist/js">
                </webResource>
                <importResource
-                     relativePath="js-lib/knime/layoutEditor/dist/js/nodeSorter.js"
+                     relativePath="js-lib/knime/layoutEditor/dist/js/configurationLayoutEditor.js"
                      type="JAVASCRIPT">
                </importResource>
                <webDependency
