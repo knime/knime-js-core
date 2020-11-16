@@ -6,6 +6,9 @@ module.exports = {
         const svgRule = config.module.rule('svg');
         svgRule.uses.clear();
         svgRule
+            .use('babel-loader') /* only for IE11 */
+            .loader('babel-loader')
+            .end()
             .use('vue-svg-loader')
             .loader('vue-svg-loader');
     },
@@ -24,5 +27,8 @@ module.exports = {
             entry: 'src/mainConfigurationLayoutEditor.js',
             template: 'public/configurationLayoutEditor.html'
         }
-    }
+    },
+    transpileDependencies: [ /* only for IE11 */
+        'vuedraggable'
+      ]
 };
