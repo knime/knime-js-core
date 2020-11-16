@@ -1952,7 +1952,7 @@
             </webResourceBundle>
             <webResourceBundle
                   debug="true"
-                  name="KNIME Node Sorter"
+                  name="KNIME Configuration Layout Editor"
                   usesDefine="false"
                   version="1.0.0"
                   webResourceBundleID="knimeConfigurationLayoutEditor_1.0.0_Debug">
@@ -1973,7 +1973,7 @@
             </webResourceBundle>
             <webResourceBundle
                   debug="false"
-                  name="KNIME Node Sorter"
+                  name="KNIME Configuration Layout Editor"
                   usesDefine="false"
                   version="1.0.0"
                   webResourceBundleID="knimeConfigurationLayoutEditor_1.0.0">
