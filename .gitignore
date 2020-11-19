@@ -4,3 +4,4 @@
 org.knime.dynamic.js/src/xmlbeans
 **/.flattened-pom.xml
 **/.polyglot.build.properties
+**/CHANGELOG.md
