@@ -11,8 +11,8 @@
       class="d-inline-flex align-items-center justify-content-center"
     >
       <main>
-        <img :src="node.icon"><br>{{ node.name }}
-        <small class="text-muted">Node&nbsp;{{ view.nodeID }}</small>
+        <img :src="node.icon"><br>{{ node.name }}<br>
+        <small class="text-muted node-id">Node&nbsp;{{ view.nodeID }}</small>
         <small
           v-if="disabledOrMissing"
           class="text-muted"
@@ -29,7 +29,7 @@
     </div>
 
     <div v-else>
-      <main>Node&nbsp;{{ view.nodeID }} (missing in workflow)</main>
+      <main><span class="node-id">Node&nbsp;{{ view.nodeID }}</span> (missing in workflow)</main>
     </div>
   </div>
 </template>
@@ -171,6 +171,10 @@ export default {
 
     & .description {
       line-height: 100%;
+    }
+
+    & .node-id {
+      white-space: nowrap;
     }
   }
 }
