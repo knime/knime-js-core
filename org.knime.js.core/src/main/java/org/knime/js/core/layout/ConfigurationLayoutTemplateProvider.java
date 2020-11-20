@@ -55,6 +55,7 @@ import org.knime.js.core.layout.bs.JSONLayoutConfigurationContent;
  * Implementations provide a configuration layout template according to their current settings.
  *
  * @author Daniel Bogenrieder, KNIME.com GmbH, Konstanz, Germany
+ * @since 4.3
  */
 public interface ConfigurationLayoutTemplateProvider {
 

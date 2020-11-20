@@ -66,23 +66,20 @@ import org.knime.core.node.workflow.SubnodeContainerConfigurationStringProvider;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutConfigurationContent;
-import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;
 import org.knime.js.core.layout.bs.JSONNestedLayout;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  *
  * @author Daniel Bogenrieder, KNIME.com GmbH, Konstanz, Germany
+ * @since 4.3
  */
 public final class DefaultConfigurationCreatorImpl implements DefaultConfigurationLayoutCreator {
 
@@ -209,7 +206,6 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
             String configurationLayoutString = configurationStringProvider.getConfigurationLayoutString();
             final ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
             final SimpleModule module = new SimpleModule();
-            module.addSerializer(new JSONLayoutColumnSerializer());
             mapper.registerModule(module);
             try {
                 JSONLayoutPage page = mapper.readValue(configurationLayoutString, JSONLayoutPage.class);
@@ -282,74 +278,6 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
             configurationStringProvider.setConfigurationLayoutString(serializeLayout(finalLayout));
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize updated layout, returning original: " + ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * Custom serializer for {@link JSONLayoutColumn}. This will only serialize non-empty fields with the exception of
-     * "content" which can be empty but not null. This was needed because there's no way to override Jackson's
-     * serialization inclusion rule.
-     */
-    private static final class JSONLayoutColumnSerializer extends StdSerializer<JSONLayoutColumn> {
-
-        private static final long serialVersionUID = 1L;
-
-        protected JSONLayoutColumnSerializer() {
-            super(JSONLayoutColumn.class);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void serialize(final JSONLayoutColumn value, final JsonGenerator gen,
-            final SerializerProvider serializers) throws IOException, JsonProcessingException {
-            final List<String> additionalClasses = value.getAdditionalClasses();
-            final List<String> additionalStyles = value.getAdditionalStyles();
-            final List<JSONLayoutContent> content = value.getContent();
-            final Integer widthLG = value.getWidthLG();
-            final Integer widthMD = value.getWidthMD();
-            final Integer widthSM = value.getWidthSM();
-            final Integer widthXL = value.getWidthXL();
-            final Integer widthXS = value.getWidthXS();
-            gen.writeStartObject();
-            if (additionalClasses != null && !additionalClasses.isEmpty()) {
-                gen.writeArrayFieldStart("additionalClasses");
-                for (final String s : additionalClasses) {
-                    gen.writeString(s);
-                }
-                gen.writeEndArray();
-            }
-            if (additionalStyles != null && !additionalStyles.isEmpty()) {
-                gen.writeArrayFieldStart("additionalStyles");
-                for (final String s : additionalStyles) {
-                    gen.writeString(s);
-                }
-                gen.writeEndArray();
-            }
-            if (content != null) {
-                gen.writeArrayFieldStart("content");
-                for (final JSONLayoutContent c : content) {
-                    gen.writeObject(c);
-                }
-                gen.writeEndArray();
-            }
-            if (widthLG != null) {
-                gen.writeNumberField("widthLG", widthLG);
-            }
-            if (widthMD != null) {
-                gen.writeNumberField("widthMD", widthMD);
-            }
-            if (widthSM != null) {
-                gen.writeNumberField("widthSM", widthSM);
-            }
-            if (widthXL != null) {
-                gen.writeNumberField("widthXL", widthXL);
-            }
-            if (widthXS != null) {
-                gen.writeNumberField("widthXS", widthXS);
-            }
-            gen.writeEndObject();
         }
     }
 }

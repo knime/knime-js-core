@@ -59,6 +59,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
 *
 * @author Daniel Bogenrieder, KNIME.com GmbH, Konstanz, Germany
+ * @since 4.3
 */
 @JsonAutoDetect
 public class JSONLayoutConfigurationContent extends JSONLayoutElement implements JSONLayoutContent, Cloneable {
