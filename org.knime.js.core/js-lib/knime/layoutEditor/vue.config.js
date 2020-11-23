@@ -28,7 +28,5 @@ module.exports = {
             template: 'public/configurationLayoutEditor.html'
         }
     },
-    transpileDependencies: [ /* only for IE11 */
-        'vuedraggable'
-      ]
+    transpileDependencies: ['vuedraggable'] // only for IE11
 };

@@ -51,7 +51,7 @@ describe('AppConfigurationLayoutEditor.vue', () => {
         expect(wrapper.find(Draggable).exists()).toBe(true);
 
         let views = wrapper.findAll(KnimeView);
-        let expectedViewCount = 3;
+        const expectedViewCount = 3;
         expect(views.length).toBe(expectedViewCount);
         views.wrappers.forEach((view, index) => {
             expect(view.props('view')).toBe(store.state.layout.rows[index].columns[0].content[0]);

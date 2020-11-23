@@ -52,7 +52,7 @@ describe('KnimeView.vue', () => {
         expect(wrapper.classes()).toContain('knimeView');
         expect(wrapper.classes()).toContain('widget');
         
-        let nodeDiv = wrapper.find('div[title="' + nodeName + '"]');
+        let nodeDiv = wrapper.find(`div[title="${nodeName}"]`);
         expect(nodeDiv.exists()).toBeTruthy();
         expect(nodeDiv.find('img').attributes('src')).toBe('iconData');
         expect(nodeDiv.text()).toContain(nodeName);
@@ -124,7 +124,8 @@ describe('KnimeView.vue', () => {
             }
         });
         expect(wrapper.attributes('style')).toBe(
-            'min-width: 10px; max-width: 20px; min-height: 30px; max-height: 40px;');
+            'min-width: 10px; max-width: 20px; min-height: 30px; max-height: 40px;'
+        );
 
         wrapper = shallowMount(KnimeView, {
             mocks,
