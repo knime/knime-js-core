@@ -115,6 +115,7 @@ export default {
   border-radius: 3px;
   overflow: hidden;
   text-align: center;
+  padding: 10px;
 
   &.missing {
     opacity: 0.4;

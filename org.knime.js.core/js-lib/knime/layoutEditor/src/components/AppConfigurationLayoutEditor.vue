@@ -72,8 +72,7 @@ body {
   & .item {
     cursor: move;
     margin: 5px 0;
-    min-height: 60px !important;
-    max-height: 60px;
+    min-height: 90px !important;
   }
 }
 </style>
