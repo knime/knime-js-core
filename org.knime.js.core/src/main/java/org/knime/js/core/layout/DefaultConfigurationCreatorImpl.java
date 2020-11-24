@@ -177,7 +177,8 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
      */
     @SuppressWarnings("rawtypes")
     @Override
-    public void addUnreferencedViews(final SubnodeContainerConfigurationStringProvider configurationStringProvider,
+    public void addUnreferencedDialogNodes(
+        final SubnodeContainerConfigurationStringProvider configurationStringProvider,
         final Map<NodeIDSuffix, DialogNode> allNodes) {
         JSONLayoutPage finalLayout;
         if (configurationStringProvider.isEmptyLayout()) {
@@ -192,7 +193,7 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
             }
         }
         try {
-            finalLayout = addUnreferencedViews(finalLayout, allNodes);
+            finalLayout = addUnreferencedDialogNodes(finalLayout, allNodes);
             configurationStringProvider.setConfigurationLayoutString(serializeLayout(finalLayout));
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize amended layout, returning original: " + ex.getMessage(), ex);
@@ -230,7 +231,7 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     }
 
     @SuppressWarnings("rawtypes")
-    private static JSONLayoutPage addUnreferencedViews(final JSONLayoutPage layout,
+    private static JSONLayoutPage addUnreferencedDialogNodes(final JSONLayoutPage layout,
         final Map<NodeIDSuffix, DialogNode> allNodes) {
         List<NodeIDSuffix> containedNodes = new ArrayList<NodeIDSuffix>();
         layout.getRows().stream().forEach(row -> {

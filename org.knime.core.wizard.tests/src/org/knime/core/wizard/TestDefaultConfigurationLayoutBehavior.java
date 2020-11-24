@@ -80,7 +80,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
     private NodeID m_oldSubNode;
     private NodeID m_mixedNodes;
     private NodeID m_disabledNodes;
-    private NodeID m_containsUnreferenzedNodes;
+    private NodeID m_containsUnreferencedNodes;
 
     /**
      * Creates and copies the workflow into a temporary directory.
@@ -94,7 +94,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         m_oldSubNode = new NodeID(baseID, 5);
         m_mixedNodes = new NodeID(baseID, 10);
         m_disabledNodes = new NodeID(baseID, 11);
-        m_containsUnreferenzedNodes = new NodeID(baseID, 15);
+        m_containsUnreferencedNodes = new NodeID(baseID, 15);
     }
 
     /**
@@ -187,7 +187,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
     @SuppressWarnings("rawtypes")
     @Test
     public void testComponentContainingUnreferencedNodes() throws Exception {
-        SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_containsUnreferenzedNodes);
+        SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_containsUnreferencedNodes);
         assertNotNull(container);
         SubnodeContainerConfigurationStringProvider configurationStringProvider =
             container.getSubnodeConfigurationLayoutStringProvider();
@@ -203,7 +203,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         List<Integer> orderBefore = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
             configurationNodes, getManager());
         assertTrue("Only three dialog nodes should be present", orderBefore.toArray().length == 2);
-        ConfigurationLayoutUtil.addUnreferencedViews(configurationStringProvider, resultMapConfiguration);
+        ConfigurationLayoutUtil.addUnreferencedDialogNodes(configurationStringProvider, resultMapConfiguration);
         List<Integer> orderAfter = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
             configurationNodes, getManager());
         assertTrue("Five dialog nodes should be present", orderAfter.toArray().length == 4);
