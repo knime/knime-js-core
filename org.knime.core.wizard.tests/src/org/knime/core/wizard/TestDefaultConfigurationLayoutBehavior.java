@@ -76,7 +76,6 @@ import org.knime.core.node.workflow.SubnodeContainerConfigurationStringProvider;
  */
 public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
 
-    private SinglePageManager m_spm;
     private NodeID m_subnodeID;
     private NodeID m_oldSubNode;
     private NodeID m_mixedNodes;
@@ -96,64 +95,78 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         m_mixedNodes = new NodeID(baseID, 10);
         m_disabledNodes = new NodeID(baseID, 11);
         m_containsUnreferenzedNodes = new NodeID(baseID, 15);
-        m_spm = SinglePageManager.of(getManager());
     }
 
     /**
-     * Simple test if a combined view can successfully be created and contains the configuration layout and expected node order
+     * Simple test if a combined view can successfully be created and contains the configuration layout and expected
+     * node order
+     *
      * @throws Exception
      */
     @Test
     public void testExecuteAndCreateSubnodeConfiguration() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subnodeID);
         assertNotNull(container);
-        SubnodeContainerConfigurationStringProvider configurationLayoutProvider = container.getSubnodeConfigurationLayoutStringProvider();
+        SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
+            container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes = container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
-        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider, configurationNodes, getManager());
-        assertEquals("Configuration node order should be: 2, 4, 3, 5, 1",order, Arrays.asList(2, 4, 3, 5, 1));
+        Map<NodeID, MetaNodeDialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
+            configurationNodes, getManager());
+        assertEquals("Configuration node order should be: 2, 4, 3, 5, 1", order, Arrays.asList(2, 4, 3, 5, 1));
     }
 
     /**
-     * Simple test if an older component (previous to 4.3) can be successfully executed, although it does not have a configuration layout defined.
+     * Simple test if an older component (previous to 4.3) can be successfully executed, although it does not have a
+     * configuration layout defined.
+     *
      * @throws Exception
      */
     @Test
     public void testExecuteAndCreateOldSubnodeConfiguration() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_oldSubNode);
         assertNotNull(container);
-        SubnodeContainerConfigurationStringProvider configurationLayoutProvider = container.getSubnodeConfigurationLayoutStringProvider();
+        SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
+            container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes = container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
-        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider, configurationNodes, getManager());
+        Map<NodeID, MetaNodeDialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
+            configurationNodes, getManager());
         assertArrayEquals("There should be no order", order.toArray(), new String[]{});
     }
 
     /**
-     * Check if a component with a mix of configuration, view and quickform nodes can be executed and only the two dialog nodes are shown in the configuration layout
+     * Check if a component with a mix of configuration, view and quickform nodes can be executed and only the two
+     * dialog nodes are shown in the configuration layout
+     *
      * @throws Exception
      */
     @Test
     public void testMixedConfigurationAndQuickFormNodes() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_mixedNodes);
         assertNotNull(container);
-        SubnodeContainerConfigurationStringProvider configurationLayoutProvider = container.getSubnodeConfigurationLayoutStringProvider();
+        SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
+            container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes = container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
-        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider, configurationNodes, getManager());
+        Map<NodeID, MetaNodeDialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
+            configurationNodes, getManager());
         assertTrue("Only two dialog nodes should be present", order.toArray().length == 2);
     }
 
     /**
      * Check if disabling of is saved to the layout
+     *
      * @throws Exception
      */
+    @SuppressWarnings("rawtypes")
     @Test
     public void testDisabledNodesInLayout() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_disabledNodes);
         assertNotNull(container);
-        SubnodeContainerConfigurationStringProvider configurationLayoutProvider = container.getSubnodeConfigurationLayoutStringProvider();
-
         Map<NodeID, DialogNode> configurationNodes = container.getWorkflowManager().findNodes(DialogNode.class, false);
         LinkedHashMap<NodeIDSuffix, DialogNode> resultMapConfiguration = new LinkedHashMap<>();
         for (Map.Entry<NodeID, DialogNode> entry : configurationNodes.entrySet()) {
@@ -168,27 +181,32 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
 
     /**
      * Check if unreferenced views are correctly added to the layout
+     *
      * @throws Exception
      */
+    @SuppressWarnings("rawtypes")
     @Test
     public void testComponentContainingUnreferencedNodes() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_containsUnreferenzedNodes);
         assertNotNull(container);
-        SubnodeContainerConfigurationStringProvider configurationStringProvider = container.getSubnodeConfigurationLayoutStringProvider();
+        SubnodeContainerConfigurationStringProvider configurationStringProvider =
+            container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes = container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        Map<NodeID, MetaNodeDialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
         Map<NodeID, DialogNode> dialogNodes = container.getWorkflowManager().findNodes(DialogNode.class, false);
         LinkedHashMap<NodeIDSuffix, DialogNode> resultMapConfiguration = new LinkedHashMap<>();
         for (Map.Entry<NodeID, DialogNode> entry : dialogNodes.entrySet()) {
             NodeID.NodeIDSuffix idSuffix = NodeID.NodeIDSuffix.create(container.getID(), entry.getKey());
             resultMapConfiguration.put(idSuffix, entry.getValue());
         }
-        List<Integer> orderBefore = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider, configurationNodes, getManager());
+        List<Integer> orderBefore = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
+            configurationNodes, getManager());
         assertTrue("Only three dialog nodes should be present", orderBefore.toArray().length == 2);
-        ConfigurationLayoutUtil.addUnreferencedViews(configurationStringProvider, resultMapConfiguration, container.getID());
-        List<Integer> orderAfter = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider, configurationNodes, getManager());
+        ConfigurationLayoutUtil.addUnreferencedViews(configurationStringProvider, resultMapConfiguration);
+        List<Integer> orderAfter = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
+            configurationNodes, getManager());
         assertTrue("Five dialog nodes should be present", orderAfter.toArray().length == 4);
-        assertEquals("Configuration node order should be: 12, 14, 17, 18",orderAfter, Arrays.asList(12, 14, 17, 18));
+        assertEquals("Configuration node order should be: 12, 14, 17, 18", orderAfter, Arrays.asList(12, 14, 17, 18));
     }
 }
-
