@@ -89,7 +89,8 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
      * {@inheritDoc}
      */
     @Override
-    public String createDefaultConfigurationLayout(final Map<NodeIDSuffix, DialogNode> configurationNodes) throws IOException {
+    public String createDefaultConfigurationLayout(
+        @SuppressWarnings("rawtypes") final Map<NodeIDSuffix, DialogNode> configurationNodes) throws IOException {
         JSONLayoutPage page = createDefaultConfigurationLayoutStructure(configurationNodes);
         ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
         try {
@@ -105,11 +106,13 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
      * @param dialogNodes a map of view nodes to create the layout for
      * @return the new default configuration layout structure
      */
-    public static JSONLayoutPage createDefaultConfigurationLayoutStructure(final Map<NodeIDSuffix, DialogNode> dialogNodes) {
+    public static JSONLayoutPage createDefaultConfigurationLayoutStructure(
+        @SuppressWarnings("rawtypes") final Map<NodeIDSuffix, DialogNode> dialogNodes) {
         JSONLayoutPage page = new JSONLayoutPage();
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
         for (NodeIDSuffix suffix : dialogNodes.keySet()) {
+            @SuppressWarnings("rawtypes")
             DialogNode viewNode = dialogNodes.get(suffix);
             JSONLayoutRow row = createDefaultRowForDialogContent(suffix, viewNode);
             rows.add(row);
@@ -117,7 +120,8 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
         return page;
     }
 
-    private static JSONLayoutRow createDefaultRowForDialogContent(final NodeIDSuffix suffix, final DialogNode dialogNode) {
+    private static JSONLayoutRow createDefaultRowForDialogContent(final NodeIDSuffix suffix,
+        @SuppressWarnings("rawtypes") final DialogNode dialogNode) {
         JSONLayoutRow row = new JSONLayoutRow();
         JSONLayoutColumn col = new JSONLayoutColumn();
         JSONLayoutConfigurationContent colContent;
@@ -141,11 +145,12 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
      * @return a new view content element for a JSON layout
      */
     public static JSONLayoutConfigurationContent getDefaultConfigurationContentForNode(final NodeIDSuffix suffix,
-        final DialogNode dialogNode) {
+        @SuppressWarnings("rawtypes") final DialogNode dialogNode) {
         NodeID id = NodeID.fromString(suffix.toString());
         JSONLayoutConfigurationContent view = new JSONLayoutConfigurationContent();
         if (dialogNode instanceof ConfigurationLayoutTemplateProvider) {
-            JSONLayoutConfigurationContent layoutViewTemplate = ((ConfigurationLayoutTemplateProvider)dialogNode).getLayoutTemplate();
+            JSONLayoutConfigurationContent layoutViewTemplate =
+                ((ConfigurationLayoutTemplateProvider)dialogNode).getLayoutTemplate();
             if (layoutViewTemplate != null) {
                 view = layoutViewTemplate;
             }
@@ -173,7 +178,7 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     @SuppressWarnings("rawtypes")
     @Override
     public void addUnreferencedViews(final SubnodeContainerConfigurationStringProvider configurationStringProvider,
-        final Map<NodeIDSuffix, DialogNode> allNodes, final NodeID containerID) {
+        final Map<NodeIDSuffix, DialogNode> allNodes) {
         JSONLayoutPage finalLayout;
         if (configurationStringProvider.isEmptyLayout()) {
             finalLayout = new JSONLayoutPage();
@@ -187,7 +192,7 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
             }
         }
         try {
-            finalLayout = addUnreferencedViews(containerID, finalLayout, allNodes);
+            finalLayout = addUnreferencedViews(finalLayout, allNodes);
             configurationStringProvider.setConfigurationLayoutString(serializeLayout(finalLayout));
         } catch (Exception ex) {
             LOGGER.error("Could not deserialize amended layout, returning original: " + ex.getMessage(), ex);
@@ -195,7 +200,9 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     }
 
     @Override
-    public List<Integer> getConfigurationOrder(final SubnodeContainerConfigurationStringProvider configurationStringProvider, final Map<NodeID, MetaNodeDialogNode> nodes, final WorkflowManager wfm) {
+    public List<Integer> getConfigurationOrder(
+        final SubnodeContainerConfigurationStringProvider configurationStringProvider,
+        final Map<NodeID, MetaNodeDialogNode> nodes, final WorkflowManager wfm) {
         LinkedHashMap<NodeIDSuffix, MetaNodeDialogNode> resultMap = new LinkedHashMap<>();
         for (Map.Entry<NodeID, MetaNodeDialogNode> entry : nodes.entrySet()) {
             NodeID.NodeIDSuffix idSuffix = NodeID.NodeIDSuffix.create(wfm.getID(), entry.getKey());
@@ -211,7 +218,8 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
                 JSONLayoutPage page = mapper.readValue(configurationLayoutString, JSONLayoutPage.class);
                 List<JSONLayoutRow> rows = page.getRows();
                 for (JSONLayoutRow row : rows) {
-                    Integer id = Integer.valueOf(((JSONLayoutConfigurationContent)row.getColumns().get(0).getContent().get(0)).getNodeID());
+                    Integer id = Integer.valueOf(
+                        ((JSONLayoutConfigurationContent)row.getColumns().get(0).getContent().get(0)).getNodeID());
                     order.add(id);
                 }
             } catch (JsonProcessingException ex) {
@@ -222,14 +230,13 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     }
 
     @SuppressWarnings("rawtypes")
-    private static JSONLayoutPage addUnreferencedViews(final NodeID containerID, final JSONLayoutPage layout,
+    private static JSONLayoutPage addUnreferencedViews(final JSONLayoutPage layout,
         final Map<NodeIDSuffix, DialogNode> allNodes) {
         List<NodeIDSuffix> containedNodes = new ArrayList<NodeIDSuffix>();
         layout.getRows().stream().forEach(row -> {
             addNodesFromRow(row, containedNodes);
         });
-        Map<NodeIDSuffix, DialogNode> allDialogs =
-            getAllCurrentSNCDialogs(containerID, allNodes);
+        Map<NodeIDSuffix, DialogNode> allDialogs = getAllCurrentSNCDialogs(allNodes);
         Map<NodeIDSuffix, DialogNode> missingViews = allDialogs.entrySet().stream()
                 .filter(e -> {
                     final NodeID nodeID = NodeID.fromString(e.getKey().toString());
@@ -255,8 +262,7 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     }
 
     @SuppressWarnings("rawtypes")
-    private static Map<NodeIDSuffix, DialogNode> getAllCurrentSNCDialogs(final NodeID containerID,
-        final Map<NodeIDSuffix, DialogNode> allNodes) {
+    private static Map<NodeIDSuffix, DialogNode> getAllCurrentSNCDialogs(final Map<NodeIDSuffix, DialogNode> allNodes) {
         Map<NodeIDSuffix, DialogNode> allDialogs = new LinkedHashMap<NodeIDSuffix, DialogNode>();
         allNodes.entrySet().stream().forEach(e -> allDialogs.put(e.getKey(), e.getValue()));
         return allDialogs;
@@ -266,7 +272,8 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
      * {@inheritDoc}
      */
     @Override
-    public void updateConfigurationLayout(final SubnodeContainerConfigurationStringProvider configurationStringProvider) {
+    public void
+        updateConfigurationLayout(final SubnodeContainerConfigurationStringProvider configurationStringProvider) {
         JSONLayoutPage finalLayout;
         try {
             finalLayout = deserializeLayout(configurationStringProvider.getConfigurationLayoutString());
