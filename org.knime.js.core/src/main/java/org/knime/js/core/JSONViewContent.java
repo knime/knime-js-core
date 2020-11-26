@@ -53,6 +53,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import org.knime.core.node.web.WebViewContent;
+import org.knime.core.util.CoreConstants;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -63,6 +64,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
@@ -75,6 +77,9 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class JSONViewContent implements WebViewContent {
 
+    // since 4.3
+    private boolean hasArtifactsView = false;
+
     /**
      * {@inheritDoc}
      * @throws IOException
@@ -83,7 +88,10 @@ public abstract class JSONViewContent implements WebViewContent {
     @Override
     @JsonIgnore
     public final void loadFromStream(final InputStream viewContentStream) throws IOException {
-        ObjectReader reader = createObjectMapper().readerForUpdating(this);
+        ObjectMapper mapper = createObjectMapper();
+        ObjectReader reader = this.getHasArtifactsView() ?
+            mapper.readerWithView(CoreConstants.ArtifactsView.class).withValueToUpdate(this) :
+            mapper.readerForUpdating(this);
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
@@ -104,7 +112,11 @@ public abstract class JSONViewContent implements WebViewContent {
     @Override
     @JsonIgnore
     public final OutputStream saveToStream() throws IOException {
-        String viewContentString = createObjectMapper().writeValueAsString(this);
+        ObjectMapper mapper = createObjectMapper();
+        ObjectWriter writer = this.getHasArtifactsView() ?
+            mapper.writerWithView(CoreConstants.ArtifactsView.class) :
+            mapper.writer();
+        String viewContentString = writer.writeValueAsString(this);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(viewContentString.getBytes(Charset.forName("UTF-8")));
         out.flush();
@@ -121,6 +133,16 @@ public abstract class JSONViewContent implements WebViewContent {
         return mapper;
     }
 
+    /**
+     * Default implementation of if the implementation contains JSON content which should be de-/serialized
+     * using the {@link org.knime.core.util.CoreConstants.ArtifactsView} {@code JSONView} annotation.
+     *
+     * @return if the class has ArtifactsView fields.
+     * @since 4.3
+     */
+    protected boolean getHasArtifactsView() {
+        return hasArtifactsView;
+    }
 
     //Force equals and hashCode
 

@@ -71,6 +71,16 @@ public class JSONWebNodePage extends JSONViewContent {
     private final String m_version;
     private JSONWebNodePageConfiguration m_configuration;
     private Map<String, JSONWebNode> m_webNodes;
+    // since 4.3
+    private boolean hasArtifactsView = true;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean getHasArtifactsView() {
+        return hasArtifactsView;
+    }
 
     /**
      * @param configuration
