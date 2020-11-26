@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="['knimeView', typeClass, resizeClass, 'd-flex align-items-center justify-content-center',
+    :class="['knimeView', typeClass, resizeClass, 'align-items-center justify-content-center',
              {'missing': disabledOrMissing}
     ]"
     :style="style"
@@ -111,6 +111,7 @@ export default {
 @import "../../style/variables.css";
 
 .knimeView {
+  display: flex;
   background-color: var(--knime-view-preview);
   border-radius: 3px;
   overflow: hidden;
