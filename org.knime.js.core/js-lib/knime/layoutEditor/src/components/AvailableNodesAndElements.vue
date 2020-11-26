@@ -3,12 +3,10 @@
     <h4>Views <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="availableNodes"
-      :group="{name: 'content', pull: 'clone', put: false}"
-      :sort="false"
-      draggable=".item"
+      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false, draggable: '.item'}"
       :clone="onCloneNode"
       :move="onMoveNode"
-      tag="ul"
+      element="ul"
       class="availableNodes"
       @start="$store.commit('setDragging', true)"
       @end="$store.commit('setDragging', false)"
@@ -49,10 +47,8 @@
     <h4>Rows <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="$store.state.elements"
-      :group="{name: 'content', pull: 'clone', put: false}"
-      :sort="false"
-      :clone="onCloneElement"
-      tag="ul"
+      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
+      element="ul"
       class="availableElements"
       @start="$store.commit('setDragging', true)"
       @end="$store.commit('setDragging', false)"

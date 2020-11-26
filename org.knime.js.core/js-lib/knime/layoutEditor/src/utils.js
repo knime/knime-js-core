@@ -18,7 +18,7 @@ export default {
     checkMove(e) {
         // only allow rows to be dropped in first level
         const targetComponent = e.relatedContext.component;
-        if (targetComponent && targetComponent.$attrs && targetComponent.$attrs['is-first-level']) {
+        if (targetComponent && targetComponent.options && targetComponent.options.isFirstLevel) {
             if (e.draggedContext.element.type === 'row') {
                 return true;
             } else {
