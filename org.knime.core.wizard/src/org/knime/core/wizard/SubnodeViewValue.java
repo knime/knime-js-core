@@ -48,8 +48,10 @@
  */
 package org.knime.core.wizard;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -59,27 +61,40 @@ import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.js.core.JSONViewContent;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
- * View value for combined subnode view, contains of map of contained view values
+ * View value for combined subnode view, contains of map of contained view values. <br/>
+ *
+ * A note on the custom de-/serializers: This value reads/writes from/into generic json-objects internally represented
+ * as a string-to-string map. The map's keys are the top-level fields (i.e., the node-ids) of the json-object and the
+ * map's values are the 'sub-json-objects' as string (i.e., the nodes view values, without any escaping!).
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
+ * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
+@JsonSerialize(using = SubnodeViewValue.CustomSerializer.class)
+@JsonDeserialize(using = SubnodeViewValue.CustomDeserializer.class)
 public class SubnodeViewValue extends JSONViewContent {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewValue.class);
 
-    private Map<String, String> m_viewValues = new HashMap<String, String>();
+    private Map<String, String> m_viewValues = new HashMap<>();
 
     /**
      * @return the viewValues
      */
-    @JsonAnyGetter
     public Map<String, String> getViewValues() {
         return m_viewValues;
     }
@@ -89,18 +104,6 @@ public class SubnodeViewValue extends JSONViewContent {
      */
     public void setViewValues(final Map<String, String> viewValues) {
         m_viewValues = viewValues;
-    }
-
-    /**
-     * @param key
-     * @param value
-     */
-    @JsonAnySetter
-    public void addViewValue(final String key, final Object value) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            m_viewValues.put(key, mapper.writeValueAsString(value));
-        } catch (JsonProcessingException e) { /* do nothing */ }
     }
 
     /**
@@ -161,6 +164,62 @@ public class SubnodeViewValue extends JSONViewContent {
         return new HashCodeBuilder()
                 .append(m_viewValues)
                 .toHashCode();
+    }
+
+    private static class CustomSerializer extends StdSerializer<SubnodeViewValue> {
+
+        private static final long serialVersionUID = 1L;
+
+        protected CustomSerializer() {
+            super(SubnodeViewValue.class);
+        }
+
+        @Override
+        public void serializeWithType(final SubnodeViewValue value, final JsonGenerator gen, final SerializerProvider serializers,
+            final TypeSerializer typeSer) throws IOException {
+            serialize(value, gen, serializers);
+        }
+
+        @Override
+        public void serialize(final SubnodeViewValue value, final JsonGenerator gen,
+            final SerializerProvider serializers) throws IOException {
+            // TODO write type id?
+            gen.writeStartObject();
+            for (Entry<String, String> entry : value.m_viewValues.entrySet()) {
+                gen.writeFieldName(entry.getKey());
+                gen.writeRaw(":" + entry.getValue());
+            }
+            gen.writeEndObject();
+        }
+    }
+
+    private static class CustomDeserializer extends StdDeserializer<SubnodeViewValue> {
+
+        private static final long serialVersionUID = 1L;
+
+        protected CustomDeserializer() {
+            super(SubnodeViewValue.class);
+        }
+
+        @Override
+        public SubnodeViewValue deserializeWithType(final JsonParser p, final DeserializationContext ctxt,
+            final TypeDeserializer typeDeserializer, final SubnodeViewValue intoValue) throws IOException {
+            JsonNode tree = p.readValueAs(JsonNode.class);
+            tree.fields().forEachRemaining(e -> intoValue.m_viewValues.put(e.getKey(), e.getValue().toString()));
+            return intoValue;
+        }
+
+        @Override
+        public SubnodeViewValue deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
+            return deserializeWithType(p, ctxt, null, new SubnodeViewValue());
+        }
+
+        @Override
+        public SubnodeViewValue deserialize(final JsonParser p, final DeserializationContext ctxt, final SubnodeViewValue intoValue)
+            throws IOException {
+            return deserializeWithType(p, ctxt, null, intoValue);
+        }
+
     }
 
 }
