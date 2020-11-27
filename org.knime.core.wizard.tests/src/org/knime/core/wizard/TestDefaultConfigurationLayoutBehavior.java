@@ -68,6 +68,10 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.SubnodeContainerConfigurationStringProvider;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 /**
  * Check SubNodeContainer configuration layout v4.3.0
@@ -81,6 +85,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
     private NodeID m_mixedNodes;
     private NodeID m_disabledNodes;
     private NodeID m_containsUnreferencedNodes;
+    private NodeID m_onlyViewNodes;
 
     /**
      * Creates and copies the workflow into a temporary directory.
@@ -95,6 +100,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         m_mixedNodes = new NodeID(baseID, 10);
         m_disabledNodes = new NodeID(baseID, 11);
         m_containsUnreferencedNodes = new NodeID(baseID, 15);
+        m_onlyViewNodes = new NodeID(baseID, 18);
     }
 
     /**
@@ -149,12 +155,35 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         assertNotNull(container);
         SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
             container.getSubnodeConfigurationLayoutStringProvider();
+        JSONLayoutPage page = new JSONLayoutPage();
+        ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
+        ObjectReader reader = mapper.readerForUpdating(page);
+        reader.readValue(configurationLayoutProvider.getConfigurationLayoutString());
+        assertTrue("Only two dialog nodes should be present", page.getRows().size() == 2);
 
         Map<NodeID, MetaNodeDialogNode> configurationNodes =
             container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
         List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
             configurationNodes, getManager());
-        assertTrue("Only two dialog nodes should be present", order.toArray().length == 2);
+        assertTrue("Only two dialog nodes should be present in the order", order.toArray().length == 2);
+    }
+
+    /**
+     * Check if a component with a only view nodes contains no rows in the dialog layout editor
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testComponentWithOnlyViewNodes() throws Exception {
+        SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_onlyViewNodes);
+        assertNotNull(container);
+        SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
+            container.getSubnodeConfigurationLayoutStringProvider();
+        JSONLayoutPage page = new JSONLayoutPage();
+        ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
+        ObjectReader reader = mapper.readerForUpdating(page);
+        reader.readValue(configurationLayoutProvider.getConfigurationLayoutString());
+        assertTrue("No dialog node should be present", page.getRows().size() == 0);
     }
 
     /**
