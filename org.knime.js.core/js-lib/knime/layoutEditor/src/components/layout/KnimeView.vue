@@ -101,6 +101,11 @@ export default {
   height: 50px;
   color: transparent;
 
+  &.quickform,
+  &.configuration {
+    background-color: var(--knime-configuration-preview);
+  }
+
   & * {
     display: none; /* for now we just hide the content, maybe there is a better way to render the ghost */
   }

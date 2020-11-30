@@ -14,7 +14,7 @@
       <li
         v-for="(node, index) in availableNodes"
         :key="index"
-        class="item"
+        :class="['item', node.type]"
         @click.prevent="onAvailableNodeClick(node)"
       >
         <div class="name">
@@ -48,6 +48,7 @@
     <Draggable
       v-model="$store.state.elements"
       :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
+      :clone="onCloneElement"
       element="ul"
       class="availableElements"
       @start="$store.commit('setDragging', true)"
@@ -134,6 +135,15 @@ export default {
 .availableNodes {
   & .item {
     background-color: var(--knime-view-preview);
+
+    &.quickform,
+    &.configuration {
+      background-color: var(--knime-configuration-preview);
+
+      &:hover {
+        background-color: var(--knime-configuration-preview-semi);
+      }
+    }
 
     & .name {
       display: flex;

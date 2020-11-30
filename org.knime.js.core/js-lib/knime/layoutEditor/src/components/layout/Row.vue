@@ -75,6 +75,17 @@ export default {
 };
 </script>
 
+<style lang="postcss">
+@import "../../style/variables.css";
+
+/* when dragging from available elements over layout,
+  this list element will temporarily be added to the layout */
+.layoutPreview li.sortable-ghost.row {
+  border: 4px solid var(--knime-gray-ultra-light);
+  background-color: transparent;
+  min-height: 68px;
+}
+</style>
 
 <style lang="postcss" scoped>
 @import "../../style/variables.css";
