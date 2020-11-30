@@ -58,4 +58,15 @@ describe('AppConfigurationLayoutEditor.vue', () => {
         });
     });
 
+    it('renders empty message', () => {
+        const wrapper = shallowMount(AppConfigurationLayoutEditor, {
+            mocks
+        });
+
+        store.state.layout = {};
+
+        expect(wrapper.find(Draggable).exists()).toBe(false);
+        expect(wrapper.text()).toBe('This component doesn’t contain any configuration nodes.');
+    });
+
 });

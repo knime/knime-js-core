@@ -24,6 +24,7 @@ export default {
 
 <template>
   <Draggable
+    v-if="rows && rows.length"
     v-model="rows"
     class="container-fluid layout"
   >
@@ -34,6 +35,12 @@ export default {
       class="item"
     />
   </Draggable>
+  <p
+    v-else
+    class="hint text-muted text-center"
+  >
+    This component doesn’t contain any configuration nodes.
+  </p>
 </template>
 
 <style lang="postcss">
@@ -74,5 +81,12 @@ body {
     margin: 5px 0;
     min-height: 90px !important;
   }
+}
+
+.hint {
+  height: 95vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
