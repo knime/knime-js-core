@@ -355,8 +355,10 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             JSONLayoutPage nLP = e.getValue().getLayout();
             NodeID sncID = e.getKey().prependParent(containerID);
             SubNodeContainer nestedSNC = allNestedViews.get(NodeIDSuffix.fromString(sncID.toString()));
-            NodeID sncContainerID = sncID.createChild(nestedSNC.getWorkflowManager().getID().getIndex());
-            addUnreferencedViews(sncContainerID, nLP, allNodes, allNestedViews);
+            if (nestedSNC != null) {
+                NodeID sncContainerID = sncID.createChild(nestedSNC.getWorkflowManager().getID().getIndex());
+                addUnreferencedViews(sncContainerID, nLP, allNodes, allNestedViews);
+            }
         });
         return layout;
     }
