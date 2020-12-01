@@ -77,9 +77,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public abstract class JSONViewContent implements WebViewContent {
 
-    // since 4.3
-    private boolean hasArtifactsView = false;
-
     /**
      * {@inheritDoc}
      * @throws IOException
@@ -89,9 +86,7 @@ public abstract class JSONViewContent implements WebViewContent {
     @JsonIgnore
     public final void loadFromStream(final InputStream viewContentStream) throws IOException {
         ObjectMapper mapper = createObjectMapper();
-        ObjectReader reader = this.getHasArtifactsView() ?
-            mapper.readerWithView(CoreConstants.ArtifactsView.class).withValueToUpdate(this) :
-            mapper.readerForUpdating(this);
+        ObjectReader reader = mapper.readerWithView(CoreConstants.ArtifactsView.class).withValueToUpdate(this);
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
@@ -113,9 +108,7 @@ public abstract class JSONViewContent implements WebViewContent {
     @JsonIgnore
     public final OutputStream saveToStream() throws IOException {
         ObjectMapper mapper = createObjectMapper();
-        ObjectWriter writer = this.getHasArtifactsView() ?
-            mapper.writerWithView(CoreConstants.ArtifactsView.class) :
-            mapper.writer();
+        ObjectWriter writer = mapper.writerWithView(CoreConstants.ArtifactsView.class);
         String viewContentString = writer.writeValueAsString(this);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.write(viewContentString.getBytes(Charset.forName("UTF-8")));
@@ -131,17 +124,6 @@ public abstract class JSONViewContent implements WebViewContent {
         mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
-    }
-
-    /**
-     * Default implementation of if the implementation contains JSON content which should be de-/serialized
-     * using the {@link org.knime.core.util.CoreConstants.ArtifactsView} {@code JSONView} annotation.
-     *
-     * @return if the class has ArtifactsView fields.
-     * @since 4.3
-     */
-    protected boolean getHasArtifactsView() {
-        return hasArtifactsView;
     }
 
     //Force equals and hashCode
