@@ -187,7 +187,7 @@ public class SubnodeViewValue extends JSONViewContent {
             gen.writeStartObject();
             for (Entry<String, String> entry : value.m_viewValues.entrySet()) {
                 gen.writeFieldName(entry.getKey());
-                gen.writeRaw(":" + entry.getValue());
+                gen.writeRawValue(entry.getValue());
             }
             gen.writeEndObject();
         }
