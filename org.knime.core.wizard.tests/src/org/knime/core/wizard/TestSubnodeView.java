@@ -83,6 +83,7 @@ import org.knime.core.wizard.SubnodeViewableModel.CollectionValidationError;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.testing.node.blocking.BlockingRepository;
+import org.knime.testing.node.blocking.BlockingRepository.LockedMethod;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -114,7 +115,7 @@ public class TestSubnodeView extends WorkflowTestCase {
      */
     @Before
     public void setUp() throws Exception {
-        BlockingRepository.put(LOCK_ID, new ReentrantLock());
+        BlockingRepository.put(LOCK_ID, LockedMethod.EXECUTE, new ReentrantLock());
         NodeID baseID = loadAndSetWorkflow();
         m_subnodeID = new NodeID(baseID, 6);
         m_stringInputID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 4));
@@ -127,7 +128,7 @@ public class TestSubnodeView extends WorkflowTestCase {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        BlockingRepository.remove(LOCK_ID);
+        BlockingRepository.remove(LOCK_ID, LockedMethod.EXECUTE);
     }
 
     /**
@@ -286,7 +287,7 @@ public class TestSubnodeView extends WorkflowTestCase {
     @Test(expected = IllegalStateException.class)
     public void testApplyNewValueWhileDownstreamIsExecuting() throws Exception {
         initialExecute();
-        ReentrantLock blockLock = BlockingRepository.get(LOCK_ID);
+        ReentrantLock blockLock = BlockingRepository.getNonNull(LOCK_ID, LockedMethod.EXECUTE);
         blockLock.lock();
         try {
             getManager().executeUpToHere(m_blockID);
