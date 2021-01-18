@@ -251,8 +251,8 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
                 int x = 0;
                 int y = 0;
                 if (knimeWindowBounds != null) {
-                    x = (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x;
-                    y = (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y;
+                    x = Math.max(0, (knimeWindowBounds.width / 2) - (DEFAULT_WIDTH / 2) + knimeWindowBounds.x);
+                    y = Math.max(0, (knimeWindowBounds.height / 2) - (DEFAULT_HEIGHT / 2) + knimeWindowBounds.y);
                 }
 
                 Path bridgePath = null;
