@@ -72,6 +72,7 @@ import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
+import org.knime.core.util.CoreConstants;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 
@@ -143,7 +144,7 @@ public final class WizardPageManager extends AbstractPageManager implements View
     public String createCurrentWizardPageString() throws IOException, JsonProcessingException {
         JSONWebNodePage jsonPage = createCurrentWizardPage();
         ObjectMapper mapper = JSONLayoutPage.getConfiguredVerboseObjectMapper();
-        return mapper.writeValueAsString(jsonPage);
+        return mapper.writerWithView(CoreConstants.ArtifactsView.class).writeValueAsString(jsonPage);
     }
 
     /**
