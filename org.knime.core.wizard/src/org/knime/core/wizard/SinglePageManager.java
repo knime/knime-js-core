@@ -98,6 +98,7 @@ public class SinglePageManager extends AbstractPageManager {
     }
 
     private SinglePageWebResourceController getController(final NodeID containerNodeID) {
+        // TODO cache!
         return new SinglePageWebResourceController(getWorkflowManager(), containerNodeID);
     }
 
@@ -146,9 +147,8 @@ public class SinglePageManager extends AbstractPageManager {
      * @param viewValues a map with {@link NodeIDSuffix} string as key and parsed view value as value
      * @param containerNodeId the {@link NodeID} of the subnode
      * @return Null or empty map if validation succeeds, map of errors otherwise
-     * @throws IOException on serialization error
      */
-    public Map<String, ValidationError> validateViewValues(final Map<String, String> viewValues, final NodeID containerNodeId) throws IOException {
+    public Map<String, ValidationError> validateViewValues(final Map<String, String> viewValues, final NodeID containerNodeId) {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
             /*ObjectMapper mapper = new ObjectMapper();
             for (String key : viewValues.keySet()) {
@@ -192,14 +192,10 @@ public class SinglePageManager extends AbstractPageManager {
      * @param valueMap an already validated map with {@link NodeIDSuffix} string as key and parsed view value as value
      * @param containerNodeId the {@link NodeID} of the subnode
      * @param useAsDefault true, if values are supposed to be applied as new defaults, false if applied temporarily
-     * @throws IOException on serialization error
      */
     public void applyValidatedValuesAndReexecute(final Map<String, String> valueMap, final NodeID containerNodeId,
-        final boolean useAsDefault) throws IOException {
-        try (WorkflowLock lock = getWorkflowManager().assertLock()) {
-            applyValidatedViewValues(valueMap, containerNodeId, useAsDefault);
-            getController(containerNodeId).reexecuteSinglePage();
-        }
+        final boolean useAsDefault) {
+        getController(containerNodeId).reexecuteSinglePage(valueMap, false, useAsDefault);
     }
 
     /**

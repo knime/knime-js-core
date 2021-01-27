@@ -206,13 +206,10 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     @Override
     public ValidationError validateViewValue(final SubnodeViewValue viewContent) {
-        try {
-            Map<String, ValidationError> validationResult = m_spm.validateViewValues(viewContent.getViewValues(), m_container.getID());
-            if (!validationResult.isEmpty()) {
-                return new CollectionValidationError(validationResult);
-            }
-        } catch (IOException e) {
-            logErrorAndReset("Validating view values for node " + m_container.getID() + " failed: ", e);
+        Map<String, ValidationError> validationResult =
+            m_spm.validateViewValues(viewContent.getViewValues(), m_container.getID());
+        if (!validationResult.isEmpty()) {
+            return new CollectionValidationError(validationResult);
         }
         return null;
     }
@@ -222,36 +219,24 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     @Override
     public void loadViewValue(final SubnodeViewValue value, final boolean useAsDefault) {
-        try {
-            CheckUtils.checkState(m_container.getNodeContainerState().isExecuted(),
-                "Node needs to be in executed state to apply new view values.");
-            m_isReexecuteInProgress.set(true);
-            try (WorkflowLock lock = m_container.getParent().lock()) {
-                m_spm.applyValidatedValuesAndReexecute(value.getViewValues(), m_container.getID(), useAsDefault);
-                m_value = value;
-            } finally {
-                m_isReexecuteInProgress.set(false);
-                NodeContainerState state = m_container.getNodeContainerState();
-                if (state.isExecuted()) {
-                    // the framework refused to reset the node (because there are downstream nodes still executing);
-                    // ignore it.
-                } else if (!m_container.getNodeContainerState().isExecutionInProgress()) {
-                    // this happens if after the reset the execution can't be triggered, e.g. because #configure of
-                    // a node rejects the current settings -> #onNodeStateChange has been called as part of the reset
-                    // but was ignored due to the m_isReexecuteInProgress = true.
-                    onNodeStateChange();
-                }
+        CheckUtils.checkState(m_container.getNodeContainerState().isExecuted(),
+            "Node needs to be in executed state to apply new view values.");
+        m_isReexecuteInProgress.set(true);
+        try (WorkflowLock lock = m_container.getParent().lock()) {
+            m_spm.applyValidatedValuesAndReexecute(value.getViewValues(), m_container.getID(), useAsDefault);
+            m_value = value;
+        } finally {
+            m_isReexecuteInProgress.set(false);
+            NodeContainerState state = m_container.getNodeContainerState();
+            if (state.isExecuted()) {
+                // the framework refused to reset the node (because there are downstream nodes still executing);
+                // ignore it.
+            } else if (!m_container.getNodeContainerState().isExecutionInProgress()) {
+                // this happens if after the reset the execution can't be triggered, e.g. because #configure of
+                // a node rejects the current settings -> #onNodeStateChange has been called as part of the reset
+                // but was ignored due to the m_isReexecuteInProgress = true.
+                onNodeStateChange();
             }
-        } catch (IOException e) {
-            logErrorAndReset("Loading view values for node " + m_container.getID() + " failed: ", e);
-        }
-    }
-
-    private void logErrorAndReset(final String message, final Exception ex) {
-        LOGGER.error(message + ex.getMessage(), ex);
-        reset();
-        if (m_view != null) {
-            m_view.callViewableModelChanged();
         }
     }
 

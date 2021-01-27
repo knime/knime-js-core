@@ -57,6 +57,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
@@ -111,9 +112,18 @@ public class JSONLayoutPage {
     }
 
     /**
+     * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes and omitting empty
+     *         fields
+     */
+    public static ObjectWriter getConfiguredObjectWriter() {
+        // TODO instantiate (thread-safety?) or return from cache!
+        return null;
+    }
+
+    /**
      * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes and omitting empty fields
      */
-    public static ObjectMapper getConfiguredObjectMapper() {
+    public static ObjectMapper createConfiguredObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModules(new Jdk8Module());
         mapper.setSerializationInclusion(Include.NON_EMPTY);
