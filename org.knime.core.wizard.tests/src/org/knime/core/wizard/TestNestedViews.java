@@ -60,7 +60,7 @@ import org.junit.Test;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.SinglePageWebResourceController;
+import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.JSONWebNodePage;
@@ -77,7 +77,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class TestNestedViews extends WorkflowTestCase {
 
-    private SinglePageManager m_spm;
+    private CompositeViewPageManager m_spm;
     private NodeID m_outerSubnodeID;
     private NodeID m_topLevelTableID;
     private NodeID m_innerViewSubnodeID;
@@ -93,7 +93,7 @@ public class TestNestedViews extends WorkflowTestCase {
     @Before
     public void setUp() throws Exception {
         loadAndSetWorkflow();
-        m_spm = SinglePageManager.of(getManager());
+        m_spm = CompositeViewPageManager.of(getManager());
         m_outerSubnodeID = createNodeID("6");
         m_topLevelTableID = createNodeID("6:0:3");
         m_innerViewSubnodeID = createNodeID("6:0:9");
@@ -130,7 +130,7 @@ public class TestNestedViews extends WorkflowTestCase {
     public void testExecuteAndCreateSubnodeView() throws Exception {
         //setup
         executeAllAndWait();
-        SinglePageWebResourceController spc = new SinglePageWebResourceController(getManager(), m_outerSubnodeID);
+        CompositeViewController spc = new CompositeViewController(getManager(), m_outerSubnodeID);
         assertTrue("Should have subnode view", spc.isSubnodeViewAvailable());
 
         //create page content

@@ -74,7 +74,7 @@ import org.knime.core.node.workflow.FlowVariable;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.SinglePageWebResourceController;
+import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WorkflowLock;
@@ -100,7 +100,7 @@ public class TestSubnodeView extends WorkflowTestCase {
 
     private static final String LOCK_ID = "lock_node_7";
 
-    private SinglePageManager m_spm;
+    private CompositeViewPageManager m_spm;
     private NodeID m_subnodeID;
     private NodeIDSuffix m_stringInputID;
     private NodeIDSuffix m_tableViewID;
@@ -121,7 +121,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         m_stringInputID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 4));
         m_tableViewID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 3));
         m_blockID = new NodeID(baseID, 7);
-        m_spm = SinglePageManager.of(getManager());
+        m_spm = CompositeViewPageManager.of(getManager());
     }
 
     @Override
@@ -154,7 +154,7 @@ public class TestSubnodeView extends WorkflowTestCase {
     @Test
     public void testExecuteAndCreateSubnodeView() throws Exception {
         initialExecute();
-        SinglePageWebResourceController spc = new SinglePageWebResourceController(getManager(), m_subnodeID);
+        CompositeViewController spc = new CompositeViewController(getManager(), m_subnodeID);
         assertTrue("Should have subnode view", spc.isSubnodeViewAvailable());
         WizardPageContent page = spc.getWizardPage();
         assertNotNull("Page content should be available", page);

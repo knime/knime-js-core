@@ -64,7 +64,7 @@ import org.knime.core.node.wizard.util.DefaultLayoutCreator;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.SinglePageWebResourceController;
+import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 import org.knime.core.node.workflow.WebResourceController;
@@ -275,8 +275,8 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
                     .toMap(e -> NodeIDSuffix.create(wfm.getID(), e.getKey()), v -> (ViewHideable)v.getValue()));
                 Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.getSubnodeContainers(wfm);
                 for (Entry<NodeID, SubNodeContainer> entry : nestedSubnodes.entrySet()) {
-                    SinglePageWebResourceController controller =
-                            new SinglePageWebResourceController(wfm, entry.getKey());
+                    CompositeViewController controller =
+                            new CompositeViewController(wfm, entry.getKey());
                     if (controller.isSubnodeViewAvailable()) {
                         nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
                     }

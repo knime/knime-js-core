@@ -105,7 +105,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private JSONWebNodePage m_page;
     private SubnodeViewValue m_value;
 
-    private final SinglePageManager m_spm;
+    private final CompositeViewPageManager m_spm;
     private final SubNodeContainer m_container;
     private final String m_viewName;
     private final JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> m_viewCreator;
@@ -124,7 +124,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName) throws IOException {
         m_viewName = viewName;
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
-        m_spm = SinglePageManager.of(nodeContainer.getParent());
+        m_spm = CompositeViewPageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
         createPageAndValue();
         m_nodeStateChangeListener = s -> onNodeStateChange();

@@ -61,31 +61,31 @@ import org.knime.core.node.interactive.ViewRequestHandlingException;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewResponse;
+import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.SinglePageWebResourceController;
 import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.JSONWebNodePage;
 
 /**
- * Utility class which handles serialization/deserialization of meta node or wizard views,
- * as well as forwarding and bundling requests for single page views.
+ * Utility class which handles serialization/deserialization of component's composite views,
+ * as well as forwarding and bundling requests for those.
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  * @since 3.4
  */
-public class SinglePageManager extends AbstractPageManager {
+public class CompositeViewPageManager extends AbstractPageManager {
 
     /**
-     * Returns a {@link SinglePageManager} instance for the given {@link SinglePageManager}
-     * @param workflowManager the {@link WorkflowManager} to get the {@link SinglePageManager} instance for
-     * @return a {@link SinglePageManager} of the given {@link WorkflowManager}
+     * Returns a {@link CompositeViewPageManager} instance for the given {@link CompositeViewPageManager}
+     * @param workflowManager the {@link WorkflowManager} to get the {@link CompositeViewPageManager} instance for
+     * @return a {@link CompositeViewPageManager} of the given {@link WorkflowManager}
      */
-    public static SinglePageManager of(final WorkflowManager workflowManager) {
+    public static CompositeViewPageManager of(final WorkflowManager workflowManager) {
         // return new instance, could also be used to invoke a caching/pooling service in the future
-        return new SinglePageManager(workflowManager);
+        return new CompositeViewPageManager(workflowManager);
     }
 
     /**
@@ -93,12 +93,12 @@ public class SinglePageManager extends AbstractPageManager {
      *
      * @param workflowManager a {@link WorkflowManager} corresponding to the current workflow
      */
-    private SinglePageManager(final WorkflowManager workflowManager) {
+    private CompositeViewPageManager(final WorkflowManager workflowManager) {
         super(workflowManager);
     }
 
-    private SinglePageWebResourceController getController(final NodeID containerNodeID) {
-        return new SinglePageWebResourceController(getWorkflowManager(), containerNodeID);
+    private CompositeViewController getController(final NodeID containerNodeID) {
+        return new CompositeViewController(getWorkflowManager(), containerNodeID);
     }
 
     /**
@@ -118,7 +118,7 @@ public class SinglePageManager extends AbstractPageManager {
      * @throws IOException if the layout of the wizard page can not be generated
      */
     public JSONWebNodePage createWizardPage(final NodeID containerNodeID) throws IOException {
-        SinglePageWebResourceController sec = getController(containerNodeID);
+        CompositeViewController sec = getController(containerNodeID);
         WizardPageContent page = sec.getWizardPage();
         return createWizardPageInternal(page);
     }
@@ -131,7 +131,7 @@ public class SinglePageManager extends AbstractPageManager {
      * @throws IOException on serialization error
      */
     public Map<String, String> createWizardPageViewValueMap(final NodeID containerNodeID) throws IOException {
-        SinglePageWebResourceController sec = getController(containerNodeID);
+        CompositeViewController sec = getController(containerNodeID);
         Map<NodeIDSuffix, WebViewContent> viewMap = sec.getWizardPageViewValueMap();
         Map<String, String> resultMap = new HashMap<String, String>();
         for (Entry<NodeIDSuffix, WebViewContent> entry : viewMap.entrySet()) {
@@ -156,7 +156,7 @@ public class SinglePageManager extends AbstractPageManager {
                 viewValues.put(key, content);
             }*/
             if (!viewValues.isEmpty()) {
-                SinglePageWebResourceController sec = getController(containerNodeId);
+                CompositeViewController sec = getController(containerNodeId);
                 return sec.validateViewValuesInPage(viewValues);
             } else {
                 return Collections.emptyMap();
@@ -179,7 +179,7 @@ public class SinglePageManager extends AbstractPageManager {
                 viewValues.put(key, content);
             }*/
             if (!viewValues.isEmpty()) {
-                SinglePageWebResourceController sec = getController(containerNodeId);
+                CompositeViewController sec = getController(containerNodeId);
                 sec.loadValuesIntoPage(viewValues, false, useAsDefault);
             }
         }
@@ -222,7 +222,7 @@ public class SinglePageManager extends AbstractPageManager {
         final ExecutionMonitor exec)
         throws ViewRequestHandlingException, InterruptedException, CanceledExecutionException {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
-            SinglePageWebResourceController sec = getController(containerNodeId);
+            CompositeViewController sec = getController(containerNodeId);
             WizardViewResponse response = sec.processViewRequest(nodeID, jsonRequest, exec);
             return serializeViewResponse(response);
         }
