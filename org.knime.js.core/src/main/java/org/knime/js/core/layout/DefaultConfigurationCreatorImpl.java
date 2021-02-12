@@ -54,11 +54,11 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.dialog.DialogNode;
-import org.knime.core.node.dialog.MetaNodeDialogNode;
 import org.knime.core.node.dialog.util.DefaultConfigurationLayoutCreator;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
@@ -200,16 +200,17 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
         }
     }
 
+    @SuppressWarnings({"java:S3740", "rawtypes"}) // DialogNode generics
     @Override
     public List<Integer> getConfigurationOrder(
         final SubnodeContainerConfigurationStringProvider configurationStringProvider,
-        final Map<NodeID, MetaNodeDialogNode> nodes, final WorkflowManager wfm) {
-        LinkedHashMap<NodeIDSuffix, MetaNodeDialogNode> resultMap = new LinkedHashMap<>();
-        for (Map.Entry<NodeID, MetaNodeDialogNode> entry : nodes.entrySet()) {
+        final Map<NodeID, DialogNode> nodes, final WorkflowManager wfm) {
+        LinkedHashMap<NodeIDSuffix, DialogNode> resultMap = new LinkedHashMap<>();
+        for (Map.Entry<NodeID, DialogNode> entry : nodes.entrySet()) {
             NodeID.NodeIDSuffix idSuffix = NodeID.NodeIDSuffix.create(wfm.getID(), entry.getKey());
             resultMap.put(idSuffix, entry.getValue());
         }
-        List<Integer> order = new ArrayList<Integer>();
+        List<Integer> order = new ArrayList<>();
         if (configurationStringProvider != null) {
             String configurationLayoutString = configurationStringProvider.getConfigurationLayoutString();
             final ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
@@ -224,25 +225,23 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
                     order.add(id);
                 }
             } catch (JsonProcessingException ex) {
-                // TODO Auto-generated catch block
+                LOGGER.warn("Unable to parse JSON describing layout of configuration nodes, using default", ex);
             }
         }
         return order;
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"java:S3740", "rawtypes"}) // DialogNode generics
     private static JSONLayoutPage addUnreferencedDialogNodes(final JSONLayoutPage layout,
         final Map<NodeIDSuffix, DialogNode> allNodes) {
-        List<NodeIDSuffix> containedNodes = new ArrayList<NodeIDSuffix>();
-        layout.getRows().stream().forEach(row -> {
-            addNodesFromRow(row, containedNodes);
-        });
+        List<NodeIDSuffix> containedNodes = new ArrayList<>();
+        layout.getRows().stream().forEach(row -> addNodesFromRow(row, containedNodes));
         Map<NodeIDSuffix, DialogNode> allDialogs = getAllCurrentSNCDialogs(allNodes);
         Map<NodeIDSuffix, DialogNode> missingViews = allDialogs.entrySet().stream()
                 .filter(e -> {
                     final NodeID nodeID = NodeID.fromString(e.getKey().toString());
                     return !containedNodes.contains(NodeIDSuffix.fromString(String.valueOf(nodeID.getIndex())));
-                }).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+                }).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
             missingViews.entrySet().stream().forEach(e -> {
                 JSONLayoutRow newRow = createDefaultRowForDialogContent(e.getKey(), e.getValue());
                 layout.getRows().add(newRow);
@@ -251,15 +250,13 @@ public final class DefaultConfigurationCreatorImpl implements DefaultConfigurati
     }
 
     private static void addNodesFromRow(final JSONLayoutRow row, final List<NodeIDSuffix> nodes) {
-        row.getColumns().stream().forEach(col -> {
-            col.getContent().stream().forEach(content -> {
-                if (content instanceof JSONLayoutConfigurationContent) {
-                    nodes.add(NodeIDSuffix.fromString(((JSONLayoutConfigurationContent)content).getNodeID()));
-                } else if (content instanceof JSONNestedLayout) {
-                    nodes.add(NodeIDSuffix.fromString(((JSONNestedLayout)content).getNodeID()));
-                }
-            });
-        });
+        row.getColumns().stream().forEach(col -> col.getContent().stream().forEach(content -> {
+            if (content instanceof JSONLayoutConfigurationContent) {
+                nodes.add(NodeIDSuffix.fromString(((JSONLayoutConfigurationContent)content).getNodeID()));
+            } else if (content instanceof JSONNestedLayout) {
+                nodes.add(NodeIDSuffix.fromString(((JSONNestedLayout)content).getNodeID()));
+            }
+        }));
     }
 
     @SuppressWarnings("rawtypes")

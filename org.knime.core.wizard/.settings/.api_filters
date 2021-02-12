@@ -16,12 +16,5 @@
                 <message_argument value="close()"/>
             </message_arguments>
         </filter>
-        <filter id="1108344834">
-            <message_arguments>
-                <message_argument value="3.4"/>
-                <message_argument value="4.4"/>
-                <message_argument value="org.knime.core.wizard.CompositeViewPageManager"/>
-            </message_arguments>
-        </filter>
     </resource>
 </component>
