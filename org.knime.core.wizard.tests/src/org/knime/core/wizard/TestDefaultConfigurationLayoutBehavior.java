@@ -62,7 +62,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.knime.core.node.dialog.DialogNode;
-import org.knime.core.node.dialog.MetaNodeDialogNode;
 import org.knime.core.node.dialog.util.ConfigurationLayoutUtil;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
@@ -110,14 +109,15 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
      * @throws Exception
      */
     @Test
+    @SuppressWarnings({"java:S3740", "rawtypes"}) // DialogNode generics
     public void testExecuteAndCreateSubnodeConfiguration() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_subnodeID);
         assertNotNull(container);
         SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
             container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes =
-            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        Map<NodeID, DialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(DialogNode.class, false);
         List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
             configurationNodes, getManager());
         assertEquals("Configuration node order should be: 2, 4, 3, 5, 1", order, Arrays.asList(2, 4, 3, 5, 1));
@@ -130,14 +130,15 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
      * @throws Exception
      */
     @Test
+    @SuppressWarnings({"java:S3740", "rawtypes"}) // DialogNode generics
     public void testExecuteAndCreateOldSubnodeConfiguration() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_oldSubNode);
         assertNotNull(container);
         SubnodeContainerConfigurationStringProvider configurationLayoutProvider =
             container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes =
-            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        Map<NodeID, DialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(DialogNode.class, false);
         List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
             configurationNodes, getManager());
         assertArrayEquals("There should be no order", order.toArray(), new String[]{});
@@ -150,6 +151,7 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
      * @throws Exception
      */
     @Test
+    @SuppressWarnings({"java:S3740", "rawtypes"}) // DialogNode generics
     public void testMixedConfigurationAndQuickFormNodes() throws Exception {
         SubNodeContainer container = (SubNodeContainer)findNodeContainer(m_mixedNodes);
         assertNotNull(container);
@@ -161,8 +163,8 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         reader.readValue(configurationLayoutProvider.getConfigurationLayoutString());
         assertTrue("Only two dialog nodes should be present", page.getRows().size() == 2);
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes =
-            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
+        Map<NodeID, DialogNode> configurationNodes =
+            container.getWorkflowManager().findNodes(DialogNode.class, false);
         List<Integer> order = ConfigurationLayoutUtil.getConfigurationOrder(configurationLayoutProvider,
             configurationNodes, getManager());
         assertTrue("Only two dialog nodes should be present in the order", order.toArray().length == 2);
@@ -221,8 +223,6 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
         SubnodeContainerConfigurationStringProvider configurationStringProvider =
             container.getSubnodeConfigurationLayoutStringProvider();
 
-        Map<NodeID, MetaNodeDialogNode> configurationNodes =
-            container.getWorkflowManager().findNodes(MetaNodeDialogNode.class, false);
         Map<NodeID, DialogNode> dialogNodes = container.getWorkflowManager().findNodes(DialogNode.class, false);
         LinkedHashMap<NodeIDSuffix, DialogNode> resultMapConfiguration = new LinkedHashMap<>();
         for (Map.Entry<NodeID, DialogNode> entry : dialogNodes.entrySet()) {
@@ -230,11 +230,11 @@ public class TestDefaultConfigurationLayoutBehavior extends WorkflowTestCase {
             resultMapConfiguration.put(idSuffix, entry.getValue());
         }
         List<Integer> orderBefore = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
-            configurationNodes, getManager());
+            dialogNodes, getManager());
         assertTrue("Only three dialog nodes should be present", orderBefore.toArray().length == 2);
         ConfigurationLayoutUtil.addUnreferencedDialogNodes(configurationStringProvider, resultMapConfiguration);
         List<Integer> orderAfter = ConfigurationLayoutUtil.getConfigurationOrder(configurationStringProvider,
-            configurationNodes, getManager());
+            dialogNodes, getManager());
         assertTrue("Five dialog nodes should be present", orderAfter.toArray().length == 4);
         assertEquals("Configuration node order should be: 12, 14, 17, 18", orderAfter, Arrays.asList(12, 14, 17, 18));
     }
