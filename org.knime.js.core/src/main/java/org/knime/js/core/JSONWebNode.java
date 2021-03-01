@@ -348,6 +348,11 @@ public class JSONWebNode {
         */
         protected boolean m_sanitize;
 
+        /**
+        * User-provided node names (human readable; e.g. "Table View", "Text Output Widget", etc.) defining which WebNodes should
+        * be sanitized. Names are derived from the ...NodeFactory.xml name because this can the only uniquely identifying information
+        * about the node contained in the {@link JSONWebNode} (as many serializable assets share class names, etc.).
+        */
         protected String[] m_sanitizedNodeNames;
 
         private final JsonSerializer<Object> m_defaultSerializer;
@@ -386,7 +391,7 @@ public class JSONWebNode {
             List<String> sanitizeList = Arrays.asList(m_sanitizedNodeNames);
             Iterator<PropertyWriter> nodeProperties = m_defaultSerializer.properties();
 
-            while(nodeProperties.hasNext()) {
+            while (nodeProperties.hasNext()) {
                 PropertyWriter writer = nodeProperties.next();
                 String jsonPropertyName = writer.getName();
                 JsonSanitize sanitizeProperty = writer.getMember().getAnnotation(JsonSanitize.class);
