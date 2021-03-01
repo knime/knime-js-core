@@ -46,14 +46,37 @@
  */
 package org.knime.js.core;
 
+import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import javax.json.stream.JsonGenerationException;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.eclipse.jface.preference.IPreferenceStore;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 /**
  *
@@ -209,6 +232,7 @@ public class JSONWebNode {
      * @return the view representation
      */
     @JsonProperty("viewRepresentation")
+    @JSONWebNodeSerializer.JsonSanitize
     public JSONViewContent getViewRepresentation() {
         return m_viewRepresentation;
     }
@@ -225,6 +249,7 @@ public class JSONWebNode {
      * @return the view value
      */
     @JsonProperty("viewValue")
+    @JSONWebNodeSerializer.JsonSanitize
     public JSONViewContent getViewValue() {
         return m_viewValue;
     }
@@ -303,4 +328,182 @@ public class JSONWebNode {
                 .toHashCode();
     }
 
+    /**
+     * A necessary serialization implementation required to properly (and conditionally) sanitize user data which may be
+     * rendered in the browser and still allow configuration. We must have access to the Node Info to allow specific
+     * nodes to be "sanitized" (as the {@link viewRepresentation} and {@link viewValue} fields do not contain
+     * information which is necessarily node-specific or useful to the end user for configuration purposes).
+     *
+     * Otherwise, we could might use the {@link JSONWebNodeModifier} and override
+     * {@link BeanSerializerModifier.changeProperties} to conditionally assign {@link JSONSanitizationSerializer} to the
+     * {@link viewRepresentation} and {@link viewValue} fields.
+     *
+     * @author ben.laney
+     * @since 4.4
+     */
+    @JsonIgnoreType
+    private static class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
+
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * If the user preference calls for sanitization during serialization.
+         */
+        private boolean m_sanitize;
+
+        /**
+         * User-provided node names (human readable; e.g. "Table View", "Text Output Widget", etc.) defining which
+         * WebNodes should be sanitized. Names are derived from the ...NodeFactory.xml name because this can the only
+         * uniquely identifying information about the node contained in the {@link JSONWebNode} (as many serializable
+         * assets share class names, etc.).
+         */
+        private String[] m_sanitizedNodeNames;
+
+        /**
+         * User-defined, comma-separated list of valid HTML elements which should be allowed. If none is defined, OWASP
+         * defaults are used.
+         */
+        private String m_allowElem;
+
+        /**
+         * User-defined, comma-separated list of valid HTML attributes which should be allowed. If none is defined,
+         * OWASP defaults are used.
+         */
+        private String m_allowAttr;
+
+        /**
+         * User-defined override of the default OWASP approved CSS styles. If none is defined, OWASP styles are used.
+         */
+        private boolean m_allowStyles;
+
+        private final JsonSerializer<Object> m_defaultSerializer;
+
+        private final BeanDescription m_beanDescription;
+
+        /**
+         * @param serializer - default serializer
+         * @param beanDesc - JSONWebNode serialization description
+         */
+        private JSONWebNodeSerializer(final JsonSerializer<Object> serializer, final BeanDescription beanDesc) {
+            super(JSONWebNode.class);
+
+            m_defaultSerializer = serializer;
+            m_beanDescription = beanDesc;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public final void serializeWithType(final JSONWebNode value, final JsonGenerator jgen,
+            final SerializerProvider provider, final TypeSerializer typeSer) throws IOException {
+            typeSer.writeTypePrefixForObject(value, jgen);
+            serialize(value, jgen, provider);
+        };
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void serialize(final JSONWebNode value, final JsonGenerator jgen, final SerializerProvider provider)
+            throws IOException {
+
+            // check each invocation for changes
+            updatePreferences();
+
+            // check if node is configured to be sanitized
+            String nodeName = value.getNodeInfo().getNodeName();
+            List<String> sanitizeList = Arrays.asList(m_sanitizedNodeNames);
+            boolean isSanitaryNode = sanitizeList.stream()
+                .anyMatch(sanitizedNodeName -> StringUtils.equals(StringUtils.trim(sanitizedNodeName), nodeName));
+
+            Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
+
+            Iterator<PropertyWriter> nodeProperties = m_defaultSerializer.properties();
+
+            // Copy of existing mapper with custom String serializer module
+            ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(new StringSanitizationSerializer(m_allowElem, m_allowAttr, m_allowStyles));
+            mapper.registerModule(module);
+
+            while (nodeProperties.hasNext()) {
+                PropertyWriter writer = nodeProperties.next();
+                String jsonPropertyName = writer.getName();
+                JsonSanitize sanitizeProperty = writer.getMember().getAnnotation(JsonSanitize.class);
+
+                // skip missing/ignored properties
+                if (jsonPropertyName == null || ignoredProperties.contains(jsonPropertyName)) {
+                    return;
+                }
+                /*
+                 * Sanitize if JS Preference set and current property annotation (JsonSanitize) and current node is on the
+                 * user-defined node list; else default serialization.
+                 */
+                if (m_sanitize && isSanitaryNode && sanitizeProperty != null) {
+                    jgen.writeFieldName(jsonPropertyName);
+                    mapper.writeValue(jgen, writer.getMember().getValue(value));
+                } else {
+                    // Use default serializer.
+                    try {
+                        writer.serializeAsField(value, jgen, provider);
+                    } catch (Exception ex) {
+                        throw new JsonGenerationException("Default serialization for JSONWebNodePage failed.", ex);
+                    }
+                }
+            }
+
+            jgen.writeEndObject();
+
+        }
+
+        /**
+         * Check the JS Preference page for user-defined serialization options and update internal members.
+         */
+        private void updatePreferences() {
+            IPreferenceStore jsStore = JSCorePlugin.getDefault().getPreferenceStore();
+            m_sanitize = jsStore.getBoolean(JSCorePlugin.P_SANITIZE_HTML_CONTENT);
+            m_sanitizedNodeNames = jsStore.getString(JSCorePlugin.P_SANITIZED_NODES).split(",");
+            m_allowElem = jsStore.getString(JSCorePlugin.P_ALLOW_ELEM);
+            m_allowAttr = jsStore.getString(JSCorePlugin.P_ALLOW_ATTR);
+            m_allowStyles = jsStore.getBoolean(JSCorePlugin.P_ALLOW_STYLES);
+        }
+
+        /**
+         * Annotation for outer class fields which should be sanitized.
+         *
+         * @author ben.laney
+         * @since 4.4
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @JacksonAnnotationsInside
+        private @interface JsonSanitize {
+            boolean value() default true;
+        }
+    }
+
+    /**
+     * A serializer-provider modifier to be registered with the {@link ObjectMapper} module for the serialization parent
+     * of the {@link JSONWebNode} class. The modifier intercepts the default serializer for the class and creates a
+     * custom serializer which can perform both default and field-specific serializations.
+     *
+     * Importantly, by intercepting via modifier, we can access the default serializer at runtime and choose based on
+     * the current KNIME Node identity if we want to use the default or custom serializer.
+     *
+     * @author ben.laney
+     * @since 4.4
+     */
+    @JsonIgnoreType
+    static class JSONWebNodeModifier extends BeanSerializerModifier {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public JsonSerializer<?> modifySerializer(final SerializationConfig config, final BeanDescription beanDesc,
+            final JsonSerializer<?> serializer) {
+            if (beanDesc.getBeanClass().equals(JSONWebNode.class)) {
+                return new JSONWebNodeSerializer((JsonSerializer<Object>)serializer, beanDesc);
+            }
+            return serializer;
+        }
+    }
 }
