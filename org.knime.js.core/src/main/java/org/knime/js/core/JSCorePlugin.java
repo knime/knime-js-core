@@ -105,6 +105,44 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      */
     public static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
 
+    /**
+     * Preference constant: if user input/data should be sanitized for Browser vulnerabilities.
+     *
+     * @since 4.4
+     */
+    public static final String P_SANITIZE_HTML_CONTENT = "js.core.sanitizeHtmlContent";
+
+    /**
+     * Preference constant: a comma separated list of node names who's client-side data should be sanitized
+     * for Browser vulnerabilities.
+     *
+     * @since 4.4
+     */
+    public static final String P_SANITIZED_NODES = "js.core.sanitizedNodes";
+
+    /**
+     * Preference constant: a comma separated list of valid HTML element tags which should be allowed in the
+     * sanitized data. Overrides the default OWASP suggested elements.
+     *
+     * @since 4.4
+     */
+    public static final String P_ALLOW_ELEM = "js.core.allowElements";
+
+    /**
+     * Preference constant: a comma separated list of valid HTML attributes which should be allowed in the
+     * sanitized data. Overrides the default OWASP suggested attributes.
+     *
+     * @since 4.4
+     */
+    public static final String P_ALLOW_ATTR = "js.core.allowAttributes";
+
+    /**
+     * Preference constant: if OWASP suggested CSS styles should be allowed in the sanitized data (default true).
+     *
+     * @since 4.4
+     */
+    public static final String P_ALLOW_STYLES = "js.core.allowStyles";
+
     // The shared instance.
     private static JSCorePlugin PLUGIN;
 
