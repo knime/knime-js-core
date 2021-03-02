@@ -74,11 +74,12 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
     private HtmlPolicyBuilder m_policyBuilder;
 
     /**
-     * Custom HTML sanitization serializer.
+     * Custom String HTML sanitization serializer.
      *
-     * Reads in the HTML sanitization config (defined by the user in the JS Core Plugin preferences) and creates
-     * an internal sanitization policy for creating a JSON representation with "safe" text field which can be more
-     * safely rendered client side.
+     * With the provided parameters, the class creates an internal sanitization policy to process string input
+     * and output strings which which are compliant with the configured policy for the purpose of safely rendering
+     * in a WebBrowser. The default policy is configured using OWASP standards and recommendations, but these can
+     * be overwritten with said parameters.
      *
      * This may be desired whenever there is data from an unknown source being displayed in a visualization or web
      * application of some kind. No browser or data is 100% safe, but the parsing provided by this class can improve
@@ -142,7 +143,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
     }
 
     /**
-     * Create a sanitization policy based on the user defined configuration.
+     * Create a new sanitization policy.
      *
      * @return built policy
      */
