@@ -246,7 +246,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         m_allowedAttributes = new StringFieldEditor(JSCorePlugin.P_ALLOW_ATTR, "HTML attributes which should be allowed in sanitized output (overrides suggested):", parent);
         addField(m_allowedAttributes);
 
-        m_allowStyles = new BooleanFieldEditor(JSCorePlugin.P_ALLOW_STYLES, "Allow limited CSS styles in sanitized output:", BooleanFieldEditor.DEFAULT, parent);
+        m_allowStyles = new BooleanFieldEditor(JSCorePlugin.P_ALLOW_STYLES, "Allow limited CSS styles in sanitized output", BooleanFieldEditor.DEFAULT, parent);
         addField(m_allowStyles);
 
         m_sanitizeHtmlContent.setPropertyChangeListener(event -> enableSanitizationFields(m_sanitizeHtmlContent.getBooleanValue(), parent));
