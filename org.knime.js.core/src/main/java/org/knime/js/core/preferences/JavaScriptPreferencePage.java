@@ -233,6 +233,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         addField(m_enableLegacyQuickformExecution);
 
         // Sanitization
+        addField(new HorizontalLineField(parent));
 
         m_sanitizeHtmlContent = new BooleanFieldEditor(JSCorePlugin.P_SANITIZE_HTML_CONTENT, "Sanitize HTML user input/data", BooleanFieldEditor.DEFAULT, parent);
         addField(m_sanitizeHtmlContent);

@@ -341,7 +341,7 @@ public class JSONWebNode {
      * @since 4.4
      */
     @JsonIgnoreType
-    public static class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
+    private static class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
         private static final long serialVersionUID = 1L;
 
@@ -418,6 +418,12 @@ public class JSONWebNode {
 
             Iterator<PropertyWriter> nodeProperties = m_defaultSerializer.properties();
 
+            // Copy of existing mapper with custom String serializer module
+            ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
+            SimpleModule module = new SimpleModule();
+            module.addSerializer(new StringSanitizationSerializer(m_allowElem, m_allowAttr, m_allowStyles));
+            mapper.registerModule(module);
+
             while (nodeProperties.hasNext()) {
                 PropertyWriter writer = nodeProperties.next();
                 String jsonPropertyName = writer.getName();
@@ -432,10 +438,6 @@ public class JSONWebNode {
                  * user-defined node list; else default serialization.
                  */
                 if (m_sanitize && isSanitaryNode && sanitizeProperty != null) {
-                    ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
-                    SimpleModule module = new SimpleModule();
-                    module.addSerializer(new StringSanitizationSerializer(m_allowElem, m_allowAttr, m_allowStyles));
-                    mapper.registerModule(module);
                     jgen.writeFieldName(jsonPropertyName);
                     mapper.writeValue(jgen, writer.getMember().getValue(value));
                 } else {
