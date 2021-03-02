@@ -386,9 +386,15 @@ public class JSONWebNode {
         @Override
         public final void serialize(final JSONWebNode value, final JsonGenerator jgen,
             final SerializerProvider provider) throws IOException {
+
+            // check if node is configured to be sanitized
             String nodeName = value.getNodeInfo().getNodeName();
-            Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
             List<String> sanitizeList = Arrays.asList(m_sanitizedNodeNames);
+            boolean isSanitaryNode = sanitizeList.stream().anyMatch(sanitizedNodeName ->
+                StringUtils.equals(StringUtils.trim(sanitizedNodeName), nodeName));
+
+            Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
+
             Iterator<PropertyWriter> nodeProperties = m_defaultSerializer.properties();
 
             while (nodeProperties.hasNext()) {
@@ -404,9 +410,7 @@ public class JSONWebNode {
                  * Sanitize if JS Preference set and current property annotation (JsonSanitize) and current node is on the
                  * user-defined node list; else default serialization.
                  */
-                if (m_sanitize && sanitizeProperty != null &&
-                        sanitizeList.stream().anyMatch(sanitizedNodeName ->
-                        StringUtils.equals(StringUtils.trim(sanitizedNodeName), nodeName)) ) {
+                if (m_sanitize && isSanitaryNode && sanitizeProperty != null) {
                     ObjectMapper mapper = JSONViewContent.createObjectMapper();
                     JsonNode jsonNode = mapper.valueToTree(writer.getMember().getValue(value));
                     jgen.writeObjectFieldStart(jsonPropertyName);
