@@ -329,13 +329,14 @@ public class JSONWebNode {
     }
 
     /**
-     * A necessary serialization implementation required to properly (and conditionally) sanitize user data which
-     * may be rendered in the browser and still allow configuration. We must have access to the Node Info to allow
-     * specific nodes to be "sanitized" (as the {@link viewRepresentation} and {@link viewValue} fields do not contain
+     * A necessary serialization implementation required to properly (and conditionally) sanitize user data which may be
+     * rendered in the browser and still allow configuration. We must have access to the Node Info to allow specific
+     * nodes to be "sanitized" (as the {@link viewRepresentation} and {@link viewValue} fields do not contain
      * information which is necessarily node-specific or useful to the end user for configuration purposes).
      *
-     * Otherwise, we could might use the {@link JSONWebNodeModifier} and override {@link BeanSerializerModifier.changeProperties}
-     * to conditionally assign {@link JSONSanitizationSerializer} to the {@link viewRepresentation} and {@link viewValue} fields.
+     * Otherwise, we could might use the {@link JSONWebNodeModifier} and override
+     * {@link BeanSerializerModifier.changeProperties} to conditionally assign {@link JSONSanitizationSerializer} to the
+     * {@link viewRepresentation} and {@link viewValue} fields.
      *
      * @author ben.laney
      * @since 4.4
@@ -346,20 +347,21 @@ public class JSONWebNode {
         private static final long serialVersionUID = 1L;
 
         /**
-        * If the user preference calls for sanitization during serialization.
-        */
+         * If the user preference calls for sanitization during serialization.
+         */
         private boolean m_sanitize;
 
         /**
-        * User-provided node names (human readable; e.g. "Table View", "Text Output Widget", etc.) defining which WebNodes should
-        * be sanitized. Names are derived from the ...NodeFactory.xml name because this can the only uniquely identifying information
-        * about the node contained in the {@link JSONWebNode} (as many serializable assets share class names, etc.).
-        */
+         * User-provided node names (human readable; e.g. "Table View", "Text Output Widget", etc.) defining which
+         * WebNodes should be sanitized. Names are derived from the ...NodeFactory.xml name because this can the only
+         * uniquely identifying information about the node contained in the {@link JSONWebNode} (as many serializable
+         * assets share class names, etc.).
+         */
         private String[] m_sanitizedNodeNames;
 
         /**
-         * User-defined, comma-separated list of valid HTML elements which should be allowed. If none is defined,
-         * OWASP defaults are used.
+         * User-defined, comma-separated list of valid HTML elements which should be allowed. If none is defined, OWASP
+         * defaults are used.
          */
         private String m_allowElem;
 
@@ -393,8 +395,8 @@ public class JSONWebNode {
          * {@inheritDoc}
          */
         @Override
-        public final void serializeWithType(final JSONWebNode value, final JsonGenerator jgen, final SerializerProvider provider,
-                final TypeSerializer typeSer) throws IOException {
+        public final void serializeWithType(final JSONWebNode value, final JsonGenerator jgen,
+            final SerializerProvider provider, final TypeSerializer typeSer) throws IOException {
             typeSer.writeTypePrefixForObject(value, jgen);
             serialize(value, jgen, provider);
         };
@@ -403,7 +405,8 @@ public class JSONWebNode {
          * {@inheritDoc}
          */
         @Override
-        public void serialize(final JSONWebNode value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException {
+        public void serialize(final JSONWebNode value, final JsonGenerator jgen, final SerializerProvider provider)
+            throws IOException {
 
             // check each invocation for changes
             updatePreferences();
@@ -411,8 +414,8 @@ public class JSONWebNode {
             // check if node is configured to be sanitized
             String nodeName = value.getNodeInfo().getNodeName();
             List<String> sanitizeList = Arrays.asList(m_sanitizedNodeNames);
-            boolean isSanitaryNode = sanitizeList.stream().anyMatch(sanitizedNodeName ->
-                StringUtils.equals(StringUtils.trim(sanitizedNodeName), nodeName));
+            boolean isSanitaryNode = sanitizeList.stream()
+                .anyMatch(sanitizedNodeName -> StringUtils.equals(StringUtils.trim(sanitizedNodeName), nodeName));
 
             Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
 
@@ -474,25 +477,24 @@ public class JSONWebNode {
          */
         @Retention(RetentionPolicy.RUNTIME)
         @JacksonAnnotationsInside
-        public @interface JsonSanitize {
-            @SuppressWarnings("javadoc")
+        private @interface JsonSanitize {
             boolean value() default true;
         }
     }
 
     /**
      * A serializer-provider modifier to be registered with the {@link ObjectMapper} module for the serialization parent
-     * of the {@link JSONWebNode} class. The modifier intercepts the default serializer for the class and creates a custom
-     * serializer which can perform both default and field-specific serializations.
+     * of the {@link JSONWebNode} class. The modifier intercepts the default serializer for the class and creates a
+     * custom serializer which can perform both default and field-specific serializations.
      *
-     * Importantly, by intercepting via modifier, we can access the default serializer at runtime and choose based on the current KNIME Node
-     * identity if we want to use the default or custom serializer.
+     * Importantly, by intercepting via modifier, we can access the default serializer at runtime and choose based on
+     * the current KNIME Node identity if we want to use the default or custom serializer.
      *
      * @author ben.laney
      * @since 4.4
      */
     @JsonIgnoreType
-    protected static class JSONWebNodeModifier extends BeanSerializerModifier {
+    static class JSONWebNodeModifier extends BeanSerializerModifier {
 
         @SuppressWarnings("unchecked")
         @Override
