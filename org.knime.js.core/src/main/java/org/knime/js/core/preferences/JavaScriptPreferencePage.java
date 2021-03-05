@@ -127,12 +127,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private BooleanFieldEditor m_createDebugHtml;
     private BooleanFieldEditor m_enableLegacyQuickformExecution;
 
-    private BooleanFieldEditor m_sanitizeHtmlContent;
-    private StringFieldEditor m_sanitizedNodes;
-    private StringFieldEditor m_allowedElements;
-    private StringFieldEditor m_allowedAttributes;
-    private BooleanFieldEditor m_allowStyles;
-
     /** Creates a new preference page */
     public JavaScriptPreferencePage() {
         super("KNIME JavaScript View Settings", null, GRID);
@@ -231,26 +225,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
         m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
         addField(m_enableLegacyQuickformExecution);
-
-        // Sanitization
-        addField(new HorizontalLineField(parent));
-
-        m_sanitizeHtmlContent = new BooleanFieldEditor(JSCorePlugin.P_SANITIZE_HTML_CONTENT, "Sanitize HTML user input/data", BooleanFieldEditor.DEFAULT, parent);
-        addField(m_sanitizeHtmlContent);
-
-        m_sanitizedNodes = new StringFieldEditor(JSCorePlugin.P_SANITIZED_NODES, "Node names (comma-separated) whose HTML user input/data should be sanitized:", parent);
-        addField(m_sanitizedNodes);
-
-        m_allowedElements = new StringFieldEditor(JSCorePlugin.P_ALLOW_ELEM, "HTML element tags which should be allowed in sanitized output (overrides suggested):", parent);
-        addField(m_allowedElements);
-
-        m_allowedAttributes = new StringFieldEditor(JSCorePlugin.P_ALLOW_ATTR, "HTML attributes which should be allowed in sanitized output (overrides suggested):", parent);
-        addField(m_allowedAttributes);
-
-        m_allowStyles = new BooleanFieldEditor(JSCorePlugin.P_ALLOW_STYLES, "Allow limited CSS styles in sanitized output", BooleanFieldEditor.DEFAULT, parent);
-        addField(m_allowStyles);
-
-        m_sanitizeHtmlContent.setPropertyChangeListener(event -> enableSanitizationFields(m_sanitizeHtmlContent.getBooleanValue(), parent));
     }
 
     private static String[][] retrieveAllBrowsers() {
@@ -332,13 +306,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
             m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
         }
-    }
-
-    private void enableSanitizationFields(final boolean enable, final Composite parent) {
-        m_sanitizedNodes.setEnabled(enable, parent);
-        m_allowedElements.setEnabled(enable, parent);
-        m_allowedAttributes.setEnabled(enable, parent);
-        m_allowStyles.setEnabled(enable, parent);
     }
 
     /**
