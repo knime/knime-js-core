@@ -1,0 +1,223 @@
+/*
+ * ------------------------------------------------------------------------
+ *
+ *  Copyright by KNIME AG, Zurich, Switzerland
+ *  Website: http://www.knime.com; Email: contact@knime.com
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License, Version 3, as
+ *  published by the Free Software Foundation.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, see <http://www.gnu.org/licenses>.
+ *
+ *  Additional permission under GNU GPL version 3 section 7:
+ *
+ *  KNIME interoperates with ECLIPSE solely via ECLIPSE's plug-in APIs.
+ *  Hence, KNIME and ECLIPSE are both independent programs and are not
+ *  derived from each other. Should, however, the interpretation of the
+ *  GNU GPL Version 3 ("License") under any applicable laws result in
+ *  KNIME and ECLIPSE being a combined program, KNIME AG herewith grants
+ *  you the additional permission to use and propagate KNIME together with
+ *  ECLIPSE with only the license terms in place for ECLIPSE applying to
+ *  ECLIPSE and the GNU GPL Version 3 applying for KNIME, provided the
+ *  license terms of ECLIPSE themselves allow for the respective use and
+ *  propagation of ECLIPSE together with KNIME.
+ *
+ *  Additional permission relating to nodes for KNIME that extend the Node
+ *  Extension (and in particular that are based on subclasses of NodeModel,
+ *  NodeDialog, and NodeView) and that only interoperate with KNIME through
+ *  standard APIs ("Nodes"):
+ *  Nodes are deemed to be separate and independent programs and to not be
+ *  covered works.  Notwithstanding anything to the contrary in the
+ *  License, the License does not apply to Nodes, you are not required to
+ *  license Nodes under the License, and you are granted a license to
+ *  prepare and propagate Nodes, in each case even if such Nodes are
+ *  propagated with or for interoperation with KNIME.  The owner of a Node
+ *  may freely choose the license terms applicable to such Node, including
+ *  when such Node is propagated with or for interoperation with KNIME.
+ * ---------------------------------------------------------------------
+ *
+ * History
+ *   Mar 16, 2021 (ben.laney): created
+ */
+package org.knime.js.core;
+
+import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.json.stream.JsonGenerationException;
+
+import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.knime.core.node.KNIMEConstants;
+
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.PropertyWriter;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+/**
+ * A {@link JSONWebNode} specific serialization implementation required to properly (and conditionally) sanitize user
+ * data which may be rendered in the browser and still allow configuration of a node-allow list via
+ * {@link KNIMEConstants} system properties. We must have access to the {@link JSONWebNode.nodeInfo} (which contains the
+ * node name as found in the title of the node description) to allow selective node sanitization
+ * {@link viewRepresentation} and {@link viewValue} fields do not contain information which is necessarily unique (as
+ * there are no other node UUID's the user/admin might have knowledge of available to our serialization logic here, at
+ * this late stage of flight processing)
+ *
+ * Otherwise, we could might use the {@link JSONWebNodeModifier} and override
+ * {@link BeanSerializerModifier.changeProperties} to conditionally assign {@link JSONSanitizationSerializer} to the
+ * {@link JSONWebNode.viewRepresentation} and {@link JSONWebNode.viewValue} fields or just define the custom serializers
+ * directly on those member properties.
+ *
+ * @author ben.laney
+ * @since 4.4
+ */
+class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
+
+    private static final long serialVersionUID = 1L;
+
+    private final boolean m_sanitize;
+
+    private final String[] m_allowNodes;
+
+    private final String[] m_allowElems;
+
+    private final String[] m_allowAttrs;
+
+    private final boolean m_allowCSS;
+
+    private final JsonSerializer<Object> m_defaultSerializer;
+
+    private final BeanDescription m_beanDescription;
+
+    /**
+     * @param serializer - default serializer
+     * @param beanDesc - JSONWebNode serialization description
+     */
+    JSONWebNodeSerializer(final JsonSerializer<Object> serializer, final BeanDescription beanDesc) {
+        super(JSONWebNode.class);
+
+        m_defaultSerializer = serializer;
+        m_beanDescription = beanDesc;
+
+        // default false
+        m_sanitize = Boolean.parseBoolean(System.getProperty(KNIMEConstants.PROPERTY_SANITIZE_CLIENT_HTML));
+        // default empty
+        m_allowNodes = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_NODES);
+        m_allowElems = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_ELEM);
+        m_allowAttrs = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_ATTR);
+        // default true
+        m_allowCSS = BooleanUtils.isNotTrue(
+            StringUtils.equalsIgnoreCase(System.getProperty(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_CSS), "false"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final void serializeWithType(final JSONWebNode value, final JsonGenerator jgen,
+        final SerializerProvider provider, final TypeSerializer typeSer) throws IOException {
+        typeSer.writeTypePrefixForObject(value, jgen);
+        serialize(value, jgen, provider);
+    };
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void serialize(final JSONWebNode value, final JsonGenerator jgen, final SerializerProvider provider)
+        throws IOException {
+
+        // check if node is configured to be sanitized
+        String nodeName = value.getNodeInfo().getNodeName();
+        List<String> excludedNodes = Arrays.asList(m_allowNodes);
+        boolean shouldSanitizeNode = excludedNodes.stream()
+            .noneMatch(excludedNodeName -> StringUtils.equals(StringUtils.trim(excludedNodeName), nodeName));
+
+        Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
+
+        Iterator<PropertyWriter> nodeProperties = m_defaultSerializer.properties();
+
+        // Copy of existing mapper with custom String serializer module
+        ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(new StringSanitizationSerializer(m_allowElems, m_allowAttrs, m_allowCSS));
+        mapper.registerModule(module);
+
+        while (nodeProperties.hasNext()) {
+            PropertyWriter writer = nodeProperties.next();
+            String jsonPropertyName = writer.getName();
+            JSONWebNodeSerializer.JsonSanitize sanitizeAnnotation =
+                writer.getMember().getAnnotation(JSONWebNodeSerializer.JsonSanitize.class);
+
+            // skip missing/ignored properties
+            if (jsonPropertyName == null || ignoredProperties.contains(jsonPropertyName)) {
+                return;
+            }
+            /*
+             * Sanitize if system preferences set, current node has not been excluded explicitly and
+             * current property has the sanitize annotation (JsonSanitize); else default serialization.
+             */
+            if (m_sanitize && shouldSanitizeNode && sanitizeAnnotation != null) {
+                jgen.writeFieldName(jsonPropertyName);
+                mapper.writeValue(jgen, writer.getMember().getValue(value));
+            } else {
+                // Use default serializer.
+                try {
+                    writer.serializeAsField(value, jgen, provider);
+                } catch (Exception ex) {
+                    throw new JsonGenerationException("Default serialization for JSONWebNodePage failed.", ex);
+                }
+            }
+        }
+
+        jgen.writeEndObject();
+
+    }
+
+    /**
+     * Helper to retrieve the value of a comma-separated {@literal String} system property (if it has been defined) and
+     * return an array of strings; else an empty array.
+     *
+     * @param propertyName - system property name to retrieve and parse
+     * @return array of parsed strings from the defined property value else an empty string array
+     */
+    private static String[] getSysPropertyOrDefault(final String propertyName) {
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue == null) {
+            return new String[]{};
+        }
+        return propertyValue.split(",");
+    }
+
+    /**
+     * Annotation for class fields which should be sanitized.
+     *
+     * @author ben.laney
+     * @since 4.4
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @JacksonAnnotationsInside
+    @interface JsonSanitize {
+        boolean value() default true;
+    }
+}

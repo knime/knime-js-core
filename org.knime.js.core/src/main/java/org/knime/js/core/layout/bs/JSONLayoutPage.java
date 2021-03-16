@@ -52,12 +52,14 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.js.core.JSONWebNodeModifier;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 /**
@@ -114,10 +116,8 @@ public class JSONLayoutPage {
      * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes and omitting empty fields
      */
     public static ObjectMapper getConfiguredObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModules(new Jdk8Module());
+        ObjectMapper mapper = getBaseObjectMapper();
         mapper.setSerializationInclusion(Include.NON_EMPTY);
-        mapper = registerSubtypes(mapper);
         return mapper;
     }
 
@@ -125,10 +125,8 @@ public class JSONLayoutPage {
      * @return a pre-configured {@link ObjectMapper} instance handling polymorphism on layout classes including empty fields
      */
     public static ObjectMapper getConfiguredVerboseObjectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = getBaseObjectMapper();
         mapper.setSerializationInclusion(Include.ALWAYS);
-        mapper.registerModules(new Jdk8Module());
-        mapper = registerSubtypes(mapper);
         return mapper;
     }
 
@@ -141,6 +139,17 @@ public class JSONLayoutPage {
             // Added 4.3
             new NamedType(JSONLayoutConfigurationContent.class, "configuration")
                 );
+        return mapper;
+    }
+
+    private static ObjectMapper getBaseObjectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModules(new Jdk8Module());
+        // as a POJO-parent of JSONWebNodes, we must register a custom serialization modifier
+        mapper.registerModule(
+            new SimpleModule().setSerializerModifier(new JSONWebNodeModifier())
+        );
+        registerSubtypes(mapper);
         return mapper;
     }
 

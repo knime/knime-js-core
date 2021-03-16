@@ -46,6 +46,7 @@ package org.knime.js.core;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -95,13 +96,13 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
      * previously mentioned). Finding the right balance for the application is essential to building modern, secure web
      * applications.
      *
-     * @param allowElem - HTML element tags which should be allowed in sanitized output (overrides OWASP suggested)
-     * @param allowAttr - HTML attributes which should be allowed in sanitized output (overrides OWASP suggested)
-     * @param allowStyles - allow limited CSS styles in sanitized output
+     * @param allowElems - HTML element tags which should be allowed in sanitized output (overrides OWASP suggested)
+     * @param allowAttrs - HTML attributes which should be allowed in sanitized output (overrides OWASP suggested)
+     * @param allowCSS - allow limited CSS styles in sanitized output
      */
-    public StringSanitizationSerializer(final String allowElem, final String allowAttr, final boolean allowStyles) {
+    public StringSanitizationSerializer(final String[] allowElems, final String[] allowAttrs, final boolean allowCSS) {
         super(String.class);
-        m_policyBuilder = createPolicy(allowElem, allowAttr, allowStyles);
+        m_policyBuilder = createPolicy(allowElems, allowAttrs, allowCSS);
     }
 
     /**
@@ -146,13 +147,13 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
      *
      * @return built policy
      */
-    private static HtmlPolicyBuilder createPolicy(final String allowElem, final String allowAttr,
-        final boolean allowStyles) {
+    private static HtmlPolicyBuilder createPolicy(final String[] allowElems, final String[] allowAttrs,
+        final boolean allowCSS) {
         HtmlPolicyBuilder policyBuilder = new HtmlPolicyBuilder();
 
-        if (StringUtils.isNotEmpty(allowElem)) {
+        if (ArrayUtils.isNotEmpty(allowElems)) {
             try {
-                policyBuilder.allowElements(allowElem.split(","));
+                policyBuilder.allowElements(allowElems);
             } catch (Exception ex) {
                 LOGGER.error("Could not apply allowed elements to sanitization policy.", ex);
             }
@@ -164,15 +165,15 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
                 .allowCommonBlockElements();
         }
 
-        if (StringUtils.isNotEmpty(allowAttr)) {
+        if (ArrayUtils.isNotEmpty(allowAttrs)) {
             try {
-                policyBuilder.allowAttributes(allowAttr.split(","));
+                policyBuilder.allowAttributes(allowAttrs);
             } catch (Exception ex) {
                 LOGGER.error("Could not apply allowed attributes to sanitization policy.", ex);
             }
         }
 
-        if (allowStyles) {
+        if (allowCSS) {
             policyBuilder.allowStyling();
         }
 

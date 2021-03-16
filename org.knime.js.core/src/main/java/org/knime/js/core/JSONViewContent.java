@@ -124,8 +124,9 @@ public abstract class JSONViewContent implements WebViewContent {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        // as a POJO-parent of JSONWebNodes, we must register a custom serialization modifier
         mapper.registerModule(
-            new SimpleModule().setSerializerModifier(new JSONWebNode.JSONWebNodeModifier())
+            new SimpleModule().setSerializerModifier(new JSONWebNodeModifier())
         );
         return mapper;
     }
