@@ -99,6 +99,48 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public static final String P_SHOW_LEGACY_QUICKFORM_EXECUTION = "js.core.enableLegacyQuickformExecution";
 
     /**
+     * If <code>true</code> (default <code>false</code>), user input/data in view/wizard page will be sanitized for
+     * potential vulnerabilities before rendering in the browser. The default sanitization behavior can be overridden
+     * with the additional sanitize properties. These additional properties have no effect if this property is
+     * <code>false</code> or empty (default).
+     *
+     * @since 4.4 (AP-16130)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_CLIENT_HTML = "js.core.sanitize.clientHTML";
+
+    /**
+     * A comma separated list of node names (as seen in the node description; e.g. "Table View") to exclude from
+     * sanitization before being transferred to the client. Default is empty; thereby sanitizing all node data.
+     *
+     * @since 4.4 (AP-16130)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_ALLOW_NODES = "js.core.sanitize.allowNodes";
+
+    /**
+     * A comma separated list of valid HTML element tags which should be allowed in the sanitized data. Any non-empty
+     * value overrides the default element policy defined by OWASP.
+     *
+     * @since 4.4 (AP-16130)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_ALLOW_ELEMS = "js.core.sanitize.allowElements";
+
+    /**
+     * A comma separated list of valid HTML attribute tags which should be allowed in the sanitized data. Any non-empty
+     * value overrides the default attribute policy defined by OWASP.
+     *
+     * @since 4.4 (AP-16130)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_ALLOW_ATTRS = "js.core.sanitize.allowAttributes";
+
+    /**
+     * If <code>false</code> (default <code>true</code>), all CSS styles will be removed from the final HTML sent to the
+     * client. Otherwise, CSS styles are allowed as defined by the default OWASP policy.
+     *
+     * @since 4.4 (AP-16130)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_ALLOW_CSS = "js.core.sanitize.allowCSS";
+
+    /**
      * Name of the Chromium feature.
      *
      * @since 4.2

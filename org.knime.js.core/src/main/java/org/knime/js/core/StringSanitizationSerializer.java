@@ -45,8 +45,8 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -68,6 +68,8 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringSanitizationSerializer.class);
 
     private static final long serialVersionUID = 1027138718748213L;
+    
+    private static final String EMPTY_QUOTES_MARKER_STRING = "&#34;&#34;";
 
     /**
      * The HTML Policy which is used to sanitize user data.
@@ -100,7 +102,8 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
      * @param allowAttrs - HTML attributes which should be allowed in sanitized output (overrides OWASP suggested)
      * @param allowCSS - allow limited CSS styles in sanitized output
      */
-    public StringSanitizationSerializer(final String[] allowElems, final String[] allowAttrs, final boolean allowCSS) {
+    public StringSanitizationSerializer(final List<String> allowElems, final List<String> allowAttrs,
+        final boolean allowCSS) {
         super(String.class);
         m_policyBuilder = createPolicy(allowElems, allowAttrs, allowCSS);
     }
@@ -139,7 +142,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
          * We filter to allow the front-end (web) to ignore them properly- otherwise lots of JS View configuration
          * options which may not have been desired will render (e.g. empty "" for labels in all the widgets).
          */
-        return StringUtils.equals("&#34;&#34;", newString) ? "" : newString;
+        return StringUtils.equals(EMPTY_QUOTES_MARKER_STRING, newString) ? "" : newString;
     }
 
     /**
@@ -147,27 +150,27 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
      *
      * @return built policy
      */
-    private static HtmlPolicyBuilder createPolicy(final String[] allowElems, final String[] allowAttrs,
+    private static HtmlPolicyBuilder createPolicy(final List<String> allowElems, final List<String> allowAttrs,
         final boolean allowCSS) {
         HtmlPolicyBuilder policyBuilder = new HtmlPolicyBuilder();
 
-        if (ArrayUtils.isNotEmpty(allowElems)) {
-            try {
-                policyBuilder.allowElements(allowElems);
-            } catch (Exception ex) {
-                LOGGER.error("Could not apply allowed elements to sanitization policy.", ex);
-            }
-        } else {
+        if (allowElems.isEmpty()) {
             // Use OWASP default policies
             policyBuilder
                 .allowCommonInlineFormattingElements()
                 .allowStandardUrlProtocols()
                 .allowCommonBlockElements();
+        } else {
+            try {
+                policyBuilder.allowElements(allowElems.toArray(new String[0]));
+            } catch (Exception ex) {
+                LOGGER.error("Could not apply allowed elements to sanitization policy.", ex);
+            }
         }
 
-        if (ArrayUtils.isNotEmpty(allowAttrs)) {
+        if (!allowAttrs.isEmpty()) {
             try {
-                policyBuilder.allowAttributes(allowAttrs);
+                policyBuilder.allowAttributes(allowAttrs.toArray(new String[0]));
             } catch (Exception ex) {
                 LOGGER.error("Could not apply allowed attributes to sanitization policy.", ex);
             }
