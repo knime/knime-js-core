@@ -71,11 +71,15 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  */
 public class JSONWebNodeModifier extends BeanSerializerModifier {
 
+    /** System property check to see if serializer modification required. Default is false. */
+    private final boolean m_sanitize =
+        Boolean.parseBoolean(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML));
+
     @SuppressWarnings("unchecked")
     @Override
     public JsonSerializer<?> modifySerializer(final SerializationConfig config, final BeanDescription beanDesc,
         final JsonSerializer<?> serializer) {
-        if (beanDesc.getBeanClass().equals(JSONWebNode.class)) {
+        if (m_sanitize && beanDesc.getBeanClass().equals(JSONWebNode.class)) {
             return new JSONWebNodeSerializer((JsonSerializer<Object>)serializer, beanDesc);
         }
         return serializer;

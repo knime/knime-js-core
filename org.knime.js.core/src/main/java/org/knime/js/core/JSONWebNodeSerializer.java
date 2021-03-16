@@ -51,6 +51,7 @@ package org.knime.js.core;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -93,17 +94,20 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  */
 class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3247239167142L;
 
-    private final boolean m_sanitize;
+    // default empty
+    private final List<String> m_allowNodes = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
 
-    private final String[] m_allowNodes;
+    // default empty
+    private final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
 
-    private final String[] m_allowElems;
+    // default empty
+    private final List<String> m_allowAttrs = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
 
-    private final String[] m_allowAttrs;
-
-    private final boolean m_allowCSS;
+    // default true
+    private final boolean m_allowCSS = BooleanUtils.isNotTrue(
+        StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
     private final JsonSerializer<Object> m_defaultSerializer;
 
@@ -118,16 +122,6 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
         m_defaultSerializer = serializer;
         m_beanDescription = beanDesc;
-
-        // default false
-        m_sanitize = Boolean.parseBoolean(System.getProperty(KNIMEConstants.PROPERTY_SANITIZE_CLIENT_HTML));
-        // default empty
-        m_allowNodes = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_NODES);
-        m_allowElems = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_ELEM);
-        m_allowAttrs = getSysPropertyOrDefault(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_ATTR);
-        // default true
-        m_allowCSS = BooleanUtils.isNotTrue(
-            StringUtils.equalsIgnoreCase(System.getProperty(KNIMEConstants.PROPERTY_SANITIZE_ALLOW_CSS), "false"));
     }
 
     /**
@@ -149,9 +143,8 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
         // check if node is configured to be sanitized
         String nodeName = value.getNodeInfo().getNodeName();
-        List<String> excludedNodes = Arrays.asList(m_allowNodes);
-        boolean shouldSanitizeNode = excludedNodes.stream()
-            .noneMatch(excludedNodeName -> StringUtils.equals(StringUtils.trim(excludedNodeName), nodeName));
+        boolean shouldSanitizeNode =
+            m_allowNodes.stream().noneMatch(excludedNodeName -> StringUtils.equals(excludedNodeName, nodeName));
 
         Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
 
@@ -173,11 +166,9 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
             if (jsonPropertyName == null || ignoredProperties.contains(jsonPropertyName)) {
                 return;
             }
-            /*
-             * Sanitize if system preferences set, current node has not been excluded explicitly and
-             * current property has the sanitize annotation (JsonSanitize); else default serialization.
-             */
-            if (m_sanitize && shouldSanitizeNode && sanitizeAnnotation != null) {
+            /* Sanitize if current node has not been explicitly excluded and current property has the sanitize
+             annotation (JsonSanitize); else default serialization. */
+            if (shouldSanitizeNode && sanitizeAnnotation != null) {
                 jgen.writeFieldName(jsonPropertyName);
                 mapper.writeValue(jgen, writer.getMember().getValue(value));
             } else {
@@ -201,12 +192,15 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
      * @param propertyName - system property name to retrieve and parse
      * @return array of parsed strings from the defined property value else an empty string array
      */
-    private static String[] getSysPropertyOrDefault(final String propertyName) {
+    private static List<String> getSysPropertyOrDefault(final String propertyName) {
         String propertyValue = System.getProperty(propertyName);
         if (propertyValue == null) {
-            return new String[]{};
+            return new ArrayList<>();
         }
-        return propertyValue.split(",");
+        return Arrays.asList(propertyValue.split(","))
+                .stream()
+                .map(String::trim)
+                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
     }
 
     /**
