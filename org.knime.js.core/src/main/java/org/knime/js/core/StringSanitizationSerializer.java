@@ -68,7 +68,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringSanitizationSerializer.class);
 
     private static final long serialVersionUID = 1027138718748213L;
-    
+
     private static final String EMPTY_QUOTES_MARKER_STRING = "&#34;&#34;";
 
     /**
@@ -170,7 +170,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
 
         if (!allowAttrs.isEmpty()) {
             try {
-                policyBuilder.allowAttributes(allowAttrs.toArray(new String[0]));
+                policyBuilder.allowAttributes(allowAttrs.toArray(new String[0])).globally();
             } catch (Exception ex) {
                 LOGGER.error("Could not apply allowed attributes to sanitization policy.", ex);
             }

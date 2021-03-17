@@ -1,6 +1,5 @@
 /*
  * ------------------------------------------------------------------------
- *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -44,44 +43,22 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Mar 16, 2021 (ben.laney): created
+ *   16.03.2021 (ben.laney): created
  */
 package org.knime.js.core;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import junit.framework.JUnit4TestAdapter;
+import junit.framework.TestSuite;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
+import org.knime.testing.core.AbstractTestcaseCollector;
 
 /**
- * A serializer-provider modifier to be registered with the {@link ObjectMapper} module for a serialization parent of
- * the {@link JSONWebNode} class. For different application serialization mechanisms, this modifier should be registered
- * on each instance of {@link ObjectMapper} which will serialize an instance of {@link JSONWebNode}, even if it is a
- * nested POJO field.
- *
- * The modifier intercepts the default serializer for the class and creates a custom serializer which can perform both
- * default and field-specific serializations. Importantly, by intercepting via modifier, we can access the default
- * serializer at runtime and choose based on the current KNIME Node identity if we want to use the default or custom
- * serializer.
- *
+ * Testcase collector for this plug-in.
  *
  * @author ben.laney
- * @since 4.4
  */
-public class JSONWebNodeModifier extends BeanSerializerModifier {
-
-    /** System property check to see if serializer modification required. Default is false. */
-    private final boolean m_sanitize =
-        Boolean.parseBoolean(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML));
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public JsonSerializer<?> modifySerializer(final SerializationConfig config, final BeanDescription beanDesc,
-        final JsonSerializer<?> serializer) {
-        if (m_sanitize && beanDesc.getBeanClass().equals(JSONWebNode.class)) {
-            return new JSONWebNodeSerializer((JsonSerializer<JSONWebNode>)serializer, beanDesc);
-        }
-        return serializer;
-    }
+public class JSCoreTestcaseCollector extends AbstractTestcaseCollector {
+	// do nothing
 }

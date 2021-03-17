@@ -109,7 +109,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private final boolean m_allowCSS = BooleanUtils.isNotTrue(
         StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
-    private final JsonSerializer<Object> m_defaultSerializer;
+    private final JsonSerializer<JSONWebNode> m_defaultSerializer;
 
     private final BeanDescription m_beanDescription;
 
@@ -117,7 +117,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
      * @param serializer - default serializer
      * @param beanDesc - JSONWebNode serialization description
      */
-    JSONWebNodeSerializer(final JsonSerializer<Object> serializer, final BeanDescription beanDesc) {
+    JSONWebNodeSerializer(final JsonSerializer<JSONWebNode> serializer, final BeanDescription beanDesc) {
         super(JSONWebNode.class);
 
         m_defaultSerializer = serializer;
@@ -201,6 +201,34 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
                 .stream()
                 .map(String::trim)
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    /**
+     * @return the allowNodes
+     */
+    List<String> getAllowNodes() {
+        return m_allowNodes;
+    }
+
+    /**
+     * @return the allowElems
+     */
+    List<String> getAllowElems() {
+        return m_allowElems;
+    }
+
+    /**
+     * @return the allowAttrs
+     */
+    List<String> getAllowAttrs() {
+        return m_allowAttrs;
+    }
+
+    /**
+     * @return the allowCSS
+     */
+    boolean getAllowCSS() {
+        return m_allowCSS;
     }
 
     /**
