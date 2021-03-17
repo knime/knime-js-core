@@ -48,40 +48,65 @@
  */
 package org.knime.js.core;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 /**
- * A serializer-provider modifier to be registered with the {@link ObjectMapper} module for a serialization parent of
- * the {@link JSONWebNode} class. For different application serialization mechanisms, this modifier should be registered
- * on each instance of {@link ObjectMapper} which will serialize an instance of {@link JSONWebNode}, even if it is a
- * nested POJO field.
- *
- * The modifier intercepts the default serializer for the class and creates a custom serializer which can perform both
- * default and field-specific serializations. Importantly, by intercepting via modifier, we can access the default
- * serializer at runtime and choose based on the current KNIME Node identity if we want to use the default or custom
- * serializer.
- *
- *
  * @author ben.laney
- * @since 4.4
  */
-public class JSONWebNodeModifier extends BeanSerializerModifier {
+@SuppressWarnings("javadoc")
+public class JSONWebNodeModifierTest {
+    private SerializationConfig m_configMock;
 
-    /** System property check to see if serializer modification required. Default is false. */
-    private final boolean m_sanitize =
-        Boolean.parseBoolean(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML));
+    private BeanDescription m_descriptionMock;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public JsonSerializer<?> modifySerializer(final SerializationConfig config, final BeanDescription beanDesc,
-        final JsonSerializer<?> serializer) {
-        if (m_sanitize && beanDesc.getBeanClass().equals(JSONWebNode.class)) {
-            return new JSONWebNodeSerializer((JsonSerializer<JSONWebNode>)serializer, beanDesc);
-        }
-        return serializer;
+    private JsonSerializer<?> m_serializerMock;
+
+    @Before
+    public void initialize() {
+        ObjectMapper mockMapper = new ObjectMapper();
+        m_configMock = mockMapper.getSerializationConfig();
+        m_descriptionMock = getTypeDescription(Object.class);
+        m_serializerMock = new StringSerializer();
+    }
+
+    @After
+    public void tearDown() {
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML);
+    }
+
+    @Test
+    public void testProvidingDefaultSerializer() {
+        JSONWebNodeModifier nodeModifier = new JSONWebNodeModifier();
+        JsonSerializer<?> providedSerializer =
+            nodeModifier.modifySerializer(m_configMock, m_descriptionMock, m_serializerMock);
+        assertEquals(providedSerializer, m_serializerMock);
+    }
+
+    @Test
+    public void testProvidingCustomSerializer() {
+        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+        m_descriptionMock = getTypeDescription(JSONWebNode.class);
+        JSONWebNodeModifier nodeModifier = new JSONWebNodeModifier();
+        JsonSerializer<?> providedSerializer =
+            nodeModifier.modifySerializer(m_configMock, m_descriptionMock, m_serializerMock);
+        assertNotSame(providedSerializer, m_serializerMock);
+        assertTrue(providedSerializer instanceof JSONWebNodeSerializer);
+    }
+
+    private <T> BeanDescription getTypeDescription(final Class<T> oClass) {
+        return m_configMock.introspectClassAnnotations(TypeFactory.rawClass(oClass));
     }
 }

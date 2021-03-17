@@ -48,40 +48,107 @@
  */
 package org.knime.js.core;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 /**
- * A serializer-provider modifier to be registered with the {@link ObjectMapper} module for a serialization parent of
- * the {@link JSONWebNode} class. For different application serialization mechanisms, this modifier should be registered
- * on each instance of {@link ObjectMapper} which will serialize an instance of {@link JSONWebNode}, even if it is a
- * nested POJO field.
- *
- * The modifier intercepts the default serializer for the class and creates a custom serializer which can perform both
- * default and field-specific serializations. Importantly, by intercepting via modifier, we can access the default
- * serializer at runtime and choose based on the current KNIME Node identity if we want to use the default or custom
- * serializer.
- *
+ * Simple mock sub-class for testing {@link JSONViewContent}.
  *
  * @author ben.laney
- * @since 4.4
  */
-public class JSONWebNodeModifier extends BeanSerializerModifier {
+public class JSONMockContent extends JSONViewContent {
 
-    /** System property check to see if serializer modification required. Default is false. */
-    private final boolean m_sanitize =
-        Boolean.parseBoolean(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML));
+    private InnerPojo m_value;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public JsonSerializer<?> modifySerializer(final SerializationConfig config, final BeanDescription beanDesc,
-        final JsonSerializer<?> serializer) {
-        if (m_sanitize && beanDesc.getBeanClass().equals(JSONWebNode.class)) {
-            return new JSONWebNodeSerializer((JsonSerializer<JSONWebNode>)serializer, beanDesc);
-        }
-        return serializer;
+    /**
+     * Mock nested class
+     */
+    public JSONMockContent() {
+        m_value = new InnerPojo();
     }
+
+    /**
+     * @return the value
+     */
+    public InnerPojo getValue() {
+        return m_value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(final InnerPojo value) {
+        m_value = value;
+    }
+
+    /**
+     * @param pojoValue
+     */
+    public void setPojoValue(final String pojoValue) {
+        m_value.setInnerValue(pojoValue);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        /* mock, unused */
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        /* mock, unused */
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        JSONMockContent other = (JSONMockContent)obj;
+        return new EqualsBuilder().append(m_value, other.m_value).isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(m_value).toHashCode();
+    }
+
+    static class InnerPojo {
+        private String m_innerValue;
+
+        /**
+         * @return the innerValue
+         */
+        public String getInnerValue() {
+            return m_innerValue;
+        }
+
+        /**
+         * @param innerValue the innerValue to set
+         */
+        public void setInnerValue(final String innerValue) {
+            m_innerValue = innerValue;
+        }
+    }
+
 }
