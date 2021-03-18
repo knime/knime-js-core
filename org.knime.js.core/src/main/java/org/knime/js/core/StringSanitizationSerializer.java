@@ -74,7 +74,8 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
     /**
      * The HTML Policy which is used to sanitize user data.
      */
-    private HtmlPolicyBuilder m_policyBuilder;
+    @SuppressWarnings("java:S1948")
+    private final HtmlPolicyBuilder m_policyBuilder;
 
     /**
      * Custom String HTML sanitization serializer.
@@ -163,7 +164,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
         } else {
             try {
                 policyBuilder.allowElements(allowElems.toArray(new String[0]));
-            } catch (Exception ex) {
+            } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Could not apply allowed elements to sanitization policy.", ex);
             }
         }
@@ -171,7 +172,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
         if (!allowAttrs.isEmpty()) {
             try {
                 policyBuilder.allowAttributes(allowAttrs.toArray(new String[0])).globally();
-            } catch (Exception ex) {
+            } catch (Exception ex) { // NOSONAR
                 LOGGER.error("Could not apply allowed attributes to sanitization policy.", ex);
             }
         }

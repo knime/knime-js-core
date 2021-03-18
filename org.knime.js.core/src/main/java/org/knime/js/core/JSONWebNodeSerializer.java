@@ -92,6 +92,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * @author ben.laney
  * @since 4.4
  */
+@SuppressWarnings("java:S1948")
 class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
     private static final long serialVersionUID = 3247239167142L;
@@ -227,7 +228,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     /**
      * @return the allowCSS
      */
-    boolean getAllowCSS() {
+    boolean getAllowCSS() { // NOSONAR
         return m_allowCSS;
     }
 

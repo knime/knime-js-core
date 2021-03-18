@@ -67,7 +67,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @SuppressWarnings("javadoc")
 public class JSONWebNodeSerializerTest {
 
-    private static String CHECK_STRING = "0riginal 'STRING'!!!";
+    private static final String CHECK_STRING = "0riginal 'STRING'!!!";
 
     @After
     public void tearDown() {
