@@ -139,10 +139,14 @@ public class StringSanitizationSerializerTest {
         assertEquals(wrapTestGetResult(serializer, testString), expectedString);
     }
 
+    @SuppressWarnings("java:S4087")
     private static String wrapTestGetResult(final StringSanitizationSerializer serializer, final String input)
         throws IOException {
         try (StringWriter stringWriter = new StringWriter(); JsonGenerator generator = getGenerator(stringWriter)) {
             serializer.serialize(input, generator, getProvider());
+            // explicit close required
+            generator.close(); // NO SONAR
+            stringWriter.close(); // NO SONAR
             return stringWriter.toString();
         }
     }
