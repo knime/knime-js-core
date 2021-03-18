@@ -55,11 +55,14 @@ import static org.junit.Assert.assertTrue;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
 
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.ser.impl.TypeWrappedSerializer;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -104,6 +107,22 @@ public class JSONWebNodeModifierTest {
             nodeModifier.modifySerializer(m_configMock, m_descriptionMock, m_serializerMock);
         assertNotSame(providedSerializer, m_serializerMock);
         assertTrue(providedSerializer instanceof JSONWebNodeSerializer);
+    }
+
+    @Test
+    public void testJSONWebNodeModifierIsRegisteredWithObjectMappers() throws JsonMappingException {
+        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+        assertObjectMapperUsesJSONWebNodeSerializer(JSONLayoutPage.getConfiguredObjectMapper());
+        assertObjectMapperUsesJSONWebNodeSerializer(JSONLayoutPage.getConfiguredVerboseObjectMapper());
+        assertObjectMapperUsesJSONWebNodeSerializer(JSONViewContent.createObjectMapper());
+    }
+
+    private static void assertObjectMapperUsesJSONWebNodeSerializer(final ObjectMapper mapper)
+        throws JsonMappingException {
+        TypeWrappedSerializer test = (TypeWrappedSerializer)mapper.getSerializerProviderInstance()
+            .findTypedValueSerializer(JSONWebNode.class, false, null);
+        assertTrue("object mapper doesn't use the custom JSONWebNodeSerializer",
+            JSONWebNodeSerializer.class.isAssignableFrom(test.valueSerializer().getClass()));
     }
 
     private <T> BeanDescription getTypeDescription(final Class<T> oClass) {

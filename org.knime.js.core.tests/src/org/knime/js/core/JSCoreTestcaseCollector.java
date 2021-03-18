@@ -47,11 +47,6 @@
  */
 package org.knime.js.core;
 
-import junit.framework.JUnit4TestAdapter;
-import junit.framework.TestSuite;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.AllTests;
 import org.knime.testing.core.AbstractTestcaseCollector;
 
 /**

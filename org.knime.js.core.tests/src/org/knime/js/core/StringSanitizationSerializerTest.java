@@ -69,7 +69,7 @@ public class StringSanitizationSerializerTest {
 
     private static final ArrayList<String> DEFAULT_PARAM = new ArrayList<>();
 
-    private static ObjectMapper m_mapper = JSONViewContent.createObjectMapper();
+    private static final ObjectMapper MAPPER = JSONViewContent.createObjectMapper();
 
     @Test
     public void testEmptySerialization() throws IOException {
@@ -143,17 +143,15 @@ public class StringSanitizationSerializerTest {
         throws IOException {
         try (StringWriter stringWriter = new StringWriter(); JsonGenerator generator = getGenerator(stringWriter)) {
             serializer.serialize(input, generator, getProvider());
-            generator.close();
-            stringWriter.close();
             return stringWriter.toString();
         }
     }
 
     private static JsonGenerator getGenerator(final Writer writer) throws IOException {
-        return m_mapper.createGenerator(writer);
+        return MAPPER.createGenerator(writer);
     }
 
     private static SerializerProvider getProvider() {
-        return m_mapper.getSerializerProvider();
+        return MAPPER.getSerializerProvider();
     }
 }
