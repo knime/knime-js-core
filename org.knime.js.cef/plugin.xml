@@ -8,5 +8,12 @@
             name="Chromium Embedded Framework (CEF) Browser"
             viewClass="org.knime.js.cef.wizardnodeview.CEFWizardNodeView">
       </wizardNodeView>
-   </extension>   
+   </extension>
+   <extension
+         point="org.knime.js.core.headlessBrowsers">
+      <headlessBrowser
+            imageGeneratorClass="org.knime.js.cef.headless.CEFImageGenerator"
+            name="Chromium Embedded Framework (CEF) Browser">
+      </headlessBrowser>
+   </extension>
 </plugin>
