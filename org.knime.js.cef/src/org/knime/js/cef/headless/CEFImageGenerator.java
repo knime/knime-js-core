@@ -49,12 +49,15 @@
 package org.knime.js.cef.headless;
 
 import java.io.File;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.chromium.Browser;
 import org.eclipse.swt.chromium.IBrowser;
 import org.eclipse.swt.widgets.Display;
+import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
@@ -65,24 +68,41 @@ import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JavaScriptViewCreator;
 
-public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent,
-    VAL extends WebViewContent> extends AbstractImageGenerator<T, REP, VAL> {
+/**
+ * Image generator using the chromium embedded framework.
+ *
+ * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ * @author Nico Sebey, EQUO
+ *
+ * @param <T>
+ * @param <REP>
+ * @param <VAL>
+ */
+@SuppressWarnings("java:S119")
+public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent>
+    extends AbstractImageGenerator<T, REP, VAL> {
+
+    private static final int MAX_NUMBER_OF_ATTEMPTS_TO_EVALUATE_SCRIPT = 5;
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(CEFImageGenerator.class);
-    private static final int INTERVAL = 500;
-    private static final String FRAME = "document.getElementById('"+SINGLE_NODE_FRAME_ID+"')";
-    private static final String FRAME_WIN = FRAME+".contentWindow.";
-    private IBrowser browser;
 
+    private static final int INTERVAL = 200;
+
+    private static final String FRAME = "document.getElementById('" + SINGLE_NODE_FRAME_ID + "')";
+
+    private static final String FRAME_WIN = FRAME + ".contentWindow.";
+
+    private IBrowser m_browser;
+
+    /**
+     * @param nodeModel
+     */
     public CEFImageGenerator(final T nodeModel) {
         super(nodeModel);
     }
 
     @Override
     public void generateView(final Long optionalWait, final ExecutionContext exec) throws Exception {
-        if (exec != null) {
-            exec.setProgress("Initializing view");
-        }
         T model = getNodeModel();
         String viewPath = model.getViewHTMLPath();
         if (viewPath == null || viewPath.isEmpty()) {
@@ -100,105 +120,136 @@ public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP e
         String initCall = viewCreator.createInitJSViewMethodCall(viewRepresentation, viewValue);
 
         Display.getDefault().syncExec(() -> {
-            browser = Browser.windowless();
-        });
-        Display.getDefault().syncExec(() -> {
-            browser.setUrl(new File(viewPath).toURI().toString());
-        });
-        waitForDocumentReady(INTERVAL);
-        Display.getDefault().syncExec(() -> {
-            browser.evaluate("window.headless = true;");
-            browser.evaluate(initCall);
-        });
-        if (exec != null) {
-            exec.setProgress(0.66);
-        }
-
-        //wait until any element has been appended to body, which is not the service header
-        waitFor(DEFAULT_TIMEOUT, INTERVAL, true, () -> {
-            String anyNonKnimeElement = "body > *:not(#knime-service-header)";
-            return Boolean.TRUE.equals(browser.evaluate("return "+ FRAME +" && "+ FRAME_WIN +"$('"+anyNonKnimeElement+"').length > 0;"));
+            m_browser = Browser.windowless();
+            m_browser.setUrl(new File(viewPath).toURI().toString());
         });
 
-        //wait additional specified time to compensate for initial animation, etc.
+        waitForDocumentReady(exec);
+
+        evaluateInBrowser("window.headless = true;return true;");
+        evaluateInBrowser(initCall + "return true");
+
+        exec.setProgress(0.66);
+
+        waitForFrameBodyReady(exec);
+
+        // wait additional specified time to compensate for initial animation, etc.
         if (optionalWait != null && optionalWait > 0L) {
-            int waitInS = (int) (optionalWait/1000);
-            final double interval = 0.33 / Math.max(1, waitInS);
-            if (exec != null) {
-                String pString = "Waiting additional time.";
-                if (waitInS > 0) {
-                    pString = "Waiting additional " + waitInS + " seconds.";
-                }
-                exec.setProgress(pString);
+            int waitInS = (int)(optionalWait / 1000);
+            String pString = "Waiting additional time.";
+            if (waitInS > 0) {
+                pString = "Waiting additional " + waitInS + " seconds.";
             }
-            try {
-                waitFor(optionalWait, INTERVAL, false, () -> {
-                    if (exec != null) {
-                        exec.setProgress(exec.getProgressMonitor().getProgress() + interval);
-                    }
-                    return false;
-                });
-            } catch (Exception e) { /* do nothing */ }
+            exec.setProgress(pString);
+            Thread.sleep(optionalWait);
         }
-        if (exec != null) {
-            exec.setProgress(1.0);
-        }
+        exec.setProgress(1.0);
     }
 
-    private boolean waitForDocumentReady(final long interval) throws Exception {
-        return waitFor(DEFAULT_TIMEOUT, interval, true, () -> {
-            return (Boolean.TRUE.equals(browser.evaluate("return (document.readyState == 'complete');")));
-        });
-    }
-
-    private static boolean waitFor(final long timeout, final long interval, final boolean ui, final Callable<Boolean> condition) throws Exception {
-        AtomicBoolean ready = new AtomicBoolean(false);
-        long time = System.currentTimeMillis();
-        long time_timeout = time + timeout*1000;
-
-        while (time < time_timeout && !ready.get()) {
-            Runnable runnable = () -> {
+    /**
+     * Tries to evaluate a script in the browser. Since the script-evaluation doesn't seem to be very reliable, we just
+     * try it again (for a limited number of times) if an exception is thrown or no result returned.
+     *
+     * @param script the script to evaluate
+     * @return the return value of the script evaluation
+     */
+    private Object evaluateInBrowser(final String script) {
+        AtomicReference<Object> res = new AtomicReference<>();
+        AtomicReference<SWTException> exception = new AtomicReference<>();
+        int attempts = 0;
+        do {
+            Display.getDefault().syncExec(() -> {
                 try {
-                    if (Boolean.TRUE.equals(condition.call())) {
-                        ready.set(true);
-                    }
-                } catch (Exception e) {
-                    // ignoring
+                    res.set(m_browser.evaluate(script));
+                } catch (SWTException e) {
+                    exception.set(e);
                 }
-            };
-            if (ui) {
-                Display.getDefault().syncExec(runnable);
-            } else {
-                runnable.run();
+            });
+            if (exception.get() != null) {
+                attempts++;
+                LOGGER.debug(
+                    "Executing script failed. Trying again (" + attempts + "). The script is: '" + script + "'",
+                    exception.get());
+                exception.set(null);
+                waitConstantTime();
             }
+        } while (res.get() == null && attempts < MAX_NUMBER_OF_ATTEMPTS_TO_EVALUATE_SCRIPT);
+        if (res.get() == null) {
+            LOGGER.error("Executing script failed after " + attempts + " attempts. The script is: '" + script + "'");
+        }
+        return res.get();
+    }
+
+    private void waitForDocumentReady(final ExecutionContext exec) throws TimeoutException, CanceledExecutionException {
+        waitForSuccessTimeoutOrCancellation(DEFAULT_TIMEOUT, exec,
+            () -> Boolean.TRUE.equals(evaluateInBrowser("return (document.readyState == 'complete');")));
+    }
+
+    private void waitForFrameBodyReady(final ExecutionContext exec)
+        throws TimeoutException, CanceledExecutionException {
+        // wait until any element has been appended to body, which is not the service header
+        final String anyNonKnimeElement = "body > *:not(#knime-service-header)";
+        waitForSuccessTimeoutOrCancellation(DEFAULT_TIMEOUT, exec, () -> Boolean.TRUE.equals(evaluateInBrowser("return "
+            + FRAME + " && " + FRAME_WIN + "document.querySelectorAll('" + anyNonKnimeElement + "').length > 0;")));
+    }
+
+    /**
+     * Waits till either<br>
+     * - the given condition evaluates to true <br>
+     * - we run into the given timeout <br>
+     * - the user cancels
+     *
+     * Cleans up when canceled, but not when timing out!
+     *
+     * @param timeout the maximum time to wait
+     * @param exec for cancellation
+     * @param condition the condition to evaluate
+     */
+    private void waitForSuccessTimeoutOrCancellation(final long timeout, final ExecutionContext exec,
+        final BooleanSupplier condition) throws TimeoutException, CanceledExecutionException {
+        long time = System.currentTimeMillis();
+        long timeoutTime = time + timeout * 1000;
+        boolean done = false;
+        do {
             try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) {
-                // ignoring
+                exec.checkCanceled();
+            } catch (CanceledExecutionException e) {
+                cleanup();
+                throw e;
             }
-            time = System.currentTimeMillis();
+
+            done = condition.getAsBoolean();
+            if (!done) {
+                waitConstantTime();
+                time = System.currentTimeMillis();
+            }
+        } while (time < timeoutTime && !done);
+        if (!done) {
+            throw new TimeoutException("Timeout while generating image");
         }
-        if (ready.get()) {
-            return true;
+    }
+
+    private static void waitConstantTime() {
+        try {
+            Thread.sleep(INTERVAL);
+        } catch (InterruptedException e1) { // NOSONAR
+            //
         }
-        throw new RuntimeException("Timeout waiting");
     }
 
     @Override
     public Object retrieveImage(final String methodCall) throws Exception {
-        Object[] image = new Object[1];
-        Display.getDefault().syncExec(() -> {
-            image[0] = browser.evaluate("return " + FRAME_WIN + methodCall);
-        });
-        return image[0];
+        return evaluateInBrowser("return " + FRAME_WIN + methodCall);
     }
 
     @Override
     public void cleanup() {
         Display.getDefault().syncExec(() -> {
-            browser.close();
+            if (m_browser != null) {
+                m_browser.close();
+            }
         });
-        browser = null;
+        m_browser = null;
     }
 
 }
