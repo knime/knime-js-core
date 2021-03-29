@@ -44,7 +44,7 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   22 Feb 2018 (albrecht): created
+ *   Mar 24, 2021 (ben.laney): created
  */
 package org.knime.core.wizard;
 
@@ -53,24 +53,41 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.js.core.JSONViewRequest;
+import org.knime.js.core.JSONViewResponse;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonRawValue;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Container class encapsulating a view request for a specific node made from a combined view.
+ * Base class for responses to any {@link SubnodeWizardRequest}. Implementers should address scope specific needs e.g.
+ * those for single views inside of a composite page or the entire page itself.
  *
- * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
- * @since 3.7
+ * @author ben.laney
+ * @since 4.4
  */
 @JsonAutoDetect
-public class SubnodeViewRequest extends JSONViewRequest {
-
-    static final String CFG_NODE_ID = "nodeID";
-    private static final String CFG_JSON_REQUEST = "jsonRequest";
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+public abstract class AbstractSubnodeResponse extends JSONViewResponse<SubnodeWizardRequest> {
 
     private String m_nodeID;
-    private String m_jsonRequest;
+
+    private static final String CFG_JSON_RESPONSE = "jsonResponse";
+
+    private String m_jsonResponse;
+
+    /**
+     * Creates a JSON-serializable response object for subnode/composite view communication.
+     *
+     * @param request the original request.
+     * @param nodeID the node ID of the response target.
+     * @param jsonResponse the JSON serialized response.
+     */
+    public AbstractSubnodeResponse(final SubnodeWizardRequest request, final String nodeID, final String jsonResponse) {
+        super(request);
+        m_nodeID = nodeID;
+        m_jsonResponse = jsonResponse;
+    }
 
     /**
      * @return the nodeID
@@ -80,24 +97,11 @@ public class SubnodeViewRequest extends JSONViewRequest {
     }
 
     /**
-     * @param nodeID the nodeID to set
+     * @return the jsonResponse
      */
-    public void setNodeID(final String nodeID) {
-        m_nodeID = nodeID;
-    }
-
-    /**
-     * @return the jsonRequest
-     */
-    public String getJsonRequest() {
-        return m_jsonRequest;
-    }
-
-    /**
-     * @param jsonRequest the jsonRequest to set
-     */
-    public void setJsonRequest(final String jsonRequest) {
-        m_jsonRequest = jsonRequest;
+    @JsonRawValue
+    public String getJsonResponse() {
+        return m_jsonResponse;
     }
 
     /**
@@ -106,8 +110,8 @@ public class SubnodeViewRequest extends JSONViewRequest {
     @Override
     public void saveToNodeSettings(final NodeSettingsWO settings) {
         super.saveToNodeSettings(settings);
-        settings.addString(CFG_NODE_ID, m_nodeID);
-        settings.addString(CFG_JSON_REQUEST, m_jsonRequest);
+        settings.addString(SubnodeWizardRequest.CFG_NODE_ID, m_nodeID);
+        settings.addString(CFG_JSON_RESPONSE, m_jsonResponse);
     }
 
     /**
@@ -116,8 +120,8 @@ public class SubnodeViewRequest extends JSONViewRequest {
     @Override
     public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
         super.loadFromNodeSettings(settings);
-        m_nodeID = settings.getString(CFG_NODE_ID);
-        m_jsonRequest = settings.getString(CFG_JSON_REQUEST);
+        m_nodeID = settings.getString(SubnodeWizardRequest.CFG_NODE_ID);
+        m_jsonResponse = settings.getString(CFG_JSON_RESPONSE);
     }
 
     /**
@@ -134,12 +138,9 @@ public class SubnodeViewRequest extends JSONViewRequest {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        SubnodeViewRequest other = (SubnodeViewRequest)obj;
-        return new EqualsBuilder()
-                .appendSuper(super.equals(obj))
-                .append(m_nodeID, other.m_nodeID)
-                .append(m_jsonRequest, other.m_jsonRequest)
-                .isEquals();
+        AbstractSubnodeResponse other = (AbstractSubnodeResponse)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(m_nodeID, other.m_nodeID)
+            .append(m_jsonResponse, other.m_jsonResponse).isEquals();
     }
 
     /**
@@ -147,11 +148,6 @@ public class SubnodeViewRequest extends JSONViewRequest {
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .appendSuper(super.hashCode())
-                .append(m_nodeID)
-                .append(m_jsonRequest)
-                .toHashCode();
+        return new HashCodeBuilder().appendSuper(super.hashCode()).append(m_nodeID).append(m_jsonResponse).toHashCode();
     }
-
 }

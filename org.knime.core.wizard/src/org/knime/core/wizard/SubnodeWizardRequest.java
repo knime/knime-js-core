@@ -1,5 +1,6 @@
 /*
  * ------------------------------------------------------------------------
+ *
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
  *
@@ -42,129 +43,113 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * Created on 16.09.2013 by Christian Albrecht, KNIME AG, Zurich, Switzerland
+ * History
+ *   Mar 24, 2021 (ben.laney): created
  */
-package org.knime.js.core;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+package org.knime.core.wizard;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.JSONViewRequest;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
+ * A JSON Wizard request originating from a subnode/composite view. Requests can either target child nodes contained in
+ * the component or the component itself via the {@code m_isSinglePageRequest} flag.
  *
- * @author Christian Albrecht, KNIME AG, Zurich, Switzerland
+ * @author ben.laney
+ * @since 4.4
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public class JSONWebNodePage extends JSONViewContent {
+public class SubnodeWizardRequest extends JSONViewRequest {
 
-    private final String m_version;
-    private JSONWebNodePageConfiguration m_configuration;
-    private Map<String, JSONWebNode> m_webNodes;
+    static final String CFG_NODE_ID = "nodeID";
+
+    private static final String CFG_JSON_REQUEST = "jsonRequest";
+
+    private static final String CFG_SINGLE_PAGE_REQUEST = "singlePageRequest";
+
+    private String m_nodeID;
+
+    private String m_jsonRequest;
+
+    private boolean m_isSinglePageRequest = false;
 
     /**
-     * @param configuration
-     * @param webNodes
-     *
+     * Creates an empty request.
      */
-    public JSONWebNodePage(final JSONWebNodePageConfiguration configuration,
-        final Map<String, JSONWebNode> webNodes) {
-        this(configuration, webNodes, KNIMEConstants.VERSION);
-    }
-
-    @JsonCreator
-    private JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes,
-        @JsonProperty("version") final String version) {
-        m_version = version;
-        m_configuration = configuration;
-        m_webNodes = webNodes;
+    public SubnodeWizardRequest() {
+        super();
     }
 
     /**
-     * @return the version
+     * @return the nodeID
      */
-    @JsonProperty("version")
-    public String getVersion() {
-        return m_version;
+    public String getNodeID() {
+        return m_nodeID;
     }
 
     /**
-     * @return the configuration
+     * @param nodeID the nodeID to set
      */
-    @JsonProperty("webNodePageConfiguration")
-    public JSONWebNodePageConfiguration getWebNodePageConfiguration() {
-        return m_configuration;
+    public void setNodeID(final String nodeID) {
+        m_nodeID = nodeID;
     }
 
     /**
-     * @param configuration the configuration to set
+     * @return the jsonRequest
      */
-    @JsonProperty("webNodePageConfiguration")
-    public void setWebNodePageConfiguration(final JSONWebNodePageConfiguration configuration) {
-        m_configuration = configuration;
+    public String getJsonRequest() {
+        return m_jsonRequest;
     }
 
     /**
-     * @return the webNodes
+     * @param jsonRequest the jsonRequest to set
      */
-    @JsonProperty("webNodes")
-    public Map<String, JSONWebNode> getWebNodes() {
-        return m_webNodes;
+    public void setJsonRequest(final String jsonRequest) {
+        m_jsonRequest = jsonRequest;
     }
 
     /**
-     * @param webNodes the webNodes to set
+     * @return the isSinglePageRequest
      */
-    @JsonProperty("webNodes")
-    public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
-        m_webNodes = webNodes;
+    public boolean getIsSinglePageRequest() {
+        return m_isSinglePageRequest;
     }
 
     /**
-     * Filter the included web nodes in the JSON page to only include specified node IDs. Useful if
-     * only part of the page has been updated and reducing the size of the serialized page string is
-     * desired.
-     *
-     * @param includedNodeIds
-     * @since 4.4
+     * @param isSinglePageRequest the isSinglePageRequest to set
      */
-    public void filterWebNodesById(final List<String> includedNodeIds) {
-        if (m_webNodes != null) {
-            Iterator<Entry<String, JSONWebNode>> webNodeIterator = m_webNodes.entrySet().iterator();
-            while (webNodeIterator.hasNext()) {
-                Entry<String, JSONWebNode> nodeEntry = webNodeIterator.next();
-                if (!includedNodeIds.contains(nodeEntry.getKey())) {
-                    webNodeIterator.remove();
-                }
-            }
-        }
+    public void setIsSinglePageRequest(final boolean isSinglePageRequest) {
+        m_isSinglePageRequest = isSinglePageRequest;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void saveToNodeSettings(final NodeSettingsWO settings) { /* not needed so far */ }
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
+        settings.addString(CFG_NODE_ID, m_nodeID);
+        settings.addString(CFG_JSON_REQUEST, m_jsonRequest);
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException { /* not needed so far */ }
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
+        m_nodeID = settings.getString(CFG_NODE_ID);
+        m_jsonRequest = settings.getString(CFG_JSON_REQUEST);
+        m_isSinglePageRequest = settings.getBoolean(CFG_SINGLE_PAGE_REQUEST);
+    }
 
     /**
      * {@inheritDoc}
@@ -180,12 +165,10 @@ public class JSONWebNodePage extends JSONViewContent {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        JSONWebNodePage other = (JSONWebNodePage)obj;
-        return new EqualsBuilder()
-                .append(m_version, other.m_version)
-                .append(m_configuration, other.m_configuration)
-                .append(m_webNodes, other.m_webNodes)
-                .isEquals();
+        SubnodeWizardRequest other = (SubnodeWizardRequest)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(m_nodeID, other.m_nodeID)
+            .append(m_jsonRequest, other.m_jsonRequest).append(m_isSinglePageRequest, other.m_isSinglePageRequest)
+            .isEquals();
     }
 
     /**
@@ -193,10 +176,7 @@ public class JSONWebNodePage extends JSONViewContent {
      */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder()
-                .append(m_version)
-                .append(m_configuration)
-                .append(m_webNodes)
-                .toHashCode();
+        return new HashCodeBuilder().appendSuper(super.hashCode()).append(m_nodeID).append(m_jsonRequest)
+            .append(m_isSinglePageRequest).toHashCode();
     }
 }

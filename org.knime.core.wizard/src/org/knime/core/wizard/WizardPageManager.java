@@ -89,7 +89,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
  * @since 3.4
  */
 public final class WizardPageManager extends AbstractPageManager implements ViewRequestExecutor<String>,
-    WizardViewRequestHandler<SubnodeViewRequest, SubnodeViewResponse> {
+    WizardViewRequestHandler<SubnodeWizardRequest, AbstractSubnodeResponse> {
 
     /**
      * Returns a {@link WizardPageManager} instance for the given {@link WorkflowManager}
@@ -208,10 +208,10 @@ public final class WizardPageManager extends AbstractPageManager implements View
     public String handleViewRequest(final String request) {
         ViewRequestRegistry registry = ViewRequestRegistry.getInstance();
         ExecutionMonitor exec = new ExecutionMonitor();
-        ViewResponseMonitor<SubnodeViewResponse> requestJob = null;
+        ViewResponseMonitor<AbstractSubnodeResponse> requestJob = null;
         int requestSequence = -1;
         try (WorkflowLock lock = getWorkflowManager().lock()){
-            SubnodeViewRequest wrapperRequest = new SubnodeViewRequest();
+            SubnodeWizardRequest wrapperRequest = new SubnodeWizardRequest();
             wrapperRequest.loadFromStream(new ByteArrayInputStream(request.getBytes("UTF-8")));
             requestSequence = wrapperRequest.getSequence();
             requestJob = WizardViewRequestRunner.run(this, wrapperRequest, exec);
@@ -235,7 +235,7 @@ public final class WizardPageManager extends AbstractPageManager implements View
      * @since 3.7
      */
     @Override
-    public SubnodeViewResponse handleRequest(final SubnodeViewRequest request, final ExecutionMonitor exec)
+    public AbstractSubnodeResponse handleRequest(final SubnodeWizardRequest request, final ExecutionMonitor exec)
         throws ViewRequestHandlingException, InterruptedException, CanceledExecutionException {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
             WizardExecutionController wec = getWizardExecutionController();
@@ -250,8 +250,8 @@ public final class WizardPageManager extends AbstractPageManager implements View
      * @since 3.7
      */
     @Override
-    public SubnodeViewRequest createEmptyViewRequest() {
-        return new SubnodeViewRequest();
+    public SubnodeWizardRequest createEmptyViewRequest() {
+        return new SubnodeWizardRequest();
     }
 
     private static String serializeResponseMonitor(

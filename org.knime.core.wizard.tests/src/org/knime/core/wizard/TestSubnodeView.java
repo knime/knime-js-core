@@ -251,7 +251,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         Map<String, ValidationError> errorMap = m_spm.validateViewValues(valueMap, m_subnodeID);
         assertTrue("There should not be any validation errors", errorMap == null || errorMap.isEmpty());
         try (WorkflowLock lock = getManager().lock()) {
-            m_spm.applyValidatedValuesAndReexecute(valueMap, m_subnodeID, false);
+            m_spm.applyValidatedValuesAndExecute(valueMap, m_subnodeID, false);
         }
         waitWhileNodeInExecution(m_subnodeID);
         assertTrue("Subnode should be executed.", getManager().getNodeContainer(m_subnodeID).getNodeContainerState().isExecuted());
@@ -271,7 +271,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         selectRowInTable(valueMap);
 
         try (WorkflowLock lock = getManager().lock()) {
-            m_spm.applyValidatedValuesAndReexecute(valueMap, m_subnodeID, false);
+            m_spm.applyValidatedValuesAndExecute(valueMap, m_subnodeID, false);
         }
         waitWhileNodeInExecution(m_subnodeID);
 		assertThat("Subnode is not executed", findNodeContainer(m_subnodeID).getNodeContainerState().isExecuted(),
@@ -298,7 +298,7 @@ public class TestSubnodeView extends WorkflowTestCase {
             Map<String, String> valueMap = changeStringInputTo(CHANGED_URL, buildValueMap());
             selectRowInTable(valueMap);
             try (WorkflowLock lock = getManager().lock()) {
-                m_spm.applyValidatedValuesAndReexecute(valueMap, m_subnodeID, false);
+                m_spm.applyValidatedValuesAndExecute(valueMap, m_subnodeID, false);
             }
             Assert.fail("Shouldn't be able to apply values while downstream nodes are executing");
         } finally {

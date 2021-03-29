@@ -48,14 +48,18 @@
  */
 package org.knime.core.wizard;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
@@ -76,6 +80,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.wizard.WizardViewRequestHandler;
 import org.knime.core.node.workflow.NodeContainerState;
+import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
@@ -98,7 +103,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @since 3.4
  */
 public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNodePage, SubnodeViewValue>,
-        WizardViewRequestHandler<SubnodeViewRequest, SubnodeViewResponse> {
+        WizardViewRequestHandler<SubnodeWizardRequest, AbstractSubnodeResponse> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewableModel.class);
 
@@ -112,6 +117,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private String m_viewPath;
     private AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> m_view;
     private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
+    private AtomicReference<NodeID> m_resetNodeId = new AtomicReference<NodeID>();
     private NodeStateChangeListener m_nodeStateChangeListener;
 
     /**
@@ -135,13 +141,26 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     /** Called by state listener on subnode container. */
     private void onNodeStateChange() {
         NodeContainerState nodeContainerState = m_container.getNodeContainerState();
-
-        // only react on state changes when
-        //  - no re-exec is ongoing
-        //  - no irrelevant pre-exec -> queue -> post-exec step is ongoing.
-        //    (ideally this should be removed but those state changes on the SNC are not protected by the workflow lock)
+        if (m_resetNodeId.get() != null) {
+            // single page re-execution has finished
+            if (nodeContainerState.isExecuted() && m_view.isPushEnabled()) {
+                SubnodeWizardRequest request = new SubnodeWizardRequest();
+                SinglePageResponse response = new SinglePageResponse(request, m_container.getID().toString(), "{}");
+                try {
+                    response = getUpdatedPageResponse(request);
+                    m_view.pushViewUpdate(response);
+                    m_resetNodeId.set(null);
+                } catch (IOException e) {
+                    LOGGER.error("Updating view following re-execution failed: " + e.getMessage(), e);
+                }
+            }
+            return;
+        }
         if (!(m_isReexecuteInProgress.get() || nodeContainerState.isExecutionInProgress())) {
-
+            // only react on state changes when
+            //  - no re-exec is ongoing
+            //  - no irrelevant pre-exec -> queue -> post-exec step is ongoing.
+            //    (ideally this should be removed but those state changes on the SNC are not protected by the workflow lock)
             boolean isCallModelChanged = true;
             SubnodeViewValue v = getViewValue();
             if (nodeContainerState.isExecuted()) {
@@ -227,7 +246,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                 "Node needs to be in executed state to apply new view values.");
             m_isReexecuteInProgress.set(true);
             try (WorkflowLock lock = m_container.getParent().lock()) {
-                m_spm.applyValidatedValuesAndReexecute(value.getViewValues(), m_container.getID(), useAsDefault);
+                m_spm.applyValidatedValuesAndExecute(value.getViewValues(), m_container.getID(), useAsDefault);
                 m_value = value;
             } finally {
                 m_isReexecuteInProgress.set(false);
@@ -384,6 +403,105 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @since 3.7
+     */
+    @Override
+    public SubnodeWizardRequest createEmptyViewRequest() {
+        return new SubnodeWizardRequest();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 3.7
+     */
+    @Override
+    public AbstractSubnodeResponse handleRequest(final SubnodeWizardRequest request, final ExecutionMonitor exec)
+        throws ViewRequestHandlingException, InterruptedException, CanceledExecutionException {
+        if (request.getIsSinglePageRequest()) {
+            return handleSinglePageRequest(request, exec);
+        }
+        String jsonResponse =
+            m_spm.processViewRequest(request.getNodeID(), request.getJsonRequest(), m_container.getID(), exec);
+        return new SubnodeViewResponse(request, request.getNodeID(), jsonResponse);
+    }
+
+    /**
+     * Handling of page-level requests.
+     *
+     * Actions supported: - partial subnode re-execution (reactive SPA; see AP-16267)
+     *
+     * @param request single page request.
+     * @param exec subnode execution monitor.
+     * @return single page response.
+     * @throws ViewRequestHandlingException
+     *
+     * @since 4.4
+     */
+    public SinglePageResponse handleSinglePageRequest(final SubnodeWizardRequest request, final ExecutionMonitor exec)
+        throws ViewRequestHandlingException {
+
+        SinglePageResponse response = new SinglePageResponse(request, m_container.getID().toString(), null);
+        try {
+            NodeID resetNodeId = NodeID.fromString(request.getNodeID());
+            m_resetNodeId.set(resetNodeId);
+            NodeID containerId = m_container.getID();
+            String req = request.getJsonRequest();
+            List<String> resetNodes = m_spm.getDownstreamViewNodes(containerId, resetNodeId);
+            response.setResetNodes(resetNodes);
+            SubnodeViewValue subnodeReguest = new SubnodeViewValue();
+            subnodeReguest.loadFromStream(new ByteArrayInputStream(req.getBytes(StandardCharsets.UTF_8)));
+            CheckUtils.checkState(m_container.getNodeContainerState().isExecuted(),
+                "Node needs to be in executed state to apply new view values.");
+            m_isReexecuteInProgress.set(true);
+            Map<String, ValidationError> validationErrors = null;
+            try (WorkflowLock lock = m_container.getParent().lock()) {
+                validationErrors =
+                    m_spm.applyPartialValuesAndReexecute(subnodeReguest.getViewValues(), containerId, resetNodeId);
+                if (validationErrors != null && !validationErrors.isEmpty()) {
+                    throw new ViewRequestHandlingException(
+                        "Unable to re-execute component with current page values. Please check the workflow for errors.");
+                }
+            } finally {
+                NodeContainerState state = m_container.getNodeContainerState();
+                if (state.isExecuted()) {
+                    response = getUpdatedPageResponse(request);
+                    m_resetNodeId.set(null);
+                    m_isReexecuteInProgress.set(false);
+                }
+            }
+        } catch (IOException e) {
+            logErrorAndReset("Loading view values for node " + m_container.getID() + " failed: ", e);
+        }
+        return response;
+    }
+
+    /**
+     * Create a single page request containing an updated page configuration following some partial re-execution event.
+     * The configuration is filtered by the node ID which triggered the response and only contains node configurations
+     * which have been updated.
+     *
+     * @param request the original single page request.
+     * @return the updated page response.
+     * @throws IOException
+     *
+     * @since 4.4
+     */
+    private SinglePageResponse getUpdatedPageResponse(final SubnodeWizardRequest request) throws IOException {
+        NodeID resetNodeId = m_resetNodeId.get();
+        CheckUtils.checkNotNull(resetNodeId, "Reset node ID must be defined for updated page response");
+        NodeID containerNodeID = m_container.getID();
+        JSONWebNodePage page = m_spm.createWizardPage(containerNodeID);
+        page.filterWebNodesById(m_spm.getDownstreamViewNodes(containerNodeID, resetNodeId));
+        try (OutputStream pageStream = page.saveToStream()) {
+            String pageString = pageStream.toString();
+            return new SinglePageResponse(request, containerNodeID.toString(), pageString);
+        }
+    }
+
+    /**
      * {@link JavaScriptViewCreator} for components (i.e. composite views).
      *
      * @param <REP>
@@ -499,26 +617,5 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                 return "Validation errors present but could not be serialized: " + e.getMessage();
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @since 3.7
-     */
-    @Override
-    public SubnodeViewResponse handleRequest(final SubnodeViewRequest request, final ExecutionMonitor exec)
-        throws ViewRequestHandlingException, InterruptedException, CanceledExecutionException {
-        String jsonResponse = m_spm.processViewRequest(request.getNodeID(), request.getJsonRequest(),
-            m_container.getID(), exec);
-        return new SubnodeViewResponse(request, request.getNodeID(), jsonResponse);
-    }
-
-    /**
-     * {@inheritDoc}
-     * @since 3.7
-     */
-    @Override
-    public SubnodeViewRequest createEmptyViewRequest() {
-        return new SubnodeViewRequest();
     }
 }

@@ -44,31 +44,108 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Mar 29, 2021 (ben.laney): created
+ *   Mar 24, 2021 (ben.laney): created
  */
 package org.knime.core.wizard;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Basic class for node-specific responses in composite views. Not to be used for page-level responses.
+ * Response class for page-level actions in composite views.
  *
  * @author ben.laney
  * @since 4.4
  */
 @JsonAutoDetect
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public final class SubnodeViewResponse extends AbstractSubnodeResponse {
+public final class SinglePageResponse extends AbstractSubnodeResponse {
+
+    private static final String CFG_RESET_NODES = "resetNodes";
+
+    private List<String> m_resetNodes;
 
     /**
-     * View-specific response for a node action targeting a single node view inside a larger, composite page.
+     * Single-page subnode response for page-level actions.
      *
      * @param request the original request.
      * @param nodeID the target node ID.
      * @param jsonResponse the serialized JSON response.
      */
-    public SubnodeViewResponse(final SubnodeWizardRequest request, final String nodeID, final String jsonResponse) {
+    public SinglePageResponse(final SubnodeWizardRequest request, final String nodeID, final String jsonResponse) {
         super(request, nodeID, jsonResponse);
+        m_resetNodes = new ArrayList<>();
+    }
+
+    /**
+     * Get the node IDs of the modified nodes since page creation.
+     *
+     * @return the resetNodes
+     */
+    public List<String> getResetNodes() {
+        return m_resetNodes;
+    }
+
+    /**
+     * Set the node IDs which have been modified in the composite view since page creation.
+     *
+     * @param resetNodes the resetNodes to set
+     */
+    public void setResetNodes(final List<String> resetNodes) {
+        m_resetNodes = resetNodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
+        settings.addStringArray(CFG_RESET_NODES, m_resetNodes.toArray(new String[0]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
+        m_resetNodes = Arrays.asList(settings.getStringArray(CFG_RESET_NODES, new String[0]));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        SinglePageResponse other = (SinglePageResponse)obj;
+        return new EqualsBuilder().appendSuper(super.equals(obj)).append(m_resetNodes, other.m_resetNodes).isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().appendSuper(super.hashCode()).append(m_resetNodes).toHashCode();
     }
 }

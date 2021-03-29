@@ -52,6 +52,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -194,11 +195,32 @@ public class CompositeViewPageManager extends AbstractPageManager {
      * @param useAsDefault true, if values are supposed to be applied as new defaults, false if applied temporarily
      * @throws IOException on serialization error
      */
-    public void applyValidatedValuesAndReexecute(final Map<String, String> valueMap, final NodeID containerNodeId,
+    public void applyValidatedValuesAndExecute(final Map<String, String> valueMap, final NodeID containerNodeId,
         final boolean useAsDefault) throws IOException {
         try (WorkflowLock lock = getWorkflowManager().assertLock()) {
             applyValidatedViewValues(valueMap, containerNodeId, useAsDefault);
-            getController(containerNodeId).reexecuteSinglePage();
+            getController(containerNodeId).executeSinglePage();
+        }
+    }
+
+    /**
+     * Applies a pre-filtered subset of serialized view values to nodes within a subnode container and partially
+     * re-executes the component, starting with the reset {@link NodeID} provided.
+     *
+     * @param valueMap a map with {@link NodeIDSuffix} string as key and parsed view value as value.
+     * @param containerNodeId the {@link NodeID} of the subnode.
+     * @param resetNodeId the {@link NodeID} which should initiate partial re-execution.
+     * @return a map of validation errors which occurred when applying the updated values or else null.
+     *
+     * @throws IOException on serialization error
+     *
+     * @since 4.4
+     */
+    public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
+        final NodeID containerNodeId, final NodeID resetNodeId) throws IOException {
+        try (WorkflowLock lock = getWorkflowManager().assertLock()) {
+            return getController(containerNodeId).reexecuteSinglePage(NodeIDSuffix.fromString(resetNodeId.toString()),
+                valueMap);
         }
     }
 
@@ -228,4 +250,17 @@ public class CompositeViewPageManager extends AbstractPageManager {
         }
     }
 
+    /**
+     * Utility method to see which downstream wizard view nodes will be reset if the provided {@link NodeID} is reset.
+     *
+     * @param containerNodeId the {@link NodeID} of the composite view/subnode container.
+     * @param resetNodeId the {@link NodeID} of the node which will be reset in the composite view.
+     * @return a list of downstream wizard view nodes which will be reset and re-executed based on the provided nodeID
+     *         to reset.
+     *
+     * @since 4.4
+     */
+    public List<String> getDownstreamViewNodes(final NodeID containerNodeId, final NodeID resetNodeId) {
+        return getController(containerNodeId).getDownstreamViewNodes(NodeIDSuffix.fromString(resetNodeId.toString()));
+    }
 }
