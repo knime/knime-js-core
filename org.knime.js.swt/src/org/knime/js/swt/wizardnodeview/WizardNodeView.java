@@ -47,12 +47,16 @@
 package org.knime.js.swt.wizardnodeview;
 
 import java.awt.Rectangle;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -83,6 +87,8 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.rpc.RpcServer;
+import org.knime.core.rpc.RpcServerFactory;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
@@ -117,6 +123,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_isPushSupportedCallback;
     private BrowserFunctionInternal m_validateCurrentValueInViewCallback;
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
+    private BrowserFunctionInternal m_rpcCallback;
     private boolean m_viewSet = false;
     private boolean m_initialized = false;
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
@@ -321,48 +328,48 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         });
         m_shell.open();
 
-        display.asyncExec(new Runnable() {
+        display.asyncExec(() -> {
+            m_browserWrapper.addProgressListener(new ProgressListener() {
 
-            @Override
-            public void run() {
-                m_browserWrapper.addProgressListener(new ProgressListener() {
-
-                    @Override
-                    public void completed(final ProgressEvent event) {
-                        if (m_viewSet && !m_initialized) {
-                            WizardNode<REP, VAL> model = getModel();
-                            WizardViewCreator<REP, VAL> creator = model.getViewCreator();
-                            if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
-                                String customCSS = ((CSSModifiable)model).getCssStyles();
-                                ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
-                            }
-                            String initCall =
-                                creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
-                            initCall = creator.wrapInTryCatch(initCall);
-                            //The execute call might fire the completed event again in some browsers!
-                            m_initialized = true;
-                            m_browserWrapper.execute(initCall);
+                @Override
+                public void completed(final ProgressEvent event) {
+                    if (m_viewSet && !m_initialized) {
+                        WizardNode<REP, VAL> model = getModel();
+                        WizardViewCreator<REP, VAL> creator = model.getViewCreator();
+                        if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+                            String customCSS = ((CSSModifiable)model).getCssStyles();
+                            ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
                         }
+                        String initCall =
+                            creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
+                        initCall = creator.wrapInTryCatch(initCall);
+                        //The execute call might fire the completed event again in some browsers!
+                        m_initialized = true;
+                        m_browserWrapper.execute(initCall);
                     }
+                }
 
-                    @Override
-                    public void changed(final ProgressEvent event) {
-                        // do nothing
-                    }
-                });
-                setBrowserURL();
-                m_viewRequestCallback = new ViewRequestFunction(m_browserWrapper, "knimeViewRequest");
-                m_updateRequestStatusCallback =
-                    new UpdateRequestStatusFunction(m_browserWrapper, "knimeUpdateRequestStatus");
-                m_cancelRequestCallback = new CancelRequestFunction(m_browserWrapper, "knimeCancelRequest");
-                m_isPushSupportedCallback = new PushSupportedFunction(m_browserWrapper, "knimePushSupported");
-                m_validateCurrentValueInViewCallback = new AsyncEvalCallbackFunction<Boolean>(m_browserWrapper,
-                    "validateCurrentValueInView", VIEW_VALID, Boolean.FALSE);
-                m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
-                        "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
-            }
+                @Override
+                public void changed(final ProgressEvent event) {
+                    // do nothing
+                }
+            });
+            setBrowserURL();
+            initBrowserFunctions();
         });
 
+    }
+
+    private void initBrowserFunctions() {
+        m_viewRequestCallback = new ViewRequestFunction(m_browserWrapper, "knimeViewRequest");
+        m_updateRequestStatusCallback = new UpdateRequestStatusFunction(m_browserWrapper, "knimeUpdateRequestStatus");
+        m_cancelRequestCallback = new CancelRequestFunction(m_browserWrapper, "knimeCancelRequest");
+        m_isPushSupportedCallback = new PushSupportedFunction(m_browserWrapper, "knimePushSupported");
+        m_validateCurrentValueInViewCallback = new AsyncEvalCallbackFunction<Boolean>(m_browserWrapper,
+            "validateCurrentValueInView", VIEW_VALID, Boolean.FALSE);
+        m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
+            "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
+        m_rpcCallback = new RpcFunction(m_browserWrapper, "rpc");
     }
 
     class DropdownSelectionListener extends SelectionAdapter {
@@ -523,6 +530,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (m_retrieveCurrentValueFromViewCallback != null && !m_retrieveCurrentValueFromViewCallback.isDisposed()) {
             m_retrieveCurrentValueFromViewCallback.dispose();
         }
+        if (m_rpcCallback != null && !m_rpcCallback.isDisposed()) {
+            m_rpcCallback.dispose();
+        }
         if (m_shell != null && !m_shell.isDisposed()) {
             m_shell.dispose();
         }
@@ -534,6 +544,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_isPushSupportedCallback = null;
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
+        m_rpcCallback = null;
         m_viewSet = false;
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
@@ -803,6 +814,35 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         @Override
         public Object function(final Object[] arguments) {
             return isPushEnabled();
+        }
+
+    }
+
+    private class RpcFunction extends BrowserFunctionInternal {
+
+        private RpcServer m_rpcServer;
+
+        RpcFunction(final BrowserWrapper browser, final String name) {
+            super(browser, name);
+        }
+
+        @Override
+        public Object function(final Object[] arguments) {
+            // TODO check args
+            WizardNode<REP, VAL> model = getModel();
+            if (model instanceof RpcServerFactory && m_rpcServer == null) {
+                m_rpcServer = ((RpcServerFactory)model).createRpcServer(model);
+            }
+            if (m_rpcServer != null) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                try {
+                    m_rpcServer.handleRequest(IOUtils.toInputStream((String)arguments[0], StandardCharsets.UTF_8), out);
+                } catch (IOException e) {
+                    // TODO
+                }
+                return new String(out.toByteArray(), StandardCharsets.UTF_8);
+            }
+            return null;
         }
 
     }

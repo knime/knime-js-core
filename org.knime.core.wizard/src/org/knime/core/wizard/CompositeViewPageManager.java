@@ -212,12 +212,10 @@ public class CompositeViewPageManager extends AbstractPageManager {
      * @param resetNodeId the {@link NodeID} which should initiate partial re-execution.
      * @return a map of validation errors which occurred when applying the updated values or else null.
      *
-     * @throws IOException on serialization error
-     *
      * @since 4.4
      */
     public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
-        final NodeID containerNodeId, final NodeID resetNodeId) throws IOException {
+        final NodeID containerNodeId, final NodeID resetNodeId) {
         try (WorkflowLock lock = getWorkflowManager().assertLock()) {
             return getController(containerNodeId).reexecuteSinglePage(NodeIDSuffix.fromString(resetNodeId.toString()),
                 valueMap);
@@ -251,16 +249,16 @@ public class CompositeViewPageManager extends AbstractPageManager {
     }
 
     /**
-     * Utility method to see which downstream wizard view nodes will be reset if the provided {@link NodeID} is reset.
+     * Utility method to see which downstream nodes will be reset if the provided {@link NodeID} is reset.
      *
-     * @param containerNodeId the {@link NodeID} of the composite view/subnode container.
-     * @param resetNodeId the {@link NodeID} of the node which will be reset in the composite view.
+     * @param containerNodeId the {@link NodeID} of the composite view/subnode container
+     * @param resetNodeId the {@link NodeID} of the node which will be reset in the composite view
      * @return a list of downstream wizard view nodes which will be reset and re-executed based on the provided nodeID
-     *         to reset.
+     *         to reset
      *
      * @since 4.4
      */
-    public List<String> getDownstreamViewNodes(final NodeID containerNodeId, final NodeID resetNodeId) {
-        return getController(containerNodeId).getDownstreamViewNodes(NodeIDSuffix.fromString(resetNodeId.toString()));
+    public List<String> getDownstreamNodes(final NodeID containerNodeId, final NodeID resetNodeId) {
+        return getController(containerNodeId).getDownstreamNodes(NodeIDSuffix.fromString(resetNodeId.toString()));
     }
 }

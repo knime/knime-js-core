@@ -44,31 +44,117 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Mar 29, 2021 (ben.laney): created
+ *   22 Feb 2018 (albrecht): created
  */
 package org.knime.core.wizard;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.JSONViewResponse;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Basic class for node-specific responses in composite views. Not to be used for page-level responses.
+ * Container class encapsulating a view response for a specific node inside a combined view.
  *
- * @author ben.laney
- * @since 4.4
+ * @author Christian Albrecht, KNIME GmbH, Konstanz, Germany
+ * @since 3.7
  */
 @JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
-public final class SubnodeViewResponse extends AbstractSubnodeResponse {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+public class SubnodeViewResponse extends JSONViewResponse<SubnodeViewRequest> {
+
+    private String m_nodeID;
+
+    private static final String CFG_JSON_RESPONSE = "jsonResponse";
+    private String m_jsonResponse;
 
     /**
-     * View-specific response for a node action targeting a single node view inside a larger, composite page.
+     * Creates a new response object for subnode views.
      *
-     * @param request the original request.
-     * @param nodeID the target node ID.
-     * @param jsonResponse the serialized JSON response.
+     * @param request
+     * @param nodeID the node id of the view the response is for
+     * @param jsonResponse the JSON serialized response for the specific view
      */
-    public SubnodeViewResponse(final SubnodeWizardRequest request, final String nodeID, final String jsonResponse) {
-        super(request, nodeID, jsonResponse);
+    public SubnodeViewResponse(final SubnodeViewRequest request, final String nodeID,
+        final String jsonResponse) {
+        super(request);
+        m_nodeID = nodeID;
+        m_jsonResponse = jsonResponse;
     }
+
+    /**
+     * @return the nodeID
+     */
+    public String getNodeID() {
+        return m_nodeID;
+    }
+
+    /**
+     * @return the jsonResponse
+     */
+    @JsonRawValue
+    public String getJsonResponse() {
+        return m_jsonResponse;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void saveToNodeSettings(final NodeSettingsWO settings) {
+        super.saveToNodeSettings(settings);
+        settings.addString(SubnodeViewRequest.CFG_NODE_ID, m_nodeID);
+        settings.addString(CFG_JSON_RESPONSE, m_jsonResponse);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void loadFromNodeSettings(final NodeSettingsRO settings) throws InvalidSettingsException {
+        super.loadFromNodeSettings(settings);
+        m_nodeID = settings.getString(SubnodeViewRequest.CFG_NODE_ID);
+        m_jsonResponse = settings.getString(CFG_JSON_RESPONSE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (obj.getClass() != getClass()) {
+            return false;
+        }
+        SubnodeViewResponse other = (SubnodeViewResponse)obj;
+        return new EqualsBuilder()
+                .appendSuper(super.equals(obj))
+                .append(m_nodeID, other.m_nodeID)
+                .append(m_jsonResponse, other.m_jsonResponse)
+                .isEquals();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder()
+                .appendSuper(super.hashCode())
+                .append(m_nodeID)
+                .append(m_jsonResponse)
+                .toHashCode();
+    }
+
 }
