@@ -50,11 +50,19 @@ package org.knime.core.wizard.rpc;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * Default implementation of {@link PageContainer}.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
+@JsonAutoDetect
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+@JsonInclude(Include.NON_NULL)
 public class DefaultPageContainer implements PageContainer {
 
     private String m_page;
@@ -74,7 +82,7 @@ public class DefaultPageContainer implements PageContainer {
      * {@inheritDoc}
      */
     @Override
-    public List<String> resetNodes() {
+    public List<String> getResetNodes() {
         return m_resetNodes;
     }
 
@@ -82,7 +90,7 @@ public class DefaultPageContainer implements PageContainer {
      * {@inheritDoc}
      */
     @Override
-    public String page() {
+    public String getPage() {
         return m_page;
     }
 

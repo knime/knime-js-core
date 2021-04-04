@@ -317,7 +317,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         //pageBuilder.append(debugScript);
 
         //  uncomment if testing SWT
-        //  pageBuilder.append(String.format(scriptString, "js-lib/firebug-lite/firebug-lite.js"));
+          pageBuilder.append(String.format(scriptString, "js-lib/firebug-lite/firebug-lite.js"));
 
         String bodyText = "";
         if (m_template == null || m_template.getWebResources() == null || m_template.getWebResources().length < 1) {

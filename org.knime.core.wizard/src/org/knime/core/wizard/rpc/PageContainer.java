@@ -15,13 +15,13 @@ public interface PageContainer {
      * @return the nodes that have been reset or <code>null</code> if the component is in executed state and
      *         {@link #page()} returns page content
      */
-    List<String> resetNodes();
+    List<String> getResetNodes();
 
     /**
      * Returns the actual page content, i.e. as serialized {@link JSONWebNodePage}-object.
      *
      * @return the actual page content or <code>null</code> if the component is in execution
      */
-    String page();
+    String getPage();
 
 }
