@@ -49,6 +49,11 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -60,6 +65,8 @@ import javax.json.stream.JsonGenerationException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeLogger;
+import org.knime.core.node.util.CheckUtils;
 import org.knime.js.core.StringSanitizationSerializer.JsonSanitize;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -93,10 +100,12 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 @SuppressWarnings("java:S1948")
 class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(JSONWebNodeSerializer.class);
+
     private static final long serialVersionUID = 3247239167142L;
 
     // default empty
-    private final List<String> m_allowNodes = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
+    private final List<String> m_allowNodes = getAllowedNodes();
 
     // default empty
     private final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
@@ -200,6 +209,23 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
                 .stream()
                 .map(String::trim)
                 .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
+    private static List<String> getAllowedNodes() {
+        String allowedNodesLocation = System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
+        if (StringUtils.isNotBlank(allowedNodesLocation)) {
+            try {
+                Path allowedNodesPath = Paths.get(allowedNodesLocation);
+                CheckUtils.checkArgument(allowedNodesPath.isAbsolute(),
+                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + " must be an absolute path.");
+                CheckUtils.checkArgument(Files.exists(allowedNodesPath),
+                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + " file not found.");
+                return Files.readAllLines(allowedNodesPath);
+            } catch (IOException ex) {
+                LOGGER.error("Could not read from configured file: " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + ".");
+            }
+        }
+        return new ArrayList<>();
     }
 
     /**
