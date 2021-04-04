@@ -109,8 +109,9 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public static final String SYS_PROPERTY_SANITIZE_CLIENT_HTML = "js.core.sanitize.clientHTML";
 
     /**
-     * A comma separated list of node names (as seen in the node description; e.g. "Table View") to exclude from
-     * sanitization before being transferred to the client. Default is empty; thereby sanitizing all node data.
+     * The optional absolute path to a file containing new-line delimited node nodes (as seen in the node description;
+     * e.g. "Table View")(one per line) to exclude from sanitization before being transferred to the client. Default is
+     * empty; thereby sanitizing all node data.
      *
      * @since 4.4 (AP-16130)
      */
