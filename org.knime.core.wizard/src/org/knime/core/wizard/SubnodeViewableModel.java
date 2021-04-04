@@ -50,7 +50,6 @@ package org.knime.core.wizard;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,13 +75,14 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.wizard.WizardViewRequestHandler;
 import org.knime.core.node.workflow.NodeContainerState;
-import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.rpc.RpcServerFactory;
 import org.knime.core.rpc.RpcSingleServer;
 import org.knime.core.rpc.json.JsonRpcSingleServer;
+import org.knime.core.wizard.rpc.DefaultReexecutionService;
+import org.knime.core.wizard.rpc.ReexecutionService;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
@@ -116,7 +116,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private String m_viewPath;
     private AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> m_view;
     private boolean m_isReexecuteInProgress = false;
-    private NodeID m_resetNodeId = null;
     private NodeStateChangeListener m_nodeStateChangeListener;
 
     /**
@@ -395,70 +394,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     @Override
     public RpcSingleServer<ReexecutionService> createRpcServer(final SubnodeViewableModel target) {
-        return new JsonRpcSingleServer<>(new ReexecutionService() {
-
-            @Override
-            public PageContainer reexecutePage(final String nodeID, final Map<String, String> viewValues) {
-                return SubnodeViewableModel.this.reexecutePage(nodeID, viewValues);
-            }
-
-            @Override
-            public PageContainer getPage() {
-                try {
-                    CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
-                    String page = filterAndGetSerializedJSONWebNodePage(
-                        m_spm.getDownstreamNodes(m_container.getID(), m_resetNodeId));
-                    return createPageContainer(page, null);
-                } catch (IOException ex) {
-                    // TODO
-                    throw new IllegalStateException(ex);
-                }
-            }
-
-        });
-    }
-
-    private PageContainer reexecutePage(final String nodeID, final Map<String, String> viewValues) {
-        // validate view values and re-execute
-        NodeID resetNodeId = NodeID.fromString(nodeID);
-        NodeID containerId = m_container.getID();
-        try (WorkflowLock lock = m_container.getParent().lock()) {
-            Map<String, ValidationError> validationErrors =
-                m_spm.applyPartialValuesAndReexecute(viewValues, containerId, resetNodeId);
-            if (validationErrors != null && !validationErrors.isEmpty()) {
-                // TODO
-                throw new IllegalStateException(
-                    "Unable to re-execute component with current page values. Please check the workflow for errors.");
-            }
-        }
-
-        // create response
-        List<String> resetNodes = m_spm.getDownstreamNodes(containerId, resetNodeId);
-        String page;
-        if (m_container.getNodeContainerState().isExecuted()) {
-            try {
-                page = filterAndGetSerializedJSONWebNodePage(resetNodes);
-            } catch (IOException ex) {
-                // TODO
-                throw new IllegalStateException(ex);
-            }
-            resetNodes = null;
-            m_resetNodeId = resetNodeId;
-            m_isReexecuteInProgress = false;
-        } else {
-            page = null;
-            m_resetNodeId = resetNodeId;
-            m_isReexecuteInProgress = true;
-        }
-        return createPageContainer(page, resetNodes);
-    }
-
-    private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
-        JSONWebNodePage page = m_spm.createWizardPage(m_container.getID());
-        page.filterWebNodesById(resetNodeIDs);
-        try (OutputStream pageStream = page.saveToStream()) {
-            return pageStream.toString();
-        }
+        return new JsonRpcSingleServer<>(new DefaultReexecutionService(m_container, m_spm));
     }
 
     /**
@@ -600,58 +536,4 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         return new SubnodeViewRequest();
     }
 
-    /**
-     * Service which is exposes the functionality to partially re-execute a component to, e.g., the JS component (i.e.
-     * composite view) view implementation.
-     */
-    private interface ReexecutionService {
-
-        /**
-         * (Partially) re-executes the component.
-         *
-         * @param nodeID the id of the node to be reset (and all the downstream nodes)
-         * @param viewValues the view values to apply to the reset nodes
-         * @return the re-executed or re-executing page
-         */
-        PageContainer reexecutePage(String nodeID, Map<String, String> viewValues);
-
-        PageContainer getPage();
-
-    }
-
-    /**
-     * Object that contains the wizard page and some additional information.
-     */
-    private interface PageContainer {
-
-        /**
-         * @return the nodes that have been reset or <code>null</code> if the component is in executed state and
-         *         {@link #page()} returns page content
-         */
-        List<String> resetNodes();
-
-        /**
-         * Returns the actual page content, i.e. as serialized {@link JSONWebNodePage}-object.
-         *
-         * @return the actual page content or <code>null</code> if the component is in execution
-         */
-        String page();
-
-    }
-
-    private static PageContainer createPageContainer(final String page, final List<String> resetNodes) {
-        return new PageContainer() {
-
-            @Override
-            public List<String> resetNodes() {
-                return resetNodes;
-            }
-
-            @Override
-            public String page() {
-                return page;
-            }
-
-        };
-    }
 }
