@@ -1,11 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.core.wizard" version="2">
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.core.wizard.SinglePageManager">
+        <filter id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.SinglePageManager"/>
+                <message_argument value="org.knime.core.wizard_4.4.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/CompositeViewPageManager.java" type="org.knime.core.wizard.CompositeViewPageManager">
         <filter id="640712815">
             <message_arguments>
                 <message_argument value="WorkflowLock"/>
                 <message_argument value="CompositeViewPageManager"/>
                 <message_argument value="close()"/>
+            </message_arguments>
+        </filter>
+        <filter id="1108344834">
+            <message_arguments>
+                <message_argument value="3.4"/>
+                <message_argument value="4.4"/>
+                <message_argument value="org.knime.core.wizard.CompositeViewPageManager"/>
             </message_arguments>
         </filter>
     </resource>
