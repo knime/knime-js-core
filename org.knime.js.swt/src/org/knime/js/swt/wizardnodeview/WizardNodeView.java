@@ -605,6 +605,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return evaluateAsync(evalCode, VIEW_VALUE, EMPTY_OBJECT_STRING, warnMessage);
     }
 
+    private boolean isExecuted() {
+        return m_nodeContext.getNodeContainer().getNodeContainerState().isExecuted();
+    }
+
     /**
      * Calls evaluate on the browser and waits until a given object was assigned by a {@link BrowserFunction}
      *
@@ -613,12 +617,16 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * @param referenceObject the object that should be assigned by a {@link BrowserFunction}, this call will wait until
      *            the object is not null
      * @param defaultValue the value by which the a warning message should be issued
-     * @param warnMessage a warning message in case the async call is not successful or only the default value is retrieved
-     * @return the retrieved value from the async call, may be null in case of an error
+     * @param warnMessage a warning message in case the async call is not successful or only the default value is
+     *            retrieved
+     * @return the retrieved value from the async call, may be null in case of an error; returns the default value if
+     *         the underlying node is not executed
      */
-    @SuppressWarnings("null")
     private <O> O evaluateAsync(final String evalCode, final String referenceObject, final O defaultValue,
         final String warnMessage) {
+        if (!isExecuted()) {
+            return defaultValue;
+        }
         Display display = getDisplay();
         @SuppressWarnings("unchecked")
         AtomicReference<O> reference = (AtomicReference<O>)m_asyncEvalReferenceMap.get(referenceObject);
@@ -640,7 +648,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
         O localValue = reference.get();
         reference.set(null);
-        if (localValue.equals(defaultValue)) {
+        if (localValue != null && localValue.equals(defaultValue)) {
             LOGGER.warn(warnMessage);
         }
         return localValue == null ? defaultValue : localValue;
