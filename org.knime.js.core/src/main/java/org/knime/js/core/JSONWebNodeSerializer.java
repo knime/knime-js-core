@@ -145,7 +145,8 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         // check if node is configured to be sanitized
         String nodeName = value.getNodeInfo().getNodeName();
         boolean shouldSanitizeNode =
-            m_allowNodes.stream().noneMatch(excludedNodeName -> StringUtils.equals(excludedNodeName, nodeName));
+            m_allowNodes.stream().noneMatch(excludedNodeName -> StringUtils.equals(excludedNodeName, nodeName))
+                && !StringUtils.equals(JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME, nodeName);
 
         Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
 
