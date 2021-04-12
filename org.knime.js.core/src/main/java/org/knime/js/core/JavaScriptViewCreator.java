@@ -106,6 +106,10 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JavaScriptViewCreator.class);
 
+    private static final String SINGLE_NODE_ID = "SINGLE";
+
+    static final String SINGLE_PAGE_NODE_NAME = "Single Node Page";
+
     private static File tempFolder;
 
     private File m_tempIndexFile;
@@ -581,7 +585,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         private Map<String, JSONWebNode> createNodesMap(final JSONWebNode node) {
             Map<String, JSONWebNode> nodesMap = new HashMap<String, JSONWebNode>();
-            nodesMap.put("SINGLE", node);
+            nodesMap.put(SINGLE_NODE_ID, node);
             return nodesMap;
         }
 
@@ -636,7 +640,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         private void setNodeInfo( final JSONWebNode node) {
             JSONWebNodeInfo info = new JSONWebNodeInfo();
-            info.setNodeName("Single Node Page");
+            info.setNodeName(SINGLE_PAGE_NODE_NAME);
             info.setDisplayPossible(true);
             node.setNodeInfo(info);
         }
@@ -673,7 +677,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         private List<JSONLayoutContent> createJSONContent() {
             JSONLayoutViewContent content = new JSONLayoutViewContent();
             content.setUseLegacyMode(false);
-            content.setNodeID("SINGLE");
+            content.setNodeID(SINGLE_NODE_ID);
             List<JSONLayoutContent> list = new ArrayList<>();
             list.add(content);
             return list;
