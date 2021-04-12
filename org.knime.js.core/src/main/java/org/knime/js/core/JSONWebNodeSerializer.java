@@ -105,16 +105,16 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private static final long serialVersionUID = 3247239167142L;
 
     // default empty
-    private final List<String> m_allowNodes = getAllowedNodes();
+    private static final List<String> m_allowNodes = getAllowedNodes();
 
     // default empty
-    private final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+    private static final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
 
     // default empty
-    private final List<String> m_allowAttrs = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+    private static final List<String> m_allowAttrs = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
 
     // default true
-    private final boolean m_allowCSS = BooleanUtils.isNotTrue(
+    private static final boolean m_allowCSS = BooleanUtils.isNotTrue(
         StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
     private final JsonSerializer<JSONWebNode> m_defaultSerializer;
