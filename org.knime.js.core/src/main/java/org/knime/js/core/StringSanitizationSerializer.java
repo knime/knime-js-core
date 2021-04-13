@@ -45,6 +45,8 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,9 +55,15 @@ import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.HtmlSanitizer;
 import org.owasp.html.HtmlStreamRenderer;
 
+import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 
 /**
  * Custom HTML sanitization serializer.
@@ -63,13 +71,15 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  * @author ben.laney
  * @since 4.4
  */
-public class StringSanitizationSerializer extends StdSerializer<String> {
+public class StringSanitizationSerializer extends StdSerializer<String> implements ContextualSerializer {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(StringSanitizationSerializer.class);
 
     private static final long serialVersionUID = 1027138718748213L;
 
     private static final String EMPTY_QUOTES_MARKER_STRING = "&#34;&#34;";
+
+    private static final StringSerializer DEFAULT_STR_SERIALIZER = new StringSerializer();
 
     /**
      * The HTML Policy which is used to sanitize user data.
@@ -184,4 +194,42 @@ public class StringSanitizationSerializer extends StdSerializer<String> {
         return policyBuilder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonSerializer<?> createContextual(final SerializerProvider prov, final BeanProperty property)
+        throws JsonMappingException {
+        JsonSanitizeIgnore ignoreAnnotation = property.getMember().getAnnotation(JsonSanitizeIgnore.class);
+        if (ignoreAnnotation != null) {
+            return DEFAULT_STR_SERIALIZER;
+        }
+        return this;
+    }
+
+    /**
+     * Annotation for class fields which should be sanitized.
+     *
+     * @author ben.laney
+     * @since 4.4
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @JacksonAnnotationsInside
+    public @interface JsonSanitize {
+        @SuppressWarnings("javadoc")
+        boolean value() default true;
+    }
+
+    /**
+     * Annotation for class fields which should be explicitly ignored during sanitization.
+     *
+     * @author ben.laney
+     * @since 4.4
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @JacksonAnnotationsInside
+    public @interface JsonSanitizeIgnore {
+        @SuppressWarnings("javadoc")
+        boolean value() default true;
+    }
 }
