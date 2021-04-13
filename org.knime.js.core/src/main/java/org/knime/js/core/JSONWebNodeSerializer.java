@@ -49,8 +49,6 @@
 package org.knime.js.core;
 
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -62,8 +60,8 @@ import javax.json.stream.JsonGenerationException;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.js.core.StringSanitizationSerializer.JsonSanitize;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanDescription;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -161,8 +159,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         while (nodeProperties.hasNext()) {
             PropertyWriter writer = nodeProperties.next();
             String jsonPropertyName = writer.getName();
-            JSONWebNodeSerializer.JsonSanitize sanitizeAnnotation =
-                writer.getMember().getAnnotation(JSONWebNodeSerializer.JsonSanitize.class);
+            JsonSanitize sanitizeAnnotation = writer.getMember().getAnnotation(JsonSanitize.class);
 
             // skip missing/ignored properties
             if (jsonPropertyName == null || ignoredProperties.contains(jsonPropertyName)) {
@@ -231,17 +228,5 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
      */
     boolean getAllowCSS() { // NOSONAR
         return m_allowCSS;
-    }
-
-    /**
-     * Annotation for class fields which should be sanitized.
-     *
-     * @author ben.laney
-     * @since 4.4
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @JacksonAnnotationsInside
-    @interface JsonSanitize {
-        boolean value() default true;
     }
 }

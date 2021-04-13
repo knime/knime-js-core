@@ -50,6 +50,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.knime.js.core.StringSanitizationSerializer.JsonSanitize;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -209,7 +210,7 @@ public class JSONWebNode {
      * @return the view representation
      */
     @JsonProperty("viewRepresentation")
-    @JSONWebNodeSerializer.JsonSanitize
+    @JsonSanitize
     public JSONViewContent getViewRepresentation() {
         return m_viewRepresentation;
     }
@@ -226,7 +227,7 @@ public class JSONWebNode {
      * @return the view value
      */
     @JsonProperty("viewValue")
-    @JSONWebNodeSerializer.JsonSanitize
+    @JsonSanitize
     public JSONViewContent getViewValue() {
         return m_viewValue;
     }
