@@ -105,16 +105,16 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private static final long serialVersionUID = 3247239167142L;
 
     // default empty
-    private static final List<String> m_allowNodes = getAllowedNodes();
+    private static final List<String> ALLOW_NODES = getAllowedNodes();
 
     // default empty
-    private static final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+    private static final List<String> ALLOW_ELEMS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
 
     // default empty
-    private static final List<String> m_allowAttrs = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+    private static final List<String> ALLOW_ATTRS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
 
     // default true
-    private static final boolean m_allowCSS = BooleanUtils.isNotTrue(
+    private static final boolean ALLOW_CSS = BooleanUtils.isNotTrue(
         StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
     private final JsonSerializer<JSONWebNode> m_defaultSerializer;
@@ -162,7 +162,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         // Copy of existing mapper with custom String serializer module
         ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(new StringSanitizationSerializer(m_allowElems, m_allowAttrs, m_allowCSS));
+        module.addSerializer(new StringSanitizationSerializer(ALLOW_ELEMS, ALLOW_ATTRS, ALLOW_CSS));
         mapper.registerModule(module);
 
         while (nodeProperties.hasNext()) {
@@ -232,27 +232,27 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
      * @return the allowNodes
      */
     List<String> getAllowNodes() {
-        return m_allowNodes;
+        return ALLOW_NODES;
     }
 
     /**
      * @return the allowElems
      */
     List<String> getAllowElems() {
-        return m_allowElems;
+        return ALLOW_ELEMS;
     }
 
     /**
      * @return the allowAttrs
      */
     List<String> getAllowAttrs() {
-        return m_allowAttrs;
+        return ALLOW_ATTRS;
     }
 
     /**
      * @return the allowCSS
      */
     boolean getAllowCSS() { // NOSONAR
-        return m_allowCSS;
+        return ALLOW_CSS;
     }
 }
