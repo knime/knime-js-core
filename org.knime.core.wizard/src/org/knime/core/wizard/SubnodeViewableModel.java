@@ -116,9 +116,14 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private final JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> m_viewCreator;
     private String m_viewPath;
     private AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> m_view;
-//    private boolean m_isReexecuteInProgress = false;
-    private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
     private NodeStateChangeListener m_nodeStateChangeListener;
+
+    /*
+     * Atomic to prevent race conditions with the async behaviour of the non-SWT bundled Chromium BrowserFunction-equivalent
+     * (comet actions). We can use regular boolean once the bundled Chromium extension is no longer supported and CEF is the
+     * official KAP browser.
+     */
+    private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
 
     /**
      * Creates a new instance of this viewable model
@@ -234,7 +239,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         try {
             CheckUtils.checkState(m_container.getNodeContainerState().isExecuted(),
                 "Node needs to be in executed state to apply new view values.");
-            m_isReexecuteInProgress.set(true);;
+            m_isReexecuteInProgress.set(true);
             try (WorkflowLock lock = m_container.getParent().lock()) {
                 m_spm.applyValidatedValuesAndExecute(value.getViewValues(), m_container.getID(), useAsDefault);
                 m_value = value;
