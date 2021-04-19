@@ -48,6 +48,7 @@
  */
 package org.knime.js.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -110,19 +111,28 @@ public class JSONWebNodeSerializerTest {
     @Test
     public void testIgnoredProperties() throws IOException {
 
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
-        JSONWebNode mockWebNode = getMockWebNode();
         ObjectMapper webNodeMapper = JSONViewContent.createObjectMapper();
+
+        // set a nested ignored property (explicit exclusion)
+        JSONWebNode mockWebNode = getMockWebNode(null, true);
+        // set a top-level sibling property (implicit exclusion)
+        mockWebNode.setGetViewValueMethodName(CHECK_STRING);
+
+        try (StringWriter stringWriter = new StringWriter();) {
+            // default, non-sanitized should match nested ignored and non-annotated property and sibling property
+            webNodeMapper.writeValue(stringWriter, mockWebNode);
+            int strMatches = StringUtils.countMatches(stringWriter.toString(), CHECK_STRING);
+            assertEquals(3, strMatches);
+        }
+
+        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+        webNodeMapper = JSONViewContent.createObjectMapper();
 
         try (StringWriter stringWriter = new StringWriter();) {
             webNodeMapper.writeValue(stringWriter, mockWebNode);
-            assertFalse(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
-
-            stringWriter.flush();
-
-            mockWebNode.setGetViewValueMethodName(CHECK_STRING);
-            webNodeMapper.writeValue(stringWriter, mockWebNode);
-            assertTrue(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
+            // should match nested ignored property and sibling property, but not nested sanitized property
+            int strMatches = StringUtils.countMatches(stringWriter.toString(), CHECK_STRING);
+            assertEquals(2, strMatches);
         }
     }
 
@@ -158,18 +168,21 @@ public class JSONWebNodeSerializerTest {
     private static JSONWebNode getNamedMockWebNode(final String nodeName) {
         JSONWebNodeInfo mockNodeInfo = new JSONWebNodeInfo();
         mockNodeInfo.setNodeName(nodeName);
-        return getMockWebNode(mockNodeInfo);
+        return getMockWebNode(mockNodeInfo, false);
     }
 
     private static JSONWebNode getMockWebNode() {
-        return getMockWebNode(null);
+        return getMockWebNode(null, false);
     }
 
-    private static JSONWebNode getMockWebNode(final JSONWebNodeInfo nodeInfo) {
+    private static JSONWebNode getMockWebNode(final JSONWebNodeInfo nodeInfo, final boolean setIgnored) {
         JSONWebNode mockNode = new JSONWebNode();
         mockNode.setNodeInfo(nodeInfo != null ? nodeInfo : new JSONWebNodeInfo());
         JSONMockContent mockContent = new JSONMockContent();
         mockContent.setPojoValue(CHECK_STRING);
+        if (setIgnored) {
+            mockContent.setPojoIgnoredValue(CHECK_STRING);
+        }
         mockNode.setViewRepresentation(mockContent);
         return mockNode;
     }
