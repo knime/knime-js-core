@@ -115,7 +115,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      *
      * @since 4.4 (AP-16130)
      */
-    public static final String SYS_PROPERTY_SANITIZE_ALLOW_NODES = "js.core.sanitize.allowNodes";
+    public static final String SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH = "js.core.sanitize.allowNodesPath";
 
     /**
      * A comma separated list of valid HTML element tags which should be allowed in the sanitized data. Any non-empty
