@@ -77,7 +77,7 @@ public class JSONWebNodeSerializerTest {
     @After
     public void tearDown() {
         System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML);
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
         System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
         System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
         System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS);
@@ -116,7 +116,8 @@ public class JSONWebNodeSerializerTest {
             allowedNodesConfig = getMockAllowedNodesFile(String.join("\n", allowedNodes));
 
             System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, allowedNodesConfig.getCanonicalPath());
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
+                allowedNodesConfig.getCanonicalPath());
 
             try (StringWriter stringWriter = new StringWriter();) {
                 JSONViewContent.createObjectMapper().writeValue(stringWriter, getNamedMockWebNode(nodeName));
@@ -184,7 +185,8 @@ public class JSONWebNodeSerializerTest {
             String elemValue = "div";
             String attrValue = "data";
 
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, allowedNodesConfig.getCanonicalPath());
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
+                allowedNodesConfig.getCanonicalPath());
             System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS, elemValue);
             System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS, attrValue);
             System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS, "false");

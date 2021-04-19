@@ -205,24 +205,23 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         if (propertyValue == null) {
             return new ArrayList<>();
         }
-        return Arrays.asList(propertyValue.split(","))
-                .stream()
-                .map(String::trim)
-                .collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+        return Arrays.asList(propertyValue.split(",")).stream().map(String::trim).collect(ArrayList::new,
+            ArrayList::add, ArrayList::addAll);
     }
 
     private static List<String> getAllowedNodes() {
-        String allowedNodesLocation = System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
+        String allowedNodesLocation = System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
         if (StringUtils.isNotBlank(allowedNodesLocation)) {
             try {
                 Path allowedNodesPath = Paths.get(allowedNodesLocation);
-                CheckUtils.checkArgument(allowedNodesPath.isAbsolute(),
-                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + " must be an absolute path.");
+                CheckUtils.checkArgument(allowedNodesPath.isAbsolute(), "System property "
+                    + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + " must be an absolute path.");
                 CheckUtils.checkArgument(Files.exists(allowedNodesPath),
-                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + " file not found.");
+                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + " file not found.");
                 return Files.readAllLines(allowedNodesPath);
             } catch (IOException ex) {
-                LOGGER.error("Could not read from configured file: " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES + ".");
+                LOGGER.error("Could not read from file configured for "
+                    + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + ".");
             }
         }
         return new ArrayList<>();
