@@ -53,6 +53,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.js.core.StringSanitizationSerializer.JsonSanitizeIgnore;
 
 /**
  * Simple mock sub-class for testing {@link JSONViewContent}.
@@ -89,6 +90,13 @@ public class JSONMockContent extends JSONViewContent {
      */
     public void setPojoValue(final String pojoValue) {
         m_value.setInnerValue(pojoValue);
+    }
+
+    /**
+     * @param pojoIgnoredValue
+     */
+    public void setPojoIgnoredValue(final String pojoIgnoredValue) {
+        m_value.setIgnoredInnerValue(pojoIgnoredValue);
     }
 
     /**
@@ -135,6 +143,7 @@ public class JSONMockContent extends JSONViewContent {
 
     static class InnerPojo {
         private String m_innerValue;
+        private String m_ignoredInnerValue;
 
         /**
          * @return the innerValue
@@ -148,6 +157,21 @@ public class JSONMockContent extends JSONViewContent {
          */
         public void setInnerValue(final String innerValue) {
             m_innerValue = innerValue;
+        }
+
+        /**
+         * @return the ignoredInnerValue
+         */
+        @JsonSanitizeIgnore
+        public String getIgnoredInnerValue() {
+            return m_ignoredInnerValue;
+        }
+
+        /**
+         * @param ignoredInnerValue the ignoredInnerValue to set
+         */
+        public void setIgnoredInnerValue(final String ignoredInnerValue) {
+            m_ignoredInnerValue = ignoredInnerValue;
         }
     }
 
