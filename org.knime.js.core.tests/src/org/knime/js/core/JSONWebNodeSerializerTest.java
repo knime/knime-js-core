@@ -52,13 +52,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
+import org.knime.core.util.FileUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -73,6 +77,10 @@ public class JSONWebNodeSerializerTest {
     @After
     public void tearDown() {
         System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML);
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES);
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS);
     }
 
     @Test
@@ -97,14 +105,29 @@ public class JSONWebNodeSerializerTest {
     @Test
     public void testModExclusionByName() throws IOException {
 
-        String nodeName = "my_node";
+        File allowedNodesConfig = null;
 
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, nodeName);
+        try {
 
-        try (StringWriter stringWriter = new StringWriter();) {
-            JSONViewContent.createObjectMapper().writeValue(stringWriter, getNamedMockWebNode(nodeName));
-            assertTrue(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
+            List<String> allowedNodes = new ArrayList<String>();
+            String nodeName = "my_node";
+            allowedNodes.add(nodeName);
+            allowedNodes.add("Scatter Plot");
+            allowedNodesConfig = getMockAllowedNodesFile(String.join("\n", allowedNodes));
+
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, allowedNodesConfig.getCanonicalPath());
+
+            try (StringWriter stringWriter = new StringWriter();) {
+                JSONViewContent.createObjectMapper().writeValue(stringWriter, getNamedMockWebNode(nodeName));
+                assertTrue(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
+            }
+        } catch (IOException e) {
+            assertTrue("Mocking allowed nodes configuration file failed: " + e, false);
+        } finally {
+            if (allowedNodesConfig != null) {
+                allowedNodesConfig.delete();
+            }
         }
     }
 
@@ -148,21 +171,40 @@ public class JSONWebNodeSerializerTest {
         assertTrue(serializer.getAllowAttrs().equals(mockParam));
         assertTrue(serializer.getAllowCSS());
 
-        String nodeValue = "my_node";
-        String elemValue = "div";
-        String attrValue = "data";
+        File allowedNodesConfig = null;
 
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, nodeValue);
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS, elemValue);
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS, attrValue);
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS, "false");
+        try {
 
-        serializer = new JSONWebNodeSerializer(null, null);
+            List<String> allowedNodes = new ArrayList<String>();
 
-        assertTrue(serializer.getAllowNodes().contains(nodeValue));
-        assertTrue(serializer.getAllowElems().contains(elemValue));
-        assertTrue(serializer.getAllowAttrs().contains(attrValue));
-        assertFalse(serializer.getAllowCSS());
+            allowedNodes.add("Table View");
+            allowedNodes.add("Scatter Plot");
+            allowedNodesConfig = getMockAllowedNodesFile(String.join("\n", allowedNodes));
+
+            String elemValue = "div";
+            String attrValue = "data";
+
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES, allowedNodesConfig.getCanonicalPath());
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS, elemValue);
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS, attrValue);
+            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS, "false");
+
+            serializer = new JSONWebNodeSerializer(null, null);
+
+            List<String> sysAllowedNodes = serializer.getAllowNodes();
+
+            assertFalse(sysAllowedNodes.isEmpty());
+            sysAllowedNodes.forEach(nodeName -> assertTrue(allowedNodes.contains(nodeName)));
+            assertTrue(serializer.getAllowElems().contains(elemValue));
+            assertTrue(serializer.getAllowAttrs().contains(attrValue));
+            assertFalse(serializer.getAllowCSS());
+        } catch (IOException e) {
+            assertTrue("Mocking allowed configuration file failed: " + e, false);
+        } finally {
+            if (allowedNodesConfig != null) {
+                allowedNodesConfig.delete();
+            }
+        }
     }
 
     private static JSONWebNode getNamedMockWebNode(final String nodeName) {
@@ -185,5 +227,18 @@ public class JSONWebNodeSerializerTest {
         }
         mockNode.setViewRepresentation(mockContent);
         return mockNode;
+    }
+
+    private static File getMockAllowedNodesFile(final String allowedNodes) throws IOException {
+        File dir = FileUtil.createTempDir("sanitization_junit_test");
+        File configFile = new File(dir, "test_allowed_nodes.txt");
+        if (configFile.createNewFile()) {
+            try (FileOutputStream outputStream = new FileOutputStream(configFile)) {
+                outputStream.write(allowedNodes.getBytes());
+            }
+        } else {
+            throw new IllegalStateException("Creating mock allowed nodes config file failed.");
+        }
+        return configFile;
     }
 }
