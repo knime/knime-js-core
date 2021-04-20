@@ -55,7 +55,6 @@ import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.HtmlSanitizer;
 import org.owasp.html.HtmlStreamRenderer;
 
-import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -214,10 +213,8 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
      * @since 4.4
      */
     @Retention(RetentionPolicy.RUNTIME)
-    @JacksonAnnotationsInside
     public @interface JsonSanitize {
-        @SuppressWarnings("javadoc")
-        boolean value() default true;
+        //
     }
 
     /**
@@ -227,9 +224,7 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
      * @since 4.4
      */
     @Retention(RetentionPolicy.RUNTIME)
-    @JacksonAnnotationsInside
     public @interface JsonSanitizeIgnore {
-        @SuppressWarnings("javadoc")
-        boolean value() default true;
+        //
     }
 }
