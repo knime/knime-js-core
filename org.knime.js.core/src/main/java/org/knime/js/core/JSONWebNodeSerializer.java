@@ -49,8 +49,6 @@
 package org.knime.js.core;
 
 import java.io.IOException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,7 +103,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private static final long serialVersionUID = 3247239167142L;
 
     // default empty
-    private final List<String> m_allowNodes = getAllowedNodes();
+    static final List<String> m_allowNodes = getAllowedNodes();
 
     // default empty
     private final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
@@ -209,7 +207,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
             ArrayList::add, ArrayList::addAll);
     }
 
-    private static List<String> getAllowedNodes() {
+    static List<String> getAllowedNodes() {
         String allowedNodesLocation = System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
         if (StringUtils.isNotBlank(allowedNodesLocation)) {
             try {

@@ -119,6 +119,9 @@ public class JSONWebNodeSerializerTest {
             System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
                 allowedNodesConfig.getCanonicalPath());
 
+            // needed for testing only to manually read and update the static configuration field
+            updateStaticAllowedNodes();
+
             try (StringWriter stringWriter = new StringWriter();) {
                 JSONViewContent.createObjectMapper().writeValue(stringWriter, getNamedMockWebNode(nodeName));
                 assertTrue(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
@@ -193,6 +196,9 @@ public class JSONWebNodeSerializerTest {
 
             serializer = new JSONWebNodeSerializer(null, null);
 
+            // needed for testing only to manually read and update the static configuration field
+            updateStaticAllowedNodes();
+
             List<String> sysAllowedNodes = serializer.getAllowNodes();
 
             assertFalse(sysAllowedNodes.isEmpty());
@@ -207,6 +213,11 @@ public class JSONWebNodeSerializerTest {
                 allowedNodesConfig.delete();
             }
         }
+    }
+
+    private static void updateStaticAllowedNodes() {
+        JSONWebNodeSerializer.m_allowNodes.clear();
+        JSONWebNodeSerializer.m_allowNodes.addAll(JSONWebNodeSerializer.getAllowedNodes());
     }
 
     private static JSONWebNode getNamedMockWebNode(final String nodeName) {
