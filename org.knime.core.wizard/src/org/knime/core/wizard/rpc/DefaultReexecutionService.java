@@ -71,20 +71,25 @@ import com.fasterxml.jackson.databind.util.RawValue;
  */
 public final class DefaultReexecutionService implements ReexecutionService {
 
-    private SingleNodeContainer m_container;
+    private final SingleNodeContainer m_container;
 
-    private CompositeViewPageManager m_cvm;
+    private final CompositeViewPageManager m_cvm;
 
     private NodeID m_resetNodeId;
+
+    private final Runnable m_reexecuteTriggeredCallback;
 
     /**
      * @param container
      * @param cvm
+     * @param reexecuteTriggeredCallback will be called whenever a re-execution is triggered, can be <code>null</code>
      *
      */
-    public DefaultReexecutionService(final SingleNodeContainer container, final CompositeViewPageManager cvm) {
+    public DefaultReexecutionService(final SingleNodeContainer container, final CompositeViewPageManager cvm,
+        final Runnable reexecuteTriggeredCallback) {
         m_container = container;
         m_cvm = cvm;
+        m_reexecuteTriggeredCallback = reexecuteTriggeredCallback;
     }
 
     /**
@@ -93,10 +98,12 @@ public final class DefaultReexecutionService implements ReexecutionService {
     @Override
     public PageContainer reexecutePage(final String nodeID, final Map<String, String> viewValues) {
         // validate view values and re-execute
+        if (m_reexecuteTriggeredCallback != null) {
+            m_reexecuteTriggeredCallback.run();
+        }
         NodeID resetNodeId = NodeID.fromString(nodeID);
         NodeID containerId = m_container.getID();
         try (WorkflowLock lock = m_container.getParent().lock()) {
-            // TODO properly respect and set the 'isReexecuteInProgress' flag in SubnodeViewableModel??
             Map<String, ValidationError> validationErrors =
                 m_cvm.applyPartialValuesAndReexecute(viewValues, containerId, resetNodeId);
             if (validationErrors != null && !validationErrors.isEmpty()) {
