@@ -50,6 +50,7 @@ import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -828,17 +829,18 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         @Override
         public Object function(final Object[] arguments) {
-            // TODO check args
             WizardNode<REP, VAL> model = getModel();
             if (model instanceof RpcServerFactory && m_rpcServer == null) {
                 m_rpcServer = ((RpcServerFactory)model).createRpcServer(model);
             }
             if (m_rpcServer != null) {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
-                try {
-                    m_rpcServer.handleRequest(IOUtils.toInputStream((String)arguments[0], StandardCharsets.UTF_8), out);
+                try (InputStream in = IOUtils.toInputStream((String)arguments[0], StandardCharsets.UTF_8)) {
+                    m_rpcServer.handleRequest(in, out);
                 } catch (IOException e) {
-                    // TODO
+                    LOGGER.error("A problem occurred while handling rpc request.", e);
+                    return "A problem occurred while handling rpc request: " + e.getMessage()
+                        + ". See log for more details.";
                 }
                 return new String(out.toByteArray(), StandardCharsets.UTF_8);
             }

@@ -8,4 +8,7 @@ Automatic-Module-Name: org.knime.core.wizard.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.junit;bundle-version="[4.12.0,5.0.0)",
- org.knime.testing;bundle-version="[4.0.0,5.0.0)"
+ org.knime.testing;bundle-version="[4.0.0,5.0.0)",
+ com.fasterxml.jackson.module.jackson-module-mrbean;bundle-version="[2.11.0,3.0.0)",
+ org.awaitility;bundle-version="[3.0.0,4.0.0)",
+ org.hamcrest.library;bundle-version="[1.3.0,2.0.0)"

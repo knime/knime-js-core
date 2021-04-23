@@ -19,6 +19,9 @@ public interface ReexecutionService {
      */
     PageContainer reexecutePage(String nodeID, Map<String, String> viewValues);
 
+    /**
+     * @return the re-executed or re-executing page
+     */
     PageContainer getPage();
 
 }

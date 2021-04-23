@@ -50,22 +50,24 @@ package org.knime.core.wizard.rpc;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.util.RawValue;
+
 /**
  * Default implementation of {@link PageContainer}.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class DefaultPageContainer implements PageContainer {
+public final class DefaultPageContainer implements PageContainer {
 
-    private String m_page;
+    private final RawValue m_page;
 
-    private List<String> m_resetNodes;
+    private final List<String> m_resetNodes;
 
     /**
      * @param page
      * @param resetNodes
      */
-    public DefaultPageContainer(final String page, final List<String> resetNodes) {
+    public DefaultPageContainer(final RawValue page, final List<String> resetNodes) {
         m_page = page;
         m_resetNodes = resetNodes;
     }
@@ -82,7 +84,7 @@ public class DefaultPageContainer implements PageContainer {
      * {@inheritDoc}
      */
     @Override
-    public String getPage() {
+    public RawValue getPage() {
         return m_page;
     }
 

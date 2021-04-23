@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.knime.js.core.JSONWebNodePage;
 
+import com.fasterxml.jackson.databind.util.RawValue;
+
 /**
  * Object that contains the wizard page and some additional information.
  *
@@ -13,15 +15,15 @@ public interface PageContainer {
 
     /**
      * @return the nodes that have been reset or <code>null</code> if the component is in executed state and
-     *         {@link #page()} returns page content
+     *         {@link #getPage()} returns page content
      */
     List<String> getResetNodes();
 
     /**
-     * Returns the actual page content, i.e. as serialized {@link JSONWebNodePage}-object.
+     * Returns the actual page content, i.e. as json-serialized {@link JSONWebNodePage}-object.
      *
      * @return the actual page content or <code>null</code> if the component is in execution
      */
-    String getPage();
+    RawValue getPage();
 
 }

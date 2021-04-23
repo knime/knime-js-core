@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.web.ValidationError;
@@ -61,12 +62,14 @@ import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.wizard.CompositeViewPageManager;
 import org.knime.js.core.JSONWebNodePage;
 
+import com.fasterxml.jackson.databind.util.RawValue;
+
 /**
  * Default implementation of {@link ReexecutionService}.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class DefaultReexecutionService implements ReexecutionService {
+public final class DefaultReexecutionService implements ReexecutionService {
 
     private SingleNodeContainer m_container;
 
@@ -97,9 +100,9 @@ public class DefaultReexecutionService implements ReexecutionService {
             Map<String, ValidationError> validationErrors =
                 m_cvm.applyPartialValuesAndReexecute(viewValues, containerId, resetNodeId);
             if (validationErrors != null && !validationErrors.isEmpty()) {
-                // TODO
                 throw new IllegalStateException(
-                    "Unable to re-execute component with current page values. Please check the workflow for errors.");
+                    "Unable to re-execute component with current page values. Validation errors: " + validationErrors
+                        .values().stream().map(ValidationError::getError).collect(Collectors.joining(";")));
             }
         }
 
@@ -110,7 +113,6 @@ public class DefaultReexecutionService implements ReexecutionService {
             try {
                 page = filterAndGetSerializedJSONWebNodePage(resetNodes);
             } catch (IOException ex) {
-                // TODO
                 throw new IllegalStateException(ex);
             }
             resetNodes = null;
@@ -119,7 +121,7 @@ public class DefaultReexecutionService implements ReexecutionService {
             page = null;
             m_resetNodeId = resetNodeId;
         }
-        return new DefaultPageContainer(page, resetNodes);
+        return new DefaultPageContainer(new RawValue(page), resetNodes);
     }
 
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
@@ -139,10 +141,9 @@ public class DefaultReexecutionService implements ReexecutionService {
             CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
             String page =
                 filterAndGetSerializedJSONWebNodePage(m_cvm.getDownstreamNodes(m_container.getID(), m_resetNodeId));
-            return new DefaultPageContainer(page, null);
+            return new DefaultPageContainer(new RawValue(page), null);
         } catch (IOException ex) {
-            // TODO
-            throw new IllegalStateException(ex);
+            throw new IllegalStateException("Problem occurred while serializing page", ex);
         }
     }
 
