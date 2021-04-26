@@ -98,6 +98,7 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
     private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
     private static final String CHROME = "org.knime.ext.seleniumdrivers.multios.ChromeImageGenerator";
     private static final String CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
+    private static final String CEF = "org.knime.js.cef.headless.CEFImageGenerator";
     private static final String IMAGE_GENERATOR_CLASS = "imageGeneratorClass";
 
 
@@ -185,6 +186,9 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
             // try loading defaults
             if (JSCorePlugin.isChromiumInstalled()) {
                 viewClass = getViewClassByReflection(CHROMIUM, configurationElements);
+            }
+            if( viewClass == null) {
+                viewClass = getViewClassByReflection(CEF, configurationElements);
             }
             if (viewClass == null) {
                 LOGGER.error("Headless Chromium could not be initialized as default browser for image "
