@@ -115,8 +115,10 @@ public class TestReexecutionService extends WorkflowTestCase {
             PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
-            System.out.println();
         });
+        res = service.getPage();
+        assertThat(res.getPage().rawValue().toString(), containsString("834567"));
+        assertThat(res.getResetNodes(), is(nullValue()));
 
         // test re-execution with validation error
         Map<String, String> viewValues2 = Map.of("5:0:7",

@@ -77,6 +77,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private NodeID m_resetNodeId;
 
+    private List<String> m_resetNodes;
+
     private final Runnable m_reexecuteTriggeredCallback;
 
     /**
@@ -114,21 +116,21 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
 
         // create response
-        List<String> resetNodes = m_cvm.getDownstreamNodes(containerId, resetNodeId);
+        m_resetNodes = m_cvm.getDownstreamNodes(containerId, resetNodeId);
         String page;
         if (m_container.getNodeContainerState().isExecuted()) {
             try {
-                page = filterAndGetSerializedJSONWebNodePage(resetNodes);
+                page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
             } catch (IOException ex) {
                 throw new IllegalStateException(ex);
             }
-            resetNodes = null;
+            m_resetNodes = null;
             m_resetNodeId = resetNodeId;
         } else {
             page = null;
             m_resetNodeId = resetNodeId;
         }
-        return new DefaultPageContainer(new RawValue(page), resetNodes);
+        return new DefaultPageContainer(new RawValue(page), m_resetNodes);
     }
 
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
@@ -144,14 +146,20 @@ public final class DefaultReexecutionService implements ReexecutionService {
      */
     @Override
     public PageContainer getPage() {
-        try {
+        String page;
+        if (m_container.getNodeContainerState().isExecuted()) {
             CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
-            String page =
-                filterAndGetSerializedJSONWebNodePage(m_cvm.getDownstreamNodes(m_container.getID(), m_resetNodeId));
-            return new DefaultPageContainer(new RawValue(page), null);
-        } catch (IOException ex) {
-            throw new IllegalStateException("Problem occurred while serializing page", ex);
+            try {
+                page =
+                    filterAndGetSerializedJSONWebNodePage(m_cvm.getDownstreamNodes(m_container.getID(), m_resetNodeId));
+            } catch (IOException ex) {
+                throw new IllegalStateException("Problem occurred while serializing page", ex);
+            }
+            m_resetNodes = null;
+        } else {
+            page = null;
         }
+        return new DefaultPageContainer(new RawValue(page), m_resetNodes);
     }
 
 }
