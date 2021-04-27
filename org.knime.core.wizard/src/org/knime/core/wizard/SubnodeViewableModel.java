@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
@@ -117,7 +118,12 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> m_view;
     private NodeStateChangeListener m_nodeStateChangeListener;
 
-    private boolean m_ignoreNodeStateChangesWhileExecuting = false;
+    /*
+     * Atomic to prevent race conditions with the async behaviour of the non-SWT bundled Chromium BrowserFunction-equivalent
+     * (comet actions). We can use regular boolean once the bundled Chromium extension is no longer supported and CEF is the
+     * official KAP browser.
+     */
+    private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
 
     /**
      * Creates a new instance of this viewable model
@@ -139,13 +145,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
 
     /** Called by state listener on subnode container. */
     private void onNodeStateChange() {
-        if (m_ignoreNodeStateChangesWhileExecuting) {
-            if (!m_container.getNodeContainerState().isExecutionInProgress()) {
-                m_ignoreNodeStateChangesWhileExecuting = false;
-            }
-            return;
-        }
-
         try (WorkflowLock lock = m_container.getParent().lock()) {
             NodeContainerState nodeContainerState = m_container.getNodeContainerState();
 
@@ -153,30 +152,33 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
             //  - no re-exec is ongoing
             //  - no irrelevant pre-exec -> queue -> post-exec step is ongoing.
             //    (ideally this should be removed but those state changes on the SNC are not protected by the workflow lock)
-            boolean isCallModelChanged = true;
-            SubnodeViewValue v = getViewValue();
-            if (nodeContainerState.isExecuted()) {
-                if (v == null) {
-                    // node was just executed, i.e. view is open and user executes via "run" button in main application
-                    try {
-                        createPageAndValue();
-                        assert m_value != null : "value supposed to be non-null on executed node";
-                    } catch (IOException e) {
-                        LOGGER.error("Creating view failed: " + e.getMessage(), e);
-                        reset();
+            if (!m_isReexecuteInProgress.get() && !nodeContainerState.isExecutionInProgress()) {
+
+                boolean isCallModelChanged = true;
+                SubnodeViewValue v = getViewValue();
+                if (nodeContainerState.isExecuted()) {
+                    if (v == null) {
+                        // node was just executed, i.e. view is open and user executes via "run" button in main application
+                        try {
+                            createPageAndValue();
+                            assert m_value != null : "value supposed to be non-null on executed node";
+                        } catch (IOException e) {
+                            LOGGER.error("Creating view failed: " + e.getMessage(), e);
+                            reset();
+                        }
+                    } else {
+                        // node was 're-executed', i.e. user clicked 'apply' button in view and subsequent
+                        // reset->configured->executing events were swallowed as part of m_isReexecutionInProgress
+                        if (m_view != null && v.equals(m_view.getLastRetrievedValue())) {
+                            isCallModelChanged = false;
+                        }
                     }
-                } else {
-                    // node was 're-executed', i.e. user clicked 'apply' button in view and subsequent
-                    // reset->configured->executing events were swallowed as part of m_isReexecutionInProgress
-                    if (m_view != null && v.equals(m_view.getLastRetrievedValue())) {
-                        isCallModelChanged = false;
-                    }
+                } else if (v != null) {
+                    reset(); // sets #getViewValue to null
                 }
-            } else if (v != null) {
-                reset(); // sets #getViewValue to null
-            }
-            if (m_view != null && isCallModelChanged) {
-                m_view.callViewableModelChanged();
+                if (m_view != null && isCallModelChanged) {
+                    m_view.callViewableModelChanged();
+                }
             }
         }
     }
@@ -236,11 +238,12 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         try {
             CheckUtils.checkState(m_container.getNodeContainerState().isExecuted(),
                 "Node needs to be in executed state to apply new view values.");
-            m_ignoreNodeStateChangesWhileExecuting = true;
+            m_isReexecuteInProgress.set(true);
             try (WorkflowLock lock = m_container.getParent().lock()) {
                 m_spm.applyValidatedValuesAndExecute(value.getViewValues(), m_container.getID(), useAsDefault);
                 m_value = value;
             } finally {
+                m_isReexecuteInProgress.set(false);
                 NodeContainerState state = m_container.getNodeContainerState();
                 if (state.isExecuted()) {
                     // the framework refused to reset the node (because there are downstream nodes still executing);
@@ -400,8 +403,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     @Override
     public RpcSingleServer<ReexecutionService> createRpcServer(final SubnodeViewableModel target) {
-        return new JsonRpcSingleServer<>(
-            new DefaultReexecutionService(m_container, m_spm, () -> m_ignoreNodeStateChangesWhileExecuting = true));
+        return new JsonRpcSingleServer<>(new DefaultReexecutionService(m_container, m_spm,
+            () -> m_isReexecuteInProgress.set(true), () -> m_isReexecuteInProgress.set(false)));
     }
 
     /**

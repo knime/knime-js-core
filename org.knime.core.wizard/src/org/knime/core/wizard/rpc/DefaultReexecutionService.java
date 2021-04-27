@@ -79,19 +79,22 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private List<String> m_resetNodes;
 
-    private final Runnable m_reexecuteTriggeredCallback;
+    private final Runnable m_onReexecutionStart;
+
+    private final Runnable m_onReexecutionEnd;
 
     /**
      * @param container
      * @param cvm
-     * @param reexecuteTriggeredCallback will be called whenever a re-execution is triggered, can be <code>null</code>
-     *
+     * @param onReexecutionStart will be called whenever a re-execution is triggered, can be <code>null</code>
+     * @param onReexecutionEnd will be called whenever a re-execution finishes, can be <code>null</code>
      */
     public DefaultReexecutionService(final SingleNodeContainer container, final CompositeViewPageManager cvm,
-        final Runnable reexecuteTriggeredCallback) {
+        final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
         m_container = container;
         m_cvm = cvm;
-        m_reexecuteTriggeredCallback = reexecuteTriggeredCallback;
+        m_onReexecutionStart = onReexecutionStart;
+        m_onReexecutionEnd = onReexecutionEnd;
     }
 
     /**
@@ -99,10 +102,10 @@ public final class DefaultReexecutionService implements ReexecutionService {
      */
     @Override
     public PageContainer reexecutePage(final String nodeID, final Map<String, String> viewValues) {
-        // validate view values and re-execute
-        if (m_reexecuteTriggeredCallback != null) {
-            m_reexecuteTriggeredCallback.run();
+        if (m_onReexecutionStart != null) {
+            m_onReexecutionStart.run();
         }
+        // validate view values and re-execute
         NodeID resetNodeId = NodeID.fromString(nodeID);
         NodeID containerId = m_container.getID();
         try (WorkflowLock lock = m_container.getParent().lock()) {
@@ -129,6 +132,9 @@ public final class DefaultReexecutionService implements ReexecutionService {
         } else {
             page = null;
             m_resetNodeId = resetNodeId;
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
         }
         return new DefaultPageContainer(new RawValue(page), m_resetNodes);
     }
@@ -158,6 +164,9 @@ public final class DefaultReexecutionService implements ReexecutionService {
             m_resetNodes = null;
         } else {
             page = null;
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
         }
         return new DefaultPageContainer(new RawValue(page), m_resetNodes);
     }
