@@ -88,8 +88,10 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.node.workflow.NodeContext;
 import org.knime.core.rpc.RpcServer;
 import org.knime.core.rpc.RpcServerFactory;
+import org.knime.core.ui.node.workflow.NodeContainerUI;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
@@ -617,8 +619,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return evaluateAsync(evalCode, VIEW_VALUE, EMPTY_OBJECT_STRING, warnMessage);
     }
 
-    private boolean isExecuted() {
-        return m_nodeContext.getNodeContainer().getNodeContainerState().isExecuted();
+    private static boolean isExecuted(final NodeContext context) {
+        NodeContainerUI nc = context.getContextObjectForClass(NodeContainerUI.class).orElse(null);
+        return nc != null && nc.getNodeContainerState().isExecuted();
     }
 
     /**
@@ -636,7 +639,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      */
     private <O> O evaluateAsync(final String evalCode, final String referenceObject, final O defaultValue,
         final String warnMessage) {
-        if (!isExecuted()) {
+        if (m_nodeContext != null && !isExecuted(m_nodeContext)) {
             return defaultValue;
         }
         Display display = getDisplay();
