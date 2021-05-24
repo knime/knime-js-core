@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: KNIME Wizard Execution
 Bundle-SymbolicName: org.knime.core.wizard;singleton:=true
-Bundle-Version: 4.3.1.qualifier
+Bundle-Version: 4.3.3.qualifier
 Bundle-Activator: org.knime.core.wizard.WizardPlugin
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Export-Package: org.knime.core.wizard
