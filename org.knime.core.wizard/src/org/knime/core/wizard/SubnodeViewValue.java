@@ -88,6 +88,8 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 @JsonDeserialize(using = SubnodeViewValue.CustomDeserializer.class)
 public class SubnodeViewValue extends JSONViewContent {
 
+    private static final String CLASS_KEY = "@class";
+
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewValue.class);
 
     private Map<String, String> m_viewValues = new HashMap<>();
@@ -132,21 +134,24 @@ public class SubnodeViewValue extends JSONViewContent {
         if (obj.getClass() != getClass()) {
             return false;
         }
-        SubnodeViewValue other = (SubnodeViewValue)obj;
-        if (!m_viewValues.keySet().equals(other.m_viewValues.keySet())) {
-            return false;
-        }
         EqualsBuilder builder = new EqualsBuilder();
         ObjectMapper mapper = new ObjectMapper();
+        SubnodeViewValue other = (SubnodeViewValue)obj;
         for (String key : m_viewValues.keySet()) {
             try {
-                // try deserializing and comparing generic JSON objects
-                JsonNode first = mapper.readTree(m_viewValues.get(key));
-                JsonNode second = mapper.readTree(other.m_viewValues.get(key));
-                // the following would be better but concrete view classes might not be visible here
-                /*JSONViewContent first = mapper.readValue(m_viewValues.get(key), JSONViewContent.class);
-                JSONViewContent second = mapper.readValue(other.m_viewValues.get(key), JSONViewContent.class);*/
-                builder.append(first, second);
+                Map<String, JsonNode> localValueMap = mapWithoutClass(mapper.readTree(m_viewValues.get(key)));
+                // Check if the incoming object returned a value for the nodeId key.
+                if (other.m_viewValues.containsKey(key)) {
+                    Map<String, JsonNode> otherValueMap = mapWithoutClass(mapper.readTree(other.m_viewValues.get(key)));
+                    builder.append(localValueMap, otherValueMap);
+                } else {
+                    // Check for "false" inequality caused by a missing node view value. If the local value only contains a
+                    // "@class" attribute (and is empty after removing that), we can assume the missing view value was expected.
+                    if (!localValueMap.isEmpty()) {
+                        throw new IllegalArgumentException(
+                            "Missing client-side view value for a node where one was expected (non-output).");
+                    }
+                }
             } catch (Exception e) {
                 LOGGER.debug("Can't compare JsonNode in #equals", e);
                 //compare strings on exception
@@ -164,6 +169,24 @@ public class SubnodeViewValue extends JSONViewContent {
         return new HashCodeBuilder()
                 .append(m_viewValues)
                 .toHashCode();
+    }
+
+    /**
+     *
+     * Create a map from a JsonNode while removing the "@class" attribute.
+     *
+     * @param node the JsonNode to map.
+     * @return a map (depth of 1) of the provided JsonNode with the "@class" property removed.
+     */
+    private static Map<String, JsonNode> mapWithoutClass(final JsonNode node) {
+        Map<String, JsonNode> nodeMap = new HashMap<>();
+        node.fields().forEachRemaining(entry -> {
+            String key = entry.getKey();
+            if (!CLASS_KEY.contentEquals(key)) {
+                nodeMap.put(key, entry.getValue());
+            }
+        });
+        return nodeMap;
     }
 
     private static class CustomSerializer extends StdSerializer<SubnodeViewValue> {
