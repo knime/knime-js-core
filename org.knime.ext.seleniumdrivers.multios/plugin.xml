@@ -5,7 +5,7 @@
          point="org.knime.core.WizardNodeView">
       <wizardNodeView
             description="This option uses the internal Chromium browser to display a node view."
-            name="Bundled Chromium Browser (version 83)"
+            name="Bundled Chromium Browser (version 91)"
             viewClass="org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView">
       </wizardNodeView>
    </extension>
@@ -13,7 +13,7 @@
          point="org.knime.js.core.headlessBrowsers">
       <headlessBrowser
             imageGeneratorClass="org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator"
-            name="Bundled Headless Chromium (version 83)">
+            name="Bundled Headless Chromium (version 91)">
       </headlessBrowser>
    </extension>
 
