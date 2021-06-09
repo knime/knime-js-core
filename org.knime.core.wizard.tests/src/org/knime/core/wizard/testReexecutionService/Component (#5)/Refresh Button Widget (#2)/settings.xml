@@ -12,7 +12,7 @@
     </config>
     <entry key="customDescription" type="xstring" isnull="true" value=""/>
     <entry key="state" type="xstring" value="CONFIGURED"/>
-    <entry key="factory" type="xstring" value="org.knime.js.base.node.widget.reactive.refresh.RefreshButtonWidgetNodeFactory"/>
+    <entry key="factory" type="xstring" value="org.knime.js.base.node.widget.reexecution.refresh.RefreshButtonWidgetNodeFactory"/>
     <entry key="node-name" type="xstring" value="Refresh Button Widget"/>
     <entry key="node-bundle-name" type="xstring" value="KNIME Quick Form Nodes"/>
     <entry key="node-bundle-symbolic-name" type="xstring" value="org.knime.js.quickforms"/>
