@@ -119,7 +119,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
 
         // create response
-        m_resetNodes = m_cvm.getDownstreamNodes(containerId, resetNodeId);
+        m_resetNodes = m_cvm.getSuccessorNodeIDSuffixes(containerId, resetNodeId);
         String page;
         if (m_container.getNodeContainerState().isExecuted()) {
             try {
@@ -157,7 +157,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
             CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
             try {
                 page =
-                    filterAndGetSerializedJSONWebNodePage(m_cvm.getDownstreamNodes(m_container.getID(), m_resetNodeId));
+                    filterAndGetSerializedJSONWebNodePage(m_cvm.getSuccessorNodeIDSuffixes(m_container.getID(), m_resetNodeId));
             } catch (IOException ex) {
                 throw new IllegalStateException("Problem occurred while serializing page", ex);
             }
