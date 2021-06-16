@@ -59,11 +59,12 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.wizard.ClientValueComparator;
+import org.knime.core.node.wizard.WebViewContentComparator;
 import org.knime.js.core.JSONViewContent;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,11 +88,13 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
  */
 @JsonSerialize(using = SubnodeViewValue.CustomSerializer.class)
 @JsonDeserialize(using = SubnodeViewValue.CustomDeserializer.class)
-public class SubnodeViewValue extends JSONViewContent implements ClientValueComparator {
+public class SubnodeViewValue extends JSONViewContent implements WebViewContentComparator<JSONViewContent> {
 
     private static final String CLASS_KEY = "@class";
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewValue.class);
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private Map<String, String> m_viewValues = new HashMap<>();
 
@@ -123,43 +126,48 @@ public class SubnodeViewValue extends JSONViewContent implements ClientValueComp
 
     /**
      * {@inheritDoc}
+     *
+     * @since 4.4
      */
     @Override
-    public boolean compareViewValues(final Object obj) {
-        if (obj == null) {
-            return false;
-        }
+    public boolean compareViewValues(final JSONViewContent obj) { // NOSONAR
         if (obj == this) {
             return true;
         }
-        if (obj.getClass() != getClass()) {
+        if (!(obj instanceof SubnodeViewValue)) {
             return false;
         }
         EqualsBuilder builder = new EqualsBuilder();
-        ObjectMapper mapper = new ObjectMapper();
+
         Map<String, String> referenceValues = m_viewValues;
         Map<String, String> checkValues = ((SubnodeViewValue)obj).getViewValues();
         if (referenceValues == null || checkValues == null) {
-            return referenceValues == checkValues;
+            return referenceValues == null && checkValues == null;
         }
         if (checkValues.size() > m_viewValues.size()) {
             referenceValues = checkValues;
             checkValues = m_viewValues;
         }
-        for (String key : referenceValues.keySet()) {
+        for (Entry<String, String> entry : referenceValues.entrySet()) {
+            String refKey = entry.getKey();
+            String refValue = entry.getValue();
             try {
-                JsonNode checkNode = mapper.readTree(checkValues.get(key));
-                JsonNode referenceNode = mapper.readTree(referenceValues.get(key));
+                if (refValue == null || !checkValues.containsKey(refKey)) {
+                    continue;
+                }
+                JsonNode checkNode = MAPPER.readTree(checkValues.get(refKey));
+                JsonNode referenceNode = MAPPER.readTree(refValue);
                 referenceNode.fields().forEachRemaining(valueEntry -> {
                     String nodeValueKey = valueEntry.getKey();
-                    if (nodeValueKey != CLASS_KEY && checkNode.has(nodeValueKey)) {
+                    // Check for empty value representations (e.g. from output nodes or nodes w/o updated value
+                    if (!CLASS_KEY.equals(nodeValueKey) && checkNode.has(nodeValueKey)) {
                         builder.append(valueEntry.getValue(), checkNode.get(nodeValueKey));
                     }
                     // TODO: AP-16937 handle additional edge-cases here
                 });
-            } catch (Exception e) {
-                LOGGER.debug("Cannot parse node values for comparison. Using fallback direct string comparison.");
-                builder.append(referenceValues.get(key), checkValues.get(key));
+            } catch (JsonProcessingException e) {
+                LOGGER.debug("Cannot parse node values for comparison. Using fallback direct string comparison.", e);
+                builder.append(refValue, checkValues.get(refKey));
             }
         }
         return builder.isEquals();

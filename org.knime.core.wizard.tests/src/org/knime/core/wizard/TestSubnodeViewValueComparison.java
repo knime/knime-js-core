@@ -84,6 +84,28 @@ public class TestSubnodeViewValueComparison {
     }
 
     @Test
+    public void testExtraNodeComparison() {
+        SubnodeViewValue defaultValue = new SubnodeViewValue();
+        SubnodeViewValue testValue = new SubnodeViewValue();
+        defaultValue.setViewValues(getValueMap(null));
+        testValue.setViewValues(getValueMap(null));
+        testValue.getViewValues().put("3", "{\"number\": 1}");
+        assertTrue(defaultValue.compareViewValues(testValue));
+        assertTrue(testValue.compareViewValues(defaultValue));
+    }
+
+    @Test
+    public void testEmptyReferenceValueComparison() {
+        SubnodeViewValue defaultValue = new SubnodeViewValue();
+        SubnodeViewValue testValue = new SubnodeViewValue();
+        defaultValue.setViewValues(getValueMap(null));
+        testValue.setViewValues(getValueMap(null));
+        testValue.getViewValues().replace("1", "null");
+        assertTrue(defaultValue.compareViewValues(testValue));
+        assertTrue(testValue.compareViewValues(defaultValue));
+    }
+
+    @Test
     public void testEmptyValueComparison() {
         SubnodeViewValue defaultValue = new SubnodeViewValue();
         SubnodeViewValue testValue = new SubnodeViewValue();
@@ -119,7 +141,7 @@ public class TestSubnodeViewValueComparison {
         SubnodeViewValue testValue = new SubnodeViewValue();
         defaultValue.setViewValues(getValueMap(null));
         Map<String, String> valueMap = new HashMap<String, String>();
-        valueMap.put("string", "1");
+        valueMap.put("1", "string");
         testValue.setViewValues(valueMap);
         assertFalse(defaultValue.compareViewValues(testValue));
         assertFalse(testValue.compareViewValues(defaultValue));
