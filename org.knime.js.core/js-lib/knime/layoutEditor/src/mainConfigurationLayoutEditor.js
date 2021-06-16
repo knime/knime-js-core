@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import App from './components/AppConfigurationLayoutEditor';
 import * as storeConfig from './store/configurationLayoutEditor';
+import showWarning from './util/showWarning';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
@@ -48,5 +49,9 @@ const app = new Vue({
 
 // wait until DOM is ready because AP will load this app in the HTML head
 document.addEventListener('DOMContentLoaded', () => {
-    app.$mount(document.body.appendChild(document.createElement('div')));
+    if (typeof window.pushLayout === 'function') {
+        app.$mount(document.body.appendChild(document.createElement('div')));
+    } else {
+        showWarning();
+    }
 });

@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 
 import App from './components/AppLayoutEditor';
 import * as storeConfig from './store/layoutEditor';
+import showWarning from './util/showWarning';
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
@@ -10,6 +11,7 @@ Vue.use(Vuex);
 
 // detect KNIME AP debug mode and make it available in all components
 Vue.prototype.$debug = Boolean(window.Firebug);
+
 
 const app = new Vue({
     store: new Vuex.Store(storeConfig),
@@ -53,5 +55,11 @@ const app = new Vue({
 
 // wait until DOM is ready because AP will load this app in the HTML head
 document.addEventListener('DOMContentLoaded', () => {
-    app.$mount(document.body.appendChild(document.createElement('div')));
+    if (typeof window.pushLayout === 'function') {
+        app.$mount(document.body.appendChild(document.createElement('div')));
+    } else {
+        // If the function is not registered something went wrong. Show an error to the user with the link to the FAQ
+        // Probably related to https://knime-com.atlassian.net/browse/AP-16763
+        showWarning();
+    }
 });
