@@ -14,6 +14,12 @@ import com.fasterxml.jackson.databind.util.RawValue;
 public interface PageContainer {
 
     /**
+     * @return the nodes that have been executed or an empty list <code>null</code> if the successor node
+     *      are all reset
+     */
+    List<String> getExecutedNodes();
+
+    /**
      * @return the nodes that have been reset or <code>null</code> if the component is in executed state and
      *         {@link #getPage()} returns page content
      */
