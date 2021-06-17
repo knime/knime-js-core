@@ -63,13 +63,24 @@ public final class DefaultPageContainer implements PageContainer {
 
     private final List<String> m_resetNodes;
 
+    private final List<String> m_executedNodes;
+
     /**
      * @param page
      * @param resetNodes
      */
-    public DefaultPageContainer(final RawValue page, final List<String> resetNodes) {
+    public DefaultPageContainer(final RawValue page, final List<String> resetNodes, final List<String> executedNodes) {
         m_page = page;
         m_resetNodes = resetNodes;
+        m_executedNodes = executedNodes;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getExecutedNodes() {
+        return m_executedNodes;
     }
 
     /**
