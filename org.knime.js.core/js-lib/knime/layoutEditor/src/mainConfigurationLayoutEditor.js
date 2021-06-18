@@ -52,6 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof window.pushLayout === 'function') {
         app.$mount(document.body.appendChild(document.createElement('div')));
     } else {
+        // If the function is not registered something went wrong. Show an error to the user with the link to the FAQ
+        // Probably related to https://knime-com.atlassian.net/browse/AP-16763
         showWarning();
     }
 });

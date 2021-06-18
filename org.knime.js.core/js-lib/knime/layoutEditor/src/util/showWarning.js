@@ -1,8 +1,8 @@
 export default () => {
-	// If the function is not registered something went wrong. Show an error to the user with the link to the FAQ
+	// This methods displays a warning to the user that the layout/configuration editor does not properly work.
 	// Probably related to https://knime-com.atlassian.net/browse/AP-16763
 	let containerDiv = document.createElement('div');
-	containerDiv.innerHTML = 'The Layout/Configuration Editor has experienced a problem. If you are on a Linux system the following FAQ might help (https://www.knime.com/faq#q40).';
+	containerDiv.innerHTML = 'The Layout/Configuration Editor has experienced a problem. The following FAQ might help (https://www.knime.com/faq#q7). You can still use the advanced tab to set the layout.';
 	containerDiv.classList.add('alert');
 	containerDiv.classList.add('alert-warning');
 	// Add ability to select text in order to copy the link
