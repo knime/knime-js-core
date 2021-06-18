@@ -181,7 +181,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
             }*/
             if (!viewValues.isEmpty()) {
                 CompositeViewController sec = getController(containerNodeId);
-                sec.loadValuesIntoPage(viewValues, false, useAsDefault);
+                sec.loadValuesIntoPage(viewValues, false, useAsDefault, null);
             }
         }
     }
@@ -249,16 +249,18 @@ public class CompositeViewPageManager extends AbstractPageManager {
     }
 
     /**
-     * Utility method to see which downstream nodes will be reset if the provided {@link NodeID} is reset.
+     * Utility method to get the successor nodes of the node denoted by the provided {@link NodeID} (including the
+     * 'start' node itself, too).
      *
      * @param containerNodeId the {@link NodeID} of the composite view/subnode container
-     * @param resetNodeId the {@link NodeID} of the node which will be reset in the composite view
-     * @return a list of downstream wizard view nodes which will be reset and re-executed based on the provided nodeID
-     *         to reset
+     * @param nodeId the {@link NodeID} of the node to get the successors for
+     * @return a list of successor nodes (represented by node id suffices); including the 'start' node (the 'nodeId'
+     *         argument)
+     *
      *
      * @since 4.4
      */
-    public List<String> getDownstreamNodes(final NodeID containerNodeId, final NodeID resetNodeId) {
-        return getController(containerNodeId).getDownstreamNodes(NodeIDSuffix.fromString(resetNodeId.toString()));
+    public List<String> getSuccessorNodeIDSuffixes(final NodeID containerNodeId, final NodeID nodeId) {
+        return getController(containerNodeId).getSuccessorNodeIDSuffixes(NodeIDSuffix.fromString(nodeId.toString()));
     }
 }

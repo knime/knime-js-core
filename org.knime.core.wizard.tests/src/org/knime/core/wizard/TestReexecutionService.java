@@ -49,13 +49,13 @@
 package org.knime.core.wizard;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +110,7 @@ public class TestReexecutionService extends WorkflowTestCase {
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}");
         PageContainer res = service.reexecutePage("2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
-        assertThat(res.getResetNodes(), is(List.of("5:0:3", "5:0:2", "5:0:7")));
+        assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
             PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
