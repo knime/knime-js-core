@@ -7,9 +7,9 @@ Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.knime.core;bundle-version="[4.0.0,5.0.0)",
  com.fasterxml.jackson.core.jackson-core;bundle-version="[2.10.2,3.0.0)",
  org.knime.js.core;bundle-version="[4.2.0,5.0.0)",
- org.eclipse.swt.chromium;bundle-version="[76.0.1,77.0.0)",
  org.knime.js.swt;bundle-version="[4.2.0,5.0.0)",
- org.eclipse.swt;bundle-version="[3.114.0,4.0.0)"
+ org.eclipse.swt;bundle-version="[3.114.0,4.0.0)",
+ com.equo.chromium;bundle-version="[80.0.0,81.0.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: org.knime.js.cef
