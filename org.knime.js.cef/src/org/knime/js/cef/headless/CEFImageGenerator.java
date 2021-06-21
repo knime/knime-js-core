@@ -54,8 +54,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
 
 import org.eclipse.swt.SWTException;
-import org.eclipse.swt.chromium.Browser;
-import org.eclipse.swt.chromium.IBrowser;
 import org.eclipse.swt.widgets.Display;
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionContext;
@@ -67,6 +65,8 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JavaScriptViewCreator;
+
+import com.equo.chromium.wl.IBrowser;
 
 /**
  * Image generator using the chromium embedded framework.
@@ -119,10 +119,7 @@ public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP e
         VAL viewValue = model.getViewValue();
         String initCall = viewCreator.createInitJSViewMethodCall(viewRepresentation, viewValue);
 
-        Display.getDefault().syncExec(() -> {
-            m_browser = Browser.windowless();
-            m_browser.setUrl(new File(viewPath).toURI().toString());
-        });
+        Display.getDefault().syncExec(() -> m_browser = IBrowser.windowless(new File(viewPath).toURI().toString()));
 
         waitForDocumentReady(exec);
 

@@ -52,8 +52,6 @@ import java.util.function.Function;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.ProgressListener;
-import org.eclipse.swt.chromium.Browser;
-import org.eclipse.swt.chromium.BrowserFunction;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -61,6 +59,9 @@ import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.js.swt.wizardnodeview.WizardNodeView;
+
+import com.equo.chromium.swt.Browser;
+import com.equo.chromium.swt.BrowserFunction;
 
 /**
  * Wizard node view implementation using the Chromium Embedded Framework (CEF) as browser.
