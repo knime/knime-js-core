@@ -265,17 +265,19 @@ public class CompositeViewPageManager extends AbstractPageManager {
     }
 
     /**
-     * Utility method to get the executed successor nodes of the node denoted by the provided {@link NodeID} (including the
-     * 'start' node itself, too).
+     * Utility method to get the re-executed successor nodes (only nodes which were reset and no longer pending
+     * re-execution; e.g. finished, failed, deactivated, etc.) of the node denoted by the provided {@link NodeID}
+     * (including the 'start' node itself, too).
      *
      * @param containerNodeId the {@link NodeID} of the composite view/subnode container
-     * @param nodeId the {@link NodeID} of the node to get the executed successors for
-     * @return a list of executed successor nodes (represented by node id suffices); including the 'start' node (the 'nodeId'
-     *         argument)
+     * @param nodeId the {@link NodeID} of the node to get the re-executed successors for
+     * @return a list of re-executed successor nodes (represented by node id suffices); including the 'start' node (the
+     *         'nodeId' argument)
      *
      * @since 4.4
      */
-    public List<String> getExecutedSuccessorNodeIDSuffixes(final NodeID containerNodeId, final NodeID nodeId) {
-        return getController(containerNodeId).getExecutedSuccessorNodeIDSuffixes(NodeIDSuffix.fromString(nodeId.toString()));
+    public List<String> getReexecutedSuccessorNodeIDSuffixes(final NodeID containerNodeId, final NodeID nodeId) {
+        return getController(containerNodeId).getSuccessorNodeIDSuffixes(NodeIDSuffix.fromString(nodeId.toString()),
+            true);
     }
 }
