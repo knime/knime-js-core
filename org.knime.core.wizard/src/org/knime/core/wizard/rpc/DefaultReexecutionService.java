@@ -50,7 +50,7 @@ package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -80,7 +80,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private List<String> m_resetNodes;
 
-    private List<String> m_executedNodes;
+    private List<String> m_reexecutedNodes;
 
     private final Runnable m_onReexecutionStart;
 
@@ -130,18 +130,18 @@ public final class DefaultReexecutionService implements ReexecutionService {
             } catch (IOException ex) {
                 throw new IllegalStateException(ex);
             }
-            m_executedNodes = m_resetNodes;
+            m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
             m_resetNodeId = resetNodeId;
         } else {
             page = null;
             m_resetNodeId = resetNodeId;
-            m_executedNodes = new ArrayList<>();
+            m_reexecutedNodes = Collections.emptyList();
         }
         if (page != null && m_onReexecutionEnd != null) {
             m_onReexecutionEnd.run();
         }
-        return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_executedNodes);
+        return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
     }
 
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
@@ -166,16 +166,16 @@ public final class DefaultReexecutionService implements ReexecutionService {
             } catch (IOException ex) {
                 throw new IllegalStateException("Problem occurred while serializing page", ex);
             }
-            m_executedNodes = m_resetNodes;
+            m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
         } else {
             page = null;
-            m_executedNodes = m_cvm.getExecutedSuccessorNodeIDSuffixes(m_container.getID(), m_resetNodeId);
+            m_reexecutedNodes = m_cvm.getReexecutedSuccessorNodeIDSuffixes(m_container.getID(), m_resetNodeId);
         }
         if (page != null && m_onReexecutionEnd != null) {
             m_onReexecutionEnd.run();
         }
-        return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_executedNodes);
+        return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
     }
 
 }

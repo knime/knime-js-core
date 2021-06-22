@@ -50,6 +50,10 @@ package org.knime.core.wizard.rpc;
 
 import java.util.List;
 
+import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
+import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
+import org.knime.core.wizard.SubnodeViewableModel;
+
 import com.fasterxml.jackson.databind.util.RawValue;
 
 /**
@@ -63,24 +67,30 @@ public final class DefaultPageContainer implements PageContainer {
 
     private final List<String> m_resetNodes;
 
-    private final List<String> m_executedNodes;
+    private final List<String> m_reexecutedNodes;
 
     /**
-     * @param page
-     * @param resetNodes
+     * @param page - {@link WizardPageContent} for the associated {@link SubnodeViewableModel}
+     * @param resetNodes - a list of string {@link NodeIDSuffix} for nodes reset during the current re-execution event
+     *            or null if re-execution is not in progress.
+     * @param reexecutedNodes - a list of string {@link NodeIDSuffix} for nodes that have been reset by a re-execution
+     *            event and are effectively re-executed (no longer pending re-execution; e.g. finished, failed,
+     *            deactivated, etc.) or an empty list if the nodes reset by the re-execution event are still awaiting
+     *            execution.
      */
-    public DefaultPageContainer(final RawValue page, final List<String> resetNodes, final List<String> executedNodes) {
+    public DefaultPageContainer(final RawValue page, final List<String> resetNodes,
+        final List<String> reexecutedNodes) {
         m_page = page;
         m_resetNodes = resetNodes;
-        m_executedNodes = executedNodes;
+        m_reexecutedNodes = reexecutedNodes;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<String> getExecutedNodes() {
-        return m_executedNodes;
+    public List<String> getReexecutedNodes() {
+        return m_reexecutedNodes;
     }
 
     /**

@@ -51,6 +51,7 @@ package org.knime.core.wizard;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
@@ -111,14 +112,17 @@ public class TestReexecutionService extends WorkflowTestCase {
         PageContainer res = service.reexecutePage("2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
+        assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
             PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
+            assertThat(res2.getReexecutedNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
         });
         res = service.getPage();
         assertThat(res.getPage().rawValue().toString(), containsString("834567"));
         assertThat(res.getResetNodes(), is(nullValue()));
+        assertThat(res.getReexecutedNodes(), is(nullValue()));
 
         // test re-execution with validation error
         Map<String, String> viewValues2 = Map.of("5:0:7",
