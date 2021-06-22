@@ -61,10 +61,10 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
+import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 import org.knime.core.node.workflow.WebResourceController;
@@ -265,7 +265,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     private void expandSubnode(final JSONNestedLayout nestedLayout, final SubNodeContainer sub) throws JsonProcessingException, IOException {
         WorkflowManager wfm = sub.getWorkflowManager();
         SubnodeContainerLayoutStringProvider layoutStringProvider = sub.getSubnodeLayoutStringProvider();
-        if (layoutStringProvider.isEmptyLayout()) {
+        if (layoutStringProvider.isEmptyLayout() || layoutStringProvider.isPlaceholderLayout()) {
             // create default layout also for nested subnodes, if there is no layout defined
             @SuppressWarnings("rawtypes")
             Map<NodeID, WizardNode> nestedNodes =
@@ -302,7 +302,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews,
         final NodeID containerID) {
         JSONLayoutPage finalLayout;
-        if (layoutStringProvider.isEmptyLayout()) {
+        if (layoutStringProvider.isEmptyLayout() || layoutStringProvider.isPlaceholderLayout()) {
             finalLayout = new JSONLayoutPage();
             finalLayout.setRows(new ArrayList<JSONLayoutRow>(0));
         } else {
