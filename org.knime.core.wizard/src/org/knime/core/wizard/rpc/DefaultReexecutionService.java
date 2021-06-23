@@ -53,12 +53,16 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.web.ValidationError;
+import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
+import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.wizard.CompositeViewPageManager;
 import org.knime.js.core.JSONWebNodePage;
@@ -72,11 +76,11 @@ import com.fasterxml.jackson.databind.util.RawValue;
  */
 public final class DefaultReexecutionService implements ReexecutionService {
 
-    private final SingleNodeContainer m_container;
+    private final SingleNodeContainer m_page;
 
     private final CompositeViewPageManager m_cvm;
 
-    private NodeID m_resetNodeId;
+    private NodeIDSuffix m_resetNodeIdSuffix;
 
     private List<String> m_resetNodes;
 
@@ -87,14 +91,14 @@ public final class DefaultReexecutionService implements ReexecutionService {
     private final Runnable m_onReexecutionEnd;
 
     /**
-     * @param container
+     * @param page
      * @param cvm
      * @param onReexecutionStart will be called whenever a re-execution is triggered, can be <code>null</code>
      * @param onReexecutionEnd will be called whenever a re-execution finishes, can be <code>null</code>
      */
-    public DefaultReexecutionService(final SingleNodeContainer container, final CompositeViewPageManager cvm,
+    public DefaultReexecutionService(final SingleNodeContainer page, final CompositeViewPageManager cvm,
         final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
-        m_container = container;
+        m_page = page;
         m_cvm = cvm;
         m_onReexecutionStart = onReexecutionStart;
         m_onReexecutionEnd = onReexecutionEnd;
@@ -109,11 +113,11 @@ public final class DefaultReexecutionService implements ReexecutionService {
             m_onReexecutionStart.run();
         }
         // validate view values and re-execute
-        NodeID resetNodeId = NodeID.fromString(nodeID);
-        NodeID containerId = m_container.getID();
-        try (WorkflowLock lock = m_container.getParent().lock()) {
+        NodeIDSuffix resetNodeIdSuffix = NodeIDSuffix.fromString(nodeID);
+        NodeID pageId = m_page.getID();
+        try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =
-                m_cvm.applyPartialValuesAndReexecute(viewValues, containerId, resetNodeId);
+                m_cvm.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeIdSuffix);
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 throw new IllegalStateException(
                     "Unable to re-execute component with current page values. Validation errors: " + validationErrors
@@ -122,9 +126,9 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
 
         // create response
-        m_resetNodes = m_cvm.getSuccessorNodeIDSuffixes(containerId, resetNodeId);
+        m_resetNodes = getSuccessorWizardNodesWithinPage(resetNodeIdSuffix, null);
         String page;
-        if (m_container.getNodeContainerState().isExecuted()) {
+        if (m_page.getNodeContainerState().isExecuted()) {
             try {
                 page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
             } catch (IOException ex) {
@@ -132,10 +136,10 @@ public final class DefaultReexecutionService implements ReexecutionService {
             }
             m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
-            m_resetNodeId = resetNodeId;
+            m_resetNodeIdSuffix = resetNodeIdSuffix;
         } else {
             page = null;
-            m_resetNodeId = resetNodeId;
+            m_resetNodeIdSuffix = resetNodeIdSuffix;
             m_reexecutedNodes = Collections.emptyList();
         }
         if (page != null && m_onReexecutionEnd != null) {
@@ -145,7 +149,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
     }
 
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
-        JSONWebNodePage page = m_cvm.createWizardPage(m_container.getID());
+        JSONWebNodePage page = m_cvm.createWizardPage(m_page.getID());
         page.filterWebNodesById(resetNodeIDs);
         try (OutputStream pageStream = page.saveToStream()) {
             return pageStream.toString();
@@ -158,11 +162,11 @@ public final class DefaultReexecutionService implements ReexecutionService {
     @Override
     public PageContainer getPage() {
         String page;
-        if (m_container.getNodeContainerState().isExecuted()) {
-            CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
+        if (m_page.getNodeContainerState().isExecuted()) {
+            CheckUtils.checkNotNull(m_resetNodeIdSuffix, "Reset node ID must be defined for updated page response");
             try {
-                page =
-                    filterAndGetSerializedJSONWebNodePage(m_cvm.getSuccessorNodeIDSuffixes(m_container.getID(), m_resetNodeId));
+                page = filterAndGetSerializedJSONWebNodePage(
+                    getSuccessorWizardNodesWithinPage(m_resetNodeIdSuffix, null));
             } catch (IOException ex) {
                 throw new IllegalStateException("Problem occurred while serializing page", ex);
             }
@@ -170,12 +174,27 @@ public final class DefaultReexecutionService implements ReexecutionService {
             m_resetNodes = null;
         } else {
             page = null;
-            m_reexecutedNodes = m_cvm.getReexecutedSuccessorNodeIDSuffixes(m_container.getID(), m_resetNodeId);
+            m_reexecutedNodes = getSuccessorWizardNodesWithinPage(m_resetNodeIdSuffix,
+                nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
+                    && !nc.getNodeContainerState().isExecutionInProgress());
         }
         if (page != null && m_onReexecutionEnd != null) {
             m_onReexecutionEnd.run();
         }
         return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
+    }
+
+    private List<String> getSuccessorWizardNodesWithinPage(final NodeIDSuffix resetNodeIdSuffix,
+        final Predicate<NodeContainer> nodeFilter) {
+        NodeID pageId = m_page.getID();
+        return WebResourceController
+            .getSuccessorWizardNodesWithinPage(m_cvm.getWorkflowManager(), pageId,
+                getNodeID(pageId, resetNodeIdSuffix), nodeFilter)
+            .map(NodeIDSuffix::toString).collect(Collectors.toList());
+    }
+
+    private static NodeID getNodeID(final NodeID pageId, final NodeIDSuffix resetNodeIdSuffix) {
+        return resetNodeIdSuffix.prependParent(pageId.createChild(0));
     }
 
 }

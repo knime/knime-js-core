@@ -52,7 +52,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -209,16 +208,15 @@ public class CompositeViewPageManager extends AbstractPageManager {
      *
      * @param valueMap a map with {@link NodeIDSuffix} string as key and parsed view value as value.
      * @param containerNodeId the {@link NodeID} of the subnode.
-     * @param resetNodeId the {@link NodeID} which should initiate partial re-execution.
+     * @param resetNodeId the {@link NodeIDSuffix} which should initiate partial re-execution.
      * @return a map of validation errors which occurred when applying the updated values or else null.
      *
      * @since 4.4
      */
     public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
-        final NodeID containerNodeId, final NodeID resetNodeId) {
+        final NodeID containerNodeId, final NodeIDSuffix resetNodeId) {
         try (WorkflowLock lock = getWorkflowManager().assertLock()) {
-            return getController(containerNodeId).reexecuteSinglePage(NodeIDSuffix.fromString(resetNodeId.toString()),
-                valueMap);
+            return getController(containerNodeId).reexecuteSinglePage(resetNodeId, valueMap);
         }
     }
 
@@ -248,36 +246,4 @@ public class CompositeViewPageManager extends AbstractPageManager {
         }
     }
 
-    /**
-     * Utility method to get the successor nodes of the node denoted by the provided {@link NodeID} (including the
-     * 'start' node itself, too).
-     *
-     * @param containerNodeId the {@link NodeID} of the composite view/subnode container
-     * @param nodeId the {@link NodeID} of the node to get the successors for
-     * @return a list of successor nodes (represented by node id suffices); including the 'start' node (the 'nodeId'
-     *         argument)
-     *
-     *
-     * @since 4.4
-     */
-    public List<String> getSuccessorNodeIDSuffixes(final NodeID containerNodeId, final NodeID nodeId) {
-        return getController(containerNodeId).getSuccessorNodeIDSuffixes(NodeIDSuffix.fromString(nodeId.toString()));
-    }
-
-    /**
-     * Utility method to get the re-executed successor nodes (only nodes which were reset and no longer pending
-     * re-execution; e.g. finished, failed, deactivated, etc.) of the node denoted by the provided {@link NodeID}
-     * (including the 'start' node itself, too).
-     *
-     * @param containerNodeId the {@link NodeID} of the composite view/subnode container
-     * @param nodeId the {@link NodeID} of the node to get the re-executed successors for
-     * @return a list of re-executed successor nodes (represented by node id suffices); including the 'start' node (the
-     *         'nodeId' argument)
-     *
-     * @since 4.4
-     */
-    public List<String> getReexecutedSuccessorNodeIDSuffixes(final NodeID containerNodeId, final NodeID nodeId) {
-        return getController(containerNodeId).getSuccessorNodeIDSuffixes(NodeIDSuffix.fromString(nodeId.toString()),
-            true);
-    }
 }
