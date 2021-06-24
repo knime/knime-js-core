@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.web.ValidationError;
@@ -64,6 +65,7 @@ import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowLock;
+import org.knime.core.util.Pair;
 import org.knime.core.wizard.CompositeViewPageManager;
 import org.knime.js.core.JSONWebNodePage;
 
@@ -187,10 +189,12 @@ public final class DefaultReexecutionService implements ReexecutionService {
     private List<String> getSuccessorWizardNodesWithinPage(final NodeIDSuffix resetNodeIdSuffix,
         final Predicate<NodeContainer> nodeFilter) {
         NodeID pageId = m_page.getID();
-        return WebResourceController
-            .getSuccessorWizardNodesWithinPage(m_cvm.getWorkflowManager(), pageId,
-                getNodeID(pageId, resetNodeIdSuffix), nodeFilter)
-            .map(NodeIDSuffix::toString).collect(Collectors.toList());
+        Stream<Pair<NodeIDSuffix, NodeContainer>> res = WebResourceController.getSuccessorWizardNodesWithinPage(
+            m_cvm.getWorkflowManager(), pageId, getNodeID(pageId, resetNodeIdSuffix));
+        if (nodeFilter != null) {
+            res = res.filter(p -> nodeFilter.test(p.getSecond()));
+        }
+        return res.map(p -> p.getFirst().toString()).collect(Collectors.toList());
     }
 
     private static NodeID getNodeID(final NodeID pageId, final NodeIDSuffix resetNodeIdSuffix) {
