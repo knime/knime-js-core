@@ -48,6 +48,11 @@
  */
 package org.knime.js.core.preferences;
 
+import static org.knime.js.core.JSCorePlugin.CHROMIUM_BROWSER;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_CHROMIUM;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_PHANTOMJS;
+import static org.knime.js.core.JSCorePlugin.INTERNAL_BROWSER;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -108,11 +113,6 @@ import org.knime.js.core.JSCorePlugin;
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 public class JavaScriptPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
-    static final String INTERNAL_BROWSER = "org.knime.workbench.editor2.WizardNodeView";
-    static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
-    static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
-    static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
 
     private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
 
@@ -230,6 +230,12 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private static String[][] retrieveAllBrowsers() {
         return AbstractWizardNodeView.getAllWizardNodeViews().stream()
             .filter(v -> {
+                // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
+                if (JSCorePlugin.isRunningOnMacCatalina() &&
+                        v.getViewClass().getCanonicalName().equals(JSCorePlugin.CEF_BROWSER)) {
+                    return false;
+                }
+
                 try {
                     Method isEnabled = v.getViewClass().getMethod("isEnabled");
                     return (boolean)isEnabled.invoke(null);
@@ -249,6 +255,12 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private static String[][] retrieveHeadlessBrowsers() {
         return AbstractImageGenerator.getAllHeadlessBrowsers().stream()
                 .filter(v -> {
+                    // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
+                    if (JSCorePlugin.isRunningOnMacCatalina() &&
+                            v.getImageGeneratorClass().getCanonicalName().equals(JSCorePlugin.HEADLESS_CEF)) {
+                        return false;
+                    }
+
                     try {
                         Method isEnabled = v.getImageGeneratorClass().getMethod("isEnabled");
                         return (boolean)isEnabled.invoke(null);
@@ -285,7 +297,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private static String getHeadlessName(final HeadlessBrowserExtension browser) {
         String name = browser.getBrowserName();
-        boolean isPhantom = PHANTOMJS.equals(browser.getImageGeneratorClass().getCanonicalName());
+        boolean isPhantom = HEADLESS_PHANTOMJS.equals(browser.getImageGeneratorClass().getCanonicalName());
         if (isPhantom) {
             return name + " (support discontinued)";
         }
@@ -301,7 +313,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private void enableHeadlessFields(final String view, final Composite parent) {
         if (m_headlessBrowserExePath != null && m_headlesBrowserCLIArgs != null) {
-            boolean isPhantom = PHANTOMJS.equals(view);
+            boolean isPhantom = HEADLESS_PHANTOMJS.equals(view);
             boolean isChromium = HEADLESS_CHROMIUM.equals(view);
             m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
             m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
