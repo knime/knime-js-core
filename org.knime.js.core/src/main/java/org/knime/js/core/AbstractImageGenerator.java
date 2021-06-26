@@ -48,6 +48,11 @@
  */
 package org.knime.js.core;
 
+import static org.knime.js.core.JSCorePlugin.CEF_BROWSER;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_CEF;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_CHROMIUM;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_PHANTOMJS;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,10 +100,7 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractImageGenerator.class);
     private static final String EXT_POINT_ID = "org.knime.js.core.headlessBrowsers";
-    private static final String PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
     private static final String CHROME = "org.knime.ext.seleniumdrivers.multios.ChromeImageGenerator";
-    private static final String CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
-    private static final String CEF = "org.knime.js.cef.headless.CEFImageGenerator";
     private static final String IMAGE_GENERATOR_CLASS = "imageGeneratorClass";
 
 
@@ -171,9 +173,17 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
         String classString = JSCorePlugin.getDefault().getPreferenceStore()
                 .getString(JSCorePlugin.P_HEADLESS_BROWSER);
         // disable Chrome image generation in general or Chromium image generation if the binaries are not installed
-        if (classString.equals(CHROME) || (classString.equals(CHROMIUM) && !JSCorePlugin.isChromiumInstalled())) {
+        if (classString.equals(CHROME)
+            || (classString.equals(HEADLESS_CHROMIUM) && !JSCorePlugin.isChromiumInstalled())) {
             classString = null;
         }
+
+        // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
+        if (JSCorePlugin.isRunningOnMacCatalina() && CEF_BROWSER.equals(classString)) {
+            // make sure to never use the CEF browser on Catalina
+            classString = null;
+        }
+
         if (StringUtils.isNotEmpty(classString)) {
          // try loading selected view
             viewClass = getViewClassByReflection(classString, configurationElements);
@@ -185,15 +195,15 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
         if (viewClass == null) {
             // try loading defaults
             if (JSCorePlugin.isChromiumInstalled()) {
-                viewClass = getViewClassByReflection(CHROMIUM, configurationElements);
+                viewClass = getViewClassByReflection(HEADLESS_CHROMIUM, configurationElements);
             }
             if( viewClass == null) {
-                viewClass = getViewClassByReflection(CEF, configurationElements);
+                viewClass = getViewClassByReflection(HEADLESS_CEF, configurationElements);
             }
             if (viewClass == null) {
                 LOGGER.error("Headless Chromium could not be initialized as default browser for image "
                     + "generation. Trying PhantomJS...");
-                viewClass = getViewClassByReflection(PHANTOMJS, configurationElements);
+                viewClass = getViewClassByReflection(HEADLESS_PHANTOMJS, configurationElements);
             }
         }
         if (viewClass != null) {

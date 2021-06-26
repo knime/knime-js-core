@@ -148,6 +148,56 @@ public final class JSCorePlugin extends AbstractUIPlugin {
      */
     public static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
 
+    /**
+     * Class name of a node view implementation using a specific browser.
+     *
+     * @since 4.4
+     */
+    public static final String INTERNAL_BROWSER = "org.knime.js.swt.wizardnodeview.WizardNodeView";
+
+    /**
+     * Class name of a node view implementation using a specific browser.
+     *
+     * @since 4.4
+     */
+    public static final String CHROMIUM_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromiumWizardNodeView";
+
+    /**
+     * Class name of a node view implementation using a specific browser.
+     *
+     * @since 4.4
+     */
+    public static final String CHROME_BROWSER = "org.knime.ext.seleniumdrivers.multios.ChromeWizardNodeView";
+
+    /**
+     * Class name of a node view implementation using a specific browser.
+     *
+     * @since 4.4
+     */
+    public static final String CEF_BROWSER = "org.knime.js.cef.wizardnodeview.CEFWizardNodeView";
+
+    /**
+     * Class name for a JS image generation implementation using a specific headless/windowless browser.
+     *
+     * @since 4.4
+     */
+    public static final String HEADLESS_CHROMIUM = "org.knime.ext.seleniumdrivers.multios.ChromiumImageGenerator";
+
+    /**
+     * Class name for a JS image generation implementation using a specific headless/windowless browser.
+     *
+     * @since 4.4
+     */
+    public static final String HEADLESS_PHANTOMJS = "org.knime.ext.phantomjs.PhantomJSImageGenerator";
+
+    /**
+     * Class name for a JS image generation implementation using a specific headless/windowless browser.
+     *
+     * @since 4.4
+     */
+    public static final String HEADLESS_CEF = "org.knime.js.cef.headless.CEFImageGenerator";
+
+
     // The shared instance.
     private static JSCorePlugin PLUGIN;
 
@@ -233,4 +283,21 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         }
         return false;
     }
+
+    /**
+     * Determines whether the AP runs on MacOSX Catalina (i.e. 10.15).
+     *
+     * TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
+     *
+     * @return <code>true</code> if it runs on Catalina
+     */
+    public static boolean isRunningOnMacCatalina() {
+        if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+            String osVersion = System.getProperty("os.version");
+            return osVersion != null && osVersion.startsWith("10.15");
+        } else {
+            return false;
+        }
+    }
+
 }

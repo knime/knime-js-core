@@ -74,14 +74,14 @@ public class JavaScriptPreferenceInitializer extends AbstractPreferenceInitializ
         }
         if (JSCorePlugin.osSupportsChromium() && JSCorePlugin.isChromiumInstalled()) {
             //use bundled Chromium as default in most cases
-            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JavaScriptPreferencePage.CHROMIUM_BROWSER);
-            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JavaScriptPreferencePage.HEADLESS_CHROMIUM);
+            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JSCorePlugin.CHROMIUM_BROWSER);
+            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JSCorePlugin.HEADLESS_CHROMIUM);
         } else {
             //some older Linux distributions do not support Chromium anymore, so we need to use:
             //SWT browser for view...
-            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JavaScriptPreferencePage.INTERNAL_BROWSER);
+            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JSCorePlugin.INTERNAL_BROWSER);
             //... and PhantomJS for image generation
-            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JavaScriptPreferencePage.PHANTOMJS);
+            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JSCorePlugin.HEADLESS_PHANTOMJS);
         }
     }
 
