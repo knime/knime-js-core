@@ -197,7 +197,9 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
             if (JSCorePlugin.isChromiumInstalled()) {
                 viewClass = getViewClassByReflection(HEADLESS_CHROMIUM, configurationElements);
             }
-            if( viewClass == null) {
+            if (viewClass == null && //
+            // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
+                !JSCorePlugin.isRunningOnMacCatalina()) {
                 viewClass = getViewClassByReflection(HEADLESS_CEF, configurationElements);
             }
             if (viewClass == null) {
