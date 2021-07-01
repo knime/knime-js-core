@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Unit-Tests for org.knime.core.wizard
 Bundle-SymbolicName: org.knime.core.wizard.tests;singleton:=true
-Bundle-Version: 4.4.0.qualifier
+Bundle-Version: 4.5.0.qualifier
 Fragment-Host: org.knime.core.wizard;bundle-version="[4.0.0,5.0.0)"
 Automatic-Module-Name: org.knime.core.wizard.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
