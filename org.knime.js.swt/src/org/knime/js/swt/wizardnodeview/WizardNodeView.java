@@ -202,6 +202,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_shell.setLayout(layout);
 
         m_browserWrapper = createBrowserWrapper(m_shell);
+        initBrowserFunctions();
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
         m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
 
@@ -358,7 +359,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 }
             });
             setBrowserURL();
-            initBrowserFunctions();
         });
 
     }
