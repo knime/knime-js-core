@@ -58,7 +58,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.config.base.JSONConfig;
 import org.knime.core.node.property.hilite.HiLiteManager;
 import org.knime.core.node.property.hilite.HiLiteTranslator;
 import org.knime.core.node.util.CheckUtils;
@@ -164,7 +163,14 @@ public abstract class AbstractPageManager {
         if (selectionTranslators.size() < 1) {
             selectionTranslators = null;
         }
-        JSONWebNodePageConfiguration pageConfig = new JSONWebNodePageConfiguration(layout, null, selectionTranslators);
+        NodeID pagePrefix = page.getPageNodeID().getPrefix();
+        NodeID projectID = m_wfm.getProjectWFM().getID();
+        CheckUtils.checkState(!pagePrefix.isRoot(),
+            "Cannot determine context for page creation- received ROOT as the projectID.");
+        String projectRelativePageIDSuffix =
+            projectID.equals(pagePrefix) ? "" : NodeIDSuffix.create(projectID, pagePrefix).toString();
+        JSONWebNodePageConfiguration pageConfig =
+            new JSONWebNodePageConfiguration(layout, null, selectionTranslators, projectRelativePageIDSuffix);
         Map<String, JSONWebNode> nodes = new HashMap<String, JSONWebNode>();
         for (Map.Entry<NodeIDSuffix, WizardPageNodeInfo> e : page.getInfoMap().entrySet()) {
             WizardPageNodeInfo pInfo = e.getValue();
@@ -228,14 +234,13 @@ public abstract class AbstractPageManager {
         return new JSONWebNodePage(pageConfig, nodes);
     }
 
-    private JSONLayoutPage getJSONLayoutFromSubnode(final NodeIDSuffix pageID, final String layoutInfo)
+    private JSONLayoutPage getJSONLayoutFromSubnode(final NodeID pageID, final String layoutInfo)
             throws IOException {
         ObjectMapper mapper = JSONLayoutPage.getConfiguredVerboseObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         ObjectReader reader = mapper.readerForUpdating(new JSONLayoutPage());
         JSONLayoutPage page = reader.readValue(layoutInfo);
-        SubNodeContainer subNodeContainer =
-            m_wfm.getNodeContainer(pageID.prependParent(m_wfm.getID()), SubNodeContainer.class, true);
+        SubNodeContainer subNodeContainer = m_wfm.getNodeContainer(pageID, SubNodeContainer.class, true);
         if (page != null && page.getRows() != null) {
             for (JSONLayoutRow row : page.getRows()) {
                 setNodeIDInContent(row, subNodeContainer.getWorkflowManager());

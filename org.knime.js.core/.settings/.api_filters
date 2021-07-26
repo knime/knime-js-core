@@ -1,34 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.js.core" version="2">
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.js.core.JSONTypedDeserializer">
-        <filter id="305324134">
+    <resource path="src/main/java/org/knime/js/core/JSONWebNodePageConfiguration.java" type="org.knime.js.core.JSONWebNodePageConfiguration">
+        <filter id="338722907">
             <message_arguments>
-                <message_argument value="org.knime.js.core.JSONTypedDeserializer"/>
-                <message_argument value="org.knime.js.core_4.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.js.core.JSONTypedSerializer">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.js.core.JSONTypedSerializer"/>
-                <message_argument value="org.knime.js.core_4.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.js.core.JSONWebResource">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.js.core.JSONWebResource"/>
-                <message_argument value="org.knime.js.core_4.4.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.js.core.JSONWebResources">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.js.core.JSONWebResources"/>
-                <message_argument value="org.knime.js.core_4.4.0"/>
+                <message_argument value="org.knime.js.core.JSONWebNodePageConfiguration"/>
+                <message_argument value="JSONWebNodePageConfiguration(JSONLayoutPage, JSONBlackBoard, List&lt;JSONSelectionTranslator&gt;)"/>
             </message_arguments>
         </filter>
     </resource>
