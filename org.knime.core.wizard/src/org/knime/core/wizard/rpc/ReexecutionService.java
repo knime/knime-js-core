@@ -13,11 +13,11 @@ public interface ReexecutionService {
     /**
      * (Partially) re-executes the component.
      *
-     * @param nodeID the id of the node to be reset (and all the downstream nodes)
+     * @param nodeIDSuffix the project relative id suffix of the node to be reset (and all the downstream nodes)
      * @param viewValues the view values to apply to the reset nodes
      * @return the re-executed or re-executing page
      */
-    PageContainer reexecutePage(String nodeID, Map<String, String> viewValues);
+    PageContainer reexecutePage(String nodeIDSuffix, Map<String, String> viewValues);
 
     /**
      * @return the re-executed or re-executing page

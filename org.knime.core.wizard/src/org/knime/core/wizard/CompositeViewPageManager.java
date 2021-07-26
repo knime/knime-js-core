@@ -208,13 +208,13 @@ public class CompositeViewPageManager extends AbstractPageManager {
      *
      * @param valueMap a map with {@link NodeIDSuffix} string as key and parsed view value as value.
      * @param containerNodeId the {@link NodeID} of the subnode.
-     * @param resetNodeId the {@link NodeIDSuffix} which should initiate partial re-execution.
+     * @param resetNodeId the absolute {@link NodeID} which should initiate partial re-execution.
      * @return a map of validation errors which occurred when applying the updated values or else null.
      *
-     * @since 4.4
+     * @since 4.5
      */
     public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
-        final NodeID containerNodeId, final NodeIDSuffix resetNodeId) {
+        final NodeID containerNodeId, final NodeID resetNodeId) {
         try (WorkflowLock lock = getWorkflowManager().assertLock()) {
             return getController(containerNodeId).reexecuteSinglePage(resetNodeId, valueMap);
         }

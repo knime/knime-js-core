@@ -109,7 +109,7 @@ public class TestReexecutionService extends WorkflowTestCase {
         // test normal re-execution
         Map<String, String> viewValues = Map.of("5:0:7",
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}");
-        PageContainer res = service.reexecutePage("2", viewValues);
+        PageContainer res = service.reexecutePage("5:0:2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
         assertThat(res.getReexecutedNodes(), is(empty()));
@@ -128,7 +128,7 @@ public class TestReexecutionService extends WorkflowTestCase {
         Map<String, String> viewValues2 = Map.of("5:0:7",
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":8345673838383838383838383}}");
         IllegalStateException ex =
-            assertThrows(IllegalStateException.class, () -> service.reexecutePage("2", viewValues2));
+            assertThrows(IllegalStateException.class, () -> service.reexecutePage("5:0:2", viewValues2));
         assertThat(ex.getMessage(), containsString("Unable to re-execute component with current page values."));
 
     }

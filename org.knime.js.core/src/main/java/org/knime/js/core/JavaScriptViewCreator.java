@@ -650,7 +650,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
         }
 
         private JSONWebNodePageConfiguration createJSONPageConfig() {
-            return new JSONWebNodePageConfiguration(createJSONLayoutPage(), null, null);
+            return new JSONWebNodePageConfiguration(createJSONLayoutPage(), null, null, null);
         }
 
         private JSONLayoutPage createJSONLayoutPage() {

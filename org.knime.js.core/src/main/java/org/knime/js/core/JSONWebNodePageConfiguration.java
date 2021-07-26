@@ -51,6 +51,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.selections.json.JSONSelectionTranslator;
 
@@ -67,6 +68,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONWebNodePageConfiguration {
 
+    private String m_projectRelativePageIDSuffix;
     private String m_version;
     private JSONLayoutPage m_layout;
     private JSONBlackBoard m_blackBoard;
@@ -79,23 +81,36 @@ public class JSONWebNodePageConfiguration {
      * @param layout the layout
      * @param blackBoard the blackboard
      * @param selectionTranslators
+     * @param projectRelativePageIDSuffix the string representation of the project relative page {@link NodeIDSuffix}.
+     * @since 4.5
      */
     public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
-        final List<JSONSelectionTranslator> selectionTranslators) {
-        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION);
+        final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix) {
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix);
     }
 
     @JsonCreator
     private JSONWebNodePageConfiguration(@JsonProperty("layout") final JSONLayoutPage layout,
         @JsonProperty("blackBoard") final JSONBlackBoard blackBoard,
         @JsonProperty("selectionTranslators") final List<JSONSelectionTranslator> selectionTranslators,
-        @JsonProperty("version") final String version) {
+        @JsonProperty("version") final String version,
+        @JsonProperty("projectRelativePageIDSuffix") final String projectRelativePageIDSuffix) {
+        m_projectRelativePageIDSuffix = projectRelativePageIDSuffix;
         m_version = version;
         m_layout = layout;
         m_blackBoard = blackBoard;
         m_selectionTranslators = selectionTranslators;
     }
 
+
+    /**
+     * @return the projectRelativePageIDSuffix
+     * @since 4.5
+     */
+    @JsonProperty("projectRelativePageIDSuffix")
+    public String getProjectRelativePageIDSuffix() {
+        return m_projectRelativePageIDSuffix;
+    }
 
     /**
      * @return the version
@@ -147,6 +162,7 @@ public class JSONWebNodePageConfiguration {
         }
         JSONWebNodePageConfiguration other = (JSONWebNodePageConfiguration)obj;
         return new EqualsBuilder()
+                .append(m_projectRelativePageIDSuffix, other.m_projectRelativePageIDSuffix)
                 .append(m_version, other.m_version)
                 .append(m_layout, other.m_layout)
                 .append(m_selectionTranslators, other.m_selectionTranslators)
@@ -160,6 +176,7 @@ public class JSONWebNodePageConfiguration {
     @Override
     public int hashCode() {
         return new HashCodeBuilder()
+                .append(m_projectRelativePageIDSuffix)
                 .append(m_version)
                 .append(m_layout)
                 .append(m_selectionTranslators)
