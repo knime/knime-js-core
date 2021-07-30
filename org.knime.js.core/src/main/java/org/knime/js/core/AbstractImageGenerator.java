@@ -48,7 +48,6 @@
  */
 package org.knime.js.core;
 
-import static org.knime.js.core.JSCorePlugin.CEF_BROWSER;
 import static org.knime.js.core.JSCorePlugin.HEADLESS_CEF;
 import static org.knime.js.core.JSCorePlugin.HEADLESS_CHROMIUM;
 import static org.knime.js.core.JSCorePlugin.HEADLESS_PHANTOMJS;
@@ -178,12 +177,6 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
             classString = null;
         }
 
-        // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
-        if (JSCorePlugin.isRunningOnMacCatalina() && CEF_BROWSER.equals(classString)) {
-            // make sure to never use the CEF browser on Catalina
-            classString = null;
-        }
-
         if (StringUtils.isNotEmpty(classString)) {
          // try loading selected view
             viewClass = getViewClassByReflection(classString, configurationElements);
@@ -197,9 +190,7 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
             if (JSCorePlugin.isChromiumInstalled()) {
                 viewClass = getViewClassByReflection(HEADLESS_CHROMIUM, configurationElements);
             }
-            if (viewClass == null && //
-            // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
-                !JSCorePlugin.isRunningOnMacCatalina()) {
+            if (viewClass == null) {
                 viewClass = getViewClassByReflection(HEADLESS_CEF, configurationElements);
             }
             if (viewClass == null) {

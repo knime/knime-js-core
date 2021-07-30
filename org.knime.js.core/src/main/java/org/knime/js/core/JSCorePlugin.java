@@ -284,20 +284,4 @@ public final class JSCorePlugin extends AbstractUIPlugin {
         return false;
     }
 
-    /**
-     * Determines whether the AP runs on MacOSX Catalina (i.e. 10.15).
-     *
-     * TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
-     *
-     * @return <code>true</code> if it runs on Catalina
-     */
-    public static boolean isRunningOnMacCatalina() {
-        if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-            String osVersion = System.getProperty("os.version");
-            return osVersion != null && osVersion.startsWith("10.15");
-        } else {
-            return false;
-        }
-    }
-
 }
