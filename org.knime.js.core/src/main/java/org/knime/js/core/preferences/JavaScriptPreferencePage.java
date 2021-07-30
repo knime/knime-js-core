@@ -230,12 +230,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private static String[][] retrieveAllBrowsers() {
         return AbstractWizardNodeView.getAllWizardNodeViews().stream()
             .filter(v -> {
-                // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
-                if (JSCorePlugin.isRunningOnMacCatalina() &&
-                        v.getViewClass().getCanonicalName().equals(JSCorePlugin.CEF_BROWSER)) {
-                    return false;
-                }
-
                 try {
                     Method isEnabled = v.getViewClass().getMethod("isEnabled");
                     return (boolean)isEnabled.invoke(null);
@@ -255,12 +249,6 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private static String[][] retrieveHeadlessBrowsers() {
         return AbstractImageGenerator.getAllHeadlessBrowsers().stream()
                 .filter(v -> {
-                    // TEMPORARY - WILL BE REMOVED AGAIN SOON - see AP-17033
-                    if (JSCorePlugin.isRunningOnMacCatalina() &&
-                            v.getImageGeneratorClass().getCanonicalName().equals(JSCorePlugin.HEADLESS_CEF)) {
-                        return false;
-                    }
-
                     try {
                         Method isEnabled = v.getImageGeneratorClass().getMethod("isEnabled");
                         return (boolean)isEnabled.invoke(null);
