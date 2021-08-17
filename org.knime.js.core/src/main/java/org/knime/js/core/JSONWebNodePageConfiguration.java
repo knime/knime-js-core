@@ -82,7 +82,7 @@ public class JSONWebNodePageConfiguration {
      * @param blackBoard the blackboard
      * @param selectionTranslators
      * @param projectRelativePageIDSuffix the string representation of the project relative page {@link NodeIDSuffix}.
-     * @since 4.5
+     * @since 4.4
      */
     public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
         final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix) {
@@ -105,7 +105,7 @@ public class JSONWebNodePageConfiguration {
 
     /**
      * @return the projectRelativePageIDSuffix
-     * @since 4.5
+     * @since 4.4
      */
     @JsonProperty("projectRelativePageIDSuffix")
     public String getProjectRelativePageIDSuffix() {
