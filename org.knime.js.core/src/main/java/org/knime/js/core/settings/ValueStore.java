@@ -69,7 +69,7 @@ import org.knime.core.node.NodeLogger;
  * it's flow variable controlled).
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
- * @since 4.5
+ * @since 4.4
  */
 public class ValueStore {
 
