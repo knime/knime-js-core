@@ -249,15 +249,4 @@ public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP e
         m_browser = null;
     }
 
-    /**
-     * Disables this image generator to be available for selection in the js preferences. Only temporary till it the
-     * image generator works without problems.
-     * To enable it again, just remove the entire method.
-     *
-     * @return false
-     */
-    public static boolean isEnabled() {
-        return false;
-    }
-
 }
