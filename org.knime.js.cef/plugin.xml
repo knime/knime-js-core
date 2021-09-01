@@ -16,4 +16,10 @@
             name="Chromium Embedded Framework (CEF) Browser">
       </headlessBrowser>
    </extension>
+   <extension
+         point="org.knime.workbench.editor.NodeView">
+      <NodeView
+            class="org.knime.js.cef.nodeview.CEFNodeView">
+      </NodeView>
+   </extension>
 </plugin>
