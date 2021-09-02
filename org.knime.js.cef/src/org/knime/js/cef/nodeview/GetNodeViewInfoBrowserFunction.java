@@ -57,7 +57,7 @@ import org.knime.core.node.webui.NodeViewFactory;
 import org.knime.core.node.webui.Page;
 import org.knime.core.node.webui.internal.NodeViewFactoryInternal;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.workbench.core.webui.NodeViewUtil;
+import org.knime.core.webui.NodeViewUtil;
 
 import com.equo.chromium.swt.Browser;
 import com.equo.chromium.swt.BrowserFunction;
