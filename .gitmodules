@@ -1,3 +1,6 @@
 [submodule "webapps-common"]
 	path = org.knime.js.core/js-lib/knime/layoutEditor/webapps-common
 	url = ../webapps-common
+[submodule "webapps-common/ap-wrapper"]
+	path = org.knime.js.cef/js-src/ap-wrapper/webapps-common
+	url = ../webapps-common
