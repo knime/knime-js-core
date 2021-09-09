@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development vue-cli-service serve src/app.js",
     "build": "cross-env NODE_ENV=production vue-cli-service build --no-clean --inline-vue src/app.js",
-    "build-debug": "cross-env NODE_ENV=development vue-cli-service build --no-clean --inline-vue src/app.js --watch",
+    "build-debug": "cross-env NODE_ENV=development vue-cli-service build --no-clean --inline-vue src/app.js",
     "inspect": "vue-cli-service inspect",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint --ext .js,.vue .",
