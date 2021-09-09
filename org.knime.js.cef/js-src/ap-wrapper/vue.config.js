@@ -1,4 +1,5 @@
 const path = require('path');
+const svgConfig = require('webapps-common/webpack/webpack.svg.config');
 const LimitChunkCountPlugin = require('webpack/lib/optimize/LimitChunkCountPlugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin');
@@ -13,8 +14,13 @@ module.exports = {
 
         config.resolve.alias.set('webapps-common', path.resolve(__dirname, 'webapps-common'));
 
+        // apply SVG loader config
+        config.module.rule('svg').uses.clear();
+        config.merge({ module: { rule: { svg: svgConfig } } });
+
         // allow easy debugging (but increases file size a lot)
         // config.devtool('eval-source-map');
+        
 
         // needed to create single output js resource
         config.optimization.delete('splitChunks');

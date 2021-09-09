@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development vue-cli-service serve src/app.js",
     "build": "cross-env NODE_ENV=production vue-cli-service build --no-clean --inline-vue src/app.js",
+    "build-debug": "cross-env NODE_ENV=development vue-cli-service build --no-clean --inline-vue src/app.js --watch",
     "inspect": "vue-cli-service inspect",
     "lint": "npm run lint:js && npm run lint:css",
     "lint:js": "eslint --ext .js,.vue .",
@@ -34,6 +35,8 @@
     "fontsource-roboto-mono": "3.0.3",
     "postcss-import": "12.0.1",
     "postcss-preset-env": "6.7.0",
+    "svgo-loader": "2.2.1",
+    "vue-svg-loader": "0.11.0",
     "postcss-url": "8.0.0",
     "sonar-scanner": "3.1.0",
     "stylelint": "13.13.1",
