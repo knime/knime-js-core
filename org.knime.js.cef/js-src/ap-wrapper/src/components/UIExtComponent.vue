@@ -27,9 +27,9 @@ export default {
             required: true
         },
         initData: {
-            type: Object,
+            type: String,
             required: false,
-            default: null
+            default: ''
         }
     },
     data() {

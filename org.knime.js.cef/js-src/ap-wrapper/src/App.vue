@@ -15,7 +15,6 @@ export default {
     mounted() {
         // TODO NXT-653 use knime service to provide the information
         this.info = JSON.parse(window.getNodeViewInfo());
-        this.info.initData = JSON.parse(this.info.initData);
     }
 };
 </script>
@@ -24,20 +23,20 @@ export default {
   <div v-if="info.uicomponent">
     <UIExtComponent
       :name="info.name"
-      :componentSrc="info.url" 
-      :projectId ="info.projectId" 
-      :workflowId="info.workflowId" 
-      :nodeId="info.nodeId"
-      :initData ="info.initData"
+      :component-src="info.url"
+      :project-id="info.projectId"
+      :workflow-id="info.workflowId"
+      :node-id="info.nodeId"
+      :init-data="info.initData"
     />
   </div>
   <div v-else>
     <UIExtIFrame
-      :iframeSrc="info.url" 
-      :projectId ="info.projectId" 
-      :workflowId="info.workflowId" 
-      :nodeId="info.nodeId"
-      :initData ="info.initData"
+      :iframe-src="info.url"
+      :project-id="info.projectId"
+      :workflow-id="info.workflowId"
+      :node-id="info.nodeId"
+      :init-data="info.initData"
     />
   </div>
 </template>
