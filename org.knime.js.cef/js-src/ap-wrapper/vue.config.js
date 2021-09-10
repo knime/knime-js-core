@@ -13,8 +13,8 @@ module.exports = {
 
         config.resolve.alias.set('webapps-common', path.resolve(__dirname, 'webapps-common'));
 
-        // allow easy debugging
-        config.devtool('eval-source-map');
+        // allow easy debugging (but increases file size a lot)
+        // config.devtool('eval-source-map');
 
         // needed to create single output js resource
         config.optimization.delete('splitChunks');
