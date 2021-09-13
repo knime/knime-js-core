@@ -2,11 +2,13 @@
 import UIExtComponent from './components/UIExtComponent.vue';
 import UIExtIFrame from './components/UIExtIFrame.vue';
 import DebugButton from './components/DebugButton.vue';
+import RefreshButton from './components/RefreshButton.vue';
 
 export default {
     components: {
         UIExtComponent,
         UIExtIFrame,
+        RefreshButton,
         DebugButton
     },
     data() {
@@ -47,6 +49,7 @@ export default {
       />
     </div>
     <DebugButton v-if="isDebug" />
+    <RefreshButton v-if="info.uicomponent" />
   </div>
 </template>
 

@@ -17,7 +17,7 @@ export default {
     mounted() {
         // Code taken from cef debugger
         let tabsListRequest = new XMLHttpRequest();
-        tabsListRequest.open("GET", `http://localhost:8888/json/list?t=${new Date().getTime()}`, true);
+        tabsListRequest.open('GET', `http://localhost:8888/json/list?t=${new Date().getTime()}`, true);
         tabsListRequest.onreadystatechange = this.onReady;
         tabsListRequest.send();
     },
@@ -54,7 +54,7 @@ export default {
   </div>
 </template>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 
 .container {
   position: fixed;
