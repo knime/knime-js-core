@@ -44,85 +44,45 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Aug 25, 2021 (hornm): created
+ *   Sep 10, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview;
+package org.knime.js.cef.nodeview.jsonrpc;
 
 import java.io.IOException;
 
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeModel;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.webui.data.InitialDataService;
-import org.knime.core.webui.data.text.TextInitialDataService;
-import org.knime.core.webui.node.view.NodeView;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.core.webui.page.Page;
-
-import com.equo.chromium.swt.Browser;
-import com.equo.chromium.swt.BrowserFunction;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A browser function which returns a {@link NodeViewInfo} object.
- *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
+public class DefaultNodeService implements NodeService {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final NativeNodeContainer m_nnc;
 
-    private static final String FUNCTION_NAME = "getNodeViewInfo";
-
-    private NativeNodeContainer m_nnc;
-
-    /**
-     * @param browser
-     * @param nnc
-     */
-    public GetNodeViewInfoBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
-        super(browser, FUNCTION_NAME);
+    DefaultNodeService(final NativeNodeContainer nnc) {
         m_nnc = nnc;
     }
 
     @Override
-    public Object function(final Object[] args) {
-        NodeView nodeView = NodeViewManager.getInstance().getNodeView(m_nnc);
-
-        Page page = nodeView.getPage();
-        if (page.isComponent() && !page.isCompletelyStatic()) {
-            throw new IllegalStateException("An 'internal' node view must only provide static resources");
-        }
-        String viewName = m_nnc.getNodeViewName(0);
-        InitialDataService initDataService = nodeView.getInitialDataService().orElse(null);
-        String initData;
-        if (initDataService instanceof TextInitialDataService) {
-            initData = ((TextInitialDataService)initDataService).getInitialData();
-        } else {
-            initData = null;
-        }
-        String remoteDebugPort = System.getProperty("chromium.remote_debugging_port");
-        NodeViewInfo info = NodeViewInfo.create(viewName, getUrl(), initData, page.isComponent(), remoteDebugPort);
-        try {
-            return MAPPER.writeValueAsString(info);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to serialize the node view info into json", e);
-        }
-    }
-
-    private String getUrl() {
-        NodeFactory<NodeModel> factory = m_nnc.getNode().getFactory();
-        String debugUrl = NodeViewManager.getNodeViewDebugUrl(factory.getClass()).orElse(null);
-        if (debugUrl == null) {
+    public String callNodeViewDataService(final String projectId, final String workflowId, final String nodeID,
+        final String serviceType, final String request) {
+        NodeViewManager nvm = NodeViewManager.getInstance();
+        if ("initial_data".equals(serviceType)) {
+            return nvm.callTextInitialDataService(m_nnc);
+        } else if ("data".equals(serviceType)) {
+            return nvm.callTextDataService(m_nnc, request);
+        } else if ("apply_data".equals(serviceType)) {
             try {
-                return NodeViewManager.getInstance().writeNodeViewResourcesToDiscAndGetFileUrl(m_nnc);
+                nvm.callTextApplyDataService(m_nnc, request);
             } catch (IOException e) {
-                throw new IllegalStateException(
-                    "The node view resources for node '" + m_nnc.getNameWithID() + "' could not be written to disc", e);
+                NodeLogger.getLogger(getClass()).error(e);
+                return e.getMessage();
             }
+            return "";
         } else {
-            return debugUrl;
+            throw new IllegalArgumentException("Unknown service type '" + serviceType + "'");
         }
     }
 

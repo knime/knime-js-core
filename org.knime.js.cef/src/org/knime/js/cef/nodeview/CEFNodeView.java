@@ -62,8 +62,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeModel;
-import org.knime.core.node.webui.NodeView;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.webui.node.view.NodeView;
+import org.knime.js.cef.nodeview.jsonrpc.JsonRpcBrowserFunction;
 
 import com.equo.chromium.swt.Browser;
 
@@ -125,7 +126,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         m_shell.setLayout(layout);
 
         m_browser = new Browser(m_shell, SWT.NONE);
-        new NodeRpcBrowserFunction(m_browser, m_nnc);
+        new JsonRpcBrowserFunction(m_browser, m_nnc);
         new GetNodeViewInfoBrowserFunction(m_browser, m_nnc);
 
         m_browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));

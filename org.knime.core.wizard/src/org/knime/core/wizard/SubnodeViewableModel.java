@@ -79,9 +79,9 @@ import org.knime.core.node.workflow.NodeContainerState;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
-import org.knime.core.rpc.RpcServerFactory;
-import org.knime.core.rpc.RpcSingleServer;
-import org.knime.core.rpc.json.JsonRpcSingleServer;
+import org.knime.core.webui.data.rpc.RpcServerFactory;
+import org.knime.core.webui.data.rpc.RpcSingleServer;
+import org.knime.core.webui.data.rpc.json.impl.JsonRpcSingleServer;
 import org.knime.core.wizard.rpc.DefaultReexecutionService;
 import org.knime.core.wizard.rpc.ReexecutionService;
 import org.knime.js.core.JSONWebNode;
@@ -399,7 +399,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     /**
      * {@inheritDoc}
      *
-     * @since 4.4
+     * @since 4.5
      */
     @Override
     public RpcSingleServer<ReexecutionService> createRpcServer(final SubnodeViewableModel target) {

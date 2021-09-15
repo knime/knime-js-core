@@ -15,4 +15,19 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/SubnodeViewableModel.java" type="org.knime.core.wizard.SubnodeViewableModel">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.SubnodeViewableModel"/>
+                <message_argument value="createRpcServer(SubnodeViewableModel)"/>
+            </message_arguments>
+        </filter>
+        <filter id="640712815">
+            <message_arguments>
+                <message_argument value="WorkflowLock"/>
+                <message_argument value="SubnodeViewableModel"/>
+                <message_argument value="close()"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>

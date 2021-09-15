@@ -46,84 +46,52 @@
  * History
  *   Aug 25, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview;
+package org.knime.js.cef.nodeview.jsonrpc;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.webui.data.InitialDataService;
-import org.knime.core.webui.data.text.TextInitialDataService;
-import org.knime.core.webui.node.view.NodeView;
-import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.core.webui.page.Page;
+import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 
 import com.equo.chromium.swt.Browser;
 import com.equo.chromium.swt.BrowserFunction;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A browser function which returns a {@link NodeViewInfo} object.
+ * A browser function for 'remote procedure calls' using the json-rpc standard. It's exactly the same browser function
+ * that is injected by the web-ui used for jsonrpc calls to the 'gateway API'. By that, the frontend (e.g. the node view
+ * framework) doesn't require extra logic.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
+public class JsonRpcBrowserFunction extends BrowserFunction {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String FUNCTION_NAME = "jsonrpc";
 
-    private static final String FUNCTION_NAME = "getNodeViewInfo";
-
-    private NativeNodeContainer m_nnc;
+    private final JsonRpcServer m_jsonRpcServer;
 
     /**
      * @param browser
      * @param nnc
      */
-    public GetNodeViewInfoBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
+    public JsonRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
         super(browser, FUNCTION_NAME);
-        m_nnc = nnc;
+        m_jsonRpcServer = new JsonRpcServer();
+        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc));
     }
 
     @Override
     public Object function(final Object[] args) {
-        NodeView nodeView = NodeViewManager.getInstance().getNodeView(m_nnc);
-
-        Page page = nodeView.getPage();
-        if (page.isComponent() && !page.isCompletelyStatic()) {
-            throw new IllegalStateException("An 'internal' node view must only provide static resources");
-        }
-        String viewName = m_nnc.getNodeViewName(0);
-        InitialDataService initDataService = nodeView.getInitialDataService().orElse(null);
-        String initData;
-        if (initDataService instanceof TextInitialDataService) {
-            initData = ((TextInitialDataService)initDataService).getInitialData();
-        } else {
-            initData = null;
-        }
-        String remoteDebugPort = System.getProperty("chromium.remote_debugging_port");
-        NodeViewInfo info = NodeViewInfo.create(viewName, getUrl(), initData, page.isComponent(), remoteDebugPort);
-        try {
-            return MAPPER.writeValueAsString(info);
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Failed to serialize the node view info into json", e);
+        try (ByteArrayInputStream request =
+            new ByteArrayInputStream(((String)args[0]).getBytes(StandardCharsets.UTF_8));
+                ByteArrayOutputStream response = new ByteArrayOutputStream()) {
+            m_jsonRpcServer.handleRequest(request, response);
+            return new String(response.toByteArray(), StandardCharsets.UTF_8.name());
+        } catch (IOException e) {
+            // should never happen
+            throw new IllegalStateException(e);
         }
     }
-
-    private String getUrl() {
-        NodeFactory<NodeModel> factory = m_nnc.getNode().getFactory();
-        String debugUrl = NodeViewManager.getNodeViewDebugUrl(factory.getClass()).orElse(null);
-        if (debugUrl == null) {
-            try {
-                return NodeViewManager.getInstance().writeNodeViewResourcesToDiscAndGetFileUrl(m_nnc);
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                    "The node view resources for node '" + m_nnc.getNameWithID() + "' could not be written to disc", e);
-            }
-        } else {
-            return debugUrl;
-        }
-    }
-
 }

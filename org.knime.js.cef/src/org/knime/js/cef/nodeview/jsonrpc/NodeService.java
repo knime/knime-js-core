@@ -44,46 +44,39 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Aug 25, 2021 (hornm): created
+ *   Sep 10, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview;
+package org.knime.js.cef.nodeview.jsonrpc;
 
-import java.io.IOException;
-
-import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.rpc.RpcServerManager;
-
-import com.equo.chromium.swt.Browser;
-import com.equo.chromium.swt.BrowserFunction;
+import org.knime.core.webui.node.view.NodeView;
 
 /**
- * A browser function for 'node remote procedure calls'.
+ * {@link NodeView}s for the new web-ui assume a certain backend to be available when opened from the desktop
+ * application.
+ *
+ * The required backend is actually the so called 'gateway API' (called through json-rpc in case of the desktop app)
+ * which is not available to the 'this' container of a node view (i.e. the node view 'container' which opens the node
+ * views in the predominantly java-based (classic) UI.
+ *
+ * This interface mirrors the few gateway API methods that are necessary to make the node views work here, too, without
+ * requiring the node view framework to call out to yet another backend (apart from the gateway API). I.e. all methods
+ * defined here are defined in the gateway API, too, and their implementations ideally re-use the very same logic.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class NodeRpcBrowserFunction extends BrowserFunction {
-
-    private static final String FUNCTION_NAME = "nodeRpc";
-
-    private NativeNodeContainer m_nnc;
+public interface NodeService {
 
     /**
-     * @param browser
-     * @param nnc
+     * Sends a request to a node view's node data service of a certain type.
+     *
+     * @param projectId
+     * @param workflowId
+     * @param nodeId
+     * @param serviceId specified the type of service to call
+     * @param request the request
+     * @return the data service response
      */
-    public NodeRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
-        super(browser, FUNCTION_NAME);
-        m_nnc = nnc;
-    }
-
-    @Override
-    public Object function(final Object[] args) {
-        try {
-            return RpcServerManager.getInstance().doRpc(m_nnc, (String)args[0]);
-        } catch (IOException e) {
-            throw new IllegalStateException(
-                "Remote procedure call to node " + m_nnc.getNameWithID() + " failed. The rpc request is " + args[0], e);
-        }
-    }
+    String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceId,
+        String request);
 
 }
