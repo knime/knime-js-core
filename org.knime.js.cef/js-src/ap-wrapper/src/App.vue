@@ -16,10 +16,6 @@ export default {
             info: {}
         };
     },
-    computed: {
-        // eslint-disable-next-line no-process-env
-        isDebug: () => process.env.NODE_ENV === 'development'
-    },
     mounted() {
         // TODO NXT-653 use knime service to provide the information
         this.info = JSON.parse(window.getNodeViewInfo());
@@ -48,8 +44,8 @@ export default {
         :init-data="info.initData"
       />
     </div>
-    <DebugButton v-if="isDebug" />
-    <RefreshButton v-if="info.uicomponent" />
+    <DebugButton v-if="info.remoteDebugEnabled" />
+    <RefreshButton v-if="info.uicomponent && info.remoteDebugEnabled" />
   </div>
 </template>
 
