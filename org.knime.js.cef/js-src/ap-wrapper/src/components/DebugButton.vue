@@ -5,6 +5,12 @@ export default {
     components: {
         InspectorIcon
     },
+    props: {
+        debugPort: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return {
             debugPage: ''
@@ -12,30 +18,15 @@ export default {
     },
     computed: {
         // Composed URL to either open the correct debugger or the overview page
-        debugUrl() { return `http://localhost:8888${this.debugPage}`; }
+        debugUrl() { return `http://localhost:${this.debugPort}${this.debugPage}`; }
     },
-    mounted() {
-        // Code taken from cef debugger
-        let tabsListRequest = new XMLHttpRequest();
-        tabsListRequest.open('GET', `http://localhost:8888/json/list?t=${new Date().getTime()}`, true);
-        tabsListRequest.onreadystatechange = this.onReady;
-        tabsListRequest.send();
-    },
-    methods: {
-        // If more than one debugger is possible redirect to the debugger list, otherwise open the debugger directly
-        onReady(e) {
-            if (e.target.readyState === 4 && e.target.status === 200) {
-                let responseJSON;
-                if (e.target.response !== null) {
-                    responseJSON = JSON.parse(e.target.response);
-                }
-                if (responseJSON.length > 1) {
-                    this.debugPage = '';
-                } else {
-                    this.debugPage = responseJSON[0].devtoolsFrontendUrl;
-                }
-            }
-        }
+    async mounted() {
+        // Checks for existing debugger instances.
+        // If there is more than 1, the list of all instances is displayed.
+        // Otherwise, the first one will be opened.
+        this.debugPage = await fetch(`http://localhost:${this.debugPort}/json/list?t=${new Date().getTime()}`)
+            .then(response => response.json())
+            .then(data => data.length === 1 ? data[0].devtoolsFrontendUrl : '');
     }
 };
 </script>

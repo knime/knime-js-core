@@ -66,10 +66,10 @@ interface NodeViewInfo {
 
     boolean isUIComponent();
 
-    boolean isRemoteDebugEnabled();
+    String getRemoteDebugPort();
 
     static NodeViewInfo create(final String name, final String url, final String initData,
-        final boolean isUIComponent, final boolean isRemoteDebugEnabled) {
+        final boolean isUIComponent, final String remoteDebugPort) {
         return new NodeViewInfo() { // NOSONAR
 
             @Override
@@ -93,8 +93,8 @@ interface NodeViewInfo {
             }
 
             @Override
-            public boolean isRemoteDebugEnabled() {
-                return isRemoteDebugEnabled;
+            public String getRemoteDebugPort() {
+                return remoteDebugPort;
             }
 
         };

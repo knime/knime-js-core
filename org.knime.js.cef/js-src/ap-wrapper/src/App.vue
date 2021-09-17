@@ -44,8 +44,13 @@ export default {
         :init-data="info.initData"
       />
     </div>
-    <DebugButton v-if="info.remoteDebugEnabled" />
-    <RefreshButton v-if="info.uicomponent && info.remoteDebugEnabled" />
+    <DebugButton
+      v-if="info.remoteDebugPort"
+      :debug-port="info.remoteDebugPort"
+    />
+    <RefreshButton
+      v-if="info.uicomponent && info.remoteDebugPort"
+    />
   </div>
 </template>
 
