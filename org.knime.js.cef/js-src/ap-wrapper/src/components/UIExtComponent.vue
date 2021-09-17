@@ -81,10 +81,3 @@ export default {
     :init-data="initData"
   />
 </template>
-
-<style lang="postcss">
-@import 'modern-normalize/modern-normalize.css';
-@import "webapps-common/ui/css/variables";
-@import "webapps-common/ui/css/basics";
-@import "webapps-common/ui/css/fonts";
-</style>

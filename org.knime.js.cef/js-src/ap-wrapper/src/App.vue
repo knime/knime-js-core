@@ -1,8 +1,8 @@
 <script>
 import UIExtComponent from './components/UIExtComponent.vue';
 import UIExtIFrame from './components/UIExtIFrame.vue';
-import DebugButton from './components/DebugButton.vue';
-import RefreshButton from './components/RefreshButton.vue';
+import DebugButton from './components/debug/DebugButton.vue';
+import RefreshButton from './components/debug/RefreshButton.vue';
 
 export default {
     components: {
@@ -44,16 +44,16 @@ export default {
         :init-data="info.initData"
       />
     </div>
-    <DebugButton
-      v-if="info.remoteDebugPort"
-      :debug-port="info.remoteDebugPort"
-    />
-    <RefreshButton
-      v-if="info.uicomponent && info.remoteDebugPort"
-    />
+    <template v-if="info.remoteDebugPort">
+      <DebugButton :debug-port="info.remoteDebugPort" />
+      <RefreshButton v-if="info.uicomponent" />
+    </template>
   </div>
 </template>
 
 <style lang="postcss">
-
+@import 'modern-normalize/modern-normalize.css';
+@import "webapps-common/ui/css/variables";
+@import "webapps-common/ui/css/basics";
+@import "webapps-common/ui/css/fonts";
 </style>
