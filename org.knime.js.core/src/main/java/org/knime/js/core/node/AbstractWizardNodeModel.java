@@ -133,6 +133,7 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
                 m_value = createEmptyViewValue();
             }
         }
+        preExecute();
         PortObject[] portObjects = performExecute(inObjects, exec);
         return portObjects;
     }
@@ -144,6 +145,15 @@ public abstract class AbstractWizardNodeModel<REP extends JSONViewContent, VAL e
     protected final BufferedDataTable[] execute(final BufferedDataTable[] inData, final ExecutionContext exec)
             throws Exception {
         return super.execute(inData, exec);
+    }
+
+    /**
+     * Called right before {@link #performExecute(PortObject[], ExecutionContext)}.
+     *
+     * @since 4.5
+     */
+    protected void preExecute() {
+       //
     }
 
     /**
