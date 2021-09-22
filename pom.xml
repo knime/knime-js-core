@@ -59,6 +59,7 @@
                 <module>org.knime.js.core</module>
                 <module>org.knime.js.core.tests</module>
                 <module>org.knime.js.cef</module>
+                <module>org.knime.js.cef.tests</module>
                 <module>org.knime.js.swt</module>
             </modules>
 
