@@ -74,7 +74,6 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.NodeMessage;
 import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WebResourceController.WizardPageContent.WizardPageNodeInfo;
 import org.knime.core.node.workflow.WorkflowLock;
@@ -93,6 +92,7 @@ import org.knime.js.core.layout.bs.JSONLayoutRow;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 import org.knime.js.core.layout.bs.JSONNestedLayout;
 import org.knime.js.core.selections.json.JSONSelectionTranslator;
+import org.knime.js.core.webtemplate.WebTemplateUtil;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -204,7 +204,7 @@ public abstract class AbstractPageManager {
             } else {
                 info.setDisplayPossible(true);
                 WebTemplate template =
-                        WebResourceController.getWebTemplateFromJSObjectID(wizardNode.getJavascriptObjectID());
+                        WebTemplateUtil.getWebTemplateFromJSObjectID(wizardNode.getJavascriptObjectID());
                     List<String> jsList = new ArrayList<String>();
                     List<String> cssList = new ArrayList<String>();
                     for (WebResourceLocator locator : template.getWebResources()) {

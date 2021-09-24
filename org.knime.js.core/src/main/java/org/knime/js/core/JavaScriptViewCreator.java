@@ -81,13 +81,13 @@ import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewCreator;
-import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.util.FileUtil;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent;
+import org.knime.js.core.webtemplate.WebTemplateUtil;
 import org.osgi.framework.Bundle;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -158,7 +158,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      */
     public JavaScriptViewCreator(final String javascriptObjectID) {
         if (javascriptObjectID != null) {
-            m_template = WebResourceController.getWebTemplateFromJSObjectID(javascriptObjectID);
+            m_template = WebTemplateUtil.getWebTemplateFromJSObjectID(javascriptObjectID);
         }
     }
 

@@ -62,9 +62,9 @@ import org.knime.core.node.port.image.ImagePortObject;
 import org.knime.core.node.port.inactive.InactiveBranchPortObject;
 import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.wizard.WizardNode;
-import org.knime.core.node.workflow.WebResourceController;
 import org.knime.js.core.AbstractImageGenerator;
 import org.knime.js.core.JSONViewContent;
+import org.knime.js.core.webtemplate.WebTemplateUtil;
 import org.openqa.selenium.TimeoutException;
 
 /**
@@ -256,7 +256,7 @@ public abstract class AbstractImageWizardNodeModel<REP extends JSONViewContent, 
      * @return the view implementation namespace
      */
     protected final String getViewNamespace() {
-        WebTemplate template = WebResourceController.getWebTemplateFromJSObjectID(getJavascriptObjectID());
+        WebTemplate template = WebTemplateUtil.getWebTemplateFromJSObjectID(getJavascriptObjectID());
         return template.getNamespace();
     }
 }

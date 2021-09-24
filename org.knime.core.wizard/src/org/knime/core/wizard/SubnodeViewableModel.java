@@ -65,7 +65,6 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.core.node.interactive.ViewRequestHandlingException;
 import org.knime.core.node.util.CheckUtils;
-import org.knime.core.node.web.DefaultWebTemplate;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebResourceLocator;
 import org.knime.core.node.web.WebResourceLocator.WebResourceType;
@@ -88,6 +87,7 @@ import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.JavaScriptViewCreator;
+import org.knime.js.core.webtemplate.DefaultWebTemplate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
