@@ -139,7 +139,7 @@ public class DefaultNodeService implements NodeService {
             return nvm.callTextDataService(m_nnc, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                nvm.callTextApplyDataService(m_nnc, request);
+                nvm.callTextReExecuteDataService(m_nnc, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
