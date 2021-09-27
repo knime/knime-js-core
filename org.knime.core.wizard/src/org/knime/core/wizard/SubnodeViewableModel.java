@@ -48,6 +48,8 @@
  */
 package org.knime.core.wizard;
 
+import static java.util.Collections.emptyMap;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -207,13 +209,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         m_value.setViewValues(valueMap);
     }
 
-    private SubnodeViewValue createViewValue() throws IOException {
-        Map<String, String> valueMap = m_spm.createWizardPageViewValueMap(m_container.getID());
-        SubnodeViewValue value = new SubnodeViewValue();
-        value.setViewValues(valueMap);
-        return value;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -295,8 +290,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     @Override
     public JSONWebNodePage createEmptyViewRepresentation() {
-        Map<String, JSONWebNode> emptyNode = new HashMap<String, JSONWebNode>();
-        return new JSONWebNodePage(new JSONWebNodePageConfiguration(), emptyNode);
+        return new JSONWebNodePage(new JSONWebNodePageConfiguration(), emptyMap(), emptyMap());
     }
 
     /**

@@ -58,16 +58,16 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.wizard.util.DefaultLayoutCreator;
-import org.knime.core.node.workflow.CompositeViewController;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
+import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
-import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
@@ -95,7 +95,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * {@inheritDoc}
      */
     @Override
-    public String createDefaultLayout(final Map<NodeIDSuffix, ViewHideable> viewNodes) throws IOException {
+    public String createDefaultLayout(final Map<NodeIDSuffix, SingleNodeContainer> viewNodes) throws IOException {
         JSONLayoutPage page = createDefaultLayoutStructure(viewNodes);
         ObjectMapper mapper = JSONLayoutPage.getConfiguredObjectMapper();
         try {
@@ -111,19 +111,21 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @param viewNodes a map of view nodes to create the layout for
      * @return the new default layout structure
      */
-    public static JSONLayoutPage createDefaultLayoutStructure(final Map<NodeIDSuffix, ViewHideable> viewNodes) {
+    public static JSONLayoutPage
+        createDefaultLayoutStructure(final Map<NodeIDSuffix, SingleNodeContainer> viewNodes) {
         JSONLayoutPage page = new JSONLayoutPage();
         List<JSONLayoutRow> rows = new ArrayList<JSONLayoutRow>();
         page.setRows(rows);
         for (NodeIDSuffix suffix : viewNodes.keySet()) {
-            ViewHideable viewNode = viewNodes.get(suffix);
+            SingleNodeContainer viewNode = viewNodes.get(suffix);
             JSONLayoutRow row = createDefaultRowForViewContent(suffix, viewNode);
             rows.add(row);
         }
         return page;
     }
 
-    private static JSONLayoutRow createDefaultRowForViewContent(final NodeIDSuffix suffix, final ViewHideable viewNode) {
+    private static JSONLayoutRow createDefaultRowForViewContent(final NodeIDSuffix suffix,
+        final SingleNodeContainer viewNode) {
         JSONLayoutRow row = new JSONLayoutRow();
         JSONLayoutColumn col = new JSONLayoutColumn();
         JSONLayoutContent colContent;
@@ -133,7 +135,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             nestedLayout.setNodeID(Integer.toString(id.getIndex()));
             colContent = nestedLayout;
         } else {
-            colContent = getDefaultViewContentForNode(suffix, viewNode);
+            colContent = getDefaultViewContentForNode(suffix, (NativeNodeContainer)viewNode);
         }
         col.setContent(Arrays.asList(new JSONLayoutContent[]{colContent}));
         try {
@@ -151,14 +153,15 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * @param suffix the node id suffix as used in the layout definition
      * @param viewNode the node to create the view content for
      * @return a new view content element for a JSON layout
-     * @since 3.7
+     * @since 4.5
      */
     public static JSONLayoutViewContent getDefaultViewContentForNode(final NodeIDSuffix suffix,
-        final ViewHideable viewNode) {
+        final NativeNodeContainer viewNode) {
         NodeID id = NodeID.fromString(suffix.toString());
         JSONLayoutViewContent view = new JSONLayoutViewContent();
-        if (viewNode instanceof LayoutTemplateProvider) {
-            JSONLayoutViewContent layoutViewTemplate = ((LayoutTemplateProvider)viewNode).getLayoutTemplate();
+        if (viewNode.getNodeModel() instanceof LayoutTemplateProvider) {
+            JSONLayoutViewContent layoutViewTemplate =
+                ((LayoutTemplateProvider)viewNode.getNodeModel()).getLayoutTemplate();
             if (layoutViewTemplate != null) {
                 view = layoutViewTemplate;
             }
@@ -267,19 +270,13 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         SubnodeContainerLayoutStringProvider layoutStringProvider = sub.getSubnodeLayoutStringProvider();
         if (layoutStringProvider.isEmptyLayout() || layoutStringProvider.isPlaceholderLayout()) {
             // create default layout also for nested subnodes, if there is no layout defined
-            @SuppressWarnings("rawtypes")
-            Map<NodeID, WizardNode> nestedNodes =
-            wfm.findNodes(WizardNode.class, WebResourceController.NOT_HIDDEN_FILTER, false);
-            if (nestedNodes.size() > 0) {
-                Map<NodeIDSuffix, ViewHideable> nestedViews = nestedNodes.entrySet().stream().collect(Collectors
-                    .toMap(e -> NodeIDSuffix.create(wfm.getID(), e.getKey()), v -> (ViewHideable)v.getValue()));
-                Map<NodeID, SubNodeContainer> nestedSubnodes = WebResourceController.getSubnodeContainers(wfm);
+            List<NativeNodeContainer> nestedNodes = WizardPageUtil.getWizardPageNodes(wfm);
+            if (!nestedNodes.isEmpty()) {
+                Map<NodeIDSuffix, SingleNodeContainer> nestedViews = nestedNodes.stream().collect(Collectors
+                    .toMap(n -> NodeIDSuffix.create(wfm.getID(), n.getID()), n -> (SingleNodeContainer)n));
+                Map<NodeID, SubNodeContainer> nestedSubnodes = WizardPageUtil.getSubPageNodes(wfm);
                 for (Entry<NodeID, SubNodeContainer> entry : nestedSubnodes.entrySet()) {
-                    CompositeViewController controller =
-                            new CompositeViewController(wfm, entry.getKey());
-                    if (controller.isSubnodeViewAvailable()) {
-                        nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
-                    }
+                    nestedViews.put(NodeIDSuffix.create(wfm.getID(), entry.getKey()), entry.getValue());
                 }
                 JSONLayoutPage nestedPage = createDefaultLayoutStructure(nestedViews);
                 expandNestedLayout(nestedPage, wfm);
@@ -296,10 +293,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
      * {@inheritDoc}
      * @since 4.2
      */
-    @SuppressWarnings("rawtypes")
     @Override
     public void addUnreferencedViews(final SubnodeContainerLayoutStringProvider layoutStringProvider,
-        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews,
+        final Map<NodeIDSuffix, NativeNodeContainer> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews,
         final NodeID containerID) {
         JSONLayoutPage finalLayout;
         if (layoutStringProvider.isEmptyLayout() || layoutStringProvider.isPlaceholderLayout()) {
@@ -323,14 +319,14 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
 
     @SuppressWarnings("rawtypes")
     private JSONLayoutPage addUnreferencedViews(final NodeID containerID, final JSONLayoutPage layout,
-        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
+        final Map<NodeIDSuffix, NativeNodeContainer> allNodes,
+        final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
         List<NodeIDSuffix> containedNodes = new ArrayList<NodeIDSuffix>();
         layout.getRows().stream().forEach(row -> {
             addNodesFromRow(row, containedNodes);
         });
-        Map<NodeIDSuffix, ViewHideable> allViews =
-            getAllCurrentSNCViews(containerID, allNodes, allNestedViews);
-        Map<NodeIDSuffix, ViewHideable> missingViews = allViews.entrySet().stream()
+        Map<NodeIDSuffix, SingleNodeContainer> allViews = getAllCurrentSNCViews(containerID, allNodes, allNestedViews);
+        Map<NodeIDSuffix, SingleNodeContainer> missingViews = allViews.entrySet().stream()
             .filter(e -> {
                 final NodeID nodeID = NodeID.fromString(e.getKey().toString());
                 return !containedNodes.contains(NodeIDSuffix.create(containerID, nodeID));
@@ -398,9 +394,10 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     }
 
     @SuppressWarnings("rawtypes")
-    private static Map<NodeIDSuffix, ViewHideable> getAllCurrentSNCViews(final NodeID containerID,
-        final Map<NodeIDSuffix, WizardNode> allNodes, final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
-        Map<NodeIDSuffix, ViewHideable> allViews = new LinkedHashMap<NodeIDSuffix, ViewHideable>();
+    private static Map<NodeIDSuffix, SingleNodeContainer> getAllCurrentSNCViews(final NodeID containerID,
+        final Map<NodeIDSuffix, NativeNodeContainer> allNodes,
+        final Map<NodeIDSuffix, SubNodeContainer> allNestedViews) {
+        Map<NodeIDSuffix, SingleNodeContainer> allViews = new LinkedHashMap<>();
         allNodes.entrySet().stream().filter(e -> isInCurrentSNC(containerID, e.getKey()))
             .forEach(e -> allViews.put(e.getKey(), e.getValue()));
         allNestedViews.entrySet().stream().filter(e -> isInCurrentSNC(containerID, e.getKey()))

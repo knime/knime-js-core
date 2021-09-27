@@ -68,14 +68,14 @@ import org.knime.core.node.web.WebTemplate;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.page.WizardPage;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeContainerState;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.NodeMessage;
 import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent.WizardPageNodeInfo;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.JSONViewContent;
@@ -127,12 +127,13 @@ public abstract class AbstractPageManager {
     }
 
     /**
-     * Performs a transformation from {@link WizardPageContent} to {@link JSONWebNodePage} which can be used for serialization.
-     * @param page the {@link WizardPageContent} to transform
+     * Performs a transformation from {@link WizardPage} to {@link JSONWebNodePage} which can be used for serialization.
+     * @param page the {@link WizardPage} to transform
      * @return the transformed {@link JSONWebNodePage}
      * @throws IOException if layout of page can not be generated
+     * @since 4.5
      */
-    protected JSONWebNodePage createWizardPageInternal(final WizardPageContent page) throws IOException {
+    protected JSONWebNodePage createWizardPageInternal(final WizardPage page) throws IOException {
         // process layout
         JSONLayoutPage layout = new JSONLayoutPage();
         try {
@@ -171,14 +172,14 @@ public abstract class AbstractPageManager {
             projectID.equals(pagePrefix) ? "" : NodeIDSuffix.create(projectID, pagePrefix).toString();
         JSONWebNodePageConfiguration pageConfig =
             new JSONWebNodePageConfiguration(layout, null, selectionTranslators, projectRelativePageIDSuffix);
-        Map<String, JSONWebNode> nodes = new HashMap<String, JSONWebNode>();
-        for (Map.Entry<NodeIDSuffix, WizardPageNodeInfo> e : page.getInfoMap().entrySet()) {
-            WizardPageNodeInfo pInfo = e.getValue();
+        Map<String, JSONWebNode> nodes = new HashMap<>();
+        for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
+            NativeNodeContainer nnc = e.getValue();
             JSONWebNode jsonNode = new JSONWebNode();
             JSONWebNodeInfo info = new JSONWebNodeInfo();
-            info.setNodeName(pInfo.getNodeName());
-            info.setNodeAnnotation(pInfo.getNodeAnnotation());
-            NodeContainerState state = pInfo.getNodeState();
+            info.setNodeName(nnc.getName());
+            info.setNodeAnnotation(nnc.getNodeAnnotation().toString());
+            NodeContainerState state = nnc.getNodeContainerState();
             if (state.isIdle()) {
                 info.setNodeState(JSONNodeState.IDLE);
             }
@@ -191,22 +192,24 @@ public abstract class AbstractPageManager {
             if (state.isExecuted()) {
                 info.setNodeState(JSONNodeState.EXECUTED);
             }
-            NodeMessage message = pInfo.getNodeMessage();
-            if (org.knime.core.node.workflow.NodeMessage.Type.ERROR.equals(message.getMessageType())) {
+            NodeMessage message = nnc.getNodeMessage();
+            if (NodeMessage.Type.ERROR == message.getMessageType()) {
                 info.setNodeErrorMessage(message.getMessage());
             }
-            if (org.knime.core.node.workflow.NodeMessage.Type.WARNING.equals(message.getMessageType())) {
+            if (NodeMessage.Type.WARNING == message.getMessageType()) {
                 info.setNodeWarnMessage(message.getMessage());
             }
-            WizardNode<?, ?> wizardNode = page.getPageMap().get(e.getKey());
-            if (wizardNode == null) {
+
+            if (!state.isExecuted()) {
                 info.setDisplayPossible(false);
-            } else {
+            } else if (nnc.getNodeModel() instanceof WizardNode) {
+                @SuppressWarnings("rawtypes")
+                WizardNode wizardNode = (WizardNode)nnc.getNodeModel(); // NOSONAR
                 info.setDisplayPossible(true);
                 WebTemplate template =
                         WebTemplateUtil.getWebTemplateFromJSObjectID(wizardNode.getJavascriptObjectID());
-                    List<String> jsList = new ArrayList<String>();
-                    List<String> cssList = new ArrayList<String>();
+                    List<String> jsList = new ArrayList<>();
+                    List<String> cssList = new ArrayList<>();
                     for (WebResourceLocator locator : template.getWebResources()) {
                         if (locator.getType() == WebResourceType.JAVASCRIPT) {
                             jsList.add(locator.getRelativePathTarget());

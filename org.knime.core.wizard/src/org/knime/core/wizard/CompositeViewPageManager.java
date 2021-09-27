@@ -50,6 +50,7 @@ package org.knime.core.wizard;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,10 +62,10 @@ import org.knime.core.node.interactive.ViewRequestHandlingException;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewResponse;
+import org.knime.core.node.wizard.page.WizardPage;
 import org.knime.core.node.workflow.CompositeViewController;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.JSONWebNodePage;
@@ -119,7 +120,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
      */
     public JSONWebNodePage createWizardPage(final NodeID containerNodeID) throws IOException {
         CompositeViewController sec = getController(containerNodeID);
-        WizardPageContent page = sec.getWizardPage();
+        WizardPage page = sec.getWizardPage();
         return createWizardPageInternal(page);
     }
 
@@ -132,11 +133,17 @@ public class CompositeViewPageManager extends AbstractPageManager {
      */
     public Map<String, String> createWizardPageViewValueMap(final NodeID containerNodeID) throws IOException {
         CompositeViewController sec = getController(containerNodeID);
-        Map<NodeIDSuffix, WebViewContent> viewMap = sec.getWizardPageViewValueMap();
-        Map<String, String> resultMap = new HashMap<String, String>();
-        for (Entry<NodeIDSuffix, WebViewContent> entry : viewMap.entrySet()) {
-            WebViewContent c = entry.getValue();
-            resultMap.put(entry.getKey().toString(), new String(((ByteArrayOutputStream)c.saveToStream()).toByteArray()));
+        Map<NodeIDSuffix, Object> viewMap = sec.getWizardPageViewValueMap();
+        Map<String, String> resultMap = new HashMap<>();
+        for (Entry<NodeIDSuffix, Object> entry : viewMap.entrySet()) {
+            Object v = entry.getValue();
+            if (v instanceof WebViewContent) {
+                WebViewContent c = (WebViewContent)v;
+                resultMap.put(entry.getKey().toString(),
+                    new String(((ByteArrayOutputStream)c.saveToStream()).toByteArray(), StandardCharsets.UTF_8));
+            } else {
+                throw new IOException("View value of type " + v.getClass().getSimpleName() + " can' be serialized");
+            }
         }
         return resultMap;
     }

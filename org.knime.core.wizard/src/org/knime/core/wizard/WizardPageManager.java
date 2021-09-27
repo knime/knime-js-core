@@ -66,9 +66,9 @@ import org.knime.core.node.wizard.ViewRequestExecutor;
 import org.knime.core.node.wizard.WizardViewRequestHandler;
 import org.knime.core.node.wizard.WizardViewRequestRunner;
 import org.knime.core.node.wizard.WizardViewResponse;
+import org.knime.core.node.wizard.page.WizardPage;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.WebResourceController;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
@@ -130,7 +130,7 @@ public final class WizardPageManager extends AbstractPageManager implements View
      */
     public JSONWebNodePage createCurrentWizardPage() throws IOException {
         WizardExecutionController wec = getWizardExecutionController();
-        WizardPageContent page = wec.getCurrentWizardPage();
+        WizardPage page = wec.getCurrentWizardPage();
         return createWizardPageInternal(page);
     }
 

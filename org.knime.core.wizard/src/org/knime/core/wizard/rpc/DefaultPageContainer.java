@@ -50,8 +50,8 @@ package org.knime.core.wizard.rpc;
 
 import java.util.List;
 
+import org.knime.core.node.wizard.page.WizardPage;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.wizard.SubnodeViewableModel;
 
 import com.fasterxml.jackson.databind.util.RawValue;
@@ -70,7 +70,7 @@ public final class DefaultPageContainer implements PageContainer {
     private final List<String> m_reexecutedNodes;
 
     /**
-     * @param page - {@link WizardPageContent} for the associated {@link SubnodeViewableModel}
+     * @param page - {@link WizardPage} for the associated {@link SubnodeViewableModel}
      * @param resetNodes - a list of string {@link NodeIDSuffix} for nodes reset during the current re-execution event
      *            or null if re-execution is not in progress.
      * @param reexecutedNodes - a list of string {@link NodeIDSuffix} for nodes that have been reset by a re-execution

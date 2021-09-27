@@ -48,6 +48,8 @@
  */
 package org.knime.js.core;
 
+import static java.util.Collections.emptyMap;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -568,7 +570,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         @JsonCreator
         private JSONSingleNodePage(final REP viewRep, final VAL viewVal) {
-            super(new JSONWebNodePageConfiguration(), new HashMap<String, JSONWebNode>());
+            super(new JSONWebNodePageConfiguration(), emptyMap(), emptyMap());
             setWebNodePageConfiguration(createJSONPageConfig());
             setWebNodes(createNodesMap(createJsonWebNode(viewRep, viewVal)));
         }

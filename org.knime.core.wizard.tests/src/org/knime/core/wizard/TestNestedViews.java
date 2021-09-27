@@ -57,11 +57,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.wizard.page.WizardPage;
+import org.knime.core.node.workflow.CompositeViewController;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
-import org.knime.core.node.workflow.CompositeViewController;
-import org.knime.core.node.workflow.WebResourceController.WizardPageContent;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
@@ -134,10 +134,9 @@ public class TestNestedViews extends WorkflowTestCase {
         assertTrue("Should have subnode view", spc.isSubnodeViewAvailable());
 
         //create page content
-        WizardPageContent page = spc.getWizardPage();
+        WizardPage page = spc.getWizardPage();
         assertNotNull("Page content should be available", page);
-        @SuppressWarnings("rawtypes")
-        Map<NodeIDSuffix, WizardNode> pageMap = page.getPageMap();
+        Map<NodeIDSuffix, NativeNodeContainer> pageMap = page.getPageMap();
         assertNotNull("Page map should be available", pageMap);
         String layoutString = page.getLayoutInfo();
         assertNotNull("Page layout should be available", layoutString);

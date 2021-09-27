@@ -59,11 +59,11 @@ import java.util.stream.Stream;
 
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.web.ValidationError;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SingleNodeContainer;
-import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.util.Pair;
 import org.knime.core.wizard.CompositeViewPageManager;
@@ -191,7 +191,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         final Predicate<NodeContainer> nodeFilter) {
         NodeID pageId = m_page.getID();
         Stream<Pair<NodeIDSuffix, NodeContainer>> res =
-            WebResourceController.getSuccessorWizardNodesWithinComponent(m_cvm.getWorkflowManager(), pageId,
+            WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(m_cvm.getWorkflowManager(), pageId,
                 resetNodeId);
         if (nodeFilter != null) {
             res = res.filter(p -> nodeFilter.test(p.getSecond()));
