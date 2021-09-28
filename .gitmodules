@@ -4,3 +4,6 @@
 [submodule "webapps-common-ap-wrapper"]
 	path = org.knime.js.cef/js-src/ap-wrapper/webapps-common
 	url = ../webapps-common
+[submodule "org.knime.js.cef/js-src/ap-wrapper/knime-ui-extension-service"]
+	path = org.knime.js.cef/js-src/ap-wrapper/knime-ui-extension-service
+	url = .../knime-ui-extension-service

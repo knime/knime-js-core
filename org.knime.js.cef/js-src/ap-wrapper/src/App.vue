@@ -13,11 +13,10 @@ export default {
     },
     data() {
         return {
-            info: {}
+            info: null
         };
     },
     mounted() {
-        // TODO NXT-653 use knime service to provide the information
         this.info = JSON.parse(window.getNodeViewInfo());
     }
 };
@@ -25,34 +24,30 @@ export default {
 
 <template>
   <div>
-    <div v-if="info.uicomponent">
+    <template v-if="info">
       <UIExtComponent
-        :name="info.name"
-        :component-src="info.url"
-        :project-id="info.projectId"
-        :workflow-id="info.workflowId"
-        :node-id="info.nodeId"
-        :init-data="info.initData"
+        v-if="info.uicomponent"
+        :ext-info="info"
       />
-    </div>
-    <div v-else>
       <UIExtIFrame
+        v-else
         :iframe-src="info.url"
         :project-id="info.projectId"
         :workflow-id="info.workflowId"
         :node-id="info.nodeId"
         :init-data="info.initData"
       />
-    </div>
-    <template v-if="info.remoteDebugPort">
-      <DebugButton :debug-port="info.remoteDebugPort" />
-      <RefreshButton v-if="info.uicomponent" />
+
+      <template v-if="info.remoteDebugPort">
+        <DebugButton :debug-port="info.remoteDebugPort" />
+        <RefreshButton v-if="info.uicomponent" />
+      </template>
     </template>
   </div>
 </template>
 
 <style lang="postcss">
-@import 'modern-normalize/modern-normalize.css';
+@import "modern-normalize/modern-normalize.css";
 @import "webapps-common/ui/css/variables";
 @import "webapps-common/ui/css/basics";
 @import "webapps-common/ui/css/fonts";

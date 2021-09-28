@@ -13,6 +13,7 @@ module.exports = {
         config.resolve.alias.set('~', path.resolve(__dirname));
 
         config.resolve.alias.set('webapps-common', path.resolve(__dirname, 'webapps-common'));
+        config.resolve.alias.set('knime-ui-extension-service', path.resolve(__dirname, 'knime-ui-extension-service'));
 
         // apply SVG loader config
         config.module.rule('svg').uses.clear();
