@@ -48,16 +48,22 @@
  */
 package org.knime.js.cef.nodeview.jsonrpc;
 
+import static org.knime.js.cef.nodeview.GetNodeViewInfoBrowserFunction.MAPPER;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.swt.widgets.Display;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 
 import com.equo.chromium.swt.Browser;
 import com.equo.chromium.swt.BrowserFunction;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * A browser function for 'remote procedure calls' using the json-rpc standard. It's exactly the same browser function
@@ -79,7 +85,22 @@ public class JsonRpcBrowserFunction extends BrowserFunction {
     public JsonRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
         super(browser, FUNCTION_NAME);
         m_jsonRpcServer = new JsonRpcServer();
-        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc));
+
+        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc, selectionEvent -> { // NOSONAR
+            // code copied from org.knime.ui.java.browser.KnimeBrowserView
+            final var jsonrpcObjectNode = MAPPER.createObjectNode();
+            final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
+            paramsArrayNode.addPOJO(selectionEvent);
+            jsonrpcObjectNode.put(FUNCTION_NAME, "2.0").put("method", "SelectionEvent").set("params", paramsArrayNode);
+            try {
+                final String jsCode = "jsonrpcNotification(\""
+                    + StringEscapeUtils.escapeJava(MAPPER.writeValueAsString(jsonrpcObjectNode)) + "\");";
+                Display.getDefault().syncExec(() -> browser.execute(jsCode));
+            } catch (JsonProcessingException ex) {
+                NodeLogger.getLogger(DefaultNodeService.class)
+                    .error("Problem creating a json-rpc notification in order to send an event", ex);
+            }
+        }));
     }
 
     @Override

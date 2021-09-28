@@ -49,26 +49,90 @@
 package org.knime.js.cef.nodeview.jsonrpc;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.property.hilite.HiLiteHandler;
+import org.knime.core.node.property.hilite.HiLiteListener;
+import org.knime.core.node.property.hilite.KeyEvent;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.webui.node.view.NodeViewManager;
 
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ * @author Marc Bux, KNIME GmbH, Berlin, Germany
  */
 public class DefaultNodeService implements NodeService {
 
+    static interface SelectionEvent {
+        SelectionEventMode getMode();
+
+        List<String> getKeys();
+    }
+
+    enum SelectionEventMode {
+            ADD, REMOVE, REPLACE
+    }
+
     private final NativeNodeContainer m_nnc;
 
-    DefaultNodeService(final NativeNodeContainer nnc) {
+    private final Consumer<SelectionEvent> m_selectionEventConsumer;
+
+    private final HiLiteHandler m_hiliteHandler;
+
+    DefaultNodeService(final NativeNodeContainer nnc, final Consumer<SelectionEvent> selectionEventConsumer) {
         m_nnc = nnc;
+        m_selectionEventConsumer = selectionEventConsumer;
+        m_hiliteHandler = m_nnc.getNodeModel().getInHiLiteHandler(0);
+        m_hiliteHandler.addHiLiteListener(new HiLiteListener() {
+            @Override
+            public void hiLite(final KeyEvent event) {
+                consumeSelectionEvent(event, SelectionEventMode.ADD);
+            }
+
+            @Override
+            public void unHiLite(final KeyEvent event) {
+                consumeSelectionEvent(event, SelectionEventMode.REMOVE);
+            }
+
+            @Override
+            public void unHiLiteAll(final KeyEvent event) {
+                consumeSelectionEvent(new KeyEvent(event.getSource()), SelectionEventMode.REPLACE);
+            }
+
+            @Override
+            public void replaceHiLite(final KeyEvent event) {
+                consumeSelectionEvent(event, SelectionEventMode.REPLACE);
+            }
+        });
+    }
+
+    private void consumeSelectionEvent(final KeyEvent event, final SelectionEventMode type) {
+        final var src = event.getSource();
+        // do not consume selection events that have been fired by this very node / default node service
+        if (src != this) {
+            final var keys = event.keys().stream().map(RowKey::getString).collect(Collectors.toUnmodifiableList());
+            m_selectionEventConsumer.accept(new SelectionEvent() {
+                @Override
+                public SelectionEventMode getMode() {
+                    return type;
+                }
+
+                @Override
+                public List<String> getKeys() {
+                    return keys;
+                }
+            });
+        }
     }
 
     @Override
     public String callNodeViewDataService(final String projectId, final String workflowId, final String nodeID,
         final String serviceType, final String request) {
-        NodeViewManager nvm = NodeViewManager.getInstance();
+        final var nvm = NodeViewManager.getInstance();
         if ("initial_data".equals(serviceType)) {
             return nvm.callTextInitialDataService(m_nnc);
         } else if ("data".equals(serviceType)) {
@@ -83,6 +147,25 @@ public class DefaultNodeService implements NodeService {
             return "";
         } else {
             throw new IllegalArgumentException("Unknown service type '" + serviceType + "'");
+        }
+    }
+
+    @Override
+    public void selectDataPoints(final String projectId, final String workflowId, final String nodeId,
+        final String mode, final List<String> rowKeys) {
+        final var selectionEventMode = SelectionEventMode.valueOf(mode);
+        final var keyEvent = new KeyEvent(this, rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
+        switch (selectionEventMode) {
+            case ADD:
+                m_hiliteHandler.fireHiLiteEvent(keyEvent);
+                break;
+            case REMOVE:
+                m_hiliteHandler.fireUnHiLiteEvent(keyEvent);
+                break;
+            case REPLACE:
+                m_hiliteHandler.fireReplaceHiLiteEvent(keyEvent);
+                break;
+            default:
         }
     }
 

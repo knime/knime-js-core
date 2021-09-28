@@ -48,6 +48,8 @@
  */
 package org.knime.js.cef.nodeview.jsonrpc;
 
+import java.util.List;
+
 import org.knime.core.webui.node.view.NodeView;
 
 /**
@@ -63,6 +65,7 @@ import org.knime.core.webui.node.view.NodeView;
  * defined here are defined in the gateway API, too, and their implementations ideally re-use the very same logic.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ * @author Marc Bux, KNIME GmbH, Berlin, Germany
  */
 public interface NodeService {
 
@@ -78,5 +81,17 @@ public interface NodeService {
      */
     String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceId,
         String request);
+
+    /**
+     * Selects data points, as identified by their row keys. Unselects any other data points, if they were previously
+     * selected.
+     *
+     * @param projectId
+     * @param workflowId
+     * @param nodeId
+     * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
+     * @param rowKeys the keys affected by the data point selection modification
+     */
+    void selectDataPoints(String projectId, String workflowId, String nodeId, String mode, List<String> rowKeys);
 
 }
