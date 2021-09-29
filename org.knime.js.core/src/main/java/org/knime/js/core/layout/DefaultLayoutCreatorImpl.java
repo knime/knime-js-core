@@ -349,15 +349,22 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         });
         Map<NodeIDSuffix, JSONNestedLayout> nestedLayouts = new LinkedHashMap<NodeIDSuffix, JSONNestedLayout>();
         layout.getRows().stream().forEach(row -> {
-           getNestedLayoutsFromRow(row, nestedLayouts);
+            getNestedLayoutsFromRow(row, nestedLayouts);
         });
         nestedLayouts.entrySet().stream().forEach(e -> {
-            JSONLayoutPage nLP = e.getValue().getLayout();
+            JSONNestedLayout nestedLayout = e.getValue();
+            JSONLayoutPage layoutPage = nestedLayout.getLayout();
             NodeID sncID = e.getKey().prependParent(containerID);
-            SubNodeContainer nestedSNC = allNestedViews.get(NodeIDSuffix.fromString(sncID.toString()));
-            if (nestedSNC != null && nLP != null) {
+            NodeIDSuffix nestedSuffix = NodeIDSuffix.fromString(sncID.toString());
+            SubNodeContainer nestedSNC = allNestedViews.get(nestedSuffix);
+            if (nestedSNC != null) {
+                if (layoutPage == null) {
+                    Map<NodeIDSuffix, ViewHideable> nestedContentMap = new LinkedHashMap<NodeIDSuffix, ViewHideable>();
+                    layoutPage = createDefaultLayoutStructure(nestedContentMap);
+                    nestedLayout.setLayout(layoutPage);
+                }
                 NodeID sncContainerID = sncID.createChild(nestedSNC.getWorkflowManager().getID().getIndex());
-                addUnreferencedViews(sncContainerID, nLP, allNodes, allNestedViews);
+                addUnreferencedViews(sncContainerID, layoutPage, allNodes, allNestedViews);
             }
         });
         return layout;
