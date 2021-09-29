@@ -46,7 +46,7 @@
  * History
  *   Sep 10, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview.jsonrpc;
+package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
 import java.util.List;
@@ -64,6 +64,8 @@ import org.knime.core.webui.node.view.NodeViewManager;
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  * @author Marc Bux, KNIME GmbH, Berlin, Germany
+ *
+ * @since 4.5
  */
 public class DefaultNodeService implements NodeService {
 

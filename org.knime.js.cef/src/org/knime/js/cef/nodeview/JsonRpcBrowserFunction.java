@@ -43,11 +43,40 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
+ * History
+ *   Aug 25, 2021 (hornm): created
  */
+package org.knime.js.cef.nodeview;
+
+import org.eclipse.swt.widgets.Display;
+import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.wizard.rpc.JsonRpcFunction;
+
+import com.equo.chromium.swt.Browser;
+import com.equo.chromium.swt.BrowserFunction;
 
 /**
- * The interfaces/classes in this package are meant to mirror some gateway-api service methods required to support UI
- * extensions (i.e. node views etc.) in the java-based UI. It's to enable the frontend to use the same backend methods
- * no matter whether it's from the java-ui or new web-ui (i.e. AP.next).
+ * A browser function for 'remote procedure calls' using the json-rpc standard. It's exactly the same browser function
+ * that is injected by the web-ui used for jsonrpc calls to the 'gateway API'. By that, the frontend (e.g. the node view
+ * framework) doesn't require extra logic.
+ *
+ * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-package org.knime.js.cef.nodeview.jsonrpc;
+public class JsonRpcBrowserFunction extends BrowserFunction {
+
+    private final JsonRpcFunction m_function;
+
+    /**
+     * @param browser
+     * @param nnc
+     */
+    public JsonRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
+        super(browser, JsonRpcFunction.FUNCTION_NAME);
+        m_function = new JsonRpcFunction(nnc, c -> Display.getDefault().syncExec(() -> browser.execute(c)));
+    }
+
+    @Override
+    public Object function(final Object[] args) {
+        return m_function.call((String) args[0]);
+    }
+}

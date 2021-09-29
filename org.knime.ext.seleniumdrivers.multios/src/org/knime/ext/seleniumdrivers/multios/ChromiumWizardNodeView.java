@@ -51,6 +51,7 @@ package org.knime.ext.seleniumdrivers.multios;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
+import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.js.core.JSCorePlugin;
 
 /**
@@ -65,9 +66,10 @@ public class ChromiumWizardNodeView<T extends ViewableModel & WizardNode<REP, VA
 
     /**
      * @param viewableModel
+     * @since 4.5
      */
-    public ChromiumWizardNodeView(final T viewableModel) {
-        super(viewableModel);
+    public ChromiumWizardNodeView(final SingleNodeContainer snc, final T viewableModel) {
+        super(snc, viewableModel);
     }
 
     /**

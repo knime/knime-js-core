@@ -46,47 +46,79 @@
  * History
  *   Aug 25, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview.jsonrpc;
-
-import static org.knime.js.cef.nodeview.GetNodeViewInfoBrowserFunction.MAPPER;
+package org.knime.core.wizard.rpc;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
-import org.apache.commons.text.StringEscapeUtils;
-import org.eclipse.swt.widgets.Display;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
+import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEvent;
 
-import com.equo.chromium.swt.Browser;
-import com.equo.chromium.swt.BrowserFunction;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A browser function for 'remote procedure calls' using the json-rpc standard. It's exactly the same browser function
+ * A (browser) function for 'remote procedure calls' using the json-rpc standard. It's exactly the same browser function
  * that is injected by the web-ui used for jsonrpc calls to the 'gateway API'. By that, the frontend (e.g. the node view
  * framework) doesn't require extra logic.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ *
+ * @since 4.5
  */
-public class JsonRpcBrowserFunction extends BrowserFunction {
+public class JsonRpcFunction {
 
-    private static final String FUNCTION_NAME = "jsonrpc";
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    /**
+     * Name to use when, e.g., this function is injected into the browser.
+     */
+    public static final String FUNCTION_NAME = "jsonrpc";
 
     private final JsonRpcServer m_jsonRpcServer;
 
     /**
-     * @param browser
-     * @param nnc
+     * Initializes the json-rpc function for composite views.
+     *
+     * @param snc the component with the composite view
+     * @param model
+     * @param jsCodeRunner to execute js code in the browser
      */
-    public JsonRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
-        super(browser, FUNCTION_NAME);
-        m_jsonRpcServer = new JsonRpcServer();
+    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model,
+        final Consumer<String> jsCodeRunner) {
+        m_jsonRpcServer = initJsonRpcServer(snc, jsCodeRunner);
+        m_jsonRpcServer.addService(ReexecutionService.class, model.createReexecutionService());
+    }
 
-        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc, selectionEvent -> { // NOSONAR
+    /**
+     * Intializes the json-rpc function for single node view.
+     *
+     * @param nnc
+     * @param jsCodeRunner to execute js code in the browser
+     */
+    public JsonRpcFunction(final NativeNodeContainer nnc, final Consumer<String> jsCodeRunner) {
+        m_jsonRpcServer = initJsonRpcServer(nnc, jsCodeRunner);
+    }
+
+    private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc, final Consumer<String> jsCodeRunner) {
+        JsonRpcServer jsonRpcServer = new JsonRpcServer();
+        // TODO
+        // jsonRpcServer.addService(NodeService.class,
+        // new DefaultNodeService(nc, createSelectionEventConsumer(jsCodeRunner)));
+        return jsonRpcServer;
+    }
+
+    private static Consumer<SelectionEvent> createSelectionEventConsumer(final Consumer<String> jsCodeRunner) {
+        return selectionEvent -> { // NOSONAR
             // code copied from org.knime.ui.java.browser.KnimeBrowserView
             final var jsonrpcObjectNode = MAPPER.createObjectNode();
             final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
@@ -95,18 +127,23 @@ public class JsonRpcBrowserFunction extends BrowserFunction {
             try {
                 final String jsCode = "jsonrpcNotification(\""
                     + StringEscapeUtils.escapeJava(MAPPER.writeValueAsString(jsonrpcObjectNode)) + "\");";
-                Display.getDefault().syncExec(() -> browser.execute(jsCode));
+                jsCodeRunner.accept(jsCode);
             } catch (JsonProcessingException ex) {
                 NodeLogger.getLogger(DefaultNodeService.class)
                     .error("Problem creating a json-rpc notification in order to send an event", ex);
             }
-        }));
+        };
     }
 
-    @Override
-    public Object function(final Object[] args) {
+    /**
+     * Carries out a json-rpc function call.
+     *
+     * @param jsonRpcRequest
+     * @return the json-rpc response
+     */
+    public String call(final String jsonRpcRequest) {
         try (ByteArrayInputStream request =
-            new ByteArrayInputStream(((String)args[0]).getBytes(StandardCharsets.UTF_8));
+            new ByteArrayInputStream(jsonRpcRequest.getBytes(StandardCharsets.UTF_8));
                 ByteArrayOutputStream response = new ByteArrayOutputStream()) {
             m_jsonRpcServer.handleRequest(request, response);
             return new String(response.toByteArray(), StandardCharsets.UTF_8.name());

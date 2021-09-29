@@ -71,8 +71,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
 
-    /** a re-usable object mapper instance */
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private static final String FUNCTION_NAME = "getNodeViewInfo";
 

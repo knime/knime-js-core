@@ -47,17 +47,13 @@
 package org.knime.js.swt.wizardnodeview;
 
 import java.awt.Rectangle;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -88,11 +84,13 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContext;
+import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
-import org.knime.core.webui.data.rpc.RpcServer;
-import org.knime.core.webui.data.rpc.RpcServerFactory;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
 
@@ -133,11 +131,12 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private String m_title;
 
     /**
+     * @param snc
      * @param nodeModel the underlying model
-     * @since 2.10
+     * @since 4.5
      */
-    public WizardNodeView(final T nodeModel) {
-        super(nodeModel);
+    public WizardNodeView(final SingleNodeContainer snc, final T nodeModel) {
+        super(snc, nodeModel);
         m_asyncEvalReferenceMap = new HashMap<String, AtomicReference<Object>>(2);
         m_asyncEvalReferenceMap.put(VIEW_VALID, new AtomicReference<Object>(null));
         m_asyncEvalReferenceMap.put(VIEW_VALUE, new AtomicReference<Object>(null));
@@ -372,7 +371,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             "validateCurrentValueInView", VIEW_VALID, Boolean.FALSE);
         m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
             "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
-        m_rpcCallback = new RpcFunction(m_browserWrapper, "rpc");
+        m_rpcCallback = new RpcFunction(m_browserWrapper);
     }
 
     class DropdownSelectionListener extends SelectionAdapter {
@@ -824,30 +823,23 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
     private class RpcFunction extends BrowserFunctionInternal {
 
-        private RpcServer m_rpcServer;
+        private final JsonRpcFunction m_function;
 
-        RpcFunction(final BrowserWrapper browser, final String name) {
-            super(browser, name);
+        RpcFunction(final BrowserWrapper browser) {
+            super(browser, JsonRpcFunction.FUNCTION_NAME);
+            SingleNodeContainer nc = getNodeContainer();
+            Consumer<String> jsCodeRunner = c -> Display.getDefault().syncExec(() -> browser.execute(c));
+            if (nc instanceof SubNodeContainer) {
+                m_function = new JsonRpcFunction((SubNodeContainer)nc, (SubnodeViewableModel)getViewableModel(),
+                    jsCodeRunner);
+            } else {
+                m_function = new JsonRpcFunction((NativeNodeContainer)nc, jsCodeRunner);
+            }
         }
 
         @Override
-        public Object function(final Object[] arguments) {
-            WizardNode<REP, VAL> model = getModel();
-            if (model instanceof RpcServerFactory && m_rpcServer == null) {
-                m_rpcServer = ((RpcServerFactory)model).createRpcServer(model);
-            }
-            if (m_rpcServer != null) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                try (InputStream in = IOUtils.toInputStream((String)arguments[0], StandardCharsets.UTF_8)) {
-                    m_rpcServer.handleRequest(in, out);
-                } catch (IOException e) {
-                    LOGGER.error("A problem occurred while handling rpc request.", e);
-                    return "A problem occurred while handling rpc request: " + e.getMessage()
-                        + ". See log for more details.";
-                }
-                return new String(out.toByteArray(), StandardCharsets.UTF_8);
-            }
-            return null;
+        public Object function(final Object[] args) {
+            return m_function.call((String)args[0]);
         }
 
     }

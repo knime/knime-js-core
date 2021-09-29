@@ -80,9 +80,6 @@ import org.knime.core.node.workflow.NodeContainerState;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
-import org.knime.core.webui.data.rpc.RpcServerFactory;
-import org.knime.core.webui.data.rpc.RpcSingleServer;
-import org.knime.core.webui.data.rpc.json.impl.JsonRpcSingleServer;
 import org.knime.core.wizard.rpc.DefaultReexecutionService;
 import org.knime.core.wizard.rpc.ReexecutionService;
 import org.knime.js.core.JSONWebNode;
@@ -105,7 +102,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @since 3.4
  */
 public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNodePage, SubnodeViewValue>,
-    WizardViewRequestHandler<SubnodeViewRequest, SubnodeViewResponse>, RpcServerFactory<SubnodeViewableModel> {
+    WizardViewRequestHandler<SubnodeViewRequest, SubnodeViewResponse> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewableModel.class);
 
@@ -207,6 +204,16 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         }
         m_value = new SubnodeViewValue();
         m_value.setViewValues(valueMap);
+    }
+
+    /**
+     * @return a new {@link ReexecutionService} instance
+     *
+     * @since 4.5
+     */
+    public ReexecutionService createReexecutionService() {
+        return new DefaultReexecutionService(m_container, m_spm, () -> m_isReexecuteInProgress.set(true),
+            () -> m_isReexecuteInProgress.set(false));
     }
 
     /**
@@ -388,17 +395,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         /* TODO no implementation possible at the moment
          * this needs to be configurable for nested subnodes, etc
          */
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 4.5
-     */
-    @Override
-    public RpcSingleServer<ReexecutionService> createRpcServer(final SubnodeViewableModel target) {
-        return new JsonRpcSingleServer<>(new DefaultReexecutionService(m_container, m_spm,
-            () -> m_isReexecuteInProgress.set(true), () -> m_isReexecuteInProgress.set(false)));
     }
 
     /**

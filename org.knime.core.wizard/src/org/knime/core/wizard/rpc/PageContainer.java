@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.util.RawValue;
  * Object that contains the wizard page and some additional information.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ * @since 4.5
  */
 public interface PageContainer {
 

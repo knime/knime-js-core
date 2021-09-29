@@ -7,6 +7,8 @@ import java.util.Map;
  * composite view) view implementation.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ *
+ * @since 4.5
  */
 public interface ReexecutionService {
 

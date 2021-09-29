@@ -82,6 +82,7 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.js.core.JSCorePlugin;
@@ -164,9 +165,11 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
      * Instantiates a new view instance
      *
      * @param viewableModel the underlying model
+     *
+     * @since 4.5
      */
-    public ChromeWizardNodeView(final T viewableModel) {
-        super(viewableModel);
+    public ChromeWizardNodeView(final SingleNodeContainer snc, final T viewableModel) {
+        super(snc, viewableModel);
         m_service = ChromeViewService.getInstance();
     }
 

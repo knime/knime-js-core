@@ -46,7 +46,7 @@
  * History
  *   Apr 23, 2021 (hornm): created
  */
-package org.knime.core.wizard;
+package org.knime.core.wizard.rpc;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -66,10 +66,10 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.RpcSingleClient;
 import org.knime.core.webui.data.rpc.RpcSingleServer;
+import org.knime.core.webui.data.rpc.json.impl.JsonRpcSingleServer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcTestUtil;
-import org.knime.core.wizard.rpc.DefaultReexecutionService;
-import org.knime.core.wizard.rpc.PageContainer;
-import org.knime.core.wizard.rpc.ReexecutionService;
+import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.core.wizard.WorkflowTestCase;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -87,7 +87,7 @@ import com.fasterxml.jackson.module.mrbean.MrBeanModule;
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public class TestReexecutionService extends WorkflowTestCase {
+public class DefaultReexecutionServiceTest extends WorkflowTestCase {
 
     /**
      *
@@ -101,7 +101,8 @@ public class TestReexecutionService extends WorkflowTestCase {
         // create reexecution service 'client'
         SubNodeContainer component = (SubNodeContainer)getManager().getNodeContainer(new NodeID(wfId, 5));
         SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub");
-        RpcSingleServer<ReexecutionService> rpcServer = model.createRpcServer(model);
+        RpcSingleServer<ReexecutionService> rpcServer =
+            new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService());
         RpcSingleClient<ReexecutionService> rpcClient = JsonRpcTestUtil.createRpcSingleClientInstanceForTesting(
             ReexecutionService.class, rpcServer.getHandler(), createObjectMapper());
         ReexecutionService service = rpcClient.getService();

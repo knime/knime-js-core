@@ -64,7 +64,6 @@ import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.webui.node.view.NodeView;
-import org.knime.js.cef.nodeview.jsonrpc.JsonRpcBrowserFunction;
 
 import com.equo.chromium.swt.Browser;
 

@@ -60,6 +60,8 @@ import com.fasterxml.jackson.databind.util.RawValue;
  * Default implementation of {@link PageContainer}.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ *
+ * @since 4.5
  */
 public final class DefaultPageContainer implements PageContainer {
 

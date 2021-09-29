@@ -43,55 +43,11 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
  *
- * History
- *   Sep 10, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview.jsonrpc;
-
-import java.util.List;
-
-import org.knime.core.webui.node.view.NodeView;
 
 /**
- * {@link NodeView}s for the new web-ui assume a certain backend to be available when opened from the desktop
- * application.
- *
- * The required backend is actually the so called 'gateway API' (called through json-rpc in case of the desktop app)
- * which is not available to the 'this' container of a node view (i.e. the node view 'container' which opens the node
- * views in the predominantly java-based (classic) UI.
- *
- * This interface mirrors the few gateway API methods that are necessary to make the node views work here, too, without
- * requiring the node view framework to call out to yet another backend (apart from the gateway API). I.e. all methods
- * defined here are defined in the gateway API, too, and their implementations ideally re-use the very same logic.
- *
- * @author Martin Horn, KNIME GmbH, Konstanz, Germany
- * @author Marc Bux, KNIME GmbH, Berlin, Germany
+ * The interfaces/classes in this package are meant to mirror some gateway-api service methods required to support UI
+ * extensions (i.e. node views etc.) in the java-based UI. It's to enable the frontend to use the same backend methods
+ * no matter whether it's from the java-ui or new web-ui (i.e. AP.next).
  */
-public interface NodeService {
-
-    /**
-     * Sends a request to a node view's node data service of a certain type.
-     *
-     * @param projectId
-     * @param workflowId
-     * @param nodeId
-     * @param serviceId specified the type of service to call
-     * @param request the request
-     * @return the data service response
-     */
-    String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceId,
-        String request);
-
-    /**
-     * Selects data points, as identified by their row keys. Unselects any other data points, if they were previously
-     * selected.
-     *
-     * @param projectId
-     * @param workflowId
-     * @param nodeId
-     * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
-     * @param rowKeys the keys affected by the data point selection modification
-     */
-    void selectDataPoints(String projectId, String workflowId, String nodeId, String mode, List<String> rowKeys);
-
-}
+package org.knime.core.wizard.rpc;

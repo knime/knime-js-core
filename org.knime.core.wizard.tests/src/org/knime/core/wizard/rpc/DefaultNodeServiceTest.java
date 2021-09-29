@@ -46,15 +46,15 @@
  * History
  *   21 Sep 2021 (Marc Bux, KNIME GmbH, Berlin, Germany): created
  */
-package org.knime.js.cef.nodeview.jsonrpc;
+package org.knime.core.wizard.rpc;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Duration.FIVE_SECONDS;
 import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.knime.js.cef.nodeview.jsonrpc.DefaultNodeService.SelectionEventMode.ADD;
-import static org.knime.js.cef.nodeview.jsonrpc.DefaultNodeService.SelectionEventMode.REMOVE;
-import static org.knime.js.cef.nodeview.jsonrpc.DefaultNodeService.SelectionEventMode.REPLACE;
+import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.ADD;
+import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.REMOVE;
+import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.REPLACE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -85,8 +85,8 @@ import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.WorkflowPersistor;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
 import org.knime.core.util.FileUtil;
-import org.knime.js.cef.nodeview.jsonrpc.DefaultNodeService.SelectionEvent;
-import org.knime.js.cef.nodeview.jsonrpc.DefaultNodeService.SelectionEventMode;
+import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEvent;
+import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode;
 
 /**
  * @author Marc Bux, KNIME GmbH, Berlin, Germany
