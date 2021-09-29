@@ -69,6 +69,7 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.page.WizardPage;
+import org.knime.core.node.wizard.page.WizardPage.WizardPageNodeInfo;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeContainerState;
@@ -78,6 +79,8 @@ import org.knime.core.node.workflow.NodeMessage;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
+import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodeInfo;
@@ -172,69 +175,79 @@ public abstract class AbstractPageManager {
             projectID.equals(pagePrefix) ? "" : NodeIDSuffix.create(projectID, pagePrefix).toString();
         JSONWebNodePageConfiguration pageConfig =
             new JSONWebNodePageConfiguration(layout, null, selectionTranslators, projectRelativePageIDSuffix);
-        Map<String, JSONWebNode> nodes = new HashMap<>();
+        Map<String, JSONWebNode> webNodes = new HashMap<>();
+        Map<String, NodeViewEnt> nodeViews = new HashMap<>();
+        Map<NodeIDSuffix, WizardPageNodeInfo> infoMap = page.getInfoMap();
         for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
             NativeNodeContainer nnc = e.getValue();
-            JSONWebNode jsonNode = new JSONWebNode();
-            JSONWebNodeInfo info = new JSONWebNodeInfo();
-            info.setNodeName(nnc.getName());
-            info.setNodeAnnotation(nnc.getNodeAnnotation().toString());
-            NodeContainerState state = nnc.getNodeContainerState();
-            if (state.isIdle()) {
-                info.setNodeState(JSONNodeState.IDLE);
+            if (nnc.getNodeModel() instanceof WizardNode) {
+                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc, infoMap.get(e.getKey())));
+            } else if (NodeViewManager.hasNodeView(nnc)) {
+                nodeViews.put(e.getKey().toString(), new NodeViewEnt(nnc));
             }
-            if (state.isConfigured()) {
-                info.setNodeState(JSONNodeState.CONFIGURED);
-            }
-            if (state.isExecutionInProgress() || state.isExecutingRemotely()) {
-                info.setNodeState(JSONNodeState.EXECUTING);
-            }
-            if (state.isExecuted()) {
-                info.setNodeState(JSONNodeState.EXECUTED);
-            }
-            NodeMessage message = nnc.getNodeMessage();
-            if (NodeMessage.Type.ERROR == message.getMessageType()) {
-                info.setNodeErrorMessage(message.getMessage());
-            }
-            if (NodeMessage.Type.WARNING == message.getMessageType()) {
-                info.setNodeWarnMessage(message.getMessage());
-            }
-
-            if (!state.isExecuted()) {
-                info.setDisplayPossible(false);
-            } else if (nnc.getNodeModel() instanceof WizardNode) {
-                @SuppressWarnings("rawtypes")
-                WizardNode wizardNode = (WizardNode)nnc.getNodeModel(); // NOSONAR
-                info.setDisplayPossible(true);
-                WebTemplate template =
-                        WebTemplateUtil.getWebTemplateFromJSObjectID(wizardNode.getJavascriptObjectID());
-                    List<String> jsList = new ArrayList<>();
-                    List<String> cssList = new ArrayList<>();
-                    for (WebResourceLocator locator : template.getWebResources()) {
-                        if (locator.getType() == WebResourceType.JAVASCRIPT) {
-                            jsList.add(locator.getRelativePathTarget());
-                        } else if (locator.getType() == WebResourceType.CSS) {
-                            cssList.add(locator.getRelativePathTarget());
-                        }
-                    }
-                    jsonNode.setJavascriptLibraries(jsList);
-                    jsonNode.setStylesheets(cssList);
-                    jsonNode.setNamespace(template.getNamespace());
-                    jsonNode.setInitMethodName(template.getInitMethodName());
-                    jsonNode.setValidateMethodName(template.getValidateMethodName());
-                    jsonNode.setSetValidationErrorMethodName(template.getSetValidationErrorMethodName());
-                    jsonNode.setGetViewValueMethodName(template.getPullViewContentMethodName());
-                    jsonNode.setViewRepresentation((JSONViewContent)wizardNode.getViewRepresentation());
-                    jsonNode.setViewValue((JSONViewContent)wizardNode.getViewValue());
-
-                    if (wizardNode instanceof CSSModifiable) {
-                        jsonNode.setCustomCSS(((CSSModifiable)wizardNode).getCssStyles());
-                    }
-            }
-            jsonNode.setNodeInfo(info);
-            nodes.put(e.getKey().toString(), jsonNode);
         }
-        return new JSONWebNodePage(pageConfig, nodes);
+        return new JSONWebNodePage(pageConfig, webNodes, nodeViews);
+    }
+
+    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc, final WizardPageNodeInfo nodeInfo) {
+        JSONWebNode jsonNode = new JSONWebNode();
+        JSONWebNodeInfo info = new JSONWebNodeInfo();
+        info.setNodeName(nodeInfo.getNodeName());
+        info.setNodeAnnotation(nodeInfo.getNodeAnnotation());
+        NodeContainerState state = nodeInfo.getNodeState();
+        if (state.isIdle()) {
+            info.setNodeState(JSONNodeState.IDLE);
+        }
+        if (state.isConfigured()) {
+            info.setNodeState(JSONNodeState.CONFIGURED);
+        }
+        if (state.isExecutionInProgress() || state.isExecutingRemotely()) {
+            info.setNodeState(JSONNodeState.EXECUTING);
+        }
+        if (state.isExecuted()) {
+            info.setNodeState(JSONNodeState.EXECUTED);
+        }
+        NodeMessage message = nodeInfo.getNodeMessage();
+        if (NodeMessage.Type.ERROR == message.getMessageType()) {
+            info.setNodeErrorMessage(message.getMessage());
+        }
+        if (NodeMessage.Type.WARNING == message.getMessageType()) {
+            info.setNodeWarnMessage(message.getMessage());
+        }
+
+        if (!state.isExecuted()) {
+            info.setDisplayPossible(false);
+        } else if (nnc.getNodeModel() instanceof WizardNode) {
+            @SuppressWarnings("rawtypes")
+            WizardNode wizardNode = (WizardNode)nnc.getNodeModel(); // NOSONAR
+            info.setDisplayPossible(true);
+            WebTemplate template =
+                    WebTemplateUtil.getWebTemplateFromJSObjectID(wizardNode.getJavascriptObjectID());
+                List<String> jsList = new ArrayList<>();
+                List<String> cssList = new ArrayList<>();
+                for (WebResourceLocator locator : template.getWebResources()) {
+                    if (locator.getType() == WebResourceType.JAVASCRIPT) {
+                        jsList.add(locator.getRelativePathTarget());
+                    } else if (locator.getType() == WebResourceType.CSS) {
+                        cssList.add(locator.getRelativePathTarget());
+                    }
+                }
+                jsonNode.setJavascriptLibraries(jsList);
+                jsonNode.setStylesheets(cssList);
+                jsonNode.setNamespace(template.getNamespace());
+                jsonNode.setInitMethodName(template.getInitMethodName());
+                jsonNode.setValidateMethodName(template.getValidateMethodName());
+                jsonNode.setSetValidationErrorMethodName(template.getSetValidationErrorMethodName());
+                jsonNode.setGetViewValueMethodName(template.getPullViewContentMethodName());
+                jsonNode.setViewRepresentation((JSONViewContent)wizardNode.getViewRepresentation());
+                jsonNode.setViewValue((JSONViewContent)wizardNode.getViewValue());
+
+                if (wizardNode instanceof CSSModifiable) {
+                    jsonNode.setCustomCSS(((CSSModifiable)wizardNode).getCssStyles());
+                }
+        }
+        jsonNode.setNodeInfo(info);
+        return jsonNode;
     }
 
     private JSONLayoutPage getJSONLayoutFromSubnode(final NodeID pageID, final String layoutInfo)

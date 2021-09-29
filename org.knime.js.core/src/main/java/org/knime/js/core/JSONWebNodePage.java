@@ -57,6 +57,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
+import org.knime.gateway.api.entity.NodeViewEnt;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -74,24 +75,28 @@ public class JSONWebNodePage extends JSONViewContent {
     private final String m_version;
     private JSONWebNodePageConfiguration m_configuration;
     private Map<String, JSONWebNode> m_webNodes;
+    private Map<String, NodeViewEnt> m_nodeViews;
 
     /**
      * @param configuration
      * @param webNodes
+     * @param nodeViews
      *
+     * @since 4.5
      */
-    public JSONWebNodePage(final JSONWebNodePageConfiguration configuration,
-        final Map<String, JSONWebNode> webNodes) {
-        this(configuration, webNodes, KNIMEConstants.VERSION);
+    public JSONWebNodePage(final JSONWebNodePageConfiguration configuration, final Map<String, JSONWebNode> webNodes,
+        final Map<String, NodeViewEnt> nodeViews) {
+        this(configuration, webNodes, nodeViews, KNIMEConstants.VERSION);
     }
 
     @JsonCreator
     private JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes,
+        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes, final Map<String, NodeViewEnt> nodeViews,
         @JsonProperty("version") final String version) {
         m_version = version;
         m_configuration = configuration;
         m_webNodes = webNodes;
+        m_nodeViews = nodeViews;
     }
 
     /**
@@ -132,6 +137,26 @@ public class JSONWebNodePage extends JSONViewContent {
     @JsonProperty("webNodes")
     public void setWebNodes(final Map<String, JSONWebNode> webNodes) {
         m_webNodes = webNodes;
+    }
+
+    /**
+     * @return the nodeViews
+     *
+     * @since 4.5
+     */
+    @JsonProperty("nodeViews")
+    public Map<String, NodeViewEnt> getNodeViews() {
+        return m_nodeViews;
+    }
+
+    /**
+     * @param nodeViews the nodeViews to set
+     *
+     * @since 4.5
+     */
+    @JsonProperty("nodeViews")
+    public void setNodeViews(final Map<String, NodeViewEnt> nodeViews) {
+        m_nodeViews = nodeViews;
     }
 
     /**
