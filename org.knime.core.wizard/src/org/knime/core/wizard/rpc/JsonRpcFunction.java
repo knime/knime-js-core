@@ -111,9 +111,8 @@ public class JsonRpcFunction {
 
     private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc, final Consumer<String> jsCodeRunner) {
         JsonRpcServer jsonRpcServer = new JsonRpcServer();
-        // TODO
-        // jsonRpcServer.addService(NodeService.class,
-        // new DefaultNodeService(nc, createSelectionEventConsumer(jsCodeRunner)));
+        jsonRpcServer.addService(NodeService.class,
+            new DefaultNodeService(nc, createSelectionEventConsumer(jsCodeRunner)));
         return jsonRpcServer;
     }
 

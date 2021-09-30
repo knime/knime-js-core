@@ -49,8 +49,11 @@
 package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.knime.core.data.RowKey;
@@ -58,8 +61,13 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
 import org.knime.core.node.property.hilite.KeyEvent;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.NodeID;
+import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.gateway.api.entity.NodeIDEnt;
 
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
@@ -70,6 +78,13 @@ import org.knime.core.webui.node.view.NodeViewManager;
 public class DefaultNodeService implements NodeService {
 
     static interface SelectionEvent {
+
+        String getProjectId();
+
+        String getWorkflowId();
+
+        String getNodeId();
+
         SelectionEventMode getMode();
 
         List<String> getKeys();
@@ -79,69 +94,53 @@ public class DefaultNodeService implements NodeService {
             ADD, REMOVE, REPLACE
     }
 
-    private final NativeNodeContainer m_nnc;
+    private final Function<String, NativeNodeContainer> m_getNode;
 
-    private final Consumer<SelectionEvent> m_selectionEventConsumer;
+    private final Function<String, NodeID> m_getNodeId;
 
-    private final HiLiteHandler m_hiliteHandler;
+    private final Map<NodeID, HiLiteHandler> m_hiliteHandlers;
 
-    DefaultNodeService(final NativeNodeContainer nnc, final Consumer<SelectionEvent> selectionEventConsumer) {
-        m_nnc = nnc;
-        m_selectionEventConsumer = selectionEventConsumer;
-        m_hiliteHandler = m_nnc.getNodeModel().getInHiLiteHandler(0);
-        m_hiliteHandler.addHiLiteListener(new HiLiteListener() {
-            @Override
-            public void hiLite(final KeyEvent event) {
-                consumeSelectionEvent(event, SelectionEventMode.ADD);
-            }
-
-            @Override
-            public void unHiLite(final KeyEvent event) {
-                consumeSelectionEvent(event, SelectionEventMode.REMOVE);
-            }
-
-            @Override
-            public void unHiLiteAll(final KeyEvent event) {
-                consumeSelectionEvent(new KeyEvent(event.getSource()), SelectionEventMode.REPLACE);
-            }
-
-            @Override
-            public void replaceHiLite(final KeyEvent event) {
-                consumeSelectionEvent(event, SelectionEventMode.REPLACE);
-            }
-        });
+    DefaultNodeService(final SingleNodeContainer snc, final Consumer<SelectionEvent> selectionEventConsumer) {
+        m_hiliteHandlers = new HashMap<>();
+        if (snc instanceof NativeNodeContainer) {
+            addHiLiteListener((NativeNodeContainer)snc,
+                new PerNodeHiliteListener(selectionEventConsumer, (NativeNodeContainer)snc));
+            m_getNodeId = id -> snc.getID();
+            m_getNode = id -> (NativeNodeContainer)snc;
+        } else {
+            SubNodeContainer component = (SubNodeContainer)snc;
+            WizardPageUtil.getWizardPageNodes(component.getWorkflowManager(), true)
+                .forEach(nnc -> addHiLiteListener(nnc, new PerNodeHiliteListener(selectionEventConsumer, nnc)));
+            var projectWfm = snc.getParent().getProjectWFM();
+            m_getNodeId = id -> new NodeIDEnt(id).toNodeID(projectWfm.getID());
+            m_getNode = id -> {
+                var nc = projectWfm.findNodeContainer(m_getNodeId.apply(id));
+                if (!(nc instanceof NativeNodeContainer)) {
+                    throw new IllegalArgumentException("Not a native node: " + nc.getNameWithID());
+                }
+                return (NativeNodeContainer)nc;
+            };
+        }
     }
 
-    private void consumeSelectionEvent(final KeyEvent event, final SelectionEventMode type) {
-        final var src = event.getSource();
-        // do not consume selection events that have been fired by this very node / default node service
-        if (src != this) {
-            final var keys = event.keys().stream().map(RowKey::getString).collect(Collectors.toUnmodifiableList());
-            m_selectionEventConsumer.accept(new SelectionEvent() {
-                @Override
-                public SelectionEventMode getMode() {
-                    return type;
-                }
-
-                @Override
-                public List<String> getKeys() {
-                    return keys;
-                }
-            });
-        }
+    private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
+        var hiLiteHandler = nnc.getNodeModel().getInHiLiteHandler(0);
+        hiLiteHandler.addHiLiteListener(listener);
+        m_hiliteHandlers.put(nnc.getID(), hiLiteHandler);
     }
 
     @Override
     public String callNodeViewDataService(final String projectId, final String workflowId, final String nodeID,
         final String serviceType, final String request) {
         final var nvm = NodeViewManager.getInstance();
+        var nc = m_getNode.apply(nodeID);
         if ("initial_data".equals(serviceType)) {
-            return nvm.callTextInitialDataService(m_nnc);
+            return nvm.callTextInitialDataService(nc);
         } else if ("data".equals(serviceType)) {
-            return nvm.callTextDataService(m_nnc, request);
+            return nvm.callTextDataService(nc, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                nvm.callTextReExecuteDataService(m_nnc, request);
+                nvm.callTextReExecuteDataService(nc, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
@@ -153,21 +152,102 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public void selectDataPoints(final String projectId, final String workflowId, final String nodeId,
+    public void selectDataPoints(final String projectId, final String workflowId, final String nodeIdString,
         final String mode, final List<String> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        final var keyEvent = new KeyEvent(this, rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
+        NodeID nodeId = m_getNodeId.apply(nodeIdString);
+        final var keyEvent = new KeyEvent(nodeId, rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
+        var hiLiteHandler = m_hiliteHandlers.get(nodeId);
         switch (selectionEventMode) {
             case ADD:
-                m_hiliteHandler.fireHiLiteEvent(keyEvent);
+                hiLiteHandler.fireHiLiteEvent(keyEvent);
                 break;
             case REMOVE:
-                m_hiliteHandler.fireUnHiLiteEvent(keyEvent);
+                hiLiteHandler.fireUnHiLiteEvent(keyEvent);
                 break;
             case REPLACE:
-                m_hiliteHandler.fireReplaceHiLiteEvent(keyEvent);
+                hiLiteHandler.fireReplaceHiLiteEvent(keyEvent);
                 break;
             default:
+        }
+    }
+
+    private static class PerNodeHiliteListener implements HiLiteListener {
+
+        private final Consumer<SelectionEvent> m_eventConsumer;
+
+        private final NodeID m_nodeId;
+
+        private final String m_projectId;
+
+        private final String m_workflowId;
+
+        private final String m_nodeIdString;
+
+        PerNodeHiliteListener(final Consumer<SelectionEvent> eventConsumer, final NativeNodeContainer nnc) {
+            m_eventConsumer = eventConsumer;
+            var parent = nnc.getParent();
+            var projectWfm = parent.getProjectWFM();
+            m_projectId = projectWfm.getNameWithID();
+            NodeID ncParentId = parent.getDirectNCParent() instanceof SubNodeContainer
+                ? ((SubNodeContainer)parent.getDirectNCParent()).getID() : parent.getID();
+            m_workflowId = new NodeIDEnt(ncParentId).toString();
+            m_nodeId = nnc.getID();
+            m_nodeIdString = new NodeIDEnt(m_nodeId).toString();
+        }
+
+        @Override
+        public void hiLite(final KeyEvent event) {
+            consumeSelectionEvent(event, SelectionEventMode.ADD);
+        }
+
+        @Override
+        public void unHiLite(final KeyEvent event) {
+            consumeSelectionEvent(event, SelectionEventMode.REMOVE);
+        }
+
+        @Override
+        public void unHiLiteAll(final KeyEvent event) {
+            consumeSelectionEvent(new KeyEvent(event.getSource()), SelectionEventMode.REPLACE);
+        }
+
+        @Override
+        public void replaceHiLite(final KeyEvent event) {
+            consumeSelectionEvent(event, SelectionEventMode.REPLACE);
+        }
+
+        private void consumeSelectionEvent(final KeyEvent event, final SelectionEventMode type) {
+            // do not consume selection events that have been fired by the node this listener is registered on
+            if (!m_nodeId.equals(event.getSource())) {
+                final var keys = event.keys().stream().map(RowKey::getString).collect(Collectors.toUnmodifiableList());
+                m_eventConsumer.accept(new SelectionEvent() { // NOSONAR
+
+                    @Override
+                    public SelectionEventMode getMode() {
+                        return type;
+                    }
+
+                    @Override
+                    public List<String> getKeys() {
+                        return keys;
+                    }
+
+                    @Override
+                    public String getProjectId() {
+                        return m_projectId;
+                    }
+
+                    @Override
+                    public String getWorkflowId() {
+                        return m_workflowId;
+                    }
+
+                    @Override
+                    public String getNodeId() {
+                        return m_nodeIdString;
+                    }
+                });
+            }
         }
     }
 
