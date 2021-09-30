@@ -57,7 +57,8 @@ import javax.swing.JPanel;
 
 /**
  *
- * @author Konrad Amtenbrink
+ * @author Konrad Amtenbrink, KNIME GmbH, Berlin, Germany
+ *
  */
 public class ReExecutionPanel extends JPanel {
 
@@ -87,6 +88,8 @@ public class ReExecutionPanel extends JPanel {
     private void initBasePanel() {
         GridBagConstraints gbc = createConfiguredGridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weighty = 1.0;
+        gbc.weightx = 1.0;
         this.add(m_reExecuteDownstreamNodesCheckBox, gbc);
     }
 
