@@ -74,6 +74,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.knime.core.data.RowKey;
+import org.knime.core.node.extension.NodeFactoryExtensionManager;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
@@ -255,8 +256,14 @@ public class DefaultNodeServiceTest {
 
     // code copied from org.knime.core.webui.node.view.NodeViewManagerTest
     private static NativeNodeContainer createNodeWithoutNodeView(final WorkflowManager wfm) {
+        try {
+            NodeFactoryExtensionManager.getInstance();
+        } catch (IllegalStateException e) {
+            // HACK to make this test work in the build system where the org.knime.workbench.repository plugin
+            // is not present (causes an exception on the first call
+            // 'Invalid extension point: org.knime.workbench.repository.nodes')
+        }
         final var factory = new VirtualSubNodeInputNodeFactory(null, new PortType[0]);
-        factory.init();
         final var nodeId = wfm.createAndAddNode(factory);
         return (NativeNodeContainer)wfm.getNodeContainer(nodeId);
     }
