@@ -49,9 +49,7 @@
 package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -96,25 +94,18 @@ public class DefaultNodeService implements NodeService {
 
     private final Function<String, NativeNodeContainer> m_getNode;
 
-    private final Function<String, NodeID> m_getNodeId;
-
-    private final Map<NodeID, HiLiteHandler> m_hiliteHandlers;
-
     DefaultNodeService(final SingleNodeContainer snc, final Consumer<SelectionEvent> selectionEventConsumer) {
-        m_hiliteHandlers = new HashMap<>();
         if (snc instanceof NativeNodeContainer) {
             addHiLiteListener((NativeNodeContainer)snc,
                 new PerNodeHiliteListener(selectionEventConsumer, (NativeNodeContainer)snc));
-            m_getNodeId = id -> snc.getID();
             m_getNode = id -> (NativeNodeContainer)snc;
         } else {
             SubNodeContainer component = (SubNodeContainer)snc;
             WizardPageUtil.getWizardPageNodes(component.getWorkflowManager(), true)
                 .forEach(nnc -> addHiLiteListener(nnc, new PerNodeHiliteListener(selectionEventConsumer, nnc)));
             var projectWfm = snc.getParent().getProjectWFM();
-            m_getNodeId = id -> new NodeIDEnt(id).toNodeID(projectWfm.getID());
             m_getNode = id -> {
-                var nc = projectWfm.findNodeContainer(m_getNodeId.apply(id));
+                var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
                 if (!(nc instanceof NativeNodeContainer)) {
                     throw new IllegalArgumentException("Not a native node: " + nc.getNameWithID());
                 }
@@ -123,10 +114,12 @@ public class DefaultNodeService implements NodeService {
         }
     }
 
-    private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
-        var hiLiteHandler = nnc.getNodeModel().getInHiLiteHandler(0);
-        hiLiteHandler.addHiLiteListener(listener);
-        m_hiliteHandlers.put(nnc.getID(), hiLiteHandler);
+    private static void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
+        getHiLiteHandler(nnc).addHiLiteListener(listener);
+    }
+
+    private static HiLiteHandler getHiLiteHandler(final NativeNodeContainer nnc) {
+        return nnc.getNodeModel().getInHiLiteHandler(0);
     }
 
     @Override
@@ -155,9 +148,9 @@ public class DefaultNodeService implements NodeService {
     public void selectDataPoints(final String projectId, final String workflowId, final String nodeIdString,
         final String mode, final List<String> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        NodeID nodeId = m_getNodeId.apply(nodeIdString);
-        final var keyEvent = new KeyEvent(nodeId, rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
-        var hiLiteHandler = m_hiliteHandlers.get(nodeId);
+        var nc = m_getNode.apply(nodeIdString);
+        final var keyEvent = new KeyEvent(nc.getID(), rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
+        var hiLiteHandler = getHiLiteHandler(nc);
         switch (selectionEventMode) {
             case ADD:
                 hiLiteHandler.fireHiLiteEvent(keyEvent);
