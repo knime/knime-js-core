@@ -55,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.ADD;
 import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.REMOVE;
 import static org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode.REPLACE;
+import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -62,7 +63,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -74,7 +74,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.knime.core.data.RowKey;
-import org.knime.core.node.extension.NodeFactoryExtensionManager;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
@@ -82,14 +81,12 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.WorkflowAnnotation;
-import org.knime.core.node.workflow.WorkflowContext;
-import org.knime.core.node.workflow.WorkflowCreationHelper;
 import org.knime.core.node.workflow.WorkflowManager;
-import org.knime.core.node.workflow.WorkflowPersistor;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
-import org.knime.core.util.FileUtil;
 import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEvent;
 import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEventMode;
+import org.knime.testing.node.view.NodeViewNodeFactory;
+import org.knime.testing.util.WorkflowManagerUtil;
 
 /**
  * @author Marc Bux, KNIME GmbH, Berlin, Germany
@@ -113,16 +110,8 @@ public class DefaultNodeServiceTest {
 
     @Before
     public void setup() throws IOException {
-        try {
-            NodeFactoryExtensionManager.getInstance();
-        } catch (IllegalStateException e) {
-            // HACK to make this test work in the build system where the org.knime.workbench.repository plugin
-            // is not present (causes an exception on the first call
-            // 'Invalid extension point: org.knime.workbench.repository.nodes')
-        }
-
-        m_wfm = createEmptyWorkflow();
-        m_nnc = createNodeWithoutNodeView(m_wfm);
+        m_wfm = WorkflowManagerUtil.createEmptyWorkflow();
+        m_nnc = WorkflowManagerUtil.createAndAddNode(m_wfm, new VirtualSubNodeInputNodeFactory(null, new PortType[0]));
         m_hlh = m_nnc.getNodeModel().getInHiLiteHandler(0);
     }
 
@@ -160,8 +149,8 @@ public class DefaultNodeServiceTest {
 
     @Test
     public void testSelectDataPointsInComponentView() {
-        NodeID n1 = createNodeWithNodeView(m_wfm, 0, 1).getID();
-        NodeID n2 = createNodeWithNodeView(m_wfm, 1, 0).getID();
+        NodeID n1 = createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 1)).getID();
+        NodeID n2 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 0)).getID();
         m_wfm.addConnection(n1, 1, n2, 1);
 
         NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotation[0], "component")
@@ -291,34 +280,6 @@ public class DefaultNodeServiceTest {
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
         m_hlh.fireClearHiLiteEvent();
-    }
-
-    // code copied from org.knime.core.webui.node.view.NodeViewManagerTest
-    private static NativeNodeContainer createNodeWithoutNodeView(final WorkflowManager wfm) {
-        final var factory = new VirtualSubNodeInputNodeFactory(null, new PortType[0]);
-        final var nodeId = wfm.createAndAddNode(factory);
-        return (NativeNodeContainer)wfm.getNodeContainer(nodeId);
-    }
-
-    private static NativeNodeContainer createNodeWithNodeView(final WorkflowManager wfm, final int numInputs,
-        final int numOutputs) {
-        final var factory = new NodeViewNodeFactory(numInputs, numOutputs);
-        final var nodeId = wfm.createAndAddNode(factory);
-        return (NativeNodeContainer)wfm.getNodeContainer(nodeId);
-    }
-
-    private static WorkflowManager createEmptyWorkflow() throws IOException {
-        final var dir = FileUtil.createTempDir(WORKFLOW_NAME);
-        final var workflowFile = new File(dir, WorkflowPersistor.WORKFLOW_FILE);
-        if (workflowFile.createNewFile()) {
-            final var creationHelper = new WorkflowCreationHelper();
-            final var fac = new WorkflowContext.Factory(workflowFile.getParentFile());
-            creationHelper.setWorkflowContext(fac.createContext());
-
-            return WorkflowManager.ROOT.createAndAddProject(WORKFLOW_NAME, creationHelper);
-        } else {
-            throw new IllegalStateException("Creating empty workflow failed");
-        }
     }
 
 }
