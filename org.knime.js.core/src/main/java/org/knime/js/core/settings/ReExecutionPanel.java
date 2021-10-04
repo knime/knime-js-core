@@ -46,7 +46,7 @@
  * History
  *   Sep 15, 2021 (konrad-amtenbrink): created
  */
-package org.knime.js.core.components.reExecution;
+package org.knime.js.core.settings;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -62,6 +62,8 @@ import javax.swing.JPanel;
  */
 public class ReExecutionPanel extends JPanel {
 
+    private static final long serialVersionUID = 1L;
+
     private final JCheckBox m_reExecuteDownstreamNodesCheckBox;
 
     /**
@@ -70,12 +72,15 @@ public class ReExecutionPanel extends JPanel {
     public ReExecutionPanel() {
         super(new GridBagLayout());
 
-        m_reExecuteDownstreamNodesCheckBox = new JCheckBox("Re-execution of downstream nodes if widget value is changed");
+        m_reExecuteDownstreamNodesCheckBox = new JCheckBox(
+            "Enable re-execution (triggers a downstream re-execution event when the value of the widget is changed)."
+        );
         initBasePanel();
     }
 
     /**
      * Constructor, initializes base panel with custom title for re-execution check box
+     *
      * @param title the title of the re-execution check box
      */
     public ReExecutionPanel(final String title) {
@@ -86,7 +91,11 @@ public class ReExecutionPanel extends JPanel {
     }
 
     private void initBasePanel() {
-        GridBagConstraints gbc = createConfiguredGridBagConstraints();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weighty = 1.0;
         gbc.weightx = 1.0;
@@ -105,15 +114,6 @@ public class ReExecutionPanel extends JPanel {
      */
     public void setReExecuteDownstreamNodesValue(final Boolean reExecuteDownstreamNodes) {
         m_reExecuteDownstreamNodesCheckBox.setSelected(reExecuteDownstreamNodes);
-    }
-
-    private static GridBagConstraints createConfiguredGridBagConstraints() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        return gbc;
     }
 
 }
