@@ -49,6 +49,8 @@
 package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -64,6 +66,7 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.util.Pair;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 
@@ -94,7 +97,10 @@ public class DefaultNodeService implements NodeService {
 
     private final Function<String, NativeNodeContainer> m_getNode;
 
+    private final List<WeakReference<Pair<HiLiteHandler, HiLiteListener>>> m_registeredHiLiteListeners;
+
     DefaultNodeService(final SingleNodeContainer snc, final Consumer<SelectionEvent> selectionEventConsumer) {
+        m_registeredHiLiteListeners = new ArrayList<>();
         if (snc instanceof NativeNodeContainer) {
             addHiLiteListener((NativeNodeContainer)snc,
                 new PerNodeHiliteListener(selectionEventConsumer, (NativeNodeContainer)snc));
@@ -114,8 +120,10 @@ public class DefaultNodeService implements NodeService {
         }
     }
 
-    private static void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
-        getHiLiteHandler(nnc).addHiLiteListener(listener);
+    private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
+        HiLiteHandler hiLiteHandler = getHiLiteHandler(nnc);
+        hiLiteHandler.addHiLiteListener(listener);
+        m_registeredHiLiteListeners.add(new WeakReference<>(Pair.create(hiLiteHandler, listener)));
     }
 
     private static HiLiteHandler getHiLiteHandler(final NativeNodeContainer nnc) {
@@ -163,6 +171,18 @@ public class DefaultNodeService implements NodeService {
                 break;
             default:
         }
+    }
+
+    /**
+     * Cleans up the default node service (e.g. removing hilite listeners).
+     */
+    public void dispose() {
+        m_registeredHiLiteListeners.forEach(r -> {
+            Pair<HiLiteHandler, HiLiteListener> p = r.get();
+            if (p != null) {
+                p.getFirst().removeHiLiteListener(p.getSecond());
+            }
+        });
     }
 
     private static class PerNodeHiliteListener implements HiLiteListener {

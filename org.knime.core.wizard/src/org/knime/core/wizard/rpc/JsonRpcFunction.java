@@ -151,4 +151,11 @@ public class JsonRpcFunction {
             throw new IllegalStateException(e);
         }
     }
+
+    /**
+     * Cleans up the rpc function.
+     */
+    public void dispose() {
+        ((DefaultNodeService)m_jsonRpcServer.getHandler(NodeService.class)).dispose();
+    }
 }

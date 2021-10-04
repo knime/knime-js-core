@@ -842,6 +842,15 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             return m_function.call((String)args[0]);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose() {
+            super.dispose();
+            m_function.dispose();
+        }
+
     }
 
     @SuppressWarnings("unchecked")

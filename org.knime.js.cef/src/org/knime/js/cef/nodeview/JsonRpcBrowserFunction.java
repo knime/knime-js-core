@@ -79,4 +79,13 @@ public class JsonRpcBrowserFunction extends BrowserFunction {
     public Object function(final Object[] args) {
         return m_function.call((String) args[0]);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        super.dispose();
+        m_function.dispose();
+    }
 }
