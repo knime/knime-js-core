@@ -91,7 +91,7 @@ public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
         NodeView nodeView = NodeViewManager.getInstance().getNodeView(m_nnc);
 
         Page page = nodeView.getPage();
-        if (page.isComponent() && !page.isCompletelyStatic()) {
+        if (page.isWebComponent() && !page.isCompletelyStatic()) {
             throw new IllegalStateException("An 'internal' node view must only provide static resources");
         }
         String viewName = m_nnc.getNodeViewName(0);
@@ -103,7 +103,7 @@ public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
             initData = null;
         }
         String remoteDebugPort = System.getProperty("chromium.remote_debugging_port");
-        NodeViewInfo info = NodeViewInfo.create(viewName, getUrl(), initData, page.isComponent(), remoteDebugPort);
+        NodeViewInfo info = NodeViewInfo.create(viewName, getUrl(), initData, page.isWebComponent(), remoteDebugPort);
         try {
             return MAPPER.writeValueAsString(info);
         } catch (JsonProcessingException e) {
