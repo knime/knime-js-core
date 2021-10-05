@@ -69,7 +69,6 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.page.WizardPage;
-import org.knime.core.node.wizard.page.WizardPage.WizardPageNodeInfo;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeContainerState;
@@ -177,11 +176,10 @@ public abstract class AbstractPageManager {
             new JSONWebNodePageConfiguration(layout, null, selectionTranslators, projectRelativePageIDSuffix);
         Map<String, JSONWebNode> webNodes = new HashMap<>();
         Map<String, NodeViewEnt> nodeViews = new HashMap<>();
-        Map<NodeIDSuffix, WizardPageNodeInfo> infoMap = page.getInfoMap();
         for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
             NativeNodeContainer nnc = e.getValue();
             if (nnc.getNodeModel() instanceof WizardNode) {
-                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc, infoMap.get(e.getKey())));
+                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc));
             } else if (NodeViewManager.hasNodeView(nnc)) {
                 nodeViews.put(e.getKey().toString(), new NodeViewEnt(nnc));
             }
@@ -189,12 +187,12 @@ public abstract class AbstractPageManager {
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);
     }
 
-    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc, final WizardPageNodeInfo nodeInfo) {
+    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc) {
         JSONWebNode jsonNode = new JSONWebNode();
         JSONWebNodeInfo info = new JSONWebNodeInfo();
-        info.setNodeName(nodeInfo.getNodeName());
-        info.setNodeAnnotation(nodeInfo.getNodeAnnotation());
-        NodeContainerState state = nodeInfo.getNodeState();
+        info.setNodeName(nnc.getName());
+        info.setNodeAnnotation(nnc.getNodeAnnotation().toString());
+        NodeContainerState state = nnc.getNodeContainerState();
         if (state.isIdle()) {
             info.setNodeState(JSONNodeState.IDLE);
         }
@@ -207,7 +205,7 @@ public abstract class AbstractPageManager {
         if (state.isExecuted()) {
             info.setNodeState(JSONNodeState.EXECUTED);
         }
-        NodeMessage message = nodeInfo.getNodeMessage();
+        NodeMessage message = nnc.getNodeMessage();
         if (NodeMessage.Type.ERROR == message.getMessageType()) {
             info.setNodeErrorMessage(message.getMessage());
         }
