@@ -141,6 +141,8 @@ public class CompositeViewPageManager extends AbstractPageManager {
                 WebViewContent c = (WebViewContent)v;
                 resultMap.put(entry.getKey().toString(),
                     new String(((ByteArrayOutputStream)c.saveToStream()).toByteArray(), StandardCharsets.UTF_8));
+            } else if (v instanceof String) {
+                resultMap.put(entry.getKey().toString(), (String)v);
             } else {
                 throw new IOException("View value of type " + v.getClass().getSimpleName() + " can' be serialized");
             }

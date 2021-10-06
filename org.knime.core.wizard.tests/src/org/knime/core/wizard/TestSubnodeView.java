@@ -103,6 +103,7 @@ public class TestSubnodeView extends WorkflowTestCase {
     private CompositeViewPageManager m_spm;
     private NodeID m_subnodeID;
     private NodeIDSuffix m_stringInputID;
+    private NodeIDSuffix m_nodeViewNodeID;
     private NodeIDSuffix m_tableViewID;
     private NodeID m_blockID;
 
@@ -119,6 +120,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         NodeID baseID = loadAndSetWorkflow();
         m_subnodeID = new NodeID(baseID, 6);
         m_stringInputID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 4));
+        m_nodeViewNodeID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 10));
         m_tableViewID = NodeID.NodeIDSuffix.create(baseID, new NodeID(new NodeID(m_subnodeID, 0), 3));
         m_blockID = new NodeID(baseID, 7);
         m_spm = CompositeViewPageManager.of(getManager());
@@ -160,7 +162,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         assertNotNull("Page content should be available", page);
         Map<NodeIDSuffix, NativeNodeContainer> pageMap = page.getPageMap();
         assertNotNull("Page map should be available", pageMap);
-        assertEquals("Page should contain three nodes", 3, pageMap.size());
+        assertEquals("Page should contain four nodes", 4, pageMap.size());
         String layout = page.getLayoutInfo();
         assertNotNull("Page layout should be available", layout);
         assertTrue("Layout should contain test string", layout.contains("testString"));
@@ -183,14 +185,15 @@ public class TestSubnodeView extends WorkflowTestCase {
         assertNotNull("Page should have layout information", page.getWebNodePageConfiguration().getLayout());
         JSONLayoutPage layout = page.getWebNodePageConfiguration().getLayout();
         assertNotNull("Layout should contain list of rows", layout.getRows());
-        assertEquals("Layout should contain four rows", 4, layout.getRows().size());
-        assertEquals("Page should contain three nodes", 3, page.getWebNodes().size());
+        assertEquals("Layout should contain five rows", 5, layout.getRows().size());
+        assertEquals("Page should contain three wizard nodes", 3, page.getWebNodes().size());
+        assertEquals("Page should contain one node with a view", 1, page.getNodeViews().size());
     }
 
     private Map<String, String> buildValueMap() throws Exception {
         Map<String, String> valueMap = m_spm.createWizardPageViewValueMap(m_subnodeID);
         assertNotNull("Value map of page should exist", valueMap);
-        assertTrue("Value map should contain three entries", valueMap.size() == 3);
+        assertTrue("Value map should contain four entries", valueMap.size() == 4);
         return valueMap;
     }
 
@@ -215,12 +218,16 @@ public class TestSubnodeView extends WorkflowTestCase {
     public void testValidationError() throws Exception {
         initialExecute();
         Map<String, String> valueMap = changeStringInputTo("foo", buildValueMap());
+        valueMap.put(m_nodeViewNodeID.toString(), "ERROR a validation error");
         Map<String, ValidationError> errorMap = m_spm.validateViewValues(valueMap, m_subnodeID);
         assertNotNull("Error map should exist", errorMap);
-        assertEquals("Error map should contain one entry", 1, errorMap.size());
+        assertEquals("Error map should contain two entries", 2, errorMap.size());
         ValidationError error = errorMap.get(m_stringInputID.toString());
         assertNotNull("Error for string input should exist", error);
         assertEquals("Error for string input incorrect", "The given input 'foo' is not a valid URL", error.getError());
+        error = errorMap.get(m_nodeViewNodeID.toString());
+        assertNotNull("Error for node-view node should exist", error);
+        assertEquals("Error for node-view incorrect", "ERROR a validation error", error.getError());
     }
 
     /**
@@ -242,9 +249,10 @@ public class TestSubnodeView extends WorkflowTestCase {
     @Test
     public void testValidationAndReexecute() throws Exception {
         initialExecute();
-        // change URL in string input
+        // change some values
         Map<String, String> valueMap = changeStringInputTo(CHANGED_URL, buildValueMap());
         selectRowInTable(valueMap);
+        valueMap.put(m_nodeViewNodeID.toString(), "new initial data");
 
         // validate and reexecute
         Map<String, ValidationError> errorMap = m_spm.validateViewValues(valueMap, m_subnodeID);
@@ -254,7 +262,7 @@ public class TestSubnodeView extends WorkflowTestCase {
         }
         waitWhileNodeInExecution(m_subnodeID);
         assertTrue("Subnode should be executed.", getManager().getNodeContainer(m_subnodeID).getNodeContainerState().isExecuted());
-        validateReexecutionResult();
+        validateReexecutionResult("new initial data");
     }
 
     /**
@@ -353,14 +361,14 @@ public class TestSubnodeView extends WorkflowTestCase {
 
         waitWhileNodeInExecution(m_subnodeID);
         assertTrue("Subnode should be executed.", getManager().getNodeContainer(m_subnodeID).getNodeContainerState().isExecuted());
-        validateReexecutionResult();
+        validateReexecutionResult("the initial data");
 
         svm.discard();
         assertNull("Page should be null after reset", svm.getViewRepresentation());
         assertNull("View value should be null after reset", svm.getViewValue());
     }
 
-    private void validateReexecutionResult() throws Exception {
+    private void validateReexecutionResult(final String expectedInitialNodeViewVal) throws Exception {
         // validate results
         Map<String, String> newValueMap = buildValueMap();
         String stringInputValue = newValueMap.get(m_stringInputID.toString());
@@ -369,6 +377,8 @@ public class TestSubnodeView extends WorkflowTestCase {
         JsonNode jsonValue = mapper.readTree(stringInputValue);
         assertNotNull("String input value should contain new string value", jsonValue.get("string"));
         assertEquals("String input value should be '" + CHANGED_URL + "'", CHANGED_URL, jsonValue.get("string").asText());
+
+        assertEquals(newValueMap.get(m_nodeViewNodeID.toString()), expectedInitialNodeViewVal);
 
         // check one row was selected and filtered
         NodeContainer container = getManager().getNodeContainer(m_subnodeID);
