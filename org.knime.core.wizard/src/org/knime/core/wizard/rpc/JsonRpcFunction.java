@@ -110,7 +110,7 @@ public class JsonRpcFunction {
     }
 
     private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc, final Consumer<String> jsCodeRunner) {
-        JsonRpcServer jsonRpcServer = new JsonRpcServer();
+        var jsonRpcServer = new JsonRpcServer();
         jsonRpcServer.addService(NodeService.class,
             new DefaultNodeService(nc, createSelectionEventConsumer(jsCodeRunner)));
         return jsonRpcServer;
@@ -141,9 +141,8 @@ public class JsonRpcFunction {
      * @return the json-rpc response
      */
     public String call(final String jsonRpcRequest) {
-        try (ByteArrayInputStream request =
-            new ByteArrayInputStream(jsonRpcRequest.getBytes(StandardCharsets.UTF_8));
-                ByteArrayOutputStream response = new ByteArrayOutputStream()) {
+        try (var request = new ByteArrayInputStream(jsonRpcRequest.getBytes(StandardCharsets.UTF_8));
+                var response = new ByteArrayOutputStream()) {
             m_jsonRpcServer.handleRequest(request, response);
             return new String(response.toByteArray(), StandardCharsets.UTF_8.name());
         } catch (IOException e) {

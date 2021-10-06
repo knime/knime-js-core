@@ -117,8 +117,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
             m_onReexecutionStart.run();
         }
         // validate view values and re-execute
-        NodeID pageId = m_page.getID();
-        NodeID resetNodeId =
+        var pageId = m_page.getID();
+        var resetNodeId =
             NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
         try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =

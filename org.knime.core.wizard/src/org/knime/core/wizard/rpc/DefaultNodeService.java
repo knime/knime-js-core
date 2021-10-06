@@ -121,7 +121,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
-        HiLiteHandler hiLiteHandler = getHiLiteHandler(nnc);
+        var hiLiteHandler = getHiLiteHandler(nnc);
         hiLiteHandler.addHiLiteListener(listener);
         m_registeredHiLiteListeners.add(new WeakReference<>(Pair.create(hiLiteHandler, listener)));
     }
