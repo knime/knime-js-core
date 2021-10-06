@@ -355,7 +355,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             SubNodeContainer nestedSNC = allNestedViews.get(nestedSuffix);
             if (nestedSNC != null) {
                 if (layoutPage == null) {
-                    Map<NodeIDSuffix, ViewHideable> nestedContentMap = new LinkedHashMap<NodeIDSuffix, ViewHideable>();
+                    Map<NodeIDSuffix, SingleNodeContainer> nestedContentMap = new LinkedHashMap<>();
                     layoutPage = createDefaultLayoutStructure(nestedContentMap);
                     nestedLayout.setLayout(layoutPage);
                 }
