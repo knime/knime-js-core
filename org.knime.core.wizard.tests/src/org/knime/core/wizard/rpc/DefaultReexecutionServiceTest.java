@@ -74,6 +74,7 @@ import org.knime.core.wizard.WorkflowTestCase;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -97,6 +98,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
     public void testReexecutePage() throws Exception {
         NodeID wfId = loadAndSetWorkflow();
         executeAllAndWait();
+        ObjectMapper mapper = createObjectMapper();
 
         // create reexecution service 'client'
         SubNodeContainer component = (SubNodeContainer)getManager().getNodeContainer(new NodeID(wfId, 5));
@@ -104,34 +106,41 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         RpcSingleServer<ReexecutionService> rpcServer =
             new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService());
         RpcSingleClient<ReexecutionService> rpcClient = JsonRpcTestUtil.createRpcSingleClientInstanceForTesting(
-            ReexecutionService.class, rpcServer.getHandler(), createObjectMapper());
+            ReexecutionService.class, rpcServer.getHandler(), mapper);
         ReexecutionService service = rpcClient.getService();
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("5:0:7",
-            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}");
+            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}",//
+            "5:0:8", "new initial data for node 5:0:8");
         PageContainer res = service.reexecutePage("5:0:2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
-        assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
+        assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
             PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
-            assertThat(res2.getReexecutedNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7"));
+            assertThat(res2.getReexecutedNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8"));
         });
         res = service.getPage();
-        assertThat(res.getPage().rawValue().toString(), containsString("834567"));
+        JsonNode page = mapper.readTree(res.getPage().rawValue().toString());
+        assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
+        assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
+            is("new initial data for node 5:0:8"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
 
         // test re-execution with validation error
         Map<String, String> viewValues2 = Map.of("5:0:7",
-            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":8345673838383838383838383}}");
+            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":8345673838383838383838383}}", //
+            "5:0:8", "ERROR: a validation error");
         IllegalStateException ex =
             assertThrows(IllegalStateException.class, () -> service.reexecutePage("5:0:2", viewValues2));
-        assertThat(ex.getMessage(), containsString("Unable to re-execute component with current page values."));
-
+        String message = ex.getMessage();
+        assertThat(message, containsString("Unable to re-execute component with current page values."));
+        assertThat(message, containsString("out of range of int"));
+        assertThat(message, containsString("ERROR: a validation error"));
     }
 
     private static ObjectMapper createObjectMapper() {
