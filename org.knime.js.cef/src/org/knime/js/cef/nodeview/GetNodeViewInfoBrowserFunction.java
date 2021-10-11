@@ -48,8 +48,6 @@
  */
 package org.knime.js.cef.nodeview;
 
-import java.io.IOException;
-
 import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
@@ -115,12 +113,8 @@ public class GetNodeViewInfoBrowserFunction extends BrowserFunction {
         NodeFactory<NodeModel> factory = m_nnc.getNode().getFactory();
         String debugUrl = NodeViewManager.getNodeViewDebugUrl(factory.getClass()).orElse(null);
         if (debugUrl == null) {
-            try {
-                return NodeViewManager.getInstance().writeNodeViewResourcesToDiscAndGetFileUrl(m_nnc);
-            } catch (IOException e) {
-                throw new IllegalStateException(
-                    "The node view resources for node '" + m_nnc.getNameWithID() + "' could not be written to disc", e);
-            }
+            return NodeViewManager.getInstance().getNodeViewPageUrl(m_nnc).orElseThrow(
+                () -> new IllegalStateException("No node view page url available for node " + m_nnc.getNameWithID()));
         } else {
             return debugUrl;
         }
