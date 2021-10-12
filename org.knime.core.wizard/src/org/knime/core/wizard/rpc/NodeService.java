@@ -76,11 +76,11 @@ public interface NodeService {
      * @param projectId
      * @param workflowId
      * @param nodeId
-     * @param serviceId specified the type of service to call
+     * @param serviceType specified the type of service to call
      * @param request the request
      * @return the data service response
      */
-    String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceId,
+    String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceType,
         String request);
 
     /**
