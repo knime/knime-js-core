@@ -64,12 +64,9 @@ interface NodeViewInfo {
 
     String getInitData();
 
-    boolean isUIComponent();
-
     String getRemoteDebugPort();
 
-    static NodeViewInfo create(final String name, final String url, final String initData,
-        final boolean isUIComponent, final String remoteDebugPort) {
+    static NodeViewInfo create(final String name, final String url, final String initData, final String remoteDebugPort) {
         return new NodeViewInfo() { // NOSONAR
 
             @Override
@@ -85,11 +82,6 @@ interface NodeViewInfo {
             @Override
             public String getInitData() {
                 return initData;
-            }
-
-            @Override
-            public boolean isUIComponent() {
-                return isUIComponent;
             }
 
             @Override
