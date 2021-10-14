@@ -49,21 +49,42 @@
 package org.knime.js.cef.nodeview;
 
 import java.awt.Rectangle;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.ProgressEvent;
+import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.view.NodeView;
+import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.js.core.JSONWebNodePage;
+import org.knime.js.core.JSONWebNodePageConfiguration;
+import org.knime.js.core.layout.bs.JSONLayoutColumn;
+import org.knime.js.core.layout.bs.JSONLayoutContent;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
+import org.knime.js.core.layout.bs.JSONLayoutRow;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 
 import com.equo.chromium.swt.Browser;
 
@@ -83,6 +104,10 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     private Shell m_shell;
 
     private NativeNodeContainer m_nnc;
+
+    private static String htmlDocumentWithPageBuilderURL;
+
+    private String m_title;
 
     /**
      * @param nnc
@@ -116,45 +141,140 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     @SuppressWarnings("unused")
     @Override
     protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
-        Display display = Display.getDefault();
+        m_title = title;
+        var display = Display.getDefault();
         m_shell = new Shell(display, SWT.SHELL_TRIM);
         m_shell.setText(title);
 
-        GridLayout layout = new GridLayout();
+        var layout = new GridLayout();
         layout.numColumns = 1;
         m_shell.setLayout(layout);
 
         m_browser = new Browser(m_shell, SWT.NONE);
         new JsonRpcBrowserFunction(m_browser, m_nnc);
-        new GetNodeViewInfoBrowserFunction(m_browser, m_nnc);
 
         m_browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         m_shell.setSize(1024, 768);
 
-        Point middle = new Point(knimeWindowBounds.width / 2, knimeWindowBounds.height / 2);
+        var middle = new Point(knimeWindowBounds.width / 2, knimeWindowBounds.height / 2);
         // Left upper point for window
-        Point newLocation = new Point(middle.x - (m_shell.getSize().x / 2) + knimeWindowBounds.x,
+        var newLocation = new Point(middle.x - (m_shell.getSize().x / 2) + knimeWindowBounds.x,
             middle.y - (m_shell.getSize().y / 2) + knimeWindowBounds.y);
         m_shell.setLocation(newLocation.x, newLocation.y);
         m_shell.addDisposeListener(e -> callCloseView());
         m_shell.open();
 
+        m_browser.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void completed(final ProgressEvent event) {
+                try {
+                    initializePageBuilder(m_browser, m_nnc);
+                } catch (Exception e) { // NOSONAR
+                    var message = "Initialization of the node view failed";
+                    NodeLogger.getLogger(CEFNodeView.class).error(message, e);
+                    m_browser.execute("window.alert('" + message + ": " + e.getMessage() + "')");
+                }
+            }
+
+            @Override
+            public void changed(final ProgressEvent event) {
+                // do nothing
+            }
+        });
+
         setUrl();
+    }
+
+    private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc) throws IOException {
+        var nodeViewEnt = new NodeViewEnt(nnc);
+        var page = createJSONWebNodePage(nodeViewEnt);
+        String pageString;
+        try (@SuppressWarnings("resource")
+        var stream = (ByteArrayOutputStream)page.saveToStream()) {
+            pageString = stream.toString(StandardCharsets.UTF_8).replace("\\", "\\\\").replace("'", "\\'");
+        }
+        var initCall = "var parsedRepresentation = JSON.parse('" + pageString + "');"
+            + "window.KnimePageLoader.init(parsedRepresentation, null, null, false);";
+        browser.execute(initCall);
+    }
+
+    private static JSONWebNodePage createJSONWebNodePage(final NodeViewEnt nodeViewEnt) {
+        var singleNodeId = "SINGLE";
+        var layoutViewContent = new JSONLayoutViewContent();
+        layoutViewContent.setUseLegacyMode(false);
+        layoutViewContent.setNodeID(singleNodeId);
+        List<JSONLayoutContent> layoutContentList = new ArrayList<>();
+        layoutContentList.add(layoutViewContent);
+
+        var layoutColumn = new JSONLayoutColumn();
+        layoutColumn.setContent(layoutContentList);
+
+        var row = new JSONLayoutRow();
+        row.addColumn(layoutColumn);
+        List<JSONLayoutRow> layoutRowList = new ArrayList<>();
+        layoutRowList.add(row);
+
+        var layoutPage = new JSONLayoutPage();
+        layoutPage.setParentLayoutLegacyMode(false);
+        layoutPage.setRows(layoutRowList);
+
+        var webNodePageConfig = new JSONWebNodePageConfiguration(layoutPage, null, null, null);
+
+        Map<String, NodeViewEnt> nodeViewMap = Map.of(singleNodeId, nodeViewEnt);
+        return new JSONWebNodePage(webNodePageConfig, Collections.emptyMap(), nodeViewMap);
     }
 
     private void setUrl() {
         if (m_nnc.getNodeContainerState().isExecuted()) {
-            URL url = Platform.getBundle("org.knime.js.cef").getEntry("js-src/ap-wrapper/dist/index.html");
-            try {
-                String path = FileLocator.toFileURL(url).getPath();
-                m_browser.setUrl("file://" + path);
-            } catch (IOException e) {
-                // should never happen
-                throw new IllegalStateException(e);
+            if (htmlDocumentWithPageBuilderURL == null) {
+                writeHtmlDocumentWithPageBuilder(m_title);
             }
+            m_browser.setUrl(htmlDocumentWithPageBuilderURL);
         } else {
             m_browser.setText(NO_DATA_HTML);
+        }
+    }
+
+    private static void writeHtmlDocumentWithPageBuilder(final String title) {
+        var sb = new StringBuilder();
+        sb.append("<!doctype html><html lang=\"en-US\"><head>");
+        sb.append("<meta http-equiv=Content-Type content=\"text/html; charset=utf-8\">");
+        sb.append("<meta charset=\"UTF-8\">");
+        if (title != null) {
+            sb.append("<title>" + title + "</title>");
+        }
+        sb.append("<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">");
+        sb.append(
+            "<script type=\"text/javascript\" src=\"org/knime/core/knime-pagebuilder2-ap.js\" charset=\"UTF-8\"></script>");
+        sb.append("</head><body>");
+        sb.append("</body></html>");
+
+        try {
+            var dir = FileUtil.createTempDir("ui_extensions_container_").toPath();
+            var indexHtml = dir.resolve("index.html");
+            Files.writeString(indexHtml, sb.toString());
+            copyPageBuilderResources(dir);
+            htmlDocumentWithPageBuilderURL = "file://" + indexHtml.toString();
+        } catch (IOException | URISyntaxException e) {
+            throw new IllegalStateException("Problem writing the pagebuilder resources", e);
+        }
+    }
+
+    private static void copyPageBuilderResources(final Path destDir) throws IOException, URISyntaxException {
+        var from = new String[]{ //
+            "dist/knime-pagebuilder2-ap.js", //
+            "dist/knime-pagebuilder.umd.min.js"};
+        var to = new String[]{ //
+            "org/knime/core/knime-pagebuilder2-ap.js", //
+            "org/knime/core/knime-pagebuilder2.js"};
+        var bundle = Platform.getBundle("org.knime.js.pagebuilder");
+        for (var i = 0; i < to.length; i++) {
+            var url = bundle.getEntry(from[i]);
+            var destFile = destDir.resolve(to[i]);
+            Files.createDirectories(destFile.getParent());
+            Files.copy(Paths.get(FileLocator.toFileURL(url).toURI()), destFile);
         }
     }
 
