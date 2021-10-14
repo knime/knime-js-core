@@ -77,6 +77,7 @@ import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.view.NodeView;
+import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
@@ -152,6 +153,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
         m_browser = new Browser(m_shell, SWT.NONE);
         new JsonRpcBrowserFunction(m_browser, m_nnc);
+        new GetDebugInfoBrowserFunction(m_browser, NodeViewManager.getInstance().getNodeView(m_nnc).getPage());
 
         m_browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
