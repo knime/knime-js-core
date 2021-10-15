@@ -267,12 +267,14 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     private static void copyPageBuilderResources(final Path destDir) throws IOException, URISyntaxException {
         var from = new String[]{ //
+            "dist/fonts", //
             "dist/knime-pagebuilder2-ap.js", //
             "dist/knime-pagebuilder.umd.min.js", //
             "dist/knime-pagebuilder2-ap.js.map", //
             "dist/knime-pagebuilder.umd.min.js.map" //
         };
         var to = new String[]{ //
+            "fonts", //
             "org/knime/core/knime-pagebuilder2-ap.js", //
             "org/knime/core/knime-pagebuilder2.js", //
             "org/knime/core/knime-pagebuilder2-ap.js.map", //
@@ -284,10 +286,14 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
                 // skip source maps if remote debugging is disabled
                 continue;
             }
-            var url = bundle.getEntry(from[i]);
-            var destFile = destDir.resolve(to[i]);
-            Files.createDirectories(destFile.getParent());
-            Files.copy(Paths.get(FileLocator.toFileURL(url).toURI()), destFile);
+            var srcPath = Paths.get(FileLocator.toFileURL(bundle.getEntry(from[i])).toURI());
+            var destPath = destDir.resolve(to[i]);
+            Files.createDirectories(destPath.getParent());
+            if (Files.isDirectory(srcPath)) {
+                FileUtil.copyDir(srcPath.toFile(), destPath.toFile());
+            } else {
+                Files.copy(srcPath, destPath);
+            }
         }
     }
 
