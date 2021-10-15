@@ -78,6 +78,7 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.view.NodeView;
 import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.core.wizard.debug.DebugInfo;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
@@ -267,12 +268,22 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     private static void copyPageBuilderResources(final Path destDir) throws IOException, URISyntaxException {
         var from = new String[]{ //
             "dist/knime-pagebuilder2-ap.js", //
-            "dist/knime-pagebuilder.umd.min.js"};
+            "dist/knime-pagebuilder.umd.min.js", //
+            "dist/knime-pagebuilder2-ap.js.map", //
+            "dist/knime-pagebuilder.umd.min.js.map" //
+        };
         var to = new String[]{ //
             "org/knime/core/knime-pagebuilder2-ap.js", //
-            "org/knime/core/knime-pagebuilder2.js"};
+            "org/knime/core/knime-pagebuilder2.js", //
+            "org/knime/core/knime-pagebuilder2-ap.js.map", //
+            "org/knime/core/knime-pagebuilder.umd.min.js.map" //
+        };
         var bundle = Platform.getBundle("org.knime.js.pagebuilder");
         for (var i = 0; i < to.length; i++) {
+            if (DebugInfo.REMOTE_DEBUGGING_PORT == null && to[i].endsWith(".map")) {
+                // skip source maps if remote debugging is disabled
+                continue;
+            }
             var url = bundle.getEntry(from[i]);
             var destFile = destDir.resolve(to[i]);
             Files.createDirectories(destFile.getParent());

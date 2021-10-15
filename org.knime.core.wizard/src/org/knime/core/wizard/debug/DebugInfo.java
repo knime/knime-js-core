@@ -64,9 +64,12 @@ public class DebugInfo {
     @SuppressWarnings("javadoc")
     public static final String FUNCTION_NAME = "getDebugInfo";
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    /**
+     * The CEF's remote debugging port or <code>null</code> if not set.
+     */
+    public static final String REMOTE_DEBUGGING_PORT = System.getProperty("chromium.remote_debugging_port");
 
-    private final String m_remoteDebuggingPort = System.getProperty("chromium.remote_debugging_port");
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final boolean m_refreshRequired;
 
@@ -81,7 +84,7 @@ public class DebugInfo {
      * @return the remoteDebuggingPort
      */
     public String getRemoteDebuggingPort() {
-        return m_remoteDebuggingPort;
+        return REMOTE_DEBUGGING_PORT;
     }
 
     /**
