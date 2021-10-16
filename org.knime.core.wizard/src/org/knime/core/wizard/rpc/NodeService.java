@@ -71,16 +71,17 @@ import org.knime.core.webui.node.view.NodeView;
 public interface NodeService {
 
     /**
-     * Sends a request to a node view's node data service of a certain type.
+     * Sends a request to a node view's or dialog's data service of a certain type.
      *
      * @param projectId
      * @param workflowId
      * @param nodeId
+     * @param extensionType the node 'extension, i.e. view or dialog, to direct the data service call to
      * @param serviceType specified the type of service to call
      * @param request the request
      * @return the data service response
      */
-    String callNodeViewDataService(String projectId, String workflowId, String nodeId, String serviceType,
+    String callNodeDataService(String projectId, String workflowId, String nodeId, String extensionType, String serviceType,
         String request);
 
     /**

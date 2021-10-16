@@ -67,6 +67,8 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.util.Pair;
+import org.knime.core.webui.data.DataServiceProvider;
+import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 
@@ -131,17 +133,25 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public String callNodeViewDataService(final String projectId, final String workflowId, final String nodeID,
-        final String serviceType, final String request) {
-        final var nvm = NodeViewManager.getInstance();
+    public String callNodeDataService(final String projectId, final String workflowId, final String nodeID,
+        final String extensionType, final String serviceType, final String request) {
         var nc = m_getNode.apply(nodeID);
+        final DataServiceProvider dataServiceProvider;
+        if ("view".equals(extensionType)) {
+            dataServiceProvider = NodeViewManager.getInstance().getNodeView(nc);
+        } else if ("dialog".equals(extensionType)) {
+            dataServiceProvider = NodeDialogManager.getInstance().getNodeDialog(nc);
+        } else {
+            throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
+        }
+
         if ("initial_data".equals(serviceType)) {
-            return nvm.callTextInitialDataService(nc);
+            return dataServiceProvider.callTextInitialDataService();
         } else if ("data".equals(serviceType)) {
-            return nvm.callTextDataService(nc, request);
+            return dataServiceProvider.callTextDataService(request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                nvm.callTextReExecuteDataService(nc, request);
+                dataServiceProvider.callTextAppyDataService(request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
