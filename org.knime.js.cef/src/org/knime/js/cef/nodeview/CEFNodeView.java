@@ -76,10 +76,13 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.util.FileUtil;
+import org.knime.core.webui.node.dialog.NodeDialog;
 import org.knime.core.webui.node.view.NodeView;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.wizard.debug.DebugInfo;
+import org.knime.gateway.api.entity.NodeDialogEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
@@ -93,11 +96,17 @@ import com.equo.chromium.swt.Browser;
 /**
  * A node view implementation using the Chromium Embedded Framework-Browser.
  *
- * Only displays web-ui node views, i.e. {@link NodeView}.
+ * Only displays web-ui node views, i.e. {@link NodeView}, and node dialogs, i.e. {@link NodeDialog}.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
 public class CEFNodeView extends AbstractNodeView<NodeModel> {
+
+    enum Content {
+            DIALOG, //
+            VIEW; //
+        // VIEW_AND_DIALOG
+    }
 
     private static final String NO_DATA_HTML = "<html><head></head><body><p>No data to display</p></body></html>";
 
@@ -111,12 +120,17 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     private String m_title;
 
+    private final Content m_content;
+
     /**
      * @param nnc
+     * @param isDialog this 'node view' is also used to display node dialogs, if <code>true</code> a dialog is supposed
+     *            to be displayed (e.g. resulting in a modal window)
      */
-    public CEFNodeView(final NativeNodeContainer nnc) {
+    public CEFNodeView(final NativeNodeContainer nnc, final boolean isDialog) {
         super(nnc.getNodeModel());
         m_nnc = nnc;
+        m_content = isDialog ? Content.DIALOG : Content.VIEW;
     }
 
     /**
@@ -124,7 +138,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
      */
     @Override
     protected void modelChanged() {
-        if (m_browser != null) {
+        if (m_browser != null && m_content == Content.VIEW) {
             Display.getDefault().asyncExec(this::setUrl);
         }
     }
@@ -145,7 +159,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_title = title;
         var display = Display.getDefault();
-        m_shell = new Shell(display, SWT.SHELL_TRIM);
+        m_shell = new Shell(display, SWT.SHELL_TRIM | (m_content == Content.DIALOG ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
         m_shell.setText(title);
 
         var layout = new GridLayout();
@@ -158,7 +172,11 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
         m_browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
-        m_shell.setSize(1024, 768);
+        if (m_content == Content.DIALOG) {
+            m_shell.setSize(525, 565);
+        } else {
+            m_shell.setSize(1024, 768);
+        }
 
         var middle = new Point(knimeWindowBounds.width / 2, knimeWindowBounds.height / 2);
         // Left upper point for window
@@ -173,9 +191,10 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
             @Override
             public void completed(final ProgressEvent event) {
                 try {
-                    initializePageBuilder(m_browser, m_nnc);
+                    initializePageBuilder(m_browser, m_nnc, m_content);
                 } catch (Exception e) { // NOSONAR
-                    var message = "Initialization of the node view failed";
+                    var message =
+                        "Initialization of the node " + (m_content == Content.DIALOG ? "dialog" : "view") + " failed";
                     NodeLogger.getLogger(CEFNodeView.class).error(message, e);
                     m_browser.execute("window.alert('" + message + ": " + e.getMessage() + "')");
                 }
@@ -190,9 +209,10 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         setUrl();
     }
 
-    private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc) throws IOException {
-        var nodeViewEnt = new NodeViewEnt(nnc);
-        var page = createJSONWebNodePage(nodeViewEnt);
+    private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
+        final Content content) throws IOException {
+        var uiExtensionEnt = content == Content.DIALOG ? new NodeDialogEnt(nnc) : new NodeViewEnt(nnc);
+        var page = createJSONWebNodePage(uiExtensionEnt);
         String pageString;
         try (@SuppressWarnings("resource")
         var stream = (ByteArrayOutputStream)page.saveToStream()) {
@@ -203,7 +223,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         browser.execute(initCall);
     }
 
-    private static JSONWebNodePage createJSONWebNodePage(final NodeViewEnt nodeViewEnt) {
+    private static JSONWebNodePage createJSONWebNodePage(final NodeUIExtensionEnt uiExtensionEnt) {
         var singleNodeId = "SINGLE";
         var layoutViewContent = new JSONLayoutViewContent();
         layoutViewContent.setUseLegacyMode(false);
@@ -225,12 +245,12 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
         var webNodePageConfig = new JSONWebNodePageConfiguration(layoutPage, null, null, null);
 
-        Map<String, NodeViewEnt> nodeViewMap = Map.of(singleNodeId, nodeViewEnt);
+        Map<String, NodeUIExtensionEnt> nodeViewMap = Map.of(singleNodeId, uiExtensionEnt);
         return new JSONWebNodePage(webNodePageConfig, Collections.emptyMap(), nodeViewMap);
     }
 
     private void setUrl() {
-        if (m_nnc.getNodeContainerState().isExecuted()) {
+        if (m_content == Content.DIALOG || m_nnc.getNodeContainerState().isExecuted()) {
             if (htmlDocumentWithPageBuilderURL == null) {
                 writeHtmlDocumentWithPageBuilder(m_title);
             }
