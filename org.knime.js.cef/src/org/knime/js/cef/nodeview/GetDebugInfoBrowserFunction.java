@@ -48,8 +48,6 @@
  */
 package org.knime.js.cef.nodeview;
 
-import org.knime.core.webui.page.Page;
-import org.knime.core.webui.page.Resource.Type;
 import org.knime.core.wizard.debug.DebugInfo;
 
 import com.equo.chromium.swt.Browser;
@@ -66,11 +64,11 @@ final class GetDebugInfoBrowserFunction extends BrowserFunction {
 
     /**
      * @param browser
-     * @param page
+     * @param debugInfo
      */
-    public GetDebugInfoBrowserFunction(final Browser browser, final Page page) {
+    public GetDebugInfoBrowserFunction(final Browser browser, final DebugInfo debugInfo) {
         super(browser, DebugInfo.FUNCTION_NAME);
-        m_debugInfo = new DebugInfo(page.getType() == Type.VUE_COMPONENT_LIB);
+        m_debugInfo = debugInfo;
     }
 
     /**

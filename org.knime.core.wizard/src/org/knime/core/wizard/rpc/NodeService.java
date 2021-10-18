@@ -76,7 +76,7 @@ public interface NodeService {
      * @param projectId
      * @param workflowId
      * @param nodeId
-     * @param extensionType the node 'extension, i.e. view or dialog, to direct the data service call to
+     * @param extensionType the node 'extension', i.e. view or dialog, to direct the data service call to
      * @param serviceType specified the type of service to call
      * @param request the request
      * @return the data service response
