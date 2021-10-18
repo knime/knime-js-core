@@ -66,12 +66,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView;
+import org.knime.core.node.Node;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
@@ -198,6 +201,13 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         m_shell.setLocation(newLocation.x, newLocation.y);
         m_shell.addDisposeListener(e -> callCloseView());
         m_shell.open();
+
+        m_shell.addShellListener(new ShellAdapter() {
+            @Override
+            public void shellClosed(final ShellEvent e) {
+                Node.invokeCloseView(CEFNodeView.this);
+            }
+        });
 
         setUrl();
     }
