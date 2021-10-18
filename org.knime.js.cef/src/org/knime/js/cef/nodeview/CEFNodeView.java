@@ -58,8 +58,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
@@ -86,7 +86,6 @@ import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
-import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent;
@@ -102,10 +101,23 @@ import com.equo.chromium.swt.Browser;
  */
 public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
-    enum Content {
+    private enum Content {
             DIALOG, //
-            VIEW; //
-        // VIEW_AND_DIALOG
+            VIEW, //
+            VIEW_AND_DIALOG;
+
+        static Content create(final boolean isDialog, final boolean isView) {
+            if (isDialog && isView) {
+                return VIEW_AND_DIALOG;
+            } else if (isDialog) {
+                return DIALOG;
+            } else if (isView) {
+                return VIEW;
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+
     }
 
     private static final String NO_DATA_HTML = "<html><head></head><body><p>No data to display</p></body></html>";
@@ -124,13 +136,14 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     /**
      * @param nnc
-     * @param isDialog this 'node view' is also used to display node dialogs, if <code>true</code> a dialog is supposed
+     * @param showDialog this 'node view' is also used to display node dialogs, if <code>true</code> a dialog is supposed
      *            to be displayed (e.g. resulting in a modal window)
+     * @param showView if this 'node view' should display the node view
      */
-    public CEFNodeView(final NativeNodeContainer nnc, final boolean isDialog) {
+    public CEFNodeView(final NativeNodeContainer nnc, final boolean showDialog, final boolean showView) {
         super(nnc.getNodeModel());
         m_nnc = nnc;
-        m_content = isDialog ? Content.DIALOG : Content.VIEW;
+        m_content = Content.create(showDialog, showView);
     }
 
     /**
@@ -138,7 +151,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
      */
     @Override
     protected void modelChanged() {
-        if (m_browser != null && m_content == Content.VIEW) {
+        if (m_browser != null && m_content != Content.DIALOG) {
+            // TODO don't reload but just update the view - see NXT-758 (view update mechanism)
             Display.getDefault().asyncExec(this::setUrl);
         }
     }
@@ -159,7 +173,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_title = title;
         var display = Display.getDefault();
-        m_shell = new Shell(display, SWT.SHELL_TRIM | (m_content == Content.DIALOG ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
+        m_shell = new Shell(display, SWT.SHELL_TRIM | (m_content != Content.VIEW ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
         m_shell.setText(title);
 
         var layout = new GridLayout();
@@ -212,8 +226,9 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
         final Content content) throws IOException {
-        var uiExtensionEnt = content == Content.DIALOG ? new NodeDialogEnt(nnc) : new NodeViewEnt(nnc);
-        var page = createJSONWebNodePage(uiExtensionEnt);
+        var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
+        var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc) : null;
+        var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
         String pageString;
         try (@SuppressWarnings("resource")
         var stream = (ByteArrayOutputStream)page.saveToStream()) {
@@ -224,34 +239,65 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         browser.execute(initCall);
     }
 
-    private static JSONWebNodePage createJSONWebNodePage(final NodeUIExtensionEnt uiExtensionEnt) {
-        var singleNodeId = "SINGLE";
-        var layoutViewContent = new JSONLayoutViewContent();
-        layoutViewContent.setUseLegacyMode(false);
-        layoutViewContent.setNodeID(singleNodeId);
-        List<JSONLayoutContent> layoutContentList = new ArrayList<>();
-        layoutContentList.add(layoutViewContent);
+    private static JSONWebNodePage createJSONWebNodePage(final NodeDialogEnt dialogEnt, final NodeViewEnt viewEnt) {
+        String dialogNodeId = null;
+        if (dialogEnt != null) {
+            dialogNodeId = viewEnt == null ? "SINGLE" : "DIALOG";
+        }
+        String viewNodeId = null;
+        if (viewEnt != null) {
+            viewNodeId = dialogEnt == null ? "SINGLE" : "VIEW";
+        }
+        var layoutPage = createJSONLayoutPage(dialogNodeId, viewNodeId);
 
-        var layoutColumn = new JSONLayoutColumn();
-        layoutColumn.setContent(layoutContentList);
+        var webNodePageConfig = new JSONWebNodePageConfiguration(layoutPage, null, null, null);
+
+        var nodeExtMap = new HashMap<String, NodeUIExtensionEnt>();
+        if (dialogEnt != null) {
+            nodeExtMap.put(dialogNodeId, dialogEnt);
+        }
+        if (viewEnt != null) {
+            nodeExtMap.put(viewNodeId, viewEnt);
+        }
+        return new JSONWebNodePage(webNodePageConfig, Collections.emptyMap(), nodeExtMap);
+    }
+
+    private static JSONLayoutPage createJSONLayoutPage(final String dialogNodeId, final String viewNodeId) {
+        JSONLayoutColumn dialogColumn = null;
+        JSONLayoutColumn viewColumn = null;
+        if (dialogNodeId != null) {
+            dialogColumn = new JSONLayoutColumn();
+            var content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID(dialogNodeId);
+            dialogColumn.setContent(List.of(content));
+        }
+        if (viewNodeId != null) {
+            viewColumn = new JSONLayoutColumn();
+            var content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID(viewNodeId);
+            viewColumn.setContent(List.of(content));
+        }
 
         var row = new JSONLayoutRow();
-        row.addColumn(layoutColumn);
+        if (dialogColumn != null) {
+            row.addColumn(dialogColumn);
+        }
+        if (viewColumn != null) {
+            row.addColumn(viewColumn);
+        }
         List<JSONLayoutRow> layoutRowList = new ArrayList<>();
         layoutRowList.add(row);
 
         var layoutPage = new JSONLayoutPage();
         layoutPage.setParentLayoutLegacyMode(false);
         layoutPage.setRows(layoutRowList);
-
-        var webNodePageConfig = new JSONWebNodePageConfiguration(layoutPage, null, null, null);
-
-        Map<String, NodeUIExtensionEnt> nodeViewMap = Map.of(singleNodeId, uiExtensionEnt);
-        return new JSONWebNodePage(webNodePageConfig, Collections.emptyMap(), nodeViewMap);
+        return layoutPage;
     }
 
     private void setUrl() {
-        if (m_content == Content.DIALOG || m_nnc.getNodeContainerState().isExecuted()) {
+        if (m_content != Content.VIEW || m_nnc.getNodeContainerState().isExecuted()) {
             if (htmlDocumentWithPageBuilderURL == null) {
                 writeHtmlDocumentWithPageBuilder(m_title);
             }
