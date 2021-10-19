@@ -153,7 +153,7 @@ public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP e
     private Object evaluateInBrowser(final String script) {
         AtomicReference<Object> res = new AtomicReference<>();
         AtomicReference<SWTException> exception = new AtomicReference<>();
-        int attempts = 0;
+        var attempts = 0;
         do {
             Display.getDefault().syncExec(() -> {
                 try {
@@ -162,12 +162,14 @@ public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP e
                     exception.set(e);
                 }
             });
+            attempts++;
             if (exception.get() != null) {
-                attempts++;
                 LOGGER.debug(
                     "Executing script failed. Trying again (" + attempts + "). The script is: '" + script + "'",
                     exception.get());
                 exception.set(null);
+                waitConstantTime();
+            } else if (res.get() == null) {
                 waitConstantTime();
             }
         } while (res.get() == null && attempts < MAX_NUMBER_OF_ATTEMPTS_TO_EVALUATE_SCRIPT);
