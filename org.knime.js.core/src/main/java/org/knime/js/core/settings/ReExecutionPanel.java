@@ -53,6 +53,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -72,9 +73,7 @@ public class ReExecutionPanel extends JPanel {
     public ReExecutionPanel() {
         super(new GridBagLayout());
 
-        m_reExecuteDownstreamNodesCheckBox = new JCheckBox(
-            "Enable re-execution (triggers a downstream re-execution event when the value of the widget is changed)."
-        );
+        m_reExecuteDownstreamNodesCheckBox = new JCheckBox("Re-execution on widget value change");
         initBasePanel();
     }
 
@@ -93,12 +92,16 @@ public class ReExecutionPanel extends JPanel {
     private void initBasePanel() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1;
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weighty = 1.0;
-        gbc.weightx = 1.0;
+        this.add(new JLabel("Re-execution of downstream nodes inside composite views"), gbc);
+
+        gbc.weighty = 1;
+        gbc.gridy = 1;
         this.add(m_reExecuteDownstreamNodesCheckBox, gbc);
     }
 
