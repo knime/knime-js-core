@@ -132,7 +132,7 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId",
+        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId", "view",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -160,7 +160,7 @@ public class DefaultNodeServiceTest {
         final Consumer<SelectionEvent> selectionEventConsumer = mock(Consumer.class);
         DefaultNodeService nodeService =
             new DefaultNodeService((SingleNodeContainer)m_wfm.getNodeContainer(componentId), selectionEventConsumer);
-        nodeService.selectDataPoints("projectId_not_used", "workflowId_not_used", "root:4:0:2",
+        nodeService.selectDataPoints("projectId_not_used", "workflowId_not_used", "root:4:0:2", "view",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -201,7 +201,7 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId",
+        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId", "view",
             SelectionEventMode.REMOVE.toString(), ROWKEYS_1);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -246,7 +246,7 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId",
+        new DefaultNodeService(m_nnc, consumerMock).selectDataPoints("projectId", "workflowId", "nodeId", "view",
             SelectionEventMode.REPLACE.toString(), ROWKEYS_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {

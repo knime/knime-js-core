@@ -164,7 +164,10 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public void selectDataPoints(final String projectId, final String workflowId, final String nodeIdString,
-        final String mode, final List<String> rowKeys) {
+        final String extensionType, final String mode, final List<String> rowKeys) {
+        if (!"view".equals(extensionType)) {
+            throw new IllegalArgumentException("Unknown target for selection service: " + extensionType);
+        }
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
         var nc = m_getNode.apply(nodeIdString);
         final var keyEvent = new KeyEvent(nc.getID(), rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
