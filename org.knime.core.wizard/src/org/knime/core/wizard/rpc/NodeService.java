@@ -85,8 +85,8 @@ public interface NodeService {
         String request);
 
     /**
-     * Selects data points, as identified by their row keys. Unselects any other data points, if they were previously
-     * selected.
+     * Updates the selected data points as specified by the 'mode' and identified by their row keys. Unselects any other
+     * data points, if they were previously selected.
      *
      * @param projectId
      * @param workflowId
@@ -94,6 +94,7 @@ public interface NodeService {
      * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
      * @param rowKeys the keys affected by the data point selection modification
      */
-    void selectDataPoints(String projectId, String workflowId, String nodeId, String mode, List<String> rowKeys);
+    void updateDataPointSelection(String projectId, String workflowId, String nodeId, String mode,
+        List<String> rowKeys);
 
 }

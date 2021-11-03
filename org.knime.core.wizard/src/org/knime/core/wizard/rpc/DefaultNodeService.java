@@ -119,7 +119,7 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public void selectDataPoints(final String projectId, final String workflowId, final String nodeIdString,
+    public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
         final String mode, final List<String> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
         var nc = m_getNode.apply(nodeIdString);

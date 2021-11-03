@@ -117,7 +117,7 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId",
+        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -146,7 +146,7 @@ public class DefaultNodeServiceTest {
         var component = (SingleNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component);
         SelectionEventSourceTest.setupHiLiteListeners(selectionEventConsumer, component);
-        nodeService.selectDataPoints("projectId_not_used", "workflowId_not_used", "root:4:0:2",
+        nodeService.updateDataPointSelection("projectId_not_used", "workflowId_not_used", "root:4:0:2",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -162,7 +162,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId", REMOVE.toString(),
+        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REMOVE.toString(),
             ROWKEYS_1);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -183,7 +183,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId", REPLACE.toString(),
+        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REPLACE.toString(),
             ROWKEYS_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
