@@ -54,6 +54,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
@@ -87,7 +88,8 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
      */
     @Override
     protected BrowserWrapper createBrowserWrapper(final Shell shell) {
-        final Browser browser = new Browser(shell, SWT.NONE);
+        var browser = new Browser(shell, SWT.NONE);
+        browser.setMenu(new Menu(browser.getShell()));
         return new BrowserWrapper() {
 
             @Override

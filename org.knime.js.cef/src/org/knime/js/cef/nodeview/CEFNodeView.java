@@ -72,6 +72,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.knime.core.node.AbstractNodeView;
 import org.knime.core.node.Node;
@@ -234,6 +235,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
             }
         });
         browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
+        browser.setMenu(new Menu(browser.getShell()));
         return browser;
     }
 
