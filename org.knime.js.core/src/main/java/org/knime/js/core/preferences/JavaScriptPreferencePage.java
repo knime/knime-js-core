@@ -48,7 +48,9 @@
  */
 package org.knime.js.core.preferences;
 
+import static org.knime.js.core.JSCorePlugin.CEF_BROWSER;
 import static org.knime.js.core.JSCorePlugin.CHROMIUM_BROWSER;
+import static org.knime.js.core.JSCorePlugin.HEADLESS_CEF;
 import static org.knime.js.core.JSCorePlugin.HEADLESS_CHROMIUM;
 import static org.knime.js.core.JSCorePlugin.HEADLESS_PHANTOMJS;
 import static org.knime.js.core.JSCorePlugin.INTERNAL_BROWSER;
@@ -116,16 +118,13 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
 
-    private RadioGroupFieldEditor m_browserSelector;
+    private static final String HUB_FEATURE_NAME = "com.knime.features.workbench.cef";
+
     private FileFieldEditor m_browserExePath;
     private StringFieldEditor m_browserCLIArgs;
 
-    private RadioGroupFieldEditor m_headlessBrowserSelector;
     private FileFieldEditor m_headlessBrowserExePath;
     private StringFieldEditor m_headlesBrowserCLIArgs;
-
-    private BooleanFieldEditor m_createDebugHtml;
-    private BooleanFieldEditor m_enableLegacyQuickformExecution;
 
     /** Creates a new preference page */
     public JavaScriptPreferencePage() {
@@ -153,16 +152,16 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
 
-        if (!JSCorePlugin.isChromiumInstalled()) {
+        if (!JSCorePlugin.isCEFInstalled()) {
             addField(new HorizontalLineField(parent));
-            addInstallChromiumButton(parent);
+            addInstallCEFButton(parent);
         }
 
-        m_browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
-            "Please choose the browser to use for displaying JavaScript views:", 1,
-            retrieveAllBrowsers(), parent);
-        addField(m_browserSelector);
-        for (Control radioButton : m_browserSelector.getRadioBoxControl(parent).getChildren()) {
+        var allBrowsers = retrieveAllBrowsers();
+        var browserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_VIEW_BROWSER,
+            "Please choose the browser to use for displaying JavaScript views:", 1, allBrowsers, parent);
+        addField(browserSelector);
+        for (Control radioButton : browserSelector.getRadioBoxControl(parent).getChildren()) {
             ((Button)radioButton).addSelectionListener(new SelectionListener() {
 
                 @Override
@@ -183,12 +182,13 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             "Additional command\nline arguments for chosen browser:", parent);
         addField(m_browserCLIArgs);
         addField(new HorizontalLineField(parent));
+        enableBrowserFields(getSelectedBrowser(allBrowsers, JSCorePlugin.P_VIEW_BROWSER), parent);
 
         String[][] headlessBrowsers = retrieveHeadlessBrowsers();
-        m_headlessBrowserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER,
+        var headlessBrowserSelector = new RadioGroupFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER,
             "Please choose the headless browser to use for generating images from JavaScript views:"
             , 1, headlessBrowsers, parent);
-        for (Control radioButton : m_headlessBrowserSelector.getRadioBoxControl(parent).getChildren()) {
+        for (Control radioButton : headlessBrowserSelector.getRadioBoxControl(parent).getChildren()) {
             ((Button)radioButton).addSelectionListener(new SelectionListener() {
 
                 @Override
@@ -202,7 +202,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
                 }
             });
         }
-        addField(m_headlessBrowserSelector);
+        addField(headlessBrowserSelector);
         if (headlessBrowsers.length > 0) {
             m_headlessBrowserExePath = new FileFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_PATH,
                 "Path to headless browser executable\n(leave empty for default):", true, parent);
@@ -210,6 +210,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             m_headlesBrowserCLIArgs = new StringFieldEditor(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS,
                 "Additional command\nline arguments for chosen headless browser:", parent);
             addField(m_headlesBrowserCLIArgs);
+            enableHeadlessFields(getSelectedBrowser(headlessBrowsers, JSCorePlugin.P_HEADLESS_BROWSER), parent);
         } else {
             final Label label = new Label(parent, SWT.NONE);
             label.setText("No headless browser installed. Image generation will be unavailable!");
@@ -220,11 +221,11 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         }
         addField(new HorizontalLineField(parent));
 
-        m_createDebugHtml = new BooleanFieldEditor(JSCorePlugin.P_DEBUG_HTML, "Create debug HTML for JavaScript views", BooleanFieldEditor.DEFAULT, parent);
-        addField(m_createDebugHtml);
+        var createDebugHtml = new BooleanFieldEditor(JSCorePlugin.P_DEBUG_HTML, "Create debug HTML for JavaScript views", BooleanFieldEditor.DEFAULT, parent);
+        addField(createDebugHtml);
 
-        m_enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
-        addField(m_enableLegacyQuickformExecution);
+        var enableLegacyQuickformExecution = new BooleanFieldEditor(JSCorePlugin.P_SHOW_LEGACY_QUICKFORM_EXECUTION, "Enable legacy Quickform execution", BooleanFieldEditor.DEFAULT, parent);
+        addField(enableLegacyQuickformExecution);
     }
 
     private static String[][] retrieveAllBrowsers() {
@@ -241,9 +242,24 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             .sorted((e1, e2) -> {
                 String s1 = e1.getViewClass().getCanonicalName();
                 String s2 = e2.getViewClass().getCanonicalName();
-                return CHROMIUM_BROWSER.equals(s1) ? -1 : CHROMIUM_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
+                return CEF_BROWSER.equals(s1) ? -1 : CEF_BROWSER.equals(s2) ? 1 : s1.compareTo(s2);
             }).map(e -> new String[]{getViewName(e), e.getViewClass().getCanonicalName()})
             .toArray(String[][]::new);
+    }
+
+    private static String getSelectedBrowser(final String[][] allBrowsers, final String preferenceKey) {
+        var selectedBrowser = JSCorePlugin.getDefault().getPreferenceStore().getString(preferenceKey);
+        for (String[] b : allBrowsers) {
+            if (b[1].equals(selectedBrowser)) {
+                return selectedBrowser;
+            }
+        }
+        // the selected browser is not available -> fallback to the first in the list of all browsers
+        if (allBrowsers.length > 0) {
+            return allBrowsers[0][1];
+        } else {
+            return null;
+        }
     }
 
     private static String[][] retrieveHeadlessBrowsers() {
@@ -260,7 +276,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
                 .sorted((e1, e2) -> {
                     String s1 = e1.getImageGeneratorClass().getCanonicalName();
                     String s2 = e2.getImageGeneratorClass().getCanonicalName();
-                    return HEADLESS_CHROMIUM.equals(s1) ? -1 : HEADLESS_CHROMIUM.equals(s2) ? 1 : e1.getBrowserName().compareTo(e2.getBrowserName());
+                    return HEADLESS_CEF.equals(s1) ? -1 : HEADLESS_CEF.equals(s2) ? 1 : e1.getBrowserName().compareTo(e2.getBrowserName());
                 }).map(e -> new String[] {getHeadlessName(e), e.getImageGeneratorClass().getCanonicalName()})
                 .toArray(String[][]::new);
     }
@@ -295,16 +311,18 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private void enableBrowserFields(final String view, final Composite parent) {
         boolean isSWT = INTERNAL_BROWSER.equals(view);
         boolean isChromium = CHROMIUM_BROWSER.equals(view);
-        m_browserExePath.setEnabled(!isSWT && !isChromium && view != null, parent);
-        m_browserCLIArgs.setEnabled(!isSWT && view != null, parent);
+        boolean isCEF = CEF_BROWSER.equals(view);
+        m_browserExePath.setEnabled(!isSWT && !isChromium && !isCEF && view != null, parent);
+        m_browserCLIArgs.setEnabled(!isSWT && !isCEF && view != null, parent);
     }
 
     private void enableHeadlessFields(final String view, final Composite parent) {
         if (m_headlessBrowserExePath != null && m_headlesBrowserCLIArgs != null) {
             boolean isPhantom = HEADLESS_PHANTOMJS.equals(view);
             boolean isChromium = HEADLESS_CHROMIUM.equals(view);
-            m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && view != null, parent);
-            m_headlesBrowserCLIArgs.setEnabled(view != null, parent);
+            boolean isCEF = HEADLESS_CEF.equals(view);
+            m_headlessBrowserExePath.setEnabled(!isPhantom && !isChromium && !isCEF && view != null, parent);
+            m_headlesBrowserCLIArgs.setEnabled(!isCEF && view != null, parent);
         }
     }
 
@@ -383,39 +401,39 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
     }
 
-    private static void addInstallChromiumButton(final Composite parent) {
+    private static void addInstallCEFButton(final Composite parent) {
         final Composite comp = new Composite(parent, SWT.NONE);
-        comp.setLayout(new GridLayout(2, false));
+        comp.setLayout(new GridLayout(1, false));
         comp.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         final Label label = new Label(comp, SWT.NONE);
-        label.setText("Bundled Chromium Browser not installed. It is recommended to install it.");
+        label.setText("The Chromium Embedded Framework (CEF) browser is not installed. It is recommended to install it.");
         final FontData data = label.getFont().getFontData()[0];
         final Font font = new Font(label.getDisplay(), new FontData(data.getName(), data.getHeight(), SWT.BOLD));
         label.setFont(font);
         label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
 
         final Button button = new Button(comp, SWT.NONE);
-        button.setText("Install Chromium");
+        button.setText("Install KNIME Hub Integration with CEF");
 
         button.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                installChromiumExtension();
+                installHubExtension();
             }
 
             @Override
             public void widgetDefaultSelected(final SelectionEvent e) {
-                installChromiumExtension();
+                installHubExtension();
             }
         });
     }
 
     /**
-     * Installs the Chromium extension.
+     * Installs the Hub extension (which also pulls in the CEF).
      */
-    private static void installChromiumExtension() {
+    private static void installHubExtension() {
         final ProvisioningSession session = ProvisioningUI.getDefaultUI().getSession();
 
         try {
@@ -431,7 +449,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             if (featuresToInstall.isEmpty()) {
                 Display.getDefault().syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                     "No extension found",
-                    "No extension with name '" + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
+                    "No extension with name '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
             } else {
                 startInstallChromium(featuresToInstall);
             }
@@ -440,16 +458,16 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
             Display.getDefault()
                 .syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                     "Error while installing extension", "Error while installign extension '"
-                        + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
+                        + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
 
             NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
-                .error("Error while installign extension '" + JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX
+                .error("Error while installing extension '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX
                     + "': " + ex.getMessage(), ex);
         }
     }
 
     /**
-     * Searches the chromium feature in the provided repository.
+     * Searches the hub feature in the provided repository.
      *
      * @param repository the repository to search
      * @param featuresToInstall a set that will be filled with the features to be installed
@@ -458,7 +476,7 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
     private static void searchInRepository(final IMetadataRepository repository,
         final Set<IInstallableUnit> featuresToInstall) throws ProvisionException {
         final IQuery<IInstallableUnit> query = QueryUtil
-            .createLatestQuery(QueryUtil.createIUQuery(JSCorePlugin.CHROME_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
+            .createLatestQuery(QueryUtil.createIUQuery(HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
         final IQueryResult<IInstallableUnit> result = repository.query(query, null);
 
         result.forEach(i -> featuresToInstall.add(i));

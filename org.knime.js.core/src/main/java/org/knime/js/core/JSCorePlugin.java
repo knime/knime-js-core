@@ -142,13 +142,6 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public static final String SYS_PROPERTY_SANITIZE_ALLOW_CSS = "js.core.sanitize.allowCSS";
 
     /**
-     * Name of the Chromium feature.
-     *
-     * @since 4.2
-     */
-    public static final String CHROME_FEATURE_NAME = "org.knime.features.ext.chromium";
-
-    /**
      * Class name of a node view implementation using a specific browser.
      *
      * @since 4.4
@@ -282,6 +275,16 @@ public final class JSCorePlugin extends AbstractUIPlugin {
                     .anyMatch(n -> n.startsWith("org.knime.ext.chromium.bin"));
         }
         return false;
+    }
+
+    /**
+     * Checks whether the CEF plugin is installed
+     *
+     * @return {@code true} if installed
+     * @since 4.5
+     */
+    public static boolean isCEFInstalled() {
+        return Platform.getBundle("org.knime.js.cef") != null;
     }
 
 }

@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.js.core" version="2">
     <resource path="src/main/java/org/knime/js/core/JSCorePlugin.java" type="org.knime.js.core.JSCorePlugin">
+        <filter id="338755678">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.JSCorePlugin"/>
+                <message_argument value="CHROME_FEATURE_NAME"/>
+            </message_arguments>
+        </filter>
         <filter id="338792546">
             <message_arguments>
                 <message_argument value="org.knime.js.core.JSCorePlugin"/>

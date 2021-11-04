@@ -72,8 +72,11 @@ public class JavaScriptPreferenceInitializer extends AbstractPreferenceInitializ
             store.setDefault(JSCorePlugin.P_BROWSER_CLI_ARGS, "--no-sandbox");
             store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER_CLI_ARGS, "--no-sandbox");
         }
-        if (JSCorePlugin.osSupportsChromium() && JSCorePlugin.isChromiumInstalled()) {
-            //use bundled Chromium as default in most cases
+        if(JSCorePlugin.isCEFInstalled()) {
+            store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JSCorePlugin.CEF_BROWSER);
+            store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JSCorePlugin.HEADLESS_CEF);
+        } else if (JSCorePlugin.osSupportsChromium() && JSCorePlugin.isChromiumInstalled()) {
+            //use bundled Chromium as 'fallback default'
             store.setDefault(JSCorePlugin.P_VIEW_BROWSER, JSCorePlugin.CHROMIUM_BROWSER);
             store.setDefault(JSCorePlugin.P_HEADLESS_BROWSER, JSCorePlugin.HEADLESS_CHROMIUM);
         } else {
