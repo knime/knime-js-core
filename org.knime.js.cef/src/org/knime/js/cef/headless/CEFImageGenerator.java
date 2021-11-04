@@ -82,7 +82,7 @@ import com.equo.chromium.wl.IBrowser;
 public class CEFImageGenerator<T extends NodeModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent>
     extends AbstractImageGenerator<T, REP, VAL> {
 
-    private static final int MAX_NUMBER_OF_ATTEMPTS_TO_EVALUATE_SCRIPT = 5;
+    private static final int MAX_NUMBER_OF_ATTEMPTS_TO_EVALUATE_SCRIPT = 10;
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(CEFImageGenerator.class);
 
