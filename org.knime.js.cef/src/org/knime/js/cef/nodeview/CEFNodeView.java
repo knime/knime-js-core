@@ -51,6 +51,7 @@ package org.knime.js.cef.nodeview;
 import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -381,7 +382,11 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
                 // skip source maps if remote debugging is disabled
                 continue;
             }
-            var srcPath = Paths.get(FileLocator.toFileURL(bundle.getEntry(from[i])).toURI());
+
+            // must not use url.toURI() -- FileLocator leaves spaces in the URL (see eclipse bug 145096)
+            // -- taken from TableauHyperActivator.java line 158
+            var url = FileLocator.toFileURL(bundle.getEntry(from[i]));
+            var srcPath = Paths.get(new URI(url.getProtocol(), url.getFile(), null));
             var destPath = destDir.resolve(to[i]);
             Files.createDirectories(destPath.getParent());
             if (Files.isDirectory(srcPath)) {
