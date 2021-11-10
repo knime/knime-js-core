@@ -91,11 +91,9 @@ public interface NodeService {
      * @param projectId
      * @param workflowId
      * @param nodeId
-     * @param extensionType the node 'extension', i.e. view or dialog, to direct the data service call to
      * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
      * @param rowKeys the keys affected by the data point selection modification
      */
-    void selectDataPoints(String projectId, String workflowId, String nodeId, final String extensionType, String mode,
-        List<String> rowKeys);
+    void selectDataPoints(String projectId, String workflowId, String nodeId, String mode, List<String> rowKeys);
 
 }
