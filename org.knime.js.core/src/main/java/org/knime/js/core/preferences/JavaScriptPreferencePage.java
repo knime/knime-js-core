@@ -57,30 +57,11 @@ import static org.knime.js.core.JSCorePlugin.INTERNAL_BROWSER;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.equinox.p2.core.ProvisionException;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.equinox.p2.operations.InstallOperation;
-import org.eclipse.equinox.p2.operations.ProvisioningSession;
-import org.eclipse.equinox.p2.query.IQuery;
-import org.eclipse.equinox.p2.query.IQueryResult;
-import org.eclipse.equinox.p2.query.QueryUtil;
-import org.eclipse.equinox.p2.repository.IRepositoryManager;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepository;
-import org.eclipse.equinox.p2.repository.metadata.IMetadataRepositoryManager;
-import org.eclipse.equinox.p2.ui.LoadMetadataRepositoryJob;
-import org.eclipse.equinox.p2.ui.ProvisioningUI;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -98,12 +79,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PlatformUI;
-import org.knime.core.node.NodeLogger;
 import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.AbstractWizardNodeView.WizardNodeViewExtension;
 import org.knime.js.core.AbstractImageGenerator;
@@ -115,10 +93,6 @@ import org.knime.js.core.JSCorePlugin;
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  */
 public class JavaScriptPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
-    private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
-
-    private static final String HUB_FEATURE_NAME = "com.knime.features.workbench.cef";
 
     private FileFieldEditor m_browserExePath;
     private StringFieldEditor m_browserCLIArgs;
@@ -420,100 +394,14 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                installHubExtension();
+                JSCorePlugin.installHubExtension();
             }
 
             @Override
             public void widgetDefaultSelected(final SelectionEvent e) {
-                installHubExtension();
+                JSCorePlugin.installHubExtension();
             }
         });
     }
 
-    /**
-     * Installs the Hub extension (which also pulls in the CEF).
-     */
-    private static void installHubExtension() {
-        final ProvisioningSession session = ProvisioningUI.getDefaultUI().getSession();
-
-        try {
-            final IMetadataRepositoryManager metadataManager = (IMetadataRepositoryManager)session
-                .getProvisioningAgent().getService(IMetadataRepositoryManager.SERVICE_NAME);
-            final Set<IInstallableUnit> featuresToInstall = new HashSet<>();
-
-            for (URI uri : metadataManager.getKnownRepositories(IRepositoryManager.REPOSITORIES_ALL)) {
-                IMetadataRepository repo = metadataManager.loadRepository(uri, null);
-                searchInRepository(repo, featuresToInstall);
-            }
-
-            if (featuresToInstall.isEmpty()) {
-                Display.getDefault().syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
-                    "No extension found",
-                    "No extension with name '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
-            } else {
-                startInstallChromium(featuresToInstall);
-            }
-
-        } catch (ProvisionException ex) {
-            Display.getDefault()
-                .syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
-                    "Error while installing extension", "Error while installign extension '"
-                        + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
-
-            NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
-                .error("Error while installing extension '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX
-                    + "': " + ex.getMessage(), ex);
-        }
-    }
-
-    /**
-     * Searches the hub feature in the provided repository.
-     *
-     * @param repository the repository to search
-     * @param featuresToInstall a set that will be filled with the features to be installed
-     * @throws ProvisionException if an error occurs
-     */
-    private static void searchInRepository(final IMetadataRepository repository,
-        final Set<IInstallableUnit> featuresToInstall) throws ProvisionException {
-        final IQuery<IInstallableUnit> query = QueryUtil
-            .createLatestQuery(QueryUtil.createIUQuery(HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
-        final IQueryResult<IInstallableUnit> result = repository.query(query, null);
-
-        result.forEach(i -> featuresToInstall.add(i));
-    }
-
-    /**
-     * Starts installing the chromium feature.
-     *
-     * @param featuresToInstall the features that have to be installed.
-     */
-    private static void startInstallChromium(final Set<IInstallableUnit> featuresToInstall) {
-        final ProvisioningUI provUI = ProvisioningUI.getDefaultUI();
-        Job.getJobManager().cancel(LoadMetadataRepositoryJob.LOAD_FAMILY);
-        final LoadMetadataRepositoryJob loadJob = new LoadMetadataRepositoryJob(provUI);
-        loadJob.setProperty(LoadMetadataRepositoryJob.ACCUMULATE_LOAD_ERRORS, Boolean.toString(true));
-
-        loadJob.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(final IJobChangeEvent event) {
-                if (PlatformUI.isWorkbenchRunning() && event.getResult().isOK()) {
-                    Display.getDefault().asyncExec(() -> {
-                        if (Display.getDefault().isDisposed()) {
-                            NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
-                                .debug("Display disposed, aborting install action");
-                            return;
-                        }
-
-                        provUI.getPolicy().setRepositoriesVisible(false);
-                        provUI.openInstallWizard(featuresToInstall,
-                            new InstallOperation(provUI.getSession(), featuresToInstall), loadJob);
-                        provUI.getPolicy().setRepositoriesVisible(true);
-                    });
-                }
-            }
-        });
-
-        loadJob.setUser(true);
-        loadJob.schedule();
-    }
 }
