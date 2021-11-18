@@ -205,7 +205,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-        m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
+        // m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.END, GridData.END, false, false));
