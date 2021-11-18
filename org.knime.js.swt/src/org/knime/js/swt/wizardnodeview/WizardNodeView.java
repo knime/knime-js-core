@@ -359,9 +359,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     // do nothing
                 }
             });
-            setBrowserURL();
         });
 
+        setBrowserURL();
     }
 
     private void initBrowserFunctions() {
