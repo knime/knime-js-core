@@ -51,6 +51,7 @@ package org.knime.js.cef.wizardnodeview;
 import java.util.function.Function;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
@@ -105,6 +106,21 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
             @Override
             public void addProgressListener(final ProgressListener progressListener) {
                 browser.addProgressListener(progressListener);
+            }
+
+            @Override
+            public void removeProgressListener(final ProgressListener progressListener) {
+                browser.removeProgressListener(progressListener);
+            }
+
+            @Override
+            public void addLocationListener(final LocationListener locationListener) {
+                browser.addLocationListener(locationListener);
+            }
+
+            @Override
+            public void removeLocationListener(final LocationListener locationListener) {
+                browser.removeLocationListener(locationListener);
             }
 
             @Override

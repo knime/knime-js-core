@@ -8,4 +8,39 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/js/swt/wizardnodeview/WizardNodeView.java" type="org.knime.js.swt.wizardnodeview.WizardNodeView$BrowserWrapper">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.js.swt.wizardnodeview.WizardNodeView.BrowserWrapper"/>
+                <message_argument value="addLocationListener(LocationListener)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.js.swt.wizardnodeview.WizardNodeView.BrowserWrapper"/>
+                <message_argument value="removeLocationListener(LocationListener)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.js.swt.wizardnodeview.WizardNodeView.BrowserWrapper"/>
+                <message_argument value="removeProgressListener(ProgressListener)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="addLocationListener(LocationListener)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="removeLocationListener(LocationListener)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="removeProgressListener(ProgressListener)"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>

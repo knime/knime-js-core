@@ -53,11 +53,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
+import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -128,7 +131,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_rpcCallback;
     private BrowserFunctionInternal m_getDebugInfoCallback;
     private boolean m_viewSet = false;
-    private boolean m_initialized = false;
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
 
@@ -205,7 +207,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-        // m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
+        m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.END, GridData.END, false, false));
@@ -333,34 +335,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         });
         m_shell.open();
 
-        display.asyncExec(() -> {
-            m_browserWrapper.addProgressListener(new ProgressListener() {
-
-                @Override
-                public void completed(final ProgressEvent event) {
-                    if (m_viewSet && !m_initialized) {
-                        WizardNode<REP, VAL> model = getModel();
-                        WizardViewCreator<REP, VAL> creator = model.getViewCreator();
-                        if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
-                            String customCSS = ((CSSModifiable)model).getCssStyles();
-                            ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
-                        }
-                        String initCall =
-                            creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
-                        initCall = creator.wrapInTryCatch(initCall);
-                        //The execute call might fire the completed event again in some browsers!
-                        m_initialized = true;
-                        m_browserWrapper.execute(initCall);
-                    }
-                }
-
-                @Override
-                public void changed(final ProgressEvent event) {
-                    // do nothing
-                }
-            });
-        });
-
         setBrowserURL();
     }
 
@@ -407,10 +381,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
     private void setBrowserURL() {
         try {
-            m_initialized = false;
             File src = getViewSource();
             if (src != null && src.exists()) {
-                m_browserWrapper.setUrl("file://" + getViewSource().getAbsolutePath());
+                var url = "file://" + getViewSource().getAbsolutePath();
+                onPageLoaded(url, () -> m_viewSet ? createInitScript() : null);
+                m_browserWrapper.setUrl(url);
                 m_viewSet = true;
             } else {
                 m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
@@ -421,6 +396,60 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_viewSet = false;
             LOGGER.error(e.getMessage(), e);
         }
+    }
+
+    private String createInitScript() {
+        WizardNode<REP, VAL> model = getModel();
+        WizardViewCreator<REP, VAL> creator = model.getViewCreator();
+        if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+            String customCSS = ((CSSModifiable)model).getCssStyles();
+            ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
+        }
+        String initCall =
+            creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
+        return creator.wrapInTryCatch(initCall);
+    }
+
+    private void onPageLoaded(final String url, final Supplier<String> scriptToRun) {
+        // Use location listener to capture the exact event when the page of the given url
+        // is being loaded (changing). Often, other location events might be triggered
+        // before (e.g. triggered by a previous m_browserWrapper.setText(""))
+        m_browserWrapper.addLocationListener(new LocationListener() {
+
+            @Override
+            public void changing(final LocationEvent locationEvent) {
+                if (locationEvent.location.equals(url)) {
+                    // User progress listener to wait till until the page for the given
+                    // url has been completely loaded.
+                    m_browserWrapper.addProgressListener(new ProgressListener() {
+
+                        @Override
+                        public void changed(final ProgressEvent event) {
+                            //
+                        }
+
+                        @Override
+                        public void completed(final ProgressEvent event) {
+                            try {
+                                String script = scriptToRun.get();
+                                if (script != null) {
+                                    m_browserWrapper.execute(script);
+                                }
+                            } finally {
+                                m_browserWrapper.removeProgressListener(this);
+                            }
+                        }
+                    });
+                    m_browserWrapper.removeLocationListener(this);
+                }
+            }
+
+            @Override
+            public void changed(final LocationEvent event) {
+                //
+            }
+
+        });
     }
 
     /**
@@ -449,6 +478,21 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             @Override
             public void addProgressListener(final ProgressListener progressListener) {
                 browser.addProgressListener(progressListener);
+            }
+
+            @Override
+            public void removeProgressListener(final ProgressListener progressListener) {
+                browser.removeProgressListener(progressListener);
+            }
+
+            @Override
+            public void addLocationListener(final LocationListener locationListener) {
+                browser.addLocationListener(locationListener);
+            }
+
+            @Override
+            public void removeLocationListener(final LocationListener locationListener) {
+                browser.removeLocationListener(locationListener);
             }
 
             @Override
@@ -929,6 +973,12 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         Display getDisplay();
 
         void addProgressListener(ProgressListener progressListener);
+
+        void removeProgressListener(ProgressListener progressListener);
+
+        void addLocationListener(LocationListener locationListener);
+
+        void removeLocationListener(LocationListener locationListener);
 
         void setUrl(String absolutePath);
 
