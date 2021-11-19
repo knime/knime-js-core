@@ -163,7 +163,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             public void run() {
                 if (m_browserWrapper != null && !m_browserWrapper.isDisposed()) {
                     synchronized (m_browserWrapper) {
-                        setBrowserURL();
+                        setBrowserContent(getNodeContainer().getNodeContainerState().isExecuted());
                     }
                 }
             }
@@ -335,7 +335,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         });
         m_shell.open();
 
-        setBrowserURL();
+        setBrowserContent(true);
     }
 
     private void initBrowserFunctions() {
@@ -379,24 +379,27 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
       }
 
-    private void setBrowserURL() {
-        try {
-            File src = getViewSource();
-            if (src != null && src.exists()) {
-                var url = "file://" + getViewSource().getAbsolutePath();
-                onPageLoaded(url, () -> m_viewSet ? createInitScript() : null);
-                m_browserWrapper.setUrl(url);
-                m_viewSet = true;
-            } else {
-                m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
-                m_viewSet = false;
-            }
-        } catch (Exception e) {
-            m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
-            m_viewSet = false;
-            LOGGER.error(e.getMessage(), e);
-        }
-    }
+      private void setBrowserContent(final boolean hasData) {
+          try {
+              if (hasData) {
+                  File src = getViewSource();
+                  if (src != null && src.exists()) {
+                      var url = "file://" + getViewSource().getAbsolutePath();
+                      onPageLoaded(url, () -> m_viewSet ? createInitScript() : null);
+                      m_browserWrapper.setUrl(url);
+                      m_viewSet = true;
+                      return;
+                  }
+              }
+
+              m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
+              m_viewSet = false;
+          } catch (Exception e) {
+              m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
+              m_viewSet = false;
+              LOGGER.error(e.getMessage(), e);
+          }
+      }
 
     private String createInitScript() {
         WizardNode<REP, VAL> model = getModel();
