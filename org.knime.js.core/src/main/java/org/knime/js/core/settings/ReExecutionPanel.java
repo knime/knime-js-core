@@ -60,6 +60,7 @@ import javax.swing.JPanel;
  *
  * @author Konrad Amtenbrink, KNIME GmbH, Berlin, Germany
  *
+ * @since 4.5
  */
 public class ReExecutionPanel extends JPanel {
 
