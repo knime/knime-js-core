@@ -134,11 +134,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         m_resetNodes = getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
         String page;
         if (m_page.getNodeContainerState().isExecuted()) {
-            try {
-                page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
-            } catch (IOException ex) {
-                throw new IllegalStateException(ex);
-            }
+            page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
             m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
             m_resetNodeId = resetNodeId;
@@ -153,11 +149,16 @@ public final class DefaultReexecutionService implements ReexecutionService {
         return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
     }
 
-    private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) throws IOException {
-        JSONWebNodePage page = m_cvm.createWizardPage(m_page.getID());
-        page.filterWebNodesById(resetNodeIDs);
-        try (OutputStream pageStream = page.saveToStream()) {
-            return pageStream.toString();
+    private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) {
+        JSONWebNodePage page;
+        try {
+            page = m_cvm.createWizardPage(m_page.getID());
+            page.filterWebNodesById(resetNodeIDs);
+            try (OutputStream pageStream = page.saveToStream()) {
+                return pageStream.toString();
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Problem occurred while serializing page", ex);
         }
     }
 
@@ -166,22 +167,18 @@ public final class DefaultReexecutionService implements ReexecutionService {
      */
     @Override
     public PageContainer getPage() {
+        CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
+        var pageState = m_page.getNodeContainerState();
         String page;
-        if (m_page.getNodeContainerState().isExecuted()) {
-            CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
-            try {
-                page = filterAndGetSerializedJSONWebNodePage(
-                    getSuccessorWizardNodesWithinComponent(m_resetNodeId, null));
-            } catch (IOException ex) {
-                throw new IllegalStateException("Problem occurred while serializing page", ex);
-            }
-            m_reexecutedNodes = m_resetNodes;
-            m_resetNodes = null;
-        } else {
+        if(pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
             page = null;
             m_reexecutedNodes = getSuccessorWizardNodesWithinComponent(m_resetNodeId,
                 nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
                     && !nc.getNodeContainerState().isExecutionInProgress());
+        } else {
+            page = filterAndGetSerializedJSONWebNodePage(getSuccessorWizardNodesWithinComponent(m_resetNodeId, null));
+            m_reexecutedNodes = m_resetNodes;
+            m_resetNodes = null;
         }
         if (page != null && m_onReexecutionEnd != null) {
             m_onReexecutionEnd.run();

@@ -73,6 +73,11 @@
                     <layout>p2</layout>
                     <url>${knime.workbench.p2}</url>
                 </repository>
+                <repository>
+                    <id>p2-knime-javasnippet</id>
+                    <layout>p2</layout>
+                    <url>${knime.javasnippet.p2}</url>
+                </repository>
             </repositories>
 
         </profile>
