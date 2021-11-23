@@ -48,7 +48,9 @@ package org.knime.js.swt.wizardnodeview;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -92,7 +94,6 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
 import org.knime.core.wizard.SubnodeViewableModel;
-import org.knime.core.wizard.debug.DebugInfo;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
@@ -128,7 +129,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_validateCurrentValueInViewCallback;
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
     private BrowserFunctionInternal m_rpcCallback;
-    private BrowserFunctionInternal m_getDebugInfoCallback;
+    private List<BrowserFunctionWrapper> m_additionalCallbacks;
     private boolean m_viewSet = false;
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
@@ -401,7 +402,16 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
             "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
         m_rpcCallback = new RpcFunction(m_browserWrapper);
-        m_getDebugInfoCallback = new GetDebugInfoFunction(m_browserWrapper, false);
+        m_additionalCallbacks = registerAndGetAdditionalBrowserFunctions(m_browserWrapper);
+    }
+
+    /**
+     * @param browser the browser to add the browser function to
+     * @return list of additional browser function registered with passed browser
+     * @since 4.5
+     */
+    protected List<BrowserFunctionWrapper> registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browser) {
+        return Collections.emptyList();
     }
 
     class DropdownSelectionListener extends SelectionAdapter {
@@ -562,9 +572,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (m_rpcCallback != null && !m_rpcCallback.isDisposed()) {
             m_rpcCallback.dispose();
         }
-        if (m_getDebugInfoCallback != null && !m_getDebugInfoCallback.isDisposed()) {
-            m_getDebugInfoCallback.dispose();
-        }
+        m_additionalCallbacks.forEach(c -> {
+            if (!c.isDisposed()) {
+                c.dispose();
+            }
+        });
         if (m_shell != null && !m_shell.isDisposed()) {
             m_shell.dispose();
         }
@@ -577,7 +589,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
-        m_getDebugInfoCallback = null;
+        m_additionalCallbacks.clear();
         m_viewSet = false;
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
@@ -880,29 +892,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         public void dispose() {
             super.dispose();
             m_function.dispose();
-        }
-
-    }
-
-    private class GetDebugInfoFunction extends BrowserFunctionInternal {
-
-        private DebugInfo m_debugInfo;
-
-        /**
-         * @param browser
-         * @param refreshRequired
-         */
-        public GetDebugInfoFunction(final BrowserWrapper browser, final boolean refreshRequired) {
-            super(browser, DebugInfo.FUNCTION_NAME);
-            m_debugInfo = new DebugInfo(refreshRequired);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public Object function(final Object[] arguments) {
-            return m_debugInfo.toString();
         }
 
     }

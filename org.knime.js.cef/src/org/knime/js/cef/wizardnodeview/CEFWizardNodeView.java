@@ -48,6 +48,7 @@
  */
 package org.knime.js.cef.wizardnodeview;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.eclipse.swt.SWT;
@@ -61,6 +62,7 @@ import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.wizard.debug.DebugInfo;
 import org.knime.js.swt.wizardnodeview.WizardNodeView;
 
 import com.equo.chromium.swt.Browser;
@@ -82,6 +84,15 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
      */
     public CEFWizardNodeView(final SingleNodeContainer snc, final T nodeModel) {
         super(snc, nodeModel);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected List<BrowserFunctionWrapper> registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browser) {
+        var debugInfo = new DebugInfo(false);
+        return List.of(browser.registerBrowserFunction(DebugInfo.FUNCTION_NAME, args -> debugInfo.toString()));
     }
 
     /**
