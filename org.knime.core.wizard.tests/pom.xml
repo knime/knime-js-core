@@ -64,6 +64,16 @@
 								<id>org.knime.features.clfixes</id>
 								<versionRange>0.0.0</versionRange>
 							</requirement>
+							<requirement>
+								<type>eclipse-feature</type>
+								<id>org.knime.features.javasnippet</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
+							<requirement>
+								<type>eclipse-plugin</type>
+								<id>org.knime.testing.application</id>
+								<versionRange>0.0.0</versionRange>
+							</requirement>
 						</extraRequirements>
 					</dependency-resolution>
 				</configuration>
