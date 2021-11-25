@@ -48,7 +48,6 @@
  */
 package org.knime.js.cef.nodeview;
 
-import org.eclipse.swt.widgets.Display;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 
@@ -72,7 +71,7 @@ public class JsonRpcBrowserFunction extends BrowserFunction {
      */
     public JsonRpcBrowserFunction(final Browser browser, final NativeNodeContainer nnc) {
         super(browser, JsonRpcFunction.FUNCTION_NAME);
-        m_function = new JsonRpcFunction(nnc, c -> Display.getDefault().syncExec(() -> browser.execute(c)));
+        m_function = new JsonRpcFunction(nnc);
     }
 
     @Override

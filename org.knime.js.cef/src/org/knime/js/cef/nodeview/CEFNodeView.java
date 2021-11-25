@@ -88,6 +88,8 @@ import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.page.Page;
 import org.knime.core.webui.page.Resource.Type;
 import org.knime.core.wizard.debug.DebugInfo;
+import org.knime.core.wizard.rpc.JsonRpcFunction;
+import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.gateway.api.entity.NodeDialogEnt;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
@@ -238,6 +240,16 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         final Content content) {
         var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
         var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc) : null;
+
+        // Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
+        // are passed to the frontend by executing a piece of js-code.
+        var selectionEventSource = new SelectionEventSource(e -> {
+            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
+            Display.getDefault().syncExec(() -> browser.execute(jsCall));
+        });
+        selectionEventSource.addEventListener(nnc);
+        browser.addDisposeListener(e -> selectionEventSource.dispose());
+
         var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
         String pageString;
         try (@SuppressWarnings("resource")
@@ -404,6 +416,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     protected void callCloseView() {
         if (m_browser != null) {
             // this also disposes the registered browser functions
+            // and selection event listeners
             m_browser.dispose();
             m_browser = null;
         }

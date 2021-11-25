@@ -44,9 +44,9 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   21 Sep 2021 (Marc Bux, KNIME GmbH, Berlin, Germany): created
+ *   Nov 25, 2021 (hornm): created
  */
-package org.knime.core.wizard.rpc;
+package org.knime.core.wizard.rpc.events;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Duration.FIVE_SECONDS;
@@ -54,45 +54,46 @@ import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
 import static org.junit.Assert.assertEquals;
 import static org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode.REMOVE;
 import static org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode.REPLACE;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_1;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_1_2;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_2;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.stringListToRowKeySet;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.verifySelectionEvent;
-import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.knime.core.data.RowKey;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
-import org.knime.core.node.property.hilite.HiLiteListener;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.node.workflow.NodeID;
-import org.knime.core.node.workflow.SingleNodeContainer;
-import org.knime.core.node.workflow.WorkflowAnnotation;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
-import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
-import org.knime.testing.node.view.NodeViewNodeFactory;
 import org.knime.testing.util.WorkflowManagerUtil;
 
 /**
- * @author Marc Bux, KNIME GmbH, Berlin, Germany
+ * Tests {@link SelectionEventSource}.
+ *
+ * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
 @SuppressWarnings("javadoc")
-public class DefaultNodeServiceTest {
+public class SelectionEventSourceTest {
+
+    private static final String WORKFLOW_NAME = "workflow";
+
+    public static final List<String> ROWKEYS_1 = List.of("Row01");
+
+    public static final List<String> ROWKEYS_2 = List.of("Row02");
+
+    public static final List<String> ROWKEYS_1_2 = List.of("Row01", "Row02");
 
     private WorkflowManager m_wfm;
 
@@ -113,91 +114,71 @@ public class DefaultNodeServiceTest {
     }
 
     @Test
-    public void testSelectDataPoints() {
+    public void testConsumeHiLiteEvent() {
 
-        final var listenerMock = mock(HiLiteListener.class);
-        m_hlh.addHiLiteListener(listenerMock);
+        @SuppressWarnings("unchecked")
+        final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId", "view",
-            SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
+        var selectionEventSource = new SelectionEventSource(consumerMock);
+        selectionEventSource.addEventListener(m_nnc);
 
-        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_1_2))));
-            verify(listenerMock, never()).unHiLite(any());
-            verify(listenerMock, never()).unHiLiteAll(any());
-            verify(listenerMock, never()).replaceHiLite(any());
-        });
+        m_nnc.getNodeModel().getInHiLiteHandler(0).fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
+
+        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(
+            () -> verify(consumerMock, times(1)).accept(argThat(se -> verifySelectionEvent(se, "root", "root:1"))));
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_1_2));
         m_hlh.fireClearHiLiteEvent();
     }
 
     @Test
-    public void testSelectDataPointsInComponentView() {
-        NodeID n1 = createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 1)).getID();
-        NodeID n2 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 0)).getID();
-        m_wfm.addConnection(n1, 1, n2, 1);
+    public void testConsumeUnHiLiteEvent() {
 
-        NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotation[0], "component")
-            .getCollapsedMetanodeID();
-        m_wfm.convertMetaNodeToSubNode(componentId);
-
-        @SuppressWarnings("unchecked")
-        final Consumer<SelectionEvent> selectionEventConsumer = mock(Consumer.class);
-        var component = (SingleNodeContainer)m_wfm.getNodeContainer(componentId);
-        var nodeService = new DefaultNodeService(component);
-        var selectionEventSource = new SelectionEventSource(selectionEventConsumer);
-        selectionEventSource.addEventListener(component);
-        nodeService.selectDataPoints("projectId_not_used", "workflowId_not_used", "root:4:0:2", "view",
-            SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
-
-        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(selectionEventConsumer, times(1))
-                .accept(argThat(se -> verifySelectionEvent(se, "root:4", "root:4:0:3")));
-        });
-    }
-
-    @Test
-    public void testUnSelectDataPoints() throws InterruptedException {
-        final var listenerMock = mock(HiLiteListener.class);
-
-        m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId", "view", REMOVE.toString(),
-            ROWKEYS_1);
+        @SuppressWarnings("unchecked")
+        final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(listenerMock, times(1)).hiLite(any());
-            verify(listenerMock, times(1)).unHiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_1))));
-            verify(listenerMock, never()).unHiLiteAll(any());
-            verify(listenerMock, never()).replaceHiLite(any());
-        });
+        var selectionEventSource = new SelectionEventSource(consumerMock);
+        selectionEventSource.addEventListener(m_nnc);
+        m_nnc.getNodeModel().getInHiLiteHandler(0).fireUnHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
+
+        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS)
+            .untilAsserted(() -> verify(consumerMock, times(1))
+                .accept(argThat(se -> se.getKeys().equals(ROWKEYS_1) && se.getMode() == REMOVE)));
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
         m_hlh.fireClearHiLiteEvent();
     }
 
     @Test
-    public void testReplaceDataPoints() throws InterruptedException {
-        final var listenerMock = mock(HiLiteListener.class);
+    public void testConsumeReplaceHiLiteEvent() {
 
-        m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
 
-        new DefaultNodeService(m_nnc).selectDataPoints("projectId", "workflowId", "nodeId", "view",
-            REPLACE.toString(), ROWKEYS_2);
+        @SuppressWarnings("unchecked")
+        final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(listenerMock, times(1)).hiLite(any());
-            verify(listenerMock, never()).unHiLite(any());
-            verify(listenerMock, never()).unHiLiteAll(any());
-            verify(listenerMock, times(1))
-                .replaceHiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_2))));
-        });
+        var selectionEventSource = new SelectionEventSource(consumerMock);
+        selectionEventSource.addEventListener(m_nnc);
+        m_nnc.getNodeModel().getInHiLiteHandler(0).fireReplaceHiLiteEvent(stringListToRowKeySet(ROWKEYS_2));
+
+        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS)
+            .untilAsserted(() -> verify(consumerMock, times(1))
+                .accept(argThat(se -> se.getKeys().equals(ROWKEYS_2) && se.getMode() == REPLACE)));
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
         m_hlh.fireClearHiLiteEvent();
+    }
+
+    public static boolean verifySelectionEvent(final SelectionEvent se, final String workflowId, final String nodeId) {
+        return se.getKeys().equals(ROWKEYS_1_2) && se.getMode() == SelectionEventMode.ADD
+            && se.getNodeId().equals(nodeId) && se.getWorkflowId().equals(workflowId)
+            && se.getProjectId().startsWith(WORKFLOW_NAME);
+    }
+
+    public static Set<RowKey> stringListToRowKeySet(final List<String> keys) {
+        return keys.stream().map(RowKey::new).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 }

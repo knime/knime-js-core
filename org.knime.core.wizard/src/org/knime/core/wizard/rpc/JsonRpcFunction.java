@@ -52,7 +52,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
@@ -61,7 +60,7 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.core.wizard.SubnodeViewableModel;
-import org.knime.core.wizard.rpc.DefaultNodeService.SelectionEvent;
+import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,11 +90,9 @@ public class JsonRpcFunction {
      *
      * @param snc the component with the composite view
      * @param model
-     * @param jsCodeRunner to execute js code in the browser
      */
-    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model,
-        final Consumer<String> jsCodeRunner) {
-        m_jsonRpcServer = initJsonRpcServer(snc, jsCodeRunner);
+    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model) {
+        m_jsonRpcServer = initJsonRpcServer(snc);
         m_jsonRpcServer.addService(ReexecutionService.class, model.createReexecutionService());
     }
 
@@ -103,35 +100,37 @@ public class JsonRpcFunction {
      * Intializes the json-rpc function for single node view.
      *
      * @param nnc
-     * @param jsCodeRunner to execute js code in the browser
      */
-    public JsonRpcFunction(final NativeNodeContainer nnc, final Consumer<String> jsCodeRunner) {
-        m_jsonRpcServer = initJsonRpcServer(nnc, jsCodeRunner);
+    public JsonRpcFunction(final NativeNodeContainer nnc) {
+        m_jsonRpcServer = initJsonRpcServer(nnc);
     }
 
-    private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc, final Consumer<String> jsCodeRunner) {
+    private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc) {
         var jsonRpcServer = new JsonRpcServer();
-        jsonRpcServer.addService(NodeService.class,
-            new DefaultNodeService(nc, createSelectionEventConsumer(jsCodeRunner)));
+        jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nc));
         return jsonRpcServer;
     }
 
-    private static Consumer<SelectionEvent> createSelectionEventConsumer(final Consumer<String> jsCodeRunner) {
-        return selectionEvent -> { // NOSONAR
-            // code copied from org.knime.ui.java.browser.KnimeBrowserView
-            final var jsonrpcObjectNode = MAPPER.createObjectNode();
-            final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
-            paramsArrayNode.addPOJO(selectionEvent);
-            jsonrpcObjectNode.put(FUNCTION_NAME, "2.0").put("method", "SelectionEvent").set("params", paramsArrayNode);
-            try {
-                final String jsCode = "jsonrpcNotification(\""
-                    + StringEscapeUtils.escapeJava(MAPPER.writeValueAsString(jsonrpcObjectNode)) + "\");";
-                jsCodeRunner.accept(jsCode);
-            } catch (JsonProcessingException ex) {
-                NodeLogger.getLogger(DefaultNodeService.class)
-                    .error("Problem creating a json-rpc notification in order to send an event", ex);
-            }
-        };
+    /**
+     * Helper to create a jsonrpc-notification call from a selection event to be run as a JS script in the browser.
+     *
+     * @param selectionEvent
+     * @return the js-call or {@code null} if a problem occurred
+     */
+    public static String createJsonRpcNotificationCall(final SelectionEvent selectionEvent) {
+        // code copied from org.knime.ui.java.browser.KnimeBrowserView
+        final var jsonrpcObjectNode = MAPPER.createObjectNode();
+        final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
+        paramsArrayNode.addPOJO(selectionEvent);
+        jsonrpcObjectNode.put(FUNCTION_NAME, "2.0").put("method", "SelectionEvent").set("params", paramsArrayNode);
+        try {
+            return "jsonrpcNotification(\"" + StringEscapeUtils.escapeJava(MAPPER.writeValueAsString(jsonrpcObjectNode))
+                + "\");";
+        } catch (JsonProcessingException ex) {
+            NodeLogger.getLogger(DefaultNodeService.class)
+                .error("Problem creating a json-rpc notification in order to send an event", ex);
+            return null;
+        }
     }
 
     /**
@@ -155,6 +154,6 @@ public class JsonRpcFunction {
      * Cleans up the rpc function.
      */
     public void dispose() {
-        ((DefaultNodeService)m_jsonRpcServer.getHandler(NodeService.class)).dispose();
+        // nothing to dispose
     }
 }

@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -97,6 +96,7 @@ import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
+import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
 
@@ -132,6 +132,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
     private BrowserFunctionInternal m_rpcCallback;
     private List<BrowserFunctionWrapper> m_additionalCallbacks;
+    private SelectionEventSource m_selectionEventSource;
     private final AtomicBoolean m_viewSet = new AtomicBoolean(false);
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
@@ -216,6 +217,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
+        registerSelectionEventListener();
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
@@ -427,6 +429,18 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return Collections.emptyList();
     }
 
+    /*
+     * Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
+     * are passed to the frontend by executing a piece of js-code.
+     */
+    private void registerSelectionEventListener() {
+        m_selectionEventSource = new SelectionEventSource(e -> {
+            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
+            Display.getDefault().syncExec(() -> m_browserWrapper.execute(jsCall));
+        });
+        m_selectionEventSource.addEventListener(getNodeContainer());
+    }
+
     class DropdownSelectionListener extends SelectionAdapter {
 
         private Menu menu;
@@ -596,6 +610,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (m_shell != null && !m_shell.isDisposed()) {
             m_shell.dispose();
         }
+        if (m_selectionEventSource != null) {
+            m_selectionEventSource.dispose();
+        }
         m_shell = null;
         m_browserWrapper = null;
         m_viewRequestCallback = null;
@@ -605,6 +622,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
+        m_selectionEventSource = null;
         m_viewSet.set(false);
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
@@ -887,12 +905,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         RpcFunction(final BrowserWrapper browser, final SingleNodeContainer nc) {
             super(browser, JsonRpcFunction.FUNCTION_NAME);
-            Consumer<String> jsCodeRunner = c -> Display.getDefault().syncExec(() -> browser.execute(c));
             if (nc instanceof SubNodeContainer) {
-                m_function = new JsonRpcFunction((SubNodeContainer)nc, (SubnodeViewableModel)getViewableModel(),
-                    jsCodeRunner);
+                m_function = new JsonRpcFunction((SubNodeContainer)nc, (SubnodeViewableModel)getViewableModel());
             } else {
-                m_function = new JsonRpcFunction((NativeNodeContainer)nc, jsCodeRunner);
+                m_function = new JsonRpcFunction((NativeNodeContainer)nc);
             }
         }
 

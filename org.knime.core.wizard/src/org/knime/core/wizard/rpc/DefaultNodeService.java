@@ -49,27 +49,18 @@
 package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.property.hilite.HiLiteHandler;
-import org.knime.core.node.property.hilite.HiLiteListener;
 import org.knime.core.node.property.hilite.KeyEvent;
-import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
-import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.core.util.Pair;
 import org.knime.core.webui.data.DataServiceProvider;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
 import org.knime.gateway.api.entity.NodeIDEnt;
 
 /**
@@ -80,37 +71,12 @@ import org.knime.gateway.api.entity.NodeIDEnt;
  */
 public class DefaultNodeService implements NodeService {
 
-    static interface SelectionEvent {
-
-        String getProjectId();
-
-        String getWorkflowId();
-
-        String getNodeId();
-
-        SelectionEventMode getMode();
-
-        List<String> getKeys();
-    }
-
-    enum SelectionEventMode {
-            ADD, REMOVE, REPLACE
-    }
-
     private final Function<String, NativeNodeContainer> m_getNode;
 
-    private final List<WeakReference<Pair<HiLiteHandler, HiLiteListener>>> m_registeredHiLiteListeners;
-
-    DefaultNodeService(final SingleNodeContainer snc, final Consumer<SelectionEvent> selectionEventConsumer) {
-        m_registeredHiLiteListeners = new ArrayList<>();
+    DefaultNodeService(final SingleNodeContainer snc) {
         if (snc instanceof NativeNodeContainer) {
-            addHiLiteListener((NativeNodeContainer)snc,
-                new PerNodeHiliteListener(selectionEventConsumer, (NativeNodeContainer)snc));
             m_getNode = id -> (NativeNodeContainer)snc;
         } else {
-            SubNodeContainer component = (SubNodeContainer)snc;
-            WizardPageUtil.getWizardPageNodes(component.getWorkflowManager(), true)
-                .forEach(nnc -> addHiLiteListener(nnc, new PerNodeHiliteListener(selectionEventConsumer, nnc)));
             var projectWfm = snc.getParent().getProjectWFM();
             m_getNode = id -> {
                 var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
@@ -120,16 +86,6 @@ public class DefaultNodeService implements NodeService {
                 return (NativeNodeContainer)nc;
             };
         }
-    }
-
-    private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
-        var hiLiteHandler = getHiLiteHandler(nnc);
-        hiLiteHandler.addHiLiteListener(listener);
-        m_registeredHiLiteListeners.add(new WeakReference<>(Pair.create(hiLiteHandler, listener)));
-    }
-
-    private static HiLiteHandler getHiLiteHandler(final NativeNodeContainer nnc) {
-        return nnc.getNodeModel().getInHiLiteHandler(0);
     }
 
     @Override
@@ -171,7 +127,7 @@ public class DefaultNodeService implements NodeService {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
         var nc = m_getNode.apply(nodeIdString);
         final var keyEvent = new KeyEvent(nc.getID(), rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
-        var hiLiteHandler = getHiLiteHandler(nc);
+        var hiLiteHandler = nc.getNodeModel().getInHiLiteHandler(0);
         switch (selectionEventMode) {
             case ADD:
                 hiLiteHandler.fireHiLiteEvent(keyEvent);
@@ -186,95 +142,6 @@ public class DefaultNodeService implements NodeService {
         }
     }
 
-    /**
-     * Cleans up the default node service (e.g. removing hilite listeners).
-     */
-    public void dispose() {
-        m_registeredHiLiteListeners.forEach(r -> {
-            Pair<HiLiteHandler, HiLiteListener> p = r.get();
-            if (p != null) {
-                p.getFirst().removeHiLiteListener(p.getSecond());
-            }
-        });
-    }
 
-    private static class PerNodeHiliteListener implements HiLiteListener {
-
-        private final Consumer<SelectionEvent> m_eventConsumer;
-
-        private final NodeID m_nodeId;
-
-        private final String m_projectId;
-
-        private final String m_workflowId;
-
-        private final String m_nodeIdString;
-
-        PerNodeHiliteListener(final Consumer<SelectionEvent> eventConsumer, final NativeNodeContainer nnc) {
-            m_eventConsumer = eventConsumer;
-            var parent = nnc.getParent();
-            var projectWfm = parent.getProjectWFM();
-            m_projectId = projectWfm.getNameWithID();
-            NodeID ncParentId = parent.getDirectNCParent() instanceof SubNodeContainer
-                ? ((SubNodeContainer)parent.getDirectNCParent()).getID() : parent.getID();
-            m_workflowId = new NodeIDEnt(ncParentId).toString();
-            m_nodeId = nnc.getID();
-            m_nodeIdString = new NodeIDEnt(m_nodeId).toString();
-        }
-
-        @Override
-        public void hiLite(final KeyEvent event) {
-            consumeSelectionEvent(event, SelectionEventMode.ADD);
-        }
-
-        @Override
-        public void unHiLite(final KeyEvent event) {
-            consumeSelectionEvent(event, SelectionEventMode.REMOVE);
-        }
-
-        @Override
-        public void unHiLiteAll(final KeyEvent event) {
-            consumeSelectionEvent(new KeyEvent(event.getSource()), SelectionEventMode.REPLACE);
-        }
-
-        @Override
-        public void replaceHiLite(final KeyEvent event) {
-            consumeSelectionEvent(event, SelectionEventMode.REPLACE);
-        }
-
-        private void consumeSelectionEvent(final KeyEvent event, final SelectionEventMode type) {
-            // do not consume selection events that have been fired by the node this listener is registered on
-            if (!m_nodeId.equals(event.getSource())) {
-                final var keys = event.keys().stream().map(RowKey::getString).collect(Collectors.toUnmodifiableList());
-                m_eventConsumer.accept(new SelectionEvent() { // NOSONAR
-
-                    @Override
-                    public SelectionEventMode getMode() {
-                        return type;
-                    }
-
-                    @Override
-                    public List<String> getKeys() {
-                        return keys;
-                    }
-
-                    @Override
-                    public String getProjectId() {
-                        return m_projectId;
-                    }
-
-                    @Override
-                    public String getWorkflowId() {
-                        return m_workflowId;
-                    }
-
-                    @Override
-                    public String getNodeId() {
-                        return m_nodeIdString;
-                    }
-                });
-            }
-        }
-    }
 
 }
