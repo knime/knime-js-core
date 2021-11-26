@@ -59,7 +59,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
-import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
@@ -207,7 +206,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-        m_browserWrapper.setText(getViewCreator().createMessageHTML("Loading view..."), true);
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.END, GridData.END, false, false));
@@ -338,6 +336,61 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         setBrowserContent(true);
     }
 
+    private void setBrowserContent(final boolean hasData) {
+        try {
+            if (hasData) {
+                File src = getViewSource();
+                if (src != null && src.exists()) {
+                    var url = "file://" + getViewSource().getAbsolutePath();
+                    onPageLoaded(this::createInitScript);
+                    m_browserWrapper.setUrl(url);
+                    m_viewSet = true;
+                    return;
+                }
+            }
+
+            m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
+            m_viewSet = false;
+        } catch (Exception e) {
+            m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
+            m_viewSet = false;
+            LOGGER.error(e.getMessage(), e);
+        }
+    }
+
+    private String createInitScript() {
+        WizardNode<REP, VAL> model = getModel();
+        WizardViewCreator<REP, VAL> creator = model.getViewCreator();
+        if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
+            String customCSS = ((CSSModifiable)model).getCssStyles();
+            ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
+        }
+        var initCall = creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
+        return creator.wrapInTryCatch(initCall);
+    }
+
+    private void onPageLoaded(final Supplier<String> scriptToRun) {
+        m_browserWrapper.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void changed(final ProgressEvent event) {
+                //
+            }
+
+            @Override
+            public void completed(final ProgressEvent event) {
+                try {
+                    String script = scriptToRun.get();
+                    if (script != null) {
+                        m_browserWrapper.execute(script);
+                    }
+                } finally {
+                    m_browserWrapper.removeProgressListener(this);
+                }
+            }
+        });
+    }
+
     private void initBrowserFunctions() {
         m_viewRequestCallback = new ViewRequestFunction(m_browserWrapper, "knimeViewRequest");
         m_updateRequestStatusCallback = new UpdateRequestStatusFunction(m_browserWrapper, "knimeUpdateRequestStatus");
@@ -378,82 +431,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
           }
         }
       }
-
-      private void setBrowserContent(final boolean hasData) {
-          try {
-              if (hasData) {
-                  File src = getViewSource();
-                  if (src != null && src.exists()) {
-                      var url = "file://" + getViewSource().getAbsolutePath();
-                      onPageLoaded(url, () -> m_viewSet ? createInitScript() : null);
-                      m_browserWrapper.setUrl(url);
-                      m_viewSet = true;
-                      return;
-                  }
-              }
-
-              m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
-              m_viewSet = false;
-          } catch (Exception e) {
-              m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
-              m_viewSet = false;
-              LOGGER.error(e.getMessage(), e);
-          }
-      }
-
-    private String createInitScript() {
-        WizardNode<REP, VAL> model = getModel();
-        WizardViewCreator<REP, VAL> creator = model.getViewCreator();
-        if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
-            String customCSS = ((CSSModifiable)model).getCssStyles();
-            ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
-        }
-        String initCall =
-            creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
-        return creator.wrapInTryCatch(initCall);
-    }
-
-    private void onPageLoaded(final String url, final Supplier<String> scriptToRun) {
-        // Use location listener to capture the exact event when the page of the given url
-        // is being loaded (changing). Often, other location events might be triggered
-        // before (e.g. triggered by a previous m_browserWrapper.setText(""))
-        m_browserWrapper.addLocationListener(new LocationListener() {
-
-            @Override
-            public void changing(final LocationEvent locationEvent) {
-                if (locationEvent.location.equals(url)) {
-                    // User progress listener to wait till until the page for the given
-                    // url has been completely loaded.
-                    m_browserWrapper.addProgressListener(new ProgressListener() {
-
-                        @Override
-                        public void changed(final ProgressEvent event) {
-                            //
-                        }
-
-                        @Override
-                        public void completed(final ProgressEvent event) {
-                            try {
-                                String script = scriptToRun.get();
-                                if (script != null) {
-                                    m_browserWrapper.execute(script);
-                                }
-                            } finally {
-                                m_browserWrapper.removeProgressListener(this);
-                            }
-                        }
-                    });
-                    m_browserWrapper.removeLocationListener(this);
-                }
-            }
-
-            @Override
-            public void changed(final LocationEvent event) {
-                //
-            }
-
-        });
-    }
 
     /**
      * Creates a browser wrapper instance. The browser wrapper is necessary because there is nor
