@@ -572,11 +572,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (m_rpcCallback != null && !m_rpcCallback.isDisposed()) {
             m_rpcCallback.dispose();
         }
-        m_additionalCallbacks.forEach(c -> {
-            if (!c.isDisposed()) {
-                c.dispose();
-            }
-        });
+        if (m_additionalCallbacks != null) {
+            m_additionalCallbacks.forEach(c -> {
+                if (!c.isDisposed()) {
+                    c.dispose();
+                }
+            });
+            m_additionalCallbacks = null;
+        }
         if (m_shell != null && !m_shell.isDisposed()) {
             m_shell.dispose();
         }
@@ -589,7 +592,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
-        m_additionalCallbacks = null;
         m_viewSet = false;
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
