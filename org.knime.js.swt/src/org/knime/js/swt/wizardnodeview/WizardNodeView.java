@@ -589,7 +589,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
-        m_additionalCallbacks.clear();
+        m_additionalCallbacks = null;
         m_viewSet = false;
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
