@@ -216,25 +216,6 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     private static Browser initializeBrowser(final Shell shell, final NativeNodeContainer nnc, final Content content) {
         var browser = new Browser(shell, SWT.NONE);
-        browser.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void completed(final ProgressEvent event) {
-                try {
-                    initializePageBuilder(browser, nnc, content);
-                } catch (Exception e) { // NOSONAR
-                    var message =
-                        "Initialization of the node " + (content == Content.DIALOG ? "dialog" : "view") + " failed";
-                    NodeLogger.getLogger(CEFNodeView.class).error(message, e);
-                    browser.execute("window.alert('" + message + ": " + e.getMessage() + "')");
-                }
-            }
-
-            @Override
-            public void changed(final ProgressEvent event) {
-                // do nothing
-            }
-        });
         browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
         browser.setMenu(new Menu(browser.getShell()));
         return browser;
@@ -254,7 +235,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     }
 
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
-        final Content content) throws IOException {
+        final Content content) {
         var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
         var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc) : null;
         var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
@@ -262,6 +243,11 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         try (@SuppressWarnings("resource")
         var stream = (ByteArrayOutputStream)page.saveToStream()) {
             pageString = stream.toString(StandardCharsets.UTF_8).replace("\\", "\\\\").replace("'", "\\'");
+        } catch (IOException e) {
+            var message = "Initialization of the node " + (content == Content.DIALOG ? "dialog" : "view") + " failed";
+            NodeLogger.getLogger(CEFNodeView.class).error(message, e);
+            browser.execute("window.alert('" + message + ": " + e.getMessage() + "')");
+            return;
         }
         var initCall = "var parsedRepresentation = JSON.parse('" + pageString + "');"
             + "window.KnimePageLoader.init(parsedRepresentation, null, null, false);";
@@ -330,10 +316,27 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
             if (htmlDocumentWithPageBuilderURL == null) {
                 writeHtmlDocumentWithPageBuilder(m_title);
             }
+            onPageLoaded(m_browser, () -> initializePageBuilder(m_browser, m_nnc, m_content));
             m_browser.setUrl(htmlDocumentWithPageBuilderURL);
         } else {
             m_browser.setText(NO_DATA_HTML);
         }
+    }
+
+    private static void onPageLoaded(final Browser browser, final Runnable action) {
+        browser.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void completed(final ProgressEvent event) {
+                action.run();
+                browser.removeProgressListener(this);
+            }
+
+            @Override
+            public void changed(final ProgressEvent event) {
+                // do nothing
+            }
+        });
     }
 
     private static void writeHtmlDocumentWithPageBuilder(final String title) {
