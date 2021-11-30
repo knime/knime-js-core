@@ -401,7 +401,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             "validateCurrentValueInView", VIEW_VALID, Boolean.FALSE);
         m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
             "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
-        m_rpcCallback = new RpcFunction(m_browserWrapper);
+        var snc = getNodeContainer();
+        if (snc != null) {
+            m_rpcCallback = new RpcFunction(m_browserWrapper, snc);
+        }
         m_additionalCallbacks = registerAndGetAdditionalBrowserFunctions(m_browserWrapper);
     }
 
@@ -870,9 +873,8 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         private final JsonRpcFunction m_function;
 
-        RpcFunction(final BrowserWrapper browser) {
+        RpcFunction(final BrowserWrapper browser, final SingleNodeContainer nc) {
             super(browser, JsonRpcFunction.FUNCTION_NAME);
-            SingleNodeContainer nc = getNodeContainer();
             Consumer<String> jsCodeRunner = c -> Display.getDefault().syncExec(() -> browser.execute(c));
             if (nc instanceof SubNodeContainer) {
                 m_function = new JsonRpcFunction((SubNodeContainer)nc, (SubnodeViewableModel)getViewableModel(),
