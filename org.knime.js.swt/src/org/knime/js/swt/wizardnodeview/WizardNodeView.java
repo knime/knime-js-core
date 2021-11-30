@@ -52,6 +52,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -90,6 +91,7 @@ import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContext;
+import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
@@ -130,9 +132,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
     private BrowserFunctionInternal m_rpcCallback;
     private List<BrowserFunctionWrapper> m_additionalCallbacks;
-    private boolean m_viewSet = false;
+    private final AtomicBoolean m_viewSet = new AtomicBoolean(false);
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
+
+    private NodeStateChangeListener m_nodeStateChangeListener;
 
     /**
      * @param snc
@@ -141,9 +145,31 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      */
     public WizardNodeView(final SingleNodeContainer snc, final T nodeModel) {
         super(snc, nodeModel);
+
+        m_nodeStateChangeListener = e -> {
+            var isExecuted = snc.getNodeContainerState().isExecuted();
+            if (m_viewSet.getAndSet(isExecuted) != isExecuted) {
+                nodeStateChanged(isExecuted);
+            }
+        };
+        snc.addNodeStateChangeListener(m_nodeStateChangeListener);
+
         m_asyncEvalReferenceMap = new HashMap<String, AtomicReference<Object>>(2);
         m_asyncEvalReferenceMap.put(VIEW_VALID, new AtomicReference<Object>(null));
         m_asyncEvalReferenceMap.put(VIEW_VALUE, new AtomicReference<Object>(null));
+    }
+
+    private void nodeStateChanged(final boolean isExecuted) {
+        var display = getDisplay();
+        if (display == null) {
+            // view most likely disposed
+            return;
+        }
+        if (m_browserWrapper != null && !m_browserWrapper.isDisposed()) {
+            synchronized (m_browserWrapper) {
+                display.asyncExec(() -> setBrowserContent(isExecuted));
+            }
+        }
     }
 
     /**
@@ -152,22 +178,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     @Override
     public void modelChanged() {
         cancelOutstandingViewRequests();
-        Display display = getDisplay();
-        if (display == null) {
-            // view most likely disposed
-            return;
-        }
-        display.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                if (m_browserWrapper != null && !m_browserWrapper.isDisposed()) {
-                    synchronized (m_browserWrapper) {
-                        setBrowserContent(getNodeContainer().getNodeContainerState().isExecuted());
-                    }
-                }
-            }
-        });
     }
 
     private Display getDisplay() {
@@ -223,6 +233,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 // which do not get saved, then it's nice to trigger the event anyways.
                 /*if (checkSettingsChanged()) {*/
                     modelChanged();
+                    nodeStateChanged(true);
                 /*}*/
             }
         });
@@ -335,6 +346,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_shell.open();
 
         setBrowserContent(true);
+        m_viewSet.set(true);
     }
 
     private void setBrowserContent(final boolean hasData) {
@@ -345,16 +357,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     var url = "file://" + getViewSource().getAbsolutePath();
                     onPageLoaded(this::createInitScript);
                     m_browserWrapper.setUrl(url);
-                    m_viewSet = true;
                     return;
                 }
             }
 
             m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
-            m_viewSet = false;
         } catch (Exception e) {
             m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
-            m_viewSet = false;
+            m_viewSet.set(false);
             LOGGER.error(e.getMessage(), e);
         }
     }
@@ -595,11 +605,13 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
-        m_viewSet = false;
+        m_viewSet.set(false);
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {
             ((SubnodeViewableModel)getViewableModel()).discard();
         }
+        getNodeContainer().removeNodeStateChangeListener(m_nodeStateChangeListener);
+        m_nodeStateChangeListener = null;
     }
 
      /**
@@ -643,7 +655,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      */
     @Override
     protected boolean viewInteractionPossible() {
-        return m_viewSet;
+        return m_viewSet.get();
     }
 
     /**
