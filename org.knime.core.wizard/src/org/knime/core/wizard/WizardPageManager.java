@@ -131,7 +131,7 @@ public final class WizardPageManager extends AbstractPageManager implements View
     public JSONWebNodePage createCurrentWizardPage() throws IOException {
         WizardExecutionController wec = getWizardExecutionController();
         WizardPage page = wec.getCurrentWizardPage();
-        return createWizardPageInternal(page);
+        return createWizardPageInternal(page, null);
     }
 
     /**

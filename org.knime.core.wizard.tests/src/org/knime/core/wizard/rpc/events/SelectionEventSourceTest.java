@@ -72,16 +72,21 @@ import org.junit.Test;
 import org.knime.core.data.RowKey;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.testing.util.WorkflowManagerUtil;
 
 /**
  * Tests {@link SelectionEventSource}.
  *
+ * @author Marc Bux, KNIME GmbH, Berlin, Germany
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
 @SuppressWarnings("javadoc")
@@ -119,8 +124,7 @@ public class SelectionEventSourceTest {
         @SuppressWarnings("unchecked")
         final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        var selectionEventSource = new SelectionEventSource(consumerMock);
-        selectionEventSource.addEventListener(m_nnc);
+        setupHiLiteListeners(consumerMock, m_nnc);
 
         m_nnc.getNodeModel().getInHiLiteHandler(0).fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
 
@@ -139,8 +143,8 @@ public class SelectionEventSourceTest {
         @SuppressWarnings("unchecked")
         final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        var selectionEventSource = new SelectionEventSource(consumerMock);
-        selectionEventSource.addEventListener(m_nnc);
+        setupHiLiteListeners(consumerMock, m_nnc);
+
         m_nnc.getNodeModel().getInHiLiteHandler(0).fireUnHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS)
@@ -159,8 +163,8 @@ public class SelectionEventSourceTest {
         @SuppressWarnings("unchecked")
         final Consumer<SelectionEvent> consumerMock = mock(Consumer.class);
 
-        var selectionEventSource = new SelectionEventSource(consumerMock);
-        selectionEventSource.addEventListener(m_nnc);
+        setupHiLiteListeners(consumerMock, m_nnc);
+
         m_nnc.getNodeModel().getInHiLiteHandler(0).fireReplaceHiLiteEvent(stringListToRowKeySet(ROWKEYS_2));
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS)
@@ -179,6 +183,20 @@ public class SelectionEventSourceTest {
 
     public static Set<RowKey> stringListToRowKeySet(final List<String> keys) {
         return keys.stream().map(RowKey::new).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    public static void setupHiLiteListeners(final Consumer<SelectionEvent> selectionEventConsumer,
+        final SingleNodeContainer node) {
+        var hllr = new HiLiteListenerRegistry();
+        var selectionEventSource = new SelectionEventSource(selectionEventConsumer, hllr);
+        if (node instanceof NativeNodeContainer) {
+            selectionEventSource.addEventListener(node);
+            hllr.getHiliteStateAndActivateListener((NativeNodeContainer)node);
+        } else {
+            selectionEventSource.addEventListener(node);
+            WizardPageUtil.getWizardPageNodes(((SubNodeContainer)node).getWorkflowManager())
+                .forEach(hllr::getHiliteStateAndActivateListener);
+        }
     }
 
 }

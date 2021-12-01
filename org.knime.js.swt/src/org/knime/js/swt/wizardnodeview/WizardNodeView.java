@@ -48,6 +48,7 @@ package org.knime.js.swt.wizardnodeview;
 
 import java.awt.Rectangle;
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +98,7 @@ import org.knime.core.ui.node.workflow.NodeContainerUI;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.core.wizard.rpc.events.SelectionEventSource;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
 
@@ -133,6 +135,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_rpcCallback;
     private List<BrowserFunctionWrapper> m_additionalCallbacks;
     private SelectionEventSource m_selectionEventSource;
+    private HiLiteListenerRegistry m_hiLiteListenerRegistry;
     private final AtomicBoolean m_viewSet = new AtomicBoolean(false);
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
@@ -166,6 +169,13 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             // view most likely disposed
             return;
         }
+
+        if (isExecuted) {
+            m_selectionEventSource.addEventListener(getNodeContainer());
+        } else {
+            m_selectionEventSource.removeEventListeners();
+        }
+
         if (m_browserWrapper != null && !m_browserWrapper.isDisposed()) {
             synchronized (m_browserWrapper) {
                 display.asyncExec(() -> setBrowserContent(isExecuted));
@@ -217,7 +227,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
-        registerSelectionEventListener();
+        m_hiLiteListenerRegistry = new HiLiteListenerRegistry();
+        m_selectionEventSource = createSelectionEventSource(m_browserWrapper, m_hiLiteListenerRegistry);
+        m_selectionEventSource.addEventListener(getNodeContainer());
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
@@ -357,7 +369,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 File src = getViewSource();
                 if (src != null && src.exists()) {
                     var url = "file://" + getViewSource().getAbsolutePath();
-                    onPageLoaded(this::createInitScript);
+                    onPageLoaded(() -> createInitScript(m_hiLiteListenerRegistry));
                     m_browserWrapper.setUrl(url);
                     return;
                 }
@@ -371,12 +383,20 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
     }
 
-    private String createInitScript() {
+    private String createInitScript(final HiLiteListenerRegistry hllr) {
         WizardNode<REP, VAL> model = getModel();
         WizardViewCreator<REP, VAL> creator = model.getViewCreator();
         if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
             String customCSS = ((CSSModifiable)model).getCssStyles();
             ((JavaScriptViewCreator<?, ?>)creator).setCustomCSS(customCSS);
+        }
+        if (model instanceof SubnodeViewableModel) {
+            try {
+                ((SubnodeViewableModel)model).createPageAndValue(hllr);
+            } catch (IOException e) {
+                // should never happen
+                throw new IllegalStateException("Wizard page couldn't be created", e);
+            }
         }
         var initCall = creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
         return creator.wrapInTryCatch(initCall);
@@ -430,15 +450,15 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     }
 
     /*
-     * Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
-     * are passed to the frontend by executing a piece of js-code.
-     */
-    private void registerSelectionEventListener() {
-        m_selectionEventSource = new SelectionEventSource(e -> {
+    * Creates a selection event source (i.e. for hiliting). The emitted selection (hiliting)-events
+    * are passed to the frontend by executing a piece of js-code.
+    */
+    private static SelectionEventSource createSelectionEventSource(final BrowserWrapper browserWrapper,
+        final HiLiteListenerRegistry hllr) {
+        return new SelectionEventSource(e -> {
             var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
-            Display.getDefault().syncExec(() -> m_browserWrapper.execute(jsCall));
-        });
-        m_selectionEventSource.addEventListener(getNodeContainer());
+            Display.getDefault().syncExec(() -> browserWrapper.execute(jsCall));
+        }, hllr);
     }
 
     class DropdownSelectionListener extends SelectionAdapter {
@@ -611,7 +631,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_shell.dispose();
         }
         if (m_selectionEventSource != null) {
-            m_selectionEventSource.dispose();
+            m_selectionEventSource.removeEventListeners();
         }
         m_shell = null;
         m_browserWrapper = null;

@@ -48,14 +48,13 @@
  */
 package org.knime.core.wizard.rpc.events;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.knime.core.data.RowKey;
-import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
 import org.knime.core.node.property.hilite.KeyEvent;
 import org.knime.core.node.wizard.page.WizardPageUtil;
@@ -63,8 +62,8 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.core.util.Pair;
 import org.knime.gateway.api.entity.NodeIDEnt;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 
 /**
  * An event source that emits selection events (i.e. hiliting events) to the given event consumer.
@@ -116,53 +115,51 @@ public class SelectionEventSource {
 
     private final Consumer<SelectionEvent> m_eventConsumer;
 
-    private final List<WeakReference<Pair<HiLiteHandler, HiLiteListener>>> m_registeredHiLiteListeners;
+    private final Set<NodeID> m_registeredNodes = new HashSet<>();
+
+    private final HiLiteListenerRegistry m_hiLiteListenerRegistry;
 
     /**
      * @param eventConsumer selection events will be forwarded to this consumer
+     * @param hllr the hilite-listeners for associated nodes are registered with this registry
      */
-    public SelectionEventSource(final Consumer<SelectionEvent> eventConsumer) {
+    public SelectionEventSource(final Consumer<SelectionEvent> eventConsumer, final HiLiteListenerRegistry hllr) {
         m_eventConsumer = eventConsumer;
-        m_registeredHiLiteListeners = new ArrayList<>();
+        m_hiLiteListenerRegistry = hllr;
     }
 
     /**
-     * Registers a new selection event listener for the given node. If it's a component ({@link SubNodeContainer}),
-     * hitlite-listeners will be registered for every contained 'wizard page node'.
+     * Registers a new selection event listener for the given node. The {@link HiLiteListener}s of the given node(s)
+     * serve as a 'selection event source' and will emit events to the associated event consumer.
      *
-     * @param snc
+     * If it's a component ({@link SubNodeContainer}), hilite-listeners will be registered for every contained 'wizard
+     * page node'.
+     *
+     * @param snc the node (or component) to register event listener(s) for
      */
     public void addEventListener(final SingleNodeContainer snc) {
         if (snc instanceof NativeNodeContainer) {
-            addHiLiteListener((NativeNodeContainer)snc,
+            var nodeId = snc.getID();
+            m_hiLiteListenerRegistry.registerHiLiteListener(snc.getID(),
                 new PerNodeHiliteListener(m_eventConsumer, (NativeNodeContainer)snc));
+            m_registeredNodes.add(nodeId);
         } else {
             SubNodeContainer component = (SubNodeContainer)snc;
-            WizardPageUtil.getWizardPageNodes(component.getWorkflowManager(), true)
-                .forEach(nnc -> addHiLiteListener(nnc, new PerNodeHiliteListener(m_eventConsumer, nnc)));
+            WizardPageUtil.getWizardPageNodes(component.getWorkflowManager(), true).forEach(nnc -> {
+                var nodeId = nnc.getID();
+                m_hiLiteListenerRegistry.registerHiLiteListener(nodeId,
+                    new PerNodeHiliteListener(m_eventConsumer, nnc));
+                m_registeredNodes.add(nodeId);
+            });
         }
     }
 
-    private void addHiLiteListener(final NativeNodeContainer nnc, final HiLiteListener listener) {
-        var hiLiteHandler = getHiLiteHandler(nnc);
-        hiLiteHandler.addHiLiteListener(listener);
-        m_registeredHiLiteListeners.add(new WeakReference<>(Pair.create(hiLiteHandler, listener)));
-    }
-
-    private static HiLiteHandler getHiLiteHandler(final NativeNodeContainer nnc) {
-        return nnc.getNodeModel().getInHiLiteHandler(0);
-    }
-
     /**
-     * Cleans up the hilite listeners.
+     * Cleans up all the added hilite listeners. After this method, no events will be emitted anymore.
      */
-    public void dispose() {
-        m_registeredHiLiteListeners.forEach(r -> {
-            Pair<HiLiteHandler, HiLiteListener> p = r.get();
-            if (p != null) {
-                p.getFirst().removeHiLiteListener(p.getSecond());
-            }
-        });
+    public void removeEventListeners() {
+        m_registeredNodes.forEach(m_hiLiteListenerRegistry::unregisterHiLiteListener);
+        m_registeredNodes.clear();
     }
 
     private static class PerNodeHiliteListener implements HiLiteListener {

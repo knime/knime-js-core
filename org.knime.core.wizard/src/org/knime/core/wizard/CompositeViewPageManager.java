@@ -68,6 +68,8 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
+import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONWebNodePage;
 
 /**
@@ -117,11 +119,26 @@ public class CompositeViewPageManager extends AbstractPageManager {
      * @param containerNodeID the node id to create the wizard page for
      * @return a {@link JSONWebNodePage} object which can be used for serialization
      * @throws IOException if the layout of the wizard page can not be generated
+     * @since 4.5
      */
     public JSONWebNodePage createWizardPage(final NodeID containerNodeID) throws IOException {
+        return this.createWizardPage(containerNodeID, null);
+    }
+
+    /**
+     * Creates a wizard page object from a given node id
+     *
+     * @param containerNodeID the node id to create the wizard page for
+     * @param hllr object required to create {@link NodeViewEnt}-instances, can be {@code null}
+     * @return a {@link JSONWebNodePage} object which can be used for serialization
+     * @throws IOException if the layout of the wizard page can not be generated
+     * @since 4.5
+     */
+    public JSONWebNodePage createWizardPage(final NodeID containerNodeID, final HiLiteListenerRegistry hllr)
+        throws IOException {
         CompositeViewController sec = getController(containerNodeID);
         WizardPage page = sec.getWizardPage();
-        return createWizardPageInternal(page);
+        return createWizardPageInternal(page, hllr);
     }
 
     /**

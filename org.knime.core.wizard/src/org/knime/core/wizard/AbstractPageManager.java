@@ -79,8 +79,9 @@ import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
+import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodeInfo;
@@ -131,12 +132,15 @@ public abstract class AbstractPageManager {
 
     /**
      * Performs a transformation from {@link WizardPage} to {@link JSONWebNodePage} which can be used for serialization.
+     *
      * @param page the {@link WizardPage} to transform
+     * @param hllr object required to create {@link NodeViewEnt}-instances, can be {@code null}
      * @return the transformed {@link JSONWebNodePage}
      * @throws IOException if layout of page can not be generated
      * @since 4.5
      */
-    protected JSONWebNodePage createWizardPageInternal(final WizardPage page) throws IOException {
+    protected JSONWebNodePage createWizardPageInternal(final WizardPage page, final HiLiteListenerRegistry hllr)
+        throws IOException {
         // process layout
         JSONLayoutPage layout = new JSONLayoutPage();
         try {
@@ -182,7 +186,7 @@ public abstract class AbstractPageManager {
             if (nnc.getNodeModel() instanceof WizardNode) {
                 webNodes.put(e.getKey().toString(), createJSONWebNode(nnc));
             } else if (NodeViewManager.hasNodeView(nnc)) {
-                nodeViews.put(e.getKey().toString(), new NodeViewEnt(nnc));
+                nodeViews.put(e.getKey().toString(), new NodeViewEnt(nnc, hllr));
             }
         }
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);

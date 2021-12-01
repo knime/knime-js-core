@@ -58,7 +58,6 @@ import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_
 import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_1_2;
 import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_2;
 import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.stringListToRowKeySet;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.verifySelectionEvent;
 import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -82,9 +81,9 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.WorkflowAnnotation;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
-import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
+import org.knime.core.wizard.rpc.events.SelectionEventSourceTest;
 import org.knime.testing.node.view.NodeViewNodeFactory;
 import org.knime.testing.util.WorkflowManagerUtil;
 
@@ -146,14 +145,13 @@ public class DefaultNodeServiceTest {
         final Consumer<SelectionEvent> selectionEventConsumer = mock(Consumer.class);
         var component = (SingleNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component);
-        var selectionEventSource = new SelectionEventSource(selectionEventConsumer);
-        selectionEventSource.addEventListener(component);
+        SelectionEventSourceTest.setupHiLiteListeners(selectionEventConsumer, component);
         nodeService.selectDataPoints("projectId_not_used", "workflowId_not_used", "root:4:0:2", "view",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(selectionEventConsumer, times(1))
-                .accept(argThat(se -> verifySelectionEvent(se, "root:4", "root:4:0:3")));
+                .accept(argThat(se -> SelectionEventSourceTest.verifySelectionEvent(se, "root:4", "root:4:0:3")));
         });
     }
 

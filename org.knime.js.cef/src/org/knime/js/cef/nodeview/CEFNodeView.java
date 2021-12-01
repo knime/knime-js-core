@@ -67,6 +67,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Point;
@@ -80,6 +82,8 @@ import org.knime.core.node.Node;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.NodeStateChangeListener;
+import org.knime.core.node.workflow.NodeStateEvent;
 import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.dialog.NodeDialog;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
@@ -93,6 +97,7 @@ import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.gateway.api.entity.NodeDialogEnt;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
@@ -146,8 +151,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     /**
      * @param nnc
-     * @param showDialog this 'node view' is also used to display node dialogs, if <code>true</code> a dialog is supposed
-     *            to be displayed (e.g. resulting in a modal window)
+     * @param showDialog this 'node view' is also used to display node dialogs, if <code>true</code> a dialog is
+     *            supposed to be displayed (e.g. resulting in a modal window)
      * @param showView if this 'node view' should display the node view
      */
     public CEFNodeView(final NativeNodeContainer nnc, final boolean showDialog, final boolean showView) {
@@ -182,7 +187,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_title = title;
         var display = Display.getDefault();
-        m_shell = new Shell(display, SWT.SHELL_TRIM | (m_content != Content.VIEW ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
+        m_shell = new Shell(display,
+            SWT.SHELL_TRIM | (m_content != Content.VIEW ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
         m_shell.setText(title);
 
         var layout = new GridLayout();
@@ -224,7 +230,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     }
 
     @SuppressWarnings("unused")
-    private static void initializeBrowserFunctions(final Browser browser, final NativeNodeContainer nnc, final Content content) {
+    private static void initializeBrowserFunctions(final Browser browser, final NativeNodeContainer nnc,
+        final Content content) {
         new JsonRpcBrowserFunction(browser, nnc);
         Page page;
         if (content == Content.DIALOG) {
@@ -238,17 +245,11 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
         final Content content) {
-        var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
-        var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc) : null;
 
-        // Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
-        // are passed to the frontend by executing a piece of js-code.
-        var selectionEventSource = new SelectionEventSource(e -> {
-            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
-            Display.getDefault().syncExec(() -> browser.execute(jsCall));
-        });
-        selectionEventSource.addEventListener(nnc);
-        browser.addDisposeListener(e -> selectionEventSource.dispose());
+        var hiLiteListenerRegistry = initializeSelectionEventSource(browser, nnc);
+
+        var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
+        var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc, hiLiteListenerRegistry) : null;
 
         var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
         String pageString;
@@ -264,6 +265,26 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         var initCall = "var parsedRepresentation = JSON.parse('" + pageString + "');"
             + "window.KnimePageLoader.init(parsedRepresentation, null, null, false);";
         browser.execute(initCall);
+    }
+
+    private static HiLiteListenerRegistry initializeSelectionEventSource(final Browser browser,
+        final NativeNodeContainer nnc) {
+        // Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
+        // are passed to the frontend by executing a piece of js-code.
+        // Needs to happen before a NodeViewEnt-instance is created.
+        var hiLiteListenerRegistry = new HiLiteListenerRegistry();
+        var selectionEventSource = new SelectionEventSource(e -> {
+            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
+            Display.getDefault().syncExec(() -> browser.execute(jsCall));
+        }, hiLiteListenerRegistry);
+        selectionEventSource.addEventListener(nnc);
+
+        // register listeners to clean-up
+        var cleanUpListener = new CleanUpListener(selectionEventSource, nnc);
+        nnc.addNodeStateChangeListener(cleanUpListener);
+        browser.addDisposeListener(cleanUpListener);
+
+        return hiLiteListenerRegistry;
     }
 
     private static JSONWebNodePage createJSONWebNodePage(final NodeDialogEnt dialogEnt, final NodeViewEnt viewEnt) {
@@ -424,6 +445,34 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
             m_shell.dispose();
             m_shell = null;
         }
+    }
+
+    private static class CleanUpListener implements NodeStateChangeListener, DisposeListener {
+
+        private final SelectionEventSource m_ses;
+
+        private final NativeNodeContainer m_nnc;
+
+        public CleanUpListener(final SelectionEventSource ses, final NativeNodeContainer nnc) {
+            m_ses = ses;
+            m_nnc = nnc;
+        }
+
+        @Override
+        public void stateChanged(final NodeStateEvent state) {
+            cleanUp();
+        }
+
+        @Override
+        public void widgetDisposed(final DisposeEvent e) {
+            cleanUp();
+        }
+
+        private void cleanUp() {
+            m_ses.removeEventListeners();
+            m_nnc.removeNodeStateChangeListener(this);
+        }
+
     }
 
 }
