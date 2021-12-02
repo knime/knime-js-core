@@ -175,7 +175,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             && m_browserWrapper != null //
             && !m_browserWrapper.isDisposed()) {
             if (isExecuted) {
-                m_selectionEventSource.addEventListener(getNodeContainer());
+                m_selectionEventSource.addEventListener(snc);
             } else {
                 m_selectionEventSource.removeEventListeners();
             }
@@ -236,8 +236,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         m_hiLiteListenerRegistry = new HiLiteListenerRegistry();
-        m_selectionEventSource = createSelectionEventSource(m_browserWrapper, m_hiLiteListenerRegistry);
-        m_selectionEventSource.addEventListener(getNodeContainer());
+        var snc = getNodeContainer();
+        if (snc != null) {
+            m_selectionEventSource = createSelectionEventSource(m_browserWrapper, m_hiLiteListenerRegistry);
+            m_selectionEventSource.addEventListener(snc);
+        }
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
@@ -255,7 +258,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 // which do not get saved, then it's nice to trigger the event anyways.
                 /*if (checkSettingsChanged()) {*/
                     modelChanged();
-                    nodeStateChanged(getNodeContainer());
+                    if (snc != null) {
+                        nodeStateChanged(snc);
+                    }
                 /*}*/
             }
         });
@@ -656,8 +661,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (getViewableModel() instanceof SubnodeViewableModel) {
             ((SubnodeViewableModel)getViewableModel()).discard();
         }
-        getNodeContainer().removeNodeStateChangeListener(m_nodeStateChangeListener);
-        m_nodeStateChangeListener = null;
+        if (m_nodeStateChangeListener != null) {
+            getNodeContainer().removeNodeStateChangeListener(m_nodeStateChangeListener);
+            m_nodeStateChangeListener = null;
+        }
     }
 
      /**
