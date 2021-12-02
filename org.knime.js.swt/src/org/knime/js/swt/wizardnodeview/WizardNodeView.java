@@ -150,33 +150,35 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     public WizardNodeView(final SingleNodeContainer snc, final T nodeModel) {
         super(snc, nodeModel);
 
-        m_nodeStateChangeListener = e -> {
-            var isExecuted = snc.getNodeContainerState().isExecuted();
-            if (m_viewSet.getAndSet(isExecuted) != isExecuted) {
-                nodeStateChanged(isExecuted);
-            }
-        };
-        snc.addNodeStateChangeListener(m_nodeStateChangeListener);
+        if (snc instanceof NativeNodeContainer) {
+            // special handling for native nodes because it's not possible to
+            // properly determine the node state within the #modelChanged-callback
+            // because it's, e.g., called from within the 'execute'-method
+            m_nodeStateChangeListener = e -> nodeStateChanged(snc);
+            snc.addNodeStateChangeListener(m_nodeStateChangeListener);
+        }
 
         m_asyncEvalReferenceMap = new HashMap<String, AtomicReference<Object>>(2);
         m_asyncEvalReferenceMap.put(VIEW_VALID, new AtomicReference<Object>(null));
         m_asyncEvalReferenceMap.put(VIEW_VALUE, new AtomicReference<Object>(null));
     }
 
-    private void nodeStateChanged(final boolean isExecuted) {
+    private void nodeStateChanged(final SingleNodeContainer snc) {
         var display = getDisplay();
         if (display == null) {
             // view most likely disposed
             return;
         }
 
-        if (isExecuted) {
-            m_selectionEventSource.addEventListener(getNodeContainer());
-        } else {
-            m_selectionEventSource.removeEventListeners();
-        }
-
-        if (m_browserWrapper != null && !m_browserWrapper.isDisposed()) {
+        var isExecuted = snc.getNodeContainerState().isExecuted();
+        if (m_viewSet.getAndSet(isExecuted) != isExecuted //
+            && m_browserWrapper != null //
+            && !m_browserWrapper.isDisposed()) {
+            if (isExecuted) {
+                m_selectionEventSource.addEventListener(getNodeContainer());
+            } else {
+                m_selectionEventSource.removeEventListeners();
+            }
             synchronized (m_browserWrapper) {
                 display.asyncExec(() -> setBrowserContent(isExecuted));
             }
@@ -189,6 +191,12 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     @Override
     public void modelChanged() {
         cancelOutstandingViewRequests();
+        var nc = getNodeContainer();
+        if (nc instanceof SubNodeContainer) {
+            // native nodes are handled differently
+            // see #WizardNodeView-constructor
+            nodeStateChanged(nc);
+        }
     }
 
     private Display getDisplay() {
@@ -247,7 +255,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 // which do not get saved, then it's nice to trigger the event anyways.
                 /*if (checkSettingsChanged()) {*/
                     modelChanged();
-                    nodeStateChanged(true);
+                    nodeStateChanged(getNodeContainer());
                 /*}*/
             }
         });
