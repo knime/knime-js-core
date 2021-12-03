@@ -171,17 +171,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
 
         var isExecuted = snc.getNodeContainerState().isExecuted();
-        if (m_viewSet.getAndSet(isExecuted) != isExecuted //
-            && m_browserWrapper != null //
-            && !m_browserWrapper.isDisposed()) {
+
+        if (m_viewSet.getAndSet(isExecuted) != isExecuted) {
             if (isExecuted) {
                 m_selectionEventSource.addEventListener(snc);
             } else {
                 m_selectionEventSource.removeEventListeners();
             }
-            synchronized (m_browserWrapper) {
-                display.asyncExec(() -> setBrowserContent(isExecuted));
-            }
+            display.asyncExec(() -> setBrowserContent(isExecuted));
         }
     }
 
@@ -377,23 +374,34 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     }
 
     private void setBrowserContent(final boolean hasData) {
-        try {
-            if (hasData) {
-                File src = getViewSource();
-                if (src != null && src.exists()) {
-                    var url = "file://" + getViewSource().getAbsolutePath();
-                    onPageLoaded(() -> createInitScript(m_hiLiteListenerRegistry));
-                    m_browserWrapper.setUrl(url);
+        // m_browserWrapper can be null if this method is called while the
+        // view is being closed
+        if (!isBrowserWrapperDisposed()) {
+            synchronized (m_browserWrapper) {
+                if (isBrowserWrapperDisposed()) {
                     return;
                 }
-            }
+                try {
+                    File src;
+                    if (hasData && (src = getViewSource()) != null && src.exists()) {
+                        var url = "file://" + getViewSource().getAbsolutePath();
+                        onPageLoaded(() -> createInitScript(m_hiLiteListenerRegistry));
+                        m_browserWrapper.setUrl(url);
+                        return;
+                    }
 
-            m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
-        } catch (Exception e) {
-            m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
-            m_viewSet.set(false);
-            LOGGER.error(e.getMessage(), e);
+                    m_browserWrapper.setText(getViewCreator().createMessageHTML("No data to display"));
+                } catch (Exception e) {
+                    m_browserWrapper.setText(getViewCreator().createMessageHTML(e.getMessage()));
+                    m_viewSet.set(false);
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
         }
+    }
+
+    private boolean isBrowserWrapperDisposed() {
+        return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
 
     private String createInitScript(final HiLiteListenerRegistry hllr) {
@@ -647,7 +655,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_selectionEventSource.removeEventListeners();
         }
         m_shell = null;
-        m_browserWrapper = null;
+        synchronized (m_browserWrapper) { // NOSONAR
+            m_browserWrapper = null;
+        }
         m_viewRequestCallback = null;
         m_updateRequestStatusCallback = null;
         m_cancelRequestCallback = null;
