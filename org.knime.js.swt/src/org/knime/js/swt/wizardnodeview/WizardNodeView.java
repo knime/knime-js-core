@@ -655,8 +655,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_selectionEventSource.removeEventListeners();
         }
         m_shell = null;
-        synchronized (m_browserWrapper) { // NOSONAR
-            m_browserWrapper = null;
+        if (m_browserWrapper != null) {
+            synchronized (m_browserWrapper) { // NOSONAR
+                m_browserWrapper = null;
+            }
         }
         m_viewRequestCallback = null;
         m_updateRequestStatusCallback = null;
