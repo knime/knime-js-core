@@ -50,6 +50,8 @@ package org.knime.js.cef.wizardnodeview;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.LocationListener;
@@ -63,6 +65,8 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.wizard.debug.DebugInfo;
+import org.knime.js.cef.nodeview.GetDebugInfoBrowserFunction;
+import org.knime.js.cef.nodeview.OpenBrowserBrowserFunction;
 import org.knime.js.swt.wizardnodeview.WizardNodeView;
 
 import com.equo.chromium.swt.Browser;
@@ -79,7 +83,10 @@ import com.equo.chromium.swt.BrowserFunction;
 public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, REP extends WebViewContent, VAL extends WebViewContent>
     extends WizardNodeView<T, REP, VAL> {
 
+    private Browser m_browser;
+
     /**
+     * @param snc
      * @param nodeModel
      */
     public CEFWizardNodeView(final SingleNodeContainer snc, final T nodeModel) {
@@ -90,9 +97,12 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
      * {@inheritDoc}
      */
     @Override
-    protected List<BrowserFunctionWrapper> registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browser) {
-        var debugInfo = new DebugInfo(false);
-        return List.of(browser.registerBrowserFunction(DebugInfo.FUNCTION_NAME, args -> debugInfo.toString()));
+    protected List<BrowserFunctionWrapper>
+        registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browserWrapper) {
+        return Stream.of( //
+            new GetDebugInfoBrowserFunction(m_browser, new DebugInfo(false)), //
+            new OpenBrowserBrowserFunction(m_browser) //
+        ).map(fct -> browserWrapper.registerBrowserFunction(fct.getName(), fct::function)).collect(Collectors.toList());
     }
 
     /**
@@ -100,79 +110,79 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
      */
     @Override
     protected BrowserWrapper createBrowserWrapper(final Shell shell) {
-        var browser = new Browser(shell, SWT.NONE);
-        browser.setMenu(new Menu(browser.getShell()));
+        m_browser = new Browser(shell, SWT.NONE);
+        m_browser.setMenu(new Menu(m_browser.getShell()));
         return new BrowserWrapper() {
 
             @Override
             public void execute(final String call) {
-                browser.execute(call);
+                m_browser.execute(call);
             }
 
             @Override
             public Display getDisplay() {
-                return browser.getDisplay();
+                return m_browser.getDisplay();
             }
 
             @Override
             public void addProgressListener(final ProgressListener progressListener) {
-                browser.addProgressListener(progressListener);
+                m_browser.addProgressListener(progressListener);
             }
 
             @Override
             public void removeProgressListener(final ProgressListener progressListener) {
-                browser.removeProgressListener(progressListener);
+                m_browser.removeProgressListener(progressListener);
             }
 
             @Override
             public void addLocationListener(final LocationListener locationListener) {
-                browser.addLocationListener(locationListener);
+                m_browser.addLocationListener(locationListener);
             }
 
             @Override
             public void removeLocationListener(final LocationListener locationListener) {
-                browser.removeLocationListener(locationListener);
+                m_browser.removeLocationListener(locationListener);
             }
 
             @Override
             public void setUrl(final String absolutePath) {
-                browser.setUrl(absolutePath);
+                m_browser.setUrl(absolutePath);
             }
 
             @Override
             public void setText(final String html) {
-                browser.setText(html);
+                m_browser.setText(html);
             }
 
             @Override
             public Shell getShell() {
-                return browser.getShell();
+                return m_browser.getShell();
             }
 
             @Override
             public String evaluate(final String evalCode) {
-                return (String)browser.evaluate(evalCode);
+                return (String)m_browser.evaluate(evalCode);
             }
 
             @Override
             public boolean isDisposed() {
-                return browser.isDisposed();
+                return m_browser.isDisposed();
             }
 
             @Override
             public void setText(final String html, final boolean trusted) {
-                browser.setText(html, trusted);
+                m_browser.setText(html, trusted);
             }
 
             @Override
             public void setLayoutData(final GridData gridData) {
-                browser.setLayoutData(gridData);
+                m_browser.setLayoutData(gridData);
             }
 
             @Override
             public BrowserFunctionWrapper registerBrowserFunction(final String name,
                 final Function<Object[], Object> func) {
-                final BrowserFunction fct = new BrowserFunction(browser, name) {
+                final BrowserFunction fct = new BrowserFunction(m_browser, name) {
                     @Override
                     public Object function(final Object[] args) {
                         return func.apply(args);

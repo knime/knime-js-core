@@ -241,6 +241,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         }
         new GetDebugInfoBrowserFunction(browser, new DebugInfo(page.getType() == Type.VUE_COMPONENT_LIB));
         new CloseCEFWindowBrowserFunction(browser);
+        new OpenBrowserBrowserFunction(browser);
     }
 
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
