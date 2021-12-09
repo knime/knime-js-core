@@ -44,31 +44,32 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 14, 2021 (hornm): created
+ *   Dec 8, 2021 (hornm): created
  */
 package org.knime.js.cef.nodeview;
 
-import org.knime.core.wizard.debug.DebugInfo;
+import org.eclipse.swt.program.Program;
+import org.knime.core.node.NodeLogger;
 
 import com.equo.chromium.swt.Browser;
 import com.equo.chromium.swt.BrowserFunction;
 
 /**
- * Browser function that returns debug info for the {@link CEFNodeView}.
+ * Browser function that opens a URL in a browser. The browser being used can be specified by a system property.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  */
-public final class GetDebugInfoBrowserFunction extends BrowserFunction {
+public class OpenBrowserBrowserFunction extends BrowserFunction {
 
-    private final DebugInfo m_debugInfo;
+    private static final String FUNCTION_NAME = "openBrowser";
+
+    private static final String DEBUG_BUTTON_BROWSER_SYS_PROP = "org.knime.ui.debug.button.browser";
 
     /**
      * @param browser
-     * @param debugInfo
      */
-    public GetDebugInfoBrowserFunction(final Browser browser, final DebugInfo debugInfo) {
-        super(browser, DebugInfo.FUNCTION_NAME);
-        m_debugInfo = debugInfo;
+    public OpenBrowserBrowserFunction(final Browser browser) {
+        super(browser, FUNCTION_NAME);
     }
 
     /**
@@ -76,7 +77,15 @@ public final class GetDebugInfoBrowserFunction extends BrowserFunction {
      */
     @Override
     public Object function(final Object[] arguments) {
-        return m_debugInfo.toString();
+        var url = (String)arguments[0];
+        if ("cef".equals(System.getProperty(DEBUG_BUTTON_BROWSER_SYS_PROP))) {
+            getBrowser().execute("window.open('" + url + "')");
+        } else {
+            if (!Program.launch(url)) {
+                NodeLogger.getLogger(this.getClass()).error("Failed to open URL in browser. The URL is: " + url);
+            }
+        }
+        return null;
     }
 
 }
