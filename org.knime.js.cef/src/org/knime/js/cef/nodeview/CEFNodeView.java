@@ -311,15 +311,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     }
 
     private static JSONLayoutPage createJSONLayoutPage(final String dialogNodeId, final String viewNodeId) {
-        JSONLayoutColumn dialogColumn = null;
         JSONLayoutColumn viewColumn = null;
-        if (dialogNodeId != null) {
-            dialogColumn = new JSONLayoutColumn();
-            var content = new JSONLayoutViewContent();
-            content.setUseLegacyMode(false);
-            content.setNodeID(dialogNodeId);
-            dialogColumn.setContent(List.of(content));
-        }
+        JSONLayoutColumn dialogColumn = null;
         if (viewNodeId != null) {
             viewColumn = new JSONLayoutColumn();
             var content = new JSONLayoutViewContent();
@@ -327,13 +320,28 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
             content.setNodeID(viewNodeId);
             viewColumn.setContent(List.of(content));
         }
+        if (dialogNodeId != null) {
+            dialogColumn = new JSONLayoutColumn();
+            var content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID(dialogNodeId);
+            dialogColumn.setContent(List.of(content));
+            if (viewColumn != null) {
+                try { // update layout for split view
+                    dialogColumn.setWidthXS(3);
+                    viewColumn.setWidthXS(9);
+                } catch (IOException e) {
+                    // Do nothing as JSONMappingException is never thrown.
+                }
+            }
+        }
 
         var row = new JSONLayoutRow();
-        if (dialogColumn != null) {
-            row.addColumn(dialogColumn);
-        }
         if (viewColumn != null) {
             row.addColumn(viewColumn);
+        }
+        if (dialogColumn != null) {
+            row.addColumn(dialogColumn);
         }
         List<JSONLayoutRow> layoutRowList = new ArrayList<>();
         layoutRowList.add(row);
