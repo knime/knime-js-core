@@ -64,9 +64,10 @@ import org.knime.core.node.AbstractNodeView.ViewableModel;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.workflow.SingleNodeContainer;
-import org.knime.core.wizard.debug.DebugInfo;
+import org.knime.js.cef.DebugInfo;
 import org.knime.js.cef.nodeview.GetDebugInfoBrowserFunction;
 import org.knime.js.cef.nodeview.OpenBrowserBrowserFunction;
+import org.knime.js.cef.nodeview.ReloadCEFWindowBrowserFunction;
 import org.knime.js.swt.wizardnodeview.WizardNodeView;
 
 import com.equo.chromium.swt.Browser;
@@ -100,9 +101,11 @@ public class CEFWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>, R
     protected List<BrowserFunctionWrapper>
         registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browserWrapper) {
         return Stream.of( //
-            new GetDebugInfoBrowserFunction(m_browser, new DebugInfo(false)), //
-            new OpenBrowserBrowserFunction(m_browser) //
-        ).map(fct -> browserWrapper.registerBrowserFunction(fct.getName(), fct::function)).collect(Collectors.toList());
+            new GetDebugInfoBrowserFunction(m_browser, new DebugInfo(true)), //
+            new OpenBrowserBrowserFunction(m_browser), //
+            new ReloadCEFWindowBrowserFunction(m_browser, this::reloadBrowserContent))
+            .map(fct -> browserWrapper.registerBrowserFunction(fct.getName(), fct::function))
+            .collect(Collectors.toList());
     }
 
     /**

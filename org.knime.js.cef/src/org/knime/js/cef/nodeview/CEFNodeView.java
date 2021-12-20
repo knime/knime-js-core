@@ -86,18 +86,14 @@ import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.NodeStateEvent;
 import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.dialog.NodeDialog;
-import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeView;
-import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.core.webui.page.Page;
-import org.knime.core.webui.page.Resource.Type;
-import org.knime.core.wizard.debug.DebugInfo;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.gateway.api.entity.NodeDialogEnt;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
+import org.knime.js.cef.DebugInfo;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
@@ -195,8 +191,8 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         layout.numColumns = 1;
         m_shell.setLayout(layout);
 
-        m_browser = initializeBrowser(m_shell, m_nnc, m_content);
-        initializeBrowserFunctions(m_browser, m_nnc, m_content);
+        m_browser = initializeBrowser(m_shell);
+        initializeBrowserFunctions(m_browser, m_nnc, this::setUrl);
 
         if (m_content == Content.DIALOG) {
             m_shell.setSize(525, 565);
@@ -222,7 +218,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         setUrl();
     }
 
-    private static Browser initializeBrowser(final Shell shell, final NativeNodeContainer nnc, final Content content) {
+    private static Browser initializeBrowser(final Shell shell) {
         var browser = new Browser(shell, SWT.NONE);
         browser.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
         browser.setMenu(new Menu(browser.getShell()));
@@ -231,17 +227,12 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
     @SuppressWarnings("unused")
     private static void initializeBrowserFunctions(final Browser browser, final NativeNodeContainer nnc,
-        final Content content) {
+        final Runnable reload) {
         new JsonRpcBrowserFunction(browser, nnc);
-        Page page;
-        if (content == Content.DIALOG) {
-            page = NodeDialogManager.getInstance().getNodeDialog(nnc).getPage();
-        } else {
-            page = NodeViewManager.getInstance().getNodeView(nnc).getPage();
-        }
-        new GetDebugInfoBrowserFunction(browser, new DebugInfo(page.getType() == Type.VUE_COMPONENT_LIB));
+        new GetDebugInfoBrowserFunction(browser, new DebugInfo(true));
         new CloseCEFWindowBrowserFunction(browser);
         new OpenBrowserBrowserFunction(browser);
+        new ReloadCEFWindowBrowserFunction(browser, reload);
     }
 
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,

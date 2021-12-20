@@ -46,37 +46,62 @@
  * History
  *   Oct 14, 2021 (hornm): created
  */
-package org.knime.js.cef.nodeview;
+package org.knime.js.cef;
 
-import org.knime.js.cef.DebugInfo;
-
-import com.equo.chromium.swt.Browser;
-import com.equo.chromium.swt.BrowserFunction;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Browser function that returns debug info for the {@link CEFNodeView}.
+ * Debugging info for wizard (node) views.
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
+ * @since 4.5
  */
-public final class GetDebugInfoBrowserFunction extends BrowserFunction {
+@JsonAutoDetect
+public class DebugInfo {
 
-    private final DebugInfo m_debugInfo;
+    @SuppressWarnings("javadoc")
+    public static final String FUNCTION_NAME = "getDebugInfo";
 
     /**
-     * @param browser
-     * @param debugInfo
+     * The CEF's remote debugging port or <code>null</code> if not set.
      */
-    public GetDebugInfoBrowserFunction(final Browser browser, final DebugInfo debugInfo) {
-        super(browser, DebugInfo.FUNCTION_NAME);
-        m_debugInfo = debugInfo;
+    public static final String REMOTE_DEBUGGING_PORT = System.getProperty("chromium.remote_debugging_port");
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private final boolean m_refreshRequired;
+
+    /**
+     * @param refreshRequired
+     */
+    public DebugInfo(final boolean refreshRequired) {
+        m_refreshRequired = refreshRequired;
     }
 
     /**
-     * {@inheritDoc}
+     * @return the remoteDebuggingPort
      */
+    public String getRemoteDebuggingPort() {
+        return REMOTE_DEBUGGING_PORT;
+    }
+
+    /**
+     * @return the refreshRequired
+     */
+    public boolean isRefreshRequired() {
+        return m_refreshRequired;
+    }
+
     @Override
-    public Object function(final Object[] arguments) {
-        return m_debugInfo.toString();
+    public String toString() {
+        try {
+            return MAPPER.writeValueAsString(this);
+        } catch (JsonProcessingException ex) {
+            // should never happen
+            throw new RuntimeException(ex); // NOSONAR
+        }
     }
 
 }

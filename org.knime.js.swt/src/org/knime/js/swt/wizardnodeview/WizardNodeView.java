@@ -400,6 +400,17 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
     }
 
+    /**
+     * Reloads the view's content.
+     *
+     * @since 4.6
+     */
+    protected final void reloadBrowserContent() {
+        m_selectionEventSource.removeEventListeners();
+        m_selectionEventSource.addEventListener(getNodeContainer());
+        setBrowserContent(true);
+    }
+
     private boolean isBrowserWrapperDisposed() {
         return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
