@@ -183,8 +183,13 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_title = title;
         var display = Display.getDefault();
-        m_shell = new Shell(display,
-            SWT.SHELL_TRIM | (m_content != Content.VIEW ? (SWT.APPLICATION_MODAL | SWT.ON_TOP) : SWT.NONE));
+
+        if (m_content == Content.VIEW) {
+            m_shell = new Shell(display, SWT.SHELL_TRIM);
+        } else {
+            m_shell = new Shell(display.getActiveShell(), SWT.SHELL_TRIM | SWT.APPLICATION_MODAL);
+        }
+
         m_shell.setText(title);
 
         var layout = new GridLayout();
