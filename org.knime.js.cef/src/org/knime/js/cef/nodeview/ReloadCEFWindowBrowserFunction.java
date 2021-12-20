@@ -44,64 +44,43 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Oct 14, 2021 (hornm): created
+ *   Dec 20, 2021 (hornm): created
  */
-package org.knime.core.wizard.debug;
+package org.knime.js.cef.nodeview;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.knime.core.webui.page.PageUtil;
+
+import com.equo.chromium.swt.Browser;
+import com.equo.chromium.swt.BrowserFunction;
 
 /**
- * Debugging info for wizard (node) views.
+ * Deletes all ui-extension related temporary files and reloads the respective node view (or dialog).
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
- * @since 4.5
  */
-@JsonAutoDetect
-public class DebugInfo {
+public class ReloadCEFWindowBrowserFunction extends BrowserFunction {
 
-    @SuppressWarnings("javadoc")
-    public static final String FUNCTION_NAME = "getDebugInfo";
+    private static final String FUNCTION_NAME = "reloadCEFWindow";
 
-    /**
-     * The CEF's remote debugging port or <code>null</code> if not set.
-     */
-    public static final String REMOTE_DEBUGGING_PORT = System.getProperty("chromium.remote_debugging_port");
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private final boolean m_refreshRequired;
+    private final Runnable m_reload;
 
     /**
-     * @param refreshRequired
+     * @param browser
+     * @param reload the actual operation the carries out the reload
      */
-    public DebugInfo(final boolean refreshRequired) {
-        m_refreshRequired = refreshRequired;
+    public ReloadCEFWindowBrowserFunction(final Browser browser, final Runnable reload) {
+        super(browser, FUNCTION_NAME);
+        m_reload = reload;
     }
 
     /**
-     * @return the remoteDebuggingPort
+     * {@inheritDoc}
      */
-    public String getRemoteDebuggingPort() {
-        return REMOTE_DEBUGGING_PORT;
-    }
-
-    /**
-     * @return the refreshRequired
-     */
-    public boolean isRefreshRequired() {
-        return m_refreshRequired;
-    }
-
     @Override
-    public String toString() {
-        try {
-            return MAPPER.writeValueAsString(this);
-        } catch (JsonProcessingException ex) {
-            // should never happen
-            throw new RuntimeException(ex); // NOSONAR
-        }
+    public Object function(final Object[] arguments) {
+        PageUtil.clearUIExtensionFiles();
+        m_reload.run();
+        return null;
     }
 
 }
