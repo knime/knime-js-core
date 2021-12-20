@@ -24,16 +24,16 @@ When pressed, all ui-extension-related temporary files are deleted and the respe
 
 The URL used within the node view window can be controlled via the 
 ```
--Dorg.knime.ui.debug.node.view.url=...
+-Dorg.knime.ui.dev.node.view.url=...
 ```
  system property. 
  The specified URL will be used for all nodes having a node view (contributed via the UI Extension framework) unless it is limited to node factories specified via 
 ```
--Dorg.knime.ui.debug.node.view.url.factory-class=...
+-Dorg.knime.ui.dev.node.view.url.factory-class=...
 ```
 which receives a regular expression to match a node factory or factories, e.g. `.*MyNodeFactory`.
 
-The analogous system properties for node dialogs are `org.knime.ui.debug.node.dialog.url` and `org.knime.ui.debug.node.dialog.url.factory-class`.
+The analogous system properties for node dialogs are `org.knime.ui.dev.node.dialog.url` and `org.knime.ui.dev.node.dialog.url.factory-class`.
 
 Depending on the particular node, the provided URL either needs to serve a html page which is embedded in an iframe or a vue-component (i.e. a js-file) which is loaded at runtime ('internal node view').
 
