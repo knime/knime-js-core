@@ -57,7 +57,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.property.hilite.KeyEvent;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
-import org.knime.core.webui.data.DataServiceProvider;
+import org.knime.core.webui.node.DataServiceManager;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
@@ -91,23 +91,23 @@ public class DefaultNodeService implements NodeService {
     @Override
     public String callNodeDataService(final String projectId, final String workflowId, final String nodeID,
         final String extensionType, final String serviceType, final String request) {
-        var nc = m_getNode.apply(nodeID);
-        final DataServiceProvider dataServiceProvider;
+        final DataServiceManager dataServiceManager;
         if ("view".equals(extensionType)) {
-            dataServiceProvider = NodeViewManager.getInstance().getNodeView(nc);
+            dataServiceManager = NodeViewManager.getInstance();
         } else if ("dialog".equals(extensionType)) {
-            dataServiceProvider = NodeDialogManager.getInstance().getNodeDialog(nc);
+            dataServiceManager = NodeDialogManager.getInstance();
         } else {
             throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
         }
 
+        var nc = m_getNode.apply(nodeID);
         if ("initial_data".equals(serviceType)) {
-            return dataServiceProvider.callTextInitialDataService();
+            return dataServiceManager.callTextInitialDataService(nc);
         } else if ("data".equals(serviceType)) {
-            return dataServiceProvider.callTextDataService(request);
+            return dataServiceManager.callTextDataService(nc, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                dataServiceProvider.callTextAppyDataService(request);
+                dataServiceManager.callTextAppyDataService(nc, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
