@@ -25,16 +25,8 @@
             <id>build</id>
             <modules>
                 <module>org.knime.core.wizard</module>
-                <module>org.knime.ext.phantomjs</module>
-                <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
-                <module>org.knime.ext.phantomjs.bin.win32.x86</module>
-                <module>org.knime.ext.seleniumdrivers.multios</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
                 <module>org.knime.features.js.core</module>
                 <module>org.knime.js.core</module>
-                <module>org.knime.js.cef</module>
                 <module>org.knime.js.swt</module>
                 <module>org.knime.update.js.core</module>
             </modules>
@@ -48,17 +40,9 @@
             <modules>
                 <module>org.knime.core.wizard</module>
                 <module>org.knime.core.wizard.tests</module>
-                <module>org.knime.ext.phantomjs</module>
-                <module>org.knime.ext.phantomjs.bin.linux.x86_64</module>
-                <module>org.knime.ext.phantomjs.bin.win32.x86</module>
-                <module>org.knime.ext.seleniumdrivers.multios</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.linux.x86_64</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.macosx.x86_64</module>
-                <module>org.knime.ext.seleniumdrivers.multios.bin.win32.x86</module>
                 <module>org.knime.features.js.core</module>
                 <module>org.knime.js.core</module>
                 <module>org.knime.js.core.tests</module>
-                <module>org.knime.js.cef</module>
                 <module>org.knime.js.swt</module>
             </modules>
 

@@ -4,7 +4,6 @@
 This repository contains the source code of the [KNIME Analytics Platform](http://www.knime.org) JavaScript-Core components. The code is organized as follows:
 
 * _org.knime.js.core*_: Core components of the KNIME JavaScript integration.
-* _org.knime.ext.selenium.*_: Includes the Chromedriver and defines the Selenium-KNIME-bridge to display JavaScript enabled views of appropriate KNIME nodes in a Chromium browser.
 * _org.knime.core.wizard.*_: Defines combined views on components.
 
 

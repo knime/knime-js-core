@@ -1,4 +1,0 @@
----------ChromeDriver 91.0.4472.19 (2021-04-22)---------
-Supports Chrome version 91
-Resolved issue 3744: SendKeys() and Click() silently fail after link navigation [Pri-]
-Resolved issue 3746: attribute endpoint incorrectly updates values [Pri-2]
