@@ -52,16 +52,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Function;
 
-import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.property.hilite.KeyEvent;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
 import org.knime.gateway.api.entity.NodeIDEnt;
+import org.knime.gateway.impl.service.events.SelectionEventSource;
+import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
 
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
@@ -123,22 +122,7 @@ public class DefaultNodeService implements NodeService {
         final String mode, final List<String> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
         var nc = m_getNode.apply(nodeIdString);
-        final var keyEvent = new KeyEvent(nc.getID(), rowKeys.stream().map(RowKey::new).toArray(RowKey[]::new));
-        var hiLiteHandler = nc.getNodeModel().getInHiLiteHandler(0);
-        switch (selectionEventMode) {
-            case ADD:
-                hiLiteHandler.fireHiLiteEvent(keyEvent);
-                break;
-            case REMOVE:
-                hiLiteHandler.fireUnHiLiteEvent(keyEvent);
-                break;
-            case REPLACE:
-                hiLiteHandler.fireReplaceHiLiteEvent(keyEvent);
-                break;
-            default:
-        }
+        SelectionEventSource.processSelectionEvent(nc, selectionEventMode, true, rowKeys);
     }
-
-
 
 }

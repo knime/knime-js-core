@@ -52,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -67,12 +68,14 @@ import org.knime.core.node.wizard.WizardViewRequestHandler;
 import org.knime.core.node.wizard.WizardViewRequestRunner;
 import org.knime.core.node.wizard.WizardViewResponse;
 import org.knime.core.node.wizard.page.WizardPage;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.WebResourceController;
 import org.knime.core.node.workflow.WizardExecutionController;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.util.CoreConstants;
+import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 
@@ -129,9 +132,14 @@ public final class WizardPageManager extends AbstractPageManager implements View
      * @throws IOException if the layout of the wizard page can not be generated
      */
     public JSONWebNodePage createCurrentWizardPage() throws IOException {
+        return createCurrentWizardPage(null);
+    }
+
+    private JSONWebNodePage createCurrentWizardPage(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator)
+        throws IOException {
         WizardExecutionController wec = getWizardExecutionController();
         WizardPage page = wec.getCurrentWizardPage();
-        return createWizardPageInternal(page, null);
+        return createWizardPageInternal(page, nodeViewEntCreator);
     }
 
     /**
@@ -142,8 +150,25 @@ public final class WizardPageManager extends AbstractPageManager implements View
      * @throws JsonProcessingException on serialization errors
      */
     public String createCurrentWizardPageString() throws IOException, JsonProcessingException {
-        JSONWebNodePage jsonPage = createCurrentWizardPage();
-        ObjectMapper mapper = JSONLayoutPage.getConfiguredVerboseObjectMapper();
+        return createCurrentWizardPageString(null);
+    }
+
+    /**
+     * Creates a JSON string containing a wizard page for the current subnode in wizard execution
+     *
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
+     * @param hllr object required to create {@link NodeViewEnt}-instances, can be {@code null}
+     * @return a JSON string containing the wizard page
+     * @throws IOException if the layout of the wizard page can not be generated
+     * @throws JsonProcessingException on serialization errors
+     *
+     * @since 4.6
+     */
+    public String createCurrentWizardPageString(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator)
+        throws IOException, JsonProcessingException { // NOSONAR
+        var jsonPage = createCurrentWizardPage(nodeViewEntCreator);
+        var mapper = JSONLayoutPage.getConfiguredVerboseObjectMapper();
         return mapper.writerWithView(CoreConstants.ArtifactsView.class).writeValueAsString(jsonPage);
     }
 

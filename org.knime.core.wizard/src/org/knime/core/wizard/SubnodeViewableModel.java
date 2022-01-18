@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
@@ -76,6 +77,7 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.wizard.WizardViewRequestHandler;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainerState;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
@@ -83,7 +85,6 @@ import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.wizard.rpc.DefaultReexecutionService;
 import org.knime.core.wizard.rpc.ReexecutionService;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
@@ -128,7 +129,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
 
-    private HiLiteListenerRegistry m_hiLiteListenerRegistry;
+    private Function<NativeNodeContainer, NodeViewEnt> m_nodeViewEntCreator;
 
     /**
      * Creates a new instance of this viewable model
@@ -148,20 +149,22 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * @param nodeContainer the subnode container
      * @param viewName the name of the view
      * @param lazyPageAndValueInitialization whether the wizard page and respective view value should be created
-     *            immediately or later via {@link #createPageAndValue(HiLiteListenerRegistry)}
-     * @param hllr hilite-listener registry to synchronize hilite-listener registration and hilite-state itself
+     *            immediately or later via {@link #createPageAndValue(Function)}
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
      * @throws IOException on view model creation error
-     * @since 4.5
+     * @since 4.6
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName,
-        final boolean lazyPageAndValueInitialization, final HiLiteListenerRegistry hllr) throws IOException {
+        final boolean lazyPageAndValueInitialization,
+        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
         m_viewName = viewName;
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
         m_spm = CompositeViewPageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
-        m_hiLiteListenerRegistry = hllr;
+        m_nodeViewEntCreator = nodeViewEntCreator;
         if (!lazyPageAndValueInitialization) {
-            createPageAndValue(hllr);
+            createPageAndValue(nodeViewEntCreator);
         }
         m_nodeStateChangeListener = s -> onNodeStateChange();
         nodeContainer.addNodeStateChangeListener(m_nodeStateChangeListener);
@@ -184,7 +187,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                     if (v == null) {
                         // node was just executed, i.e. view is open and user executes via "run" button in main application
                         try {
-                            createPageAndValue(m_hiLiteListenerRegistry);
+                            createPageAndValue(m_nodeViewEntCreator);
                             assert m_value != null : "value supposed to be non-null on executed node";
                         } catch (IOException e) {
                             LOGGER.error("Creating view failed: " + e.getMessage(), e);
@@ -223,16 +226,17 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * Creates the wizard page (i.e. the view representation here) and the view value.
      *
      * In case of lazy initialization (see
-     * {@link #SubnodeViewableModel(SubNodeContainer, String, boolean, HiLiteListenerRegistry)}, this method must be
+     * {@link #SubnodeViewableModel(SubNodeContainer, String, boolean, Function)}, this method must be
      * called before calling {@link #getViewValue()} or {@link #getViewRepresentation()}.
      *
-     * @param hllr required to create {@link NodeViewEnt}-instances
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
      *
      * @throws IOException
-     * @since 4.5
+     * @since 4.6
      */
-    public void createPageAndValue(final HiLiteListenerRegistry hllr) throws IOException {
-        m_page = m_spm.createWizardPage(m_container.getID(), hllr);
+    public void createPageAndValue(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
+        m_page = m_spm.createWizardPage(m_container.getID(), nodeViewEntCreator);
         Map<String, String> valueMap = new HashMap<String, String>();
         for (Entry<String, JSONWebNode> entry : m_page.getWebNodes().entrySet()) {
             String value = MAPPER.writeValueAsString(entry.getValue().getViewValue());

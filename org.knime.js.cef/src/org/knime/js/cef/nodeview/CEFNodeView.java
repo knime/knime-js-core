@@ -88,11 +88,11 @@ import org.knime.core.util.FileUtil;
 import org.knime.core.webui.node.dialog.NodeDialog;
 import org.knime.core.webui.node.view.NodeView;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
-import org.knime.core.wizard.rpc.events.SelectionEventSource;
 import org.knime.gateway.api.entity.NodeDialogEnt;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
+import org.knime.gateway.impl.service.events.SelectionEvent;
+import org.knime.gateway.impl.service.events.SelectionEventSource;
 import org.knime.js.cef.DebugInfo;
 import org.knime.js.core.JSONWebNodePage;
 import org.knime.js.core.JSONWebNodePageConfiguration;
@@ -243,10 +243,12 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
     private static void initializePageBuilder(final Browser browser, final NativeNodeContainer nnc,
         final Content content) {
 
-        var hiLiteListenerRegistry = initializeSelectionEventSource(browser, nnc);
+        var selectionEventSource = initializeSelectionEventSource(browser, nnc);
 
         var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
-        var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc, hiLiteListenerRegistry) : null;
+        var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc, selectionEventSource
+            .addEventListenerAndGetInitialEvent(nnc).map(SelectionEvent::getKeys).orElse(Collections.emptyList()))
+            : null;
 
         var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
         String pageString;
@@ -264,24 +266,22 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         browser.execute(initCall);
     }
 
-    private static HiLiteListenerRegistry initializeSelectionEventSource(final Browser browser,
+    private static SelectionEventSource initializeSelectionEventSource(final Browser browser,
         final NativeNodeContainer nnc) {
         // Registers a selection event listener (i.e. hiliting). The emitted selection (hiliting)-events
         // are passed to the frontend by executing a piece of js-code.
-        // Needs to happen before a NodeViewEnt-instance is created.
-        var hiLiteListenerRegistry = new HiLiteListenerRegistry();
-        var selectionEventSource = new SelectionEventSource(e -> {
-            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(e);
+        // Registering the nodes with the event source happens when NodeViewEnt-instances are created.
+        var selectionEventSource = new SelectionEventSource((s, e) -> {
+            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall((SelectionEvent)e);
             Display.getDefault().syncExec(() -> browser.execute(jsCall));
-        }, hiLiteListenerRegistry);
-        selectionEventSource.addEventListener(nnc);
+        });
 
         // register listeners to clean-up
         var cleanUpListener = new CleanUpListener(selectionEventSource, nnc);
         nnc.addNodeStateChangeListener(cleanUpListener);
         browser.addDisposeListener(cleanUpListener);
 
-        return hiLiteListenerRegistry;
+        return selectionEventSource;
     }
 
     private static JSONWebNodePage createJSONWebNodePage(final NodeDialogEnt dialogEnt, final NodeViewEnt viewEnt) {
@@ -474,7 +474,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
         }
 
         private void cleanUp() {
-            m_ses.removeEventListeners();
+            m_ses.removeAllEventListeners();
             m_nnc.removeNodeStateChangeListener(this);
         }
 

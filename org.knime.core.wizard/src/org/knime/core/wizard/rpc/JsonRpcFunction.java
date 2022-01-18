@@ -60,7 +60,7 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.core.wizard.SubnodeViewableModel;
-import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
+import org.knime.gateway.impl.service.events.SelectionEvent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -116,6 +116,8 @@ public class JsonRpcFunction {
      *
      * @param selectionEvent
      * @return the js-call or {@code null} if a problem occurred
+     *
+     * @since 4.6
      */
     public static String createJsonRpcNotificationCall(final SelectionEvent selectionEvent) {
         // code copied from org.knime.ui.java.browser.KnimeBrowserView

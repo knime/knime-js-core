@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
@@ -81,7 +82,6 @@ import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodeInfo;
@@ -134,13 +134,14 @@ public abstract class AbstractPageManager {
      * Performs a transformation from {@link WizardPage} to {@link JSONWebNodePage} which can be used for serialization.
      *
      * @param page the {@link WizardPage} to transform
-     * @param hllr object required to create {@link NodeViewEnt}-instances, can be {@code null}
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
      * @return the transformed {@link JSONWebNodePage}
      * @throws IOException if layout of page can not be generated
-     * @since 4.5
+     * @since 4.6
      */
-    protected JSONWebNodePage createWizardPageInternal(final WizardPage page, final HiLiteListenerRegistry hllr)
-        throws IOException {
+    protected JSONWebNodePage createWizardPageInternal(final WizardPage page,
+        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
         // process layout
         JSONLayoutPage layout = new JSONLayoutPage();
         try {
@@ -186,7 +187,8 @@ public abstract class AbstractPageManager {
             if (nnc.getNodeModel() instanceof WizardNode) {
                 webNodes.put(e.getKey().toString(), createJSONWebNode(nnc));
             } else if (NodeViewManager.hasNodeView(nnc)) {
-                nodeViews.put(e.getKey().toString(), new NodeViewEnt(nnc, hllr));
+                var nodeViewEnt = nodeViewEntCreator == null ? new NodeViewEnt(nnc) : nodeViewEntCreator.apply(nnc);
+                nodeViews.put(e.getKey().toString(), nodeViewEnt);
             }
         }
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);

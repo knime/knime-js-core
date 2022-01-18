@@ -52,38 +52,41 @@ import static org.awaitility.Awaitility.await;
 import static org.awaitility.Duration.FIVE_SECONDS;
 import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode.REMOVE;
-import static org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode.REPLACE;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_1;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_1_2;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.ROWKEYS_2;
-import static org.knime.core.wizard.rpc.events.SelectionEventSourceTest.stringListToRowKeySet;
+import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REMOVE;
+import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REPLACE;
 import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.util.function.Consumer;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.knime.core.data.RowKey;
 import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
-import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowAnnotation;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
-import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEvent;
-import org.knime.core.wizard.rpc.events.SelectionEventSource.SelectionEventMode;
-import org.knime.core.wizard.rpc.events.SelectionEventSourceTest;
+import org.knime.gateway.impl.service.events.SelectionEvent;
+import org.knime.gateway.impl.service.events.SelectionEventSource;
+import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
 import org.knime.testing.node.view.NodeViewNodeFactory;
 import org.knime.testing.util.WorkflowManagerUtil;
 
@@ -92,6 +95,14 @@ import org.knime.testing.util.WorkflowManagerUtil;
  */
 @SuppressWarnings("javadoc")
 public class DefaultNodeServiceTest {
+
+    private static final String WORKFLOW_NAME = "workflow";
+
+    private static final List<String> ROWKEYS_1 = List.of("Row01");
+
+    private static final List<String> ROWKEYS_2 = List.of("Row02");
+
+    private static final List<String> ROWKEYS_1_2 = List.of("Row01", "Row02");
 
     private WorkflowManager m_wfm;
 
@@ -142,16 +153,16 @@ public class DefaultNodeServiceTest {
         m_wfm.convertMetaNodeToSubNode(componentId);
 
         @SuppressWarnings("unchecked")
-        final Consumer<SelectionEvent> selectionEventConsumer = mock(Consumer.class);
-        var component = (SingleNodeContainer)m_wfm.getNodeContainer(componentId);
+        final BiConsumer<String, SelectionEvent> selectionEventConsumer = mock(BiConsumer.class);
+        var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component);
-        SelectionEventSourceTest.setupHiLiteListeners(selectionEventConsumer, component);
+        setupSelectionEventSource(selectionEventConsumer, component);
         nodeService.updateDataPointSelection("projectId_not_used", "workflowId_not_used", "root:4:0:2",
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(selectionEventConsumer, times(1))
-                .accept(argThat(se -> SelectionEventSourceTest.verifySelectionEvent(se, "root:4", "root:4:0:3")));
+            verify(selectionEventConsumer, times(1)).accept(eq("Selection"),
+                argThat(se -> verifySelectionEvent(se, "root:4", "root:4:0:3")));
         });
     }
 
@@ -162,8 +173,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REMOVE.toString(),
-            ROWKEYS_1);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REMOVE.toString(), ROWKEYS_1);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -196,6 +206,24 @@ public class DefaultNodeServiceTest {
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
         m_hlh.fireClearHiLiteEvent();
+    }
+
+    private static Set<RowKey> stringListToRowKeySet(final List<String> keys) {
+        return keys.stream().map(RowKey::new).collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private static boolean verifySelectionEvent(final SelectionEvent se, final String workflowId, final String nodeId) {
+        return se.getKeys().equals(ROWKEYS_1_2) && se.getMode() == SelectionEventMode.ADD
+            && se.getNodeId().equals(nodeId) && se.getWorkflowId().equals(workflowId)
+            && se.getProjectId().startsWith(WORKFLOW_NAME);
+    }
+
+    private static void setupSelectionEventSource(final BiConsumer<String, SelectionEvent> selectionEventConsumer,
+        final SubNodeContainer node) {
+        var selectionEventSource =
+            new SelectionEventSource((n, o) -> selectionEventConsumer.accept(n, (SelectionEvent)o));
+        WizardPageUtil.getWizardPageNodes(node.getWorkflowManager())
+            .forEach(nnc -> selectionEventSource.addEventListener(nnc));
     }
 
 }

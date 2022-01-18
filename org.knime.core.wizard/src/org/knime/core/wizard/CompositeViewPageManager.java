@@ -55,6 +55,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import org.knime.core.node.CanceledExecutionException;
 import org.knime.core.node.ExecutionMonitor;
@@ -64,12 +65,12 @@ import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.WizardViewResponse;
 import org.knime.core.node.wizard.page.WizardPage;
 import org.knime.core.node.workflow.CompositeViewController;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.service.util.HiLiteListenerRegistry;
 import org.knime.js.core.JSONWebNodePage;
 
 /**
@@ -129,16 +130,17 @@ public class CompositeViewPageManager extends AbstractPageManager {
      * Creates a wizard page object from a given node id
      *
      * @param containerNodeID the node id to create the wizard page for
-     * @param hllr object required to create {@link NodeViewEnt}-instances, can be {@code null}
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
      * @return a {@link JSONWebNodePage} object which can be used for serialization
      * @throws IOException if the layout of the wizard page can not be generated
-     * @since 4.5
+     * @since 4.6
      */
-    public JSONWebNodePage createWizardPage(final NodeID containerNodeID, final HiLiteListenerRegistry hllr)
-        throws IOException {
+    public JSONWebNodePage createWizardPage(final NodeID containerNodeID,
+        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
         CompositeViewController sec = getController(containerNodeID);
         WizardPage page = sec.getWizardPage();
-        return createWizardPageInternal(page, hllr);
+        return createWizardPageInternal(page, nodeViewEntCreator);
     }
 
     /**
