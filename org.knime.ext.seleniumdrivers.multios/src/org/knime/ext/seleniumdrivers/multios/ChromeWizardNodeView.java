@@ -239,6 +239,15 @@ public class ChromeWizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>
     public final void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_viewTitle = title;
         final T model = getViewableModel();
+        if (model instanceof SubnodeViewableModel) {
+            try {
+                ((SubnodeViewableModel)model).createPageAndValue(null);
+            } catch (IOException e) {
+                // should never happen
+                throw new IllegalStateException("Wizard page couldn't be created", e);
+            }
+        }
+
         final WizardViewCreator<REP, VAL> viewCreator = model.getViewCreator();
         if (viewCreator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
             String customCSS = ((CSSModifiable)model).getCssStyles();
