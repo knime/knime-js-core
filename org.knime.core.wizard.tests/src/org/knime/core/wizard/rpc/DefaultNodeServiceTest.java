@@ -223,7 +223,7 @@ public class DefaultNodeServiceTest {
         var selectionEventSource =
             new SelectionEventSource((n, o) -> selectionEventConsumer.accept(n, (SelectionEvent)o));
         WizardPageUtil.getWizardPageNodes(node.getWorkflowManager())
-            .forEach(nnc -> selectionEventSource.addEventListener(nnc));
+            .forEach(nnc -> selectionEventSource.addEventListenerFor(nnc));
     }
 
 }

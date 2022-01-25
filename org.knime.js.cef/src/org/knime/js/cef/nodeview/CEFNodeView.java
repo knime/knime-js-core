@@ -247,7 +247,7 @@ public class CEFNodeView extends AbstractNodeView<NodeModel> {
 
         var nodeDialogEnt = content != Content.VIEW ? new NodeDialogEnt(nnc) : null;
         var nodeViewEnt = content != Content.DIALOG ? new NodeViewEnt(nnc, selectionEventSource
-            .addEventListenerAndGetInitialEvent(nnc).map(SelectionEvent::getKeys).orElse(Collections.emptyList()))
+            .addEventListenerAndGetInitialEventFor(nnc).map(SelectionEvent::getKeys).orElse(Collections.emptyList()))
             : null;
 
         var page = createJSONWebNodePage(nodeDialogEnt, nodeViewEnt);
