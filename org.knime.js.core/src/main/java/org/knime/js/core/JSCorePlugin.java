@@ -312,7 +312,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
 
     private static final String FEATURE_GROUP_SUFFIX = ".feature.group";
 
-    private static final String HUB_FEATURE_NAME = "com.knime.features.workbench.cef";
+    private static final String CEF_FEATURE_NAME = "org.knime.features.browser.cef";
 
     /**
      * Installs the Hub extension (which also pulls in the CEF).
@@ -335,7 +335,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
             if (featuresToInstall.isEmpty()) {
                 Display.getDefault().syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                     "No extension found",
-                    "No extension with name '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
+                    "No extension with name '" + CEF_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
             } else {
                 startInstallHubExtension(featuresToInstall);
             }
@@ -344,10 +344,10 @@ public final class JSCorePlugin extends AbstractUIPlugin {
             Display.getDefault()
                 .syncExec(() -> MessageDialog.openWarning(Display.getDefault().getActiveShell(),
                     "Error while installing extension", "Error while installign extension '"
-                        + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
+                        + CEF_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "': " + ex.getMessage()));
 
             NodeLogger.getLogger(JavaScriptPreferenceInitializer.class.getName())
-                .error("Error while installing extension '" + HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX
+                .error("Error while installing extension '" + CEF_FEATURE_NAME + FEATURE_GROUP_SUFFIX
                     + "': " + ex.getMessage(), ex);
         }
     }
@@ -362,7 +362,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     private static void searchInRepository(final IMetadataRepository repository,
         final Set<IInstallableUnit> featuresToInstall) throws ProvisionException {
         final IQuery<IInstallableUnit> query = QueryUtil
-            .createLatestQuery(QueryUtil.createIUQuery(HUB_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
+            .createLatestQuery(QueryUtil.createIUQuery(CEF_FEATURE_NAME + FEATURE_GROUP_SUFFIX));
         final IQueryResult<IInstallableUnit> result = repository.query(query, null);
 
         result.forEach(i -> featuresToInstall.add(i));
