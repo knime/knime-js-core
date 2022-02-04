@@ -106,7 +106,7 @@ public class DefaultNodeService implements NodeService {
             return dataServiceManager.callTextDataService(nc, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                dataServiceManager.callTextAppyDataService(nc, request);
+                dataServiceManager.callTextApplyDataService(nc, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
