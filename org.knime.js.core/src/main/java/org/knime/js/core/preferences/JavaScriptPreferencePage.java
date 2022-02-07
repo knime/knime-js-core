@@ -388,18 +388,18 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_RED));
 
         final Button button = new Button(comp, SWT.NONE);
-        button.setText("Install KNIME Hub Integration with CEF");
+        button.setText("Install Chromium Embedded Framework (CEF) browser");
 
         button.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                JSCorePlugin.installHubExtension();
+                JSCorePlugin.installCEFExtension();
             }
 
             @Override
             public void widgetDefaultSelected(final SelectionEvent e) {
-                JSCorePlugin.installHubExtension();
+                JSCorePlugin.installCEFExtension();
             }
         });
     }

@@ -315,11 +315,11 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     private static final String CEF_FEATURE_NAME = "org.knime.features.browser.cef";
 
     /**
-     * Installs the Hub extension (which also pulls in the CEF).
+     * Installs the CEF extension.
      *
      * @since 4.5
      */
-    public static void installHubExtension() {
+    public static void installCEFExtension() {
         final ProvisioningSession session = ProvisioningUI.getDefaultUI().getSession();
 
         try {
@@ -337,7 +337,7 @@ public final class JSCorePlugin extends AbstractUIPlugin {
                     "No extension found",
                     "No extension with name '" + CEF_FEATURE_NAME + FEATURE_GROUP_SUFFIX + "' found."));
             } else {
-                startInstallHubExtension(featuresToInstall);
+                startInstallCEFExtension(featuresToInstall);
             }
 
         } catch (ProvisionException ex) {
@@ -369,11 +369,11 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     }
 
     /**
-     * Starts installing the hub feature.
+     * Starts installing the CEF feature.
      *
      * @param featuresToInstall the features that have to be installed.
      */
-    private static void startInstallHubExtension(final Set<IInstallableUnit> featuresToInstall) {
+    private static void startInstallCEFExtension(final Set<IInstallableUnit> featuresToInstall) {
         final ProvisioningUI provUI = ProvisioningUI.getDefaultUI();
         Job.getJobManager().cancel(LoadMetadataRepositoryJob.LOAD_FAMILY);
         final LoadMetadataRepositoryJob loadJob = new LoadMetadataRepositoryJob(provUI);
