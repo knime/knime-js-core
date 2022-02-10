@@ -485,7 +485,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private static SelectionEventSource createSelectionEventSource(final BrowserWrapper browserWrapper) {
         return new SelectionEventSource((s, e) -> {
             var jsCall =
-                JsonRpcFunction.createJsonRpcNotificationCall((org.knime.gateway.impl.service.events.SelectionEvent)e);
+                JsonRpcFunction.createJsonRpcNotificationCall(s, e);
             Display.getDefault().syncExec(() -> browserWrapper.execute(jsCall));
         });
     }

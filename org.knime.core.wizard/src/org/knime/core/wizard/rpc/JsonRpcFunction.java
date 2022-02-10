@@ -60,7 +60,6 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.core.wizard.SubnodeViewableModel;
-import org.knime.gateway.impl.service.events.SelectionEvent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -112,19 +111,21 @@ public class JsonRpcFunction {
     }
 
     /**
-     * Helper to create a jsonrpc-notification call from a selection event to be run as a JS script in the browser.
+     * Helper to create a jsonrpc-notification call from a (json-serializable) event to be run as a JS script in the
+     * browser.
      *
-     * @param selectionEvent
+     * @param eventName
+     * @param event
      * @return the js-call or {@code null} if a problem occurred
      *
      * @since 4.6
      */
-    public static String createJsonRpcNotificationCall(final SelectionEvent selectionEvent) {
+    public static String createJsonRpcNotificationCall(final String eventName, final Object event) {
         // code copied from org.knime.ui.java.browser.KnimeBrowserView
         final var jsonrpcObjectNode = MAPPER.createObjectNode();
         final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
-        paramsArrayNode.addPOJO(selectionEvent);
-        jsonrpcObjectNode.put(FUNCTION_NAME, "2.0").put("method", "SelectionEvent").set("params", paramsArrayNode);
+        paramsArrayNode.addPOJO(event);
+        jsonrpcObjectNode.put(FUNCTION_NAME, "2.0").put("method", eventName).set("params", paramsArrayNode);
         try {
             return "jsonrpcNotification(\"" + StringEscapeUtils.escapeJava(MAPPER.writeValueAsString(jsonrpcObjectNode))
                 + "\");";
