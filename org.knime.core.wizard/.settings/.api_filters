@@ -54,4 +54,12 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/rpc/NodeService.java" type="org.knime.core.wizard.rpc.NodeService">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="changeNodeStates(String, String, List&lt;String&gt;, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>

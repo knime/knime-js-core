@@ -125,4 +125,14 @@ public class DefaultNodeService implements NodeService {
         SelectionEventSource.processSelectionEvent(nc, selectionEventMode, true, rowKeys);
     }
 
+    @Override
+    @SuppressWarnings("java:S4274")
+    public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
+        final String action) {
+        var nc = m_getNode.apply("");
+        assert nodeIds.size() == 1 && nodeIds.get(0).equals(new NodeIDEnt(nc.getID()).toString()) && "execute".equals(
+            action) : "The changeNodeStates-endpoint is only partially implemented - parameter values are out of scope";
+        nc.getParent().executeUpToHere(nc.getID());
+    }
+
 }

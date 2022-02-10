@@ -51,6 +51,8 @@ package org.knime.core.wizard.rpc;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Duration.FIVE_SECONDS;
 import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REMOVE;
 import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REPLACE;
@@ -206,6 +208,15 @@ public class DefaultNodeServiceTest {
 
         assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
         m_hlh.fireClearHiLiteEvent();
+    }
+
+    @Test
+    public void testChangeNodeStates() {
+        var nnc = WorkflowManagerUtil.createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 0));
+        assertThat(nnc.getNodeContainerState().isExecuted(), is(false));
+        new DefaultNodeService(nnc).changeNodeStates("not used", "not used", List.of("root:2"), "execute");
+        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS)
+            .untilAsserted(() -> assertThat(nnc.getNodeContainerState().isExecuted(), is(true)));
     }
 
     private static Set<RowKey> stringListToRowKeySet(final List<String> keys) {
