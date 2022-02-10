@@ -21,11 +21,7 @@
         <config key="styles"/>
     </config>
     <entry key="customDescription" type="xstring" isnull="true" value=""/>
-    <entry key="state" type="xstring" value="IDLE"/>
-    <config key="nodecontainer_message">
-        <entry key="type" type="xstring" value="WARNING"/>
-        <entry key="message" type="xstring" value="Contains an unconnected node (&quot;NodeView 0:5:0:8&quot;)"/>
-    </config>
+    <entry key="state" type="xstring" value="CONFIGURED"/>
     <entry key="workflow-file" type="xstring" value="workflow.knime"/>
     <entry key="virtual-in-ID" type="xint" value="5"/>
     <config key="inports"/>
