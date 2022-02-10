@@ -419,7 +419,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (model instanceof SubnodeViewableModel) {
             try {
                 ((SubnodeViewableModel)model).createPageAndValue(nnc -> new NodeViewEnt(nnc,
-                    selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
+                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
                         .map(org.knime.gateway.impl.service.events.SelectionEvent::getKeys)
                         .orElse(Collections.emptyList())));
             } catch (IOException e) {
