@@ -163,7 +163,7 @@ public class DefaultNodeServiceTest {
             SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(selectionEventConsumer, times(1)).accept(eq("Selection"),
+            verify(selectionEventConsumer, times(1)).accept(eq("SelectionEvent"),
                 argThat(se -> verifySelectionEvent(se, "root:4", "root:4:0:3")));
         });
     }
