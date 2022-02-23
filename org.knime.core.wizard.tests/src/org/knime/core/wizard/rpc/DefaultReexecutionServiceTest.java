@@ -148,7 +148,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         // test normal re-execution
         Map<String, String> viewValues = Map.of("6:0:9",
             "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":false}}",//
-            "6:0:8", "new initial data for node 6:0:8");
+            "6:0:8", "n€w initial data for node 6:0:8");
         var res = service.reexecutePage("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
@@ -162,7 +162,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         var page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("6:0:3").get("viewRepresentation").get("text").asText(), is("TEST"));
         assertThat(page.get("nodeViews").get("6:0:8").get("initialData").asText(),
-            is("new initial data for node 6:0:8"));
+            is("n€w initial data for node 6:0:8"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
 
