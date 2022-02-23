@@ -48,8 +48,10 @@
  */
 package org.knime.core.wizard.rpc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +157,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
             page = m_cvm.createWizardPage(m_page.getID());
             page.filterWebNodesById(resetNodeIDs);
             try (OutputStream pageStream = page.saveToStream()) {
-                return pageStream.toString();
+                return ((ByteArrayOutputStream)pageStream).toString(StandardCharsets.UTF_8);
             }
         } catch (IOException ex) {
             throw new IllegalStateException("Problem occurred while serializing page", ex);
