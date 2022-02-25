@@ -187,7 +187,7 @@ public abstract class AbstractPageManager {
             if (nnc.getNodeModel() instanceof WizardNode) {
                 webNodes.put(e.getKey().toString(), createJSONWebNode(nnc));
             } else if (NodeViewManager.hasNodeView(nnc)) {
-                var nodeViewEnt = nodeViewEntCreator == null ? new NodeViewEnt(nnc) : nodeViewEntCreator.apply(nnc);
+                var nodeViewEnt = nodeViewEntCreator == null ? NodeViewEnt.create(nnc) : nodeViewEntCreator.apply(nnc);
                 nodeViews.put(e.getKey().toString(), nodeViewEnt);
             }
         }
