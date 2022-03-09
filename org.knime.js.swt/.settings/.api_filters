@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.js.swt" version="2">
+    <resource path="src/org/knime/js/swt/wizardnodeview/WizardNodeView.java" type="org.knime.js.swt.wizardnodeview.WizardNodeView">
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.js.swt.wizardnodeview.WizardNodeView"/>
+                <message_argument value="callOpenView(String, Rectangle)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

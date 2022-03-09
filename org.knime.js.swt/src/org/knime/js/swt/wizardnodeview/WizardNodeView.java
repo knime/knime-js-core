@@ -215,7 +215,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      */
     @SuppressWarnings("unused")
     @Override
-    public final void callOpenView(final String title, final Rectangle knimeWindowBounds) {
+    protected void callOpenView(final String title, final Rectangle knimeWindowBounds) {
         m_title = (title == null ? "View" : title);
 
         Display display = getDisplay();
