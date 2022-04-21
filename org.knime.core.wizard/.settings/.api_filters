@@ -46,6 +46,14 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/rpc/DefaultNodeService.java" type="org.knime.core.wizard.rpc.DefaultNodeService">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultNodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/rpc/JsonRpcFunction.java" type="org.knime.core.wizard.rpc.JsonRpcFunction">
         <filter id="338792546">
             <message_arguments>
@@ -59,6 +67,18 @@
             <message_arguments>
                 <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
                 <message_argument value="changeNodeStates(String, String, List&lt;String&gt;, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, List&lt;String&gt;)"/>
             </message_arguments>
         </filter>
     </resource>

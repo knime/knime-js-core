@@ -130,8 +130,8 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId",
-            SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", SelectionEventMode.ADD.toString(),
+            ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_1_2))));
@@ -159,8 +159,7 @@ public class DefaultNodeServiceTest {
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component);
         setupSelectionEventSource(selectionEventConsumer, component);
-        nodeService.updateDataPointSelection("projectId_not_used", "workflowId_not_used", "root:4:0:2",
-            SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
+        nodeService.updateDataPointSelection("root:4:0:2", SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(selectionEventConsumer, times(1)).accept(eq("SelectionEvent"),
@@ -175,7 +174,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REMOVE.toString(), ROWKEYS_1);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REMOVE.toString(), ROWKEYS_1);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -195,8 +194,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("projectId", "workflowId", "nodeId", REPLACE.toString(),
-            ROWKEYS_2);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REPLACE.toString(), ROWKEYS_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());

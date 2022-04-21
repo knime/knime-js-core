@@ -51,6 +51,7 @@ package org.knime.core.wizard.rpc;
 import java.util.List;
 
 import org.knime.core.webui.node.view.NodeView;
+import org.knime.core.webui.node.view.selection.TextSelectionTranslationService;
 
 /**
  * {@link NodeView}s for the new web-ui assume a certain backend to be available when opened from the desktop
@@ -81,8 +82,8 @@ public interface NodeService {
      * @param request the request
      * @return the data service response
      */
-    String callNodeDataService(String projectId, String workflowId, String nodeId, String extensionType, String serviceType,
-        String request);
+    String callNodeDataService(String projectId, String workflowId, String nodeId, String extensionType,
+        String serviceType, String request);
 
     /**
      * Updates the selected data points as specified by the 'mode' and identified by their row keys. Unselects any other
@@ -92,16 +93,19 @@ public interface NodeService {
      * @param workflowId
      * @param nodeId
      * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
-     * @param rowKeys the keys affected by the data point selection modification
+     * @param selection a string that can be {@link TextSelectionTranslationService translated} to the keys affected by
+     *            the data point selection modification
+     *
+     * @since 4.6
      */
     void updateDataPointSelection(String projectId, String workflowId, String nodeId, String mode,
-        List<String> rowKeys);
+        final String selection);
 
     /**
      * Changes the node state of multiple nodes represented by a list of node-ids.
      *
      * @param projectId ID of the workflow-project.
-     * @param workflowId The ID of a worklow which has the same format as a node-id.
+     * @param workflowId The ID of a workflow which has the same format as a node-id.
      * @param nodeIds The list of node ids of the nodes to be changed. All ids must reference nodes on the same workflow
      *            level. If no node ids are given the state of the parent workflow (i.e. the one referenced by
      *            workflow-id) is changed which is equivalent to change the states of all contained nodes.

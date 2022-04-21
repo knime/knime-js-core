@@ -119,14 +119,22 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
-        final String mode, final List<String> rowKeys) {
+        final String mode, final String selection) {
+        try {
+            var rowKeys = NodeViewManager.getInstance()
+                .callTextSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
+            updateDataPointSelection(nodeIdString, mode, rowKeys);
+        } catch (IOException e) {
+            NodeLogger.getLogger(getClass()).error(e);
+        }
+    }
+
+    void updateDataPointSelection(final String nodeIdString, final String mode, final List<String> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        var nc = m_getNode.apply(nodeIdString);
-        SelectionEventSource.processSelectionEvent(nc, selectionEventMode, true, rowKeys);
+        SelectionEventSource.processSelectionEvent(m_getNode.apply(nodeIdString), selectionEventMode, true, rowKeys);
     }
 
     @Override
-    @SuppressWarnings("java:S4274")
     public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
         final String action) {
         var nc = m_getNode.apply("");
