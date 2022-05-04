@@ -83,7 +83,7 @@ import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
-import org.knime.core.node.workflow.WorkflowAnnotation;
+import org.knime.core.node.workflow.WorkflowAnnotationID;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
 import org.knime.gateway.impl.service.events.SelectionEvent;
@@ -150,7 +150,7 @@ public class DefaultNodeServiceTest {
         NodeID n2 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 0)).getID();
         m_wfm.addConnection(n1, 1, n2, 1);
 
-        NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotation[0], "component")
+        NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotationID[0], "component")
             .getCollapsedMetanodeID();
         m_wfm.convertMetaNodeToSubNode(componentId);
 
