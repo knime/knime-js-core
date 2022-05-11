@@ -19,4 +19,3 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Automatic-Module-Name: org.knime.core.wizard
-Import-Package: org.w3c.dom.events;version="3.0.0"

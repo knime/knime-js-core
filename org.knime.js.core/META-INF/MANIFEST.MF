@@ -47,4 +47,3 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
 Automatic-Module-Name: org.knime.js.core
-Import-Package: org.w3c.dom.events;version="3.0.0"
