@@ -420,7 +420,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             try {
                 ((SubnodeViewableModel)model).createPageAndValue(nnc -> NodeViewEnt.create(nnc,
                     () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
-                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getKeys)
+                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
                         .orElse(Collections.emptyList())));
             } catch (IOException e) {
                 // should never happen

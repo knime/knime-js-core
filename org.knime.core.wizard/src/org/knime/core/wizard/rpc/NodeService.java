@@ -51,7 +51,7 @@ package org.knime.core.wizard.rpc;
 import java.util.List;
 
 import org.knime.core.webui.node.view.NodeView;
-import org.knime.core.webui.node.view.selection.TextSelectionTranslationService;
+import org.knime.core.webui.node.view.selection.SelectionTranslationService;
 
 /**
  * {@link NodeView}s for the new web-ui assume a certain backend to be available when opened from the desktop
@@ -93,13 +93,13 @@ public interface NodeService {
      * @param workflowId
      * @param nodeId
      * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
-     * @param selection a string that can be {@link TextSelectionTranslationService translated} to the keys affected by
-     *            the data point selection modification
+     * @param selection a list of strings that can be {@link SelectionTranslationService translated} to the row keys
+     *            affected by the data point selection modification
      *
      * @since 4.6
      */
     void updateDataPointSelection(String projectId, String workflowId, String nodeId, String mode,
-        final String selection);
+        final List<String> selection);
 
     /**
      * Changes the node state of multiple nodes represented by a list of node-ids.

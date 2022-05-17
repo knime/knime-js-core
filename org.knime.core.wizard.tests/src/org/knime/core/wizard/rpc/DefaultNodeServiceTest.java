@@ -66,11 +66,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -100,11 +98,11 @@ public class DefaultNodeServiceTest {
 
     private static final String WORKFLOW_NAME = "workflow";
 
-    private static final List<String> ROWKEYS_1 = List.of("Row01");
+    private static final Set<RowKey> ROWKEYS_1 = Set.of(new RowKey("Row01"));
 
-    private static final List<String> ROWKEYS_2 = List.of("Row02");
+    private static final Set<RowKey> ROWKEYS_2 = Set.of(new RowKey("Row02"));
 
-    private static final List<String> ROWKEYS_1_2 = List.of("Row01", "Row02");
+    private static final Set<RowKey> ROWKEYS_1_2 = Set.of(new RowKey("Row01"), new RowKey("Row02"));
 
     private WorkflowManager m_wfm;
 
@@ -134,13 +132,13 @@ public class DefaultNodeServiceTest {
             ROWKEYS_1_2);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_1_2))));
+            verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(ROWKEYS_1_2)));
             verify(listenerMock, never()).unHiLite(any());
             verify(listenerMock, never()).unHiLiteAll(any());
             verify(listenerMock, never()).replaceHiLite(any());
         });
 
-        assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_1_2));
+        assertEquals(m_hlh.getHiLitKeys(), ROWKEYS_1_2);
         m_hlh.fireClearHiLiteEvent();
     }
 
@@ -172,18 +170,18 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
 
         m_hlh.addHiLiteListener(listenerMock);
-        m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1_2));
+        m_hlh.fireHiLiteEvent(ROWKEYS_1_2);
 
         new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REMOVE.toString(), ROWKEYS_1);
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
-            verify(listenerMock, times(1)).unHiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_1))));
+            verify(listenerMock, times(1)).unHiLite(argThat(ke -> ke.keys().equals(ROWKEYS_1)));
             verify(listenerMock, never()).unHiLiteAll(any());
             verify(listenerMock, never()).replaceHiLite(any());
         });
 
-        assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
+        assertEquals(m_hlh.getHiLitKeys(), ROWKEYS_2);
         m_hlh.fireClearHiLiteEvent();
     }
 
@@ -192,7 +190,7 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
 
         m_hlh.addHiLiteListener(listenerMock);
-        m_hlh.fireHiLiteEvent(stringListToRowKeySet(ROWKEYS_1));
+        m_hlh.fireHiLiteEvent(ROWKEYS_1);
 
         new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REPLACE.toString(), ROWKEYS_2);
 
@@ -201,10 +199,10 @@ public class DefaultNodeServiceTest {
             verify(listenerMock, never()).unHiLite(any());
             verify(listenerMock, never()).unHiLiteAll(any());
             verify(listenerMock, times(1))
-                .replaceHiLite(argThat(ke -> ke.keys().equals(stringListToRowKeySet(ROWKEYS_2))));
+                .replaceHiLite(argThat(ke -> ke.keys().equals(ROWKEYS_2)));
         });
 
-        assertEquals(m_hlh.getHiLitKeys(), stringListToRowKeySet(ROWKEYS_2));
+        assertEquals(m_hlh.getHiLitKeys(), ROWKEYS_2);
         m_hlh.fireClearHiLiteEvent();
     }
 
@@ -217,12 +215,8 @@ public class DefaultNodeServiceTest {
             .untilAsserted(() -> assertThat(nnc.getNodeContainerState().isExecuted(), is(true)));
     }
 
-    private static Set<RowKey> stringListToRowKeySet(final List<String> keys) {
-        return keys.stream().map(RowKey::new).collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     private static boolean verifySelectionEvent(final SelectionEvent se, final String workflowId, final String nodeId) {
-        return se.getKeys().equals(ROWKEYS_1_2) && se.getMode() == SelectionEventMode.ADD
+        return se.getSelection().equals(ROWKEYS_1_2) && se.getMode() == SelectionEventMode.ADD
             && se.getNodeId().equals(nodeId) && se.getWorkflowId().equals(workflowId)
             && se.getProjectId().startsWith(WORKFLOW_NAME);
     }

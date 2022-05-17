@@ -50,8 +50,10 @@ package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
+import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
@@ -119,17 +121,17 @@ public class DefaultNodeService implements NodeService {
 
     @Override
     public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
-        final String mode, final String selection) {
+        final String mode, final List<String> selection) {
         try {
             var rowKeys = NodeViewManager.getInstance()
-                .callTextSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
+                .callSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
             updateDataPointSelection(nodeIdString, mode, rowKeys);
         } catch (IOException e) {
             NodeLogger.getLogger(getClass()).error(e);
         }
     }
 
-    void updateDataPointSelection(final String nodeIdString, final String mode, final List<String> rowKeys) {
+    void updateDataPointSelection(final String nodeIdString, final String mode, final Set<RowKey> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
         SelectionEventSource.processSelectionEvent(m_getNode.apply(nodeIdString), selectionEventMode, true, rowKeys);
     }
