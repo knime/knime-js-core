@@ -66,9 +66,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.junit.After;
 import org.junit.Before;
@@ -98,11 +100,15 @@ public class DefaultNodeServiceTest {
 
     private static final String WORKFLOW_NAME = "workflow";
 
-    private static final Set<RowKey> ROWKEYS_1 = Set.of(new RowKey("Row01"));
+    private static Set<RowKey> createSet(final RowKey... rowKeys) {
+        return Arrays.stream(rowKeys).collect(Collectors.toSet());
+    }
 
-    private static final Set<RowKey> ROWKEYS_2 = Set.of(new RowKey("Row02"));
+    private static final Set<RowKey> ROWKEYS_1 = createSet(new RowKey("Row01"));
 
-    private static final Set<RowKey> ROWKEYS_1_2 = Set.of(new RowKey("Row01"), new RowKey("Row02"));
+    private static final Set<RowKey> ROWKEYS_2 = createSet(new RowKey("Row02"));
+
+    private static final Set<RowKey> ROWKEYS_1_2 = createSet(new RowKey("Row01"), new RowKey("Row02"));
 
     private WorkflowManager m_wfm;
 
@@ -216,9 +222,9 @@ public class DefaultNodeServiceTest {
     }
 
     private static boolean verifySelectionEvent(final SelectionEvent se, final String workflowId, final String nodeId) {
-        return se.getSelection().equals(ROWKEYS_1_2) && se.getMode() == SelectionEventMode.ADD
-            && se.getNodeId().equals(nodeId) && se.getWorkflowId().equals(workflowId)
-            && se.getProjectId().startsWith(WORKFLOW_NAME);
+        return se.getSelection().equals(ROWKEYS_1_2.stream().map(RowKey::toString).collect(Collectors.toList()))
+            && se.getMode() == SelectionEventMode.ADD && se.getNodeId().equals(nodeId)
+            && se.getWorkflowId().equals(workflowId) && se.getProjectId().startsWith(WORKFLOW_NAME);
     }
 
     private static void setupSelectionEventSource(final BiConsumer<String, SelectionEvent> selectionEventConsumer,
