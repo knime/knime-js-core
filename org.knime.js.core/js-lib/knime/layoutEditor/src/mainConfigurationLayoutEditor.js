@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 
 import App from './components/AppConfigurationLayoutEditor';
 import * as storeConfig from './store/configurationLayoutEditor';
-import showWarning from './util/showWarning';
+
 
 Vue.config.productionTip = false;
 Vue.use(Vuex);
@@ -49,11 +49,5 @@ const app = new Vue({
 
 // wait until DOM is ready because AP will load this app in the HTML head
 document.addEventListener('DOMContentLoaded', () => {
-    if (typeof window.pushLayout === 'function') {
         app.$mount(document.body.appendChild(document.createElement('div')));
-    } else {
-        // If the function is not registered something went wrong. Show an error to the user with the link to the FAQ
-        // Probably related to https://knime-com.atlassian.net/browse/AP-16763
-        showWarning();
-    }
 });
