@@ -58,6 +58,7 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
+import org.knime.core.webui.node.NNCWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
@@ -92,7 +93,7 @@ public class DefaultNodeService implements NodeService {
     @Override
     public String callNodeDataService(final String projectId, final String workflowId, final String nodeID,
         final String extensionType, final String serviceType, final String request) {
-        final DataServiceManager dataServiceManager;
+        final DataServiceManager<NNCWrapper> dataServiceManager;
         if ("view".equals(extensionType)) {
             dataServiceManager = NodeViewManager.getInstance();
         } else if ("dialog".equals(extensionType)) {
@@ -102,13 +103,14 @@ public class DefaultNodeService implements NodeService {
         }
 
         var nc = m_getNode.apply(nodeID);
+        var ncWrapper = NNCWrapper.of(nc);
         if ("initial_data".equals(serviceType)) {
-            return dataServiceManager.callTextInitialDataService(nc);
+            return dataServiceManager.callTextInitialDataService(ncWrapper);
         } else if ("data".equals(serviceType)) {
-            return dataServiceManager.callTextDataService(nc, request);
+            return dataServiceManager.callTextDataService(ncWrapper, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                dataServiceManager.callTextApplyDataService(nc, request);
+                dataServiceManager.callTextApplyDataService(ncWrapper, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();
