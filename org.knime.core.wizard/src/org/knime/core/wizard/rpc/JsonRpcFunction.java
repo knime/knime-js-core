@@ -56,7 +56,6 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.core.wizard.SubnodeViewableModel;
@@ -88,10 +87,12 @@ public class JsonRpcFunction {
      * Initializes the json-rpc function for composite views.
      *
      * @param snc the component with the composite view
-     * @param model
+     * @param model The {@link SubnodeViewableModel}
+     * @param isDialog Show the dialog or the composite view of the component
+     * @since 4.7
      */
-    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model) {
-        m_jsonRpcServer = initJsonRpcServer(snc);
+    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model, final boolean isDialog) {
+        m_jsonRpcServer = initJsonRpcServer(new DefaultNodeService(snc, isDialog));
         m_jsonRpcServer.addService(ReexecutionService.class, model.createReexecutionService());
     }
 
@@ -101,12 +102,12 @@ public class JsonRpcFunction {
      * @param nnc
      */
     public JsonRpcFunction(final NativeNodeContainer nnc) {
-        m_jsonRpcServer = initJsonRpcServer(nnc);
+        m_jsonRpcServer = initJsonRpcServer(new DefaultNodeService(nnc));
     }
 
-    private static JsonRpcServer initJsonRpcServer(final SingleNodeContainer nc) {
+    private static JsonRpcServer initJsonRpcServer(final DefaultNodeService serviceInstance) {
         var jsonRpcServer = new JsonRpcServer();
-        jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nc));
+        jsonRpcServer.addService(NodeService.class, serviceInstance);
         return jsonRpcServer;
     }
 

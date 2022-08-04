@@ -57,8 +57,9 @@ import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
-import org.knime.core.webui.node.NNCWrapper;
+import org.knime.core.webui.node.SNCWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
@@ -73,12 +74,29 @@ import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEvent
  */
 public class DefaultNodeService implements NodeService {
 
-    private final Function<String, NativeNodeContainer> m_getNode;
+    private final Function<String, SingleNodeContainer> m_getNode;
 
-    DefaultNodeService(final SingleNodeContainer snc) {
-        if (snc instanceof NativeNodeContainer) {
-            m_getNode = id -> (NativeNodeContainer)snc;
+    /**
+     * Initialize the {@link DefaultNodeService} for a {@link NativeNodeContainer}.
+     *
+     * @param nnc The {@link NativeNodeContainer}
+     */
+    DefaultNodeService(final NativeNodeContainer nnc) {
+        m_getNode = id -> nnc;
+    }
+
+    /**
+     * Initialize the {@link DefaultNodeService} for either the dialog or the composite view of a
+     * {@link SubNodeContainer}
+     *
+     * @param snc The {@link SubNodeContainer} also known as component
+     * @param isDialog whether to initialise the node service for a component dialog or its composite view
+     */
+    DefaultNodeService(final SubNodeContainer snc, final boolean isDialog) {
+        if (isDialog) {
+            m_getNode = id -> snc;
         } else {
+            // initialize 'getNode'-function for a component composite view
             var projectWfm = snc.getParent().getProjectWFM();
             m_getNode = id -> {
                 var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
@@ -90,10 +108,12 @@ public class DefaultNodeService implements NodeService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public String callNodeDataService(final String projectId, final String workflowId, final String nodeID,
         final String extensionType, final String serviceType, final String request) {
-        final DataServiceManager<NNCWrapper> dataServiceManager;
+        @SuppressWarnings("rawtypes")
+        final DataServiceManager dataServiceManager;
         if ("view".equals(extensionType)) {
             dataServiceManager = NodeViewManager.getInstance();
         } else if ("dialog".equals(extensionType)) {
@@ -103,7 +123,7 @@ public class DefaultNodeService implements NodeService {
         }
 
         var nc = m_getNode.apply(nodeID);
-        var ncWrapper = NNCWrapper.of(nc);
+        var ncWrapper = SNCWrapper.of(nc);
         if ("initial_data".equals(serviceType)) {
             return dataServiceManager.callTextInitialDataService(ncWrapper);
         } else if ("data".equals(serviceType)) {
@@ -125,8 +145,8 @@ public class DefaultNodeService implements NodeService {
     public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
         final String mode, final List<String> selection) {
         try {
-            var rowKeys = NodeViewManager.getInstance()
-                .callSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
+            var rowKeys =
+                NodeViewManager.getInstance().callSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
             updateDataPointSelection(nodeIdString, mode, rowKeys);
         } catch (IOException e) {
             NodeLogger.getLogger(getClass()).error(e);
@@ -135,7 +155,8 @@ public class DefaultNodeService implements NodeService {
 
     void updateDataPointSelection(final String nodeIdString, final String mode, final Set<RowKey> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        SelectionEventSource.processSelectionEvent(m_getNode.apply(nodeIdString), selectionEventMode, true, rowKeys);
+        SelectionEventSource.processSelectionEvent((NativeNodeContainer)m_getNode.apply(nodeIdString),
+            selectionEventMode, true, rowKeys);
     }
 
     @Override
