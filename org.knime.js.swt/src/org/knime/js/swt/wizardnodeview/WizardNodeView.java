@@ -577,11 +577,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             }
 
             @Override
-            public String evaluate(final String evalCode) {
-                return (String)browser.evaluate(evalCode);
-            }
-
-            @Override
             public boolean isDisposed() {
                 return browser.isDisposed();
             }
@@ -1041,8 +1036,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         void setText(String html);
 
         Shell getShell();
-
-        String evaluate(String evalCode);
 
         boolean isDisposed();
 
