@@ -59,7 +59,7 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
-import org.knime.core.webui.node.SNCWrapper;
+import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
@@ -123,7 +123,7 @@ public class DefaultNodeService implements NodeService {
         }
 
         var nc = m_getNode.apply(nodeID);
-        var ncWrapper = SNCWrapper.of(nc);
+        var ncWrapper = NodeWrapper.of(nc);
         if ("initial_data".equals(serviceType)) {
             return dataServiceManager.callTextInitialDataService(ncWrapper);
         } else if ("data".equals(serviceType)) {

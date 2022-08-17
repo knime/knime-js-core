@@ -58,7 +58,6 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
-import org.knime.core.wizard.SubnodeViewableModel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,13 +86,15 @@ public class JsonRpcFunction {
      * Initializes the json-rpc function for composite views.
      *
      * @param snc the component with the composite view
-     * @param model The {@link SubnodeViewableModel}
+     * @param reexecutionService TODO
      * @param isDialog Show the dialog or the composite view of the component
      * @since 4.7
      */
-    public JsonRpcFunction(final SubNodeContainer snc, final SubnodeViewableModel model, final boolean isDialog) {
+    public JsonRpcFunction(final SubNodeContainer snc, final ReexecutionService reexecutionService, final boolean isDialog) {
         m_jsonRpcServer = initJsonRpcServer(new DefaultNodeService(snc, isDialog));
-        m_jsonRpcServer.addService(ReexecutionService.class, model.createReexecutionService());
+        if (reexecutionService != null) {
+            m_jsonRpcServer.addService(ReexecutionService.class, reexecutionService);
+        }
     }
 
     /**

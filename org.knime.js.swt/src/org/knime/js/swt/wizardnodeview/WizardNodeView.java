@@ -95,7 +95,6 @@ import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
-import org.knime.core.webui.node.NNCWrapper;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
@@ -419,7 +418,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
         if (model instanceof SubnodeViewableModel) {
             try {
-                ((SubnodeViewableModel)model).createPageAndValue(nnc -> NodeViewEnt.create(NNCWrapper.of(nnc),
+                ((SubnodeViewableModel)model).createPageAndValue(nnc -> NodeViewEnt.create(nnc,
                     () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
                         .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
                         .orElse(Collections.emptyList())));
@@ -957,7 +956,8 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         RpcFunction(final BrowserWrapper browser, final SingleNodeContainer nc) {
             super(browser, JsonRpcFunction.FUNCTION_NAME);
             if (nc instanceof SubNodeContainer) {
-                m_function = new JsonRpcFunction((SubNodeContainer)nc, (SubnodeViewableModel)getViewableModel(), false);
+                m_function = new JsonRpcFunction((SubNodeContainer)nc,
+                    ((SubnodeViewableModel)getViewableModel()).createReexecutionService(), false);
             } else {
                 m_function = new JsonRpcFunction((NativeNodeContainer)nc);
             }
