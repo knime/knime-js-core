@@ -161,7 +161,7 @@ public class DefaultNodeServiceTest {
         @SuppressWarnings("unchecked")
         final BiConsumer<String, SelectionEvent> selectionEventConsumer = mock(BiConsumer.class);
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
-        var nodeService = new DefaultNodeService(component);
+        var nodeService = new DefaultNodeService(component, false);
         setupSelectionEventSource(selectionEventConsumer, component);
         nodeService.updateDataPointSelection("root:4:0:2", SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
 
