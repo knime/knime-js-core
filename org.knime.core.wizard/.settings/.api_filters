@@ -1,64 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.core.wizard" version="2">
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.core.wizard.debug.DebugInfo">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.debug.DebugInfo"/>
-                <message_argument value="org.knime.core.wizard_4.6.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="META-INF/MANIFEST.MF" type="org.knime.core.wizard.rpc.events.SelectionEventSource">
-        <filter id="305324134">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.rpc.events.SelectionEventSource"/>
-                <message_argument value="org.knime.core.wizard_4.6.0"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/core/wizard/AbstractPageManager.java" type="org.knime.core.wizard.AbstractPageManager">
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.AbstractPageManager"/>
-                <message_argument value="createWizardPageInternal(WizardPage, HiLiteListenerRegistry)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/core/wizard/CompositeViewPageManager.java" type="org.knime.core.wizard.CompositeViewPageManager">
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.CompositeViewPageManager"/>
-                <message_argument value="createWizardPage(NodeID, HiLiteListenerRegistry)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/core/wizard/SubnodeViewableModel.java" type="org.knime.core.wizard.SubnodeViewableModel">
+    <resource path="src/org/knime/core/wizard/rpc/JsonRpcFunction.java" type="org.knime.core.wizard.rpc.JsonRpcFunction">
         <filter id="338722907">
             <message_arguments>
-                <message_argument value="org.knime.core.wizard.SubnodeViewableModel"/>
-                <message_argument value="SubnodeViewableModel(SubNodeContainer, String, boolean, HiLiteListenerRegistry)"/>
-            </message_arguments>
-        </filter>
-        <filter id="338792546">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.SubnodeViewableModel"/>
-                <message_argument value="createPageAndValue(HiLiteListenerRegistry)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/core/wizard/rpc/JsonRpcFunction.java" type="org.knime.core.wizard.rpc.JsonRpcFunction">
-        <filter id="338792546">
-            <message_arguments>
                 <message_argument value="org.knime.core.wizard.rpc.JsonRpcFunction"/>
-                <message_argument value="createJsonRpcNotificationCall(SelectionEventSource.SelectionEvent)"/>
-            </message_arguments>
-        </filter>
-    </resource>
-    <resource path="src/org/knime/core/wizard/rpc/NodeService.java" type="org.knime.core.wizard.rpc.NodeService">
-        <filter id="403804204">
-            <message_arguments>
-                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
-                <message_argument value="changeNodeStates(String, String, List&lt;String&gt;, String)"/>
+                <message_argument value="JsonRpcFunction(SubNodeContainer, SubnodeViewableModel)"/>
             </message_arguments>
         </filter>
     </resource>
