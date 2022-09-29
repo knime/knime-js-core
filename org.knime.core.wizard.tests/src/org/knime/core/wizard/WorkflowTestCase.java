@@ -75,9 +75,11 @@ import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.NodeStateEvent;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.node.workflow.WorkflowLoadHelper;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.node.workflow.WorkflowPersistor.LoadResultEntry.LoadResultEntryType;
 import org.knime.core.node.workflow.WorkflowPersistor.WorkflowLoadResult;
+import org.knime.core.node.workflow.contextv2.WorkflowContextV2;
 
 /**
  *
@@ -111,13 +113,14 @@ public abstract class WorkflowTestCase {
     }
 
     protected WorkflowLoadResult loadWorkflow(final File workflowDir, final ExecutionMonitor exec,
-        final DataContainerSettings settings) throws Exception {
-        return loadWorkflow(workflowDir, exec, new ConfigurableWorkflowLoadHelper(workflowDir, settings));
+            final DataContainerSettings settings) throws Exception {
+        final WorkflowContextV2 context = WorkflowContextV2.forTemporaryWorkflow(workflowDir.toPath(), null);
+        return loadWorkflow(workflowDir, exec, new WorkflowLoadHelper(context, settings));
     }
 
 
     protected WorkflowLoadResult loadWorkflow(final File workflowDir, final ExecutionMonitor exec,
-        final ConfigurableWorkflowLoadHelper loadHelper) throws Exception {
+            final WorkflowLoadHelper loadHelper) throws Exception {
         WorkflowLoadResult loadResult = WorkflowManager.ROOT.load(workflowDir, exec, loadHelper, false);
         WorkflowManager m = loadResult.getWorkflowManager();
         if (m == null) {
