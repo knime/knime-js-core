@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -230,8 +231,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         var snc = getNodeContainer();
+        var eventConsumer = initializeJsonRpcJavaBrowserCommunication(createJsonRpcFunction(snc, getViewableModel()));
         if (snc != null) {
-            m_selectionEventSource = createSelectionEventSource(m_browserWrapper);
+            m_selectionEventSource = new SelectionEventSource(eventConsumer);
         }
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
@@ -453,6 +455,37 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         });
     }
 
+    /**
+     * Initializes the js-java communication (i.e. between the browser and java) through json-rpc messages.
+     *
+     * To be overwritten by subclasses to implement alternative communication mechanisms.
+     *
+     * @param jsonRpcFunction processes the jsonrpc messages and returns the respective response
+     * @return an event consumer that is used to dispatch events to the browser/js
+     * @since 4.7
+     */
+    protected BiConsumer<String, Object>
+        initializeJsonRpcJavaBrowserCommunication(final JsonRpcFunction jsonRpcFunction) {
+        var snc = getNodeContainer();
+        if (snc != null) {
+            m_rpcCallback = new RpcFunction(m_browserWrapper, jsonRpcFunction);
+        }
+        return (s, e) -> {
+            var jsCall = JsonRpcFunction.createJsonRpcNotificationCall(s, e);
+            Display.getDefault().syncExec(() -> m_browserWrapper.execute(jsCall));
+        };
+    }
+
+    private static JsonRpcFunction createJsonRpcFunction(final SingleNodeContainer snc,
+        final ViewableModel viewableModel) {
+        if (snc instanceof SubNodeContainer) {
+            return new JsonRpcFunction((SubNodeContainer)snc,
+                ((SubnodeViewableModel)viewableModel).createReexecutionService(), false);
+        } else {
+            return new JsonRpcFunction((NativeNodeContainer)snc);
+        }
+    }
+
     private void initBrowserFunctions() {
         m_viewRequestCallback = new ViewRequestFunction(m_browserWrapper, "knimeViewRequest");
         m_updateRequestStatusCallback = new UpdateRequestStatusFunction(m_browserWrapper, "knimeUpdateRequestStatus");
@@ -462,10 +495,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             "validateCurrentValueInView", VIEW_VALID, Boolean.FALSE);
         m_retrieveCurrentValueFromViewCallback = new AsyncEvalCallbackFunction<String>(m_browserWrapper,
             "retrieveCurrentValueFromView", VIEW_VALUE, EMPTY_OBJECT_STRING);
-        var snc = getNodeContainer();
-        if (snc != null) {
-            m_rpcCallback = new RpcFunction(m_browserWrapper, snc);
-        }
         m_additionalCallbacks = registerAndGetAdditionalBrowserFunctions(m_browserWrapper);
     }
 
@@ -476,18 +505,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      */
     protected List<BrowserFunctionWrapper> registerAndGetAdditionalBrowserFunctions(final BrowserWrapper browser) {
         return Collections.emptyList();
-    }
-
-    /*
-    * Creates a selection event source (i.e. for hiliting). The emitted selection (hiliting)-events
-    * are passed to the frontend by executing a piece of js-code.
-    */
-    private static SelectionEventSource createSelectionEventSource(final BrowserWrapper browserWrapper) {
-        return new SelectionEventSource((s, e) -> {
-            var jsCall =
-                JsonRpcFunction.createJsonRpcNotificationCall(s, e);
-            Display.getDefault().syncExec(() -> browserWrapper.execute(jsCall));
-        });
     }
 
     class DropdownSelectionListener extends SelectionAdapter {
@@ -953,14 +970,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         private final JsonRpcFunction m_function;
 
-        RpcFunction(final BrowserWrapper browser, final SingleNodeContainer nc) {
+        RpcFunction(final BrowserWrapper browser, final JsonRpcFunction function) {
             super(browser, JsonRpcFunction.FUNCTION_NAME);
-            if (nc instanceof SubNodeContainer) {
-                m_function = new JsonRpcFunction((SubNodeContainer)nc,
-                    ((SubnodeViewableModel)getViewableModel()).createReexecutionService(), false);
-            } else {
-                m_function = new JsonRpcFunction((NativeNodeContainer)nc);
-            }
+            m_function = function;
         }
 
         @Override
@@ -1058,7 +1070,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         private BrowserFunctionWrapper m_browserFunctionWrapper;
 
         public BrowserFunctionInternal(final BrowserWrapper browserWrapper, final String name) {
-            m_browserFunctionWrapper = browserWrapper.registerBrowserFunction(name, o -> function(o));
+            m_browserFunctionWrapper = browserWrapper.registerBrowserFunction(name, this::function);
         }
 
         public boolean isDisposed() {
