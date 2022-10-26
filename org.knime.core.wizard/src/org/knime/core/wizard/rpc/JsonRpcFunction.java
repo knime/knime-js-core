@@ -52,6 +52,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
@@ -116,6 +117,8 @@ public class JsonRpcFunction {
      * Helper to create a jsonrpc-notification call from a (json-serializable) event to be run as a JS script in the
      * browser.
      *
+     * NOTE: usually only used in conjunction with the SWT browser!
+     *
      * @param eventName
      * @param event
      * @return the js-call or {@code null} if a problem occurred
@@ -123,7 +126,6 @@ public class JsonRpcFunction {
      * @since 4.6
      */
     public static String createJsonRpcNotificationCall(final String eventName, final Object event) {
-        // code copied from org.knime.ui.java.browser.KnimeBrowserView
         final var jsonrpcObjectNode = MAPPER.createObjectNode();
         final var paramsArrayNode = jsonrpcObjectNode.arrayNode();
         paramsArrayNode.addPOJO(event);
@@ -135,6 +137,31 @@ public class JsonRpcFunction {
             NodeLogger.getLogger(DefaultNodeService.class)
                 .error("Problem creating a json-rpc notification in order to send an event", ex);
             return null;
+        }
+    }
+
+    /**
+     * Helper to create a jsonrpc-notification from a (json-serializable) event to be sent to the browser.
+     *
+     * @param name
+     * @param event
+     * @return the js-call or {@code null} if a problem occurred
+     *
+     * @since 4.7
+     */
+    public static String createJsonRpcNotification(final String name, final Object event) {
+        // code copied from org.knime.ui.java.browser.KnimeBrowserView
+
+        // wrap event into a jsonrpc notification (method == event-name) and serialize
+        var jsonrpc = MAPPER.createObjectNode();
+        var params = jsonrpc.arrayNode();
+        params.addPOJO(event);
+        try {
+            var string =
+                MAPPER.writeValueAsString(jsonrpc.put(FUNCTION_NAME, "2.0").put("method", name).set("params", params));
+            return Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
+        } catch (JsonProcessingException ex) {
+            throw new IllegalStateException("Problem creating a json-rpc notification in order to send an event", ex);
         }
     }
 
