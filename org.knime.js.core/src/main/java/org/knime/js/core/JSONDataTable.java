@@ -169,6 +169,7 @@ public class JSONDataTable {
     private boolean m_extractRowColors = true /* default for backward compatibility */;
     private boolean m_extractRowSizes = false;
     private boolean m_calculateDataHash = false;
+    private boolean m_useIncomingNominalTableDomain;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -292,6 +293,10 @@ public class JSONDataTable {
             DataColumnSpec columnSpec = spec.getColumnSpec(includeColIndices.get(c));
             if (columnSpec.getType().isCompatible(NominalValue.class)) {
                 possValues.set(c, new LinkedHashSet<Object>());
+                if (m_useIncomingNominalTableDomain) {
+                    possValues.get(c).addAll(columnSpec.getDomain().getValues().stream()
+                        .map(JSONDataTable::getJSONCellValue).collect(Collectors.toSet()));
+                }
             }
             if (columnSpec.getFilterHandler().isPresent()) {
                 filterIds[c] = columnSpec.getFilterHandler().get().getModel().getFilterUUID().toString();
@@ -397,11 +402,13 @@ public class JSONDataTable {
                                 maxJSONValues[c] = getJSONCellValue(cell);
                             }
                         }
-                        // add it to the possible values if we record them for this col
-                        LinkedHashSet<Object> possVals = possValues.get(c);
-                        if (possVals != null) {
-                            // non-string cols have a null list and will be skipped here
-                            possVals.add(getJSONCellValue(cell));
+                        if (!m_useIncomingNominalTableDomain) {
+                            // add it to the possible values if we record them for this col
+                            LinkedHashSet<Object> possVals = possValues.get(c);
+                            if (possVals != null) {
+                                // non-string cols have a null list and will be skipped here
+                                possVals.add(getJSONCellValue(cell));
+                            }
                         }
                     }
 
@@ -1111,6 +1118,7 @@ public class JSONDataTable {
         private Boolean m_extractRowColors = null;
         private Boolean m_extractRowSizes = null;
         private Boolean m_calculateDataHash = null;
+        private Boolean m_useIncomingNominalTableDomain;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -1265,6 +1273,17 @@ public class JSONDataTable {
         }
 
         /**
+         *
+         * @param useIncomingNominalDomain True, if the spec of the incoming table should be used, false if
+         * the spec should be recalculated.
+         * @return This builder instance, which can be used for method chaining.
+         */
+        public Builder useIncomingNominalTableDomain(final boolean useIncomingNominalDomain) {
+            m_useIncomingNominalTableDomain = useIncomingNominalDomain;
+            return this;
+        }
+
+        /**
          * Builds a new JSONDataTable instance from the current configuration of this builder.
          *
          * @param exec an execution monitor for setting progress, may be null
@@ -1349,6 +1368,9 @@ public class JSONDataTable {
             }
             if (m_calculateDataHash != null) {
                 result.m_calculateDataHash = m_calculateDataHash;
+            }
+            if (m_useIncomingNominalTableDomain != null) {
+                result.m_useIncomingNominalTableDomain = m_useIncomingNominalTableDomain;
             }
             if (m_dataRows != null) {
                 result.buildJSONTableFromCache(m_dataRows, exec);
