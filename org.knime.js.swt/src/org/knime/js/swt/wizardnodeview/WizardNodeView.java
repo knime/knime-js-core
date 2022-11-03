@@ -231,10 +231,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_browserWrapper = createBrowserWrapper(m_shell);
         initBrowserFunctions();
         var snc = getNodeContainer();
-        var eventConsumer = initializeJsonRpcJavaBrowserCommunication(createJsonRpcFunction(snc, getViewableModel()));
-        if (snc != null) {
-            m_selectionEventSource = new SelectionEventSource(eventConsumer);
-        }
         m_browserWrapper.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
@@ -382,7 +378,15 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     File src;
                     if (hasData && (src = getViewSource()) != null && src.exists()) {
                         var url = "file://" + getViewSource().getAbsolutePath();
-                        onPageLoaded(() -> createInitScript(m_selectionEventSource));
+                        onPageLoaded(() -> {
+                            var snc = getNodeContainer();
+                            var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
+                                createJsonRpcFunction(snc, getViewableModel()));
+                            if (snc != null) {
+                                m_selectionEventSource = new SelectionEventSource(eventConsumer);
+                            }
+                            return createInitScript(m_selectionEventSource);
+                        });
                         m_browserWrapper.setUrl(url);
                         return;
                     }
