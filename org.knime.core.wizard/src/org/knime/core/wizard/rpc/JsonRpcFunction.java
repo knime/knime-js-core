@@ -52,7 +52,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
@@ -157,9 +156,8 @@ public class JsonRpcFunction {
         var params = jsonrpc.arrayNode();
         params.addPOJO(event);
         try {
-            var string =
-                MAPPER.writeValueAsString(jsonrpc.put(FUNCTION_NAME, "2.0").put("method", name).set("params", params));
-            return Base64.getEncoder().encodeToString(string.getBytes(StandardCharsets.UTF_8));
+            return MAPPER
+                .writeValueAsString(jsonrpc.put(FUNCTION_NAME, "2.0").put("method", name).set("params", params));
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("Problem creating a json-rpc notification in order to send an event", ex);
         }
