@@ -169,7 +169,7 @@ public class JSONDataTable {
     private boolean m_extractRowColors = true /* default for backward compatibility */;
     private boolean m_extractRowSizes = false;
     private boolean m_calculateDataHash = false;
-    private boolean m_useIncomingNominalTableDomain;
+    private boolean m_useIncomingTableDomain;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -291,11 +291,21 @@ public class JSONDataTable {
         boolean[] containsMissingValues = new boolean[numOfColumns];
         for (int c = 0; c < numOfColumns; c++) {
             DataColumnSpec columnSpec = spec.getColumnSpec(includeColIndices.get(c));
+            final var columnDomain = columnSpec.getDomain();
             if (columnSpec.getType().isCompatible(NominalValue.class)) {
                 possValues.set(c, new LinkedHashSet<Object>());
-                if (m_useIncomingNominalTableDomain) {
-                    possValues.get(c).addAll(columnSpec.getDomain().getValues().stream()
+                if (m_useIncomingTableDomain && columnDomain.hasValues()) {
+                    possValues.get(c).addAll(columnDomain.getValues().stream()
                         .map(JSONDataTable::getJSONCellValue).collect(Collectors.toSet()));
+                }
+            } else if (m_useIncomingTableDomain) {
+                if (columnDomain.hasLowerBound()) {
+                    minValues[c] = columnDomain.getLowerBound();
+                    minJSONValues[c] = getJSONCellValue(columnDomain.getLowerBound());
+                }
+                if (columnDomain.hasUpperBound()) {
+                    maxValues[c] = columnDomain.getUpperBound();
+                    maxJSONValues[c] = getJSONCellValue(columnDomain.getUpperBound());
                 }
             }
             if (columnSpec.getFilterHandler().isPresent()) {
@@ -378,7 +388,7 @@ public class JSONDataTable {
                     DataCell cell = row.getCell(col);
                     currentRow.getData()[c] = cellValue;
 
-                    if (cellValue != null) {
+                    if (cellValue != null && !m_useIncomingTableDomain) {
                         DataValueComparator comp =
                                 spec.getColumnSpec(col).getType().getComparator();
 
@@ -402,13 +412,11 @@ public class JSONDataTable {
                                 maxJSONValues[c] = getJSONCellValue(cell);
                             }
                         }
-                        if (!m_useIncomingNominalTableDomain) {
-                            // add it to the possible values if we record them for this col
-                            LinkedHashSet<Object> possVals = possValues.get(c);
-                            if (possVals != null) {
-                                // non-string cols have a null list and will be skipped here
-                                possVals.add(getJSONCellValue(cell));
-                            }
+                        // add it to the possible values if we record them for this col
+                        LinkedHashSet<Object> possVals = possValues.get(c);
+                        if (possVals != null) {
+                            // non-string cols have a null list and will be skipped here
+                            possVals.add(getJSONCellValue(cell));
                         }
                     }
 
@@ -1118,7 +1126,7 @@ public class JSONDataTable {
         private Boolean m_extractRowColors = null;
         private Boolean m_extractRowSizes = null;
         private Boolean m_calculateDataHash = null;
-        private Boolean m_useIncomingNominalTableDomain;
+        private Boolean m_useIncomingTableDomain;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -1274,12 +1282,12 @@ public class JSONDataTable {
 
         /**
          *
-         * @param useIncomingNominalDomain True, if the spec of the incoming table should be used, false if
+         * @param useIncomingDomain True, if the spec of the incoming table should be used, false if
          * the spec should be recalculated.
          * @return This builder instance, which can be used for method chaining.
          */
-        public Builder useIncomingNominalTableDomain(final boolean useIncomingNominalDomain) {
-            m_useIncomingNominalTableDomain = useIncomingNominalDomain;
+        public Builder useIncomingTableDomain(final boolean useIncomingDomain) {
+            m_useIncomingTableDomain = useIncomingDomain;
             return this;
         }
 
@@ -1369,8 +1377,8 @@ public class JSONDataTable {
             if (m_calculateDataHash != null) {
                 result.m_calculateDataHash = m_calculateDataHash;
             }
-            if (m_useIncomingNominalTableDomain != null) {
-                result.m_useIncomingNominalTableDomain = m_useIncomingNominalTableDomain;
+            if (m_useIncomingTableDomain != null) {
+                result.m_useIncomingTableDomain = m_useIncomingTableDomain;
             }
             if (m_dataRows != null) {
                 result.buildJSONTableFromCache(m_dataRows, exec);
