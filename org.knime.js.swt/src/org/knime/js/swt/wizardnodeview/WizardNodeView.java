@@ -90,12 +90,15 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.CSSModifiable;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContext;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NodeContainerUI;
+import org.knime.core.webui.node.NodeWrapper;
+import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
@@ -697,10 +700,23 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (getViewableModel() instanceof SubnodeViewableModel) {
             ((SubnodeViewableModel)getViewableModel()).discard();
         }
+
+        var nc = getNodeContainer();
         if (m_nodeStateChangeListener != null) {
-            getNodeContainer().removeNodeStateChangeListener(m_nodeStateChangeListener);
+            nc.removeNodeStateChangeListener(m_nodeStateChangeListener);
             m_nodeStateChangeListener = null;
         }
+
+        List<NativeNodeContainer> viewNodes;
+        if (nc instanceof NativeNodeContainer) {
+            viewNodes = Collections.singletonList((NativeNodeContainer)nc);
+        } else {
+            viewNodes = WizardPageUtil.getWizardPageNodes(((SubNodeContainer)nc).getWorkflowManager(), true);
+        }
+        var nvm = NodeViewManager.getInstance();
+        viewNodes.stream().filter(NodeViewManager::hasNodeView)
+            .forEach(nnc -> nvm.cleanUpDataServices(NodeWrapper.of(nnc)));
+
     }
 
      /**
