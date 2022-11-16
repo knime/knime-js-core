@@ -69,11 +69,15 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 import org.knime.core.node.workflow.WorkflowManager;
+import org.knime.core.webui.node.view.NodeView;
+import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.core.webui.node.view.PageFormat.AspectRatio;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
 import org.knime.js.core.layout.bs.JSONLayoutRow;
 import org.knime.js.core.layout.bs.JSONLayoutViewContent;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent.ResizeMethod;
 import org.knime.js.core.layout.bs.JSONNestedLayout;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -147,8 +151,9 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     }
 
     /**
-     * Creates the view content element for a given node. If the node implements {@link LayoutTemplateProvider}, the
-     * template is used, otherwise the generic defaults.
+     * Creates the view content element for a given node. If the node implements {@link LayoutTemplateProvider} or the
+     * node provides a {@link NodeView#getPageFormat()}, the node-specific values are being used, otherwise the generic
+     * defaults.
      *
      * @param suffix the node id suffix as used in the layout definition
      * @param viewNode the node to create the view content for
@@ -158,13 +163,25 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
     public static JSONLayoutViewContent getDefaultViewContentForNode(final NodeIDSuffix suffix,
         final NativeNodeContainer viewNode) {
         NodeID id = NodeID.fromString(suffix.toString());
-        JSONLayoutViewContent view = new JSONLayoutViewContent();
-        if (viewNode.getNodeModel() instanceof LayoutTemplateProvider) {
-            JSONLayoutViewContent layoutViewTemplate =
-                ((LayoutTemplateProvider)viewNode.getNodeModel()).getLayoutTemplate();
-            if (layoutViewTemplate != null) {
-                view = layoutViewTemplate;
-            }
+        final JSONLayoutViewContent view;
+        JSONLayoutViewContent layoutViewTemplate;
+        if (viewNode.getNodeModel() instanceof LayoutTemplateProvider
+            && (layoutViewTemplate = ((LayoutTemplateProvider)viewNode.getNodeModel()).getLayoutTemplate()) != null) {
+            view = layoutViewTemplate;
+        } else if (NodeViewManager.hasNodeView(viewNode)) {
+            var pageFormat = NodeViewManager.getInstance().getNodeView(viewNode).getDefaultPageFormat();
+            view = new JSONLayoutViewContent();
+            pageFormat.getAspectRatio().ifPresent(ar -> {
+                if (ar == AspectRatio.RATIO_4BY3) {
+                    view.setResizeMethod(ResizeMethod.ASPECT_RATIO_4by3);
+                    view.setAutoResize(false);
+                } else {
+                    view.setResizeMethod(ResizeMethod.VIEW_LOWEST_ELEMENT);
+                    view.setAutoResize(true);
+                }
+            });
+        } else {
+            view = new JSONLayoutViewContent();
         }
         view.setNodeID(Integer.toString(id.getIndex()));
         return view;
