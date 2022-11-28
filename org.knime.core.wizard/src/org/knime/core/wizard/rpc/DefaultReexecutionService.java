@@ -55,6 +55,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +63,7 @@ import java.util.stream.Stream;
 import org.knime.core.node.util.CheckUtils;
 import org.knime.core.node.web.ValidationError;
 import org.knime.core.node.wizard.page.WizardPageUtil;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
@@ -69,6 +71,7 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.util.Pair;
 import org.knime.core.wizard.CompositeViewPageManager;
+import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 
 import com.fasterxml.jackson.databind.util.RawValue;
@@ -96,15 +99,21 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private final Runnable m_onReexecutionEnd;
 
+    private final Function<NativeNodeContainer, NodeViewEnt> m_nodeViewEntCreator;
+
     /**
      * @param page
+     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
+     *            {@link NodeViewEnt#create(NativeNodeContainer)} is used
      * @param cvm
      * @param onReexecutionStart will be called whenever a re-execution is triggered, can be <code>null</code>
      * @param onReexecutionEnd will be called whenever a re-execution finishes, can be <code>null</code>
      */
-    public DefaultReexecutionService(final SingleNodeContainer page, final CompositeViewPageManager cvm,
+    public DefaultReexecutionService(final SingleNodeContainer page,
+        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator, final CompositeViewPageManager cvm,
         final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
         m_page = page;
+        m_nodeViewEntCreator = nodeViewEntCreator;
         m_cvm = cvm;
         m_onReexecutionStart = onReexecutionStart;
         m_onReexecutionEnd = onReexecutionEnd;
@@ -154,7 +163,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) {
         JSONWebNodePage page;
         try {
-            page = m_cvm.createWizardPage(m_page.getID());
+            page = m_cvm.createWizardPage(m_page.getID(), m_nodeViewEntCreator);
             page.filterWebNodesById(resetNodeIDs);
             try (OutputStream pageStream = page.saveToStream()) {
                 return ((ByteArrayOutputStream)pageStream).toString(StandardCharsets.UTF_8);

@@ -58,11 +58,14 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.awaitility.Awaitility;
 import org.junit.Test;
+import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.RpcSingleClient;
@@ -71,6 +74,7 @@ import org.knime.core.webui.data.rpc.json.impl.JsonRpcSingleServer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcTestUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.WorkflowTestCase;
+import org.knime.gateway.api.entity.NodeViewEnt;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -100,7 +104,9 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
      */
     @Test
     public void testReexecutePage() throws Exception {
-        ReexecutionService service = createReexecutionService(5);
+        Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator =
+            nnc -> NodeViewEnt.create(nnc, () -> List.of("selection 1", "selection 2"));
+        ReexecutionService service = createReexecutionService(5, nodeViewEntCreator);
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("5:0:7",
@@ -121,6 +127,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
             is("new initial data for node 5:0:8"));
+        assertThat(page.get("nodeViews").get("5:0:8").get("initialSelection").get(1).asText(), is("selection 2"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
 
@@ -143,12 +150,12 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
      */
     @Test
     public void testFailureOnReExecution() throws Exception {
-        ReexecutionService service = createReexecutionService(6);
+        ReexecutionService service = createReexecutionService(6, null);
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("6:0:9",
             "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":false}}",//
-            "6:0:8", "n€w initial data for node 6:0:8");
+            "6:0:8", "nï¿½w initial data for node 6:0:8");
         var res = service.reexecutePage("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
@@ -162,7 +169,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         var page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("6:0:3").get("viewRepresentation").get("text").asText(), is("TEST"));
         assertThat(page.get("nodeViews").get("6:0:8").get("initialData").asText(),
-            is("n€w initial data for node 6:0:8"));
+            is("nï¿½w initial data for node 6:0:8"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
 
@@ -189,15 +196,16 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         assertThat(res.getReexecutedNodes(), is(nullValue()));
     }
 
-    private ReexecutionService createReexecutionService(final int pageId) throws Exception {
+    private ReexecutionService createReexecutionService(final int pageId,
+        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws Exception {
         NodeID wfId = loadAndSetWorkflow();
         executeAllAndWait();
 
         // create reexecution service 'client'
         SubNodeContainer component = (SubNodeContainer)getManager().getNodeContainer(new NodeID(wfId, pageId));
-        SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub");
+        SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub", false, nodeViewEntCreator);
         RpcSingleServer<ReexecutionService> rpcServer =
-            new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService());
+            new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService(nodeViewEntCreator));
         RpcSingleClient<ReexecutionService> rpcClient = JsonRpcTestUtil
             .createRpcSingleClientInstanceForTesting(ReexecutionService.class, rpcServer.getHandler(), MAPPER);
         return rpcClient.getService();

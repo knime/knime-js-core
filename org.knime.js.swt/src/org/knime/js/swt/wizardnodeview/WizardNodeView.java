@@ -383,12 +383,13 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                         var url = "file://" + getViewSource().getAbsolutePath();
                         onPageLoaded(() -> {
                             var snc = getNodeContainer();
+                            var nodeViewEntCreator = createNodeViewEntCreator(() -> m_selectionEventSource);
                             var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
-                                createJsonRpcFunction(snc, getViewableModel()));
+                                createJsonRpcFunction(snc, getViewableModel(), nodeViewEntCreator));
                             if (snc != null) {
                                 m_selectionEventSource = new SelectionEventSource(eventConsumer);
                             }
-                            return createInitScript(m_selectionEventSource);
+                            return createInitScript(nodeViewEntCreator);
                         });
                         m_browserWrapper.setUrl(url);
                         return;
@@ -402,6 +403,22 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 }
             }
         }
+    }
+
+    private static Function<NativeNodeContainer, NodeViewEnt>
+        createNodeViewEntCreator(final Supplier<SelectionEventSource> selectionEventSourceSupplier) {
+        return nnc -> { // NOSONAR
+            var selectionEventSource = selectionEventSourceSupplier.get();
+            if (selectionEventSource == null) {
+                return NodeViewEnt.create(nnc);
+            } else {
+                return NodeViewEnt.create(nnc,
+                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
+                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
+                        .orElse(Collections.emptyList()));
+            }
+        };
+
     }
 
     /**
@@ -418,7 +435,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
 
-    private String createInitScript(final SelectionEventSource selectionEventSource) {
+    private String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
         WizardNode<REP, VAL> model = getModel();
         WizardViewCreator<REP, VAL> creator = model.getViewCreator();
         if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
@@ -427,10 +444,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
         if (model instanceof SubnodeViewableModel) {
             try {
-                ((SubnodeViewableModel)model).createPageAndValue(nnc -> NodeViewEnt.create(nnc,
-                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
-                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
-                        .orElse(Collections.emptyList())));
+                ((SubnodeViewableModel)model).createPageAndValue(nodeViewEntCreator);
             } catch (IOException e) {
                 // should never happen
                 throw new IllegalStateException("Wizard page couldn't be created", e);
@@ -484,10 +498,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     }
 
     private static JsonRpcFunction createJsonRpcFunction(final SingleNodeContainer snc,
-        final ViewableModel viewableModel) {
+        final ViewableModel viewableModel, final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
         if (snc instanceof SubNodeContainer) {
             return new JsonRpcFunction((SubNodeContainer)snc,
-                ((SubnodeViewableModel)viewableModel).createReexecutionService(), false);
+                ((SubnodeViewableModel)viewableModel).createReexecutionService(nodeViewEntCreator), false);
         } else {
             return new JsonRpcFunction((NativeNodeContainer)snc);
         }

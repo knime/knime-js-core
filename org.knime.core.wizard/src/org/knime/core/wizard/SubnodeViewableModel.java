@@ -251,9 +251,9 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      *
      * @since 4.5
      */
-    public ReexecutionService createReexecutionService() {
-        return new DefaultReexecutionService(m_container, m_spm, () -> m_isReexecuteInProgress.set(true),
-            () -> m_isReexecuteInProgress.set(false));
+    public ReexecutionService createReexecutionService(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
+        return new DefaultReexecutionService(m_container, nodeViewEntCreator, m_spm,
+            () -> m_isReexecuteInProgress.set(true), () -> m_isReexecuteInProgress.set(false));
     }
 
     /**
