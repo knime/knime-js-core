@@ -1285,6 +1285,7 @@ public class JSONDataTable {
          * @param useIncomingDomain True, if the spec of the incoming table should be used, false if
          * the spec should be recalculated.
          * @return This builder instance, which can be used for method chaining.
+         * @since 4.7
          */
         public Builder useIncomingTableDomain(final boolean useIncomingDomain) {
             m_useIncomingTableDomain = useIncomingDomain;
