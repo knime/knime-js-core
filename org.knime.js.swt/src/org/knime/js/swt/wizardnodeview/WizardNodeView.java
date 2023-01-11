@@ -47,7 +47,6 @@
 package org.knime.js.swt.wizardnodeview;
 
 import java.awt.Rectangle;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -378,9 +377,8 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     return;
                 }
                 try {
-                    File src;
-                    if (hasData && (src = getViewSource()) != null && src.exists()) {
-                        var url = "file://" + getViewSource().getAbsolutePath();
+                    String url;
+                    if (hasData && (url = getViewURL().orElse(null)) != null) {
                         onPageLoaded(() -> {
                             var snc = getNodeContainer();
                             var nodeViewEntCreator = createNodeViewEntCreator(() -> m_selectionEventSource);

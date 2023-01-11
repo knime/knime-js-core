@@ -53,6 +53,7 @@ import static java.util.Collections.emptyMap;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -60,6 +61,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -113,8 +115,6 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
     static final String SINGLE_PAGE_NODE_NAME = "Single Node Page";
 
     private static File tempFolder;
-
-    private File m_tempIndexFile;
 
     private WebTemplate m_template;
 
@@ -212,12 +212,23 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
                 }
             }
         }
-        m_tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);
-        try (BufferedWriter writer = Files.newBufferedWriter(m_tempIndexFile.toPath(), StandardCharsets.UTF_8)) {
-            writer.write(buildHTMLResource(viewRepresentation, viewValue, customCSS));
-            writer.flush();
+        var tempIndexFile = FileUtil.createTempFile("index_" + System.currentTimeMillis(), ".html", tempFolder, true);
+        if (isVisualLayoutEditor()) {
+            try (BufferedWriter writer = Files.newBufferedWriter(tempIndexFile.toPath(), StandardCharsets.UTF_8)) {
+                writer.write(buildHTMLResourceForVisualLayoutEditor(viewRepresentation, viewValue, customCSS));
+                writer.flush();
+            }
+        } else {
+            var pageBuilderHtmlFileUrl =
+                WebResourceFileUtil.getPageBuilderResourceFileURL(WebResourceFileUtil.PAGEBUILDER_AP_WRAPPER_HTML_DOC);
+            try (var out = new FileOutputStream(tempIndexFile)) {
+                Files.copy(Paths.get(pageBuilderHtmlFileUrl.toURI()), out);
+            } catch (URISyntaxException ex) {
+                // should never happen
+                throw new IllegalStateException(ex);
+            }
         }
-        return m_tempIndexFile.getAbsolutePath();
+        return tempIndexFile.getAbsolutePath();
     }
 
     /**
@@ -297,9 +308,11 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
      * @param customCSS optional custom css
      * @return an HTML string representing the view page
      * @throws IOException if the debug file cannot be written
+     * @since 5.0
      */
-    protected String buildHTMLResource(final REP viewRepresentation, final VAL viewValue, final String customCSS)
-            throws IOException {
+    protected String buildHTMLResourceForVisualLayoutEditor(final REP viewRepresentation, final VAL viewValue,
+        final String customCSS) throws IOException {
+        assert isVisualLayoutEditor();
 
         m_customCSS = customCSS;
 
@@ -327,28 +340,23 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
             LOGGER.error("No JavaScript view implementation available for view: " + m_title);
         }
 
-        if (isVisualLayoutEditor()) {
-            for (WebResourceLocator resFile : getResourceFileList()) {
-                String path = resFile.getRelativePathTarget();
-                if (path.startsWith("/")) {
-                    path = path.substring(1);
-                }
-                switch (resFile.getType()) {
-                    case CSS:
-                        pageBuilder.append(String.format(cssString, path));
-                        break;
-                    case JAVASCRIPT:
-                        pageBuilder.append(String.format(scriptString, path));
-                        break;
-                    case FILE:
-                        break;
-                    default:
-                        LOGGER.error("Unrecognized resource type " + resFile.getType());
-                }
+        for (WebResourceLocator resFile : getResourceFileList()) {
+            String path = resFile.getRelativePathTarget();
+            if (path.startsWith("/")) {
+                path = path.substring(1);
             }
-        } else {
-            // PageBuilder always included in pages (except layout editor) @since 4.2
-            pageBuilder.append(String.format(scriptString, "org/knime/core/knime-pagebuilder2-ap.js"));
+            switch (resFile.getType()) {
+                case CSS:
+                    pageBuilder.append(String.format(cssString, path));
+                    break;
+                case JAVASCRIPT:
+                    pageBuilder.append(String.format(scriptString, path));
+                    break;
+                case FILE:
+                    break;
+                default:
+                    LOGGER.error("Unrecognized resource type " + resFile.getType());
+            }
         }
 
         if (isDebug()) {
