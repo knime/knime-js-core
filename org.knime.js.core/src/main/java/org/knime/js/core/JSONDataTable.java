@@ -296,7 +296,7 @@ public class JSONDataTable {
                 possValues.set(c, new LinkedHashSet<Object>());
                 if (m_useIncomingTableDomain && columnDomain.hasValues()) {
                     possValues.get(c).addAll(columnDomain.getValues().stream()
-                        .map(JSONDataTable::getJSONCellValue).collect(Collectors.toSet()));
+                        .map(JSONDataTable::getJSONCellValue).collect(Collectors.toCollection(LinkedHashSet::new)));
                 }
             } else if (m_useIncomingTableDomain) {
                 if (columnDomain.hasLowerBound()) {
