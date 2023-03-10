@@ -125,12 +125,12 @@ public class DefaultNodeService implements NodeService {
         var nc = m_getNode.apply(nodeID);
         var ncWrapper = NodeWrapper.of(nc);
         if ("initial_data".equals(serviceType)) {
-            return dataServiceManager.callTextInitialDataService(ncWrapper);
+            return dataServiceManager.callInitialDataService(ncWrapper);
         } else if ("data".equals(serviceType)) {
-            return dataServiceManager.callTextDataService(ncWrapper, request);
+            return dataServiceManager.callRpcDataService(ncWrapper, request);
         } else if ("apply_data".equals(serviceType)) {
             try {
-                dataServiceManager.callTextApplyDataService(ncWrapper, request);
+                dataServiceManager.callApplyDataService(ncWrapper, request);
             } catch (IOException e) {
                 NodeLogger.getLogger(getClass()).error(e);
                 return e.getMessage();

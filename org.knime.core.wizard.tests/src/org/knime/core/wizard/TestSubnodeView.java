@@ -378,7 +378,8 @@ public class TestSubnodeView extends WorkflowTestCase {
         assertNotNull("String input value should contain new string value", jsonValue.get("string"));
         assertEquals("String input value should be '" + CHANGED_URL + "'", CHANGED_URL, jsonValue.get("string").asText());
 
-        assertEquals(newValueMap.get(m_nodeViewNodeID.toString()), expectedInitialNodeViewVal);
+        assertEquals("{\"result\":\"" + expectedInitialNodeViewVal + "\"}",
+            newValueMap.get(m_nodeViewNodeID.toString()));
 
         // check one row was selected and filtered
         NodeContainer container = getManager().getNodeContainer(m_subnodeID);

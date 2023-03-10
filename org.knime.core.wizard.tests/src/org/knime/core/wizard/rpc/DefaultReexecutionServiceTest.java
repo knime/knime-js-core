@@ -126,7 +126,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         JsonNode page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
-            is("new initial data for node 5:0:8"));
+            containsString("new initial data for node 5:0:8"));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialSelection").get(1).asText(), is("selection 2"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
@@ -169,7 +169,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         var page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("6:0:3").get("viewRepresentation").get("text").asText(), is("TEST"));
         assertThat(page.get("nodeViews").get("6:0:8").get("initialData").asText(),
-            is("n�w initial data for node 6:0:8"));
+            containsString("n�w initial data for node 6:0:8"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
 
