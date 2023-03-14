@@ -165,7 +165,7 @@ window.KnimeBaseTableViewer.prototype.getComponentValue = function () {
         this._value.pageSize = pageSize;
     }
     var searchString = this._dataTable.search();
-    if (searchString.length) {
+    if (typeof searchString !== 'undefined') {
         this._value.filterString = searchString;
     }
     var order = this._dataTable.order();
