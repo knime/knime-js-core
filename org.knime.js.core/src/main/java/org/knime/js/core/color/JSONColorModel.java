@@ -55,7 +55,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.property.ColorAttr;
-import org.knime.core.data.property.ColorHandler.ColorModel;
+import org.knime.core.data.property.ColorModel;
 import org.knime.core.data.property.ColorModelNominal;
 import org.knime.core.data.property.ColorModelRange;
 import org.knime.core.node.InvalidSettingsException;
