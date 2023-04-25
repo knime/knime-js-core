@@ -122,9 +122,9 @@ public abstract class JSONColorModel {
             jsonModel = new JSONColorModelNominal();
             jsonModel.setTitle(title);
             ColorModelNominal modelNominal = (ColorModelNominal) model;
-            List<String> labels = new ArrayList<String>();
-            List<String> colors = new ArrayList<String>();
-            for (DataCell dc : modelNominal) {
+            List<String> labels = new ArrayList<>();
+            List<String> colors = new ArrayList<>();
+            for (DataCell dc : modelNominal.getValues()) {
                 labels.add(dc.toString());
                 ColorAttr cAttr = modelNominal.getColorAttr(dc);
                 colors.add(CSSUtils.cssHexStringFromColor(cAttr.getColor()));
