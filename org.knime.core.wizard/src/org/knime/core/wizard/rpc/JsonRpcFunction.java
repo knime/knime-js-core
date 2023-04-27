@@ -140,26 +140,19 @@ public class JsonRpcFunction {
     }
 
     /**
-     * Helper to create a jsonrpc-notification from a (json-serializable) event to be sent to the browser.
+     * Helper to create a event-message to be sent to the browser.
      *
      * @param name
-     * @param event
-     * @return the js-call or {@code null} if a problem occurred
-     *
-     * @since 4.7
+     * @param payload the event's payload
+     * @return the message
+     * @throws IllegalStateException if the message couldn't be created
      */
-    public static String createJsonRpcNotification(final String name, final Object event) {
-        // code copied from org.knime.ui.java.browser.KnimeBrowserView
-
-        // wrap event into a jsonrpc notification (method == event-name) and serialize
-        var jsonrpc = MAPPER.createObjectNode();
-        var params = jsonrpc.arrayNode();
-        params.addPOJO(event);
+    public static String createEventMessage(final String name, final Object payload) {
+        var event = MAPPER.createObjectNode();
         try {
-            return MAPPER
-                .writeValueAsString(jsonrpc.put(FUNCTION_NAME, "2.0").put("method", name).set("params", params));
+            return MAPPER.writeValueAsString(event.put("eventType", name).set("payload", MAPPER.valueToTree(payload)));
         } catch (JsonProcessingException ex) {
-            throw new IllegalStateException("Problem creating a json-rpc notification in order to send an event", ex);
+            throw new IllegalStateException("Problem creating the event-message in order to send an event", ex);
         }
     }
 
