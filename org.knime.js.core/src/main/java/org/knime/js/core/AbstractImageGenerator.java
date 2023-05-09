@@ -204,8 +204,10 @@ public abstract class AbstractImageGenerator<T extends NodeModel & WizardNode<RE
                 Constructor<?> constructor = viewClass.getConstructor(NodeModel.class);
                 return (AbstractImageGenerator)constructor.newInstance(model);
             } catch (Exception e) {
-                throw new InstantiationException("Headless browser can not be initialized. "
+                var ex = new InstantiationException("Headless browser can not be initialized. "
                     + "Image generation not possible.");
+                ex.initCause(e);
+                throw ex;
             }
         }
         throw new OperationNotSupportedException("No headless browser available. Image generation not possible.");
