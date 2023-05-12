@@ -379,7 +379,7 @@ public class JSONDataTable {
                     }
                     if (m_calculateDataHash) {
                         DigestUtils.updateDigest(md5Digest,
-                            Objects.toString(cellValue, javax.json.JsonValue.NULL.toString()));
+                            Objects.toString(cellValue, jakarta.json.JsonValue.NULL.toString()));
                     }
                 }
 

@@ -58,8 +58,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.json.stream.JsonGenerationException;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.KNIMEConstants;
@@ -77,6 +75,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
+import jakarta.json.stream.JsonGenerationException;
 
 /**
  * A {@link JSONWebNode} specific serialization implementation required to properly (and conditionally) sanitize user
