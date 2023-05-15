@@ -157,6 +157,7 @@ public class DefaultNodeServiceTest {
         NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotationID[0], "component")
             .getCollapsedMetanodeID();
         m_wfm.convertMetaNodeToSubNode(componentId);
+        m_wfm.executeAllAndWaitUntilDone();
 
         @SuppressWarnings("unchecked")
         final BiConsumer<String, SelectionEvent> selectionEventConsumer = mock(BiConsumer.class);
