@@ -105,10 +105,15 @@ public final class WebResourceFileUtil {
      * @throws IOException
      */
     public static URL getPageBuilderResourceFileURL(final String path) throws IOException {
-        // must not use url.toURI() -- FileLocator leaves spaces in the URL (see eclipse bug 145096)
-        // -- taken from TableauHyperActivator.java line 158
         var url = PAGEBUILDER_BUNDLE.getEntry("dist/app" + path);
-        return url == null ? null : FileLocator.toFileURL(url);
+        url = FileLocator.toFileURL(url); // handles null might leave space chars (see eclipse bug 145096)
+        if (url == null) {
+            return null;
+        } else if ("file".equals(url.getProtocol())) {
+            var file = FileUtil.getFileFromURL(url);
+            url = file.toURI().toURL();
+        }
+        return url;
     }
 
     /**
