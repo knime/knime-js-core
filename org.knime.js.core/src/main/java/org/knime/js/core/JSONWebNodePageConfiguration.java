@@ -73,6 +73,7 @@ public class JSONWebNodePageConfiguration {
     private JSONLayoutPage m_layout;
     private JSONBlackBoard m_blackBoard;
     private List<JSONSelectionTranslator> m_selectionTranslators;
+    private boolean m_isReporting;
 
     /** Serialization constructor. Don't use. */
     public JSONWebNodePageConfiguration() { }
@@ -86,7 +87,21 @@ public class JSONWebNodePageConfiguration {
      */
     public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
         final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix) {
-        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix);
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix, false);
+    }
+
+    /**
+     * @param layout the layout
+     * @param blackBoard the blackboard
+     * @param selectionTranslators
+     * @param projectRelativePageIDSuffix the string representation of the project relative page {@link NodeIDSuffix}.
+     * @param isReporting
+     * @since 5.1
+     */
+    public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
+        final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix,
+        final boolean isReporting) {
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix, isReporting);
     }
 
     @JsonCreator
@@ -94,14 +109,15 @@ public class JSONWebNodePageConfiguration {
         @JsonProperty("blackBoard") final JSONBlackBoard blackBoard,
         @JsonProperty("selectionTranslators") final List<JSONSelectionTranslator> selectionTranslators,
         @JsonProperty("version") final String version,
-        @JsonProperty("projectRelativePageIDSuffix") final String projectRelativePageIDSuffix) {
+        @JsonProperty("projectRelativePageIDSuffix") final String projectRelativePageIDSuffix,
+        @JsonProperty("isReporting") final boolean isReporting) {
         m_projectRelativePageIDSuffix = projectRelativePageIDSuffix;
         m_version = version;
         m_layout = layout;
         m_blackBoard = blackBoard;
         m_selectionTranslators = selectionTranslators;
+        m_isReporting = isReporting;
     }
-
 
     /**
      * @return the projectRelativePageIDSuffix
@@ -142,6 +158,16 @@ public class JSONWebNodePageConfiguration {
     @JsonProperty("selectionTranslators")
     public List<JSONSelectionTranslator> getSelectionTranslators() {
         return m_selectionTranslators;
+    }
+
+    /**
+     * @return whether the current web node page is to be rendered for a report
+     *
+     * @since 5.1
+     */
+    @JsonProperty("isReporting")
+    public boolean isReporting() {
+        return m_isReporting;
     }
 
     // TODO: insert other meta info about page
