@@ -73,7 +73,7 @@ public class JSONWebNodePageConfiguration {
     private JSONLayoutPage m_layout;
     private JSONBlackBoard m_blackBoard;
     private List<JSONSelectionTranslator> m_selectionTranslators;
-    private boolean m_isReporting;
+    private String m_generatedReportActionId;
 
     /** Serialization constructor. Don't use. */
     public JSONWebNodePageConfiguration() { }
@@ -87,7 +87,7 @@ public class JSONWebNodePageConfiguration {
      */
     public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
         final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix) {
-        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix, false);
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix, null);
     }
 
     /**
@@ -95,13 +95,15 @@ public class JSONWebNodePageConfiguration {
      * @param blackBoard the blackboard
      * @param selectionTranslators
      * @param projectRelativePageIDSuffix the string representation of the project relative page {@link NodeIDSuffix}.
-     * @param isReporting
+     * @param generatedReportActionId action id used to communicate report content back to the backend; if {@code null},
+     *            reporting generation is not enabled
      * @since 5.1
      */
     public JSONWebNodePageConfiguration(final JSONLayoutPage layout, final JSONBlackBoard blackBoard,
         final List<JSONSelectionTranslator> selectionTranslators, final String projectRelativePageIDSuffix,
-        final boolean isReporting) {
-        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix, isReporting);
+        final String generatedReportActionId) {
+        this(layout, blackBoard, selectionTranslators, KNIMEConstants.VERSION, projectRelativePageIDSuffix,
+            generatedReportActionId);
     }
 
     @JsonCreator
@@ -110,13 +112,13 @@ public class JSONWebNodePageConfiguration {
         @JsonProperty("selectionTranslators") final List<JSONSelectionTranslator> selectionTranslators,
         @JsonProperty("version") final String version,
         @JsonProperty("projectRelativePageIDSuffix") final String projectRelativePageIDSuffix,
-        @JsonProperty("isReporting") final boolean isReporting) {
+        @JsonProperty("generatedReportActionId") final String generatedReportActionId) {
         m_projectRelativePageIDSuffix = projectRelativePageIDSuffix;
         m_version = version;
         m_layout = layout;
         m_blackBoard = blackBoard;
         m_selectionTranslators = selectionTranslators;
-        m_isReporting = isReporting;
+        m_generatedReportActionId = generatedReportActionId;
     }
 
     /**
@@ -161,13 +163,14 @@ public class JSONWebNodePageConfiguration {
     }
 
     /**
-     * @return whether the current web node page is to be rendered for a report
+     * @return generatedReportActionId action id used to communicate report content back to the backend; if
+     *         {@code null}, reporting generation is not enabled
      *
      * @since 5.1
      */
-    @JsonProperty("isReporting")
-    public boolean isReporting() {
-        return m_isReporting;
+    @JsonProperty("generatedReportActionId")
+    public String getGeneratedReportActionId() {
+        return m_generatedReportActionId;
     }
 
     // TODO: insert other meta info about page
