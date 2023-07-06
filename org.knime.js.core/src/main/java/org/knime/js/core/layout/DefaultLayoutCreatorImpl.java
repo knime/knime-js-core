@@ -71,7 +71,6 @@ import org.knime.core.node.workflow.SubnodeContainerLayoutStringProvider;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeView;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.core.webui.node.view.PageFormat.AspectRatio;
 import org.knime.js.core.layout.bs.JSONLayoutColumn;
 import org.knime.js.core.layout.bs.JSONLayoutContent;
 import org.knime.js.core.layout.bs.JSONLayoutPage;
@@ -171,15 +170,16 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
         } else if (NodeViewManager.hasNodeView(viewNode)) {
             var pageFormat = NodeViewManager.getInstance().getNodeView(viewNode).getDefaultPageFormat();
             view = new JSONLayoutViewContent();
-            pageFormat.getAspectRatio().ifPresent(ar -> {
-                if (ar == AspectRatio.RATIO_4BY3) {
+            switch (pageFormat) { // NOSONAR
+                case ASPECT_RATIO_4BY3 -> {
                     view.setResizeMethod(ResizeMethod.ASPECT_RATIO_4by3);
                     view.setAutoResize(false);
-                } else {
+                }
+                case AUTO -> {
                     view.setResizeMethod(ResizeMethod.VIEW_LOWEST_ELEMENT);
                     view.setAutoResize(true);
                 }
-            });
+            }
         } else {
             view = new JSONLayoutViewContent();
         }
