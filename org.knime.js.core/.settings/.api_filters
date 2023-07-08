@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.js.core" version="2">
+    <resource path="src/main/java/org/knime/js/core/JavaScriptViewCreator.java" type="org.knime.js.core.JavaScriptViewCreator">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.JavaScriptViewCreator"/>
+                <message_argument value="buildHTMLResource(REP, VAL, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="5.0"/>
+                <message_argument value="5.1"/>
+                <message_argument value="buildHTMLResourceForVisualLayoutEditor(REP, VAL, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/main/java/org/knime/js/core/WebResourceFileUtil.java" type="org.knime.js.core.WebResourceFileUtil">
+        <filter id="1108344834">
+            <message_arguments>
+                <message_argument value="5.0"/>
+                <message_argument value="5.1"/>
+                <message_argument value="org.knime.js.core.WebResourceFileUtil"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/main/java/org/knime/js/core/color/JSONColorModel.java" type="org.knime.js.core.color.JSONColorModel">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.color.JSONColorModel"/>
+                <message_argument value="createFromColorModel(ColorHandler.ColorModel)"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.js.core.color.JSONColorModel"/>
+                <message_argument value="createFromColorModel(ColorHandler.ColorModel, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="createFromColorModel(ColorModel)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="createFromColorModel(ColorModel, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

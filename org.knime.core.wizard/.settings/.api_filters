@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.core.wizard" version="2">
+    <resource path="src/org/knime/core/wizard/rpc/JsonRpcFunction.java" type="org.knime.core.wizard.rpc.JsonRpcFunction">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.JsonRpcFunction"/>
+                <message_argument value="createJsonRpcNotification(String, Object)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="createEventMessage(String, Object)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
