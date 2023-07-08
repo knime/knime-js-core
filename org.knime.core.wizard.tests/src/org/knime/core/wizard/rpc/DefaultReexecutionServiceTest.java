@@ -114,13 +114,15 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
             "5:0:8", "new initial data for node 5:0:8");
         PageContainer res = service.reexecutePage("5:0:2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
-        assertThat(res.getResetNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8"));
+        assertThat(res.getResetNodes(),
+            containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
             PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
-            assertThat(res2.getReexecutedNodes(), containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8"));
+            assertThat(res2.getReexecutedNodes(),
+                containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         });
         res = service.getPage();
         JsonNode page = MAPPER.readTree(res.getPage().rawValue().toString());
