@@ -59,8 +59,10 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
+import org.knime.core.webui.node.NodePortWrapper;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.impl.service.events.SelectionEventSource;
@@ -74,7 +76,7 @@ import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEvent
  */
 public class DefaultNodeService implements NodeService {
 
-    private final Function<String, SingleNodeContainer> m_getNode;
+    private final Function<String, NodeWrapper> m_getNodeWrapper;
 
     /**
      * Initialize the {@link DefaultNodeService} for a {@link NativeNodeContainer}.
@@ -82,7 +84,7 @@ public class DefaultNodeService implements NodeService {
      * @param nnc The {@link NativeNodeContainer}
      */
     DefaultNodeService(final NativeNodeContainer nnc) {
-        m_getNode = id -> nnc;
+        m_getNodeWrapper = id -> NodeWrapper.of(nnc);
     }
 
     /**
@@ -94,18 +96,29 @@ public class DefaultNodeService implements NodeService {
      */
     DefaultNodeService(final SubNodeContainer snc, final boolean isDialog) {
         if (isDialog) {
-            m_getNode = id -> snc;
+            m_getNodeWrapper = id -> NodeWrapper.of(snc);
         } else {
             // initialize 'getNode'-function for a component composite view
             var projectWfm = snc.getParent().getProjectWFM();
-            m_getNode = id -> {
+            m_getNodeWrapper = id -> {
                 var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
                 if (!(nc instanceof NativeNodeContainer)) {
                     throw new IllegalArgumentException("Not a native node: " + nc.getNameWithID());
                 }
-                return (NativeNodeContainer)nc;
+                return NodeWrapper.of(nc);
             };
         }
+    }
+
+    /**
+     * Initialize the {@link DefaultNodeService} for a port view of a node.
+     *
+     * @param snc
+     * @param portIdx
+     * @param viewIdx
+     */
+    DefaultNodeService(final SingleNodeContainer snc, final int portIdx, final int viewIdx) {
+        m_getNodeWrapper = id -> NodePortWrapper.of(snc, portIdx, viewIdx);
     }
 
     @SuppressWarnings("unchecked")
@@ -118,12 +131,16 @@ public class DefaultNodeService implements NodeService {
             dataServiceManager = NodeViewManager.getInstance();
         } else if ("dialog".equals(extensionType)) {
             dataServiceManager = NodeDialogManager.getInstance();
+        } else if ("port".equals(extensionType)) {
+            // NOTE!! This is inconsistent with the actual implementation of the DefaultNodeService (see knime-gateway).
+            // Because port-view data is actually served via the PortService.callPortDataService-endpoint and
+            // this is just a quick and dirty solution - the proper solution is implemented via NXT-1949
+            dataServiceManager = PortViewManager.getInstance();
         } else {
             throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
         }
 
-        var nc = m_getNode.apply(nodeID);
-        var ncWrapper = NodeWrapper.of(nc);
+        var ncWrapper = m_getNodeWrapper.apply(nodeID);
         if ("initial_data".equals(serviceType)) {
             return dataServiceManager.callInitialDataService(ncWrapper);
         } else if ("data".equals(serviceType)) {
@@ -146,7 +163,8 @@ public class DefaultNodeService implements NodeService {
         final String mode, final List<String> selection) {
         try {
             var rowKeys =
-                NodeViewManager.getInstance().callSelectionTranslationService(m_getNode.apply(nodeIdString), selection);
+                NodeViewManager.getInstance()
+                    .callSelectionTranslationService(m_getNodeWrapper.apply(nodeIdString).get(), selection);
             updateDataPointSelection(nodeIdString, mode, rowKeys);
         } catch (IOException e) {
             NodeLogger.getLogger(getClass()).error(e);
@@ -155,14 +173,14 @@ public class DefaultNodeService implements NodeService {
 
     void updateDataPointSelection(final String nodeIdString, final String mode, final Set<RowKey> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        SelectionEventSource.processSelectionEvent((NativeNodeContainer)m_getNode.apply(nodeIdString),
+        SelectionEventSource.processSelectionEvent((NativeNodeContainer)m_getNodeWrapper.apply(nodeIdString).get(),
             selectionEventMode, true, rowKeys);
     }
 
     @Override
     public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
         final String action) {
-        var nc = m_getNode.apply("");
+        var nc = m_getNodeWrapper.apply("").get();
         assert nodeIds.size() == 1 && nodeIds.get(0).equals(new NodeIDEnt(nc.getID()).toString()) && "execute".equals(
             action) : "The changeNodeStates-endpoint is only partially implemented - parameter values are out of scope";
         nc.getParent().executeUpToHere(nc.getID());

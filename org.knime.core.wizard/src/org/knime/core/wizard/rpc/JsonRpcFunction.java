@@ -56,6 +56,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 
@@ -80,7 +81,7 @@ public class JsonRpcFunction {
      */
     public static final String FUNCTION_NAME = "jsonrpc";
 
-    private final JsonRpcServer m_jsonRpcServer;
+    private final JsonRpcServer m_jsonRpcServer = new JsonRpcServer();
 
     /**
      * Initializes the json-rpc function for composite views.
@@ -90,8 +91,9 @@ public class JsonRpcFunction {
      * @param isDialog Show the dialog or the composite view of the component
      * @since 4.7
      */
-    public JsonRpcFunction(final SubNodeContainer snc, final ReexecutionService reexecutionService, final boolean isDialog) {
-        m_jsonRpcServer = initJsonRpcServer(new DefaultNodeService(snc, isDialog));
+    public JsonRpcFunction(final SubNodeContainer snc, final ReexecutionService reexecutionService,
+        final boolean isDialog) {
+        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(snc, isDialog));
         if (reexecutionService != null) {
             m_jsonRpcServer.addService(ReexecutionService.class, reexecutionService);
         }
@@ -103,13 +105,19 @@ public class JsonRpcFunction {
      * @param nnc
      */
     public JsonRpcFunction(final NativeNodeContainer nnc) {
-        m_jsonRpcServer = initJsonRpcServer(new DefaultNodeService(nnc));
+        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc));
     }
 
-    private static JsonRpcServer initJsonRpcServer(final DefaultNodeService serviceInstance) {
-        var jsonRpcServer = new JsonRpcServer();
-        jsonRpcServer.addService(NodeService.class, serviceInstance);
-        return jsonRpcServer;
+    /**
+     * Initializes the json-rpc function for a port view.
+     *
+     * @param nc
+     * @param portIdx
+     * @param viewIdx
+     * @since 5.2
+     */
+    public JsonRpcFunction(final SingleNodeContainer nc, final int portIdx, final int viewIdx) {
+        m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nc, portIdx, viewIdx));
     }
 
     /**

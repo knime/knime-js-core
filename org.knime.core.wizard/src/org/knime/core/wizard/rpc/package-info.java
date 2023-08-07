@@ -48,6 +48,7 @@
 /**
  * The interfaces/classes in this package are meant to mirror some gateway-api service methods required to support UI
  * extensions (i.e. node views etc.) in the java-based UI. It's to enable the frontend to use the same backend methods
- * no matter whether it's from the java-ui or new web-ui (i.e. AP.next).
+ * no matter whether it's from the java-ui or new web-ui (i.e. AP.next). Can be removed as soon as the classic/java UI
+ * is discontinued (in which case the gateway-api services can be used directly).
  */
 package org.knime.core.wizard.rpc;
