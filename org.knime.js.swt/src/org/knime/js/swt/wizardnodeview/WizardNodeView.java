@@ -433,7 +433,13 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
 
-    private String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
+    /**
+     * @param nodeViewEntCreator
+     *
+     * @return the script to initialize the pagebuilder
+     * @since 5.2
+     */
+    protected String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
         WizardNode<REP, VAL> model = getModel();
         WizardViewCreator<REP, VAL> creator = model.getViewCreator();
         if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
