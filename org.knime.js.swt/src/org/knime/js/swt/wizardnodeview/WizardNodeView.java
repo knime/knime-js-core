@@ -433,13 +433,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
 
-    /**
-     * @param nodeViewEntCreator
-     *
-     * @return the script to initialize the pagebuilder
-     * @since 5.2
-     */
-    protected String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
+    private String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
         WizardNode<REP, VAL> model = getModel();
         WizardViewCreator<REP, VAL> creator = model.getViewCreator();
         if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
@@ -454,8 +448,19 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 throw new IllegalStateException("Wizard page couldn't be created", e);
             }
         }
+        prePagebuilderInitialization();
         var initCall = creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
         return creator.wrapInTryCatch(initCall);
+    }
+
+    /**
+     * Called right before the pagebuilder is initialized by executing the init-script. Everything else is set up and
+     * ready.
+     *
+     * @since 5.2
+     */
+    protected void prePagebuilderInitialization() {
+        // nothing to do by default
     }
 
     private void onPageLoaded(final Supplier<String> scriptToRun) {
