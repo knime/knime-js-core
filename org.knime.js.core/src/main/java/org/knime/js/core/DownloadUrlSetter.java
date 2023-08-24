@@ -50,21 +50,26 @@ package org.knime.js.core;
 
 /**
  * The purpose of this interface is to solve UIEXT-1131 (no file-chooser opens when clicking a file-url in CEF).
- * Implemented by the {@code FileDownloadWidgetRepresentation} such that the CEF-based view can set the base-url. This
- * base-url is combined with the path of the file to download in order to build the download link which in turn then can
- * be intercepted by the CEF middleware.
+ * Implemented by the {@code FileDownloadWidgetRepresentation} such that the CEF-based view can set the url. This url is
+ * a combination with the path of the file to download in order to build the download link which in turn then can be
+ * intercepted and interpreted by the CEF middleware.
  *
- * If no base-url is set, the file download link will be a file-url (file://...).
+ * If no url is set, the file download link will be a file-url (file://<absolute path>).
  *
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
  *
  * @since 5.2
  */
-public interface BaseUrlSetter {
+public interface DownloadUrlSetter {
 
     /**
-     * @param baseUrl
+     * @param url
      */
-    void setBaseUrl(String baseUrl);
+    void setUrl(String url);
+
+    /**
+     * @return the absolute file path of the file to be provided as download
+     */
+    String getPath();
 
 }
