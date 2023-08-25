@@ -699,7 +699,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_additionalCallbacks = null;
         }
         if (m_shell != null && !m_shell.isDisposed()) {
-            m_shell.dispose();
+            Display.getDefault().asyncExec(m_shell::dispose);
         }
         if (m_selectionEventSource != null) {
             m_selectionEventSource.removeAllEventListeners();
