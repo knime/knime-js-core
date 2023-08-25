@@ -175,7 +175,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         var isExecuted = snc.getNodeContainerState().isExecuted();
 
         if (m_viewSet.getAndSet(isExecuted) != isExecuted) {
-            if (!isExecuted) {
+            if (!isExecuted && m_selectionEventSource != null) {
                 m_selectionEventSource.removeAllEventListeners();
             }
             display.asyncExec(() -> setBrowserContent(isExecuted));
