@@ -128,14 +128,14 @@ public class DefaultNodeService implements NodeService {
         @SuppressWarnings("rawtypes")
         final DataServiceManager dataServiceManager;
         if ("view".equals(extensionType)) {
-            dataServiceManager = NodeViewManager.getInstance();
+            dataServiceManager = NodeViewManager.getInstance().getDataServiceManager();
         } else if ("dialog".equals(extensionType)) {
-            dataServiceManager = NodeDialogManager.getInstance();
+            dataServiceManager = NodeDialogManager.getInstance().getDataServiceManager();
         } else if ("port".equals(extensionType)) {
             // NOTE!! This is inconsistent with the actual implementation of the DefaultNodeService (see knime-gateway).
             // Because port-view data is actually served via the PortService.callPortDataService-endpoint and
             // this is just a quick and dirty solution - the proper solution is implemented via NXT-1949
-            dataServiceManager = PortViewManager.getInstance();
+            dataServiceManager = PortViewManager.getInstance().getDataServiceManager();
         } else {
             throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
         }

@@ -168,7 +168,7 @@ public final class DefaultLayoutCreatorImpl implements DefaultLayoutCreator {
             && (layoutViewTemplate = ((LayoutTemplateProvider)viewNode.getNodeModel()).getLayoutTemplate()) != null) {
             view = layoutViewTemplate;
         } else if (NodeViewManager.hasNodeView(viewNode)) {
-            var pageFormat = NodeViewManager.getInstance().getNodeView(viewNode).getDefaultPageFormat();
+            var pageFormat = NodeViewManager.getInstance().getDefaultPageFormat(viewNode);
             view = new JSONLayoutViewContent();
             switch (pageFormat) { // NOSONAR
                 case ASPECT_RATIO_4BY3 -> {

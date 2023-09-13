@@ -738,7 +738,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
         var nvm = NodeViewManager.getInstance();
         viewNodes.stream().filter(NodeViewManager::hasNodeView)
-            .forEach(nnc -> nvm.deactivateDataServices(NodeWrapper.of(nnc)));
+            .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
 
     }
 
