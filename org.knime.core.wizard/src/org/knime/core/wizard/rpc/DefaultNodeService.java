@@ -55,7 +55,9 @@ import java.util.function.Function;
 
 import org.knime.core.data.RowKey;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.DataServiceManager;
@@ -64,6 +66,7 @@ import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
 import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.core.webui.node.view.table.TableViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.impl.service.events.SelectionEventSource;
 import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
@@ -162,19 +165,32 @@ public class DefaultNodeService implements NodeService {
     public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
         final String mode, final List<String> selection) {
         try {
-            var rowKeys =
-                NodeViewManager.getInstance()
-                    .callSelectionTranslationService(m_getNodeWrapper.apply(nodeIdString).get(), selection);
-            updateDataPointSelection(nodeIdString, mode, rowKeys);
+            var nodeWrapper = m_getNodeWrapper.apply(nodeIdString);
+            Set<RowKey> rowKeys;
+            HiLiteHandler hiLiteHandler;
+            // NOTE!! This is just a quick and dirty solution. There will be an extra
+            // PortService.updateDataPointSelection-endpoint for port views specifically.
+            // Proper solution is implemented with NXT-1949.
+            if (nodeWrapper instanceof NodePortWrapper portWrapper) {
+                var tableViewManager = PortViewManager.getInstance().getTableViewManager();
+                rowKeys = tableViewManager.callSelectionTranslationService(portWrapper, selection);
+                hiLiteHandler =
+                    TableViewManager.getOutHiLiteHandler(portWrapper.get(), portWrapper.getPortIdx() - 1).orElseThrow();
+            } else {
+                var tableViewManager = NodeViewManager.getInstance().getTableViewManager();
+                rowKeys = tableViewManager.callSelectionTranslationService(nodeWrapper, selection);
+                hiLiteHandler = tableViewManager.getHiLiteHandler(nodeWrapper).orElse(null);
+            }
+            updateDataPointSelection(hiLiteHandler, nodeWrapper.get().getID(), mode, rowKeys);
         } catch (IOException e) {
             NodeLogger.getLogger(getClass()).error(e);
         }
     }
 
-    void updateDataPointSelection(final String nodeIdString, final String mode, final Set<RowKey> rowKeys) {
+    private static void updateDataPointSelection(final HiLiteHandler hlh, final NodeID nodeId, final String mode,
+        final Set<RowKey> rowKeys) {
         final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        SelectionEventSource.processSelectionEvent((NativeNodeContainer)m_getNodeWrapper.apply(nodeIdString).get(),
-            selectionEventMode, true, rowKeys);
+        SelectionEventSource.processSelectionEvent(hlh, nodeId, selectionEventMode, true, rowKeys);
     }
 
     @Override

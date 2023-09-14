@@ -394,7 +394,8 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                             var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
                                 createJsonRpcFunction(snc, getViewableModel(), pageCreationHelper));
                             if (snc != null) {
-                                m_selectionEventSource = new SelectionEventSource(eventConsumer);
+                                m_selectionEventSource = new SelectionEventSource<>(eventConsumer,
+                                    NodeViewManager.getInstance().getTableViewManager());
                             }
                             return createInitScript(pageCreationHelper);
                         });
@@ -418,20 +419,16 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * @since 5.2
      */
     protected WizardPageCreationHelper
-        createWizardPageCreationHelper(final Supplier<SelectionEventSource> selectionEventSourceSupplier) {
-        return new WizardPageCreationHelper() {
-
-            @Override
-            public NodeViewEnt createNodeViewEnt(final NativeNodeContainer nnc) {
-                var selectionEventSource = selectionEventSourceSupplier.get();
-                if (selectionEventSource == null) {
-                    return NodeViewEnt.create(nnc);
-                } else {
-                    return NodeViewEnt.create(nnc,
-                        () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
-                            .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
-                            .orElse(Collections.emptyList()));
-                }
+        createWizardPageCreationHelper(final Supplier<SelectionEventSource<NodeWrapper>> selectionEventSourceSupplier) {
+        return nnc -> { // NOSONAR
+            var selectionEventSource = selectionEventSourceSupplier.get();
+            if (selectionEventSource == null) {
+                return NodeViewEnt.create(nnc);
+            } else {
+                return NodeViewEnt.create(nnc,
+                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(NodeWrapper.of(nnc))
+                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
+                        .orElse(Collections.emptyList()));
             }
         };
     }

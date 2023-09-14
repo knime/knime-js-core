@@ -51,7 +51,7 @@ package org.knime.core.wizard.rpc;
 import java.util.List;
 
 import org.knime.core.webui.node.view.NodeView;
-import org.knime.core.webui.node.view.selection.SelectionTranslationService;
+import org.knime.core.webui.node.view.table.selection.SelectionTranslationService;
 
 /**
  * {@link NodeView}s for the new web-ui assume a certain backend to be available when opened from the desktop

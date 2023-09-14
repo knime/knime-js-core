@@ -76,7 +76,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.knime.core.data.RowKey;
-import org.knime.core.node.port.PortType;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.property.hilite.HiLiteListener;
 import org.knime.core.node.wizard.page.WizardPageUtil;
@@ -85,7 +84,8 @@ import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowAnnotationID;
 import org.knime.core.node.workflow.WorkflowManager;
-import org.knime.core.node.workflow.virtual.subnode.VirtualSubNodeInputNodeFactory;
+import org.knime.core.webui.node.NodeWrapper;
+import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.impl.service.events.SelectionEvent;
 import org.knime.gateway.impl.service.events.SelectionEventSource;
 import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
@@ -119,7 +119,7 @@ public class DefaultNodeServiceTest {
     @Before
     public void setup() throws IOException {
         m_wfm = WorkflowManagerUtil.createEmptyWorkflow();
-        m_nnc = WorkflowManagerUtil.createAndAddNode(m_wfm, new VirtualSubNodeInputNodeFactory(null, new PortType[0]));
+        m_nnc = WorkflowManagerUtil.createAndAddNode(m_wfm, new NodeViewNodeFactory(1,0));
         m_hlh = m_nnc.getNodeModel().getInHiLiteHandler(0);
     }
 
@@ -134,8 +134,8 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", SelectionEventMode.ADD.toString(),
-            ROWKEYS_1_2);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
+            SelectionEventMode.ADD.toString(), ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(ROWKEYS_1_2)));
@@ -150,11 +150,13 @@ public class DefaultNodeServiceTest {
 
     @Test
     public void testSelectDataPointsInComponentView() {
-        NodeID n1 = createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 1)).getID();
+        NodeID n0 = createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 1)).getID();
+        NodeID n1 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 1)).getID();
         NodeID n2 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 0)).getID();
+        m_wfm.addConnection(n0, 1, n1, 1);
         m_wfm.addConnection(n1, 1, n2, 1);
 
-        NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n1, n2}, new WorkflowAnnotationID[0], "component")
+        NodeID componentId = m_wfm.collapseIntoMetaNode(new NodeID[]{n0, n1, n2}, new WorkflowAnnotationID[0], "component")
             .getCollapsedMetanodeID();
         m_wfm.convertMetaNodeToSubNode(componentId);
         m_wfm.executeAllAndWaitUntilDone();
@@ -164,11 +166,12 @@ public class DefaultNodeServiceTest {
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component, false);
         setupSelectionEventSource(selectionEventConsumer, component);
-        nodeService.updateDataPointSelection("root:4:0:2", SelectionEventMode.ADD.toString(), ROWKEYS_1_2);
+        nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:3", SelectionEventMode.ADD.toString(),
+            ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(selectionEventConsumer, times(1)).accept(eq("SelectionEvent"),
-                argThat(se -> verifySelectionEvent(se, "root:4", "root:4:0:3")));
+                argThat(se -> verifySelectionEvent(se, "root:5", "root:5:0:4")));
         });
     }
 
@@ -179,7 +182,8 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1_2);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REMOVE.toString(), ROWKEYS_1);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", REMOVE.toString(),
+            ROWKEYS_1.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -199,7 +203,8 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("nodeId", REPLACE.toString(), ROWKEYS_2);
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", REPLACE.toString(),
+            ROWKEYS_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -231,9 +236,10 @@ public class DefaultNodeServiceTest {
     private static void setupSelectionEventSource(final BiConsumer<String, SelectionEvent> selectionEventConsumer,
         final SubNodeContainer node) {
         var selectionEventSource =
-            new SelectionEventSource((n, o) -> selectionEventConsumer.accept(n, (SelectionEvent)o));
+            new SelectionEventSource<>((n, o) -> selectionEventConsumer.accept(n, (SelectionEvent)o),
+                NodeViewManager.getInstance().getTableViewManager());
         WizardPageUtil.getWizardPageNodes(node.getWorkflowManager())
-            .forEach(nnc -> selectionEventSource.addEventListenerFor(nnc));
+            .forEach(nnc -> selectionEventSource.addEventListenerFor(NodeWrapper.of(nnc)));
     }
 
 }
