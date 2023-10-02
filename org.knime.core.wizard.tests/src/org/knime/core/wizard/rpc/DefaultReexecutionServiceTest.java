@@ -61,11 +61,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import org.awaitility.Awaitility;
 import org.junit.Test;
-import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.RpcSingleClient;
@@ -73,6 +71,7 @@ import org.knime.core.webui.data.rpc.RpcSingleServer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcSingleServer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcTestUtil;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.core.wizard.WizardPageCreationHelper;
 import org.knime.core.wizard.WorkflowTestCase;
 import org.knime.gateway.api.entity.NodeViewEnt;
 
@@ -104,9 +103,9 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
      */
     @Test
     public void testReexecutePage() throws Exception {
-        Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator =
+        WizardPageCreationHelper pageCreationHelper =
             nnc -> NodeViewEnt.create(nnc, () -> List.of("selection 1", "selection 2"));
-        ReexecutionService service = createReexecutionService(5, nodeViewEntCreator);
+        ReexecutionService service = createReexecutionService(5, pageCreationHelper);
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("5:0:7",
@@ -152,7 +151,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
      */
     @Test
     public void testFailureOnReExecution() throws Exception {
-        ReexecutionService service = createReexecutionService(6, null);
+        ReexecutionService service = createReexecutionService(6, NodeViewEnt::create);
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("6:0:9",
@@ -199,15 +198,15 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
     }
 
     private ReexecutionService createReexecutionService(final int pageId,
-        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws Exception {
+        final WizardPageCreationHelper pageCreationHelper) throws Exception {
         NodeID wfId = loadAndSetWorkflow();
         executeAllAndWait();
 
         // create reexecution service 'client'
         SubNodeContainer component = (SubNodeContainer)getManager().getNodeContainer(new NodeID(wfId, pageId));
-        SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub", false, nodeViewEntCreator);
+        SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub", false, pageCreationHelper);
         RpcSingleServer<ReexecutionService> rpcServer =
-            new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService(nodeViewEntCreator));
+            new JsonRpcSingleServer<ReexecutionService>(model.createReexecutionService(pageCreationHelper));
         RpcSingleClient<ReexecutionService> rpcClient = JsonRpcTestUtil
             .createRpcSingleClientInstanceForTesting(ReexecutionService.class, rpcServer.getHandler(), MAPPER);
         return rpcClient.getService();

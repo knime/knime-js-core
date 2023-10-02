@@ -99,6 +99,7 @@ import org.knime.core.ui.node.workflow.NodeContainerUI;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.wizard.SubnodeViewableModel;
+import org.knime.core.wizard.WizardPageCreationHelper;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.service.events.SelectionEventSource;
@@ -381,13 +382,13 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     if (hasData && (url = getViewURL().orElse(null)) != null) {
                         onPageLoaded(() -> {
                             var snc = getNodeContainer();
-                            var nodeViewEntCreator = createNodeViewEntCreator(() -> m_selectionEventSource);
+                            var pageCreationHelper = createWizardPageCreationHelper(() -> m_selectionEventSource);
                             var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
-                                createJsonRpcFunction(snc, getViewableModel(), nodeViewEntCreator));
+                                createJsonRpcFunction(snc, getViewableModel(), pageCreationHelper));
                             if (snc != null) {
                                 m_selectionEventSource = new SelectionEventSource(eventConsumer);
                             }
-                            return createInitScript(nodeViewEntCreator);
+                            return createInitScript(pageCreationHelper);
                         });
                         m_browserWrapper.setUrl(url);
                         return;
@@ -403,20 +404,28 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
     }
 
-    private static Function<NativeNodeContainer, NodeViewEnt>
-        createNodeViewEntCreator(final Supplier<SelectionEventSource> selectionEventSourceSupplier) {
-        return nnc -> { // NOSONAR
-            var selectionEventSource = selectionEventSourceSupplier.get();
-            if (selectionEventSource == null) {
-                return NodeViewEnt.create(nnc);
-            } else {
-                return NodeViewEnt.create(nnc,
-                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
-                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
-                        .orElse(Collections.emptyList()));
+    /**
+     * @param selectionEventSourceSupplier
+     * @return a new {@link WizardPageCreationHelper}-instance
+     * @since 5.2
+     */
+    protected WizardPageCreationHelper
+        createWizardPageCreationHelper(final Supplier<SelectionEventSource> selectionEventSourceSupplier) {
+        return new WizardPageCreationHelper() {
+
+            @Override
+            public NodeViewEnt createNodeViewEnt(final NativeNodeContainer nnc) {
+                var selectionEventSource = selectionEventSourceSupplier.get();
+                if (selectionEventSource == null) {
+                    return NodeViewEnt.create(nnc);
+                } else {
+                    return NodeViewEnt.create(nnc,
+                        () -> selectionEventSource.addEventListenerAndGetInitialEventFor(nnc)
+                            .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
+                            .orElse(Collections.emptyList()));
+                }
             }
         };
-
     }
 
     /**
@@ -433,7 +442,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         return m_browserWrapper == null || m_browserWrapper.isDisposed();
     }
 
-    private String createInitScript(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
+    private String createInitScript(final WizardPageCreationHelper pageCreationHelper) {
         WizardNode<REP, VAL> model = getModel();
         WizardViewCreator<REP, VAL> creator = model.getViewCreator();
         if (creator instanceof JavaScriptViewCreator<?, ?> && model instanceof CSSModifiable) {
@@ -442,25 +451,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         }
         if (model instanceof SubnodeViewableModel) {
             try {
-                ((SubnodeViewableModel)model).createPageAndValue(nodeViewEntCreator);
+                ((SubnodeViewableModel)model).createPageAndValue(pageCreationHelper);
             } catch (IOException e) {
                 // should never happen
                 throw new IllegalStateException("Wizard page couldn't be created", e);
             }
         }
-        prePagebuilderInitialization();
         var initCall = creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
         return creator.wrapInTryCatch(initCall);
-    }
-
-    /**
-     * Called right before the pagebuilder is initialized by executing the init-script. Everything else is set up and
-     * ready.
-     *
-     * @since 5.2
-     */
-    protected void prePagebuilderInitialization() {
-        // nothing to do by default
     }
 
     private void onPageLoaded(final Supplier<String> scriptToRun) {
@@ -507,10 +505,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     }
 
     private static JsonRpcFunction createJsonRpcFunction(final SingleNodeContainer snc,
-        final ViewableModel viewableModel, final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
+        final ViewableModel viewableModel, final WizardPageCreationHelper pageCreationHelper) {
         if (snc instanceof SubNodeContainer) {
             return new JsonRpcFunction((SubNodeContainer)snc,
-                ((SubnodeViewableModel)viewableModel).createReexecutionService(nodeViewEntCreator), false);
+                ((SubnodeViewableModel)viewableModel).createReexecutionService(pageCreationHelper), false);
         } else {
             return new JsonRpcFunction((NativeNodeContainer)snc);
         }

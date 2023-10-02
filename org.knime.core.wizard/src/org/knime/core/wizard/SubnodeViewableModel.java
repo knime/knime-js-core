@@ -77,7 +77,6 @@ import org.knime.core.node.wizard.AbstractWizardNodeView;
 import org.knime.core.node.wizard.WizardNode;
 import org.knime.core.node.wizard.WizardViewCreator;
 import org.knime.core.node.wizard.WizardViewRequestHandler;
-import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainerState;
 import org.knime.core.node.workflow.NodeStateChangeListener;
 import org.knime.core.node.workflow.SubNodeContainer;
@@ -129,7 +128,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      */
     private AtomicBoolean m_isReexecuteInProgress = new AtomicBoolean(false);
 
-    private Function<NativeNodeContainer, NodeViewEnt> m_nodeViewEntCreator;
+    private WizardPageCreationHelper m_pageCreationHelper;
 
     /**
      * Creates a new instance of this viewable model
@@ -140,7 +139,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      *
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName) throws IOException {
-        this(nodeContainer, viewName, false, null);
+        this(nodeContainer, viewName, false, NodeViewEnt::create);
     }
 
     /**
@@ -149,22 +148,21 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * @param nodeContainer the subnode container
      * @param viewName the name of the view
      * @param lazyPageAndValueInitialization whether the wizard page and respective view value should be created
-     *            immediately or later via {@link #createPageAndValue(Function)}
-     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
-     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
+     *            immediately or later via {@link #createPageAndValue(WizardPageCreationHelper)}
+     * @param pageCreationHelper extra logic that controls the wizard page creation
      * @throws IOException on view model creation error
-     * @since 4.6
+     * @since 5.2
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName,
         final boolean lazyPageAndValueInitialization,
-        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
+        final WizardPageCreationHelper pageCreationHelper) throws IOException {
         m_viewName = viewName;
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
         m_spm = CompositeViewPageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
-        m_nodeViewEntCreator = nodeViewEntCreator;
+        m_pageCreationHelper = pageCreationHelper;
         if (!lazyPageAndValueInitialization) {
-            createPageAndValue(nodeViewEntCreator);
+            createPageAndValue(pageCreationHelper);
         }
         m_nodeStateChangeListener = s -> onNodeStateChange();
         nodeContainer.addNodeStateChangeListener(m_nodeStateChangeListener);
@@ -187,7 +185,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                     if (v == null) {
                         // node was just executed, i.e. view is open and user executes via "run" button in main application
                         try {
-                            createPageAndValue(m_nodeViewEntCreator);
+                            createPageAndValue(m_pageCreationHelper);
                             assert m_value != null : "value supposed to be non-null on executed node";
                         } catch (IOException e) {
                             LOGGER.error("Creating view failed: " + e.getMessage(), e);
@@ -229,14 +227,13 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * {@link #SubnodeViewableModel(SubNodeContainer, String, boolean, Function)}, this method must be
      * called before calling {@link #getViewValue()} or {@link #getViewRepresentation()}.
      *
-     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
-     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
+     * @param pageCreationHelper extra logic to control the wizard page creation
      *
      * @throws IOException
-     * @since 4.6
+     * @since 5.2
      */
-    public void createPageAndValue(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
-        m_page = m_spm.createWizardPage(m_container.getID(), nodeViewEntCreator);
+    public void createPageAndValue(final WizardPageCreationHelper pageCreationHelper) throws IOException {
+        m_page = m_spm.createWizardPage(m_container.getID(), pageCreationHelper);
         Map<String, String> valueMap = new HashMap<String, String>();
         for (Entry<String, JSONWebNode> entry : m_page.getWebNodes().entrySet()) {
             String value = MAPPER.writeValueAsString(entry.getValue().getViewValue());
@@ -247,12 +244,13 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
+     * @param pageCreationHelper
      * @return a new {@link ReexecutionService} instance
      *
-     * @since 4.5
+     * @since 5.2
      */
-    public ReexecutionService createReexecutionService(final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) {
-        return new DefaultReexecutionService(m_container, nodeViewEntCreator, m_spm,
+    public ReexecutionService createReexecutionService(final WizardPageCreationHelper pageCreationHelper) {
+        return new DefaultReexecutionService(m_container, pageCreationHelper, m_spm,
             () -> m_isReexecuteInProgress.set(true), () -> m_isReexecuteInProgress.set(false));
     }
 

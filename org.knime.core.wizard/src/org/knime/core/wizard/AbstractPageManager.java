@@ -55,7 +55,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
@@ -81,7 +80,6 @@ import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeUIExtensionEnt;
-import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodeInfo;
@@ -134,14 +132,13 @@ public abstract class AbstractPageManager {
      * Performs a transformation from {@link WizardPage} to {@link JSONWebNodePage} which can be used for serialization.
      *
      * @param page the {@link WizardPage} to transform
-     * @param nodeViewEntCreator customizes the creation of {@link NodeViewEnt}-instances; if {@code null},
-     *            {@link NodeViewEnt#NodeViewEnt(NativeNodeContainer)} is used
+     * @param pageCreationHelper extra logic that controls the wizard page creation
      * @return the transformed {@link JSONWebNodePage}
      * @throws IOException if layout of page can not be generated
-     * @since 4.6
+     * @since 5.2
      */
     protected JSONWebNodePage createWizardPageInternal(final WizardPage page,
-        final Function<NativeNodeContainer, NodeViewEnt> nodeViewEntCreator) throws IOException {
+        final WizardPageCreationHelper pageCreationHelper) throws IOException {
         // process layout
         JSONLayoutPage layout = new JSONLayoutPage();
         try {
@@ -185,16 +182,17 @@ public abstract class AbstractPageManager {
         for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
             NativeNodeContainer nnc = e.getValue();
             if (nnc.getNodeModel() instanceof WizardNode) {
-                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc));
+                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc, pageCreationHelper));
             } else if (NodeViewManager.hasNodeView(nnc)) {
-                var nodeViewEnt = nodeViewEntCreator == null ? NodeViewEnt.create(nnc) : nodeViewEntCreator.apply(nnc);
+                var nodeViewEnt = pageCreationHelper.createNodeViewEnt(nnc);
                 nodeViews.put(e.getKey().toString(), nodeViewEnt);
             }
         }
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);
     }
 
-    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc) {
+    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc,
+        final WizardPageCreationHelper pageCreationHelper) {
         JSONWebNode jsonNode = new JSONWebNode();
         JSONWebNodeInfo info = new JSONWebNodeInfo();
         info.setNodeName(nnc.getName());
@@ -244,7 +242,9 @@ public abstract class AbstractPageManager {
                 jsonNode.setValidateMethodName(template.getValidateMethodName());
                 jsonNode.setSetValidationErrorMethodName(template.getSetValidationErrorMethodName());
                 jsonNode.setGetViewValueMethodName(template.getPullViewContentMethodName());
-                jsonNode.setViewRepresentation((JSONViewContent)wizardNode.getViewRepresentation());
+                var viewRepresentation = (JSONViewContent) wizardNode.getViewRepresentation();
+                pageCreationHelper.updateViewRepresentation(viewRepresentation);
+                jsonNode.setViewRepresentation(viewRepresentation);
                 jsonNode.setViewValue((JSONViewContent)wizardNode.getViewValue());
 
                 if (wizardNode instanceof CSSModifiable) {
