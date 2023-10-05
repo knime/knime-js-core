@@ -229,6 +229,8 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         //m_shell.setImage(ImageRepository.getIconImage(SharedImages.KNIME));
         GridLayout layout = new GridLayout();
         layout.numColumns = 1;
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
         m_shell.setLayout(layout);
 
         m_browserWrapper = createBrowserWrapper(m_shell);
@@ -238,9 +240,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
 
         Composite buttonComposite = new Composite(m_shell, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.END, GridData.END, false, false));
-        buttonComposite.setLayout(new RowLayout());
+        RowLayout buttonLayout = new RowLayout();
+        buttonLayout.marginWidth = 4;
+        buttonLayout.marginTop = 1;
+        buttonLayout.marginBottom = 6;
+        buttonComposite.setLayout(buttonLayout);
 
-        ToolBar toolBar = new ToolBar(buttonComposite, SWT.BORDER | SWT.HORIZONTAL);
+        ToolBar toolBar = new ToolBar(buttonComposite, SWT.BORDER | SWT.FLAT | SWT.HORIZONTAL);
+        toolBar.setCursor(display.getSystemCursor(SWT.CURSOR_HAND));
         ToolItem resetButton = new ToolItem(toolBar, SWT.PUSH);
         resetButton.setText("Reset");
         resetButton.addSelectionListener(new SelectionAdapter() {
@@ -366,6 +373,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_shell.open();
 
         setBrowserContent(true);
+        m_shell.setFocus(); // moves focus off the buttons when window opened
         m_viewSet.set(true);
     }
 
