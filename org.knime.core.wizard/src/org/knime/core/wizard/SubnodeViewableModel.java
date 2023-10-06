@@ -139,7 +139,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      *
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName) throws IOException {
-        this(nodeContainer, viewName, false, NodeViewEnt::create);
+        this(nodeContainer, viewName, false, null);
     }
 
     /**
@@ -160,7 +160,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
         m_spm = CompositeViewPageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
-        m_pageCreationHelper = pageCreationHelper;
+        m_pageCreationHelper = pageCreationHelper == null ? NodeViewEnt::create : pageCreationHelper;
         if (!lazyPageAndValueInitialization) {
             createPageAndValue(pageCreationHelper);
         }
