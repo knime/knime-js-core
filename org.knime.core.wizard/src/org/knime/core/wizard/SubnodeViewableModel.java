@@ -162,7 +162,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         m_container = nodeContainer;
         m_pageCreationHelper = pageCreationHelper == null ? NodeViewEnt::create : pageCreationHelper;
         if (!lazyPageAndValueInitialization) {
-            createPageAndValue(pageCreationHelper);
+            createPageAndValue(m_pageCreationHelper);
         }
         m_nodeStateChangeListener = s -> onNodeStateChange();
         nodeContainer.addNodeStateChangeListener(m_nodeStateChangeListener);
