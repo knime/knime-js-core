@@ -138,7 +138,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
     private BrowserFunctionInternal m_rpcCallback;
     private List<BrowserFunctionWrapper> m_additionalCallbacks;
-    private SelectionEventSource m_selectionEventSource;
+    private SelectionEventSource<NodeWrapper> m_selectionEventSource;
     private final AtomicBoolean m_viewSet = new AtomicBoolean(false);
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
@@ -389,14 +389,10 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     String url;
                     if (hasData && (url = getViewURL().orElse(null)) != null) {
                         onPageLoaded(() -> {
-                            var snc = getNodeContainer();
                             var pageCreationHelper = createWizardPageCreationHelper(() -> m_selectionEventSource);
                             var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
-                                createJsonRpcFunction(snc, getViewableModel(), pageCreationHelper));
-                            if (snc != null) {
-                                m_selectionEventSource = new SelectionEventSource<>(eventConsumer,
-                                    NodeViewManager.getInstance().getTableViewManager());
-                            }
+                                createJsonRpcFunction(getNodeContainer(), getViewableModel(), pageCreationHelper));
+                            initSelectionEventSource(eventConsumer);
                             return createInitScript(pageCreationHelper);
                         });
                         m_browserWrapper.setUrl(url);
@@ -431,6 +427,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                         .orElse(Collections.emptyList()));
             }
         };
+    }
+
+    private void initSelectionEventSource(final BiConsumer<String, Object> eventConsumer) {
+        var snc = getNodeContainer();
+        if (snc != null) {
+            m_selectionEventSource =
+                new SelectionEventSource<>(eventConsumer, NodeViewManager.getInstance().getTableViewManager());
+        }
     }
 
     /**
