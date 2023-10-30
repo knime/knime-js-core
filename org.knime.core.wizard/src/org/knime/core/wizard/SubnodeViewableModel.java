@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 import org.apache.commons.io.FileUtils;
 import org.knime.core.node.AbstractNodeView.ViewableModel;
@@ -107,8 +106,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     WizardViewRequestHandler<SubnodeViewRequest, SubnodeViewResponse> {
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewableModel.class);
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private JSONWebNodePage m_page;
     private SubnodeViewValue m_value;
@@ -224,7 +221,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * Creates the wizard page (i.e. the view representation here) and the view value.
      *
      * In case of lazy initialization (see
-     * {@link #SubnodeViewableModel(SubNodeContainer, String, boolean, Function)}, this method must be
+     * {@link #SubnodeViewableModel(SubNodeContainer, String, boolean, WizardPageCreationHelper)}, this method must be
      * called before calling {@link #getViewValue()} or {@link #getViewRepresentation()}.
      *
      * @param pageCreationHelper extra logic to control the wizard page creation
@@ -236,7 +233,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         m_page = m_spm.createWizardPage(m_container.getID(), pageCreationHelper);
         Map<String, String> valueMap = new HashMap<String, String>();
         for (Entry<String, JSONWebNode> entry : m_page.getWebNodes().entrySet()) {
-            String value = MAPPER.writeValueAsString(entry.getValue().getViewValue());
+            String value = SubnodeViewValue.MAPPER.writeValueAsString(entry.getValue().getViewValue());
             valueMap.put(entry.getKey(), value);
         }
         m_value = new SubnodeViewValue();

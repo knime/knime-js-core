@@ -94,7 +94,13 @@ public class SubnodeViewValue extends JSONViewContent implements WebViewContentC
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(SubnodeViewValue.class);
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    /**
+     * The {@link ObjectMapper} used to read view values for comparison (see
+     * {@link #compareViewValues(JSONViewContent)}).
+     *
+     * @since 5.2
+     */
+    public static final ObjectMapper MAPPER = new ObjectMapper();
 
     private Map<String, String> m_viewValues = new HashMap<>();
 
