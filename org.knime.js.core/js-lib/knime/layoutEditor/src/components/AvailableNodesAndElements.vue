@@ -3,7 +3,11 @@
     <h4>Views <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="availableNodes"
-      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false, draggable: '.item'}"
+      :options="{
+        group: { name: 'content', pull: 'clone', put: false },
+        sort: false,
+        draggable: '.item',
+      }"
       :clone="onCloneNode"
       :move="onMoveNode"
       element="ul"
@@ -18,12 +22,8 @@
         @click.prevent="onAvailableNodeClick(node)"
       >
         <div class="name">
-          <img
-            :src="node.icon"
-          >
-          <div
-            :title="node.name"
-          >
+          <img :src="node.icon">
+          <div :title="node.name">
             {{ node.name }}
           </div>
           <small class="text-muted">Node {{ node.nodeID }}</small>
@@ -47,7 +47,10 @@
     <h4>Rows <small class="text-muted">drag into layout or click</small></h4>
     <Draggable
       v-model="$store.state.elements"
-      :options="{group: {name: 'content', pull: 'clone', put: false}, sort: false}"
+      :options="{
+        group: { name: 'content', pull: 'clone', put: false },
+        sort: false,
+      }"
       :clone="onCloneElement"
       element="ul"
       class="availableElements"
@@ -68,9 +71,34 @@
         />
       </li>
     </Draggable>
+
+    <h4>Print <small class="text-muted">drag into layout or click</small></h4>
+    <Draggable
+      v-model="$store.state.print"
+      :options="{
+        group: { name: 'content', pull: 'clone', put: false },
+        sort: false,
+      }"
+      :clone="onCloneElement"
+      element="ul"
+      class="availableElements"
+      @start="$store.commit('setDragging', true)"
+      @end="$store.commit('setDragging', false)"
+    >
+      <li
+        v-for="(element, index) in $store.state.print"
+        :key="index"
+        :title="element.name"
+        class="item row preview no-gutters align-items-center print"
+        @click.prevent="onAvailableElementClick(element)"
+      >
+        <div class="print-item">
+          <span class="label">{{ element.name }}</span>
+        </div>
+      </li>
+    </Draggable>
   </div>
 </template>
-
 
 <script>
 import Draggable from 'vuedraggable';
@@ -109,7 +137,6 @@ export default {
 };
 </script>
 
-
 <style lang="postcss" scoped>
 @import "../style/variables.css";
 
@@ -126,7 +153,8 @@ export default {
     padding: 2px 5px;
     margin-bottom: 4px;
 
-    &:hover {
+    &:hover,
+    &:hover .print-item .label {
       background-color: var(--knime-view-preview-active);
     }
   }
@@ -176,7 +204,7 @@ export default {
 
 .availableElements {
   & .item {
-    background-color: #fff;
+    background-color: #ffffff;
   }
 
   & .row {
@@ -190,6 +218,22 @@ export default {
 
   & .col:not(:last-of-type) {
     border-right: 2px solid var(--knime-gray-ultra-light);
+  }
+
+  & .print-item {
+    width: 100%;
+    height: 11px;
+    margin-bottom: 9px;
+    text-align: center;
+    color: var(--knime-silver-sand);
+    border-bottom: 2px dotted var(--knime-gray-ultra-light);
+
+    & .label {
+      padding: 0 5px;
+      background-color: #ffffff;
+      line-height: 18px;
+      vertical-align: middle;
+    }
   }
 }
 </style>

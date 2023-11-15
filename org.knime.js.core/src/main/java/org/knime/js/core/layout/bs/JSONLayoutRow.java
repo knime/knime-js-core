@@ -65,6 +65,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutContent {
 
     private List<JSONLayoutColumn> m_columns = new ArrayList<JSONLayoutColumn>(0);
+    private boolean m_pageBreakAfter = false;
 
     /**
      * @return the columns
@@ -90,6 +91,24 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
     }
 
     /**
+     * @return if a page break is supposed to be enforced after the row
+     * @since 5.2
+     */
+    @JsonProperty(defaultValue = "false", value = "pageBreakAfter")
+    public boolean isPageBreakAfter() {
+        return m_pageBreakAfter;
+    }
+
+    /**
+     * @param pageBreakAfter whether or not a page break is supposed to be enforced after the row
+     * @since 5.2
+     */
+    @JsonProperty("pageBreakAfter")
+    public void setPageBreakAfter(final boolean pageBreakAfter) {
+        m_pageBreakAfter = pageBreakAfter;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -107,6 +126,7 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
         return new EqualsBuilder()
                 .appendSuper(super.equals(obj))
                 .append(m_columns, other.m_columns)
+                .append(m_pageBreakAfter, other.m_pageBreakAfter)
                 .isEquals();
     }
 
@@ -118,6 +138,7 @@ public class JSONLayoutRow extends JSONLayoutElement implements JSONLayoutConten
         return new HashCodeBuilder()
                 .appendSuper(super.hashCode())
                 .append(m_columns)
+                .append(m_pageBreakAfter)
                 .toHashCode();
     }
 

@@ -68,6 +68,16 @@ const generateRowTemplates = function () {
     });
 };
 
+const generatePrintTemplates = function () {
+    return [{
+        name: 'Page Break',
+        data: {
+            type: 'row',
+            pageBreakAfter: true
+        }
+    }];
+};
+
 // clean up the layout:
 // - remove columns without a 'content' property
 // - remove rows without a 'columns' property
@@ -116,6 +126,9 @@ const cleanLayout = function (layout) {
                         }
                     });
                     return true;
+                } else if (item.pageBreakAfter) {
+                    // empty rows allowed if used for enforcing page breaks
+                    return true;
                 } else {
                     // remove rows without 'columns' array
                     return false;
@@ -155,7 +168,8 @@ export const state = () => ({
     layout: getEmptyLayout(),
     initialLayout: null,
     nodes: [],
-    elements: generateRowTemplates()
+    elements: generateRowTemplates(),
+    print: generatePrintTemplates()
 });
 
 export const mutations = {
