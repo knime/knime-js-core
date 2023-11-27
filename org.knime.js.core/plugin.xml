@@ -2035,7 +2035,7 @@
             category="org.knime.workbench.ui.preferences"
             class="org.knime.js.core.preferences.JavaScriptPreferencePage"
             id="org.knime.js.core.preferences"
-            name="JavaScript Views">
+            name="JavaScript Views (legacy)">
       </page>
    </extension>
    <!-- <extension

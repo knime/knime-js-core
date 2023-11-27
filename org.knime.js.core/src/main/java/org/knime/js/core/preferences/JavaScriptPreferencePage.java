@@ -108,7 +108,9 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
                 new Path("icons/js.png"), null));
             setImageDescriptor(ImageDescriptor.createFromURL(jsIcon));
         } catch (IOException e) { /* do nothing, it's just a picture */ }
-        setDescription("Setup display options for nodes utilizing JavaScript views.");
+        setDescription("Setup display options for nodes utilizing legacy JavaScript views. "
+            + "Note that the preferences on this page do not affect the modern JavaScript view nodes. "
+            + "These nodes always use the Chromium Embedded Framework (CEF) browser.");
     }
 
     /**
