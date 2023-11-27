@@ -103,6 +103,7 @@ import org.knime.core.wizard.WizardPageCreationHelper;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.service.events.SelectionEventSource;
+import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
 
@@ -455,6 +456,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             } catch (IOException e) {
                 // should never happen
                 throw new IllegalStateException("Wizard page couldn't be created", e);
+            }
+        } else {
+            var rep = model.getViewRepresentation();
+            if (rep instanceof JSONViewContent jsonViewContent) {
+                pageCreationHelper.updateViewRepresentation(jsonViewContent);
             }
         }
         var initCall = creator.createInitJSViewMethodCall(model.getViewRepresentation(), model.getViewValue());
