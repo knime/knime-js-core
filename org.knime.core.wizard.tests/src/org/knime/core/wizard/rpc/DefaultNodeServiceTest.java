@@ -166,12 +166,12 @@ public class DefaultNodeServiceTest {
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component, false);
         setupSelectionEventSource(selectionEventConsumer, component);
-        nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:3", SelectionEventMode.ADD.toString(),
+        nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:4", SelectionEventMode.ADD.toString(),
             ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(selectionEventConsumer, times(1)).accept(eq("SelectionEvent"),
-                argThat(se -> verifySelectionEvent(se, "root:5", "root:5:0:4")));
+                argThat(se -> verifySelectionEvent(se, "root:5", "root:5:0:5")));
         });
     }
 
