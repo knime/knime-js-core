@@ -1,5 +1,7 @@
 <template>
-  <div class="row no-gutters">
+  <div
+    class="row no-gutters"
+  >
     <Column
       v-for="(column, index) in columns"
       :key="index"
@@ -7,12 +9,6 @@
       :deletable="isColumnDeletable(column)"
       :column="column"
     />
-    <div
-      v-if="row.pageBreakAfter"
-      class="print-item"
-    >
-      <span class="label">Page Break</span>
-    </div>
 
     <EditButton
       v-if="canAddColumn"
@@ -32,6 +28,7 @@
   </div>
 </template>
 
+
 <script>
 import Column from './Column';
 import config from '../../config';
@@ -47,20 +44,15 @@ export default {
     },
     computed: {
         canAddColumn() {
-            return (
-                !(this.row.pageBreakAfter && this.columns.length === 0) &&
-        this.columns.length < config.gridSize
-            );
+            return this.columns.length < config.gridSize;
         },
         isRowDeletable() {
             // make sure only empty rows (= 1 empty column) can be deleted
-            const isEmpty =
-        this.columns.length === 0 ||
-        (this.columns.length === 1 && this.columns[0].content.length === 0);
+            const isEmpty = this.columns.length === 1 && this.columns[0].content.length === 0;
             return this.deletable && isEmpty;
         },
         columns() {
-            return this.row.columns ?? [];
+            return this.row.columns;
         }
     },
     methods: {
@@ -111,23 +103,6 @@ export default {
 
   & .addColumnButton {
     top: calc((var(--column-min-height) / 2) - var(--button-size) / 2);
-  }
-
-  & .print-item {
-    width: 100%;
-    height: 11px;
-    margin: 2px 7px 11px;
-    text-align: center;
-    color: var(--knime-silver-sand);
-    border-bottom: 2px dotted var(--knime-gray-ultra-light);
-
-    & .label {
-      padding: 0 5px;
-      background-color: #ffffff;
-      line-height: 18px;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
   }
 }
 </style>

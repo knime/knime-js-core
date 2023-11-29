@@ -1,20 +1,19 @@
 <template>
   <div class="item">
     <KnimeView
-      v-if="
-        item.type === 'view' ||
-          item.type === 'nestedLayout' ||
-          item.type === 'quickform'
-      "
+      v-if="item.type === 'view' || item.type === 'nestedLayout' || item.type === 'quickform'"
       :view="item"
     />
     <Row
       v-else-if="item.type === 'row'"
       :row="item"
     />
-    <div v-else-if="item.type === 'html'">
+    <div
+      v-else-if="item.type === 'html'"
+    >
       HTML
     </div>
+
 
     <EditButton
       v-if="item.type !== 'row'"
@@ -28,7 +27,7 @@
     <Popper
       v-if="item.type === 'view' || item.type === 'quickform'"
       trigger="click"
-      :options="{ placement: 'top-start' }"
+      :options="{placement: 'top-start'}"
       :append-to-body="true"
       :force-show="showConfigDialog"
       @show="showConfigDialog = true"
@@ -36,7 +35,7 @@
     >
       <EditButton
         slot="reference"
-        :class="['configButton', { active: showConfigDialog }]"
+        :class="['configButton', {active: showConfigDialog}]"
         title="Configure size"
       >
         <ConfigIcon />
@@ -53,7 +52,7 @@
     <Popper
       v-if="item.type === 'nestedLayout' && componentLegacyModeEnabled"
       trigger="click"
-      :options="{ placement: 'top-start' }"
+      :options="{placement: 'top-start'}"
       :append-to-body="true"
       :force-show="showLegacyFlagDialog"
       @show="showLegacyFlagDialog = true"
@@ -62,7 +61,7 @@
       <EditButton
         slot="reference"
         title="Legacy mode is enabled for this nested component view"
-        :class="['legacyButton', { active: showLegacyFlagDialog }]"
+        :class="['legacyButton', {active: showLegacyFlagDialog}]"
       >
         <InfoIcon />
       </EditButton>
@@ -73,8 +72,8 @@
           class="legacyInfo"
           @close="showLegacyFlagDialog = false"
         >
-          Legacy mode is enabled for this nested component view. You can change
-          these settings by editing the layout within this nested component.
+          Legacy mode is enabled for this nested component view. You can change these
+          settings by editing the layout within this nested component.
         </div>
       </div>
     </Popper>
@@ -86,6 +85,7 @@
     />
   </div>
 </template>
+
 
 <script>
 import KnimeView from './KnimeView';
@@ -105,7 +105,7 @@ export default {
         DeleteIcon,
         ConfigIcon,
         InfoIcon
-    // Row compontent is added dynamically in beforeCreate() method, see below
+        // Row compontent is added dynamically in beforeCreate() method, see below
     },
     props: {
         item: { default: () => {}, type: Object }
@@ -118,14 +118,13 @@ export default {
     },
     computed: {
         componentLegacyModeEnabled() {
-            return this.$store.state.nodes.some(
-                (node) => node.nodeID === this.item.nodeID && node.containerLegacyModeEnabled
-            );
+            return this.$store.state.nodes
+                .some(node => node.nodeID === this.item.nodeID && node.containerLegacyModeEnabled);
         }
     },
     beforeCreate() {
-    // dynamic import because of recursive components (see https://vuejs.org/v2/guide/components-edge-cases.html#Circular-References-Between-Components)
-    this.$options.components.Row = require("./Row.vue").default; // eslint-disable-line
+        // dynamic import because of recursive components (see https://vuejs.org/v2/guide/components-edge-cases.html#Circular-References-Between-Components)
+        this.$options.components.Row = require('./Row.vue').default; // eslint-disable-line
     },
     methods: {
         onContentItemDelete() {
@@ -138,6 +137,7 @@ export default {
     }
 };
 </script>
+
 
 <style lang="postcss" scoped>
 .item {
