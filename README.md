@@ -1,4 +1,6 @@
-# ![Image](https://www.knime.com/files/knime_logo_github_40x40_4layers.png) KNIMEÂ® JS Core
+# ![Image](https://www.knime.com/sites/default/files/knime_logo_github_40x40_4layers.png) KNIME® JS Core
+[![Jenkins](https://jenkins.knime.com/buildStatus/icon?job=knime-js-core%2Fmaster)](https://jenkins.knime.com/job/knime-js-core/job/master/)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KNIME_knime-js-core&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=KNIME_knime-js-core)
 
 ### Content
 This repository contains the source code of the [KNIME Analytics Platform](http://www.knime.org) JavaScript-Core components. The code is organized as follows:
