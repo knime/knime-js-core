@@ -79,7 +79,7 @@ import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.gateway.api.entity.NodeUIExtensionEnt;
+import org.knime.gateway.api.entity.UIExtensionEnt;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
 import org.knime.js.core.JSONWebNodeInfo;
@@ -178,7 +178,7 @@ public abstract class AbstractPageManager {
         JSONWebNodePageConfiguration pageConfig =
             new JSONWebNodePageConfiguration(layout, null, selectionTranslators, projectRelativePageIDSuffix);
         Map<String, JSONWebNode> webNodes = new HashMap<>();
-        Map<String, NodeUIExtensionEnt> nodeViews = new HashMap<>();
+        Map<String, UIExtensionEnt> nodeViews = new HashMap<>();
         for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
             NativeNodeContainer nnc = e.getValue();
             if (nnc.getNodeModel() instanceof WizardNode) {

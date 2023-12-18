@@ -57,7 +57,7 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
-import org.knime.gateway.api.entity.NodeUIExtensionEnt;
+import org.knime.gateway.api.entity.UIExtensionEnt;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -75,7 +75,7 @@ public class JSONWebNodePage extends JSONViewContent {
     private final String m_version;
     private JSONWebNodePageConfiguration m_configuration;
     private Map<String, JSONWebNode> m_webNodes;
-    private Map<String, NodeUIExtensionEnt> m_nodeViews;
+    private Map<String, UIExtensionEnt> m_nodeViews;
 
     /**
      * @param configuration
@@ -85,13 +85,13 @@ public class JSONWebNodePage extends JSONViewContent {
      * @since 4.5
      */
     public JSONWebNodePage(final JSONWebNodePageConfiguration configuration, final Map<String, JSONWebNode> webNodes,
-        final Map<String, NodeUIExtensionEnt> nodeViews) {
+        final Map<String, UIExtensionEnt> nodeViews) {
         this(configuration, webNodes, nodeViews, KNIMEConstants.VERSION);
     }
 
     @JsonCreator
     private JSONWebNodePage(@JsonProperty("webNodePageConfiguration") final JSONWebNodePageConfiguration configuration,
-        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes, final Map<String, NodeUIExtensionEnt> nodeViews,
+        @JsonProperty("webNodes") final Map<String, JSONWebNode> webNodes, final Map<String, UIExtensionEnt> nodeViews,
         @JsonProperty("version") final String version) {
         m_version = version;
         m_configuration = configuration;
@@ -145,7 +145,7 @@ public class JSONWebNodePage extends JSONViewContent {
      * @since 4.5
      */
     @JsonProperty("nodeViews")
-    public Map<String, NodeUIExtensionEnt> getNodeViews() {
+    public Map<String, UIExtensionEnt> getNodeViews() {
         return m_nodeViews;
     }
 
@@ -155,7 +155,7 @@ public class JSONWebNodePage extends JSONViewContent {
      * @since 4.5
      */
     @JsonProperty("nodeViews")
-    public void setNodeViews(final Map<String, NodeUIExtensionEnt> nodeViews) {
+    public void setNodeViews(final Map<String, UIExtensionEnt> nodeViews) {
         m_nodeViews = nodeViews;
     }
 

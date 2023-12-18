@@ -102,7 +102,7 @@ import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.WizardPageCreationHelper;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.service.events.SelectionEventSource;
+import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
@@ -424,7 +424,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             } else {
                 return NodeViewEnt.create(nnc,
                     () -> selectionEventSource.addEventListenerAndGetInitialEventFor(NodeWrapper.of(nnc))
-                        .map(org.knime.gateway.impl.service.events.SelectionEvent::getSelection)
+                        .map(org.knime.gateway.impl.webui.service.events.SelectionEvent::getSelection)
                         .orElse(Collections.emptyList()));
             }
         };

@@ -68,8 +68,8 @@ import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.node.view.table.TableViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
-import org.knime.gateway.impl.service.events.SelectionEventSource;
-import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
+import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
+import org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode;
 
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany

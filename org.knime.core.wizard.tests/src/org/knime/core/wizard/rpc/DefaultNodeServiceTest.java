@@ -54,8 +54,7 @@ import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REMOVE;
-import static org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode.REPLACE;
+import static org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode.REMOVE;
 import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -86,9 +85,9 @@ import org.knime.core.node.workflow.WorkflowAnnotationID;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.gateway.impl.service.events.SelectionEvent;
-import org.knime.gateway.impl.service.events.SelectionEventSource;
-import org.knime.gateway.impl.service.events.SelectionEventSource.SelectionEventMode;
+import org.knime.gateway.impl.webui.service.events.SelectionEvent;
+import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
+import org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode;
 import org.knime.testing.node.view.NodeViewNodeFactory;
 import org.knime.testing.util.WorkflowManagerUtil;
 
@@ -203,8 +202,8 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", REPLACE.toString(),
-            ROWKEYS_2.stream().map(RowKey::toString).toList());
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
+            SelectionEventMode.REPLACE.toString(), ROWKEYS_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
