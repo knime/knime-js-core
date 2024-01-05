@@ -263,23 +263,27 @@ public class JavaScriptPreferencePage extends FieldEditorPreferencePage implemen
         if (isInternal) {
             String os = Platform.getOS();
             if (Platform.OS_WIN32.equals(os)) {
-                return name + " (IE - not recommended)";
+                name += " (IE - not recommended)";
             }
             if (Platform.OS_MACOSX.equals(os)) {
-                return name + " (Safari)";
+                name += " (Safari)";
             }
             if (Platform.OS_LINUX.equals(os)) {
-                return name + " (Webkit)";
+                name += " (Webkit)";
             }
+        }
+        var isNotCef = !CEF_BROWSER.equals(view.getViewClass().getCanonicalName());
+        if (isNotCef) {
+            name += " - support discontinued";
         }
         return name;
     }
 
     private static String getHeadlessName(final HeadlessBrowserExtension browser) {
         String name = browser.getBrowserName();
-        boolean isPhantom = HEADLESS_PHANTOMJS.equals(browser.getImageGeneratorClass().getCanonicalName());
-        if (isPhantom) {
-            return name + " (support discontinued)";
+        var isNotCef = !HEADLESS_CEF.equals(browser.getImageGeneratorClass().getCanonicalName());
+        if (isNotCef) {
+            name += " - support discontinued";
         }
         return name;
     }
