@@ -184,8 +184,18 @@ public abstract class AbstractPageManager {
             if (nnc.getNodeModel() instanceof WizardNode) {
                 webNodes.put(e.getKey().toString(), createJSONWebNode(nnc, pageCreationHelper));
             } else if (NodeViewManager.hasNodeView(nnc)) {
-                var nodeViewEnt = pageCreationHelper.createNodeViewEnt(nnc);
-                nodeViews.put(e.getKey().toString(), nodeViewEnt);
+                if (pageCreationHelper == null) {
+                    var webNode = createJSONWebNode(nnc, null);
+                    var info = webNode.getNodeInfo();
+                    info.setNodeErrorMessage("Please choose another browser in order to display node views "
+                        + "(Preferences > JavaScript Views (legacy)).");
+                    info.setNodeWarnMessage(null);
+                    info.setDisplayPossible(false);
+                    webNodes.put(e.getKey().toString(), webNode);
+                } else {
+                    var nodeViewEnt = pageCreationHelper.createNodeViewEnt(nnc);
+                    nodeViews.put(e.getKey().toString(), nodeViewEnt);
+                }
             }
         }
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);
@@ -242,8 +252,10 @@ public abstract class AbstractPageManager {
                 jsonNode.setValidateMethodName(template.getValidateMethodName());
                 jsonNode.setSetValidationErrorMethodName(template.getSetValidationErrorMethodName());
                 jsonNode.setGetViewValueMethodName(template.getPullViewContentMethodName());
-                var viewRepresentation = (JSONViewContent) wizardNode.getViewRepresentation();
-                pageCreationHelper.updateViewRepresentation(viewRepresentation);
+                var viewRepresentation = (JSONViewContent)wizardNode.getViewRepresentation();
+                if (pageCreationHelper != null) {
+                    pageCreationHelper.updateViewRepresentation(viewRepresentation);
+                }
                 jsonNode.setViewRepresentation(viewRepresentation);
                 jsonNode.setViewValue((JSONViewContent)wizardNode.getViewValue());
 
