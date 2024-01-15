@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -101,6 +102,14 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JSONWebNodeSerializer.class);
 
     private static final long serialVersionUID = 3247239167142L;
+
+    static final List<String> ALWAYS_ALLOWED_NODES =
+        Arrays.asList(new String[]{
+            JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME,
+            "Generic JavaScript View",
+            "Generic JavaScript View (JavaScript)",
+            "Generic JavaScript View (legacy)"
+        });
 
     // default empty
     static final List<String> m_allowNodes = getAllowedNodes();
@@ -149,9 +158,8 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
         // check if node is configured to be sanitized
         String nodeName = value.getNodeInfo().getNodeName();
-        boolean shouldSanitizeNode =
-            m_allowNodes.stream().noneMatch(excludedNodeName -> StringUtils.equals(excludedNodeName, nodeName))
-                && !StringUtils.equals(JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME, nodeName);
+        boolean shouldSanitizeNode = Stream.concat(ALWAYS_ALLOWED_NODES.stream(), m_allowNodes.stream())
+            .noneMatch(allowedNodeName -> StringUtils.equals(allowedNodeName, nodeName));
 
         Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
 

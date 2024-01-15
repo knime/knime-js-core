@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.js.core" version="2">
+    <resource path="src/main/java/org/knime/js/core/JSCorePlugin.java" type="org.knime.js.core.JSCorePlugin">
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="5.2 (UIEXT-1518)"/>
+                <message_argument value="5.3 (UIEXT-1518)"/>
+                <message_argument value="SYS_PROPERTY_SANITIZE_GENERIC_JS_VIEW"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/main/java/org/knime/js/core/JSONDataTable.java" type="org.knime.js.core.JSONDataTable$Builder">
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="5.2"/>
+                <message_argument value="5.3"/>
+                <message_argument value="useStringSanitizer(StringSanitizationSerializer)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/main/java/org/knime/js/core/StringSanitizationSerializer.java" type="org.knime.js.core.StringSanitizationSerializer">
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="5.2"/>
+                <message_argument value="5.3"/>
+                <message_argument value="StringSanitizationSerializer()"/>
+            </message_arguments>
+        </filter>
+        <filter id="1225785346">
+            <message_arguments>
+                <message_argument value="5.2"/>
+                <message_argument value="5.3"/>
+                <message_argument value="sanitize(String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>

@@ -47,8 +47,11 @@ package org.knime.js.core;
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
 import org.owasp.html.HtmlPolicyBuilder;
@@ -80,11 +83,31 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
 
     private static final StringSerializer DEFAULT_STR_SERIALIZER = new StringSerializer();
 
+    private final static List<String> ALLOW_ELEMENTS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+
+    private final static List<String> ALLOW_ATTRS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+
+    private final static boolean ALLOW_CSS = BooleanUtils.isNotTrue(
+        StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
+
     /**
      * The HTML Policy which is used to sanitize user data.
      */
     @SuppressWarnings("java:S1948")
     private final HtmlPolicyBuilder m_policyBuilder;
+
+    /**
+     * Custom String HTML sanitization serializer.
+     *
+     * @see #StringSanitizationSerializer(List, List, boolean)
+     *
+     * Uses the available system properties (if set) for allowElems, allowAttrs and allowCSS
+     * @since 5.2
+     *
+     */
+    public StringSanitizationSerializer() {
+        this(ALLOW_ELEMENTS, ALLOW_ATTRS, ALLOW_CSS);
+    }
 
     /**
      * Custom String HTML sanitization serializer.
@@ -135,8 +158,9 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
      *
      * @param dirtyString
      * @return cleanString
+     * @since 5.2
      */
-    private String sanitize(final String dirtyString) {
+    public String sanitize(final String dirtyString) {
         StringBuilder sanitizedValueBuilder = new StringBuilder();
 
         HtmlStreamRenderer streamRenderer = HtmlStreamRenderer.create(sanitizedValueBuilder,
@@ -191,6 +215,22 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
         }
 
         return policyBuilder;
+    }
+
+    /**
+     * Helper to retrieve the value of a comma-separated {@literal String} system property (if it has been defined) and
+     * return an array of strings; else an empty array.
+     *
+     * @param propertyName - system property name to retrieve and parse
+     * @return array of parsed strings from the defined property value else an empty string array
+     */
+    private static List<String> getSysPropertyOrDefault(final String propertyName) {
+        String propertyValue = System.getProperty(propertyName);
+        if (propertyValue == null) {
+            return new ArrayList<>();
+        }
+        return Arrays.asList(propertyValue.split(",")).stream().map(String::trim).collect(ArrayList::new,
+            ArrayList::add, ArrayList::addAll);
     }
 
     /**
