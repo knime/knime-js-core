@@ -165,6 +165,14 @@ public final class JSCorePlugin extends AbstractUIPlugin {
     public static final String SYS_PROPERTY_SANITIZE_ALLOW_CSS = "js.core.sanitize.allowCSS";
 
     /**
+     * If <code>true</code> (default <code>false</code>) the input data (input table and flow variables) for
+     * the Generic JavaScript View will be sanitized according to the other set OWASP policy values.
+     *
+     * @since 5.2 (UIEXT-1518)
+     */
+    public static final String SYS_PROPERTY_SANITIZE_GENERIC_JS_VIEW = "js.core.sanitize.sanitizeGenericJSView";
+
+    /**
      * Class name of a node view implementation using a specific browser.
      *
      * @since 4.4

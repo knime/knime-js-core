@@ -170,6 +170,7 @@ public class JSONDataTable {
     private boolean m_extractRowSizes = false;
     private boolean m_calculateDataHash = false;
     private boolean m_useIncomingTableDomain;
+    private StringSanitizationSerializer m_stringSanitizer = null;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -296,7 +297,8 @@ public class JSONDataTable {
                 possValues.set(c, new LinkedHashSet<Object>());
                 if (m_useIncomingTableDomain && columnDomain.hasValues()) {
                     possValues.get(c).addAll(columnDomain.getValues().stream()
-                        .map(JSONDataTable::getJSONCellValue).collect(Collectors.toCollection(LinkedHashSet::new)));
+                        .map(cell -> getJSONCellValue(cell))
+                        .collect(Collectors.toCollection(LinkedHashSet::new)));
                 }
             } else if (m_useIncomingTableDomain) {
                 if (columnDomain.hasLowerBound()) {
@@ -803,7 +805,7 @@ public class JSONDataTable {
         return container.getTable();
     }
 
-    private static Object getJSONCellValue(final DataCell cell) {
+    private Object getJSONCellValue(final DataCell cell) {
         if (cell.isMissing()) {
             return null;
         }
@@ -822,13 +824,21 @@ public class JSONDataTable {
             case NUMBER:
                 return ((DoubleValue)cell).getDoubleValue();
             case STRING:
-                return ((StringValue)cell).getStringValue();
+                String stringValue = ((StringValue)cell).getStringValue();
+                if (m_stringSanitizer != null) {
+                    stringValue = m_stringSanitizer.sanitize(stringValue);
+                }
+                return stringValue;
             case PNG:
                 return new String(Base64.encodeBase64(((PNGImageValue)cell).getImageContent().getByteArray()));
             case SVG:
                 return ((SvgValue)cell).toString();
             default:
-                return cell.toString();
+                String stringRepresentation = cell.toString();
+                if (m_stringSanitizer != null) {
+                    stringRepresentation = m_stringSanitizer.sanitize(stringRepresentation);
+                }
+                return stringRepresentation;
         }
     }
 
@@ -1127,6 +1137,7 @@ public class JSONDataTable {
         private Boolean m_extractRowSizes = null;
         private Boolean m_calculateDataHash = null;
         private Boolean m_useIncomingTableDomain;
+        private StringSanitizationSerializer m_stringSanitizer = null;
 
         private Builder() { /* simple hidden default constructor */ }
 
@@ -1293,6 +1304,17 @@ public class JSONDataTable {
         }
 
         /**
+         * @param stringSanitizer a {@link StringSanitizationSerializer} used to HTML sanitize string compatible cells
+         * according to OWASP sanitization standards. Sanitization will be turned off if <code>null</code> is passed.
+         * @return This builder instance, which can be used for method chaining.
+         * @since 5.2
+         */
+        public Builder useStringSanitizer(final StringSanitizationSerializer stringSanitizer) {
+            m_stringSanitizer = stringSanitizer;
+            return this;
+        }
+
+        /**
          * Builds a new JSONDataTable instance from the current configuration of this builder.
          *
          * @param exec an execution monitor for setting progress, may be null
@@ -1380,6 +1402,9 @@ public class JSONDataTable {
             }
             if (m_useIncomingTableDomain != null) {
                 result.m_useIncomingTableDomain = m_useIncomingTableDomain;
+            }
+            if (m_stringSanitizer != null) {
+                result.m_stringSanitizer = m_stringSanitizer;
             }
             if (m_dataRows != null) {
                 result.buildJSONTableFromCache(m_dataRows, exec);
