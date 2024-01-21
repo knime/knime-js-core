@@ -353,6 +353,9 @@ public class JSONDataTable {
                 }
             }
 
+            if (m_stringSanitizer != null) {
+                rowKey = m_stringSanitizer.sanitize(rowKey);
+            }
             JSONDataTableRow currentRow = new JSONDataTableRow(rowKey, numOfColumns);
             // don't add a row if it's not in the window for JSON data table
             boolean excludeRow = currentRowNumber < m_firstRow || currentRowNumber - m_firstRow + 1 > m_maxRows;
@@ -445,7 +448,7 @@ public class JSONDataTable {
             }
         }
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows);
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows, m_stringSanitizer);
         jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
@@ -597,6 +600,9 @@ public class JSONDataTable {
             }
 
             String rowKey = row.getKey().getString();
+            if (m_stringSanitizer != null) {
+                rowKey = m_stringSanitizer.sanitize(rowKey);
+            }
             JSONDataTableRow jsonRow = new JSONDataTableRow(rowKey, numOfColumns);
 
             int c = 0;
@@ -614,7 +620,7 @@ public class JSONDataTable {
             }
         }
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), rows.length);
+        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), rows.length, m_stringSanitizer);
         jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);

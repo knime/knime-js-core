@@ -18,6 +18,15 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/main/java/org/knime/js/core/JSONDataTableSpec.java" type="org.knime.js.core.JSONDataTableSpec">
+        <filter id="1141899266">
+            <message_arguments>
+                <message_argument value="5.2"/>
+                <message_argument value="5.3"/>
+                <message_argument value="JSONDataTableSpec(DataTableSpec, String[], int, StringSanitizationSerializer)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/main/java/org/knime/js/core/StringSanitizationSerializer.java" type="org.knime.js.core.StringSanitizationSerializer">
         <filter id="1141899266">
             <message_arguments>

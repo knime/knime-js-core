@@ -247,7 +247,17 @@ public class JSONDataTableSpec {
      *
      */
     public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows) {
+        this(spec, excludeColumns, numRows, null);
+    }
 
+    /**
+     * @param spec the DataTableSpec for this JSONTable
+     * @param excludeColumns an array of column names to exclude from the creation of the spec
+     * @param numRows the number of rows in the DataTable
+     * @param stringSanitizer a sanitizer to treat column names, may be null
+     * @since 5.2
+     */
+    public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows, final StringSanitizationSerializer stringSanitizer) {
         int numColumns = 0;
         List<String> colNames = new ArrayList<String>();
         List<JSTypes> colTypes = new ArrayList<JSTypes>();
@@ -256,6 +266,9 @@ public class JSONDataTableSpec {
         for (int i = 0; i < spec.getNumColumns(); i++) {
             String colName = spec.getColumnNames()[i];
             if (!Arrays.asList(excludeColumns).contains(colName)) {
+                if (stringSanitizer != null) {
+                    colName = stringSanitizer.sanitize(colName);
+                }
                 colNames.add(colName);
                 orgTypes.add(spec.getColumnSpec(i).getType().getName());
                 DataType colType = spec.getColumnSpec(i).getType();
@@ -275,6 +288,7 @@ public class JSONDataTableSpec {
         setKnimeTypes(orgTypes.toArray(new String[0]));
         setColorModels(colorModels.toArray(new JSONColorModel[0]));
     }
+
 
     /**
      * Finds the column with the specified name in the TableSpec and returns its index
