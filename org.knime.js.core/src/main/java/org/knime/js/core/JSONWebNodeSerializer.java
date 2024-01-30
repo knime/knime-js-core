@@ -104,12 +104,12 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
     private static final long serialVersionUID = 3247239167142L;
 
     static final List<String> ALWAYS_ALLOWED_NODES =
-        Arrays.asList(new String[]{
+        Arrays.asList(
             JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME,
             "Generic JavaScript View",
             "Generic JavaScript View (JavaScript)",
             "Generic JavaScript View (legacy)"
-        });
+        );
 
     // default empty
     static final List<String> m_allowNodes = getAllowedNodes();

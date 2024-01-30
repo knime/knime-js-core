@@ -257,7 +257,8 @@ public class JSONDataTableSpec {
      * @param stringSanitizer a sanitizer to treat column names, may be null
      * @since 5.2
      */
-    public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows, final StringSanitizationSerializer stringSanitizer) {
+    public JSONDataTableSpec(final DataTableSpec spec, final String[] excludeColumns, final int numRows,
+        final StringSanitizationSerializer stringSanitizer) {
         int numColumns = 0;
         List<String> colNames = new ArrayList<String>();
         List<JSTypes> colTypes = new ArrayList<JSTypes>();
@@ -288,7 +289,6 @@ public class JSONDataTableSpec {
         setKnimeTypes(orgTypes.toArray(new String[0]));
         setColorModels(colorModels.toArray(new JSONColorModel[0]));
     }
-
 
     /**
      * Finds the column with the specified name in the TableSpec and returns its index

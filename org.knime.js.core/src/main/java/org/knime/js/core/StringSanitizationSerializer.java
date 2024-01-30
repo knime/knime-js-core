@@ -83,11 +83,13 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
 
     private static final StringSerializer DEFAULT_STR_SERIALIZER = new StringSerializer();
 
-    private final static List<String> ALLOW_ELEMENTS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+    private static final List<String> ALLOW_ELEMENTS =
+        getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
 
-    private final static List<String> ALLOW_ATTRS = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+    private static final List<String> ALLOW_ATTRS =
+        getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
 
-    private final static boolean ALLOW_CSS = BooleanUtils.isNotTrue(
+    private static final boolean ALLOW_CSS = BooleanUtils.isNotTrue(
         StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
     /**
