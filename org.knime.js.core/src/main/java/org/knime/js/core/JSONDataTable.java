@@ -170,7 +170,7 @@ public class JSONDataTable {
     private boolean m_extractRowSizes = false;
     private boolean m_calculateDataHash = false;
     private boolean m_useIncomingTableDomain;
-    private StringSanitizationSerializer m_stringSanitizer = null;
+    private StringSanitizationSerializer m_stringSanitizer;
 
     /** Empty serialization constructor. Don't use.*/
     public JSONDataTable() {
@@ -297,7 +297,7 @@ public class JSONDataTable {
                 possValues.set(c, new LinkedHashSet<Object>());
                 if (m_useIncomingTableDomain && columnDomain.hasValues()) {
                     possValues.get(c).addAll(columnDomain.getValues().stream()
-                        .map(cell -> getJSONCellValue(cell))
+                        .map(this::getJSONCellValue)
                         .collect(Collectors.toCollection(LinkedHashSet::new)));
                 }
             } else if (m_useIncomingTableDomain) {
@@ -448,7 +448,8 @@ public class JSONDataTable {
             }
         }
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows, m_stringSanitizer);
+        JSONDataTableSpec jsonTableSpec =
+            new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), numRows, m_stringSanitizer);
         jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
@@ -620,7 +621,8 @@ public class JSONDataTable {
             }
         }
 
-        JSONDataTableSpec jsonTableSpec = new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), rows.length, m_stringSanitizer);
+        JSONDataTableSpec jsonTableSpec =
+            new JSONDataTableSpec(spec, excludedColumns.toArray(new String[0]), rows.length, m_stringSanitizer);
         jsonTableSpec.setHiddenColumns(hiddenColumns.toArray(new String[0]));
         jsonTableSpec.setMinValues(minJSONValues);
         jsonTableSpec.setMaxValues(maxJSONValues);
