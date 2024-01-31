@@ -54,6 +54,7 @@ import java.util.List;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
+import org.owasp.html.HtmlChangeListener;
 import org.owasp.html.HtmlPolicyBuilder;
 import org.owasp.html.HtmlSanitizer;
 import org.owasp.html.HtmlStreamRenderer;
@@ -165,10 +166,24 @@ public class StringSanitizationSerializer extends StdSerializer<String> implemen
     public String sanitize(final String dirtyString) {
         StringBuilder sanitizedValueBuilder = new StringBuilder();
 
-        HtmlStreamRenderer streamRenderer = HtmlStreamRenderer.create(sanitizedValueBuilder,
+        var streamRenderer = HtmlStreamRenderer.create(sanitizedValueBuilder,
             stringViolation -> LOGGER.debug("Sanitization policy violation detected: " + stringViolation));
 
-        HtmlSanitizer.sanitize(dirtyString, m_policyBuilder.build(streamRenderer));
+        var changeListener = new HtmlChangeListener<StringSanitizationSerializer>() {
+            @Override
+            public void discardedTag(final StringSanitizationSerializer context, final String elementName) {
+                LOGGER.debug("HTML sanitization policy violation detected, discarded tag " + elementName);
+            }
+
+            @Override
+            public void discardedAttributes(final StringSanitizationSerializer context, final String elementName,
+                final String... attributeNames) {
+                LOGGER.debug("HTML sanitization policy violation detected, discarded attribute(s) "
+                    + Arrays.toString(attributeNames) + " on tag " + elementName);
+            }
+        };
+
+        HtmlSanitizer.sanitize(dirtyString, m_policyBuilder.build(streamRenderer, changeListener, this));
 
         String newString = sanitizedValueBuilder.toString();
 
