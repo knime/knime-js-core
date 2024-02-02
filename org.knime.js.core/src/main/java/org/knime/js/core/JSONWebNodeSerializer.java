@@ -108,7 +108,9 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
             JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME,
             "Generic JavaScript View",
             "Generic JavaScript View (JavaScript)",
-            "Generic JavaScript View (legacy)"
+            "Generic JavaScript View (legacy)",
+            "Text Output Widget",
+            "Text Output Widget (legacy)"
         );
 
     // default empty
