@@ -51,6 +51,12 @@ package org.knime.js.core;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.knime.js.core.JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS;
+import static org.knime.js.core.JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS;
+import static org.knime.js.core.JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS;
+import static org.knime.js.core.JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH;
+import static org.knime.js.core.JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML;
+import static org.knime.js.core.SanitizationUtils.getSysPropertyOrDefault;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,6 +65,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Test;
@@ -76,11 +83,11 @@ public class JSONWebNodeSerializerTest {
 
     @After
     public void tearDown() {
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML);
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
-        System.clearProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS);
+        System.clearProperty(SYS_PROPERTY_SANITIZE_CLIENT_HTML);
+        System.clearProperty(SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
+        System.clearProperty(SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
+        System.clearProperty(SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
+        System.clearProperty(SYS_PROPERTY_SANITIZE_ALLOW_CSS);
     }
 
     @Test
@@ -94,12 +101,26 @@ public class JSONWebNodeSerializerTest {
     @Test
     public void testModifiedSerializer() throws IOException {
 
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+        System.setProperty(SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
 
         try (StringWriter stringWriter = new StringWriter();) {
             JSONViewContent.createObjectMapper().writeValue(stringWriter, getMockWebNode());
             assertFalse(StringUtils.contains(stringWriter.toString(), CHECK_STRING));
         }
+    }
+
+    @Test
+    public void testNodeExclusionLists() throws IOException {
+        // simple sanity checks
+        // the molecule widget only exists as 'legacy mode' and is therefore not exempt
+        assertFalse(SanitizationUtils.SAFE_WIDGET_NODES.contains("Molecule Widget"));
+        // the text output widget is treated special with input data being sanitized by default
+        assertTrue(SanitizationUtils.SAFE_WIDGET_NODES.contains("Text Output Widget"));
+
+        // the text output widget is treated special with input data being sanitized by default
+        assertFalse(SanitizationUtils.UNSAFE_LEGACY_WIDGET_NODES.contains("Text Output Widget"));
+        // the refresh button only exists as Vue component and thus has no 'legacy mode'
+        assertFalse(SanitizationUtils.UNSAFE_LEGACY_WIDGET_NODES.contains("Refresh Button Widget"));
     }
 
     @Test
@@ -115,12 +136,12 @@ public class JSONWebNodeSerializerTest {
             allowedNodes.add("Scatter Plot");
             allowedNodesConfig = getMockAllowedNodesFile(String.join("\n", allowedNodes));
 
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
+            System.setProperty(SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+            System.setProperty(SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
                 allowedNodesConfig.getCanonicalPath());
 
             // needed for testing only to manually read and update the static configuration field
-            updateStaticAllowedNodes();
+            updateStaticValues();
 
             try (StringWriter stringWriter = new StringWriter();) {
                 JSONViewContent.createObjectMapper().writeValue(stringWriter, getNamedMockWebNode(nodeName));
@@ -152,7 +173,7 @@ public class JSONWebNodeSerializerTest {
             assertEquals(3, strMatches);
         }
 
-        System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
+        System.setProperty(SYS_PROPERTY_SANITIZE_CLIENT_HTML, "true");
         webNodeMapper = JSONViewContent.createObjectMapper();
 
         try (StringWriter stringWriter = new StringWriter();) {
@@ -168,12 +189,10 @@ public class JSONWebNodeSerializerTest {
 
         ArrayList<String> mockParam = new ArrayList<>();
 
-        JSONWebNodeSerializer serializer = new JSONWebNodeSerializer(null, null);
-
-        assertTrue(serializer.getAllowNodes().equals(mockParam));
-        assertTrue(serializer.getAllowElems().equals(mockParam));
-        assertTrue(serializer.getAllowAttrs().equals(mockParam));
-        assertTrue(serializer.getAllowCSS());
+        assertTrue(SanitizationUtils.USER_ALLOWED_NODES.equals(mockParam));
+        assertTrue(SanitizationUtils.ALLOW_ELEMENTS.equals(mockParam));
+        assertTrue(SanitizationUtils.ALLOW_ATTRIBUTES.equals(mockParam));
+        assertTrue(SanitizationUtils.ALLOW_CSS);
 
         File allowedNodesConfig = null;
 
@@ -188,24 +207,22 @@ public class JSONWebNodeSerializerTest {
             String elemValue = "div";
             String attrValue = "data";
 
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
+            System.setProperty(SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH,
                 allowedNodesConfig.getCanonicalPath());
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS, elemValue);
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS, attrValue);
-            System.setProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS, "false");
-
-            serializer = new JSONWebNodeSerializer(null, null);
+            System.setProperty(SYS_PROPERTY_SANITIZE_ALLOW_ELEMS, elemValue);
+            System.setProperty(SYS_PROPERTY_SANITIZE_ALLOW_ATTRS, attrValue);
+            System.setProperty(SYS_PROPERTY_SANITIZE_ALLOW_CSS, "false");
 
             // needed for testing only to manually read and update the static configuration field
-            updateStaticAllowedNodes();
+            updateStaticValues();
 
-            List<String> sysAllowedNodes = serializer.getAllowNodes();
+            List<String> sysAllowedNodes = SanitizationUtils.USER_ALLOWED_NODES;
 
             assertFalse(sysAllowedNodes.isEmpty());
             sysAllowedNodes.forEach(nodeName -> assertTrue(allowedNodes.contains(nodeName)));
-            assertTrue(serializer.getAllowElems().contains(elemValue));
-            assertTrue(serializer.getAllowAttrs().contains(attrValue));
-            assertFalse(serializer.getAllowCSS());
+            assertTrue(SanitizationUtils.ALLOW_ELEMENTS.contains(elemValue));
+            assertTrue(SanitizationUtils.ALLOW_ATTRIBUTES.contains(attrValue));
+            assertFalse(SanitizationUtils.ALLOW_CSS);
         } catch (IOException e) {
             assertTrue("Mocking allowed configuration file failed: " + e, false);
         } finally {
@@ -215,9 +232,15 @@ public class JSONWebNodeSerializerTest {
         }
     }
 
-    private static void updateStaticAllowedNodes() {
-        JSONWebNodeSerializer.m_allowNodes.clear();
-        JSONWebNodeSerializer.m_allowNodes.addAll(JSONWebNodeSerializer.getAllowedNodes());
+    private static void updateStaticValues() {
+        SanitizationUtils.USER_ALLOWED_NODES.clear();
+        SanitizationUtils.ALLOW_ELEMENTS.clear();
+        SanitizationUtils.ALLOW_ATTRIBUTES.clear();
+        SanitizationUtils.USER_ALLOWED_NODES.addAll(SanitizationUtils.getUserAllowedNodes());
+        SanitizationUtils.ALLOW_ELEMENTS.addAll(getSysPropertyOrDefault(SYS_PROPERTY_SANITIZE_ALLOW_ELEMS));
+        SanitizationUtils.ALLOW_ATTRIBUTES.addAll(getSysPropertyOrDefault(SYS_PROPERTY_SANITIZE_ALLOW_ATTRS));
+        SanitizationUtils.ALLOW_CSS = BooleanUtils
+            .isNotTrue(StringUtils.equalsIgnoreCase(System.getProperty(SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
     }
 
     private static JSONWebNode getNamedMockWebNode(final String nodeName) {

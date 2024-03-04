@@ -182,10 +182,10 @@ public abstract class AbstractPageManager {
         for (Map.Entry<NodeIDSuffix, NativeNodeContainer> e : page.getPageMap().entrySet()) {
             NativeNodeContainer nnc = e.getValue();
             if (nnc.getNodeModel() instanceof WizardNode) {
-                webNodes.put(e.getKey().toString(), createJSONWebNode(nnc, pageCreationHelper));
+                webNodes.put(e.getKey().toString(), createJSONWebNode(e.getKey(), nnc, pageCreationHelper, layout));
             } else if (NodeViewManager.hasNodeView(nnc)) {
                 if (pageCreationHelper == null) {
-                    var webNode = createJSONWebNode(nnc, null);
+                    var webNode = createJSONWebNode(e.getKey(), nnc, null, layout);
                     var info = webNode.getNodeInfo();
                     info.setNodeErrorMessage("Please choose another browser in order to display node views "
                         + "(Preferences > JavaScript Views (legacy)).");
@@ -201,8 +201,8 @@ public abstract class AbstractPageManager {
         return new JSONWebNodePage(pageConfig, webNodes, nodeViews);
     }
 
-    private static JSONWebNode createJSONWebNode(final NativeNodeContainer nnc,
-        final WizardPageCreationHelper pageCreationHelper) {
+    private static JSONWebNode createJSONWebNode(final NodeIDSuffix nodeID, final NativeNodeContainer nnc,
+        final WizardPageCreationHelper pageCreationHelper, final JSONLayoutPage layout) {
         JSONWebNode jsonNode = new JSONWebNode();
         JSONWebNodeInfo info = new JSONWebNodeInfo();
         info.setNodeName(nnc.getName());
@@ -263,8 +263,49 @@ public abstract class AbstractPageManager {
                     jsonNode.setCustomCSS(((CSSModifiable)wizardNode).getCssStyles());
                 }
         }
+        if (isLegacyInLayout(nodeID, layout)) {
+            info.setLegacyMode(true);
+        }
         jsonNode.setNodeInfo(info);
         return jsonNode;
+    }
+
+    private static boolean isLegacyInLayout(final NodeIDSuffix nodeID, final JSONLayoutPage layout) {
+        if (layout != null && layout.getRows() != null) {
+            for (JSONLayoutRow row: layout.getRows()) {
+                if (isLegacyInRow(nodeID, row)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isLegacyInRow(final NodeIDSuffix nodeID, final JSONLayoutRow row) {
+        if (row.getColumns() != null) {
+            for (JSONLayoutColumn col : row.getColumns()) {
+                if (col.getContent() != null) {
+                    for (JSONLayoutContent content : col.getContent()) {
+                        if (content instanceof JSONLayoutRow) {
+                            if (isLegacyInRow(nodeID, (JSONLayoutRow)content)) {
+                                return true;
+                            }
+                        } else if (content instanceof JSONNestedLayout) {
+                            JSONNestedLayout nestedLayout = (JSONNestedLayout)content;
+                            if (isLegacyInLayout(nodeID, nestedLayout.getLayout())) {
+                                return true;
+                            }
+                        } else if (content instanceof JSONLayoutViewContent) {
+                            JSONLayoutViewContent view = (JSONLayoutViewContent)content;
+                            if (view.getUseLegacyMode() && view.getNodeID().equals(nodeID.toString())) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private JSONLayoutPage getJSONLayoutFromSubnode(final NodeID pageID, final String layoutInfo)

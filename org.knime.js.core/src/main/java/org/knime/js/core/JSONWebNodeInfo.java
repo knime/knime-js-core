@@ -56,6 +56,7 @@ import org.knime.core.node.workflow.NodeContainerState;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -124,6 +125,8 @@ public class JSONWebNodeInfo {
     private boolean m_displayPossible;
     private String m_nodeErrorMessage;
     private String m_nodeWarnMessage;
+    // non-serialized field
+    private boolean m_legacyMode;
 
     /**
      * @return the nodeName
@@ -207,6 +210,24 @@ public class JSONWebNodeInfo {
      */
     public void setNodeWarnMessage(final String nodeWarnMessage) {
         m_nodeWarnMessage = nodeWarnMessage;
+    }
+
+    /**
+     * @return the legacyModeSet
+     * @since 5.2
+     */
+    @JsonIgnore
+    public boolean isLegacyMode() {
+        return m_legacyMode;
+    }
+
+    /**
+     * @param legacyMode the legacyMode to set
+     * @since 5.2
+     */
+    @JsonIgnore
+    public void setLegacyMode(final boolean legacyMode) {
+        m_legacyMode = legacyMode;
     }
 
     /**
