@@ -48,22 +48,16 @@
  */
 package org.knime.js.core;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
+import static org.knime.js.core.SanitizationUtils.ALLOW_ATTRIBUTES;
+import static org.knime.js.core.SanitizationUtils.ALLOW_CSS;
+import static org.knime.js.core.SanitizationUtils.ALLOW_ELEMENTS;
+import static org.knime.js.core.SanitizationUtils.shouldSanitizeNode;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.knime.core.node.KNIMEConstants;
-import org.knime.core.node.NodeLogger;
-import org.knime.core.node.util.CheckUtils;
 import org.knime.js.core.StringSanitizationSerializer.JsonSanitize;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -99,32 +93,7 @@ import jakarta.json.stream.JsonGenerationException;
 @SuppressWarnings("java:S1948")
 class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
-    private static final NodeLogger LOGGER = NodeLogger.getLogger(JSONWebNodeSerializer.class);
-
     private static final long serialVersionUID = 3247239167142L;
-
-    static final List<String> ALWAYS_ALLOWED_NODES =
-        Arrays.asList(
-            JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME,
-            "Generic JavaScript View",
-            "Generic JavaScript View (JavaScript)",
-            "Generic JavaScript View (legacy)",
-            "Text Output Widget",
-            "Text Output Widget (legacy)"
-        );
-
-    // default empty
-    static final List<String> m_allowNodes = getAllowedNodes();
-
-    // default empty
-    private final List<String> m_allowElems = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ELEMS);
-
-    // default empty
-    private final List<String> m_allowAttrs = getSysPropertyOrDefault(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_ATTRS);
-
-    // default true
-    private final boolean m_allowCss = BooleanUtils.isNotTrue(
-        StringUtils.equalsIgnoreCase(System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_CSS), "false"));
 
     private final JsonSerializer<JSONWebNode> m_defaultSerializer;
 
@@ -159,9 +128,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         throws IOException {
 
         // check if node is configured to be sanitized
-        String nodeName = value.getNodeInfo().getNodeName();
-        boolean shouldSanitizeNode = Stream.concat(ALWAYS_ALLOWED_NODES.stream(), m_allowNodes.stream())
-            .noneMatch(allowedNodeName -> StringUtils.equals(allowedNodeName, nodeName));
+        boolean shouldSanitizeNode = shouldSanitizeNode(value.getNodeInfo());
 
         Set<String> ignoredProperties = m_beanDescription.getIgnoredPropertyNames();
 
@@ -170,7 +137,7 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
         // Copy of existing mapper with custom String serializer module
         ObjectMapper mapper = ((ObjectMapper)jgen.getCodec()).copy();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(new StringSanitizationSerializer(m_allowElems, m_allowAttrs, m_allowCss));
+        module.addSerializer(new StringSanitizationSerializer(ALLOW_ELEMENTS, ALLOW_ATTRIBUTES, ALLOW_CSS));
         mapper.registerModule(module);
 
         while (nodeProperties.hasNext()) {
@@ -199,67 +166,5 @@ class JSONWebNodeSerializer extends StdSerializer<JSONWebNode> {
 
         jgen.writeEndObject();
 
-    }
-
-    /**
-     * Helper to retrieve the value of a comma-separated {@literal String} system property (if it has been defined) and
-     * return an array of strings; else an empty array.
-     *
-     * @param propertyName - system property name to retrieve and parse
-     * @return array of parsed strings from the defined property value else an empty string array
-     */
-    private static List<String> getSysPropertyOrDefault(final String propertyName) {
-        String propertyValue = System.getProperty(propertyName);
-        if (propertyValue == null) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(propertyValue.split(",")).stream().map(String::trim).collect(ArrayList::new,
-            ArrayList::add, ArrayList::addAll);
-    }
-
-    static List<String> getAllowedNodes() {
-        String allowedNodesLocation = System.getProperty(JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH);
-        if (StringUtils.isNotBlank(allowedNodesLocation)) {
-            try {
-                Path allowedNodesPath = Paths.get(allowedNodesLocation);
-                CheckUtils.checkArgument(allowedNodesPath.isAbsolute(), "System property "
-                    + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + " must be an absolute path.");
-                CheckUtils.checkArgument(Files.exists(allowedNodesPath),
-                    "System property " + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + " file not found.");
-                return Files.readAllLines(allowedNodesPath);
-            } catch (IOException ex) {
-                LOGGER.error("Could not read from file configured for "
-                    + JSCorePlugin.SYS_PROPERTY_SANITIZE_ALLOW_NODES_PATH + ".");
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    /**
-     * @return the allowNodes
-     */
-    List<String> getAllowNodes() {
-        return m_allowNodes;
-    }
-
-    /**
-     * @return the allowElems
-     */
-    List<String> getAllowElems() {
-        return m_allowElems;
-    }
-
-    /**
-     * @return the allowAttrs
-     */
-    List<String> getAllowAttrs() {
-        return m_allowAttrs;
-    }
-
-    /**
-     * @return the allowCSS
-     */
-    boolean getAllowCSS() { // NOSONAR
-        return m_allowCss;
     }
 }
