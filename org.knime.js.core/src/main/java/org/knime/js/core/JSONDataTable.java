@@ -266,6 +266,7 @@ public class JSONDataTable {
                     + " greater than or equal zero");
         }
 
+        // NOFLUID used for table change detection (non-sensitive context)
         MessageDigest md5Digest = m_calculateDataHash ? DigestUtils.getMd5Digest() : null;
 
         ArrayList<Integer> includeColIndices = new ArrayList<Integer>();
