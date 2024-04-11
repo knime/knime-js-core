@@ -137,7 +137,7 @@ public class DefaultNodeService implements NodeService {
         } else if ("port".equals(extensionType)) {
             // NOTE!! This is inconsistent with the actual implementation of the DefaultNodeService (see knime-gateway).
             // Because port-view data is actually served via the PortService.callPortDataService-endpoint and
-            // this is just a quick and dirty solution - the proper solution is implemented via NXT-1949
+            // this is just a quick and dirty solution - the proper solution is implemented via NXT-1271
             dataServiceManager = PortViewManager.getInstance().getDataServiceManager();
         } else {
             throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
@@ -170,7 +170,7 @@ public class DefaultNodeService implements NodeService {
             HiLiteHandler hiLiteHandler;
             // NOTE!! This is just a quick and dirty solution. There will be an extra
             // PortService.updateDataPointSelection-endpoint for port views specifically.
-            // Proper solution is implemented with NXT-1949.
+            // Proper solution is implemented with NXT-1271.
             if (nodeWrapper instanceof NodePortWrapper portWrapper) {
                 var tableViewManager = PortViewManager.getInstance().getTableViewManager();
                 rowKeys = tableViewManager.callSelectionTranslationService(portWrapper, selection);
