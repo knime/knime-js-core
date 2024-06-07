@@ -102,7 +102,6 @@ import org.knime.core.wizard.SubnodeViewableModel;
 import org.knime.core.wizard.WizardPageCreationHelper;
 import org.knime.core.wizard.rpc.JsonRpcFunction;
 import org.knime.gateway.api.entity.NodeViewEnt;
-import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JavaScriptViewCreator;
 import org.knime.js.swt.wizardnodeview.ElementRadioSelectionDialog.RadioItem;
@@ -139,7 +138,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private BrowserFunctionInternal m_retrieveCurrentValueFromViewCallback;
     private BrowserFunctionInternal m_rpcCallback;
     private List<BrowserFunctionWrapper> m_additionalCallbacks;
-    private SelectionEventSource<NodeWrapper> m_selectionEventSource;
     private final AtomicBoolean m_viewSet = new AtomicBoolean(false);
     private final Map<String, AtomicReference<Object>> m_asyncEvalReferenceMap;
     private String m_title;
@@ -177,9 +175,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         var isExecuted = snc.getNodeContainerState().isExecuted();
 
         if (m_viewSet.getAndSet(isExecuted) != isExecuted) {
-            if (!isExecuted && m_selectionEventSource != null) {
-                m_selectionEventSource.removeAllEventListeners();
-            }
             display.asyncExec(() -> setBrowserContent(isExecuted));
         }
     }
@@ -390,10 +385,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     String url;
                     if (hasData && (url = getViewURL().orElse(null)) != null) {
                         onPageLoaded(() -> {
-                            var pageCreationHelper = createWizardPageCreationHelper(() -> m_selectionEventSource);
-                            var eventConsumer = initializeJsonRpcJavaBrowserCommunication(
+                            var pageCreationHelper = createWizardPageCreationHelper();
+                            initializeJsonRpcJavaBrowserCommunication(
                                 createJsonRpcFunction(getNodeContainer(), getViewableModel(), pageCreationHelper));
-                            initSelectionEventSource(eventConsumer);
                             return createInitScript(pageCreationHelper);
                         });
                         m_browserWrapper.setUrl(url);
@@ -411,31 +405,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     }
 
     /**
-     * @param selectionEventSourceSupplier
      * @return a new {@link WizardPageCreationHelper}-instance
-     * @since 5.2
+     * @since 5.3
      */
-    protected WizardPageCreationHelper
-        createWizardPageCreationHelper(final Supplier<SelectionEventSource<NodeWrapper>> selectionEventSourceSupplier) {
-        return nnc -> { // NOSONAR
-            var selectionEventSource = selectionEventSourceSupplier.get();
-            if (selectionEventSource == null) {
-                return NodeViewEnt.create(nnc);
-            } else {
-                return NodeViewEnt.create(nnc,
-                    () -> selectionEventSource.addEventListenerAndGetInitialEventFor(NodeWrapper.of(nnc))
-                        .map(org.knime.gateway.impl.webui.service.events.SelectionEvent::getSelection)
-                        .orElse(Collections.emptyList()));
-            }
-        };
-    }
-
-    private void initSelectionEventSource(final BiConsumer<String, Object> eventConsumer) {
-        var snc = getNodeContainer();
-        if (snc != null) {
-            m_selectionEventSource =
-                new SelectionEventSource<>(eventConsumer, NodeViewManager.getInstance().getTableViewManager());
-        }
+    protected WizardPageCreationHelper createWizardPageCreationHelper() {
+        return nnc -> NodeViewEnt.create(nnc, List::of);
     }
 
     /**
@@ -444,7 +418,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * @since 4.6
      */
     protected final void reloadBrowserContent() {
-        m_selectionEventSource.removeAllEventListeners();
         setBrowserContent(true);
     }
 
@@ -681,7 +654,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
      * {@inheritDoc}
      */
     @Override
-    public final void closeView() {
+    public void closeView() {
         if (m_viewRequestCallback != null && !m_viewRequestCallback.isDisposed()) {
             m_viewRequestCallback.dispose();
         }
@@ -714,9 +687,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (m_shell != null && !m_shell.isDisposed()) {
             m_shell.dispose();
         }
-        if (m_selectionEventSource != null) {
-            m_selectionEventSource.removeAllEventListeners();
-        }
         m_shell = null;
         if (m_browserWrapper != null) {
             synchronized (m_browserWrapper) { // NOSONAR
@@ -730,7 +700,6 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_validateCurrentValueInViewCallback = null;
         m_retrieveCurrentValueFromViewCallback = null;
         m_rpcCallback = null;
-        m_selectionEventSource = null;
         m_viewSet.set(false);
         // do instanceof check here to avoid a public discard method in the ViewableModel interface
         if (getViewableModel() instanceof SubnodeViewableModel) {

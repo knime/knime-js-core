@@ -50,6 +50,7 @@ package org.knime.core.wizard.rpc;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -68,8 +69,8 @@ import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.node.view.table.TableViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
-import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
-import org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode;
+import org.knime.gateway.api.webui.entity.SelectionEventEnt;
+import org.knime.gateway.impl.webui.service.events.SelectionEventBus;
 
 /**
  * @author Martin Horn, KNIME GmbH, Konstanz, Germany
@@ -189,8 +190,8 @@ public class DefaultNodeService implements NodeService {
 
     private static void updateDataPointSelection(final HiLiteHandler hlh, final NodeID nodeId, final String mode,
         final Set<RowKey> rowKeys) {
-        final var selectionEventMode = SelectionEventMode.valueOf(mode);
-        SelectionEventSource.processSelectionEvent(hlh, nodeId, selectionEventMode, true, rowKeys);
+        final var selectionEventMode = SelectionEventEnt.ModeEnum.valueOf(mode.toUpperCase(Locale.ROOT));
+        SelectionEventBus.processSelectionEvent(hlh, nodeId, selectionEventMode, true, rowKeys);
     }
 
     @Override

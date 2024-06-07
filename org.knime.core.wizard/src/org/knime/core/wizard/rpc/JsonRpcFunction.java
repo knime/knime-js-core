@@ -59,6 +59,7 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
+import org.knime.gateway.json.util.JsonUtil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,7 +75,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonRpcFunction {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER;
+
+    static {
+        MAPPER = new ObjectMapper();
+        JsonUtil.addIDEntityDeSerializer(MAPPER);
+    }
 
     /**
      * Name to use when, e.g., this function is injected into the browser.

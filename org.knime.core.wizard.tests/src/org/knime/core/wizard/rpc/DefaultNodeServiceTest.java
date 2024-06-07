@@ -54,11 +54,10 @@ import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode.REMOVE;
+import static org.knime.gateway.api.webui.entity.SelectionEventEnt.ModeEnum.ADD;
 import static org.knime.testing.util.WorkflowManagerUtil.createAndAddNode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -68,7 +67,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.junit.After;
@@ -85,9 +84,9 @@ import org.knime.core.node.workflow.WorkflowAnnotationID;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.view.NodeViewManager;
-import org.knime.gateway.impl.webui.service.events.SelectionEvent;
-import org.knime.gateway.impl.webui.service.events.SelectionEventSource;
-import org.knime.gateway.impl.webui.service.events.SelectionEventSource.SelectionEventMode;
+import org.knime.gateway.api.entity.NodeIDEnt;
+import org.knime.gateway.api.webui.entity.SelectionEventEnt;
+import org.knime.gateway.impl.webui.service.events.SelectionEventBus;
 import org.knime.testing.node.view.NodeViewNodeFactory;
 import org.knime.testing.util.WorkflowManagerUtil;
 
@@ -133,8 +132,8 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
-            SelectionEventMode.ADD.toString(), ROWKEYS_1_2.stream().map(RowKey::toString).toList());
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", ADD.toString(),
+            ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(ROWKEYS_1_2)));
@@ -148,7 +147,7 @@ public class DefaultNodeServiceTest {
     }
 
     @Test
-    public void testSelectDataPointsInComponentView() {
+    public void testSelectDataPointsInComponentView() throws Exception {
         NodeID n0 = createAndAddNode(m_wfm, new NodeViewNodeFactory(0, 1)).getID();
         NodeID n1 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 1)).getID();
         NodeID n2 = createAndAddNode(m_wfm, new NodeViewNodeFactory(1, 0)).getID();
@@ -161,17 +160,18 @@ public class DefaultNodeServiceTest {
         m_wfm.executeAllAndWaitUntilDone();
 
         @SuppressWarnings("unchecked")
-        final BiConsumer<String, SelectionEvent> selectionEventConsumer = mock(BiConsumer.class);
+        final Consumer<SelectionEventEnt> selectionEventConsumer = mock(Consumer.class);
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component, false);
-        setupSelectionEventSource(selectionEventConsumer, component);
-        nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:4", SelectionEventMode.ADD.toString(),
-            ROWKEYS_1_2.stream().map(RowKey::toString).toList());
+        try (var dispose = setupSelectionEvents(selectionEventConsumer, component)) {
+            nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:4", ADD.toString(),
+                ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
-        await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
-            verify(selectionEventConsumer, times(1)).accept(eq("SelectionEvent"),
-                argThat(se -> verifySelectionEvent(se, "root:5", "root:5:0:5")));
-        });
+            await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
+                verify(selectionEventConsumer, times(1))
+                    .accept(argThat(se -> verifySelectionEvent(se, "root:5", "root:5:0:5")));
+            });
+        }
     }
 
     @Test
@@ -181,8 +181,8 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1_2);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", REMOVE.toString(),
-            ROWKEYS_1.stream().map(RowKey::toString).toList());
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
+            SelectionEventEnt.ModeEnum.REMOVE.toString(), ROWKEYS_1.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -203,7 +203,7 @@ public class DefaultNodeServiceTest {
         m_hlh.fireHiLiteEvent(ROWKEYS_1);
 
         new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
-            SelectionEventMode.REPLACE.toString(), ROWKEYS_2.stream().map(RowKey::toString).toList());
+            SelectionEventEnt.ModeEnum.REPLACE.toString(), ROWKEYS_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(any());
@@ -226,19 +226,26 @@ public class DefaultNodeServiceTest {
             .untilAsserted(() -> assertThat(nnc.getNodeContainerState().isExecuted(), is(true)));
     }
 
-    private static boolean verifySelectionEvent(final SelectionEvent se, final String workflowId, final String nodeId) {
-        return se.getSelection().equals(ROWKEYS_1_2.stream().map(RowKey::toString).collect(Collectors.toList()))
-            && se.getMode() == SelectionEventMode.ADD && se.getNodeId().equals(nodeId)
-            && se.getWorkflowId().equals(workflowId) && se.getProjectId().startsWith(WORKFLOW_NAME);
+    private static boolean verifySelectionEvent(final SelectionEventEnt se, final String workflowId,
+        final String nodeId) {
+        return se.getSelection().equals(ROWKEYS_1_2.stream().map(RowKey::toString).toList()) && se.getMode() == ADD
+            && se.getNodeId().equals(new NodeIDEnt(nodeId)) && se.getWorkflowId().equals(new NodeIDEnt(workflowId))
+            && se.getProjectId().startsWith(WORKFLOW_NAME);
     }
 
-    private static void setupSelectionEventSource(final BiConsumer<String, SelectionEvent> selectionEventConsumer,
+    private static AutoCloseable setupSelectionEvents(final Consumer<SelectionEventEnt> selectionEventConsumer,
         final SubNodeContainer node) {
-        var selectionEventSource =
-            new SelectionEventSource<>((n, o) -> selectionEventConsumer.accept(n, (SelectionEvent)o),
-                NodeViewManager.getInstance().getTableViewManager());
-        WizardPageUtil.getWizardPageNodes(node.getWorkflowManager())
-            .forEach(nnc -> selectionEventSource.addEventListenerFor(NodeWrapper.of(nnc)));
+        var selectionEventBus = new SelectionEventBus();
+        selectionEventBus.addSelectionEventListener(selectionEventConsumer);
+        var wizardPageNodes = WizardPageUtil.getWizardPageNodes(node.getWorkflowManager());
+        wizardPageNodes
+            .forEach(nnc -> selectionEventBus.addSelectionEventEmitterAndGetInitialEvent(NodeWrapper.of(nnc),
+                NodeViewManager.getInstance().getTableViewManager()));
+        var nodeIdSet = wizardPageNodes.stream().map(NativeNodeContainer::getID).collect(Collectors.toSet());
+        return () -> {
+            selectionEventBus.removeSelectionEventEmitterIf(nodeIdSet::contains);
+            selectionEventBus.removeSelectionEventListener(selectionEventConsumer);
+        };
     }
 
 }
