@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Unit-Tests for org.knime.core.wizard
 Bundle-SymbolicName: org.knime.core.wizard.tests;singleton:=true
 Bundle-Version: 5.4.0.qualifier
-Fragment-Host: org.knime.core.wizard;bundle-version="[5.3.0,6.0.0)"
+Fragment-Host: org.knime.core.wizard;bundle-version="[5.4.0,6.0.0)"
 Automatic-Module-Name: org.knime.core.wizard.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.junit;bundle-version="[4.12.0,5.0.0)",
- org.knime.testing;bundle-version="[5.3.0,6.0.0)",
+ org.knime.testing;bundle-version="[5.4.0,6.0.0)",
  com.fasterxml.jackson.module.jackson-module-mrbean;bundle-version="[2.11.0,3.0.0)",
  org.awaitility;bundle-version="[3.0.0,4.0.0)",
  org.hamcrest.library;bundle-version="[2.2.0,3.0.0)",
  org.mockito.mockito-core;bundle-version="[2.28.2,3.0.0)",
- org.knime.core.ui.testing;bundle-version="[5.3.0,6.0.0)"
+ org.knime.core.ui.testing;bundle-version="[5.4.0,6.0.0)"
