@@ -60,6 +60,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.StreamReadConstraints;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -128,6 +129,12 @@ public abstract class JSONViewContent implements WebViewContent {
         mapper.registerModule(
             new SimpleModule().setSerializerModifier(new JSONWebNodeModifier())
         );
+        // UIEXT-2138 Jackson 2.15 imposed a limit on the max string length as a security measure
+        // (see, e.g., https://github.com/FasterXML/jackson-core/issues/1001).
+        // However, we decided to accept that in favor of enabling users to continue to use the
+        // 'File Upload Widget'-view with larger files (~30 MB) in their local AP.
+        mapper.getFactory()
+            .setStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(Integer.MAX_VALUE).build());
         return mapper;
     }
 
