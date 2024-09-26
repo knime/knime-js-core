@@ -90,12 +90,17 @@
           />
         </Draggable>
 
-        <p
+        <div
           v-if="availableNodes.length"
-          class="hint text-muted text-center"
+          class="hint text-muted text-left"
         >
-          <small>Views not added into the layout and not disabled in 'Node Usage' will be shown below layout.</small>
-        </p>
+          <WarningIcon class="icon" />
+          <small>
+            Views not added into the layout and not disabled in tab 'Node Usage' will be shown below layout.
+            <br>
+            To circumvent unexpected behavior, include all views in the layout.
+          </small>
+        </div>
       </div>
 
       <Debug
@@ -114,9 +119,10 @@ import AvailableNodesAndElements from './AvailableNodesAndElements';
 import Debug from './Debug';
 import config from '../config';
 import InfoIcon from 'open-iconic/svg/info.svg';
+import WarningIcon from '../../webapps-common/ui/assets/img/icons/sign-warning.svg';
 
 export default {
-    components: { Draggable, Row, AvailableNodesAndElements, Debug, InfoIcon },
+    components: { Draggable, Row, AvailableNodesAndElements, Debug, InfoIcon, WarningIcon },
     data() {
         return {
             showDebugInfo: false
@@ -223,6 +229,18 @@ body {
 
   & > .hint {
     line-height: 100%;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    width: fit-content;
+    margin-right: auto;
+    margin-left: auto;
+
+    & > svg {
+      fill: var(--knime-yellow);
+      height: 24px;
+      width: 24px;
+    }
   }
 }
 
