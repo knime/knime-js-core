@@ -74,6 +74,14 @@
           have been caused by changes made in the advanced layout editor. If this was intentional, you can ignore this
           warning. Otherwise, toggle the "Use legacy mode" option to synchronize the settings.
         </div>
+        <div
+          v-if="availableNodes.length"
+          class="alert alert-warning"
+          role="alert"
+        >
+          Views not added into the layout and not disabled in Tab 'Node Usage' will be shown below layout.
+          To circumvent unexpected behavior, add all views into the layout.
+        </div>
 
         <Draggable
           v-model="rows"
@@ -89,18 +97,6 @@
             :deletable="rows.length > 1"
           />
         </Draggable>
-
-        <div
-          v-if="availableNodes.length"
-          class="hint text-muted text-left"
-        >
-          <WarningIcon class="icon" />
-          <small>
-            Views not added into the layout and not disabled in tab 'Node Usage' will be shown below layout.
-            <br>
-            To circumvent unexpected behavior, include all views in the layout.
-          </small>
-        </div>
       </div>
 
       <Debug
@@ -119,10 +115,9 @@ import AvailableNodesAndElements from './AvailableNodesAndElements';
 import Debug from './Debug';
 import config from '../config';
 import InfoIcon from 'open-iconic/svg/info.svg';
-import WarningIcon from '../../webapps-common/ui/assets/img/icons/sign-warning.svg';
 
 export default {
-    components: { Draggable, Row, AvailableNodesAndElements, Debug, InfoIcon, WarningIcon },
+    components: { Draggable, Row, AvailableNodesAndElements, Debug, InfoIcon },
     data() {
         return {
             showDebugInfo: false
@@ -226,22 +221,6 @@ body {
   overflow-y: scroll;
   height: 100vh;
   min-height: 100px;
-
-  & > .hint {
-    line-height: 100%;
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    width: fit-content;
-    margin-right: auto;
-    margin-left: auto;
-
-    & > svg {
-      fill: var(--knime-yellow);
-      height: 24px;
-      width: 24px;
-    }
-  }
 }
 
 .layoutPreview {
