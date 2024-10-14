@@ -69,6 +69,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -78,6 +79,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -126,6 +128,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private static final String VIEW_VALID = "viewValid";
     private static final String VIEW_VALUE = "viewValue";
     private static final String EMPTY_OBJECT_STRING = "{}";
+
+    private static final int COMPOSITE_VIEW_WIDTH = 1024;
+    private static final int COMPOSITE_VIEW_HEIGHT = 768;
 
     private Shell m_shell;
 
@@ -352,13 +357,20 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 }
             }
         });
+        Point middle = new Point(knimeWindowBounds.width / 2 + knimeWindowBounds.x,
+            knimeWindowBounds.height / 2 + knimeWindowBounds.y);
 
-        m_shell.setSize(1024, 768);
+        // Adjust to the DPI of the monitor where the shell is currently displayed.
+        // Note: SWT uses the DPI of the monitor where the shell was initially created,
+        // which can cause issues in DPI-aware applications on Windows.
+        // This scalingFactor ensures dialogs adjust to the current monitor's DPI.
+        var monitorDPI = getDPIAtLocation(display, middle.x, middle.y);
+        var scalingFactor = (float)monitorDPI / DPIUtil.getDeviceZoom();
+        m_shell.setSize(Math.round(COMPOSITE_VIEW_WIDTH * scalingFactor),
+            Math.round(COMPOSITE_VIEW_HEIGHT * scalingFactor));
 
-        Point middle = new Point(knimeWindowBounds.width / 2, knimeWindowBounds.height / 2);
         // Left upper point for window
-        Point newLocation = new Point(middle.x - (m_shell.getSize().x / 2) + knimeWindowBounds.x,
-                                      middle.y - (m_shell.getSize().y / 2) + knimeWindowBounds.y);
+        Point newLocation = new Point(middle.x - (m_shell.getSize().x / 2), middle.y - (m_shell.getSize().y / 2));
         m_shell.setLocation(newLocation.x, newLocation.y);
         m_shell.addDisposeListener(new org.eclipse.swt.events.DisposeListener() {
             @Override
@@ -402,6 +414,16 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                 }
             }
         }
+    }
+
+    private static int getDPIAtLocation(final Display display, final int x, final int y) {
+        Monitor[] monitors = display.getMonitors();
+        for (Monitor monitor : monitors) {
+            if (monitor.getClientArea().contains(x, y)) {
+                return monitor.getZoom();
+            }
+        };
+        return DPIUtil.getDeviceZoom();
     }
 
     /**
@@ -1054,6 +1076,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     protected interface BrowserWrapper {
 
         void execute(String call);
+
 
         void setText(String html, boolean b);
 
