@@ -69,6 +69,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -126,6 +127,9 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
     private static final String VIEW_VALID = "viewValid";
     private static final String VIEW_VALUE = "viewValue";
     private static final String EMPTY_OBJECT_STRING = "{}";
+
+    private static final int COMPOSITE_VIEW_WIDTH = 1024;
+    private static final int COMPOSITE_VIEW_HEIGHT = 768;
 
     private Shell m_shell;
 
@@ -219,7 +223,7 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         m_title = (title == null ? "View" : title);
 
         Display display = getDisplay();
-        m_shell = new Shell(display, SWT.SHELL_TRIM);
+        m_shell = new Shell(display.getActiveShell(), SWT.SHELL_TRIM);
         m_shell.setText(m_title);
 
         //m_shell.setImage(ImageRepository.getIconImage(SharedImages.KNIME));
@@ -353,7 +357,14 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             }
         });
 
-        m_shell.setSize(1024, 768);
+        // Adjust to the DPI of the monitor where the shell is currently displayed.
+        // Note: SWT uses the DPI of the monitor where the shell was initially created,
+        // which can cause issues in DPI-aware applications on Windows.
+        // This scalingFactor ensures dialogs adjust to the current monitor's DPI.
+        var monitorDPI = m_shell.getMonitor().getZoom();
+        var scalingFactor = (float)monitorDPI / DPIUtil.getDeviceZoom();
+        m_shell.setSize(Math.round(COMPOSITE_VIEW_WIDTH * scalingFactor),
+            Math.round(COMPOSITE_VIEW_HEIGHT * scalingFactor));
 
         Point middle = new Point(knimeWindowBounds.width / 2, knimeWindowBounds.height / 2);
         // Left upper point for window
