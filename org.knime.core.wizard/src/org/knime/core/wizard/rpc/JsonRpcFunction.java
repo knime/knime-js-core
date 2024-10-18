@@ -55,9 +55,9 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
-import org.knime.core.node.workflow.NativeNodeContainer;
-import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.ui.node.workflow.NativeNodeContainerUI;
+import org.knime.core.ui.node.workflow.SingleNodeContainerUI;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.gateway.json.util.JsonUtil;
 
@@ -110,7 +110,7 @@ public class JsonRpcFunction {
      *
      * @param nnc
      */
-    public JsonRpcFunction(final NativeNodeContainer nnc) {
+    public JsonRpcFunction(final NativeNodeContainerUI nnc) {
         m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nnc));
     }
 
@@ -122,7 +122,7 @@ public class JsonRpcFunction {
      * @param viewIdx
      * @since 5.2
      */
-    public JsonRpcFunction(final SingleNodeContainer nc, final int portIdx, final int viewIdx) {
+    public JsonRpcFunction(final SingleNodeContainerUI nc, final int portIdx, final int viewIdx) {
         m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(nc, portIdx, viewIdx));
     }
 

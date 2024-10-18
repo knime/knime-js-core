@@ -59,8 +59,9 @@ import org.knime.core.node.NodeLogger;
 import org.knime.core.node.property.hilite.HiLiteHandler;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
-import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.ui.node.workflow.NativeNodeContainerUI;
+import org.knime.core.ui.node.workflow.SingleNodeContainerUI;
 import org.knime.core.webui.node.DataServiceManager;
 import org.knime.core.webui.node.NodePortWrapper;
 import org.knime.core.webui.node.NodeWrapper;
@@ -87,7 +88,7 @@ public class DefaultNodeService implements NodeService {
      *
      * @param nnc The {@link NativeNodeContainer}
      */
-    DefaultNodeService(final NativeNodeContainer nnc) {
+    DefaultNodeService(final NativeNodeContainerUI nnc) {
         m_getNodeWrapper = id -> NodeWrapper.of(nnc);
     }
 
@@ -121,7 +122,7 @@ public class DefaultNodeService implements NodeService {
      * @param portIdx
      * @param viewIdx
      */
-    DefaultNodeService(final SingleNodeContainer snc, final int portIdx, final int viewIdx) {
+    DefaultNodeService(final SingleNodeContainerUI snc, final int portIdx, final int viewIdx) {
         m_getNodeWrapper = id -> NodePortWrapper.of(snc, portIdx, viewIdx);
     }
 
