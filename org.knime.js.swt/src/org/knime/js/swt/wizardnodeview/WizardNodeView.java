@@ -58,6 +58,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -361,8 +362,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         // Note: SWT uses the DPI of the monitor where the shell was initially created,
         // which can cause issues in DPI-aware applications on Windows.
         // This scalingFactor ensures dialogs adjust to the current monitor's DPI.
-        var monitorDPI = m_shell.getMonitor().getZoom();
-        var scalingFactor = (float)monitorDPI / DPIUtil.getDeviceZoom();
+        var scalingFactor = 1.0f;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            var monitorDPI = m_shell.getMonitor().getZoom();
+            scalingFactor = (float)monitorDPI / DPIUtil.getDeviceZoom();
+        }
         m_shell.setSize(Math.round(COMPOSITE_VIEW_WIDTH * scalingFactor),
             Math.round(COMPOSITE_VIEW_HEIGHT * scalingFactor));
 
