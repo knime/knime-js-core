@@ -52,12 +52,15 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.ui.node.workflow.NativeNodeContainerUI;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
 import org.knime.gateway.json.util.JsonUtil;
 
@@ -127,6 +130,16 @@ public class JsonRpcFunction {
     }
 
     /**
+     * Json-rpc functions required for node dialogs used in the context of the remote workflow editor.
+     *
+     * @param nncUI
+     * @since 5.4
+     */
+    public JsonRpcFunction(final NativeNodeContainerUI nncUI) {
+        m_jsonRpcServer.addService(NodeService.class, new RWENodeService(nncUI));
+    }
+
+    /**
      * Helper to create a jsonrpc-notification call from a (json-serializable) event to be run as a JS script in the
      * browser.
      *
@@ -192,5 +205,39 @@ public class JsonRpcFunction {
      */
     public void dispose() {
         // nothing to dispose
+    }
+
+    /**
+     * {@link NodeService} implementation as backend for node dialogs in the context of remote workflow editor.
+     *
+     * @since 5.4
+     */
+    public static class RWENodeService implements NodeService {
+
+        private final NativeNodeContainerUI m_nncUI;
+
+        RWENodeService(final NativeNodeContainerUI nncUI) {
+            m_nncUI = nncUI;
+        }
+
+        @Override
+        public String callNodeDataService(final String projectId, final String workflowId, final String nodeId,
+            final String extensionType, final String serviceType, final String request) {
+            return m_nncUI.callNodeDataService(UUID.fromString(projectId), workflowId, nodeId, extensionType,
+                serviceType, request);
+        }
+
+        @Override
+        public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeId,
+            final String mode, final List<String> selection) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
+            final String action) {
+            throw new UnsupportedOperationException();
+        }
+
     }
 }
