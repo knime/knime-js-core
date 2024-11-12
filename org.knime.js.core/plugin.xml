@@ -1983,6 +1983,38 @@
                </importResource>
             </webResourceBundle>
             <webResourceBundle
+                  debug="false"
+                  exports="Plotly"
+                  name="Plotly.js 2.35.2"
+                  usesDefine="true"
+                  version="2.35.2"
+                  webResourceBundleID="plotly.js-2.35.2">
+               <webResource
+                     relativePathSource="js-lib/plotly/2.35.2/plotly.min.js"
+                     relativePathTarget="js-lib/plotly/2.35.2/plotly.min.js">
+               </webResource>
+               <importResource
+                     relativePath="js-lib/plotly/2.35.2/plotly.min.js"
+                     type="JAVASCRIPT">
+               </importResource>
+            </webResourceBundle>
+            <webResourceBundle
+                  debug="true"
+                  exports="Plotly"
+                  name="Plotly.js 2.35.2"
+                  usesDefine="true"
+                  version="2.35.2"
+                  webResourceBundleID="plotly.js-2.35.2_Debug">
+               <webResource
+                     relativePathSource="js-lib/plotly/2.35.2/plotly.js"
+                     relativePathTarget="js-lib/plotly/2.35.2/plotly.js">
+               </webResource>
+               <importResource
+                     relativePath="js-lib/plotly/2.35.2/plotly.js"
+                     type="JAVASCRIPT">
+               </importResource>
+            </webResourceBundle>
+            <webResourceBundle
                   debug="true"
                   name="KNIME Configuration Layout Editor"
                   usesDefine="false"
