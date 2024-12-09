@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Unit-Tests for org.knime.js.core
 Bundle-SymbolicName: org.knime.js.core.tests;singleton:=true
-Bundle-Version: 5.4.0.qualifier
+Bundle-Version: 5.5.0.qualifier
 Fragment-Host: org.knime.js.core;bundle-version="[5.4.0,6.0.0)"
 Automatic-Module-Name: org.knime.js.core.tests
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
