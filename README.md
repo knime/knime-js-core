@@ -17,3 +17,6 @@ Instructions for how to develop extensions for KNIME Analytics Platform can be f
 
 ### Join the Community!
 * [KNIME Forum](https://tech.knime.org/forum)
+
+### Update to CEF 128.0.7
+This comment will make all the difference
