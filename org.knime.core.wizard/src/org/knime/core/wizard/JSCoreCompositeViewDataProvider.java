@@ -50,6 +50,7 @@ package org.knime.core.wizard;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.function.Function;
 
 import org.knime.core.node.NodeLogger;
@@ -89,6 +90,22 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
         // WebViewContent should have a 'saveToStream(OutputStream)'-method
         // right now the returning will be json, but what if not anymore?
         return ((ByteArrayOutputStream)webViewContent.saveToStream()).toString("UTF-8");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ReexecutedPage reexecutePage(final SubNodeContainer snc, final Map<String, String> stateUpdates,
+        final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt) throws IOException {
+
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        if (model.canTriggerReExecution() != true) {
+            System.out.println("Not triggerable?");
+        }
+        return (ReexecutedPage)model
+            .createReexecutionService((WizardPageCreationHelper)nnc -> createNodeViewEnt.apply(nnc))
+            .reexecutePage("3:0:4", stateUpdates);
     }
 
 }
