@@ -176,6 +176,36 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
+    public PageContainer getPage(final String nodeIDSuffix) {
+
+        var resetNodeId =
+                NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
+
+        var resetNodes = getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
+        List<String> reexecutedNodes;
+
+        var pageState = m_page.getNodeContainerState();
+        String page;
+        if(pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
+            page = null;
+            reexecutedNodes = getSuccessorWizardNodesWithinComponent(resetNodeId,
+                nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
+                    && !nc.getNodeContainerState().isExecutionInProgress());
+        } else {
+            page = filterAndGetSerializedJSONWebNodePage(getSuccessorWizardNodesWithinComponent(resetNodeId, null));
+            reexecutedNodes = resetNodes;
+            resetNodes = null;
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
+        }
+        return new DefaultPageContainer(new RawValue(page), resetNodes, reexecutedNodes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public PageContainer getPage() {
         CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
         var pageState = m_page.getNodeContainerState();

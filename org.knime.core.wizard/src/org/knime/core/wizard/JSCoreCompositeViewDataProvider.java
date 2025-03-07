@@ -50,6 +50,7 @@ package org.knime.core.wizard;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -58,6 +59,8 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.webui.service.CompositeViewDataProvider;
+
+import com.fasterxml.jackson.databind.util.RawValue;
 
 /**
  *
@@ -90,13 +93,45 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
     }
 
     @Override
-    public void reexecutePage(final SubNodeContainer snc, final String nodeIdThatTriggered,
+    public PageContainer reexecutePage(final SubNodeContainer snc, final String nodeIdThatTriggered,
         final Map<String, String> stateUpdates, final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt)
         throws IOException {
 
         var model = new SubnodeViewableModel(snc, snc.getName());
-        model.createReexecutionService((WizardPageCreationHelper)createNodeViewEnt::apply)
-            .reexecutePage(nodeIdThatTriggered, stateUpdates);
+        return translatePageContainerType(
+            model.createReexecutionService((WizardPageCreationHelper)createNodeViewEnt::apply)
+                .reexecutePage(nodeIdThatTriggered, stateUpdates));
+    }
+
+    @Override
+    public PageContainer getReexecutingPage(final SubNodeContainer snc, final String nodeIdThatTriggered,
+        final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt) throws IOException {
+
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        return translatePageContainerType(model
+            .createReexecutionService((WizardPageCreationHelper)createNodeViewEnt::apply).getPage(nodeIdThatTriggered));
+    }
+
+    // TODO: Deduplicate the return type. Currently its duplicated
+    private static CompositeViewDataProvider.PageContainer
+        translatePageContainerType(final org.knime.core.wizard.rpc.PageContainer pageContainer) {
+
+        return new CompositeViewDataProvider.PageContainer() {
+            @Override
+            public RawValue getPage() {
+                return pageContainer.getPage();
+            }
+
+            @Override
+            public List<String> getResetNodes() {
+                return pageContainer.getResetNodes();
+            }
+
+            @Override
+            public List<String> getReexecutedNodes() {
+                return pageContainer.getReexecutedNodes();
+            }
+        };
     }
 
 }
