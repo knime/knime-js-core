@@ -108,9 +108,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
      *
      * @since 5.2
      */
-    public DefaultReexecutionService(final SingleNodeContainer page,
-        final WizardPageCreationHelper pageCreationHelper, final CompositeViewPageManager cvm,
-        final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
+    public DefaultReexecutionService(final SingleNodeContainer page, final WizardPageCreationHelper pageCreationHelper,
+        final CompositeViewPageManager cvm, final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
         m_page = page;
         m_pageCreationHelper = pageCreationHelper;
         m_cvm = cvm;
@@ -176,11 +175,39 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
+    public PageContainer getPage(final String nodeIDSuffix) {
+        var resetNodeId =
+            NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
+        var resetNodes =
+            getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
+        var pageState = m_page.getNodeContainerState();
+        String page;
+        List<String> reexecutedNodes;
+        if (pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
+            page = null;
+            reexecutedNodes = getSuccessorWizardNodesWithinComponent(resetNodeId,
+                nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
+                    && !nc.getNodeContainerState().isExecutionInProgress());
+        } else {
+            page = filterAndGetSerializedJSONWebNodePage(getSuccessorWizardNodesWithinComponent(resetNodeId, null));
+            reexecutedNodes = resetNodes;
+            resetNodes = null;
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
+        }
+        return new DefaultPageContainer(new RawValue(page), resetNodes, reexecutedNodes);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public PageContainer getPage() {
         CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
         var pageState = m_page.getNodeContainerState();
         String page;
-        if(pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
+        if (pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
             page = null;
             m_reexecutedNodes = getSuccessorWizardNodesWithinComponent(m_resetNodeId,
                 nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
@@ -200,8 +227,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         final Predicate<NodeContainer> nodeFilter) {
         NodeID pageId = m_page.getID();
         Stream<Pair<NodeIDSuffix, NodeContainer>> res =
-            WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(m_cvm.getWorkflowManager(), pageId,
-                resetNodeId);
+            WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(m_cvm.getWorkflowManager(), pageId, resetNodeId);
         if (nodeFilter != null) {
             res = res.filter(p -> nodeFilter.test(p.getSecond()));
         }

@@ -55,6 +55,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
@@ -109,8 +110,9 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("5:0:7",
-            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}",//
+            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}", //
             "5:0:8", "new initial data for node 5:0:8");
+
         PageContainer res = service.reexecutePage("5:0:2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(),
@@ -155,7 +157,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
 
         // test normal re-execution
         Map<String, String> viewValues = Map.of("6:0:9",
-            "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":false}}",//
+            "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":false}}", //
             "6:0:8", "n�w initial data for node 6:0:8");
         var res = service.reexecutePage("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
@@ -176,7 +178,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
 
         // test failing re-execution
         viewValues = Map.of("6:0:9",
-            "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":true}}",//
+            "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":true}}", //
             "6:0:8", "new initial data for node 6:0:8");
         res = service.reexecutePage("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
@@ -195,6 +197,42 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         assertThat(page.get("nodeViews").get("6:0:8").get("nodeInfo").get("nodeState").asText(), is("configured"));
         assertThat(res.getResetNodes(), is(nullValue()));
         assertThat(res.getReexecutedNodes(), is(nullValue()));
+    }
+
+    /**
+     * Tests the consistency of the {@link ReexecutionService#getPage()} and {@link ReexecutionService#getPage(String)}
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testConsistencyOfGetPageMethods() throws Exception {
+
+        // setup two distinct re-execution services for the same component
+        var pageId = 5;
+        NodeID wfId = loadAndSetWorkflow();
+        executeAllAndWait();
+        SubNodeContainer component = (SubNodeContainer)getManager().getNodeContainer(new NodeID(wfId, pageId));
+        SubnodeViewableModel model = new SubnodeViewableModel(component, "view name blub", false, NodeViewEnt::create);
+
+        ReexecutionService firstService = model.createReexecutionService(NodeViewEnt::create);
+        ReexecutionService secondService = model.createReexecutionService(NodeViewEnt::create);
+
+        Map<String, String> viewValues = Map.of("5:0:7",
+            "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}", //
+            "5:0:8", "new initial data for node 5:0:8");
+        firstService.reexecutePage("5:0:7", viewValues);
+
+        executeAllAndWait();
+
+        // Verify that the pages are consistent before and after the re-exec
+        var pageFromFirstService = firstService.getPage();
+        var pageFromSecondService = secondService.getPage("5:0:7");
+
+        assertEquals(pageFromFirstService.getPage(), pageFromSecondService.getPage());
+        assertEquals(pageFromFirstService.getResetNodes(),
+            pageFromSecondService.getResetNodes());
+        assertEquals(pageFromFirstService.getReexecutedNodes(),
+            pageFromSecondService.getReexecutedNodes());
     }
 
     private ReexecutionService createReexecutionService(final int pageId,

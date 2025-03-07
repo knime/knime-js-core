@@ -50,6 +50,7 @@ package org.knime.core.wizard;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -58,6 +59,8 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.webui.service.CompositeViewDataProvider;
+
+import com.fasterxml.jackson.databind.util.RawValue;
 
 /**
  *
@@ -87,11 +90,41 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
     }
 
     @Override
-    public void triggerComponentReexecution(final SubNodeContainer snc, final String resetNodeIdSuffix,
+    public PageContainer triggerComponentReexecution(final SubNodeContainer snc, final String resetNodeIdSuffix,
         final Map<String, String> viewValues, final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt)
         throws IOException {
         var model = new SubnodeViewableModel(snc, snc.getName());
-        model.createReexecutionService(createNodeViewEnt::apply).reexecutePage(resetNodeIdSuffix, viewValues);
+        return translatePageContainerType(
+            model.createReexecutionService(createNodeViewEnt::apply).reexecutePage(resetNodeIdSuffix, viewValues));
     }
 
+    @Override
+    public PageContainer pollComponentReexecutionStatus(final SubNodeContainer snc, final String nodeIdThatTriggered,
+        final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt) throws IOException {
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        return translatePageContainerType(
+            model.createReexecutionService(createNodeViewEnt::apply).getPage(nodeIdThatTriggered));
+    }
+
+    // TODO(NXT-3423): Deduplicate the return type. Currently its duplicated
+    private static CompositeViewDataProvider.PageContainer
+        translatePageContainerType(final org.knime.core.wizard.rpc.PageContainer pageContainer) {
+
+        return new CompositeViewDataProvider.PageContainer() {
+            @Override
+            public RawValue getPage() {
+                return pageContainer.getPage();
+            }
+
+            @Override
+            public List<String> getResetNodes() {
+                return pageContainer.getResetNodes();
+            }
+
+            @Override
+            public List<String> getReexecutedNodes() {
+                return pageContainer.getReexecutedNodes();
+            }
+        };
+    }
 }
