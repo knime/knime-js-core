@@ -26,5 +26,13 @@ public interface ReexecutionService {
      */
     PageContainer getPage();
 
+    /**
+     * The same function as above, but it doesnt rely on the current state of the service as much
+     * m_resetNodes and m_reexecutedNodes will not be used to determine the page. WIP
+     * @param nodeIDSuffix
+     * @return the re-executed or re-executing page
+     */
+    PageContainer getPage(String nodeIDSuffix);
+
 }
 
