@@ -150,13 +150,7 @@ public class DefaultNodeService implements NodeService {
         } else if ("data".equals(serviceType)) {
             return dataServiceManager.callRpcDataService(ncWrapper, request);
         } else if ("apply_data".equals(serviceType)) {
-            try {
-                dataServiceManager.callApplyDataService(ncWrapper, request);
-            } catch (IOException e) {
-                NodeLogger.getLogger(getClass()).error(e);
-                return e.getMessage();
-            }
-            return "";
+            return dataServiceManager.callApplyDataService(ncWrapper, request);
         } else {
             throw new IllegalArgumentException("Unknown service type '" + serviceType + "'");
         }
