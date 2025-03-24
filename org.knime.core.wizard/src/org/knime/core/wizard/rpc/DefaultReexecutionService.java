@@ -66,6 +66,7 @@ import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.NodeID.NodeIDSuffix;
 import org.knime.core.node.workflow.SingleNodeContainer;
+import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.util.Pair;
 import org.knime.core.wizard.CompositeViewPageManager;
@@ -129,6 +130,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         var pageId = m_page.getID();
         var resetNodeId =
             NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
+
         try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =
                 m_cvm.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeId);
@@ -150,6 +152,47 @@ public final class DefaultReexecutionService implements ReexecutionService {
         } else {
             page = null;
             m_resetNodeId = resetNodeId;
+            m_reexecutedNodes = Collections.emptyList();
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
+        }
+        return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
+    }
+
+    /**
+     *
+     * Does not set m_resetNodeId, use extended getPage to poll
+     *
+     * @param snc the container of the component
+     * @param viewValues
+     * @return the re-executed or re-executing page
+     */
+    @Override
+    public PageContainer reexecuteCompletePage(final SubNodeContainer snc, final Map<String, String> viewValues) {
+        if (m_onReexecutionStart != null) {
+            m_onReexecutionStart.run();
+        }
+        var pageId = m_page.getID();
+
+        try (WorkflowLock lock = m_page.getParent().lock()) {
+            Map<String, ValidationError> validationErrors =
+                m_cvm.applyPartialValuesAndReexecute(viewValues, pageId, null);
+            if (validationErrors != null && !validationErrors.isEmpty()) {
+                throw new IllegalStateException(
+                    "Unable to re-execute component with current page values. Validation errors: " + validationErrors
+                        .values().stream().map(ValidationError::getError).collect(Collectors.joining(";")));
+            }
+        }
+
+        m_resetNodes = getWizardNodesWithinComponent(snc, nc -> true);
+        String page;
+        if (m_page.getNodeContainerState().isExecuted()) {
+            page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
+            m_reexecutedNodes = m_resetNodes;
+            m_resetNodes = null;
+        } else {
+            page = null;
             m_reexecutedNodes = Collections.emptyList();
         }
         if (page != null && m_onReexecutionEnd != null) {
@@ -199,6 +242,31 @@ public final class DefaultReexecutionService implements ReexecutionService {
         return new DefaultPageContainer(new RawValue(page), resetNodes, reexecutedNodes);
     }
 
+    @Override
+    public PageContainer getCompletePage(final SubNodeContainer snc) {
+        var resetNodes = getWizardNodesWithinComponent(snc, nc -> true);
+        List<String> reexecutedNodes;
+
+        var pageState = m_page.getNodeContainerState();
+        String page;
+
+        Predicate<NodeContainer> isExecuted = nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
+            && !nc.getNodeContainerState().isExecutionInProgress();
+
+        if (pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
+            page = null;
+            reexecutedNodes = getWizardNodesWithinComponent(snc, isExecuted);
+        } else {
+            page = filterAndGetSerializedJSONWebNodePage(resetNodes);
+            reexecutedNodes = resetNodes;
+            resetNodes = null;
+        }
+        if (page != null && m_onReexecutionEnd != null) {
+            m_onReexecutionEnd.run();
+        }
+        return new DefaultPageContainer(new RawValue(page), resetNodes, reexecutedNodes);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -221,6 +289,14 @@ public final class DefaultReexecutionService implements ReexecutionService {
             m_onReexecutionEnd.run();
         }
         return new DefaultPageContainer(new RawValue(page), m_resetNodes, m_reexecutedNodes);
+    }
+
+    private static List<String> getWizardNodesWithinComponent(final SubNodeContainer snc,
+        final Predicate<NodeContainer> nodeFilter) {
+        return WizardPageUtil.getWizardPageNodes(snc.getWorkflowManager(), true).stream().filter(nodeFilter).map(p -> {
+            String[] parts = p.getID().toString().split(":", 2);
+            return parts[1];
+        }).collect(Collectors.toList());
     }
 
     private List<String> getSuccessorWizardNodesWithinComponent(final NodeID resetNodeId,

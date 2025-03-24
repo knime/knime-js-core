@@ -106,6 +106,23 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
             model.createReexecutionService(createNodeViewEnt::apply).getPage(nodeIdThatTriggered));
     }
 
+    @Override
+    public PageContainer triggerCompleteComponentReexecution(final SubNodeContainer snc,
+        final Map<String, String> viewValues, final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt)
+        throws IOException {
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        return translatePageContainerType(
+            model.createReexecutionService(createNodeViewEnt::apply).reexecuteCompletePage(snc, viewValues));
+    }
+
+    @Override
+    public PageContainer pollCompleteComponentReexecutionStatus(final SubNodeContainer snc,
+        final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt) throws IOException {
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        return translatePageContainerType(
+            model.createReexecutionService(createNodeViewEnt::apply).getCompletePage(snc));
+    }
+
     // TODO(NXT-3423): Deduplicate the return type. Currently its duplicated
     private static CompositeViewDataProvider.PageContainer
         translatePageContainerType(final org.knime.core.wizard.rpc.PageContainer pageContainer) {
