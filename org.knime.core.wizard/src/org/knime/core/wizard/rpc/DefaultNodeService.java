@@ -51,6 +51,7 @@ package org.knime.core.wizard.rpc;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -61,6 +62,7 @@ import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.webui.data.DataServiceDependencies;
 import org.knime.core.webui.node.DataServiceManager;
 import org.knime.core.webui.node.NodePortWrapper;
 import org.knime.core.webui.node.NodeWrapper;
@@ -70,6 +72,8 @@ import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.node.view.table.TableViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.webui.entity.SelectionEventEnt;
+import org.knime.gateway.impl.webui.kai.CodeKaiHandler;
+import org.knime.gateway.impl.webui.kai.KaiHandlerFactoryRegistry;
 import org.knime.gateway.impl.webui.service.events.SelectionEventBus;
 
 /**
@@ -81,6 +85,9 @@ import org.knime.gateway.impl.webui.service.events.SelectionEventBus;
 public class DefaultNodeService implements NodeService {
 
     private final Function<String, NodeWrapper> m_getNodeWrapper;
+
+    // TODO what is the authentication here?
+    private final CodeKaiHandler m_codeKaiHandler = KaiHandlerFactoryRegistry.createCodeKaiHandler(null).orElse(null);
 
     /**
      * Initialize the {@link DefaultNodeService} for a {@link NativeNodeContainer}.
@@ -145,15 +152,22 @@ public class DefaultNodeService implements NodeService {
         }
 
         var ncWrapper = m_getNodeWrapper.apply(nodeID);
-        if ("initial_data".equals(serviceType)) {
-            return dataServiceManager.callInitialDataService(ncWrapper);
-        } else if ("data".equals(serviceType)) {
-            return dataServiceManager.callRpcDataService(ncWrapper, request);
-        } else if ("apply_data".equals(serviceType)) {
-            return dataServiceManager.callApplyDataService(ncWrapper, request);
-        } else {
-            throw new IllegalArgumentException("Unknown service type '" + serviceType + "'");
-        }
+        // TODO(benny) find out when this is called
+        var serviceDependencies = Map.<Class<?>, Object> of( //
+//            CodeKaiHandler.class, m_codeKaiHandler, //
+//            ProjectId.class, new ProjectId(projectId) //
+        );
+        return DataServiceDependencies.runWithDependencies(serviceDependencies, () -> {
+            if ("initial_data".equals(serviceType)) {
+                return dataServiceManager.callInitialDataService(ncWrapper);
+            } else if ("data".equals(serviceType)) {
+                return dataServiceManager.callRpcDataService(ncWrapper, request);
+            } else if ("apply_data".equals(serviceType)) {
+                return dataServiceManager.callApplyDataService(ncWrapper, request);
+            } else {
+                throw new IllegalArgumentException("Unknown service type '" + serviceType + "'");
+            }
+        });
     }
 
     @Override
