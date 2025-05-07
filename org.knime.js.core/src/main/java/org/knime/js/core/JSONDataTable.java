@@ -506,7 +506,7 @@ public class JSONDataTable {
             }
             if (m_calculateDataHash) {
                 DigestUtils.updateDigest(md5Digest, colName);
-                DigestUtils.updateDigest(md5Digest, colSpec.getType().toString());
+                DigestUtils.updateDigest(md5Digest, colSpec.getType().getLegacyName());
             }
         }
         return numOfColumns;
