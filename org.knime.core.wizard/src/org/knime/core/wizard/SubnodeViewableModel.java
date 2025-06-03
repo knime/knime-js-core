@@ -110,7 +110,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     private JSONWebNodePage m_page;
     private SubnodeViewValue m_value;
 
-    private final CompositeViewPageManager m_spm;
+    private final CompositeViewPageManager m_compositeViewPageManager;
+
     private final SubNodeContainer m_container;
     private final String m_viewName;
     private final JavaScriptViewCreator<JSONWebNodePage, SubnodeViewValue> m_viewCreator;
@@ -155,7 +156,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         final WizardPageCreationHelper pageCreationHelper) throws IOException {
         m_viewName = viewName;
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
-        m_spm = CompositeViewPageManager.of(nodeContainer.getParent());
+        m_compositeViewPageManager = CompositeViewPageManager.of(nodeContainer.getParent());
         m_container = nodeContainer;
         m_pageCreationHelper = pageCreationHelper == null ? NodeViewEnt::create : pageCreationHelper;
         if (!lazyPageAndValueInitialization) {
@@ -205,7 +206,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         }
     }
 
-
     /**
      * Registers a view with this model, so it can be notified about model changed events.
      * If a view is already registered, the method will not update it.
@@ -230,7 +230,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * @since 5.2
      */
     public void createPageAndValue(final WizardPageCreationHelper pageCreationHelper) throws IOException {
-        m_page = m_spm.createWizardPage(m_container.getID(), pageCreationHelper);
+        m_page = m_compositeViewPageManager.createWizardPage(m_container.getID(), pageCreationHelper);
         Map<String, String> valueMap = new HashMap<String, String>();
         for (Entry<String, JSONWebNode> entry : m_page.getWebNodes().entrySet()) {
             String value = SubnodeViewValue.MAPPER.writeValueAsString(entry.getValue().getViewValue());
@@ -247,7 +247,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * @since 5.2
      */
     public ReexecutionService createReexecutionService(final WizardPageCreationHelper pageCreationHelper) {
-        return new DefaultReexecutionService(m_container, pageCreationHelper, m_spm,
+        return new DefaultReexecutionService(m_container, pageCreationHelper, m_compositeViewPageManager,
             () -> m_isReexecuteInProgress.set(true), () -> m_isReexecuteInProgress.set(false));
     }
 
@@ -257,7 +257,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     @Override
     public ValidationError validateViewValue(final SubnodeViewValue viewContent) {
         try {
-            Map<String, ValidationError> validationResult = m_spm.validateViewValues(viewContent.getViewValues(), m_container.getID());
+            Map<String, ValidationError> validationResult =
+                m_compositeViewPageManager.validateViewValues(viewContent.getViewValues(), m_container.getID());
             if (!validationResult.isEmpty()) {
                 return new CollectionValidationError(validationResult);
             }
@@ -277,7 +278,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
                 "Node needs to be in executed state to apply new view values.");
             m_isReexecuteInProgress.set(true);
             try (WorkflowLock lock = m_container.getParent().lock()) {
-                m_spm.applyValidatedValuesAndExecute(value.getViewValues(), m_container.getID(), useAsDefault);
+                m_compositeViewPageManager.applyValidatedValuesAndExecute(value.getViewValues(), m_container.getID(),
+                    useAsDefault);
                 m_value = value;
             } finally {
                 m_isReexecuteInProgress.set(false);
@@ -295,6 +297,40 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         } catch (IOException e) {
             logErrorAndReset("Loading view values for node " + m_container.getID() + " failed: ", e);
         }
+    }
+
+    /**
+     * Sets view values from a map and sets them as default. If the node is not executed, the values are applied and the
+     * node is executed before setting the values as default.
+     *
+     * @param viewValueMap the map of view values to load
+     * @return the validation error if any, null otherwise
+     * @since 5.5
+     */
+    public ValidationError loadViewValueFromMapAndSetAsDefault(final Map<String, String> viewValueMap) {
+
+        NodeContainerState state = m_container.getNodeContainerState();
+
+        try {
+            var validationResult = m_compositeViewPageManager.validateViewValues(viewValueMap, m_container.getID());
+            if (!validationResult.isEmpty()) {
+                return new CollectionValidationError(validationResult);
+            }
+
+            if (state.isExecuted()) {
+                m_compositeViewPageManager.applyValidatedViewValues(viewValueMap, m_container.getID(), true);
+            } else {
+                m_isReexecuteInProgress.set(true);
+                m_compositeViewPageManager.applyValidatedValuesAndExecute(viewValueMap, m_container.getID(), true);
+            }
+            m_value = new SubnodeViewValue();
+            m_value.setViewValues(viewValueMap);
+        } catch (IOException e) {
+            logErrorAndReset("Loading view values for node " + m_container.getID() + " failed: ", e);
+        } finally {
+            m_isReexecuteInProgress.set(false);
+        }
+        return null;
     }
 
     private void logErrorAndReset(final String message, final Exception ex) {
@@ -557,8 +593,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     @Override
     public SubnodeViewResponse handleRequest(final SubnodeViewRequest request, final ExecutionMonitor exec)
         throws ViewRequestHandlingException, InterruptedException, CanceledExecutionException {
-        String jsonResponse = m_spm.processViewRequest(request.getNodeID(), request.getJsonRequest(),
-            m_container.getID(), exec);
+        String jsonResponse = m_compositeViewPageManager.processViewRequest(request.getNodeID(),
+            request.getJsonRequest(), m_container.getID(), exec);
         return new SubnodeViewResponse(request, request.getNodeID(), jsonResponse);
     }
 

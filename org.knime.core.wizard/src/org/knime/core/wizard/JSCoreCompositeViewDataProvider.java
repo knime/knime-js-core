@@ -107,6 +107,16 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
     }
 
     @Override
+    public void setViewValuesAsNewDefault(final SubNodeContainer snc, final Map<String, String> viewValues)
+        throws IOException {
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        var result = model.loadViewValueFromMapAndSetAsDefault(viewValues);
+        if (result != null) {
+            throw new IOException("Failed to set view values as new default: " + result.getError());
+        }
+    }
+
+    @Override
     public PageContainer triggerCompleteComponentReexecution(final SubNodeContainer snc,
         final Map<String, String> viewValues, final Function<NativeNodeContainer, NodeViewEnt> createNodeViewEnt)
         throws IOException {
