@@ -86,7 +86,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private final SingleNodeContainer m_page;
 
-    private final CompositeViewPageManager m_cvm;
+    private final CompositeViewPageManager m_compositeViewPageManager;
 
     private NodeID m_resetNodeId;
 
@@ -113,7 +113,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         final CompositeViewPageManager cvm, final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
         m_page = page;
         m_pageCreationHelper = pageCreationHelper;
-        m_cvm = cvm;
+        m_compositeViewPageManager = cvm;
         m_onReexecutionStart = onReexecutionStart;
         m_onReexecutionEnd = onReexecutionEnd;
     }
@@ -128,12 +128,12 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
         // validate view values and re-execute
         var pageId = m_page.getID();
-        var resetNodeId =
-            NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
+        var resetNodeId = NodeIDSuffix.fromString(nodeIDSuffix)
+            .prependParent(m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID());
 
         try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =
-                m_cvm.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeId);
+                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeId);
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 throw new IllegalStateException(
                     "Unable to re-execute component with current page values. Validation errors: " + validationErrors
@@ -177,7 +177,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
         try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =
-                m_cvm.applyPartialValuesAndReexecute(viewValues, pageId, null);
+                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, null);
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 throw new IllegalStateException(
                     "Unable to re-execute component with current page values. Validation errors: " + validationErrors
@@ -204,7 +204,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
     private String filterAndGetSerializedJSONWebNodePage(final List<String> resetNodeIDs) {
         JSONWebNodePage page;
         try {
-            page = m_cvm.createWizardPage(m_page.getID(), m_pageCreationHelper);
+            page = m_compositeViewPageManager.createWizardPage(m_page.getID(), m_pageCreationHelper);
             page.filterWebNodesById(resetNodeIDs);
             try (OutputStream pageStream = page.saveToStream()) {
                 return ((ByteArrayOutputStream)pageStream).toString(StandardCharsets.UTF_8);
@@ -219,8 +219,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
      */
     @Override
     public PageContainer getPage(final String nodeIDSuffix) {
-        var resetNodeId =
-            NodeIDSuffix.fromString(nodeIDSuffix).prependParent(m_cvm.getWorkflowManager().getProjectWFM().getID());
+        var resetNodeId = NodeIDSuffix.fromString(nodeIDSuffix)
+            .prependParent(m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID());
         var resetNodes =
             getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
         var pageState = m_page.getNodeContainerState();
@@ -302,8 +302,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
     private List<String> getSuccessorWizardNodesWithinComponent(final NodeID resetNodeId,
         final Predicate<NodeContainer> nodeFilter) {
         NodeID pageId = m_page.getID();
-        Stream<Pair<NodeIDSuffix, NodeContainer>> res =
-            WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(m_cvm.getWorkflowManager(), pageId, resetNodeId);
+        Stream<Pair<NodeIDSuffix, NodeContainer>> res = WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(
+            m_compositeViewPageManager.getWorkflowManager(), pageId, resetNodeId);
         if (nodeFilter != null) {
             res = res.filter(p -> nodeFilter.test(p.getSecond()));
         }

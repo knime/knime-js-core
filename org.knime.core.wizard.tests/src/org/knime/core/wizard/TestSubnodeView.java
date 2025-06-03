@@ -313,6 +313,35 @@ public class TestSubnodeView extends WorkflowTestCase {
         }
     }
 
+    /**
+     * Tests {@link SubnodeViewableModel#loadViewValueFromMapAndSetAsDefault(Map)} when the subnode is executed.
+     * @throws Exception
+     */
+    @Test
+    public void testLoadViewValueFromMapAndSetAsDefaultOnExecutedNode() throws Exception {
+        initialExecute();
+        SubNodeContainer snc = getManager().getNodeContainer(m_subnodeID, SubNodeContainer.class, true);
+        SubnodeViewableModel svm = new SubnodeViewableModel(snc, "testView");
+
+        Map<String, String> valueMap = buildValueMap();
+        Map<String, String> changedValueMap = changeStringInputTo(CHANGED_URL, valueMap);
+
+        ValidationError error = svm.loadViewValueFromMapAndSetAsDefault(changedValueMap);
+        assertNull("No validation error expected", error);
+        assertTrue("Subnode should be reset", snc.getNodeContainerState().isConfigured());
+
+        SubnodeViewValue viewValue = svm.getViewValue();
+        String stringInputValue = viewValue.getViewValues().get(m_stringInputID.toString());
+        JsonNode jsonValue = new ObjectMapper().readTree(stringInputValue);
+        assertEquals(CHANGED_URL, jsonValue.get("string").asText());
+
+        executeAndWait(snc.getID());
+
+        FlowVariable var = getManager().getNodeContainer(m_blockID).getFlowObjectStack().getAvailableFlowVariables()
+            .get("string-input");
+        assertEquals(CHANGED_URL, var.getStringValue());
+    }
+
     private void selectRowInTable(final Map<String, String> valueMap) throws IOException, JsonProcessingException {
         // select one value in table
         String tableValueString = valueMap.get(m_tableViewID.toString());
