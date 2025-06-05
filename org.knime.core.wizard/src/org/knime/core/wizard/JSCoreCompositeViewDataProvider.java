@@ -55,8 +55,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.knime.core.node.web.WebViewContent;
+import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
+import org.knime.core.webui.node.NodeWrapper;
+import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.impl.webui.service.CompositeViewDataProvider;
 
@@ -131,6 +134,19 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
         var model = new SubnodeViewableModel(snc, snc.getName());
         return translatePageContainerType(
             model.createReexecutionService(createNodeViewEnt::apply).getCompletePage(snc));
+    }
+
+    @Override
+    public void deactivateAllComponentDataServices(final SubNodeContainer snc) throws IOException {
+
+        var model = new SubnodeViewableModel(snc, snc.getName());
+        model.discard();
+
+        List<NativeNodeContainer> viewNodes = WizardPageUtil.getWizardPageNodes(snc.getWorkflowManager(), true);
+
+        var nvm = NodeViewManager.getInstance();
+        viewNodes.stream().filter(NodeViewManager::hasNodeView)
+            .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
     }
 
     // TODO(NXT-3423): Deduplicate the return type. Currently its duplicated
