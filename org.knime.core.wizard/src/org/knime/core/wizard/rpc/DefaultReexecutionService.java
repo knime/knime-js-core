@@ -71,6 +71,10 @@ import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.util.Pair;
 import org.knime.core.wizard.CompositeViewPageManager;
 import org.knime.core.wizard.WizardPageCreationHelper;
+import org.knime.gateway.api.entity.NodeIDEnt;
+import org.knime.gateway.api.webui.service.ComponentService;
+import org.knime.gateway.api.webui.service.util.ServiceExceptions.ServiceCallException;
+import org.knime.gateway.impl.service.util.DefaultServiceUtil;
 import org.knime.js.core.JSONWebNodePage;
 
 import com.fasterxml.jackson.databind.util.RawValue;
@@ -82,7 +86,7 @@ import com.fasterxml.jackson.databind.util.RawValue;
  * @since 4.5
  *
  */
-public final class DefaultReexecutionService implements ReexecutionService {
+public final class DefaultComponentService implements ComponentService {
 
     private final SingleNodeContainer m_page;
 
@@ -109,7 +113,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
      *
      * @since 5.2
      */
-    public DefaultReexecutionService(final SingleNodeContainer page, final WizardPageCreationHelper pageCreationHelper,
+    public DefaultComponentService(final SingleNodeContainer page, final WizardPageCreationHelper pageCreationHelper,
         final CompositeViewPageManager cvm, final Runnable onReexecutionStart, final Runnable onReexecutionEnd) {
         m_page = page;
         m_pageCreationHelper = pageCreationHelper;
@@ -118,11 +122,32 @@ public final class DefaultReexecutionService implements ReexecutionService {
         m_onReexecutionEnd = onReexecutionEnd;
     }
 
+    public DefaultComponentService() {
+        m_page = null;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public PageContainer reexecutePage(final String nodeIDSuffix, final Map<String, String> viewValues) {
+    public Object pollCompleteComponentReexecutionStatus(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
+        throws ServiceCallException {
+        SubNodeContainer snc;
+        if (m_page == null) {
+            snc = DefaultServiceUtil.getNodeContainer(projectId, workflowId, nodeId);
+        } else {
+            snc = m_page;
+        }
+
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageContainer reexecutePage(final String projectId, final String nodeIDSuffix, final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
         }

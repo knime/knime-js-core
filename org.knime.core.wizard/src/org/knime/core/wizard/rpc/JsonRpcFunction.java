@@ -62,6 +62,7 @@ import org.knime.core.node.workflow.SingleNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.ui.node.workflow.NativeNodeContainerUI;
 import org.knime.core.webui.data.rpc.json.impl.JsonRpcServer;
+import org.knime.gateway.impl.webui.service.DefaultComponentService;
 import org.knime.gateway.json.util.JsonUtil;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -104,7 +105,7 @@ public class JsonRpcFunction {
         final boolean isDialog) {
         m_jsonRpcServer.addService(NodeService.class, new DefaultNodeService(snc, isDialog));
         if (reexecutionService != null) {
-            m_jsonRpcServer.addService(ReexecutionService.class, reexecutionService);
+            m_jsonRpcServer.addService(DefaultComponentService.class, reexecutionService);
         }
     }
 
