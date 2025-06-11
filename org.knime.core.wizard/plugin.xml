@@ -2,9 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="org.knime.gateway.impl.CompositeViewDataProvider">
+         point="org.knime.gateway.impl.CompositeViewServiceFactory">
       <provider
-            impl="org.knime.core.wizard.JSCoreCompositeViewDataProvider">
+            impl="org.knime.core.wizard.DefaultCompositeViewServiceFactory">
       </provider>
    </extension>
 
