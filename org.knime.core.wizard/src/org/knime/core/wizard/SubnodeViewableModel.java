@@ -141,6 +141,17 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
+     * Creates a new instance of this viewable model. Uses the getName function of the subnode container as the view
+     * name.
+     *
+     * @param nodeContainer the subnode container
+     * @throws IOException on view model creation error
+     */
+    public SubnodeViewableModel(final SubNodeContainer nodeContainer) throws IOException {
+        this(nodeContainer, nodeContainer.getName(), false, null);
+    }
+
+    /**
      * Creates a new instance of this viewable model
      *
      * @param nodeContainer the subnode container
@@ -152,8 +163,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * @since 5.2
      */
     public SubnodeViewableModel(final SubNodeContainer nodeContainer, final String viewName,
-        final boolean lazyPageAndValueInitialization,
-        final WizardPageCreationHelper pageCreationHelper) throws IOException {
+        final boolean lazyPageAndValueInitialization, final WizardPageCreationHelper pageCreationHelper)
+        throws IOException {
         m_viewName = viewName;
         m_viewCreator = new SubnodeWizardViewCreator<JSONWebNodePage, SubnodeViewValue>();
         m_compositeViewPageManager = CompositeViewPageManager.of(nodeContainer.getParent());
@@ -207,11 +218,13 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
-     * Registers a view with this model, so it can be notified about model changed events.
-     * If a view is already registered, the method will not update it.
+     * Registers a view with this model, so it can be notified about model changed events. If a view is already
+     * registered, the method will not update it.
+     *
      * @param view the view to register
      */
-    public void registerView(final AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> view) {
+    public void
+        registerView(final AbstractWizardNodeView<SubnodeViewableModel, JSONWebNodePage, SubnodeViewValue> view) {
         if (m_view == null) {
             m_view = view;
         }
@@ -345,7 +358,8 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
      * {@inheritDoc}
      */
     @Override
-    public void saveCurrentValue(final NodeSettingsWO content) { /* not used */ }
+    public void saveCurrentValue(final NodeSettingsWO content) {
+        /* not used */ }
 
     /**
      * {@inheritDoc}
@@ -459,6 +473,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.5
      */
     @Override
@@ -531,6 +546,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
         /**
          * Passing around the ViewValue string is not needed as it's not used anywhere (all information for the view is
          * stored in the ViewReprentation). Return an empty JSON object string instead.
+         *
          * @since 4.2
          */
         @Override
@@ -588,6 +604,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.7
      */
     @Override
@@ -600,6 +617,7 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
 
     /**
      * {@inheritDoc}
+     *
      * @since 3.7
      */
     @Override
