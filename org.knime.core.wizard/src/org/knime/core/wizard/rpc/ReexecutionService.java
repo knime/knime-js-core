@@ -2,8 +2,6 @@ package org.knime.core.wizard.rpc;
 
 import java.util.Map;
 
-import org.knime.core.node.workflow.SubNodeContainer;
-
 /**
  * Service which is exposes the functionality to partially re-execute a component to, e.g., the JS component (i.e.
  * composite view) view implementation.
@@ -30,7 +28,7 @@ public interface ReexecutionService {
      * @param viewValues the view values to apply
      * @return the re-executed or re-executing page
      */
-    PageContainer reexecuteCompletePage(final SubNodeContainer snc, final Map<String, String> viewValues);
+    PageContainer reexecuteCompletePage(final Map<String, String> viewValues);
 
     /**
      * Get the current state of the re-executed or re-executing page
@@ -38,7 +36,7 @@ public interface ReexecutionService {
      * @param snc the container of the component
      * @return the re-executed or re-executing page
      */
-    PageContainer getCompletePage(final SubNodeContainer snc);
+    PageContainer getCompletePage();
 
     /**
      * @return the re-executed or re-executing page
@@ -46,8 +44,8 @@ public interface ReexecutionService {
     PageContainer getPage();
 
     /**
-     * The same function as above, but it doesnt rely on the current state of the service as much m_resetNodes and
-     * m_reexecutedNodes will not be used to determine the page. WIP
+     * The same function as above, but it doesnt rely on the current state of the service as much. m_resetNodes and
+     * m_reexecutedNodes will not be used to determine the page.
      *
      * @param nodeIDSuffix the project relative id suffix of the node to be reset (and all the downstream nodes)
      * @return the re-executed or re-executing page

@@ -122,7 +122,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
-    public PageContainer reexecutePage(final String nodeIDSuffix, final Map<String, String> viewValues) {
+    public PageContainer reexecutePage(final String nodeIDSuffix,
+        final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
         }
@@ -169,7 +170,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * @return the re-executed or re-executing page
      */
     @Override
-    public PageContainer reexecuteCompletePage(final SubNodeContainer snc, final Map<String, String> viewValues) {
+    public PageContainer reexecuteCompletePage(final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
         }
@@ -185,7 +186,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
             }
         }
 
-        m_resetNodes = getWizardNodesWithinComponent(snc, nc -> true);
+        assert (m_page instanceof SubNodeContainer);
+        m_resetNodes = getWizardNodesWithinComponent((SubNodeContainer)m_page, nc -> true);
         String page;
         if (m_page.getNodeContainerState().isExecuted()) {
             page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
@@ -243,8 +245,10 @@ public final class DefaultReexecutionService implements ReexecutionService {
     }
 
     @Override
-    public PageContainer getCompletePage(final SubNodeContainer snc) {
-        var resetNodes = getWizardNodesWithinComponent(snc, nc -> true);
+    public PageContainer getCompletePage() {
+        assert (m_page instanceof SubNodeContainer);
+
+        var resetNodes = getWizardNodesWithinComponent((SubNodeContainer)m_page, nc -> true);
         List<String> reexecutedNodes;
 
         var pageState = m_page.getNodeContainerState();
@@ -255,7 +259,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
         if (pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
             page = null;
-            reexecutedNodes = getWizardNodesWithinComponent(snc, isExecuted);
+            reexecutedNodes = getWizardNodesWithinComponent((SubNodeContainer)m_page, isExecuted);
         } else {
             page = filterAndGetSerializedJSONWebNodePage(resetNodes);
             reexecutedNodes = resetNodes;
