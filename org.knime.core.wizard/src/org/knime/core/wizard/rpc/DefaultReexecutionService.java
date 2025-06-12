@@ -122,14 +122,14 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
-    public PageContainer reexecutePage(final String nodeIDSuffix,
+    public PageContainer reexecutePage(final String resetNodeIDSuffix,
         final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
         }
         // validate view values and re-execute
         var pageId = m_page.getID();
-        var resetNodeId = NodeIDSuffix.fromString(nodeIDSuffix)
+        var resetNodeId = NodeIDSuffix.fromString(resetNodeIDSuffix)
             .prependParent(m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID());
 
         try (WorkflowLock lock = m_page.getParent().lock()) {
@@ -220,8 +220,8 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
-    public PageContainer getPage(final String nodeIDSuffix) {
-        var resetNodeId = NodeIDSuffix.fromString(nodeIDSuffix)
+    public PageContainer getPage(final String resetNodeIDSuffix) {
+        var resetNodeId = NodeIDSuffix.fromString(resetNodeIDSuffix)
             .prependParent(m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID());
         var resetNodes =
             getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
