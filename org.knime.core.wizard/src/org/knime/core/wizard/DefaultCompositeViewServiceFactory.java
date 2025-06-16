@@ -63,6 +63,7 @@ import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.NodeWrapper;
+import org.knime.core.webui.node.util.NodeCleanUpCallback;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
@@ -92,7 +93,9 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
          */
         public JSCoreCompositeViewService(
             final Function<String, Function<NativeNodeContainer, NodeViewEnt>> createNodeViewEntityFactory) {
+
             m_createNodeViewEntityFactory = createNodeViewEntityFactory;
+
         }
 
         @Override
@@ -131,7 +134,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId))
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
-                    .pollComponentReexecutionStatus();
+                    .pollComponentReexecutionStatus(resetNodeIdSuffix);
 
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
@@ -191,27 +194,9 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
 
             try {
                 var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
+                deactivateAllCompositeViewDataServices(subnodeContainer);
 
-                SubnodeViewableModel modelToDiscard;
-                synchronized (m_modelCache) {
-                    modelToDiscard = m_modelCache.remove(subnodeContainer);
-                }
-
-                if (modelToDiscard != null) {
-                    synchronized (modelToDiscard) {
-                        modelToDiscard.discard();
-                    }
-                } else {
-                    new SubnodeViewableModel(subnodeContainer).discard();
-                }
-
-                List<NativeNodeContainer> viewNodes =
-                    WizardPageUtil.getWizardPageNodes(subnodeContainer.getWorkflowManager(), true);
-
-                var nvm = NodeViewManager.getInstance();
-                viewNodes.stream().filter(NodeViewManager::hasNodeView)
-                    .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (NodeNotFoundException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -246,16 +231,44 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             return ((ByteArrayOutputStream)webViewContent.saveToStream()).toString("UTF-8");
         }
 
-        private SubnodeViewableModel getOrCreateModel(final SubNodeContainer snc) throws IOException {
+        private SubnodeViewableModel getOrCreateModel(final SubNodeContainer subnodeContainer) throws IOException {
+
+            SubnodeViewableModel model;
 
             synchronized (m_modelCache) {
-                SubnodeViewableModel model = m_modelCache.get(snc);
+                model = m_modelCache.get(subnodeContainer);
+
                 if (model == null) {
-                    model = new SubnodeViewableModel(snc);
-                    m_modelCache.put(snc, model);
+                    model = new SubnodeViewableModel(subnodeContainer);
+                    m_modelCache.put(subnodeContainer, model);
+
+                    NodeCleanUpCallback.builder(subnodeContainer, () -> {
+                        SubnodeViewableModel modelToDiscard;
+                        synchronized (m_modelCache) {
+                            modelToDiscard = m_modelCache.remove(subnodeContainer);
+                        }
+
+                        if (modelToDiscard != null) {
+                            modelToDiscard.discard();
+                        }
+
+                    }) //
+                        .cleanUpOnNodeStateChange(true) //
+                        .deactivateOnNodeStateChange(true) //
+                        .build();
                 }
+
                 return model;
             }
+        }
+
+        private static void deactivateAllCompositeViewDataServices(final SubNodeContainer subnodeContainer) {
+            List<NativeNodeContainer> viewNodes =
+                WizardPageUtil.getWizardPageNodes(subnodeContainer.getWorkflowManager(), true);
+
+            var nvm = NodeViewManager.getInstance();
+            viewNodes.stream().filter(NodeViewManager::hasNodeView)
+                .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
         }
 
     }
