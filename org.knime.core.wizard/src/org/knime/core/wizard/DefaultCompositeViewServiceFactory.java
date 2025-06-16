@@ -120,7 +120,8 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
 
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
-                    .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply).getCompletePage();
+                    .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
+                    .pollCompleteComponentReexecutionStatus();
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
@@ -133,7 +134,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
-                    .getPage(resetNodeIdSuffix); // check if correct other option pollComponentReexecutionStatus
+                    .pollComponentReexecutionStatus(resetNodeIdSuffix);
 
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
@@ -165,7 +166,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
-                    .reexecuteCompletePage(viewValues);
+                    .triggerCompleteComponentReexecution(viewValues);
 
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
@@ -180,7 +181,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
-                    .reexecutePage(resetNodeIdSuffix, viewValues);
+                    .triggerComponentReexecution(resetNodeIdSuffix, viewValues);
 
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);

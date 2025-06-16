@@ -113,19 +113,19 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}", //
             "5:0:8", "new initial data for node 5:0:8");
 
-        PageContainer res = service.reexecutePage("5:0:2", viewValues);
+        PageContainer res = service.triggerComponentReexecution("5:0:2", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(),
             containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PageContainer res2 = service.getPage();
+            PageContainer res2 = service.pollComponentReexecutionStatus("6:0:9");
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
             assertThat(res2.getReexecutedNodes(),
                 containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         });
-        res = service.getPage();
+        res = service.pollComponentReexecutionStatus("6:0:9");
         JsonNode page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
@@ -139,7 +139,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":8345673838383838383838383}}", //
             "5:0:8", "ERROR: a validation error");
         IllegalStateException ex =
-            assertThrows(IllegalStateException.class, () -> service.reexecutePage("5:0:2", viewValues2));
+            assertThrows(IllegalStateException.class, () -> service.triggerComponentReexecution("5:0:2", viewValues2));
         String message = ex.getMessage();
         assertThat(message, containsString("Unable to re-execute component with current page values."));
         assertThat(message, containsString("out of range of int"));
@@ -159,7 +159,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         Map<String, String> viewValues = Map.of("6:0:9",
             "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":false}}", //
             "6:0:8", "n�w initial data for node 6:0:8");
-        var res = service.reexecutePage("6:0:9", viewValues);
+        var res = service.triggerComponentReexecution("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         assertThat(res.getReexecutedNodes(), is(empty()));
@@ -180,7 +180,7 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         viewValues = Map.of("6:0:9",
             "{\"@class\":\"org.knime.js.base.node.base.input.bool.BooleanNodeValue\",\"boolean\":true}}", //
             "6:0:8", "new initial data for node 6:0:8");
-        res = service.reexecutePage("6:0:9", viewValues);
+        res = service.triggerComponentReexecution("6:0:9", viewValues);
         assertThat(res.getPage(), is(nullValue()));
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         assertThat(res.getReexecutedNodes(), is(empty()));
@@ -200,7 +200,8 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
     }
 
     /**
-     * Tests the consistency of the {@link ReexecutionService#getPage()} and {@link ReexecutionService#getPage(String)}
+     * Tests the consistency of the {@link ReexecutionService#pollComponentReexecutionStatus(String)} and
+     * {@link ReexecutionService#getPage()}
      *
      * @throws Exception
      */
@@ -220,19 +221,17 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         Map<String, String> viewValues = Map.of("5:0:7",
             "{\"@class\":\"org.knime.js.base.node.base.input.integer.IntegerNodeValue\",\"integer\":834567}}", //
             "5:0:8", "new initial data for node 5:0:8");
-        firstService.reexecutePage("5:0:7", viewValues);
+        firstService.triggerComponentReexecution("5:0:7", viewValues);
 
         executeAllAndWait();
 
         // Verify that the pages are consistent before and after the re-exec
         var pageFromFirstService = firstService.getPage();
-        var pageFromSecondService = secondService.getPage("5:0:7");
+        var pageFromSecondService = secondService.pollComponentReexecutionStatus("5:0:7");
 
         assertEquals(pageFromFirstService.getPage(), pageFromSecondService.getPage());
-        assertEquals(pageFromFirstService.getResetNodes(),
-            pageFromSecondService.getResetNodes());
-        assertEquals(pageFromFirstService.getReexecutedNodes(),
-            pageFromSecondService.getReexecutedNodes());
+        assertEquals(pageFromFirstService.getResetNodes(), pageFromSecondService.getResetNodes());
+        assertEquals(pageFromFirstService.getReexecutedNodes(), pageFromSecondService.getReexecutedNodes());
     }
 
     private ReexecutionService createReexecutionService(final int pageId,
