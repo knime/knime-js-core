@@ -122,7 +122,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
-    public PageContainer reexecutePage(final String resetNodeIDSuffix,
+    public PageContainer triggerComponentReexecution(final String resetNodeIDSuffix,
         final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
@@ -170,7 +170,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * @return the re-executed or re-executing page
      */
     @Override
-    public PageContainer reexecuteCompletePage(final Map<String, String> viewValues) {
+    public PageContainer triggerCompleteComponentReexecution(final Map<String, String> viewValues) {
         if (m_onReexecutionStart != null) {
             m_onReexecutionStart.run();
         }
@@ -220,7 +220,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
      * {@inheritDoc}
      */
     @Override
-    public PageContainer getPage(final String resetNodeIDSuffix) {
+    public PageContainer pollComponentReexecutionStatus(final String resetNodeIDSuffix) {
         var resetNodeId = NodeIDSuffix.fromString(resetNodeIDSuffix)
             .prependParent(m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID());
         var resetNodes =
@@ -245,7 +245,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
     }
 
     @Override
-    public PageContainer getCompletePage() {
+    public PageContainer pollCompleteComponentReexecutionStatus() {
         assert (m_page instanceof SubNodeContainer);
 
         var resetNodes = getWizardNodesWithinComponent((SubNodeContainer)m_page, nc -> true);

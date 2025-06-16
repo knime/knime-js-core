@@ -19,7 +19,7 @@ public interface ReexecutionService {
      * @param viewValues the view values to apply to the reset nodes
      * @return the re-executed or re-executing page
      */
-    PageContainer reexecutePage(String resetNodeIDSuffix, Map<String, String> viewValues);
+    PageContainer triggerComponentReexecution(String resetNodeIDSuffix, Map<String, String> viewValues);
 
     /**
      * (Partially) re-executes the complete component.
@@ -28,7 +28,7 @@ public interface ReexecutionService {
      * @param viewValues the view values to apply
      * @return the re-executed or re-executing page
      */
-    PageContainer reexecuteCompletePage(final Map<String, String> viewValues);
+    PageContainer triggerCompleteComponentReexecution(final Map<String, String> viewValues);
 
     /**
      * Get the current state of the re-executed or re-executing page
@@ -36,7 +36,7 @@ public interface ReexecutionService {
      * @param snc the container of the component
      * @return the re-executed or re-executing page
      */
-    PageContainer getCompletePage();
+    PageContainer pollCompleteComponentReexecutionStatus();
 
     /**
      * @return the re-executed or re-executing page
@@ -50,6 +50,6 @@ public interface ReexecutionService {
      * @param resetNodeIDSuffix the project relative id suffix of the node to be reset (and all the downstream nodes)
      * @return the re-executed or re-executing page
      */
-    PageContainer getPage(String resetNodeIDSuffix);
+    PageContainer pollComponentReexecutionStatus(String resetNodeIDSuffix);
 
 }
