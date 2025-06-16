@@ -138,10 +138,6 @@ public class JSCoreCompositeViewDataProvider implements CompositeViewDataProvide
 
     @Override
     public void deactivateAllComponentDataServices(final SubNodeContainer snc) throws IOException {
-
-        var model = new SubnodeViewableModel(snc, snc.getName());
-        model.discard();
-
         List<NativeNodeContainer> viewNodes = WizardPageUtil.getWizardPageNodes(snc.getWorkflowManager(), true);
 
         var nvm = NodeViewManager.getInstance();
