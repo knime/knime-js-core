@@ -51,9 +51,9 @@ package org.knime.core.wizard;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.function.Function;
 
 import javax.swing.text.CompositeView;
@@ -61,6 +61,7 @@ import javax.swing.text.CompositeView;
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.util.NodeCleanUpCallback;
@@ -83,8 +84,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
      */
     static class JSCoreCompositeViewService implements CompositeViewService {
 
-        private final Map<SubNodeContainer, SubnodeViewableModel> m_modelCache =
-            Collections.synchronizedMap(new WeakHashMap<>());
+        private final Map<NodeID, SubnodeViewableModel> m_modelCache = Collections.synchronizedMap(new HashMap<>());
 
         private final Function<String, Function<NativeNodeContainer, NodeViewEnt>> m_createNodeViewEntityFactory;
 
@@ -104,10 +104,8 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
 
             SubnodeViewableModel model;
             try {
-                model =
-                    getOrCreateModel(getSubNodeContainer(projectId, workflowId, VersionId.parse(versionId), nodeId));
-
-                model.createPageAndValue(m_createNodeViewEntityFactory.apply(projectId)::apply);
+                model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, VersionId.parse(versionId), nodeId),
+                    projectId);
                 return viewContentToJsonString(model.getViewRepresentation());
             } catch (NodeNotFoundException | IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
@@ -119,7 +117,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException {
 
             try {
-                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId))
+                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollCompleteComponentReexecutionStatus();
             } catch (NodeNotFoundException | IOException exception) {
@@ -132,7 +130,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             final NodeIDEnt nodeId, final String resetNodeIdSuffix) throws ServiceExceptions.ServiceCallException {
 
             try {
-                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId))
+                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollComponentReexecutionStatus(resetNodeIdSuffix);
 
@@ -147,7 +145,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             throws ServiceExceptions.ServiceCallException {
 
             try {
-                var model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId));
+                var model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId);
                 var result = model.loadViewValueFromMapAndSetAsDefault(viewValues);
                 if (result != null) {
                     throw new ServiceExceptions.ServiceCallException(
@@ -164,7 +162,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             throws ServiceExceptions.ServiceCallException {
 
             try {
-                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId))
+                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerCompleteComponentReexecution(viewValues);
 
@@ -179,7 +177,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             throws ServiceExceptions.ServiceCallException {
 
             try {
-                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId))
+                return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerComponentReexecution(resetNodeIdSuffix, viewValues);
 
@@ -231,35 +229,28 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             return ((ByteArrayOutputStream)webViewContent.saveToStream()).toString("UTF-8");
         }
 
-        private SubnodeViewableModel getOrCreateModel(final SubNodeContainer subnodeContainer) throws IOException {
-
+        private SubnodeViewableModel getOrCreateModel(final SubNodeContainer snc, final String projectId)
+            throws IOException {
+            var sncID = snc.getID();
             SubnodeViewableModel model;
+            model = m_modelCache.get(sncID);
+            if (model == null) {
+                model = new SubnodeViewableModel(snc, snc.getName(), false,
+                    m_createNodeViewEntityFactory.apply(projectId)::apply);
+                m_modelCache.put(sncID, model);
 
-            synchronized (m_modelCache) {
-                model = m_modelCache.get(subnodeContainer);
+                NodeCleanUpCallback.builder(snc, () -> {
+                    var modelToDiscard = m_modelCache.remove(sncID);
+                    if (modelToDiscard != null) {
+                        modelToDiscard.discard();
+                    }
 
-                if (model == null) {
-                    model = new SubnodeViewableModel(subnodeContainer);
-                    m_modelCache.put(subnodeContainer, model);
-
-                    NodeCleanUpCallback.builder(subnodeContainer, () -> {
-                        SubnodeViewableModel modelToDiscard;
-                        synchronized (m_modelCache) {
-                            modelToDiscard = m_modelCache.remove(subnodeContainer);
-                        }
-
-                        if (modelToDiscard != null) {
-                            modelToDiscard.discard();
-                        }
-
-                    }) //
-                        .cleanUpOnNodeStateChange(true) //
-                        .deactivateOnNodeStateChange(true) //
-                        .build();
-                }
-
-                return model;
+                }) //
+                    .cleanUpOnNodeStateChange(true) //
+                    .deactivateOnNodeStateChange(true) //
+                    .build();
             }
+            return model;
         }
 
         private static void deactivateAllCompositeViewDataServices(final SubNodeContainer subnodeContainer) {

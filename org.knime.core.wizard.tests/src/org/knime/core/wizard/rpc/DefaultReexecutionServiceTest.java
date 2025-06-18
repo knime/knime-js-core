@@ -119,13 +119,13 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
             containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PageContainer res2 = service.pollComponentReexecutionStatus();
+            PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
             assertThat(res2.getReexecutedNodes(),
                 containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         });
-        res = service.pollComponentReexecutionStatus();
+        res = service.getPage();
         JsonNode page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
@@ -164,11 +164,11 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PageContainer res2 = service.pollComponentReexecutionStatus();
+            PageContainer res2 = service.getPage();
             assertThat(res2.getResetNodes(), is(nullValue()));
             assertThat(res2.getReexecutedNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         });
-        res = service.pollComponentReexecutionStatus();
+        res = service.getPage();
         var page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("6:0:3").get("viewRepresentation").get("text").asText(), is("TEST"));
         assertThat(page.get("nodeViews").get("6:0:8").get("initialData").asText(),
@@ -185,12 +185,12 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         assertThat(res.getResetNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PageContainer res2 = service.pollComponentReexecutionStatus();
+            PageContainer res2 = service.getPage();
             assertThat(res2.getPage(), is(not(nullValue())));
             assertThat(res2.getResetNodes(), is(nullValue()));
             assertThat(res2.getReexecutedNodes(), containsInAnyOrder("6:0:9", "6:0:3", "6:0:8"));
         });
-        res = service.pollComponentReexecutionStatus();
+        res = service.getPage();
         page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("6:0:3").get("nodeInfo").get("nodeState").asText(), is("configured"));
         assertThat(page.get("webNodes").get("6:0:3").get("nodeInfo").get("displayPossible").asText(), is("false"));
@@ -225,8 +225,8 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
         executeAllAndWait();
 
         // Verify that the pages are consistent before and after the re-exec
-        var pageFromFirstService = firstService.pollComponentReexecutionStatus();
-        var pageFromSecondService = secondService.getPage("5:0:7");
+        var pageFromFirstService = firstService.getPage();
+        var pageFromSecondService = secondService.pollComponentReexecutionStatus("5:0:7");
 
         assertEquals(pageFromFirstService.getPage(), pageFromSecondService.getPage());
         assertEquals(pageFromFirstService.getResetNodes(),
