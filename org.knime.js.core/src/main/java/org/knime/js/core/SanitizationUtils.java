@@ -123,7 +123,7 @@ public final class SanitizationUtils {
     static final List<String> TREATED_EXEMPT_NODES = Arrays.asList(
         JavaScriptViewCreator.SINGLE_PAGE_NODE_NAME,
         "Generic JavaScript View",
-        "Generic JavaScript View (JavaScript)",
+        "Generic JavaScript View (JavaScript) (legacy)",
         "Generic JavaScript View (legacy)"
     );
 
