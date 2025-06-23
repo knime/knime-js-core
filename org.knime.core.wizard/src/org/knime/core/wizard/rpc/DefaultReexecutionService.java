@@ -52,6 +52,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +90,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private final CompositeViewPageManager m_compositeViewPageManager;
 
-    private NodeID m_resetNodeId;
+    private Collection<NodeID> m_resetNodeIds;
 
     private List<String> m_resetNodes;
 
@@ -134,7 +136,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
         try (WorkflowLock lock = m_page.getParent().lock()) {
             Map<String, ValidationError> validationErrors =
-                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeId);
+                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, List.of(resetNodeId));
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 throw new IllegalStateException(
                     "Unable to re-execute component with current page values. Validation errors: " + validationErrors
@@ -143,16 +145,16 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
 
         // create response
-        m_resetNodes = getSuccessorWizardNodesWithinComponent(resetNodeId, null).stream().collect(Collectors.toList());
+        m_resetNodes = getSuccessorWizardNodesWithinComponent(resetNodeId, null);
         String page;
         if (m_page.getNodeContainerState().isExecuted()) {
             page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
             m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
-            m_resetNodeId = resetNodeId;
+            m_resetNodeIds = List.of(resetNodeId);
         } else {
             page = null;
-            m_resetNodeId = resetNodeId;
+            m_resetNodeIds = List.of(resetNodeId);
             m_reexecutedNodes = Collections.emptyList();
         }
         if (page != null && m_onReexecutionEnd != null) {
@@ -163,7 +165,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     /**
      *
-     * Does not set m_resetNodeId, use extended getPage to poll
+     * Does not set m_resetNodeIds, use extended getPage to poll
      *
      * @param snc the container of the component
      * @param viewValues
@@ -176,9 +178,18 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
         var pageId = m_page.getID();
 
+        ArrayList<NodeID> resetNodeIds = new ArrayList<>();
         try (WorkflowLock lock = m_page.getParent().lock()) {
+
+            var parent = m_compositeViewPageManager.getWorkflowManager().getProjectWFM().getID();
+
+            for (var dirtyNode : viewValues.keySet()) {
+                resetNodeIds.add( //
+                    NodeIDSuffix.fromString(dirtyNode).prependParent(parent));
+            }
+
             Map<String, ValidationError> validationErrors =
-                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, null);
+                m_compositeViewPageManager.applyPartialValuesAndReexecute(viewValues, pageId, resetNodeIds);
             if (validationErrors != null && !validationErrors.isEmpty()) {
                 throw new IllegalStateException(
                     "Unable to re-execute component with current page values. Validation errors: " + validationErrors
@@ -187,7 +198,7 @@ public final class DefaultReexecutionService implements ReexecutionService {
         }
 
         assert (m_page instanceof SubNodeContainer);
-        m_resetNodes = getWizardNodesWithinComponent((SubNodeContainer)m_page, nc -> true);
+        m_resetNodes = getSuccessorWizardNodesWithinComponent(resetNodeIds, nc -> true);
         String page;
         if (m_page.getNodeContainerState().isExecuted()) {
             page = filterAndGetSerializedJSONWebNodePage(m_resetNodes);
@@ -276,16 +287,16 @@ public final class DefaultReexecutionService implements ReexecutionService {
      */
     @Override
     public PageContainer getPage() {
-        CheckUtils.checkNotNull(m_resetNodeId, "Reset node ID must be defined for updated page response");
+        CheckUtils.checkNotNull(m_resetNodeIds, "Reset node IDs must be defined for updated page response");
         var pageState = m_page.getNodeContainerState();
         String page;
         if (pageState.isExecutionInProgress() || pageState.isWaitingToBeExecuted()) {
             page = null;
-            m_reexecutedNodes = getSuccessorWizardNodesWithinComponent(m_resetNodeId,
+            m_reexecutedNodes = getSuccessorWizardNodesWithinComponent(m_resetNodeIds,
                 nc -> !nc.getNodeContainerState().isWaitingToBeExecuted()
                     && !nc.getNodeContainerState().isExecutionInProgress());
         } else {
-            page = filterAndGetSerializedJSONWebNodePage(getSuccessorWizardNodesWithinComponent(m_resetNodeId, null));
+            page = filterAndGetSerializedJSONWebNodePage(getSuccessorWizardNodesWithinComponent(m_resetNodeIds, null));
             m_reexecutedNodes = m_resetNodes;
             m_resetNodes = null;
         }
@@ -297,21 +308,32 @@ public final class DefaultReexecutionService implements ReexecutionService {
 
     private static List<String> getWizardNodesWithinComponent(final SubNodeContainer snc,
         final Predicate<NodeContainer> nodeFilter) {
+
         return WizardPageUtil.getWizardPageNodes(snc.getWorkflowManager(), true).stream().filter(nodeFilter).map(p -> {
             String[] parts = p.getID().toString().split(":", 2);
             return parts[1];
         }).collect(Collectors.toList());
     }
 
+    private List<String> getSuccessorWizardNodesWithinComponent(final Collection<NodeID> resetNodeIds,
+        final Predicate<NodeContainer> nodeFilter) {
+
+        NodeID pageId = m_page.getID();
+
+        Stream<Pair<NodeIDSuffix, NodeContainer>> combinedStream =
+            WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(m_compositeViewPageManager.getWorkflowManager(),
+                pageId, resetNodeIds);
+
+        if (nodeFilter != null) {
+            combinedStream = combinedStream.filter(p -> nodeFilter.test(p.getSecond()));
+        }
+
+        return combinedStream.map(p -> p.getFirst().toString()).collect(Collectors.toList());
+    }
+
     private List<String> getSuccessorWizardNodesWithinComponent(final NodeID resetNodeId,
         final Predicate<NodeContainer> nodeFilter) {
-        NodeID pageId = m_page.getID();
-        Stream<Pair<NodeIDSuffix, NodeContainer>> res = WizardPageUtil.getSuccessorWizardPageNodesWithinComponent(
-            m_compositeViewPageManager.getWorkflowManager(), pageId, resetNodeId);
-        if (nodeFilter != null) {
-            res = res.filter(p -> nodeFilter.test(p.getSecond()));
-        }
-        return res.map(p -> p.getFirst().toString()).collect(Collectors.toList());
+        return getSuccessorWizardNodesWithinComponent(List.of(resetNodeId), nodeFilter);
     }
 
 }

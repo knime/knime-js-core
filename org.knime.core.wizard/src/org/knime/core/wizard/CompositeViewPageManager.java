@@ -51,6 +51,7 @@ package org.knime.core.wizard;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,8 +73,8 @@ import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.js.core.JSONWebNodePage;
 
 /**
- * Utility class which handles serialization/deserialization of component's composite views,
- * as well as forwarding and bundling requests for those.
+ * Utility class which handles serialization/deserialization of component's composite views, as well as forwarding and
+ * bundling requests for those.
  *
  * @author Christian Albrecht, KNIME.com GmbH, Konstanz, Germany
  * @since 3.4
@@ -82,6 +83,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
 
     /**
      * Returns a {@link CompositeViewPageManager} instance for the given {@link CompositeViewPageManager}
+     *
      * @param workflowManager the {@link WorkflowManager} to get the {@link CompositeViewPageManager} instance for
      * @return a {@link CompositeViewPageManager} of the given {@link WorkflowManager}
      */
@@ -105,6 +107,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
 
     /**
      * Checks different criteria to determine if a combined page view is available for a given metanode.
+     *
      * @param containerNodeID the {@link NodeID} of the metanode to check
      * @return true, if a view on the metanode is available, false otherwise
      */
@@ -168,12 +171,14 @@ public class CompositeViewPageManager extends AbstractPageManager {
 
     /**
      * Validates a given map of view values contained in a given subnode.
+     *
      * @param viewValues a map with {@link NodeIDSuffix} string as key and parsed view value as value
      * @param containerNodeId the {@link NodeID} of the subnode
      * @return Null or empty map if validation succeeds, map of errors otherwise
      * @throws IOException on serialization error
      */
-    public Map<String, ValidationError> validateViewValues(final Map<String, String> viewValues, final NodeID containerNodeId) throws IOException {
+    public Map<String, ValidationError> validateViewValues(final Map<String, String> viewValues,
+        final NodeID containerNodeId) throws IOException {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
             /*ObjectMapper mapper = new ObjectMapper();
             for (String key : viewValues.keySet()) {
@@ -191,12 +196,14 @@ public class CompositeViewPageManager extends AbstractPageManager {
 
     /**
      * Applies a given map of view values to a given subnode which have already been validated.
+     *
      * @param viewValues an already validated map with {@link NodeIDSuffix} string as key and parsed view value as value
      * @param containerNodeId the {@link NodeID} of the subnode
      * @param useAsDefault true, if values are supposed to be applied as new defaults, false if applied temporarily
      * @throws IOException on serialization error
      */
-    public void applyValidatedViewValues(final Map<String, String> viewValues, final NodeID containerNodeId, final boolean useAsDefault) throws IOException {
+    public void applyValidatedViewValues(final Map<String, String> viewValues, final NodeID containerNodeId,
+        final boolean useAsDefault) throws IOException {
         try (WorkflowLock lock = getWorkflowManager().lock()) {
             /*ObjectMapper mapper = new ObjectMapper();
             for (String key : viewValues.keySet()) {
@@ -233,32 +240,29 @@ public class CompositeViewPageManager extends AbstractPageManager {
      *
      * @param valueMap a map with {@link NodeIDSuffix} string as key and parsed view value as value.
      * @param containerNodeId the {@link NodeID} of the subnode.
-     * @param resetNodeId the absolute {@link NodeID} which should initiate partial re-execution.
+     * @param resetNodeIds collection of the absolute {@link NodeID}s which should initiate partial re-execution.
      * @return a map of validation errors which occurred when applying the updated values or else null.
      *
      * @since 4.5
      */
     public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
-        final NodeID containerNodeId, final NodeID resetNodeId) {
+        final NodeID containerNodeId, final Collection<NodeID> resetNodeIds) {
         try (WorkflowLock lock = getWorkflowManager().assertLock()) {
-            return getController(containerNodeId).reexecuteSinglePage(resetNodeId, valueMap);
+            return getController(containerNodeId).reexecuteSinglePage(resetNodeIds, valueMap);
         }
     }
 
     /**
-     * Processes a JSON serialized request issued by a view and returns the corresponding JSON serialized
-     * response.
+     * Processes a JSON serialized request issued by a view and returns the corresponding JSON serialized response.
      *
      * @param nodeID The node id of the node that the request belongs to.
      * @param jsonRequest The JSON serialized view request
      * @param containerNodeId the {@link NodeID} of the containing subnode
      * @param exec The execution monitor to set progress and check possible cancellation.
      * @return A JSON serialized {@link WizardViewResponse} object.
-     * @throws ViewRequestHandlingException If the request handling or response generation fails for any
-     * reason.
+     * @throws ViewRequestHandlingException If the request handling or response generation fails for any reason.
      * @throws InterruptedException If the thread handling the request is interrupted.
-     * @throws CanceledExecutionException If the handling of the request was canceled e.g. by user
-     * intervention.
+     * @throws CanceledExecutionException If the handling of the request was canceled e.g. by user intervention.
      * @since 3.7
      */
     String processViewRequest(final String nodeID, final String jsonRequest, final NodeID containerNodeId,

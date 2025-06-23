@@ -119,13 +119,13 @@ public class DefaultReexecutionServiceTest extends WorkflowTestCase {
             containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         assertThat(res.getReexecutedNodes(), is(empty()));
         Awaitility.await().atMost(5, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).untilAsserted(() -> {
-            PageContainer res2 = service.pollComponentReexecutionStatus("6:0:9");
+            PageContainer res2 = service.getPage();
             assertThat(res2.getPage().rawValue().toString(), containsString("834567"));
             assertThat(res2.getResetNodes(), is(nullValue()));
             assertThat(res2.getReexecutedNodes(),
                 containsInAnyOrder("5:0:3", "5:0:2", "5:0:7", "5:0:8", "5:0:13:0:10", "5:0:13:0:11"));
         });
-        res = service.pollComponentReexecutionStatus("6:0:9");
+        res = service.getPage();
         JsonNode page = MAPPER.readTree(res.getPage().rawValue().toString());
         assertThat(page.get("webNodes").get("5:0:7").get("viewValue").get("integer").asInt(), is(834567));
         assertThat(page.get("nodeViews").get("5:0:8").get("initialData").asText(),
