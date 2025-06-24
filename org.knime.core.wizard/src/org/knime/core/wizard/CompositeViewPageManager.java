@@ -205,7 +205,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
             }*/
             if (!viewValues.isEmpty()) {
                 CompositeViewController sec = getController(containerNodeId);
-                sec.loadValuesIntoPage(viewValues, false, useAsDefault, null);
+                sec.loadValuesIntoPage(viewValues, false, useAsDefault, (NodeID) null);
             }
         }
     }
