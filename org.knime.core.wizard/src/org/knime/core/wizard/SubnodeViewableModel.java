@@ -141,17 +141,6 @@ public class SubnodeViewableModel implements ViewableModel, WizardNode<JSONWebNo
     }
 
     /**
-     * Creates a new instance of this viewable model. Uses the getName function of the subnode container as the view
-     * name.
-     *
-     * @param nodeContainer the subnode container
-     * @throws IOException on view model creation error
-     */
-    public SubnodeViewableModel(final SubNodeContainer nodeContainer) throws IOException {
-        this(nodeContainer, nodeContainer.getName(), false, null);
-    }
-
-    /**
      * Creates a new instance of this viewable model
      *
      * @param nodeContainer the subnode container
