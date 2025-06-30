@@ -71,7 +71,7 @@ import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.api.util.VersionId;
 import org.knime.gateway.api.webui.service.CompositeViewService;
 import org.knime.gateway.api.webui.service.util.ServiceExceptions;
-import org.knime.gateway.api.webui.service.util.ServiceExceptions.NodeNotFoundException;
+import org.knime.gateway.api.webui.service.util.ServiceExceptions.ServiceCallException;
 import org.knime.gateway.impl.webui.service.CompositeViewServiceFactory;
 
 /**
@@ -109,7 +109,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                 model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, VersionId.parse(versionId), nodeId),
                     projectId);
                 return viewContentToJsonString(model.getViewRepresentation());
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -122,7 +122,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollCompleteComponentReexecutionStatus();
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -136,7 +136,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollComponentReexecutionStatus(resetNodeIdSuffix);
 
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -153,7 +153,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                     throw new ServiceExceptions.ServiceCallException(
                         "Failed to set view values as new default: " + result.getError());
                 }
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -168,7 +168,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerCompleteComponentReexecution(viewValues);
 
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -183,7 +183,7 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerComponentReexecution(resetNodeIdSuffix, viewValues);
 
-            } catch (NodeNotFoundException | IOException exception) {
+            } catch (IOException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
         }
@@ -191,32 +191,26 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
         @Override
         public void deactivateAllCompositeViewDataServices(final String projectId, final NodeIDEnt workflowId,
             final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException {
-
-            try {
-                var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
-                deactivateAllCompositeViewDataServices(subnodeContainer);
-
-            } catch (NodeNotFoundException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
-            }
+            var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
+            deactivateAllCompositeViewDataServices(subnodeContainer);
         }
 
         private static SubNodeContainer getSubNodeContainer(final String projectId, final NodeIDEnt workflowId,
-            final VersionId versionId, final NodeIDEnt nodeId) throws NodeNotFoundException {
+            final VersionId versionId, final NodeIDEnt nodeId) throws ServiceCallException {
             try {
                 var container = org.knime.gateway.impl.service.util.DefaultServiceUtil.getNodeContainer(projectId,
                     workflowId, versionId, nodeId);
                 if (container instanceof SubNodeContainer snc) {
                     return snc;
                 }
-                throw new NodeNotFoundException("NodeContainer with id '" + nodeId + "' is not a SubNodeContainer.");
+                throw new ServiceCallException("Node not found. NodeContainer with id '" + nodeId + "' is not a SubNodeContainer.");
             } catch (IllegalArgumentException e) {
-                throw new NodeNotFoundException(e.getMessage(), e);
+                throw new ServiceCallException("Node not found. " + e.getMessage(), e);
             }
         }
 
         private static SubNodeContainer getSubNodeContainer(final String projectId, final NodeIDEnt workflowId,
-            final NodeIDEnt nodeId) throws NodeNotFoundException {
+            final NodeIDEnt nodeId) throws ServiceCallException {
             return getSubNodeContainer(projectId, workflowId, VersionId.currentState(), nodeId);
         }
 
