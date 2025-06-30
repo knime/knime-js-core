@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<component id="org.knime.core.wizard" version="2">
+    <resource path="src/org/knime/core/wizard/CompositeViewPageManager.java" type="org.knime.core.wizard.CompositeViewPageManager">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.CompositeViewPageManager"/>
+                <message_argument value="applyPartialValuesAndReexecute(Map&lt;String,String&gt;, NodeID, NodeID)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/core/wizard/rpc/DefaultReexecutionService.java" type="org.knime.core.wizard.rpc.DefaultReexecutionService">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
+                <message_argument value="reexecutePage(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/core/wizard/rpc/ReexecutionService.java" type="org.knime.core.wizard.rpc.ReexecutionService">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="pollCompleteComponentReexecutionStatus()"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="pollComponentReexecutionStatus(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="triggerCompleteComponentReexecution(Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="triggerComponentReexecution(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="reexecutePage(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="pollCompleteComponentReexecutionStatus()"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="pollComponentReexecutionStatus(String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="triggerCompleteComponentReexecution(Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="triggerComponentReexecution(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+</component>
