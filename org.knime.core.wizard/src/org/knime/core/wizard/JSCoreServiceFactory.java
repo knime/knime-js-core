@@ -69,17 +69,29 @@ import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.api.util.VersionId;
+import org.knime.gateway.api.webui.service.ComponentEditorService;
 import org.knime.gateway.api.webui.service.CompositeViewService;
 import org.knime.gateway.api.webui.service.util.ServiceExceptions;
 import org.knime.gateway.api.webui.service.util.ServiceExceptions.NodeNotFoundException;
-import org.knime.gateway.impl.webui.service.CompositeViewServiceFactory;
+import org.knime.gateway.impl.webui.service.GatewayServiceFactory;
 
 /**
  * Factory for creating instances of {@link CompositeViewService} that can be used to interact with components.
  *
  * @since 5.5
  */
-public class DefaultCompositeViewServiceFactory implements CompositeViewServiceFactory {
+public class JSCoreServiceFactory implements GatewayServiceFactory {
+
+    @Override
+    public CompositeViewService createCompositeViewService(
+        final Function<String, Function<NativeNodeContainer, NodeViewEnt>> createNodeViewEntityFactory) {
+        return new JSCoreCompositeViewService(createNodeViewEntityFactory);
+    }
+
+    @Override
+    public ComponentEditorService createComponentEditorService() {
+        return new DefaultComponentEditorService();
+    }
 
     /**
      * Implementation of the {@link CompositeViewService} interface
@@ -195,7 +207,6 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
             try {
                 var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
                 deactivateAllCompositeViewDataServices(subnodeContainer);
-
             } catch (NodeNotFoundException exception) {
                 throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
             }
@@ -264,15 +275,5 @@ public class DefaultCompositeViewServiceFactory implements CompositeViewServiceF
                 .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
         }
 
-    }
-
-    /**
-     * @param createNodeViewEntityFactory a factory function that creates a function that creates a NodeViewEnt
-     * @return a new instance of {@link CompositeView} that can be used to interact with components
-     */
-    @Override
-    public CompositeViewService createCompositeViewService(
-        final Function<String, Function<NativeNodeContainer, NodeViewEnt>> createNodeViewEntityFactory) {
-        return new JSCoreCompositeViewService(createNodeViewEntityFactory);
     }
 }
