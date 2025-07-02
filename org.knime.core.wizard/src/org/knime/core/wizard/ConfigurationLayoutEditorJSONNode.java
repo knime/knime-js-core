@@ -71,8 +71,6 @@ public class ConfigurationLayoutEditorJSONNode {
 
     private JSONLayoutContent m_layout;
 
-    private String m_icon;
-
     private boolean m_availableInDialog;
 
     private String m_preview;
@@ -89,13 +87,12 @@ public class ConfigurationLayoutEditorJSONNode {
      * @param type the node type (view, configuration, quickform, or nestedLayout)
      */
     public ConfigurationLayoutEditorJSONNode(final int nodeID, final String name, final String description,
-        final JSONLayoutContent layout, final String icon, final boolean availableInDialog, final String type) {
+        final JSONLayoutContent layout, final boolean availableInDialog, final String type) {
         m_nodeID = Integer.toString(nodeID);
         // it doesn't seem to be possible to escape the apostrophe for the resulting script to be executed correctly
         // replacing it with a 'right single quotation mark' keeps the visual appearance
         m_name = StringEscapeUtils.escapeJava(name.replace("'", "’"));
         m_description = StringEscapeUtils.escapeJava(description.replace("'", "’"));
-        m_icon = icon;
         m_availableInDialog = availableInDialog;
         m_layout = layout;
         m_type = type;
@@ -158,21 +155,6 @@ public class ConfigurationLayoutEditorJSONNode {
      */
     public void setLayout(final JSONLayoutConfigurationContent layout) {
         m_layout = layout;
-    }
-
-    /**
-     * @return the icon
-     */
-    public String getIcon() {
-        return m_icon;
-    }
-
-    /**
-     *
-     * @param icon the icon to set
-     */
-    public void setIcon(final String icon) {
-        m_icon = icon;
     }
 
     /**

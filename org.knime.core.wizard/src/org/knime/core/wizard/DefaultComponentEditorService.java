@@ -50,19 +50,12 @@ package org.knime.core.wizard;
 
 import static org.knime.core.node.wizard.page.WizardPageUtil.isWizardPageNode;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.io.IOUtils;
-import org.eclipse.core.runtime.FileLocator;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.dialog.DialogNode;
@@ -250,7 +243,6 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
                 node.getName(), //
                 node.getNodeAnnotation().getText(), //
                 getLayout(viewNode.getValue(), viewNode.getKey()), //
-                getIcon(node), //
                 !isHideInWizard(node), //
                 getType(node));
 
@@ -281,7 +273,6 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
                 nodeContainer.getName(), //
                 nodeContainer.getNodeAnnotation().getText(), //
                 getConfigurationLayout(dialogNode.getValue(), dialogNode.getKey()), //
-                getIcon(nodeContainer), //
                 !node.isHideInDialog(), //
                 "configuration");
             nodes.add(jsonNode);
@@ -308,35 +299,6 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
 
         throw new IllegalArgumentException(
             "Node is not view, subnode, configuration or quickform: " + node.getNameWithID());
-    }
-
-    private static String getIcon(final NodeContainer nodeContainer) {
-
-        String iconBase64 = "";
-        if (nodeContainer == null) {
-            // ImageRepository lives in the workbench.
-            return iconBase64;
-        }
-
-        if (nodeContainer instanceof SubNodeContainer) {
-            return iconBase64;
-        }
-        try {
-            final URL url = FileLocator.resolve(nodeContainer.getIcon());
-            final String mimeType = URLConnection.guessContentTypeFromName(url.getFile());
-            byte[] imageBytes = null;
-            try (InputStream s = url.openStream()) {
-                imageBytes = IOUtils.toByteArray(s);
-            }
-            iconBase64 = "data:" + mimeType + ";base64," + Base64.getEncoder().encodeToString(imageBytes);
-        } catch (final IOException e) {
-            // Do nothing
-        }
-
-        if (iconBase64.isEmpty()) {
-            return iconBase64;
-        }
-        return iconBase64;
     }
 
     private static JSONLayoutContent getLayout(final SingleNodeContainer node, final NodeIDSuffix id) {
@@ -382,7 +344,4 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             throw new ServiceCallException(e.getMessage(), e);
         }
     }
-
-
-
 }
