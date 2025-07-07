@@ -16,6 +16,25 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/rpc/DefaultNodeService.java" type="org.knime.core.wizard.rpc.DefaultNodeService">
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultNodeService"/>
+                <message_argument value="callNodeDataService(String, String, String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultNodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1143996420">
+            <message_arguments>
+                <message_argument value="getNodeView(String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/rpc/DefaultReexecutionService.java" type="org.knime.core.wizard.rpc.DefaultReexecutionService">
         <filter comment="clean up done as part of NXT-3486" id="338792546">
             <message_arguments>
@@ -39,6 +58,50 @@
             <message_arguments>
                 <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
                 <message_argument value="reexecutePage(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src/org/knime/core/wizard/rpc/NodeService.java" type="org.knime.core.wizard.rpc.NodeService">
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="callNodeDataService(String, String, String, String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="getNodeView(String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="403804204">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="callNodeDataService(String, String, String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.NodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1209008130">
+            <message_arguments>
+                <message_argument value="4.6"/>
+                <message_argument value="5.6"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter id="1211105284">
+            <message_arguments>
+                <message_argument value="callNodeDataService(String, String, String, String, String, String, String)"/>
             </message_arguments>
         </filter>
     </resource>

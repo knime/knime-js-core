@@ -48,10 +48,13 @@
  */
 package org.knime.core.wizard.rpc;
 
+import static org.knime.gateway.impl.service.util.DefaultServiceUtil.getNodeContainer;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -71,6 +74,8 @@ import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.node.view.table.TableViewManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
+import org.knime.gateway.api.entity.NodeViewEnt;
+import org.knime.gateway.api.util.VersionId;
 import org.knime.gateway.api.webui.entity.SelectionEventEnt;
 import org.knime.gateway.impl.webui.kai.CodeKaiHandler;
 import org.knime.gateway.impl.webui.kai.CodeKaiHandler.ProjectId;
@@ -97,7 +102,8 @@ public class DefaultNodeService implements NodeService {
      * @param nnc The {@link NativeNodeContainer}
      */
     DefaultNodeService(final NativeNodeContainer nnc) {
-        m_getNodeWrapper = id -> NodeWrapper.of(nnc);
+        var validId = new NodeIDEnt(nnc.getID()).toString();
+        m_getNodeWrapper = id -> id.equals(validId) ? NodeWrapper.of(nnc) : null;
     }
 
     /**
@@ -114,11 +120,15 @@ public class DefaultNodeService implements NodeService {
             // initialize 'getNode'-function for a component composite view
             var projectWfm = snc.getParent().getProjectWFM();
             m_getNodeWrapper = id -> {
-                var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
-                if (!(nc instanceof NativeNodeContainer)) {
-                    throw new IllegalArgumentException("Not a native node: " + nc.getNameWithID());
+                try {
+                    var nc = projectWfm.findNodeContainer(new NodeIDEnt(id).toNodeID(projectWfm.getID()));
+                    if (nc instanceof NativeNodeContainer) {
+                        return NodeWrapper.of(nc);
+                    }
+                } catch (IllegalArgumentException e) {
+                    //
                 }
-                return NodeWrapper.of(nc);
+                return null;
             };
         }
     }
@@ -134,10 +144,33 @@ public class DefaultNodeService implements NodeService {
         m_getNodeWrapper = id -> NodePortWrapper.of(snc, portIdx, viewIdx);
     }
 
+    @Override
+    public NodeViewEnt getNodeView(final String projectId, final String workflowId, final String versionId,
+        final String nodeId) {
+        assertIsCurrentState(versionId);
+        var nnc = getNC(projectId, new NodeIDEnt(workflowId), VersionId.currentState(), new NodeIDEnt(nodeId),
+            NativeNodeContainer.class);
+
+        if (!NodeViewManager.hasNodeView(nnc)) {
+            throw new IllegalArgumentException("The node " + nnc.getNameWithID() + " does not have a view");
+        }
+        if (!nnc.getNodeContainerState().isExecuted()) {
+            throw new IllegalStateException(
+                "Node view can't be requested. The node " + nnc.getNameWithID() + " is not executed.");
+        }
+        return NodeViewEnt.create(nnc);
+    }
+
+    // opening detached views of workflow-versions isn't supported, yet (see NXT-3670)
+    private static void assertIsCurrentState(final String versionId) {
+        assert VersionId.parse(versionId).isCurrentState();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
-    public String callNodeDataService(final String projectId, final String workflowId, final String nodeID,
-        final String extensionType, final String serviceType, final String request) {
+    public String callNodeDataService(final String projectId, final String workflowId, final String versionId,
+        final String nodeID, final String extensionType, final String serviceType, final String request) {
+        assertIsCurrentState(versionId);
         @SuppressWarnings("rawtypes")
         final DataServiceManager dataServiceManager;
         if ("view".equals(extensionType)) {
@@ -153,7 +186,9 @@ public class DefaultNodeService implements NodeService {
             throw new IllegalArgumentException("Unknown target for node data service: " + extensionType);
         }
 
-        var ncWrapper = m_getNodeWrapper.apply(nodeID);
+        var ncWrapper = Optional.ofNullable(m_getNodeWrapper.apply(nodeID))
+            .orElseGet(() -> NodeWrapper.of(getNC(projectId, new NodeIDEnt(workflowId), VersionId.currentState(),
+                new NodeIDEnt(nodeID), NativeNodeContainer.class)));
         return DataServiceDependencies.runWithDependencies(createDialogDataServiceDependencies(projectId), () -> {
             if ("initial_data".equals(serviceType)) {
                 return dataServiceManager.callInitialDataService(ncWrapper);
@@ -175,8 +210,9 @@ public class DefaultNodeService implements NodeService {
     }
 
     @Override
-    public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeIdString,
-        final String mode, final List<String> selection) {
+    public void updateDataPointSelection(final String projectId, final String workflowId, final String versionId,
+        final String nodeIdString, final String mode, final List<String> selection) {
+        assertIsCurrentState(versionId);
         try {
             var nodeWrapper = m_getNodeWrapper.apply(nodeIdString);
             Set<RowKey> rowKeys;
@@ -209,10 +245,20 @@ public class DefaultNodeService implements NodeService {
     @Override
     public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
         final String action) {
-        var nc = m_getNodeWrapper.apply("").get();
-        assert nodeIds.size() == 1 && nodeIds.get(0).equals(new NodeIDEnt(nc.getID()).toString()) && "execute".equals(
+        assert nodeIds.size() == 1 && "execute".equals(
             action) : "The changeNodeStates-endpoint is only partially implemented - parameter values are out of scope";
+        var nc = m_getNodeWrapper.apply(nodeIds.get(0)).get();
         nc.getParent().executeUpToHere(nc.getID());
+    }
+
+    private static <T> T getNC(final String projectId, final NodeIDEnt workflowId, final VersionId versionId,
+        final NodeIDEnt nodeId, final Class<T> ncClass) {
+        var nc = getNodeContainer(projectId, workflowId, versionId, nodeId);
+        if (!ncClass.isAssignableFrom(nc.getClass())) {
+            throw new IllegalArgumentException(
+                "The requested node " + nc.getNameWithID() + " is not a " + ncClass.getName());
+        }
+        return ncClass.cast(nc);
     }
 
 }

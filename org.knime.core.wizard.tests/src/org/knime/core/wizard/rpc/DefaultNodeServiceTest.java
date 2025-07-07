@@ -132,8 +132,8 @@ public class DefaultNodeServiceTest {
         final var listenerMock = mock(HiLiteListener.class);
         m_hlh.addHiLiteListener(listenerMock);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId", ADD.toString(),
-            ROWKEYS_1_2.stream().map(RowKey::toString).toList());
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "current-state", "root:1",
+            ADD.toString(), ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
             verify(listenerMock, times(1)).hiLite(argThat(ke -> ke.keys().equals(ROWKEYS_1_2)));
@@ -164,7 +164,7 @@ public class DefaultNodeServiceTest {
         var component = (SubNodeContainer)m_wfm.getNodeContainer(componentId);
         var nodeService = new DefaultNodeService(component, false);
         try (var dispose = setupSelectionEvents(selectionEventConsumer, component)) {
-            nodeService.updateDataPointSelection("ignored", "ignored", "root:5:0:4", ADD.toString(),
+            nodeService.updateDataPointSelection("ignored", "ignored", "current-state", "root:5:0:4", ADD.toString(),
                 ROWKEYS_1_2.stream().map(RowKey::toString).toList());
 
             await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -181,7 +181,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1_2);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "current-state", "root:1",
             SelectionEventEnt.ModeEnum.REMOVE.toString(), ROWKEYS_1.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {
@@ -202,7 +202,7 @@ public class DefaultNodeServiceTest {
         m_hlh.addHiLiteListener(listenerMock);
         m_hlh.fireHiLiteEvent(ROWKEYS_1);
 
-        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "nodeId",
+        new DefaultNodeService(m_nnc).updateDataPointSelection("ignored", "ignored", "current-state", "root:1",
             SelectionEventEnt.ModeEnum.REPLACE.toString(), ROWKEYS_2.stream().map(RowKey::toString).toList());
 
         await().pollDelay(ONE_HUNDRED_MILLISECONDS).timeout(FIVE_SECONDS).untilAsserted(() -> {

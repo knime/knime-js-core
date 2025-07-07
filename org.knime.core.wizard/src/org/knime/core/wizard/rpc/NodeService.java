@@ -72,33 +72,48 @@ import org.knime.core.webui.node.view.table.selection.SelectionTranslationServic
 public interface NodeService {
 
     /**
+     * Returns the node-view representation for the frontend to render it. Enables the frontend to render nested
+     * node-view ui-extensions.
+     *
+     * @param projectId -
+     * @param workflowId -
+     * @param versionId -
+     * @param nodeId -
+     * @return representation of the node-view
+     * @since 5.6
+     */
+    Object getNodeView(String projectId, String workflowId, String versionId, String nodeId);
+
+    /**
      * Sends a request to a node view's or dialog's data service of a certain type.
      *
-     * @param projectId
-     * @param workflowId
-     * @param nodeId
+     * @param projectId -
+     * @param workflowId -
+     * @param versionId -
+     * @param nodeId -
      * @param extensionType the node 'extension', i.e. view or dialog, to direct the data service call to
      * @param serviceType specified the type of service to call
      * @param request the request
      * @return the data service response
      */
-    String callNodeDataService(String projectId, String workflowId, String nodeId, String extensionType,
-        String serviceType, String request);
+    String callNodeDataService(String projectId, String workflowId, String versionId, String nodeId,
+        String extensionType, String serviceType, String request);
 
     /**
      * Updates the selected data points as specified by the 'mode' and identified by their row keys. Unselects any other
      * data points, if they were previously selected.
      *
-     * @param projectId
-     * @param workflowId
-     * @param nodeId
+     * @param projectId -
+     * @param workflowId -
+     * @param versionId -
+     * @param nodeId -
      * @param mode the type of selection modification, i.e., ADD, REMOVE, or REPLACE
      * @param selection a list of strings that can be {@link SelectionTranslationService translated} to the row keys
      *            affected by the data point selection modification
      *
      * @since 4.6
      */
-    void updateDataPointSelection(String projectId, String workflowId, String nodeId, String mode,
+    void updateDataPointSelection(String projectId, String workflowId, String versionId, String nodeId, String mode,
         final List<String> selection);
 
     /**
