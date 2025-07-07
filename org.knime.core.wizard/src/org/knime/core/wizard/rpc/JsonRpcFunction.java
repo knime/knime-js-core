@@ -221,21 +221,27 @@ public class JsonRpcFunction {
         }
 
         @Override
-        public String callNodeDataService(final String projectId, final String workflowId, final String nodeId,
-            final String extensionType, final String serviceType, final String request) {
+        public String callNodeDataService(final String projectId, final String workflowId, final String versionId,
+            final String nodeId, final String extensionType, final String serviceType, final String request) {
             return m_nncUI.callNodeDataService(UUID.fromString(projectId), workflowId, nodeId, extensionType,
                 serviceType, request);
         }
 
         @Override
-        public void updateDataPointSelection(final String projectId, final String workflowId, final String nodeId,
-            final String mode, final List<String> selection) {
+        public void updateDataPointSelection(final String projectId, final String workflowId, final String versionId,
+            final String nodeId, final String mode, final List<String> selection) {
             throw new UnsupportedOperationException();
         }
 
         @Override
         public void changeNodeStates(final String projectId, final String workflowId, final List<String> nodeIds,
             final String action) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Object getNodeView(final String projectId, final String workflowId, final String versionId,
+            final String nodeId) {
             throw new UnsupportedOperationException();
         }
 
