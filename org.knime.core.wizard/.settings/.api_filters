@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <component id="org.knime.core.wizard" version="2">
+    <resource path="META-INF/MANIFEST.MF" type="org.knime.core.wizard.DefaultCompositeViewServiceFactory">
+        <filter comment="clean up as part of NXT-3486" id="305324134">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultCompositeViewServiceFactory"/>
+                <message_argument value="org.knime.core.wizard_5.6.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/CompositeViewPageManager.java" type="org.knime.core.wizard.CompositeViewPageManager">
         <filter id="338792546">
             <message_arguments>
@@ -9,6 +17,24 @@
         </filter>
     </resource>
     <resource path="src/org/knime/core/wizard/rpc/DefaultReexecutionService.java" type="org.knime.core.wizard.rpc.DefaultReexecutionService">
+        <filter comment="clean up done as part of NXT-3486" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
+                <message_argument value="getCompletePage()"/>
+            </message_arguments>
+        </filter>
+        <filter comment="clean up done as part of NXT-3486" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
+                <message_argument value="getPage(String)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="clean up done as part of NXT-3486" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
+                <message_argument value="reexecuteCompletePage(Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
         <filter id="338792546">
             <message_arguments>
                 <message_argument value="org.knime.core.wizard.rpc.DefaultReexecutionService"/>
@@ -39,6 +65,24 @@
             <message_arguments>
                 <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
                 <message_argument value="triggerComponentReexecution(String, Map&lt;String,String&gt;)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="cleanup done as part of NXT-3486" id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="getCompletePage()"/>
+            </message_arguments>
+        </filter>
+        <filter comment="cleanup done as part of NXT-3486" id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="getPage(String)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="cleanup done as part of NXT-3486" id="405901410">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.ReexecutionService"/>
+                <message_argument value="reexecuteCompletePage(Map&lt;String,String&gt;)"/>
             </message_arguments>
         </filter>
         <filter id="405901410">

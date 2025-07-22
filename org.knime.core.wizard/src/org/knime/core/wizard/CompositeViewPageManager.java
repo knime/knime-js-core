@@ -243,7 +243,7 @@ public class CompositeViewPageManager extends AbstractPageManager {
      * @param resetNodeIds collection of the absolute {@link NodeID}s which should initiate partial re-execution.
      * @return a map of validation errors which occurred when applying the updated values or else null.
      *
-     * @since 5.5
+     * @since 5.6
      */
     public Map<String, ValidationError> applyPartialValuesAndReexecute(final Map<String, String> valueMap,
         final NodeID containerNodeId, final Collection<NodeID> resetNodeIds) {

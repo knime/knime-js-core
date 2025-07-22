@@ -59,6 +59,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
  * A JSON representation of a Javascript view node for use in the configuration sorter editor.
  *
  * @author Daniel Bogenrieder, KNIME.com GmbH, Konstanz, Germany
+ * @since 5.6
  */
 @JsonAutoDetect
 public class ConfigurationLayoutEditorJSONNode {

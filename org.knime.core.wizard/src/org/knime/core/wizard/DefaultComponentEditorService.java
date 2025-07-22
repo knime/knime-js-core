@@ -85,6 +85,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Utility class for the component editor, providing methods to retrieve view and configuration nodes as JSON strings.
+ * @since 5.6
  */
 public final class DefaultComponentEditorService implements ComponentEditorService {
 

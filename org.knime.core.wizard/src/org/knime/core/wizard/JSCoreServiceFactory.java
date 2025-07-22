@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.swing.text.CompositeView;
-
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
@@ -78,7 +76,7 @@ import org.knime.gateway.impl.webui.service.GatewayServiceFactory;
 /**
  * Factory for creating instances of {@link CompositeViewService} that can be used to interact with components.
  *
- * @since 5.5
+ * @since 5.6
  */
 public class JSCoreServiceFactory implements GatewayServiceFactory {
 
