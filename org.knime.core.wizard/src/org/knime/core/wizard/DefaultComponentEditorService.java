@@ -89,16 +89,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public final class DefaultComponentEditorService implements ComponentEditorService {
 
-    private static NodeLogger m_logger = NodeLogger.getLogger(DefaultComponentEditorService.class);
+    private static final NodeLogger LOGGER = NodeLogger.getLogger(DefaultComponentEditorService.class);
 
     // ensure node layout is written the same as the metanode layout
-    private final static ObjectMapper m_configuredObjectMapper = JSONLayoutPage.getConfiguredObjectMapper();
+    private static final ObjectMapper m_configuredObjectMapper = JSONLayoutPage.getConfiguredObjectMapper();
 
     @Override
     public String getViewNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
 
-        m_logger.debug("getViewNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
+        LOGGER.debug("getViewNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
 
         return getViewNodesString(snc);
@@ -108,7 +108,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     public String getViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
 
-        m_logger.debug("getViewLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
+        LOGGER.debug("getViewLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
 
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         return snc.getSubnodeLayoutStringProvider().getLayoutString();
@@ -118,7 +118,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     public void setViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
         final String componentViewLayout) throws ServiceCallException {
 
-        m_logger.info("pushLayout called (" + projectId + ", " + workflowId + ", " + nodeId + "): layout: "
+        LOGGER.info("pushLayout called (" + projectId + ", " + workflowId + ", " + nodeId + "): layout: "
             + componentViewLayout);
 
         if (componentViewLayout == null || componentViewLayout.isBlank()) {
@@ -137,7 +137,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     public String getConfigurationNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
 
-        m_logger.debug("getConfigurationNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
+        LOGGER.debug("getConfigurationNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
 
         return getConfigurationNodesString(snc);
@@ -147,7 +147,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     public String getConfigurationLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
 
-        m_logger.debug("getConfigurationLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
+        LOGGER.debug("getConfigurationLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
 
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         return snc.getSubnodeConfigurationLayoutStringProvider().getConfigurationLayoutString();
@@ -157,7 +157,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     public void setConfigurationLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
         final String componentConfigurationLayout) throws ServiceCallException {
 
-        m_logger.debug("pushConfigurationLayout called (" + projectId + ", " + workflowId + ", " + nodeId
+        LOGGER.debug("pushConfigurationLayout called (" + projectId + ", " + workflowId + ", " + nodeId
             + "): layout: " + componentConfigurationLayout);
 
         if (componentConfigurationLayout == null || componentConfigurationLayout.isBlank()) {
@@ -181,7 +181,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         try {
             jsonNodes = m_configuredObjectMapper.writeValueAsString(nodes);
         } catch (JsonProcessingException e) {
-            m_logger.error("Cannot write JSON: " + e.getMessage(), e);
+            LOGGER.error("Cannot write JSON: " + e.getMessage(), e);
         }
         return jsonNodes;
     }
@@ -197,7 +197,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         try {
             jsonNodes = m_configuredObjectMapper.writeValueAsString(nodes);
         } catch (JsonProcessingException e) {
-            m_logger.error("Cannot write JSON: " + e.getMessage(), e);
+            LOGGER.error("Cannot write JSON: " + e.getMessage(), e);
         }
 
         return jsonNodes;
