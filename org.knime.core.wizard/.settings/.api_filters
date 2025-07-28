@@ -61,6 +61,20 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/rpc/JsonRpcFunction.java" type="org.knime.core.wizard.rpc.JsonRpcFunction$RWENodeService">
+        <filter comment="AP-24611 - expected signature changes in non-api classes" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.JsonRpcFunction.RWENodeService"/>
+                <message_argument value="callNodeDataService(String, String, String, String, String, String)"/>
+            </message_arguments>
+        </filter>
+        <filter comment="AP-24611 - expected signature changes in non-api classes" id="338792546">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.rpc.JsonRpcFunction.RWENodeService"/>
+                <message_argument value="updateDataPointSelection(String, String, String, String, List&lt;String&gt;)"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src/org/knime/core/wizard/rpc/NodeService.java" type="org.knime.core.wizard.rpc.NodeService">
         <filter id="403804204">
             <message_arguments>
