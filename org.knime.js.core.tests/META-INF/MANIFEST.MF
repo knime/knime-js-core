@@ -5,7 +5,7 @@ Bundle-SymbolicName: org.knime.js.core.tests;singleton:=true
 Bundle-Version: 5.6.0.qualifier
 Fragment-Host: org.knime.js.core;bundle-version="[5.6.0,6.0.0)"
 Automatic-Module-Name: org.knime.js.core.tests
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.junit;bundle-version="[4.12.0,5.0.0)",
  org.knime.testing;bundle-version="[5.6.0,6.0.0)"
