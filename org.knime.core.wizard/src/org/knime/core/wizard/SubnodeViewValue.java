@@ -150,6 +150,9 @@ public class SubnodeViewValue extends JSONViewContent implements WebViewContentC
         if (referenceValues == null || checkValues == null) {
             return referenceValues == null && checkValues == null;
         }
+        if (checkValues.size() < m_viewValues.size()) {
+            return false;
+        }
         if (checkValues.size() > m_viewValues.size()) {
             referenceValues = checkValues;
             checkValues = m_viewValues;
