@@ -54,11 +54,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 import org.knime.core.node.web.WebViewContent;
 import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
+import org.knime.core.node.workflow.NodeContainer;
 import org.knime.core.node.workflow.NodeID;
 import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.webui.node.NodeWrapper;
@@ -112,116 +114,123 @@ public class JSCoreServiceFactory implements GatewayServiceFactory {
 
         @Override
         public Object getCompositeViewPage(final String projectId, final NodeIDEnt workflowId, final String versionId,
-            final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException {
+            final NodeIDEnt nodeId)
+            throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             SubnodeViewableModel model;
             try {
                 model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, VersionId.parse(versionId), nodeId),
                     projectId);
                 return viewContentToJsonString(model.getViewRepresentation());
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder().withTitle("Failed to get composite view page")
+                    .withDetails(e.getMessage()).canCopy(false).build();
             }
         }
 
         @Override
         public Object pollCompleteComponentReexecutionStatus(final String projectId, final NodeIDEnt workflowId,
-            final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException {
+            final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollCompleteComponentReexecutionStatus();
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder()
+                    .withTitle("Failed to poll component reexecution status").withDetails(e.getMessage()).canCopy(false)
+                    .build();
             }
         }
 
         @Override
         public Object pollComponentReexecutionStatus(final String projectId, final NodeIDEnt workflowId,
-            final NodeIDEnt nodeId, final String resetNodeIdSuffix) throws ServiceExceptions.ServiceCallException {
+            final NodeIDEnt nodeId, final String resetNodeIdSuffix)
+            throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .pollComponentReexecutionStatus(resetNodeIdSuffix);
-
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder()
+                    .withTitle("Failed to poll component reexecution status").withDetails(e.getMessage()).canCopy(false)
+                    .build();
             }
         }
 
         @Override
         public void setViewValuesAsNewDefault(final String projectId, final NodeIDEnt workflowId,
             final NodeIDEnt nodeId, final Map<String, String> viewValues)
-            throws ServiceExceptions.ServiceCallException {
+            throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             try {
                 var model = getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId);
                 var result = model.loadViewValueFromMapAndSetAsDefault(viewValues);
                 if (result != null) {
-                    throw new ServiceExceptions.ServiceCallException(
-                        "Failed to set view values as new default: " + result.getError());
+                    throw ServiceExceptions.ServiceCallException.builder()
+                        .withTitle("Failed to set view values as new default").withDetails(result.getError())
+                        .canCopy(false).build();
                 }
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder()
+                    .withTitle("Failed to set view values as new default").withDetails(e.getMessage()).canCopy(false)
+                    .build();
             }
         }
 
         @Override
         public Object triggerCompleteComponentReexecution(final String projectId, final NodeIDEnt workflowId,
             final NodeIDEnt nodeId, final Map<String, String> viewValues)
-            throws ServiceExceptions.ServiceCallException {
+            throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerCompleteComponentReexecution(viewValues);
-
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder().withTitle("Failed to trigger re-execution")
+                    .withDetails(e.getMessage()).canCopy(false).build();
             }
         }
 
         @Override
         public Object triggerComponentReexecution(final String projectId, final NodeIDEnt workflowId,
             final NodeIDEnt nodeId, final String resetNodeIdSuffix, final Map<String, String> viewValues)
-            throws ServiceExceptions.ServiceCallException {
+            throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
 
             try {
                 return getOrCreateModel(getSubNodeContainer(projectId, workflowId, nodeId), projectId)
                     .createReexecutionService(m_createNodeViewEntityFactory.apply(projectId)::apply)
                     .triggerComponentReexecution(resetNodeIdSuffix, viewValues);
-
-            } catch (NodeNotFoundException | IOException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
+            } catch (IOException e) {
+                throw ServiceExceptions.ServiceCallException.builder().withTitle("Failed to trigger re-execution")
+                    .withDetails(e.getMessage()).canCopy(false).build();
             }
         }
 
         @Override
         public void deactivateAllCompositeViewDataServices(final String projectId, final NodeIDEnt workflowId,
-            final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException {
-
-            try {
-                var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
-                deactivateAllCompositeViewDataServices(subnodeContainer);
-            } catch (NodeNotFoundException exception) {
-                throw new ServiceExceptions.ServiceCallException(exception.getMessage(), exception);
-            }
+            final NodeIDEnt nodeId) throws ServiceExceptions.ServiceCallException, NodeNotFoundException {
+            var subnodeContainer = getSubNodeContainer(projectId, workflowId, nodeId);
+            deactivateAllCompositeViewDataServices(subnodeContainer);
         }
 
         private static SubNodeContainer getSubNodeContainer(final String projectId, final NodeIDEnt workflowId,
             final VersionId versionId, final NodeIDEnt nodeId) throws NodeNotFoundException {
+            NodeContainer container = null;
             try {
-                var container = org.knime.gateway.impl.service.util.DefaultServiceUtil.getNodeContainer(projectId,
+                container = org.knime.gateway.impl.service.util.DefaultServiceUtil.getNodeContainer(projectId,
                     workflowId, versionId, nodeId);
-                if (container instanceof SubNodeContainer snc) {
-                    return snc;
-                }
-                throw new NodeNotFoundException("NodeContainer with id '" + nodeId + "' is not a SubNodeContainer.");
-            } catch (IllegalArgumentException e) {
-                throw new NodeNotFoundException(e.getMessage(), e);
+            } catch (IllegalStateException | IllegalArgumentException | NoSuchElementException e) {
+                throw NodeNotFoundException.builder().withTitle("Node with id '" + nodeId + "' not found.")
+                    .withDetails(e.getMessage()).canCopy(false).build();
             }
+            if (container instanceof SubNodeContainer snc) {
+                return snc;
+            }
+            throw NodeNotFoundException.builder().withTitle("Node with id '" + nodeId + "' is not a component.")
+                .withDetails().canCopy(false).build();
         }
 
         private static SubNodeContainer getSubNodeContainer(final String projectId, final NodeIDEnt workflowId,

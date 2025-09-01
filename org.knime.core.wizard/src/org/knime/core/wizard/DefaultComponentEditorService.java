@@ -122,7 +122,8 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             + componentViewLayout);
 
         if (componentViewLayout == null || componentViewLayout.isBlank()) {
-            throw new ServiceCallException("Component view layout is empty.");
+            throw ServiceCallException.builder().withTitle("Applying view layout failed")
+                .withDetails("Component view layout is empty.").canCopy(false).build();
         }
 
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
@@ -161,7 +162,8 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             + "): layout: " + componentConfigurationLayout);
 
         if (componentConfigurationLayout == null || componentConfigurationLayout.isBlank()) {
-            throw new ServiceCallException("Component configuration layout is empty.");
+            throw ServiceCallException.builder().withTitle("Applying configuration layout failed")
+                .withDetails("Component configuration layout is empty.").canCopy(false).build();
         }
 
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
@@ -340,9 +342,11 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             if (container instanceof SubNodeContainer snc) {
                 return snc;
             }
-            throw new ServiceCallException("NodeContainer with id '" + nodeId + "' is not a SubNodeContainer.");
+            throw ServiceCallException.builder().withTitle("Internal error")
+                .withDetails("Node with id '" + nodeId + "' is not a component.").canCopy(false).build();
         } catch (IllegalArgumentException | IllegalStateException e) {
-            throw new ServiceCallException(e.getMessage(), e);
+            throw ServiceCallException.builder().withTitle("Internal error")
+            .withDetails(e.getMessage()).canCopy(true).withCause(e).build();
         }
     }
 }
