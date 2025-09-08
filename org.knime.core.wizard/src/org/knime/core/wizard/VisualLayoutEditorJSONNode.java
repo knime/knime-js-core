@@ -62,7 +62,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 @JsonAutoDetect
 class VisualLayoutEditorJSONNode {
 
+
     private String m_nodeID;
+
+    private String m_templateId;
 
     private String m_name;
 
@@ -88,16 +91,17 @@ class VisualLayoutEditorJSONNode {
 
     /**
      * @param nodeID node id
+     * @param templateId the node's template id if it's a native node, otherwise {@code null}
      * @param name name of the node
      * @param description custom description of the node
      * @param layout the node's layout, if it is not a {@link LayoutTemplateProvider} then a default layout
-     * @param icon the url to the node's icon
      * @param availableInView if the node is displayed
      * @param type the node type (view, quickform, or nestedLayout)
      */
-    public VisualLayoutEditorJSONNode(final int nodeID, final String name, final String description,
-        final JSONLayoutContent layout, final boolean availableInView, final String type) {
+    public VisualLayoutEditorJSONNode(final int nodeID, final String templateId, final String name,
+        final String description, final JSONLayoutContent layout, final boolean availableInView, final String type) {
         m_nodeID = Integer.toString(nodeID);
+        m_templateId = templateId;
         // it doesn't seem to be possible to escape the apostrophe for the resulting script to be executed correctly
         // replacing it with a 'right single quotation mark' keeps the visual appearance
         m_name = StringEscapeUtils.escapeJava(name.replace("'", "’"));
@@ -119,6 +123,13 @@ class VisualLayoutEditorJSONNode {
      */
     public void setNodeID(final String nodeID) {
         m_nodeID = nodeID;
+    }
+
+    /**
+     * @return the node's template id if it's a native node, otherwise {@code null}
+     */
+    public String getTemplateId() {
+        return m_templateId;
     }
 
     /**

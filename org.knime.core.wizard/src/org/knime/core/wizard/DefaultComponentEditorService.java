@@ -243,6 +243,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             final SingleNodeContainer node = viewNode.getValue();
             final VisualLayoutEditorJSONNode jsonNode = new VisualLayoutEditorJSONNode( //
                 node.getID().getIndex(), //
+                getTemplateId(node), //
                 node.getName(), //
                 node.getNodeAnnotation().getText(), //
                 getLayout(viewNode.getValue(), viewNode.getKey()), //
@@ -260,6 +261,13 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         return nodes;
     }
 
+    private static String getTemplateId(final SingleNodeContainer nc) {
+        if (nc instanceof NativeNodeContainer nnc) {
+            return nnc.getNode().getFactory().getFactoryId();
+        }
+        return null;
+    }
+
     @SuppressWarnings("rawtypes")
     private static List<ConfigurationLayoutEditorJSONNode> createJSONConfigurationNodeList(
         final SubNodeContainer subNodeContainer, final Map<NodeIDSuffix, DialogNode> dialogNodes) {
@@ -273,6 +281,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
 
             final ConfigurationLayoutEditorJSONNode jsonNode = new ConfigurationLayoutEditorJSONNode( //
                 nodeContainer.getID().getIndex(), //
+                getTemplateId(nodeContainer), //
                 nodeContainer.getName(), //
                 nodeContainer.getNodeAnnotation().getText(), //
                 getConfigurationLayout(dialogNode.getValue(), dialogNode.getKey()), //
@@ -281,6 +290,13 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             nodes.add(jsonNode);
         }
         return nodes;
+    }
+
+    private static String getTemplateId(final NodeContainer nc) {
+        if (nc instanceof NativeNodeContainer nnc) {
+            return nnc.getNode().getFactory().getFactoryId();
+        }
+        return null;
     }
 
     private static String getType(final SingleNodeContainer node) {
