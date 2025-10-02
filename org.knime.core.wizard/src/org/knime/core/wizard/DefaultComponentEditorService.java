@@ -70,8 +70,10 @@ import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.util.VersionId;
+import org.knime.gateway.api.webui.entity.ComponentLayoutEnt;
 import org.knime.gateway.api.webui.service.ComponentEditorService;
 import org.knime.gateway.api.webui.service.util.ServiceExceptions.ServiceCallException;
+import org.knime.gateway.api.webui.util.EntityFactory;
 import org.knime.gateway.impl.service.util.DefaultServiceUtil;
 import org.knime.js.core.layout.DefaultConfigurationCreatorImpl;
 import org.knime.js.core.layout.DefaultLayoutCreatorImpl;
@@ -94,26 +96,62 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
     // ensure node layout is written the same as the metanode layout
     private static final ObjectMapper m_configuredObjectMapper = JSONLayoutPage.getConfiguredObjectMapper();
 
+    // TODO: Can we map the one thing to the other here? We should try.
+
     @Override
-    public String getViewNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
+    public ComponentLayoutEnt getLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
+        LOGGER.debug("getView called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
 
-        LOGGER.debug("getViewNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
+        final var viewLayout = getViewLayout(projectId, workflowId, nodeId);
+        final var viewNodesString = getViewNodes(projectId, workflowId, nodeId);
+        final var configurationLayout = getConfigurationLayout(projectId, workflowId, nodeId);
+        final var configurationNodesString = getConfigurationNodes(projectId, workflowId, nodeId);
 
-        return getViewNodesString(snc);
+        try {
+            final var viewNodesTree = m_configuredObjectMapper.readTree(viewNodesString);
+            final List<String> viewNodes = new ArrayList<>();
+            for (var node : viewNodesTree) {
+                viewNodes.add(m_configuredObjectMapper.writeValueAsString(node));
+            }
+
+            final var configurationNodesTree = m_configuredObjectMapper.readTree(configurationNodesString);
+            final List<String> configurationNodes = new ArrayList<>();
+            for (var node : configurationNodesTree) {
+                configurationNodes.add(m_configuredObjectMapper.writeValueAsString(node));
+            }
+
+            return EntityFactory.ComponentLayout.buildComponentLayoutEnt(viewLayout, viewNodes, configurationLayout,
+                configurationNodes);
+        } catch (JsonProcessingException e) {
+            LOGGER.error("Cannot parse JSON: " + e.getMessage(), e);
+            return null;
+        }
     }
 
     @Override
-    public String getViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
+    public void setLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
+        final ComponentLayoutEnt componentLayout) throws ServiceCallException {
+        // TODO Auto-generated method stub
+    }
+
+    private static String getViewNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
         throws ServiceCallException {
+        LOGGER.debug("getViewNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
+        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
+        return getViewNodesString(snc);
+    }
 
+    private static String getViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
+        throws ServiceCallException {
         LOGGER.debug("getViewLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
-
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         return snc.getSubnodeLayoutStringProvider().getLayoutString();
     }
 
+    /**
+     * TODO: Remove from API
+     */
     @Override
     public void setViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
         final String componentViewLayout) throws ServiceCallException {
@@ -134,26 +172,23 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         snc.setSubnodeLayoutStringProvider(layoutProvider);
     }
 
-    @Override
-    public String getConfigurationNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
-        throws ServiceCallException {
-
+    private static String getConfigurationNodes(final String projectId, final NodeIDEnt workflowId,
+        final NodeIDEnt nodeId) throws ServiceCallException {
         LOGGER.debug("getConfigurationNodes called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-
         return getConfigurationNodesString(snc);
     }
 
-    @Override
-    public String getConfigurationLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
-        throws ServiceCallException {
-
+    private static String getConfigurationLayout(final String projectId, final NodeIDEnt workflowId,
+        final NodeIDEnt nodeId) throws ServiceCallException {
         LOGGER.debug("getConfigurationLayout called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
-
         var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         return snc.getSubnodeConfigurationLayoutStringProvider().getConfigurationLayoutString();
     }
 
+    /**
+     * TODO: Remove from API
+     */
     @Override
     public void setConfigurationLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
         final String componentConfigurationLayout) throws ServiceCallException {
