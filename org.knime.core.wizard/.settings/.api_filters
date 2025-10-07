@@ -8,4 +8,42 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src/org/knime/core/wizard/DefaultComponentEditorService.java" type="org.knime.core.wizard.DefaultComponentEditorService">
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="getConfigurationLayout(String, NodeIDEnt, NodeIDEnt)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="getConfigurationNodes(String, NodeIDEnt, NodeIDEnt)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="getViewLayout(String, NodeIDEnt, NodeIDEnt)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="getViewNodes(String, NodeIDEnt, NodeIDEnt)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="setConfigurationLayout(String, NodeIDEnt, NodeIDEnt, String)"/>
+            </message_arguments>
+        </filter>
+        <filter id="421572723">
+            <message_arguments>
+                <message_argument value="org.knime.core.wizard.DefaultComponentEditorService"/>
+                <message_argument value="setViewLayout(String, NodeIDEnt, NodeIDEnt, String)"/>
+            </message_arguments>
+        </filter>
+    </resource>
 </component>
