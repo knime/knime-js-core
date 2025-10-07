@@ -60,6 +60,8 @@ import java.util.Map.Entry;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.dialog.DialogNode;
+import org.knime.core.node.port.report.ReportConfiguration;
+import org.knime.core.node.port.report.ReportUtil;
 import org.knime.core.node.wizard.ViewHideable;
 import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
@@ -104,10 +106,12 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         final NodeIDEnt nodeId) throws ServiceCallException {
         LOGGER.debug("getComponentEditorState called (" + projectId + ", " + workflowId + ", " + nodeId + ").");
 
-        final var viewLayout = getViewLayout(projectId, workflowId, nodeId);
-        final var viewNodesString = getViewNodes(projectId, workflowId, nodeId);
-        final var configurationLayout = getConfigurationLayout(projectId, workflowId, nodeId);
-        final var configurationNodesString = getConfigurationNodes(projectId, workflowId, nodeId);
+        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
+        final var viewLayout = snc.getSubnodeLayoutStringProvider().getLayoutString();
+        final var viewNodesString = getViewNodesString(snc);
+        final var configurationLayout =
+            snc.getSubnodeConfigurationLayoutStringProvider().getConfigurationLayoutString();
+        final var configurationNodesString = getConfigurationNodesString(snc);
 
         try {
             final var viewNodesTree = m_configuredObjectMapper.readTree(viewNodesString);
@@ -122,16 +126,20 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
                 configurationNodes.add(m_configuredObjectMapper.writeValueAsString(node));
             }
 
-            return buildComponentEditorStateEnt(viewLayout, viewNodes, configurationLayout, configurationNodes);
+            final Boolean isReportingEnabled =
+                ReportUtil.isReportingExtensionInstalled() ? snc.getReportConfiguration().isPresent() : null;
+            return buildComponentEditorStateEnt(isReportingEnabled, viewLayout, viewNodes, configurationLayout,
+                configurationNodes);
         } catch (JsonProcessingException e) {
             LOGGER.error("Cannot parse JSON: " + e.getMessage(), e);
             return null;
         }
     }
 
-    private static ComponentEditorStateEnt buildComponentEditorStateEnt(final String viewLayout,
-        final List<String> viewNodes, final String configurationLayout, final List<String> configurationNodes) {
-        final var config = buildComponentEditorConfigEnt(viewLayout, configurationLayout);
+    private static ComponentEditorStateEnt buildComponentEditorStateEnt(final Boolean isReportingEnabled,
+        final String viewLayout, final List<String> viewNodes, final String configurationLayout,
+        final List<String> configurationNodes) {
+        final var config = buildComponentEditorConfigEnt(isReportingEnabled, viewLayout, configurationLayout);
         return builder(ComponentEditorStateEntBuilder.class) //
             .setConfig(config) //
             .setViewNodes(viewNodes) //
@@ -139,9 +147,10 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             .build();
     }
 
-    private static ComponentEditorConfigEnt buildComponentEditorConfigEnt(final String viewLayout,
-        final String configurationLayout) {
+    private static ComponentEditorConfigEnt buildComponentEditorConfigEnt(final Boolean isReportingEnabled,
+        final String viewLayout, final String configurationLayout) {
         return builder(ComponentEditorConfigEntBuilder.class) //
+            .setReportingEnabled(isReportingEnabled) //
             .setViewLayout(viewLayout) //
             .setConfigurationLayout(configurationLayout) //
             .build();
@@ -152,34 +161,22 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         final ComponentEditorConfigEnt config) throws ServiceCallException {
         LOGGER.debug("applyComponentEditorConfig called (" + projectId + ", " + workflowId + ", " + nodeId
             + "): config: " + config);
-        setViewLayout(projectId, workflowId, nodeId, config.getViewLayout());
-        setConfigurationLayout(projectId, workflowId, nodeId, config.getConfigurationLayout());
+
+        final var snc = getSubNodeContainer(projectId, workflowId, nodeId);
+        final ReportConfiguration reportConfig =
+            Boolean.TRUE.equals(config.isReportingEnabled()) ? ReportConfiguration.INSTANCE : null;
+        snc.getParent().changeSubNodeReportOutput(snc.getID(), reportConfig);
+
+        setViewLayout(snc, config.getViewLayout());
+        setConfigurationLayout(snc, config.getConfigurationLayout());
     }
 
-    private static String getViewNodes(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
+    private static void setViewLayout(final SubNodeContainer snc, final String componentViewLayout)
         throws ServiceCallException {
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-        return getViewNodesString(snc);
-    }
-
-    private static String getViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId)
-        throws ServiceCallException {
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-        return snc.getSubnodeLayoutStringProvider().getLayoutString();
-    }
-
-    private static void setViewLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
-        final String componentViewLayout) throws ServiceCallException {
-
-        LOGGER.info("pushLayout called (" + projectId + ", " + workflowId + ", " + nodeId + "): layout: "
-            + componentViewLayout);
-
         if (componentViewLayout == null || componentViewLayout.isBlank()) {
             throw ServiceCallException.builder().withTitle("Applying view layout failed")
                 .withDetails("Component view layout is empty.").canCopy(false).build();
         }
-
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
 
         var layoutProvider = snc.getSubnodeLayoutStringProvider();
         layoutProvider.setLayoutString(componentViewLayout);
@@ -187,36 +184,20 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         snc.setSubnodeLayoutStringProvider(layoutProvider);
     }
 
-    private static String getConfigurationNodes(final String projectId, final NodeIDEnt workflowId,
-        final NodeIDEnt nodeId) throws ServiceCallException {
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-        return getConfigurationNodesString(snc);
-    }
-
-    private static String getConfigurationLayout(final String projectId, final NodeIDEnt workflowId,
-        final NodeIDEnt nodeId) throws ServiceCallException {
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-        return snc.getSubnodeConfigurationLayoutStringProvider().getConfigurationLayoutString();
-    }
-
-    private static void setConfigurationLayout(final String projectId, final NodeIDEnt workflowId, final NodeIDEnt nodeId,
-        final String componentConfigurationLayout) throws ServiceCallException {
-
+    private static void setConfigurationLayout(final SubNodeContainer snc, final String componentConfigurationLayout)
+        throws ServiceCallException {
         if (componentConfigurationLayout == null || componentConfigurationLayout.isBlank()) {
             throw ServiceCallException.builder().withTitle("Applying configuration layout failed")
                 .withDetails("Component configuration layout is empty.").canCopy(false).build();
         }
 
-        var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         var layoutProvider = snc.getSubnodeConfigurationLayoutStringProvider();
 
         layoutProvider.setConfigurationLayoutString(componentConfigurationLayout);
         snc.setSubnodeConfigurationStringProvider(layoutProvider);
-
     }
 
     private static String getViewNodesString(final SubNodeContainer subNodeContainer) {
-
         final List<VisualLayoutEditorJSONNode> nodes =
             createJSONViewNodeList(getViewValues(subNodeContainer.getWorkflowManager()));
 
