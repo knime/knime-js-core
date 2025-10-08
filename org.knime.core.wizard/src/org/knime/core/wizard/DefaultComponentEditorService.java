@@ -48,7 +48,6 @@
  */
 package org.knime.core.wizard;
 
-import static org.knime.core.node.wizard.page.WizardPageUtil.isWizardPageNode;
 import static org.knime.gateway.api.entity.EntityBuilderManager.builder;
 
 import java.util.ArrayList;
@@ -57,12 +56,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeModel;
 import org.knime.core.node.dialog.DialogNode;
 import org.knime.core.node.port.report.ReportConfiguration;
 import org.knime.core.node.port.report.ReportUtil;
 import org.knime.core.node.wizard.ViewHideable;
+import org.knime.core.node.wizard.WizardNodeFactoryExtension;
+import org.knime.core.node.wizard.page.WizardPageContribution;
 import org.knime.core.node.wizard.page.WizardPageUtil;
 import org.knime.core.node.workflow.NativeNodeContainer;
 import org.knime.core.node.workflow.NodeContainer;
@@ -169,12 +171,28 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             + "): config: " + config);
 
         final var snc = getSubNodeContainer(projectId, workflowId, nodeId);
-        final ReportConfiguration reportConfig =
-            config.getReporting() == ReportingEnum.ENABLED ? ReportConfiguration.INSTANCE : null;
-        snc.getParent().changeSubNodeReportOutput(snc.getID(), reportConfig);
+        try (var lock = snc.lock()) {
+            final ReportConfiguration reportConfig =
+                config.getReporting() == ReportingEnum.ENABLED ? ReportConfiguration.INSTANCE : null;
+            snc.getParent().changeSubNodeReportOutput(snc.getID(), reportConfig);
 
-        setViewLayout(snc, config.getViewLayout());
-        setConfigurationLayout(snc, config.getConfigurationLayout());
+            setViewLayout(snc, config.getViewLayout());
+            setConfigurationLayout(snc, config.getConfigurationLayout());
+
+            var legacyViewNodes = config.getLegacyViewNodes();
+            if (legacyViewNodes != null && !legacyViewNodes.isEmpty()) {
+                for (var legacyViewNode : legacyViewNodes) {
+                    var id = NodeIDSuffix.fromString(legacyViewNode.getNodeId())
+                        .prependParent(snc.getWorkflowManager().getID());
+                    try {
+                        snc.setHideNodeFromWizard(id, !legacyViewNode.isAvailableInView());
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.error("Unable to set hide in wizard flag on node: " + e.getMessage(), e);
+                    }
+                }
+
+            }
+        }
     }
 
     private static void setViewLayout(final SubNodeContainer snc, final String componentViewLayout)
@@ -333,10 +351,14 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         } else if (node instanceof NativeNodeContainer) {
             NativeNodeContainer nnc = (NativeNodeContainer)node;
             NodeModel model = nnc.getNodeModel();
-            if (isWizardPageNode(nnc)) {
+            NodeFactory<NodeModel> factory = nnc.getNode().getFactory();
+            if (factory instanceof WizardNodeFactoryExtension) {
                 if (model instanceof DialogNode) {
                     return "quickform";
                 }
+                return "legacyView";
+            }
+            if (factory instanceof WizardPageContribution && ((WizardPageContribution)factory).hasNodeView()) {
                 return "view";
             }
             if (model instanceof DialogNode) {
