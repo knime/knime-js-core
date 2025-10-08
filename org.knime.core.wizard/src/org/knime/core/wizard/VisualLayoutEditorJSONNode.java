@@ -75,8 +75,6 @@ class VisualLayoutEditorJSONNode {
 
     private boolean m_availableInView;
 
-    private String m_preview;
-
     private String m_type;
 
     /**
@@ -190,21 +188,6 @@ class VisualLayoutEditorJSONNode {
      */
     public void setAvailableInView(final boolean availableInView) {
         m_availableInView = availableInView;
-    }
-
-    /**
-     * @return the preview
-     */
-    public String getPreview() {
-        return m_preview;
-    }
-
-    /**
-     *
-     * @param preview the preview to set
-     */
-    public void setPreview(final String preview) {
-        m_preview = preview;
     }
 
     /**
