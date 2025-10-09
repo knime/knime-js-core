@@ -75,6 +75,7 @@ import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.util.VersionId;
 import org.knime.gateway.api.webui.entity.ComponentEditorConfigEnt;
 import org.knime.gateway.api.webui.entity.ComponentEditorConfigEnt.ComponentEditorConfigEntBuilder;
+import org.knime.gateway.api.webui.entity.ComponentEditorConfigEnt.ReportingEnum;
 import org.knime.gateway.api.webui.entity.ComponentEditorStateEnt;
 import org.knime.gateway.api.webui.entity.ComponentEditorStateEnt.ComponentEditorStateEntBuilder;
 import org.knime.gateway.api.webui.service.ComponentEditorService;
@@ -126,9 +127,14 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
                 configurationNodes.add(m_configuredObjectMapper.writeValueAsString(node));
             }
 
-            final Boolean isReportingEnabled =
-                ReportUtil.isReportingExtensionInstalled() ? snc.getReportConfiguration().isPresent() : null;
-            return buildComponentEditorStateEnt(isReportingEnabled, viewLayout, viewNodes, configurationLayout,
+            final ReportingEnum reportingFlag;
+            if (ReportUtil.isReportingExtensionInstalled()) {
+                reportingFlag =
+                    snc.getReportConfiguration().isPresent() ? ReportingEnum.ENABLED : ReportingEnum.DISABLED;
+            } else {
+                reportingFlag = ReportingEnum.NOT_AVAILABLE;
+            }
+            return buildComponentEditorStateEnt(reportingFlag, viewLayout, viewNodes, configurationLayout,
                 configurationNodes);
         } catch (JsonProcessingException e) {
             LOGGER.error("Cannot parse JSON: " + e.getMessage(), e);
@@ -136,10 +142,10 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
         }
     }
 
-    private static ComponentEditorStateEnt buildComponentEditorStateEnt(final Boolean isReportingEnabled,
+    private static ComponentEditorStateEnt buildComponentEditorStateEnt(final ReportingEnum reportingFlag,
         final String viewLayout, final List<String> viewNodes, final String configurationLayout,
         final List<String> configurationNodes) {
-        final var config = buildComponentEditorConfigEnt(isReportingEnabled, viewLayout, configurationLayout);
+        final var config = buildComponentEditorConfigEnt(reportingFlag, viewLayout, configurationLayout);
         return builder(ComponentEditorStateEntBuilder.class) //
             .setConfig(config) //
             .setViewNodes(viewNodes) //
@@ -147,10 +153,10 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
             .build();
     }
 
-    private static ComponentEditorConfigEnt buildComponentEditorConfigEnt(final Boolean isReportingEnabled,
+    private static ComponentEditorConfigEnt buildComponentEditorConfigEnt(final ReportingEnum reportingFlag,
         final String viewLayout, final String configurationLayout) {
         return builder(ComponentEditorConfigEntBuilder.class) //
-            .setReportingEnabled(isReportingEnabled) //
+            .setReporting(reportingFlag) //
             .setViewLayout(viewLayout) //
             .setConfigurationLayout(configurationLayout) //
             .build();
@@ -164,7 +170,7 @@ public final class DefaultComponentEditorService implements ComponentEditorServi
 
         final var snc = getSubNodeContainer(projectId, workflowId, nodeId);
         final ReportConfiguration reportConfig =
-            Boolean.TRUE.equals(config.isReportingEnabled()) ? ReportConfiguration.INSTANCE : null;
+            config.getReporting() == ReportingEnum.ENABLED ? ReportConfiguration.INSTANCE : null;
         snc.getParent().changeSubNodeReportOutput(snc.getID(), reportConfig);
 
         setViewLayout(snc, config.getViewLayout());
