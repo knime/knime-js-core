@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SWT Browser for JavaScript Views
 Bundle-SymbolicName: org.knime.js.swt;singleton:=true
-Bundle-Version: 5.8.0.qualifier
+Bundle-Version: 5.8.1.qualifier
 Bundle-Vendor: KNIME AG, Zurich, Switzerland
 Require-Bundle: org.knime.core;bundle-version="[5.8.0,6.0.0)",
  com.fasterxml.jackson.core.jackson-core;bundle-version="[2.10.2,3.0.0)",
