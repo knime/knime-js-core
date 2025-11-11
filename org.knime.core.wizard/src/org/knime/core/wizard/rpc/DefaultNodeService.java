@@ -70,6 +70,8 @@ import org.knime.core.webui.node.DataServiceManager;
 import org.knime.core.webui.node.NodePortWrapper;
 import org.knime.core.webui.node.NodeWrapper;
 import org.knime.core.webui.node.dialog.NodeDialogManager;
+import org.knime.core.webui.node.dialog.scripting.kai.CodeKaiHandler;
+import org.knime.core.webui.node.dialog.scripting.kai.CodeKaiHandler.ProjectId;
 import org.knime.core.webui.node.port.PortViewManager;
 import org.knime.core.webui.node.view.NodeViewManager;
 import org.knime.core.webui.node.view.table.TableViewManager;
@@ -77,8 +79,6 @@ import org.knime.gateway.api.entity.NodeIDEnt;
 import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.api.util.VersionId;
 import org.knime.gateway.api.webui.entity.SelectionEventEnt;
-import org.knime.gateway.impl.webui.kai.CodeKaiHandler;
-import org.knime.gateway.impl.webui.kai.CodeKaiHandler.ProjectId;
 import org.knime.gateway.impl.webui.kai.KaiHandlerFactoryRegistry;
 import org.knime.gateway.impl.webui.service.events.SelectionEventBus;
 
