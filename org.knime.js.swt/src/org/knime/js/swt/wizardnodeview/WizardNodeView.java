@@ -401,8 +401,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
                     if (hasData && (url = getViewURL().orElse(null)) != null) {
                         onPageLoaded(() -> {
                             var pageCreationHelper = createWizardPageCreationHelper();
-                            initializeJsonRpcJavaBrowserCommunication(
-                                createJsonRpcFunction(getNodeContainer(), getViewableModel(), pageCreationHelper));
+                            var jsonRpcFunction =
+                                createJsonRpcFunction(getNodeContainer(), getViewableModel(), pageCreationHelper);
+                            if (jsonRpcFunction != null) {
+                                initializeJsonRpcJavaBrowserCommunication(jsonRpcFunction);
+                            }
                             return createInitScript(pageCreationHelper);
                         });
                         m_browserWrapper.setUrl(url);
@@ -512,8 +515,11 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
         if (snc instanceof SubNodeContainer) {
             return new JsonRpcFunction((SubNodeContainer)snc,
                 ((SubnodeViewableModel)viewableModel).createReexecutionService(pageCreationHelper), false);
+        } else if (snc instanceof NativeNodeContainer nnc) {
+            return new JsonRpcFunction(nnc);
         } else {
-            return new JsonRpcFunction((NativeNodeContainer)snc);
+            // in case of the legacy remote workflow editor
+            return null;
         }
     }
 
@@ -727,15 +733,17 @@ public class WizardNodeView<T extends ViewableModel & WizardNode<REP, VAL>,
             m_nodeStateChangeListener = null;
         }
 
-        List<NativeNodeContainer> viewNodes;
+        List<NativeNodeContainer> viewNodes = null;
         if (nc instanceof NativeNodeContainer) {
             viewNodes = Collections.singletonList((NativeNodeContainer)nc);
-        } else {
+        } else if (nc != null) {
             viewNodes = WizardPageUtil.getWizardPageNodes(((SubNodeContainer)nc).getWorkflowManager(), true);
         }
         var nvm = NodeViewManager.getInstance();
-        viewNodes.stream().filter(NodeViewManager::hasNodeView)
-            .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
+        if (viewNodes != null) {
+            viewNodes.stream().filter(NodeViewManager::hasNodeView)
+                .forEach(nnc -> nvm.getDataServiceManager().deactivateDataServices(NodeWrapper.of(nnc)));
+        }
 
     }
 
