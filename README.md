@@ -13,7 +13,7 @@ This repository contains the source code of the [KNIME Analytics Platform](http:
 
 
 ### Development
-Instructions for how to develop extensions for KNIME Analytics Platform can be found in the _knime-sdk-setup_ repository on [BitBucket](https://bitbucket.org/KNIME/knime-sdk-setup) or [GitHub](http://github.com/knime/knime-sdk-setup).
+Instructions for how to develop extensions for KNIME Analytics Platform can be found in the _knime-sdk-setup_ repository on [GitHub](http://github.com/knime/knime-sdk-setup).
 
 ### Join the Community!
 * [KNIME Forum](https://tech.knime.org/forum)
