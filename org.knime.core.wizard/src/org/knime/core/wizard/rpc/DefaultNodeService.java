@@ -102,7 +102,7 @@ public class DefaultNodeService implements NodeService {
      * @param nnc The {@link NativeNodeContainer}
      */
     DefaultNodeService(final NativeNodeContainer nnc) {
-        var validId = new NodeIDEnt(nnc.getID()).toString();
+        var validId = new NodeIDEnt(nnc.getID(), nnc.getParent()).toString();
         m_getNodeWrapper = id -> id.equals(validId) ? NodeWrapper.of(nnc) : null;
     }
 
