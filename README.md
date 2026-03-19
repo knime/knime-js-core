@@ -1,7 +1,7 @@
 # KNIME® JS Core
 
 [![Jenkins](https://jenkins.knime.com/buildStatus/icon?job=knime-js-core%2Fmaster)](https://jenkins.knime.com/job/knime-js-core/job/master/)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=KNIME_knime-js-core&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=KNIME_knime-js-core)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=knime_knime-js-core&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=knime_knime-js-core)
 
 This repository is maintained by the [KNIME UI Extensions Development Team](mailto:team-ui-extensions@knime.com).
 
