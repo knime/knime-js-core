@@ -110,8 +110,6 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(JavaScriptViewCreator.class);
 
-    private static final String SINGLE_NODE_ID = "SINGLE";
-
     static final String SINGLE_PAGE_NODE_NAME = "Single Node Page";
 
     private static File tempFolder;
@@ -595,7 +593,7 @@ public class JavaScriptViewCreator<REP extends WebViewContent, VAL extends WebVi
 
         private Map<String, JSONWebNode> createNodesMap(final JSONWebNode node) {
             Map<String, JSONWebNode> nodesMap = new HashMap<String, JSONWebNode>();
-            nodesMap.put(SINGLE_NODE_ID, node);
+            nodesMap.put(JSONWebNodePage.SINGLE_NODE_ID, node);
             return nodesMap;
         }
 

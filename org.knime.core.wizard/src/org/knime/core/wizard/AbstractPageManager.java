@@ -52,12 +52,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.knime.core.node.NodeLogger;
+import org.knime.core.node.port.report.ReportUtil.ImageFormat;
 import org.knime.core.node.property.hilite.HiLiteManager;
 import org.knime.core.node.property.hilite.HiLiteTranslator;
 import org.knime.core.node.util.CheckUtils;
@@ -79,6 +82,8 @@ import org.knime.core.node.workflow.SubNodeContainer;
 import org.knime.core.node.workflow.WorkflowLock;
 import org.knime.core.node.workflow.WorkflowManager;
 import org.knime.core.webui.node.view.NodeViewManager;
+import org.knime.core.wizard.rpc.JsonRpcFunction;
+import org.knime.gateway.api.entity.NodeViewEnt;
 import org.knime.gateway.api.entity.UIExtensionEnt;
 import org.knime.js.core.JSONViewContent;
 import org.knime.js.core.JSONWebNode;
@@ -107,6 +112,71 @@ import com.fasterxml.jackson.databind.ObjectReader;
  * @since 3.4
  */
 public abstract class AbstractPageManager {
+
+    /**
+     * Creates a {@link JSONWebNodePage} for a single node configured for image generation.
+     *
+     * @param nnc the native node container whose view is to be rendered as an image
+     * @param imageFormat the format of the image to generate
+     * @param callbackId the callback ID used to signal completion of the image generation
+     * @return a new {@link JSONWebNodePage} ready for image generation
+     * @since 5.12
+     */
+    public static JSONWebNodePage createWizardPageForImageGeneration(final NativeNodeContainer nnc,
+        final ImageFormat imageFormat, final String callbackId) {
+        // TODO initial selection is always empty for now; revisit in UIEXT-725
+        final var nodeViewEnt =
+            NodeViewEnt.createForImageGeneration(nnc, Collections::emptyList, imageFormat, callbackId);
+        return JSONWebNodePage.create(JSONWebNodePage.SINGLE_NODE_ID, null,
+            Map.of(JSONWebNodePage.SINGLE_NODE_ID, nodeViewEnt));
+    }
+
+    /**
+     * Creates a {@link WizardPageForReportGeneration} for a component (composite view) configured for report
+     * generation. The returned record contains the {@link JSONWebNodePage} and a JSON-RPC function for communicating
+     * with the page's nodes.
+     *
+     * @param snc the sub-node container (component) to render as part of a report
+     * @param imageFormat the format of the images to generate within the report
+     * @param callbackId the callback ID used to trigger the generated-report action
+     * @return a {@link WizardPageForReportGeneration} holding the page and its JSON-RPC function
+     * @since 5.12
+     */
+    public static WizardPageForReportGeneration createWizardPageForReportGeneration(final SubNodeContainer snc,
+        final ImageFormat imageFormat, final String callbackId) {
+        try {
+            WizardPageCreationHelper pageCreationHelper =
+                nnc -> NodeViewEnt.createForReportGeneration(nnc, null, imageFormat);
+            var cvpm = CompositeViewPageManager.of(snc.getParent());
+            var page = cvpm.createWizardPage(snc.getID(), pageCreationHelper);
+            setGeneratedReportActionId(page, callbackId);
+            var jsonRpcFunction = new JsonRpcFunction(snc, null, false);
+            return new WizardPageForReportGeneration(page, jsonRpcFunction::call);
+        } catch (IOException e) {
+            // should never happen
+            throw new IllegalStateException("Wizard page couldn't be created", e);
+        }
+    }
+
+    private static void setGeneratedReportActionId(final JSONWebNodePage page, final String actionId) {
+        // hacky for the sake of time
+        var oldConfig = page.getWebNodePageConfiguration();
+        var newConfig = new JSONWebNodePageConfiguration(oldConfig.getLayout(), oldConfig.getBlackBoard(),
+            oldConfig.getSelectionTranslators(), oldConfig.getProjectRelativePageIDSuffix(),
+            /* the important part: */ actionId);
+        page.setWebNodePageConfiguration(newConfig);
+    }
+
+    /**
+     * Aggregates a {@link JSONWebNodePage} configured for report generation together with the JSON-RPC function that
+     * handles interaction with the page's nodes.
+     *
+     * @param page the wizard page configured for report generation
+     * @param jsonRpcFunction a function that accepts a JSON-RPC request string and returns the response string
+     * @since 5.12
+     */
+    public static record WizardPageForReportGeneration(JSONWebNodePage page, UnaryOperator<String> jsonRpcFunction) {
+    }
 
     private static final NodeLogger LOGGER = NodeLogger.getLogger(AbstractPageManager.class);
 
