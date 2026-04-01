@@ -486,21 +486,21 @@ window.KnimeBaseTableViewer.prototype._buildColumnDefinitions = function () {
             };
             colDef.className += ' knime-datetime';
         }
-        if (knimeColType === 'Local Date' && this._representation.dateTimeFormats.globalLocalDateFormat) {
+        if (knimeColType === 'Date' && this._representation.dateTimeFormats.globalLocalDateFormat) {
             colDef.render = function (data, type, full, meta) {
                 return formatDateTime(data, type, self._representation.dateTimeFormats.globalLocalDateFormat);
             };
             colDef.className += ' knime-datetime knime-date';
         }
 
-        if (knimeColType === 'Local Date Time' && this._representation.dateTimeFormats.globalLocalDateTimeFormat) {
+        if (knimeColType === 'Date&time (Local)' && this._representation.dateTimeFormats.globalLocalDateTimeFormat) {
             colDef.render = function (data, type, full, meta) {
                 return formatDateTime(data, type, self._representation.dateTimeFormats.globalLocalDateTimeFormat);
             };
             colDef.className += ' knime-datetime';
         }
 
-        if (knimeColType === 'Local Time' && this._representation.dateTimeFormats.globalLocalTimeFormat) {
+        if (knimeColType === 'Time' && this._representation.dateTimeFormats.globalLocalTimeFormat) {
             colDef.render = function (data, type, full, meta) {
                 return formatDateTime(moment(data, 'hh:mm:ss.SSSSSSSSS'), type,
                     self._representation.dateTimeFormats.globalLocalTimeFormat);
@@ -508,7 +508,7 @@ window.KnimeBaseTableViewer.prototype._buildColumnDefinitions = function () {
             colDef.className += ' knime-datetime knime-time';
         }
 
-        if (knimeColType === 'Zoned Date Time' && this._representation.dateTimeFormats.globalZonedDateTimeFormat) {
+        if (knimeColType === 'Date&time (Zoned)' && this._representation.dateTimeFormats.globalZonedDateTimeFormat) {
             colDef.render = function (data, type, full, meta) {
                 var regex = /(.*)\[(.*)\]$/;
                 var match = regex.exec(data);
@@ -531,7 +531,7 @@ window.KnimeBaseTableViewer.prototype._buildColumnDefinitions = function () {
             colDef.className += ' knime-datetime knime-timezone';
         }
         if (colType === 'number') {
-            if (this._knimeTable.getKnimeColumnTypes()[i].indexOf('double') > -1) {
+            if (knimeColType === 'Number (Float)') {
                 if (this._representation.enableGlobalNumberFormat) {
                     colDef.render = function (data, type, full, meta) {
                         if (!$.isNumeric(data)) {
