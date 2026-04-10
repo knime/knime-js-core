@@ -49,6 +49,7 @@
 package org.knime.js.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.DirectoryStream;
@@ -85,7 +86,7 @@ public final class WebResourceFileUtil {
     /**
      * Name of the page-builders 'index'-html (i.e. the html-document that bootstraps the page-builder).
      */
-    public static final String PAGEBUILDER_AP_WRAPPER_HTML_DOC = "/apWrapper.html";
+    public static final String PAGEBUILDER_AP_WRAPPER_HTML_DOC = "apWrapper.html";
 
     private static final Bundle PAGEBUILDER_BUNDLE = Platform.getBundle("org.knime.js.pagebuilder");
 
@@ -105,7 +106,7 @@ public final class WebResourceFileUtil {
      * @throws IOException
      */
     public static URL getPageBuilderResourceFileURL(final String path) throws IOException {
-        var url = PAGEBUILDER_BUNDLE.getEntry("dist/app" + path);
+        var url = PAGEBUILDER_BUNDLE.getEntry("dist/app/" + path);
         url = FileLocator.toFileURL(url); // handles null might leave space chars (see eclipse bug 145096)
         if (url == null) {
             return null;
@@ -114,6 +115,26 @@ public final class WebResourceFileUtil {
             url = file.toURI().toURL();
         }
         return url;
+    }
+
+    /**
+     * Open the {@link InputStream} for a pagebuilder resource (e.g. fonts) at the given relative path (relative to the
+     * assets-folder of the pagebuilder build artifacts).
+     *
+     * @param relativeResourcePath
+     * @return the input stream or {@code null} if the resource couldn't be read
+     * @since 5.9
+     */
+    public static InputStream openPageBuilderResourceStream(final String relativeResourcePath) {
+        var url =
+            PAGEBUILDER_BUNDLE.getEntry("/dist/app/org/knime/core/ui/pagebuilder/app/assets/" + relativeResourcePath);
+        try {
+            return FileLocator.toFileURL(url).openStream();
+        } catch (Exception e) { // NOSONAR
+            NodeLogger.getLogger(WebResourceFileUtil.class)
+                .warn("Pagebuilder resource '" + relativeResourcePath + "' couldn't be read", e);
+            return null;
+        }
     }
 
     /**

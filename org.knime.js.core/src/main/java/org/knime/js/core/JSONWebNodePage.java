@@ -46,6 +46,11 @@
  */
 package org.knime.js.core;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -55,9 +60,14 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.KNIMEConstants;
+import org.knime.core.node.NodeLogger;
 import org.knime.core.node.NodeSettingsRO;
 import org.knime.core.node.NodeSettingsWO;
 import org.knime.gateway.api.entity.UIExtensionEnt;
+import org.knime.js.core.layout.bs.JSONLayoutColumn;
+import org.knime.js.core.layout.bs.JSONLayoutPage;
+import org.knime.js.core.layout.bs.JSONLayoutRow;
+import org.knime.js.core.layout.bs.JSONLayoutViewContent;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -72,10 +82,82 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
 public class JSONWebNodePage extends JSONViewContent {
 
+    /**
+     * Node ID used when a page contains a single node view (as opposed to a composite/wizard page with multiple nodes).
+     *
+     * @since 5.9
+     */
+    public static final String SINGLE_NODE_ID = "SINGLE";
+
     private final String m_version;
     private JSONWebNodePageConfiguration m_configuration;
     private Map<String, JSONWebNode> m_webNodes;
     private Map<String, UIExtensionEnt> m_nodeViews;
+
+    /**
+     * Factory method creating a {@link JSONWebNodePage} from a map of {@link UIExtensionEnt} node view entities with a
+     * generated layout. If both {@code viewId} and {@code dialogNodeId} are non-null, the layout uses a split view
+     * (dialog occupying 3 columns, view occupying 9 columns). Pass {@code null} for either ID to omit that pane.
+     *
+     * @param viewId the node ID to place in the view pane, or {@code null} if there is no view
+     * @param dialogNodeId the node ID to place in the dialog pane, or {@code null} if there is no dialog
+     * @param ents map from node ID to {@link UIExtensionEnt}
+     * @return a new {@link JSONWebNodePage}
+     *
+     * @since 5.9
+     */
+    public static JSONWebNodePage create(final String viewId, final String dialogNodeId,
+        final Map<String, UIExtensionEnt> ents) {
+        var layoutPage = createJSONLayoutPage(viewId, dialogNodeId);
+        var webNodePageConfig = new JSONWebNodePageConfiguration(layoutPage, null, null, null);
+        return new JSONWebNodePage(webNodePageConfig, Collections.emptyMap(), ents);
+    }
+
+    /**
+     * @return the resulting {@link JSONLayoutPage}
+     */
+    private static JSONLayoutPage createJSONLayoutPage(final String viewId, final String dialogNodeId) {
+        JSONLayoutColumn viewColumn = null;
+        JSONLayoutColumn dialogColumn = null;
+        String id;
+        if ((id = viewId) != null) {
+            viewColumn = new JSONLayoutColumn();
+            var content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID(id);
+            viewColumn.setContent(List.of(content));
+        }
+        if ((id = dialogNodeId) != null) {
+            dialogColumn = new JSONLayoutColumn();
+            var content = new JSONLayoutViewContent();
+            content.setUseLegacyMode(false);
+            content.setNodeID(id);
+            dialogColumn.setContent(List.of(content));
+            if (viewColumn != null) {
+                try { // update layout for split view
+                    dialogColumn.setWidthXS(3);
+                    viewColumn.setWidthXS(9);
+                } catch (IOException e) {
+                    // Do nothing as JSONMappingException is never thrown.
+                }
+            }
+        }
+
+        var row = new JSONLayoutRow();
+        if (viewColumn != null) {
+            row.addColumn(viewColumn);
+        }
+        if (dialogColumn != null) {
+            row.addColumn(dialogColumn);
+        }
+        List<JSONLayoutRow> layoutRowList = new ArrayList<>();
+        layoutRowList.add(row);
+
+        var layoutPage = new JSONLayoutPage();
+        layoutPage.setParentLayoutLegacyMode(false);
+        layoutPage.setRows(layoutRowList);
+        return layoutPage;
+    }
 
     /**
      * @param configuration
@@ -223,5 +305,22 @@ public class JSONWebNodePage extends JSONViewContent {
                 .append(m_configuration)
                 .append(m_webNodes)
                 .toHashCode();
+    }
+
+    /**
+     * Serializes this page to a JSON string with escaped backslashes and single quotes, suitable for embedding in a
+     * JavaScript string literal.
+     *
+     * @return the JSON representation of this page, or {@code null} if serialization fails
+     * @since 5.9
+     */
+    public String toJsonString() {
+        try (@SuppressWarnings("resource")
+        var stream = (ByteArrayOutputStream)saveToStream()) {
+            return stream.toString(StandardCharsets.UTF_8).replace("\\", "\\\\").replace("'", "\\'");
+        } catch (IOException e) {
+            NodeLogger.getLogger(getClass()).error("Failed to serialize JSONWebNodePage to JSON string", e);
+            return null;
+        }
     }
 }
